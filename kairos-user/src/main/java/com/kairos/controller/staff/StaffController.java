@@ -462,7 +462,7 @@ public class StaffController {
     @ApiOperation("getTeamStaffAndStaffSkill")
     public ResponseEntity<Map<String, Object>> getTeamStaffAndStaffSkill(@PathVariable Long unitId, List<Long> staffIds) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getTeamStaffAndStaffSkill(unitId,staffIds)));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getTeamStaffAndStaffSkill(unitId,staffIds));
     }
 
 

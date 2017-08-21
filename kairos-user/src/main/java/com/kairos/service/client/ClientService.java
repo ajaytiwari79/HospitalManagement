@@ -977,7 +977,41 @@ public class ClientService extends UserBaseService {
         return new ClientStaffInfoDTO(client.getId(),staff.getId());
     }
 
+    /**
+     * @atuher anil maurya
+     * this method is called from task micro service
+     * @param citizenId
+     * @param staffId
+     * @return
+     */
     public Map<String, Object> getStaffAndCitizenHouseholds(Long citizenId,Long staffId){
-        taskDemandMap.put("lastModifiedBy", taskDemand.getLastModifiedByStaffId() > 0 ? staffGraphRepository.findOne(taskDemand.getLastModifiedByStaffId()).getFirstName() : "");
+        Map<String, Object> staffAndCitizenHouseholdsInfo = new HashMap<>();
+        staffAndCitizenHouseholdsInfo.put("lastModifiedBy",staffGraphRepository.findOne(staffId).getFirstName());
+        staffAndCitizenHouseholdsInfo.put("citizenHouseholds",getPeopleInHousehold(citizenId));
+       return staffAndCitizenHouseholdsInfo;
     }
+
+    /**
+     * @auther anil maurya this method is called from task micro service
+     * @param citizenId
+     * @return
+     */
+    public Map<String, Object> getCitizenDetails(Long citizenId){
+        Map<String, Object> citizenDetails = new HashMap<>();
+
+        Client citizen = clientGraphRepository.findOne(citizenId);
+        citizenDetails.put("id", citizen.getId());
+        citizenDetails.put("name", citizen.getFirstName() + " " + citizen.getLastName());
+        citizenDetails.put("age", citizen.getAge());
+        citizenDetails.put("profilePic", citizen.getProfilePic()!=null? envConfig.getServerHost() + File.separator + citizen.getProfilePic() : "");
+        citizenDetails.put("phone", citizen.getContactDetail() != null ? citizen.getContactDetail().retreiveContactNumbers() : "");
+        citizenDetails.put("address", citizen.getHomeAddress());
+        citizenDetails.put("cprNumber", citizen.getCprNumber());
+        citizenDetails.put("privateNumber",citizen.getContactDetail()!=null ? citizen.getContactDetail().getPrivatePhone() : "NA");
+        citizenDetails.put("privateAddress",citizen.getHomeAddress());
+        citizenDetails.put("gender",citizen.getGender());
+        citizenDetails.put("status",citizen.getCivilianStatus());
+        return citizenDetails;
+    }
+
 }

@@ -475,12 +475,27 @@ public class ClientController {
      * @auther anil maurya
      * this endpoint is called from task micro service
      * @param citizenId
-     * @param authToken
+     * @param staffId
      * @return
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}/{staffId}")
     @ApiOperation("get client and staff info")
     private ResponseEntity<Map<String, Object>> getStaffCitizenHouseholds(@PathVariable Long citizenId,@PathVariable Long staffId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getStaffClientInfo(citizenId,authToken));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getStaffAndCitizenHouseholds(citizenId,staffId));
     }
+
+
+    /**
+     * @auther anil maurya
+     * this endpoint is called from task micro service
+     * @param citizenId
+
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}")
+    @ApiOperation("get client and staff info")
+    private ResponseEntity<Map<String, Object>> getCitizenDetails(@PathVariable Long citizenId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getCitizenDetails(citizenId));
+    }
+
 }
