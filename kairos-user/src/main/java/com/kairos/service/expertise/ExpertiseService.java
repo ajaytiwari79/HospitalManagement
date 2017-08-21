@@ -1,0 +1,127 @@
+package com.kairos.service.expertise;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
+import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.service.UserBaseService;
+
+/**
+ * Created by prabjot on 28/10/16.
+ */
+@Service
+@Transactional
+public class ExpertiseService extends UserBaseService {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Inject
+    CountryGraphRepository countryGraphRepository;
+    @Inject
+    ExpertiseGraphRepository expertiseGraphRepository;
+    @Inject
+    StaffGraphRepository staffGraphRepository;
+
+
+    public Map<String, Object> saveExpertise(long countryId, Expertise expertise) {
+        Country country = countryGraphRepository.findOne(countryId);
+        if (country == null){
+            return null;
+        }
+        expertise.setCountry(country);
+        save(expertise);
+        return expertise.retrieveDetails();
+    }
+
+    public List<Expertise> getAllExpertise(long countryId) {
+        return expertiseGraphRepository.getAllExpertiseByCountry(countryId);
+    }
+
+
+    public Map<String, Object> updateExpertise(Expertise expertise) {
+        Expertise currentExpertise = expertiseGraphRepository.findOne(expertise.getId());
+        if (currentExpertise == null) {
+            return null;
+        }
+        currentExpertise.setName(expertise.getName());
+        currentExpertise.setDescription(expertise.getDescription());
+
+        save(currentExpertise);
+        return currentExpertise.retrieveDetails();
+    }
+
+    public boolean deleteExpertise(long expertiseId) {
+        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
+        if (expertise != null) {
+            expertise.setEnabled(false);
+            save(expertise);
+            return true;
+        }
+        return false;
+    }
+
+
+    public Map<String,Object> setExpertiseToStaff( Long staffId,Long expertiseId) {
+        Staff currentStaff= staffGraphRepository.findOne(staffId);
+        currentStaff.setExpertise(expertiseGraphRepository.findOne(expertiseId));
+        Staff staff = staffGraphRepository.save(currentStaff);
+        return  staff.retrieveExpertiseDetails();
+    }
+
+    public Map<String, Object> getExpertiseToStaff(Long staffId) {
+        Staff staff = staffGraphRepository.findOne(staffId);
+        if (staff.getExpertise()==null){
+            return null;
+        }
+        return staff.retrieveExpertiseDetails();
+    }
+
+    /**
+     * @author prabjot
+     * this method will update the relationship of expertise and skill based on parameter {isSelected},if parameter value is true
+     * new relationship b/w expertise and skill will be created or updated(if relationship already exist) if parameter value is false
+     * then relationship will be inactive (isEnabled param of relationship will set to false)
+     * @param expertiseId
+     * @param skillIds
+     * @param isSelected
+     */
+    public void addSkillInExpertise(long expertiseId,List<Long> skillIds,boolean isSelected){
+
+        if(isSelected){
+            for(long skillId : skillIds){
+                if(expertiseGraphRepository.expertiseHasAlreadySkill(expertiseId,skillId) == 0){
+                    expertiseGraphRepository.addSkillInExpertise(expertiseId,skillId,new Date().getTime(),new Date().getTime());
+                } else {
+                    expertiseGraphRepository.updateExpertiseSkill(expertiseId,skillId,new Date().getTime());
+                }
+            }
+        } else {
+            expertiseGraphRepository.deleteExpertiseSkill(expertiseId,skillIds,new Date().getTime());
+        }
+    }
+
+    /**
+     * to get skills of expertise,data will be in form of tree hierarchy
+     * @param expertiseId
+     * @param countryId
+     * @return
+     */
+    public List<Map<String,Object>> getExpertiseSkills(long expertiseId,long countryId){
+
+        ExpertiseSkillQueryResult expertiseSkillQueryResult = expertiseGraphRepository.getExpertiseSkills(expertiseId,countryId);
+        return expertiseSkillQueryResult.getSkills();
+    }
+}

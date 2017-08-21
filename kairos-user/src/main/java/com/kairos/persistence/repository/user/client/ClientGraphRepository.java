@@ -1,0 +1,240 @@
+package com.kairos.persistence.repository.user.client;
+
+import java.util.List;
+import java.util.Map;
+
+import com.kairos.persistence.model.user.country.CitizenStatus;
+import org.springframework.data.neo4j.annotation.Query;
+import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.stereotype.Repository;
+
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.client.Client;
+import com.kairos.persistence.model.user.client.ClientAddressQueryResult;
+import com.kairos.persistence.model.user.client.ClientHomeAddressQueryResult;
+import com.kairos.persistence.model.user.client.ClientStaffQueryResult;
+import com.kairos.persistence.model.user.client.ClientStaffRelation;
+import com.kairos.persistence.model.user.client.ClientTempAddressQueryResult;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+/**
+ * Created by oodles on 28/9/16.
+ */
+
+@Repository
+public interface ClientGraphRepository extends GraphRepository<Client>{
+
+
+    @Query("MATCH (c:Client) return c order by c.firstName")
+    List<Client> findAll();
+
+    @Query("MATCH (c:Client)-[:HAS_TEMPORARY_ADDRESS]->(ca:ClientTemporaryAddress) where id(c)={0} " +
+            "with ca as ca  " +
+            "MATCH (ca)-[:ZIP_CODE]->(zc:ZipCode)  " +
+            "with zc as zc , ca as ca " +
+            "OPTIONAL MATCH (ca)-[:TYPE_OF_HOUSING]->(hs:HousingType) " +
+            "RETURN {  " +
+            "  id:id(ca),  " +
+            "  country:ca.country,  " +
+            "  endDate:ca.endDate,  " +
+            "  city:ca.city, " +
+            "  regionName:ca.regionName, " +
+            "  latitude:ca.latitude, " +
+            "  houseNumber:ca.houseNumber, " +
+            "  isVerifiedByVisitour:ca.isVerifiedByVisitour, " +
+            "  municipalityName:ca.municipalityName,  " +
+            "  province:ca.province, " +
+            "  privateAddress:ca.privateAddress, " +
+            "  isEnabled:ca.isEnabled, " +
+            "  floorNumber:ca.floorNumber,  " +
+            "  street1:ca.street1, " +
+            "  startDate:ca.startDate,  " +
+            "  longitude:ca.longitude, " +
+            "  isAddressProtected:ca.isAddressProtected, " +
+            "  description:ca.description, " +
+            "  zipCode:{  " +
+            "        name:zc.name, " +
+            "        zipCode:zc.zipCode, " +
+            "        id:id(zc) " +
+            "  },  " +
+            "   typeOfHousing :{ " +
+            "        name:hs.name, " +
+            "        id:id(hs) " +
+            "  } " +
+            "} as result")
+    List<Map<String,Object>> getClientTemporaryAddressById(Long id);
+
+    @Query("MATCH (c:Client)-[rel:IS_RELATIVE_OF]->(ur:User) where id(c)={0}  " +
+            "with ur AS user, rel AS r " +
+            "OPTIONAL MATCH (user)-[:CONTACT_DETAIL]-(cd:ContactDetail), " +
+            "(user)-[:HOME_ADDRESS]-(ca:ContactAddress) " +
+            "return  " +
+            "collect({ " +
+            "firstName:user.firstName, " +
+            "lastName:user.lastName, " +
+            "age:user.age, " +
+            "relativeId:id(user), " +
+            "contactId:id(cd), " +
+            "relationId:id(r), "+
+            "priority:r.priority, "+
+            "isFullGuardian:r.isFullGuardian, " +
+            "relation:r.relation, " +
+            "canUpdateOnPublicPortal:r.canUpdateOnPublicPortal, " +
+            "distanceToRelative:r.distanceToRelative, " +
+            "remarks:r.remarks, " +
+            "workEmail:cd.workEmail, " +
+            "workPhone:cd.workPhone , " +
+            "mobilePhone:cd.mobilePhone, " +
+            "privateEmail:cd.privateEmail ,  " +
+            "privatePhone:cd.privatePhone , " +
+            "facebookAccount:cd.facebookAccount , " +
+            "twitterAccount:cd.twitterAccount,  " +
+            " addressId:id(ca), " +
+            "street1:ca.street1, " +
+            "zipCode:ca.zipCode, " +
+            "state:ca.state, " +
+            "area:ca.area, " +
+            "country:ca.country, " +
+            "longitude:ca.longitude, " +
+            "latitude:ca.latitude " +
+            "}) as RelativeList ")
+    List<Map<String,Object>> getRelativesListByClientId(Long clientId);
+
+    @Query("MATCH (c:Client)-[r:GET_SERVICE_FROM]->(org:Organization) where id(c)={0} return org")
+    List<Organization> getClientOrganizationIdList(Long clientId);
+
+    @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='PREFERRED' " +
+            "RETURN " +
+            " DISTINCT{ " +
+            "id:id(s), " +
+            "clientId:id(c), " +
+            " firstName:s.firstName, " +
+            " lastName:s.lastName, " +
+            "type:r.type " +
+            "} As result ")
+    List<Map<String,Object>> findPreferredStaff(Long id);
+
+
+    @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='FORBIDDEN'  " +
+            "RETURN " +
+            " DISTINCT { " +
+            "id:id(s), " +
+            "clientId:id(c), " +
+            "firstName:s.firstName, " +
+            "lastName:s.lastName, " +
+            "type:r.type " +
+            "} As result ")
+    List<Map<String,Object>> findForbidStaff(Long id);
+
+    @Query("MATCH (c:Client)-[r:"+SERVED_BY_TEAM+"]->(t:Team) WHERE id(c)={0} AND r.type='FORBIDDEN'   RETURN t")
+    List<Team> findForbidTeam(Long id);
+
+    @Query("MATCH (c:Client) where c.cprNumber={0}  return c")
+    Client findByCPRNumber(String cprNumber);
+
+    @Query("MATCH (c:Client) where c.cprNumber={0}  return c")
+    List<Client> findAllByCPRNumber(String cprNumber);
+
+
+    @Query("MATCH (c:User) where c.email={0}  return c")
+    User findByEmail(String email);
+
+    @Query("MATCH (t:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(s:Staff)-[:BELONGS_TO]->(u:User) where id(t)={0} \n" +
+            "             with s AS staff , u as user\n" +
+            "            OPTIONAL MATCH (c:Client)-[r:SERVED_BY_STAFF]->(staff) where id(c)={1} \n" +
+            "             with staff, r as served_by_staff,user  \n" +
+            "             OPTIONAL MATCH (staff)-[r:STAFF_HAS_SKILLS{isEnabled:true}]-(s:Skill)\n" +
+            "             with staff, served_by_staff, s as skill, r as r,user\n" +
+            "            return  DISTINCT { id:id(staff), staffType:served_by_staff.type, lastName:staff.lastName , firstName:staff.firstName, profilePic: {2} + staff.profilePic, gender:user.gender, isActive:staff.isActive,  skillList: collect ({name: skill.name,level:r.skillLevel})  }as staffList" )
+    List<Map<String,Object>> getTeamMembers(Long teamID, Long clientId,String imageUrl);
+
+    @Query("MATCH (c:Client)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress) where id(ca)= {0} return c")
+    Client getClientsByHomeAddressId(Long homeAddressId);
+
+    @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='NONE'  " +
+            "RETURN " +
+            "collect ({ " +
+            "id:id(s), " +
+            "firstName:s.firstName, " +
+            "lastName:s.lastName, " +
+            "type:r.type " +
+            "}) As staffList")
+    List<Map<String,Object>> findNeutualStaff(Long clientId);
+
+
+    @Query("MATCH (c:Client)-[:PEOPLE_IN_HOUSEHOLD_LIST]->(ps:Client) where id(c)={0}  return {id:id(ps), firstName:ps.firstName , lastName:ps.lastName, name:ps.firstName +' '+ ps.lastName } as result")
+    List<Map<String,Object>> getPeopleInHouseholdList(Long id);
+
+    @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='PREFERRED' " +
+            "RETURN {visitourId:s.visitourId} as ids")
+    List<Map<String,Object>>  findPreferredStaffVisitourIds(Long id);
+
+
+    @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='FORBIDDEN' " +
+            "RETURN {visitourId:s.visitourId} as ids ")
+    List<Map<String,Object>> findForbidStaffVisitourIds(Long id);
+
+    @Query("MATCH(o:Organization) where id(o)={0} with o MATCH(c:Client)-[:GET_SERVICE_FROM]->(o) with c MATCH(h:ContactAddress)-[:HAS_HOME_ADDRESS]-(c) return h as address UNION MATCH(s:ContactAddress)-[:HAS_SECONDARY_ADDRESS]-(c) return s as address;")
+    List<Map<String,Object>> getAllAddressListOfClientsOfAnOrganization(long organizationId);
+
+    @Query("MATCH (c:Client), (k:Client) where id(c)={0} AND id(k)={1} Create UNIQUE (c)-[r:NEXT_TO_KIN]->(k) return k")
+    void createNextToKinRelation(Long parent, Long kinId);
+
+    @Query("MATCH (client:Client{importFromKMD:true}) RETURN {kmdNexusExternalId:client.kmdNexusExternalId} as data")
+    List<Map<String, Object>> findAllCitizensFromKMD();
+
+    @Query("Match (client:Client),(staff:Staff) where id(client) = {0} AND id(staff) = {1}\n" +
+            "MERGE (client)-[r:"+SERVED_BY_STAFF+"]->(staff) \n" +
+            "ON CREATE SET r.type = {2},r.creationDate = {3},r.lastModificationDate = {4} \t\n" +
+            "ON MATCH SET r.type = {2},r.lastModificationDate = {4} return true")
+    void  assignStaffToClient(long clientId, long staffId, ClientStaffRelation.StaffType staffType,long creationDate,long lastModificationDate);
+
+    @Query("MATCH (client:Client)-[:GET_SERVICE_FROM]-(org:Organization),(staff:Staff) where id(org)={0} AND id(staff) IN {1}\n" +
+            "MERGE (client)-[r:SERVED_BY_STAFF]->(staff)\n" +
+            "ON CREATE SET r.type = {2},r.creationDate = {3},r.lastModificationDate = {4}\n" +
+            "ON MATCH SET r.type = {2},r.lastModificationDate = {4} return true")
+    void assignMultipleStaffToClient(long unitId,List<Long> staffId, ClientStaffRelation.StaffType staffType,long creationDate,long lastModificationDate);
+
+    @Query("Match (client:Client{citizenDead:false})-[:"+GET_SERVICE_FROM+"]->(organization:Organization) where id(organization)={0} with client\n" +
+            "Match (staff:Staff) where id(staff) in {1} with staff,client\n" +
+            "optional Match (client)-[r:"+SERVED_BY_STAFF+"]->(staff) with id(staff) as staffId,client,r\n" +
+            "return id(client) as id,client.firstName+\" \" +client.lastName as name,client.gender as gender,client.profilePic as profilePic,client.age as age,collect({id:staffId,type:case when r is null then 'NONE' else r.type end}) as staff")
+    List<ClientStaffQueryResult> getClientStaffRel(long unitId,List<Long> staffId);
+
+    @Query("MATCH (client:Client) where client.kmdNexusExternalId={0} RETURN client")
+    Client findByKmdNexusExternalId(String kmdNexusExternalId);
+
+    @Query("Match (n)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) where id(n)={0} return zipCode,homeAddress")
+    ClientHomeAddressQueryResult getHomeAddress(long clientId);
+
+    @Query("Match (client:Client) where id(client)={0}\n" +
+            "optional Match (client)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress)-[:"+ZIP_CODE+"]->(homeZipCode:ZipCode)\n" +
+            "optional match (homeAddress)-[:"+MUNICIPALITY+"]->(homeAddressMunicipality:Municipality)\n" +
+            "optional match (homeAddress)-[:"+TYPE_OF_HOUSING+"]->(homeAddressHousingType:HousingType)\n" +
+            "optional match (client)-[:"+HAS_SECONDARY_ADDRESS+"]->(secondaryAddress:ContactAddress)-[:"+ZIP_CODE+"]->(secondaryZipCode:ZipCode)\n" +
+            "optional match (secondaryAddress)-[:"+MUNICIPALITY+"]->(secondaryAddressMunicipality:Municipality)\n" +
+            "optional match (secondaryAddress)-[:"+TYPE_OF_HOUSING+"]->(secondaryAddressHousingType:HousingType)\n" +
+            "optional match (client)-[:"+HAS_PARTNER_ADDRESS+"]->(partnerAddress:ContactAddress)-[:"+ZIP_CODE+"]->(partnerZipCode:ZipCode)\n" +
+            "optional match (partnerAddress)-[:"+MUNICIPALITY+"]->(partnerAddressMunicipality:Municipality)\n" +
+            "optional match (partnerAddress)-[:"+TYPE_OF_HOUSING+"]->(partnerAddressHousingType:HousingType)\n" +
+            "return homeAddress,homeAddressMunicipality,homeAddressHousingType,homeZipCode,secondaryAddress,secondaryZipCode,secondaryAddressMunicipality,secondaryAddressHousingType,partnerAddress,partnerZipCode,partnerAddressMunicipality,partnerAddressHousingType\n")
+    ClientAddressQueryResult getAllAddress(long clientId);
+
+    @Query("Match (client:Client) where id(client)={0}\n" +
+            "match (client)-[:"+HAS_TEMPORARY_ADDRESS+"]->(temporaryAddress:ContactAddress)-[:"+ZIP_CODE+"]->(temporaryZipCode:ZipCode)\n" +
+            "optional match (temporaryAddress)-[:"+MUNICIPALITY+"]->(temporaryAddressMunicipality:Municipality)\n" +
+            "optional match (temporaryAddress)-[:"+TYPE_OF_HOUSING+"]->(temporaryAddressHousingType:HousingType)\n" +
+            "return temporaryAddress,temporaryAddressMunicipality,temporaryZipCode,temporaryAddressHousingType")
+    List<ClientTempAddressQueryResult> getTemporaryAddress(long clientId);
+
+    @Query("MATCH (c:Client)-[r:CIVILIAN_STATUS]->(cs:CitizenStatus) where id(c)= {0}  return cs")
+    CitizenStatus findCitizenCivilianStatus(long citizenId);
+
+    @Query("MATCH (c:Client)-[:NEXT_TO_KIN]->(n:Client) where id(c)={0}  return n")
+    Client getNextToKin(Long id);
+
+    @Query("MATCH (c:Client{citizenDead:false})-[r:"+GET_SERVICE_FROM+"]-(o:Organization) where id(o)= {0} return id(c) as id")
+    List<Long> getCitizenIds(long unitId);
+}

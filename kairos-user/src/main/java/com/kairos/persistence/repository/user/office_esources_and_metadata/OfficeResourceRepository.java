@@ -1,0 +1,24 @@
+package com.kairos.persistence.repository.user.office_esources_and_metadata;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.data.neo4j.annotation.Query;
+import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.stereotype.Repository;
+
+import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
+
+/**
+ * Created by @pankaj on 9/2/17.
+ */
+@Repository
+public interface OfficeResourceRepository extends GraphRepository<OfficeResources>{
+
+    @Query("MATCH (o:Organization)-[r:ORGANIZATION_HAS_OFFICE_RESOURCE]->(n:OfficeResources) WHERE id(o)={0} " +
+            "RETURN {type:n.resourceType,resources:collect({id:id(n),name:n.name, resourceType:n.resourceType})} as data;")
+    List<Map> getOfficeResourcesByOrganizationId(long organizationId);
+
+    @Query("MATCH(o:Organization)-[r:ORGANIZATION_HAS_OFFICE_RESOURCE]->(n:OfficeResources) WHERE id(o)={0} RETURN n;")
+    List<OfficeResources> getByOrganization(long organization);
+}

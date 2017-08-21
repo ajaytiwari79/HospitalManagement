@@ -1,0 +1,155 @@
+package com.kairos.service.organization;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.kairos.persistence.model.organization.OrgTypeExpertiseQueryResult;
+import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.service.UserBaseService;
+
+/**
+ * Created by oodles on 18/10/16.
+ */
+@Transactional
+@Service
+public class OrganizationTypeService extends UserBaseService {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    @Inject
+    OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    @Inject
+    CountryGraphRepository countryGraphRepository;
+
+    public List<Map<String, Object>> getOrgTypesByCountryId(Long countryId) {
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (OrganizationType organizationType : organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId)) {
+            Map<String, Object> map = new HashMap();
+            map.put("id", organizationType.getId());
+            map.put("name", organizationType.getName());
+            map.put("description", organizationType.getDescription());
+            list.add(map);
+        }
+        return list;
+    }
+
+    public Map<String, Object> createOrganizationTypeForCountry(Long countryId, OrganizationType data) {
+        Country country = countryGraphRepository.findOne(countryId);
+        if (country != null) {
+            if (data.getName() != null) {
+                OrganizationType organizationType = new OrganizationType();
+                organizationType.setName(data.getName());
+                organizationType.setDescription(data.getDescription());
+                organizationType.setCountry(country);
+                save(organizationType);
+                return  organizationType.retrieveDetails();
+            }
+        }
+        return null;
+    }
+
+    public OrganizationType getOrganizationTypeById(Long organizationTypeId) {
+        return organizationTypeGraphRepository.findOne(organizationTypeId);
+
+    }
+
+    public OrganizationType createOrganizationType(OrganizationType organizationType) {
+        return organizationTypeGraphRepository.save(organizationType);
+    }
+
+
+    public List<OrganizationType> getAllOrganizationTypes() {
+        return organizationTypeGraphRepository.findAll();
+    }
+
+    public boolean deleteOrganizationType(Long organizationTypeId) {
+        OrganizationType organizationType = organizationTypeGraphRepository.findOne(organizationTypeId);
+        if (organizationType!=null){
+            organizationType.setEnable(false);
+            save(organizationType);
+            return true;
+        }
+        return false;
+
+    }
+
+    public Map<String, Object> updateOrganizationType(OrganizationType organizationType) {
+        if (organizationType.getName() != null && organizationType.getId() != null) {
+            OrganizationType currentType = organizationTypeGraphRepository.findOne(organizationType.getId());
+            if (currentType != null) {
+                currentType.setName(organizationType.getName());
+                currentType.setDescription(organizationType.getDescription());
+                save(currentType);
+                return currentType.retrieveDetails();
+            }
+            return null;
+        }
+        return null;
+    }
+
+    public Map<String, Object> addOrganizationTypeSubType(OrganizationType organizationType, Long organizationTypeId) {
+        OrganizationType type = organizationTypeGraphRepository.findOne(organizationTypeId);
+        if (type != null) {
+            organizationType = organizationTypeGraphRepository.save(organizationType);
+            organizationTypeGraphRepository.createSubTypeRelation(organizationType.getId(),organizationTypeId);
+                return organizationType.retrieveDetails();
+        }
+        return null;
+    }
+
+    public List<Object> getOrgSubTypesByTypeId(Long organizationTypeId) {
+        List<Map<String, Object>> queryResponse = organizationTypeGraphRepository.getOrganizationSubTypeByTypeId(organizationTypeId);
+        if (!queryResponse.isEmpty()){
+            List<Object> response = new ArrayList<>();
+            for (Map<String,Object> map: queryResponse) {
+                Object o = map.get("result");
+                response.add(o);
+            }
+            return response;
+        }
+        return null;
+    }
+
+    /**
+     * @author prabjot
+     * this method will update the relationship of expertise and organization Type based on parameter {isSelected},if parameter value is true
+     * new relationship b/w expertise and organization type will be created or updated(if relationship already exist) if parameter value is false
+     * then relationship will be inactive (isEnabled param of relationship will set to false)
+     * @param expertiseId
+     * @param orgTypeId
+     * @param isSelected
+     */
+    public void addExpertiseInOrgType(long orgTypeId,long expertiseId,boolean isSelected){
+        if(isSelected){
+                if(organizationTypeGraphRepository.orgTypeHasAlreadySkill(orgTypeId, expertiseId) == 0){
+                    organizationTypeGraphRepository.addExpertiseInOrgType(orgTypeId,expertiseId,new Date().getTime(),new Date().getTime());
+                } else {
+                    organizationTypeGraphRepository.updateOrgTypeExpertise(orgTypeId,expertiseId,new Date().getTime());
+                }
+        } else {
+            organizationTypeGraphRepository.deleteOrgTypeExpertise(orgTypeId,expertiseId,new Date().getTime());
+        }
+    }
+
+    /**
+     * to get expertise for particular organization type
+     * @param orgTypeId
+     * @return
+     */
+    public List<Map<String,Object>> getExpertise(long countryId,long orgTypeId){
+        OrgTypeExpertiseQueryResult orgTypeExpertiseQueryResult = organizationTypeGraphRepository.getExpertiseOfOrganizationType(countryId,orgTypeId);
+        return orgTypeExpertiseQueryResult.getExpertise();
+    }
+}

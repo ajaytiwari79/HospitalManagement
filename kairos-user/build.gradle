@@ -1,0 +1,104 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.4.RELEASE'
+		swaggerVersion = '2.5.0'
+		jacksonVersion= '2.5.4'
+		neo4jBoltDriverVersion = '2.1.1'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+ext {
+	springCloudVersion = 'Dalston.SR1'
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-aop')
+	compile('org.springframework.boot:spring-boot-starter-cache')
+	compile('org.springframework.cloud:spring-cloud-starter-eureka')
+	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
+	compile('org.springframework.cloud:spring-cloud-starter-oauth2')
+	compile('org.springframework.cloud:spring-cloud-starter-security')
+	compile('org.springframework.boot:spring-boot-starter-data-neo4j')
+	compile('org.springframework.boot:spring-boot-starter-data-redis')
+	compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-mail')
+	compile('org.springframework.boot:spring-boot-starter-websocket')
+	compile("org.springframework.ws:spring-ws-core:2.3.0.RELEASE")
+	compile group: 'com.sun.mail', name: 'javax.mail', version:'1.5.6'
+	// Google Calender API
+	compile 'com.google.api-client:google-api-client:1.22.0'
+	compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'
+	compile 'com.google.apis:google-api-services-calendar:v3-rev239-1.22.0'
+	//twillio
+	compile group: 'com.twilio.sdk', name: 'twilio-java-sdk', version: '6.3.0'
+
+	// https://mvnrepository.com/artifact/org.springframework.data/spring-data-redis
+	compile group: 'org.springframework.data', name: 'spring-data-redis', version: '1.8.4.RELEASE'
+	// https://mvnrepository.com/artifact/redis.clients/jedis
+	compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
+   // https://mvnrepository.com/artifact/javax.mail/mail
+	compile group: 'javax.mail', name: 'mail', version: '1.4'
+
+     // https://mvnrepository.com/artifact/org.apache.poi/poi
+	compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'
+	// https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+	compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.10-FINAL'
+
+	// https://mvnrepository.com/artifact/joda-time/joda-time
+	compile group: 'joda-time', name: 'joda-time', version: '2.9.4'
+
+	compile group: 'org.neo4j', name: 'neo4j-ogm-bolt-driver', version: neo4jBoltDriverVersion
+
+
+	// Swagger
+	compile "io.springfox:springfox-swagger2:${swaggerVersion}"
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
+	compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion
+	compile group: 'org.json', name: 'json', version: '20160810'
+	// https://mvnrepository.com/artifact/com.lowagie/itext
+	compile group: 'com.lowagie', name: 'itext', version: '4.2.1'
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('org.springframework.security:spring-security-test')
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+
+def profile = "development"
+bootRun {
+	args = ["--spring.profile.active="+profile]
+	systemProperty "spring.profiles.active", "development"
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '3.0'
+}
+
