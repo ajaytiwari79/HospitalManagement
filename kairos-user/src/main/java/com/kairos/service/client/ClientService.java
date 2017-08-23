@@ -1,39 +1,39 @@
 package com.kairos.service.client;
 
-import com.kairos.client.PlannerServiceRestTemplateClient;
 import com.kairos.client.ClientServiceRestClient;
-import com.kairos.client.dto.TaskTypeAggregateResult;
+import com.kairos.client.PlannerServiceRestTemplateClient;
+import com.kairos.client.dto.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.Gender;
+import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
+import com.kairos.persistence.model.user.region.Municipality;
+import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.user.staff.StaffClientData;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
-import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
-import com.kairos.persistence.repository.organization.TeamGraphRepository;
+import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientLanguageRelationGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientTeamRelationGraphRepository;
+import com.kairos.persistence.repository.user.client.*;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageLevelGraphRepository;
+import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
+import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.ClientStaffInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
+import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.utils.FormatUtil;
@@ -43,8 +43,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-
 import java.io.File;
+import java.text.ParseException;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.KAIROS;
@@ -101,6 +101,17 @@ public class ClientService extends UserBaseService {
     ClientServiceRestClient clientServiceRestClient;
     @Autowired
     PlannerServiceRestTemplateClient plannerServiceRestTemplateClient;
+    @Autowired AddressVerificationService addressVerificationService;
+    @Autowired
+    MunicipalityGraphRepository municipalityGraphRepository;
+    @Autowired
+    RegionGraphRepository regionGraphRepository;
+    @Autowired
+    ContactAddressGraphRepository contactAddressGraphRepository;
+    @Autowired
+    TimeSlotGraphRepository timeSlotGraphRepository;
+    @Autowired
+    IntegrationService integrationService;
 
 
 
@@ -902,14 +913,14 @@ public class ClientService extends UserBaseService {
 
 
 
-    /**
+  /*  *//**
      *  @auther anil maurya
      *   code commented   used in planner service
-     * @param organizationId
+     * @param
      * @param staffId
      * @return
-     */
-   /* public Map<String, Object> getClintsWithPlanningByClintIds(List<Long> citizenId, Long unitId) {
+     *//*
+    public Map<String, Object> getClintsWithPlanningByClintIds(List<Long> citizenId, Long unitId) {
         Map<String, Object> response = new HashMap<>();
         List<Object> clientList = new ArrayList<>();
 
@@ -925,11 +936,11 @@ public class ClientService extends UserBaseService {
             response.put("clientList", clientList);
         }
 
-        List<ClientExceptionType> exceptionTypeData = clientExceptionTypeMongoRepository.findAll();
+       *//* List<ClientExceptionType> exceptionTypeData = clientExceptionTypeMongoRepository.findAll();
 
         if (exceptionTypeData != null) {
             response.put("exceptionTypes", exceptionTypeData);
-        }
+        }*//*
 
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(unitId);
 
@@ -937,8 +948,8 @@ public class ClientService extends UserBaseService {
             response.put("timeSlotList", timeSlotData);
         }
         return response;
-    }
-*/
+    }*/
+
     public HashMap<String, Object> getOrganizationAllClients(long organizationId, long staffId) {
         List<Map<String, Object>> mapList = organizationGraphRepository.getAllClientsOfOrganization(organizationId);
         List<Object> clientList = new ArrayList<>();
@@ -1013,5 +1024,174 @@ public class ClientService extends UserBaseService {
         citizenDetails.put("status",citizen.getCivilianStatus());
         return citizenDetails;
     }
+
+    public Map<String,Object> getClientAddressInfo(Long citizenId){
+
+        Client citizen = clientGraphRepository.findOne(citizenId, 1);
+        if (citizen.getHomeAddress() == null) {
+            throw new DataNotFoundByIdException(citizen.getFirstName() + "'s HomeAddress in not available");
+        }
+        Map<String,Object>citizenPlanningMap=new HashMap<>();
+        List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(citizenId);
+        citizenPlanningMap.put("temporaryAddressList", !temporaryAddressList.isEmpty() ? FormatUtil.formatNeoResponse(temporaryAddressList) : Collections.EMPTY_LIST);
+        ContactAddress address = citizen.getHomeAddress();
+        citizenPlanningMap.put("latitude", address.getLatitude());
+        citizenPlanningMap.put("longitude", address.getLongitude());
+        return citizenPlanningMap;
+
+    }
+
+
+    public ClientTemporaryAddress changeLocation(ClientExceptionDTO clientExceptionDto, long unitId,Long clientId){
+
+        Client client = clientGraphRepository.findOne(clientId);
+                ClientTemporaryAddress clientTemporaryAddress = null;
+                if (clientExceptionDto.getTempAddress() != null) {
+                    clientTemporaryAddress = updateClientTemporaryAddress(clientExceptionDto, unitId, client);
+                    /*if (clientTemporaryAddress != null) {
+                        map.put("tempAddress", clientTemporaryAddress);
+                    }*/
+                }
+                if (clientExceptionDto.getTemporaryAddress() != null) {
+                    clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
+                    if (clientTemporaryAddress == null) {
+                        throw new InternalError("Address not found");
+                    }
+
+                }
+
+                return clientTemporaryAddress;
+    }
+
+
+    private ClientTemporaryAddress updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, long unitId, Client client) {
+
+        AddressDTO addressDTO = clientExceptionDto.getTempAddress();
+        ZipCode zipCode;
+
+        ClientTemporaryAddress clientTemporaryAddress = ClientTemporaryAddress.getInstance();
+        if (addressDTO.isVerifiedByGoogleMap()) {
+            clientTemporaryAddress.setLongitude(addressDTO.getLongitude());
+            clientTemporaryAddress.setLatitude(addressDTO.getLatitude());
+            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
+        } else {
+            Map<String, Object> tomtomResponse = addressVerificationService.verifyAddressClientException(addressDTO, unitId);
+            if (tomtomResponse == null) {
+                throw new InternalError("Address not verified by tomtom");
+            }
+            clientTemporaryAddress.setVerifiedByVisitour(true);
+            clientTemporaryAddress.setCountry("Denmark");
+            clientTemporaryAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
+            clientTemporaryAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
+            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
+        }
+
+        if (zipCode == null) {
+            throw new InternalError("Zip code not found");
+        }
+        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
+        if (municipality == null) {
+            throw new InternalError("Municipality not found");
+        }
+
+
+        Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
+        if (geographyData == null) {
+            logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
+            throw new InternalError("Geography data not found with provided municipality");
+        }
+        logger.info("Geography Data: " + geographyData);
+        clientTemporaryAddress.setMunicipality(municipality);
+        clientTemporaryAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
+        clientTemporaryAddress.setCountry(String.valueOf(geographyData.get("countryName")));
+        clientTemporaryAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
+        clientTemporaryAddress.setCountry(String.valueOf(geographyData.get("countryName")));
+        clientTemporaryAddress.setStreet1(addressDTO.getStreet1());
+        clientTemporaryAddress.setHouseNumber(addressDTO.getHouseNumber());
+        clientTemporaryAddress.setFloorNumber(addressDTO.getFloorNumber());
+        clientTemporaryAddress.setCity(zipCode.getName());
+        clientTemporaryAddress.setZipCode(zipCode);
+        clientTemporaryAddress.setCity(zipCode.getName());
+        List<ClientTemporaryAddress> temporaryAddressList = client.getTemporaryAddress();
+        temporaryAddressList.add(clientTemporaryAddress);
+        client.setTemporaryAddress(temporaryAddressList);
+        clientGraphRepository.save(client);
+        return clientTemporaryAddress;
+    }
+
+
+    public TaskDemandVisitWrapper getClientDetailsForTaskDemandVisit(TaskDemandRequestWrapper taskDemandWrapper){
+        Client client = clientGraphRepository.findOne(taskDemandWrapper.getCitizenId());
+        List<Long> forbiddenStaff =getForbiddenStaffVisitourIds(taskDemandWrapper.getCitizenId());
+        List<Long> preferredStaff =getPreferredStaffVisitourIds(taskDemandWrapper.getCitizenId());
+
+
+        TaskAddress taskAddress = new TaskAddress();
+        ClientHomeAddressQueryResult clientHomeAddressQueryResult = clientGraphRepository.getHomeAddress(client.getId());
+        if (clientHomeAddressQueryResult == null) {
+           return null;
+        }
+        ZipCode zipCode = clientHomeAddressQueryResult.getZipCode();
+        ContactAddress homeAddress = clientHomeAddressQueryResult.getHomeAddress();
+        taskAddress.setCountry("DK");
+        taskAddress.setZip(zipCode.getZipCode());
+        taskAddress.setCity(homeAddress.getCity());
+        taskAddress.setStreet(homeAddress.getStreet1());
+        taskAddress.setHouseNumber(homeAddress.getHouseNumber());
+
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(),taskDemandWrapper.getTimeSlotId());
+        Long countryId = countryGraphRepository.getCountryOfUnit(taskDemandWrapper.getUnitId());
+
+        List<Long> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(),taskDemandWrapper.getEndDate().getTime());
+
+        TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(client,
+                forbiddenStaff, preferredStaff,taskAddress).timeSlotMap(timeSlotMap).countryId(countryId)
+                .publicHolidayList(publicHolidayList).build();
+
+        return taskDemandVisitWrapper;
+
+
+    }
+
+
+    /**
+     *
+     * @param authToken
+     * @param unitId
+     * @param citizenId
+     * @return
+     */
+    public TaskDemandVisitWrapper generateIndividualTask(String authToken, long unitId, long citizenId)  {
+
+        Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
+        Client citizen = clientGraphRepository.findOne(Long.valueOf(citizenId), 0);
+        TaskAddress taskAddress = new TaskAddress();
+
+        ClientHomeAddressQueryResult clientHomeAddressQueryResult = clientGraphRepository.getHomeAddress(citizen.getId());
+        ZipCode zipCode = clientHomeAddressQueryResult.getZipCode();
+        ContactAddress homeAddress = clientHomeAddressQueryResult.getHomeAddress();
+        taskAddress.setCountry("DK");
+        taskAddress.setZip(zipCode.getZipCode());
+        taskAddress.setCity(homeAddress.getCity());
+        taskAddress.setStreet(homeAddress.getStreet1());
+        taskAddress.setHouseNumber(homeAddress.getHouseNumber());
+
+        Staff loggedInUser = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
+        List<Long> preferredStaffIds =getPreferredStaffVisitourIds(citizen.getId());
+        List<Long> forbiddenStaffIds =getForbiddenStaffVisitourIds(citizen.getId());
+        TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(citizen,
+                preferredStaffIds, forbiddenStaffIds,taskAddress)
+                .staffId(loggedInUser.getId())
+                .flsCredentials(flsCredentials).build();
+        return taskDemandVisitWrapper;
+
+    }
+
+    public void mergeMultipleTasks(){
+
+
+
+    }
+
 
 }

@@ -1,4 +1,5 @@
 package com.kairos.controller.client;
+import com.kairos.client.dto.TaskDemandRequestWrapper;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.client.*;
@@ -497,5 +498,38 @@ public class ClientController {
     private ResponseEntity<Map<String, Object>> getCitizenDetails(@PathVariable Long citizenId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getCitizenDetails(citizenId));
     }
+
+    /**
+     * @auther anil maurya
+     * this endpoint is called from task micro service
+     * @param taskDemandWrapper
+
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/getClientInfo")
+    @ApiOperation("get client and staff info")
+    private ResponseEntity<Map<String, Object>> getClientDetailsForTaskDemandVisit(@RequestBody TaskDemandRequestWrapper taskDemandWrapper){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                clientService.getClientDetailsForTaskDemandVisit(taskDemandWrapper));
+    }
+
+
+    /**
+     * called this endpoints from task micro service
+     * @param citizenId
+     * @param unitId
+     * @param authToken
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/generateIndividualTask/{citizenId}/{unitId}/{authToken}")
+    @ApiOperation("get client and staff info")
+    private ResponseEntity<Map<String, Object>> generateIndividualTask(@PathVariable Long  citizenId
+            ,@PathVariable Long  unitId, String authToken){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                clientService.generateIndividualTask(authToken,unitId,citizenId));
+    }
+
+
+
 
 }

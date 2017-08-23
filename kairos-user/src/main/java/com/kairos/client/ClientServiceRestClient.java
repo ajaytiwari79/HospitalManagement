@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  *
@@ -192,8 +193,6 @@ public class ClientServiceRestClient {
 
             ResponseEnvelope response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-
-
                 Map<String,Object> clientsPlanning= (Map<String,Object>) response.getData();
 
                 return clientsPlanning;
