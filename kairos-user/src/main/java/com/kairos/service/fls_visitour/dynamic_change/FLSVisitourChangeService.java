@@ -15,7 +15,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by neuron on 8/5/17.
  */
-//@Service
+@Service
 public class FLSVisitourChangeService {
 
     private static final Logger logger = LoggerFactory.getLogger(FLSVisitourChangeService.class);
