@@ -11,7 +11,6 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.service.country.CountryHolidayCalenderService;
-import com.kairos.service.fls_visitour.dynamic_change.FLSVisitourChangeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -62,8 +61,6 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     @Inject
     CountryHolidayCalenderService countryHolidayCalenderService;
 
-    @Inject
-    FLSVisitourChangeService flsVisitourChangeService;
     /**
      * Executes on application ready event
      * Check's if data exists & calls createUsersAndRolesData
@@ -73,7 +70,7 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
         generateSequence(); // This method create sequence table for mongodb
         //createAccessPages();
         bootDataService.createData();
-        flsVisitourChangeService.registerReceiver("visitourChange");
+        //flsVisitourChangeService.registerReceiver("visitourChange");
     }
 
     public void createSkillCategoryAndSkills() {
