@@ -1,12 +1,10 @@
 package com.kairos.persistence.model.organization;
 
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Created by prabjot on 9/1/17.
@@ -14,10 +12,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationGeneral {
 
-
     @NotEmpty(message = "error.Organization.formalname.notnull") @NotNull(message = "error.Organization.formalname.notnull")
     private String name;
-    // @NotEmpty(message = "error.Organization.shortname.notnull") @NotNull(message = "error.Organization.shortname.notnull")
+   // @NotEmpty(message = "error.Organization.shortname.notnull") @NotNull(message = "error.Organization.shortname.notnull")
     private String shortName;
     private String eanNumber;
     private String costCenterCode;
@@ -28,22 +25,22 @@ public class OrganizationGeneral {
     private List<Long> organizationTypeId;
     @NotNull(message = "error.OrganizationType.name.notEmpty")
     private List<Long> organizationSubTypeId;
-    //  @NotNull(message = "error.Organization.businesstype.notnull")
+  //  @NotNull(message = "error.Organization.businesstype.notnull")
     private List<Long> businessTypeId;
     private String websiteUrl;
-    // @NotNull(message = "error.Organization.industrytype.notnull")
+   // @NotNull(message = "error.Organization.industrytype.notnull")
     private Long industryTypeId;
-    @NotNull(message = "error.Organization.noofemploy.notnull")
+  //  @NotNull(message = "error.Organization.noofemploy.notnull")
     private Long employeeLimitId;
-    // @NotNull(message = "error.Organization.ownershiptype.notnull")
+   // @NotNull(message = "error.Organization.ownershiptype.notnull")
     private Long ownershipTypeId;
-    //   @NotNull(message = "error.Organization.kairosstatus.notnull")
+ //   @NotNull(message = "error.Organization.kairosstatus.notnull")
     private Long kairosStatusId;
     private String cvrNumber;
     private String pNumber;
-    // @NotNull(message = "error.Organization.vattype.notnull")
+   // @NotNull(message = "error.Organization.vattype.notnull")
     private Long vatTypeId;
-    // @NotNull(message = "error.Organization.contract.notnull")
+   // @NotNull(message = "error.Organization.contract.notnull")
     private Long contractTypeId;
     private boolean isKairosHub;
     private String clientSince;
@@ -162,20 +159,20 @@ public class OrganizationGeneral {
     }
 
 
-    public long getIndustryTypeId() {
+    public Long getIndustryTypeId() {
         return industryTypeId;
     }
 
 
-    public long getOwnershipTypeId() {
+    public Long getOwnershipTypeId() {
         return ownershipTypeId;
     }
 
-    public long getVatTypeId() {
+    public Long getVatTypeId() {
         return vatTypeId;
     }
 
-    public long getContractTypeId() {
+    public Long getContractTypeId() {
         return contractTypeId;
     }
 
@@ -191,12 +188,12 @@ public class OrganizationGeneral {
         return clientSince;
     }
 
-    public long getEmployeeLimitId() {
+    public Long getEmployeeLimitId() {
         return employeeLimitId;
     }
 
 
-    public long getKairosStatusId() {
+    public Long getKairosStatusId() {
         return kairosStatusId;
     }
 

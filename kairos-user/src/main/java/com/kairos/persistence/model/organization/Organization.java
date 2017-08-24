@@ -1,66 +1,34 @@
 package com.kairos.persistence.model.organization;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.BUSINESS_TYPE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.CONTACT_ADDRESS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.CONTACT_DETAIL;
-import static com.kairos.persistence.model.constants.RelationshipConstants.CONTRACT_TYPE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY;
-import static com.kairos.persistence.model.constants.RelationshipConstants.EMPLOYEE_LIMIT;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_BILLING_ADDRESS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENTS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_GROUP;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_LOCAL_AREA_TAGS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PUBLIC_PHONE_NUMBER;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SETTING;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SUB_ORGANIZATION;
-import static com.kairos.persistence.model.constants.RelationshipConstants.INDUSTRY_TYPE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.KAIROS_STATUS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_HAS_ACCESS_GROUPS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_HAS_DEPARTMENT;
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_HAS_OFFICE_RESOURCE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_HAS_RESOURCE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.OWNERSHIP_TYPE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_TYPE_OF;
-import static com.kairos.persistence.model.constants.RelationshipConstants.TYPE_OF;
-import static com.kairos.persistence.model.constants.RelationshipConstants.VAT_TYPE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.ZIP_CODE;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.client.ContactAddress;
+import com.kairos.persistence.model.user.client.ContactDetail;
+import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.department.Department;
+import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
+import com.kairos.persistence.model.user.position.PositionName;
+import com.kairos.persistence.model.user.region.LocalAreaTag;
+import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.model.user.resources.Resource;
+import com.kairos.persistence.model.user.staff.Employment;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Property;
+import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.EnumString;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
-import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.typeconversion.EnumString;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.enums.OrganizationLevel;
-import com.kairos.persistence.model.organization.group.Group;
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.model.user.country.BusinessType;
-import com.kairos.persistence.model.user.country.ContractType;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.EmployeeLimit;
-import com.kairos.persistence.model.user.country.IndustryType;
-import com.kairos.persistence.model.user.country.KairosStatus;
-import com.kairos.persistence.model.user.country.OwnershipType;
-import com.kairos.persistence.model.user.country.VatType;
-import com.kairos.persistence.model.user.department.Department;
-import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
-import com.kairos.persistence.model.user.region.LocalAreaTag;
-import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.model.user.resources.Resource;
-import com.kairos.persistence.model.user.staff.Employment;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -76,9 +44,13 @@ public class Organization extends UserBaseEntity {
     @NotNull(message = "error.Organization.name.notnull")
     private String name;
     private String email;
-    @Property(name="organizationLevel")
+
+
+    @Property(name = "organizationLevel")
     @EnumString(OrganizationLevel.class)
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
+
+
     private String childLevel;
     private String eanNumber;
     @NotNull(message = "error.Organization.formal.notnull")
@@ -90,7 +62,6 @@ public class Organization extends UserBaseEntity {
     private long clientSince;
     private String cvrNumber;
     private String pNumber;
-
 
 
     private boolean isKairosHub;
@@ -198,6 +169,11 @@ public class Organization extends UserBaseEntity {
     private int nightShiftTimeDeduction = 7; //in percentage
 
 
+    @Relationship(type = HAS_POSITION_NAME)
+    private List<PositionName> positionNameList = new ArrayList<>();
+
+    @Relationship(type = HAS_WTA)
+    private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
 
     public Organization(String name, List<Group> groupList, List<Organization> children) {
         this.name = name;
@@ -440,6 +416,7 @@ public class Organization extends UserBaseEntity {
     public void setEstimoteAppToken(String estimoteAppToken) {
         this.estimoteAppToken = estimoteAppToken;
     }
+
     public String getShortName() {
         return shortName;
     }
@@ -457,8 +434,6 @@ public class Organization extends UserBaseEntity {
     }
 
 
-
-
     public Map<String, Object> retrieveOrganizationUnitDetails() {
         Map<String, Object> map = new HashMap<>();
         map.put("id", this.id);
@@ -468,7 +443,7 @@ public class Organization extends UserBaseEntity {
         map.put("externalId", this.externalId);
         map.put("kairosStatus", this.kairosStatus);
 
-        if (this.contactAddress!=null){
+        if (this.contactAddress != null) {
             map.put("type", this.contactAddress.getStreet1());
             map.put("type", this.contactAddress.getHouseNumber());
             //        map.put("zipCode", this.zipCode.getZipCode());
@@ -478,7 +453,6 @@ public class Organization extends UserBaseEntity {
 
         return map;
     }
-
 
 
     public ContactAddress getBillingAddress() {
@@ -699,7 +673,8 @@ public class Organization extends UserBaseEntity {
                 ", kmdExternalId='" + kmdExternalId + '\'' +
                 ", dayShiftTimeDeduction=" + dayShiftTimeDeduction +
                 ", nightShiftTimeDeduction=" + nightShiftTimeDeduction +
-                '}'+
+                ", workingTimeAgreements=" + workingTimeAgreements +
+                '}' +
                 '}';
     }
 
@@ -709,5 +684,21 @@ public class Organization extends UserBaseEntity {
 
     public void setAutoGeneratedPerformed(boolean autoGeneratedPerformed) {
         isAutoGeneratedPerformed = autoGeneratedPerformed;
+    }
+
+    public List<WorkingTimeAgreement> getWorkingTimeAgreements() {
+        return workingTimeAgreements;
+    }
+
+    public void setWorkingTimeAgreements(List<WorkingTimeAgreement> workingTimeAgreements) {
+        this.workingTimeAgreements = workingTimeAgreements;
+    }
+
+    public List<PositionName> getPositionNameList() {
+        return positionNameList;
+    }
+
+    public void setPositionNameList(List<PositionName> positionNameList) {
+        this.positionNameList = positionNameList;
     }
 }

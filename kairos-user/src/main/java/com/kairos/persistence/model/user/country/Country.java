@@ -1,29 +1,31 @@
 package com.kairos.persistence.model.user.country;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotEmpty;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+
+import javax.validation.constraints.NotNull;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
 
 /**
  * Country Domain extending Base Entity
  * Country has relationship with CountryHolidayCalender and SkillCategory
  */
+    /*
+    * @modified by vipul
+    * to add rule template relationship
+    * 2 august 2017
+    */
 @NodeEntity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -47,6 +49,13 @@ public class Country extends UserBaseEntity {
 
     @Relationship(type = HAS_HOLIDAY)
     private List< CountryHolidayCalender> countryHolidayCalenderList;
+
+    @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY)
+    private List <RuleTemplateCategory> ruleTemplateCategories;
+
+    @Relationship(type = HAS_RULE_TEMPLATE)
+    private List <WTABaseRuleTemplate> WTABaseRuleTemplate;
+
 
     @JsonIgnore
     @Relationship(type = HAS_ORGANIZATION_SERVICES)
@@ -72,6 +81,14 @@ public class Country extends UserBaseEntity {
         return map;
     }
 
+    public List<WTABaseRuleTemplate> getWTABaseRuleTemplate() {
+        return WTABaseRuleTemplate;
+    }
+
+    public void setWTABaseRuleTemplate(List<WTABaseRuleTemplate> WTABaseRuleTemplate) {
+        this.WTABaseRuleTemplate = WTABaseRuleTemplate;
+    }
+
     public String getGoogleCalendarCode() {
         return googleCalendarCode;
     }
@@ -91,11 +108,11 @@ public class Country extends UserBaseEntity {
         this.countryHolidayCalenderList = countryHolidayCalenderList;
     }
 
-//    public List<OrganizationType> getOrganizationTypeList() {
+//    public List<OrganizationType> getOrganizationTypes() {
 //        return organizationTypeList;
 //    }
 //
-//    public void setOrganizationTypeList(List<OrganizationType> organizationTypeList) {
+//    public void setOrganizationTypes(List<OrganizationType> organizationTypeList) {
 //        this.organizationTypeList = organizationTypeList;
 //    }
 
@@ -123,6 +140,14 @@ public class Country extends UserBaseEntity {
         this.organizationServices = organizationServices;
     }
 
+    public List<RuleTemplateCategory> getRuleTemplateCategories() {
+        return Optional.ofNullable(ruleTemplateCategories).orElse(new ArrayList<>());
+    }
+
+    public void setRuleTemplateCategories(List<RuleTemplateCategory> ruleTemplateCategories) {
+        this.ruleTemplateCategories = ruleTemplateCategories;
+    }
+
     public enum Designation {
         HOME_CARE, NURSING_HOME, HOSPITAL
     }
@@ -134,6 +159,7 @@ public class Country extends UserBaseEntity {
         map.put("code",this.code);
         map.put("lastModificationDate",this.getLastModificationDate());
         map.put("creationDate",this.getCreationDate());
+        map.put("googleCalendarCode",this.getGoogleCalendarCode());
         return map;
     }
 

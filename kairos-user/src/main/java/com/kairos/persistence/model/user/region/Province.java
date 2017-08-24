@@ -1,18 +1,16 @@
 package com.kairos.persistence.model.user.region;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.common.UserBaseEntity;
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.REGION;
 
 /**
  * Created by oodles on 7/1/17.

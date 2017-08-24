@@ -1,18 +1,16 @@
 package com.kairos.persistence.model.organization;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_SUB_SERVICE;
+
 
 /**
  * Created by oodles on 14/9/16.
@@ -31,6 +29,12 @@ public class OrganizationService extends UserBaseEntity {
     private List<OrganizationService> organizationSubService;
 
     private boolean isEnabled = true;
+
+    private String kmdExternalId;
+
+    private boolean imported = false;
+
+    private String referenceId;
 
     public OrganizationService(String name, List<OrganizationService> organizationSubServicesList) {
         this.name = name;
@@ -83,5 +87,29 @@ public class OrganizationService extends UserBaseEntity {
         map.put("name",this.name);
         map.put("description",this.description);
         return map;
+    }
+
+    public String getKmdExternalId() {
+        return kmdExternalId;
+    }
+
+    public void setKmdExternalId(String kmdExternalId) {
+        this.kmdExternalId = kmdExternalId;
+    }
+
+    public boolean isImported() {
+        return imported;
+    }
+
+    public void setImported(boolean imported) {
+        this.imported = imported;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
     }
 }

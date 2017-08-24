@@ -1,14 +1,14 @@
 package com.kairos.persistence.model.user.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.enums.ClientEnum;
+import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.user.country.CitizenStatus;
+import com.kairos.persistence.model.user.language.Language;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.ClientEnum;
-import com.kairos.persistence.Gender;
-import com.kairos.persistence.model.user.country.CitizenStatus;
-import com.kairos.persistence.model.user.language.Language;
 
 /**
  * Created by oodles on 24/1/17.

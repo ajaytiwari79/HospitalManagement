@@ -1,20 +1,15 @@
 package com.kairos.service.control_panel;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
-
-import javax.inject.Inject;
-
 import com.kairos.config.scheduler.DynamicCronScheduler;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.control_panel.jobDetails.JobDetails;
+import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.user.control_panel.ControlPanelGraphRepository;
 import com.kairos.persistence.repository.user.control_panel.jobDetails.JobDetailsRepository;
+import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
+import com.kairos.service.UserBaseService;
+import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -23,24 +18,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.kairos.utils.timeCareShift.Transstatus;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.control_panel.ControlPanel;
-import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.control_panel.ControlPanelGraphRepository;
-import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
-import com.kairos.service.UserBaseService;
+
+import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.CONTROL_PANEL_INTERVAL_STRING;
 import static com.kairos.persistence.model.constants.RelationshipConstants.CONTROL_PANEL_RUN_ONCE_STRING;
+
 
 /**
  * Created by oodles on 29/12/16.
  */
 @Service
 @Transactional
-public class ControlPanelService extends UserBaseService  {
+public class ControlPanelService extends UserBaseService {
 
     @Inject
     private ControlPanelGraphRepository controlPanelGraphRepository;
@@ -120,16 +115,16 @@ public class ControlPanelService extends UserBaseService  {
     }
 
     public Map<String, Object> getControlPanelByUnitId(long unitId) {
-        List<Map<String, Object>> controlPanels = controlPanelGraphRepository.getControlPanelByUnitId(unitId);
-        List<Object> response = new ArrayList<>();
-        for (Map<String, Object> map : controlPanels) {
-            Object o = map.get("result");
-            response.add(o);
-        }
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("controlPanels", response);
-        return map;
+            List<Map<String, Object>> controlPanels = controlPanelGraphRepository.getControlPanelByUnitId(unitId);
+            List<Object> response = new ArrayList<>();
+            for (Map<String, Object> map : controlPanels) {
+                Object o = map.get("result");
+                response.add(o);
+            }
+            
+            Map<String, Object> map = new HashMap<>();
+            map.put("controlPanels", response);
+            return map;
 
     }
 
@@ -220,7 +215,6 @@ public class ControlPanelService extends UserBaseService  {
         if(transstatus.getResult().getNr_errors() > 0) result = "Error";
         jobDetails.setResult(result);
         logger.info("============>>Job logs get saved<<============");
-
         jobDetailsRepository.save(jobDetails);
 
     }
@@ -245,7 +239,10 @@ public class ControlPanelService extends UserBaseService  {
         }
     }
 
-
+    public Long getControlPanelUnitId(Long controlPanelId){
+        ControlPanel panel = controlPanelGraphRepository.findOne(controlPanelId);
+        return panel.getUnitId();
+    }
 
 }
 

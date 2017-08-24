@@ -1,7 +1,8 @@
 package com.kairos.controller.organization_service;
+
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
-import com.kairos.utils.response.ResponseHandler;
+import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+
 
 /**
  * Created by prabjot on 16/9/16.

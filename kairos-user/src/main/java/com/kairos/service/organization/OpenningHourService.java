@@ -1,21 +1,18 @@
 package com.kairos.service.organization;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.OrganizationSetting;
 import com.kairos.persistence.repository.organization.OpeningHourGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prabjot on 6/4/17.

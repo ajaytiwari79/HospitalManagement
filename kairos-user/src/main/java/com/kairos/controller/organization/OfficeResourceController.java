@@ -1,17 +1,9 @@
 package com.kairos.controller.organization;
-
-import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
-import com.kairos.utils.response.ResponseHandler;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.inject.Inject;
-
-import java.util.Map;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+
 
 /**
  * Created by @pankaj on 13/2/17.
@@ -19,8 +11,8 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 public class OfficeResourceController {
-
-   /* @Inject
+/*
+    @Inject
     OfficeResourceAndMetadataService officeResourceAndMetadataService;
 
     @ApiOperation(value = "Get a Resources and Resource Types)")

@@ -1,7 +1,5 @@
 package com.kairos.persistence.model.user.access_permission;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -10,6 +8,9 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.kairos.persistence.model.deserializer.XmlDeserializer;
+
+
+import java.util.List;
 
 /**
  * Created by prabjot on 5/1/17.
@@ -25,7 +26,7 @@ public class Tab {
     public String name;
 
     @JacksonXmlProperty(localName = "isModule", isAttribute = true)
-    public boolean isModule;
+    public boolean module;
 
     public String getModuleId() {
         return moduleId;
@@ -36,7 +37,11 @@ public class Tab {
     }
 
     public boolean isModule() {
-        return isModule;
+        return module;
+    }
+
+    public void setModule(boolean module) {
+        this.module = module;
     }
 
     public List<Tab> getSubPages() {
@@ -51,9 +56,7 @@ public class Tab {
         this.name = name;
     }
 
-    public void setModule(boolean module) {
-        isModule = module;
-    }
+
 
     public void setSubPages(List<Tab> subPages) {
         this.subPages = subPages;
@@ -66,7 +69,7 @@ public class Tab {
     public Tab(String id, String name, boolean isModule,List<Tab> children) {
         this.moduleId = id;
         this.name = name;
-        this.isModule  = isModule;
+        this.module  = isModule;
         this.subPages = Optional.fromNullable(children).or(Lists.<Tab>newArrayList());
     }
 

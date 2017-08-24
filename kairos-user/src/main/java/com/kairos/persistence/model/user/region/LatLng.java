@@ -1,17 +1,17 @@
 package com.kairos.persistence.model.user.region;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * Created by neuron on 12/6/17.
  */
 @NodeEntity
-public class LatLng extends UserBaseEntity{
+public class LatLng extends UserBaseEntity {
 
     private float lat;
     private float lng;
+    private int coordOrder;
 
     public LatLng(float lat, float lng) {
         this.lat = lat;
@@ -22,6 +22,13 @@ public class LatLng extends UserBaseEntity{
 
     }
 
+    public int getCoordOrder() {
+        return coordOrder;
+    }
+
+    public void setCoordOrder(int coordOrder) {
+        this.coordOrder = coordOrder;
+    }
 
     public float getLat() {
         return lat;
@@ -37,5 +44,13 @@ public class LatLng extends UserBaseEntity{
 
     public void setLng(float lng) {
         this.lng = lng;
+    }
+
+    @Override
+    public String toString() {
+        return "LatLng{" +
+                "lat=" + lat +
+                ", lng=" + lng +
+                '}';
     }
 }

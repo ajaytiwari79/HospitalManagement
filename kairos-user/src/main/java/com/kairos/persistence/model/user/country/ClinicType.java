@@ -1,25 +1,23 @@
 package com.kairos.persistence.model.user.country;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.common.UserBaseEntity;
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
 /**
  * Created by oodles on 9/1/17.
  */
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicType extends UserBaseEntity{
+public class ClinicType extends UserBaseEntity {
     @NotEmpty(message = "error.ClinicType.name.notEmpty") @NotNull(message = "error.ClinicType.name.notnull")
     private String name;
 

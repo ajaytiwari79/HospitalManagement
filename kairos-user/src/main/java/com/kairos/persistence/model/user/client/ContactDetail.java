@@ -1,12 +1,11 @@
 package com.kairos.persistence.model.user.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by oodles on 28/9/16.

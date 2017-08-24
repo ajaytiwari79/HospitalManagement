@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
+
 import com.kairos.persistence.model.organization.Organization;
 
 /**

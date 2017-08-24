@@ -1,10 +1,10 @@
 package com.kairos.persistence.model.user.staff;
 
-import java.util.Date;
+
+import com.kairos.persistence.model.enums.Gender;
 
 import javax.validation.constraints.NotNull;
-
-import com.kairos.persistence.Gender;
+import java.util.Date;
 
 /**
  * Created by pankaj on 7/3/17.
@@ -22,7 +22,7 @@ public class StaffCreationPOJOData {
     private Long engineerTypeId;
     private Date employedSince;
     private Date inactiveFrom;
-    private boolean isActive;
+    private boolean active;
     private String privatePhone;
     private String workEmail;
     private String userName;
@@ -117,11 +117,15 @@ public class StaffCreationPOJOData {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.active = active;
+    }
+
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
     }
 
     public String getPrivatePhone() {

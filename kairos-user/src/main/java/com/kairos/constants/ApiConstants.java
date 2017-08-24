@@ -4,7 +4,6 @@ package com.kairos.constants;
  * Constants for Application Usage
  */
 public final class ApiConstants {
-
     public static final String API_V1 ="/api/v1";
     public static final String PARENT_ORGANIZATION_URL = "/organization/{organizationId}";
     public static final String UNIT_URL = "/unit/{unitId}";
@@ -19,6 +18,12 @@ public final class ApiConstants {
     public static final String API_KMD_NEXUS_CITIZEN_URL = API_V1 + "/kmdNexus/citizen";
     public static final String API_AGGREGATOR_CITIZEN_URL = API_V1 + "/aggregator/citizen";
     public static final String WS_URL="ws://localhost:8090"+API_V1+"/kairos/ws";
+    public static final String API_REQUEST_COMPONENT_URL =  API_V1 + PARENT_ORGANIZATION_URL + "/resourceComponent";
+
+    public static final String API_ORGANIZATION_COUNTRY_URL =API_V1+PARENT_ORGANIZATION_URL+COUNTRY_URL;
+
+
+
     private ApiConstants() {
     }
 }

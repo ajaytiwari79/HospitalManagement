@@ -1,14 +1,13 @@
 package com.kairos.persistence.model.user.integration;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Created by oodles on 21/2/17.
  */
 @NodeEntity
-public class Twillio  extends UserBaseEntity implements Cloneable {
+public class Twillio  extends UserBaseEntity {
     private String accountId;
     private String authToken;
     private String number;
@@ -49,7 +48,13 @@ public class Twillio  extends UserBaseEntity implements Cloneable {
     public Twillio() {
     }
 
-    public Object clone()throws CloneNotSupportedException{
-        return super.clone();
+    public static Twillio getInstance(){
+        return new Twillio();
     }
+
+    public static Twillio copyProperties(Twillio source, Twillio target){
+        BeanUtils.copyProperties(source,target);
+        return target;
+    }
+
 }

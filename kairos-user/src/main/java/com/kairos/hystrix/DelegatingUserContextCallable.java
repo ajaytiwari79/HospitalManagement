@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import com.kairos.utils.userContext.UserContext;
-import com.kairos.utils.userContext.UserContextHolder;
+import com.kairos.util.userContext.UserContext;
+import com.kairos.util.userContext.UserContextHolder;
 
 
 public final class DelegatingUserContextCallable<V> implements Callable<V> {

@@ -1,15 +1,14 @@
 package com.kairos.persistence.model.user.department;
 
-import java.util.List;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.staff.Staff;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_STAFF;
+import static com.kairos.persistence.model.constants.RelationshipConstants.MANAGE;
 
 
 /**

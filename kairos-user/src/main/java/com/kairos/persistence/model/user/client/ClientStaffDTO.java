@@ -1,7 +1,5 @@
 package com.kairos.persistence.model.user.client;
 
-import java.util.List;
-
 /**
  * Created by prabjot on 25/4/17.
  */

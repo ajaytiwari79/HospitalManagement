@@ -1,5 +1,4 @@
 package com.kairos.controller.messaging;
-
 import com.kairos.constants.ApiConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,12 +1,9 @@
 package com.kairos.persistence.model.user.client;
 
-
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
-
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.auth.User;
 
 /**
  * Created by oodles on 4/10/16.
@@ -67,7 +64,7 @@ public class ClientRelativeRelation extends UserBaseEntity {
         this.client = client;
     }
 
-    public User getRelative() {
+    public Client getRelative() {
         return relative;
     }
 

@@ -1,13 +1,12 @@
 package com.kairos.persistence.model.user.staff;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCESS_PAGE_PERMISSION;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.access_permission.AccessPage;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.access_permission.AccessPage;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCESS_PAGE_PERMISSION;
 
 /**
  * Created by prabjot on 7/12/16.

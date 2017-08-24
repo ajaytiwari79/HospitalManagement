@@ -1,8 +1,9 @@
 package com.kairos.controller.access_group;
+
 import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.access_permission.Tab;
-import com.kairos.service.access_profile.AccessPageService;
-import com.kairos.utils.response.ResponseHandler;
+import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,6 +44,12 @@ public class AccessPageController {
     @RequestMapping(value = "/xml" ,method = RequestMethod.POST,consumes = {MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<Map<String,Object>> parseXml(@RequestBody Tab tab){
         accessPageService.createAccessPageByXml(tab);
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
+    }
+
+    @RequestMapping(value = "/page/permissions",method = RequestMethod.POST)
+    public ResponseEntity<Map<String,Object>> setPermissionsToPage(){
+        accessPageService.setPermissionToAccessPage();
         return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
     }
 

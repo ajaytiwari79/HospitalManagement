@@ -1,12 +1,11 @@
 package com.kairos.persistence.model.user.auth;
+import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ROLE_OF;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_USERROLE;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
-import com.kairos.persistence.model.common.UserBaseEntity;
 /**
  * UserRole
  * It holds reference to User ,Role & Permission of User

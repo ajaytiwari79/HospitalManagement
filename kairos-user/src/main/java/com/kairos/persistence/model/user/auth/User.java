@@ -1,25 +1,24 @@
 package com.kairos.persistence.model.user.auth;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.ADMINS_COUNTRY;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PROFILE;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.user.client.ContactAddress;
+import com.kairos.persistence.model.user.client.ContactDetail;
+import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.profile.Profile;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ADMINS_COUNTRY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PROFILE;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-import org.springframework.context.annotation.Profile;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.Gender;
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.model.user.country.Country;
 
 /**
  * User Domain & it's properties
@@ -29,7 +28,7 @@ import com.kairos.persistence.model.user.country.Country;
 public class User extends UserBaseEntity {
     protected String cprNumber;
 
-//    @NotNull(message = "error.User.userName.notnull")
+    //    @NotNull(message = "error.User.userName.notnull")
 //    @Size(min = 5, max = 20, message = "error.User.userName.size")
     private String userName;
     protected String nickName;
@@ -61,6 +60,8 @@ public class User extends UserBaseEntity {
 
     //define, first time password changed or not
     private boolean isPasswordUpdated;
+
+    private Long kmdExternalId;
 
     public int getOtp() {
         return otp;
@@ -148,6 +149,14 @@ public class User extends UserBaseEntity {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public Long getKmdExternalId() {
+        return kmdExternalId;
+    }
+
+    public void setKmdExternalId(Long kmdExternalId) {
+        this.kmdExternalId = kmdExternalId;
     }
 
     /**
@@ -386,7 +395,6 @@ public class User extends UserBaseEntity {
                 ", gender=" + gender +
                 ", email='" + email + '\'' +
                 ", timeCareExternalId='" + timeCareExternalId + '\'' +
-                ", password='" + password + '\'' +
                 ", age=" + age +
                 ", accessToken='" + accessToken + '\'' +
                 ", otp=" + otp +

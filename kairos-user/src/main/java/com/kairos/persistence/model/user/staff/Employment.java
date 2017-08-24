@@ -1,15 +1,15 @@
 package com.kairos.persistence.model.user.staff;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.EmploymentStatus;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.kairos.persistence.EmploymentStatus;
-import com.kairos.persistence.model.common.UserBaseEntity;
+import java.util.ArrayList;
+import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT_EMPLOYMENTS;
 
 /**
  * Created by prabjot on 3/12/16.

@@ -1,15 +1,18 @@
 package com.kairos.persistence.model.organization;
 
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.client.ContactDetail;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.kairos.persistence.model.user.client.ContactDetail;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by prabjot on 10/2/17.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitManagerDTO {
 
     @NotEmpty(message = "error.firstname.notnull") @NotNull(message = "error.firstname.notnull")
@@ -21,6 +24,7 @@ public class UnitManagerDTO {
     @NotNull(message = "error.Organization.unitmanager.accessgroupid.notnull")
     Long accessGroupId;
     ContactDetail contactDetail;
+    Long staffId;
 
     public String getFirstName() {
         return firstName;
@@ -60,5 +64,13 @@ public class UnitManagerDTO {
 
     public void setContactDetail(ContactDetail contactDetail) {
         this.contactDetail = contactDetail;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 }

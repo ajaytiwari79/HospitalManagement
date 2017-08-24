@@ -1,11 +1,10 @@
 package com.kairos.persistence.model.user.access_permission;
 
-import javax.validation.constraints.NotNull;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by prabjot on 9/27/16.

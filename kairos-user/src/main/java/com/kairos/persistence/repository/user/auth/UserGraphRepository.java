@@ -1,13 +1,14 @@
 package com.kairos.persistence.repository.user.auth;
-
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.auth.User;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.auth.User;
+import java.util.List;
+import java.util.Map;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENTS;
 
 
 /**
@@ -35,12 +36,8 @@ public interface UserGraphRepository extends GraphRepository<User> {
     @Query("MATCH (u:User) WHERE id(u) = {0} SET org.isDeleted = true ")
     void safeDelete(Long aLong);
 
-    @Query("Match (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0} with employment,organization\n" +
-            "Match (employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment) with unitEmployment,organization\n" +
-            "MATCH (unitEmployment)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission) with accessPermission,organization\n" +
-            "Match (accessPermission)-[r:HAS_ACCESS_PAGE_PERMISSION]->(accessPage:AccessPage{isModule:true})\n" +
-            "optional match (accessPage)-[:SUB_PAGE]->(subPage:AccessPage)<-[r2:HAS_ACCESS_PAGE_PERMISSION]-(accessPermission) with distinct {id:id(accessPage),name:accessPage.name,read:r.isRead,write:r.isWrite,tabPermissions:case when subPage is Null then [] else collect(distinct {id:id(subPage),name:subPage.name,read:r2.isRead,write:r2.isWrite}) end}as accessPermissions,organization\n" +
-            "return {id:id(organization),name:organization.name,accessPage:collect(accessPermissions)} as result")
+    @Query("Match (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with organization\n" +
+            "return {id:id(organization),name:organization.name} as result")
     List<Map<String, Object>> getOrganizations(long userId);
 
     @Query("Match (accessPage:AccessPage) where id(accessPage)={0}\n" +
@@ -55,4 +52,6 @@ public interface UserGraphRepository extends GraphRepository<User> {
 
 
     User findByCprNumber(String cprNumber);
+
+    User findByKmdExternalId(Long kmdExternalId);
 }

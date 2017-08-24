@@ -1,7 +1,8 @@
 package com.kairos.controller.user;
+
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.service.auth.UserService;
-import com.kairos.utils.response.ResponseHandler;
+import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -29,14 +30,11 @@ public class UserController {
     @Inject
     UserService userService;
 
-     //TODO use rest tempate
-
-    /*@Inject
+   /* @Inject
     TaskReportService taskReportService;*/
     /**
      * @return List of Users- All Users in db
      */
-
     @ApiOperation(value = "Get all Users")
     @RequestMapping(value = "/", method = RequestMethod.GET)
     List<User> getAllUsers() {
@@ -109,8 +107,8 @@ public class UserController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissionForModuleInOrganization(moduleId,orgId, userId));
     }
 
-   //TODO move in task service
-    /*@RequestMapping(value = "/generateExcels/citizenFile",method = RequestMethod.GET)
+   //TODO move in task micro service
+   /* @RequestMapping(value = "/generateExcels/citizenFile",method = RequestMethod.GET)
     public void createCitizenExcelfile(@RequestParam long unitId){
         taskReportService.generateCitizenList(unitId);
     }

@@ -1,19 +1,4 @@
 package com.kairos.service.staff;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.kairos.utils.timeCareShift.GetEmploymentByIdResponse;
-import com.kairos.utils.timeCareShift.GetEmploymentByIdResult;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -23,6 +8,18 @@ import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.util.timeCareShift.GetEmploymentByIdResponse;
+import com.kairos.util.timeCareShift.GetEmploymentByIdResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prabjot on 19/5/17.

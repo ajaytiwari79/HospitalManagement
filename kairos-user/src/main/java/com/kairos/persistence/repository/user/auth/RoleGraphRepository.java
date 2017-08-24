@@ -1,11 +1,10 @@
 package com.kairos.persistence.repository.user.auth;
 
-import java.util.List;
-
+import com.kairos.persistence.model.user.auth.Role;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.auth.Role;
+import java.util.List;
 
 /**
  * Interface for CRUD operation on Roleu

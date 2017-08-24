@@ -1,19 +1,15 @@
 package com.kairos.client;
 
 import com.kairos.response.dto.web.ResponseEnvelope;
-import com.kairos.utils.userContext.UserContext;
+import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by anil on 8/8/17.

@@ -20,12 +20,13 @@ import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGrap
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.service.UserBaseService;
-import com.kairos.service.access_profile.AccessGroupService;
+import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.google_calender.GoogleCalenderService;
-import com.kairos.utils.FormatUtil;
+import com.kairos.util.FormatUtil;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,8 +83,8 @@ public class CountryService extends UserBaseService {
     private AccessGroupService accessGroupService;
     @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
-    @Inject
-    private OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    @Autowired
+    OrganizationTypeGraphRepository organizationTypeGraphRepository;
 
     /**
      * @param country
@@ -125,6 +126,7 @@ public class CountryService extends UserBaseService {
         }
         currentCountry.setName(country.getName());
         currentCountry.setCode(country.getCode());
+        currentCountry.setGoogleCalendarCode(country.getGoogleCalendarCode());
         save(currentCountry);
         return currentCountry.retrieveDetails();
     }
@@ -195,7 +197,7 @@ public class CountryService extends UserBaseService {
 
                 holidayCalender = new CountryHolidayCalender();
                 holidayCalender.setHolidayTitle(event.getSummary() != null ? event.getSummary() : "");
-                holidayCalender.setHolidayDate(org.joda.time.DateTime.parse(event.getStart().get("date").toString()).getMillis());
+                holidayCalender.setHolidayDate(DateTime.parse(event.getStart().get("date").toString()).getMillis());
                 holidayCalender.setHolidayType(event.getVisibility() != null ? event.getSummary() : "");
                 holidayCalender.setGoogleCalId(event.getId());
 

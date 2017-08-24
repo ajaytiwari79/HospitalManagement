@@ -1,84 +1,49 @@
 package com.kairos.service.organization;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import com.kairos.persistence.repository.organization.*;
-import com.kairos.persistence.repository.user.access_profile.AccessGroupRepository;
-import com.kairos.persistence.repository.user.access_profile.AccessPageRepository;
-import com.kairos.service.access_profile.AccessGroupService;
-import com.kairos.service.client.ClientService;
-import com.kairos.service.country.CitizenStatusService;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.utils.DateConverter;
-import com.kairos.utils.FormatUtil;
-import com.kairos.utils.timeCareShift.GetAllWorkPlacesResponse;
-import com.kairos.utils.timeCareShift.GetAllWorkPlacesResult;
-import com.kairos.persistence.model.organization.AddressDTO;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
-import com.kairos.persistence.model.organization.OrganizationDTO;
-import com.kairos.persistence.model.organization.OrganizationGeneral;
-import com.kairos.persistence.model.organization.OrganizationQueryResult;
-import com.kairos.persistence.model.organization.OrganizationSetting;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.ParentOrganizationDTO;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.country.BusinessType;
-import com.kairos.persistence.model.user.country.ContractType;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.EmployeeLimit;
-import com.kairos.persistence.model.user.country.IndustryType;
-import com.kairos.persistence.model.user.country.KairosStatus;
-import com.kairos.persistence.model.user.country.OwnershipType;
-import com.kairos.persistence.model.user.country.VatType;
+import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
-import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.ContractTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.CurrencyGraphRepository;
-import com.kairos.persistence.repository.user.country.EmployeeLimitGraphRepository;
-import com.kairos.persistence.repository.user.country.IndustryTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.KairosStatusGraphRepository;
-import com.kairos.persistence.repository.user.country.OwnershipTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.VatTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.*;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.client.ClientOrganizationRelationService;
+import com.kairos.service.client.ClientService;
+import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
-import org.springframework.web.client.HttpClientErrorException;
+import com.kairos.util.DateConverter;
+import com.kairos.util.FormatUtil;
+import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
+import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.text.ParseException;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
-
 
 
 /**
@@ -149,23 +114,22 @@ public class OrganizationService extends UserBaseService {
     private GroupGraphRepository groupGraphRepository;
     @Inject
     private TeamGraphRepository teamGraphRepository;
-
     @Inject
     private ContactAddressGraphRepository contactAddressGraphRepository;
 
     @Inject
     private OpenningHourService openningHourService;
 
-    @Autowired private TeamService teamService;
-
-    @Autowired  private CitizenStatusService citizenStatusService;
+    @Autowired TeamService teamService;
     @Autowired
-    private OrganizationMetadataRepository organizationMetadataRepository;
-    @Autowired
-    private OrganizationServiceRepository organizationServiceRepository;
+    OrganizationMetadataRepository organizationMetadataRepository;
 
     @Autowired
-    private ClientService clientService;
+    ClientService clientService;
+    @Autowired OrganizationServiceRepository organizationServiceRepository;
+
+    @Autowired
+    CitizenStatusService citizenStatusService;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -211,6 +175,7 @@ public class OrganizationService extends UserBaseService {
         if (organization == null) {
             return null;
         }
+
         OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
         organization.setOrganizationSetting(organizationSetting);
         save(organization);
@@ -282,6 +247,30 @@ public class OrganizationService extends UserBaseService {
         List<OrganizationType> organizationTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getTypeId());
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getSubTypeId());
 
+        // @ modified by vipul for KSP-107
+        List<WorkingTimeAgreement> allWta= organizationTypeGraphRepository.getAllWTAByOrganiationType(orgDetails.getTypeId());
+
+        List<WorkingTimeAgreement> allWtaNewObject=new ArrayList<WorkingTimeAgreement>();
+
+        for(WorkingTimeAgreement obj:allWta){
+
+            WorkingTimeAgreement workingTimeAgreementObj=new WorkingTimeAgreement();
+
+            workingTimeAgreementObj.setName(obj.getName());
+            workingTimeAgreementObj.setDescription(obj.getDescription());
+            workingTimeAgreementObj.setCountry(obj.getCountry());
+            workingTimeAgreementObj.setEndDate(obj.getEndDate());
+            workingTimeAgreementObj.setExpiryDate(obj.getExpiryDate());
+            workingTimeAgreementObj.setExpertise(obj.getExpertise());
+            workingTimeAgreementObj.setRegion(obj.getRegion());
+            workingTimeAgreementObj.setEnabled(true);
+            workingTimeAgreementObj.setRuleTemplates(obj.getRuleTemplates());
+            workingTimeAgreementObj.setStartDate(obj.getStartDate());
+            workingTimeAgreementObj.setWta(obj.getWta());
+            allWtaNewObject.add(workingTimeAgreementObj);
+        }
+        organization.setWorkingTimeAgreements(allWtaNewObject);
+
         // BusinessType
         List<BusinessType> businessTypes = businessTypeGraphRepository.findByIdIn(orgDetails.getBusinessTypeIds());
 
@@ -348,10 +337,15 @@ public class OrganizationService extends UserBaseService {
         organization.setOrganizationTypes(organizationTypes);
         organization.setOrganizationSubTypes(organizationSubTypes);
         organization.setBusinessTypes(businessTypes);
+        logger.info(organization.toString());
+
         return organization;
     }
 
     public Map<String, Object> createNewUnit(OrganizationDTO organizationDTO, long unitId) {
+
+        logger.info("vipul to check                                                                 ");
+
         Organization parent = organizationGraphRepository.findOne(unitId);
 
         Organization unit = new Organization();
@@ -558,13 +552,20 @@ public class OrganizationService extends UserBaseService {
         if (unit == null) {
             throw new InternalError("unit is null");
         }
-        OwnershipType ownershipType = ownershipTypeGraphRepository.findOne(organizationGeneral.getOwnershipTypeId());
+
+        OwnershipType ownershipType = null;
+        ContractType contractType = null;
+        IndustryType industryType = null;
+        EmployeeLimit employeeLimit = null;
+        KairosStatus kairosStatus = null;
+        VatType vatType = null;
+        if(organizationGeneral.getOwnershipTypeId() != null ) ownershipType = ownershipTypeGraphRepository.findOne(organizationGeneral.getOwnershipTypeId());
         List<BusinessType> businessTypes = businessTypeGraphRepository.findByIdIn(organizationGeneral.getBusinessTypeId());
-        ContractType contractType = contractTypeGraphRepository.findOne(organizationGeneral.getContractTypeId());
-        IndustryType industryType = industryTypeGraphRepository.findOne(organizationGeneral.getIndustryTypeId());
-        EmployeeLimit employeeLimit = employeeLimitGraphRepository.findOne(organizationGeneral.getEmployeeLimitId());
-        VatType vatType = vatTypeGraphRepository.findOne(organizationGeneral.getVatTypeId());
-        KairosStatus kairosStatus = kairosStatusGraphRepository.findOne(organizationGeneral.getKairosStatusId());
+        if(organizationGeneral.getContractTypeId() != null ) contractType = contractTypeGraphRepository.findOne(organizationGeneral.getContractTypeId());
+        if(organizationGeneral.getIndustryTypeId() != null ) industryType = industryTypeGraphRepository.findOne(organizationGeneral.getIndustryTypeId());
+        if(organizationGeneral.getEmployeeLimitId() != null ) employeeLimit = employeeLimitGraphRepository.findOne(organizationGeneral.getEmployeeLimitId());
+        if(organizationGeneral.getVatTypeId() != null) vatType = vatTypeGraphRepository.findOne(organizationGeneral.getVatTypeId());
+        if(organizationGeneral.getKairosStatusId() != null ) kairosStatus = kairosStatusGraphRepository.findOne(organizationGeneral.getKairosStatusId());
         ContactAddress contactAddress = unit.getContactAddress();
         if (contactAddress != null) {
             Municipality municipality = municipalityGraphRepository.findOne(organizationGeneral.getMunicipalityId());
@@ -777,10 +778,9 @@ public class OrganizationService extends UserBaseService {
         return null;
     }
 
-    public Integer checkDuplicationOrganizationRelation(Long organizationId, Long unitId){
-        return organizationGraphRepository.checkParentChildRelation(organizationId, unitId);
+   public Integer checkDuplicationOrganizationRelation(Long organizationId, Long unitId){
+       return organizationGraphRepository.checkParentChildRelation(organizationId, unitId);
     }
-
 
 
     /**
@@ -800,7 +800,7 @@ public class OrganizationService extends UserBaseService {
         data.put("teamsOfOrganization", teamService.getTeamsInUnit(unitId));
         data.put("zipCodes", regionService.getAllZipCodes());
 
-       return data;
+        return data;
     }
 
     /**
@@ -843,9 +843,6 @@ public class OrganizationService extends UserBaseService {
 
     }
 
-
-
 }
-
 
 

@@ -1,8 +1,6 @@
 package com.kairos.service.kmdNexus;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.kairos.constants.AppConstants;
-import com.kairos.utils.JsonUtils;
+import com.kairos.util.JsonUtils;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.country.Country;
@@ -46,7 +44,6 @@ import com.kairos.response.dto.web.PatientRelative;
 import com.kairos.response.dto.web.PatientWrapper;
 import com.kairos.response.dto.web.RelativeContacts;
 import com.kairos.response.dto.web.RepetitionType;
-import com.kairos.response.dto.web.Shifts;
 import com.kairos.service.client.ExternalClientService;
 import com.kairos.service.organization.OrganizationServiceService;
 

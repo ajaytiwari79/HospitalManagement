@@ -1,16 +1,15 @@
 package com.kairos.persistence.repository.user.region;
 
-
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.region.Municipality;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.region.Municipality;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.MUNICIPALITY;
+
 
 /**
  * Created by oodles on 22/12/16.
@@ -32,18 +31,19 @@ public interface MunicipalityGraphRepository extends GraphRepository<Municipalit
      * @param zipCodeId
      * @return
      */
-    @Query("Match (zipCode:ZipCode)-[:MUNICIPALITY]->(municipality:Municipality) where id(zipCode)={0} return municipality limit 1")
-    Municipality getMunicipalityByZipCode(long zipCodeId);
+    @Query("Match (zipCode:ZipCode)-[:"+MUNICIPALITY+"]->(municipality:Municipality) where id(zipCode)={0} return municipality limit 1")
+    Municipality getMunicipalityByZipCodeId(long zipCodeId);
 
-    @Query("Match (zipCode:ZipCode)-[:MUNICIPALITY]->(municipality:Municipality) where id(zipCode)={0} return municipality")
+    @Query("Match (zipCode:ZipCode)-[:"+MUNICIPALITY+"]->(municipality:Municipality) where id(zipCode)={0} return municipality")
     List<Municipality> getMunicipalitiesByZipCode(long zipCode);
 
     Municipality findByCode(String code);
 
-    @Query("Match (zipCode:ZipCode)-[:MUNICIPALITY]->(municipality:Municipality) where zipCode.zipCode={0} return municipality limit 1")
-    Municipality getMunicipalityByZipCodeId(Long zipCodeId);
+    @Query("Match (zipCode:ZipCode)-[:"+MUNICIPALITY+"]->(municipality:Municipality) where zipCode.zipCode={0} return municipality limit 1")
+    Municipality getMunicipalityByZipCodeId(int zipCodeId);
 
     @Query("Match (zipCode:ZipCode{zipCode:{0}})-[:"+MUNICIPALITY+"]->(municipality:Municipality) return municipality")
     List<Municipality> getMuncipalityByZipcode(int zipcode);
+
 
 }

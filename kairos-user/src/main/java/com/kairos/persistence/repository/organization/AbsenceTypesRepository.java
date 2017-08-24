@@ -1,10 +1,8 @@
 package com.kairos.persistence.repository.organization;
-
-import java.util.List;
-
+import com.kairos.persistence.model.organization.AbsenceTypes;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
-import com.kairos.persistence.model.organization.AbsenceTypes;
+import java.util.List;
 
 /**
  * Created by oodles on 16/12/16.

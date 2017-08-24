@@ -1,14 +1,5 @@
 package com.kairos.service.client;
 
-import java.util.Date;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -32,10 +23,18 @@ import com.kairos.response.dto.web.PatientRelative;
 import com.kairos.response.dto.web.PatientWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.region.RegionService;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.Date;
+import java.util.Map;
 
 import static com.kairos.constants.AppConstants.KAIROS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SECONDARY_ADDRESS;
+
 
 /**
  * Created by Jasgeet on 22/5/17.
@@ -149,7 +148,6 @@ public class ExternalClientService extends UserBaseService {
     }
 
     public ContactAddress saveContactAddressFromKmd(CurrentAddress addressDTO, Long clientId, String type, long unitId, Long addressId) {
-        /*
 
         ContactAddress contactAddress = null;
         if (addressId != null) {
@@ -218,18 +216,18 @@ public class ExternalClientService extends UserBaseService {
             if (geographyData != null) {
                 //  logger.debug("Geography  not found with zipcodeId: " + zipCode.getId());
                 //  return null;
-                Municipality municipality = municipalityGraphRepository.getMunicipalityByZipCode(zipCode.getId());
+                Municipality municipality = municipalityGraphRepository.getMunicipalityByZipCodeId(zipCode.getId());
                 contactAddress.setMunicipality(municipality);
                 contactAddress.setProvince(String.valueOf(geographyData.get("province")));
                 contactAddress.setRegionName(String.valueOf(geographyData.get("region")));
                 logger.debug("Geography Data: " + geographyData);
             }
         } else {
-            *//*ZipCode zipCode1 = new ZipCode();
+            /*ZipCode zipCode1 = new ZipCode();
 >>>>>>> development
             zipCode1.setZipCode(Integer.valueOf(addressDTO.getPostalCode().toString()));
             zipCodeGraphRepository.save(zipCode1);
-            contactAddress.setZipCode(zipCode1);*//*
+            contactAddress.setZipCode(zipCode1);*/
             Municipality municipality = municipalityGraphRepository.getMunicipalityByZipCodeId(Integer.valueOf(addressDTO.getPostalCode().toString()));
             contactAddress.setMunicipality(municipality);
         }
@@ -243,8 +241,6 @@ public class ExternalClientService extends UserBaseService {
         // contactAddress.setFloorNumber(addressDTO1.getFloorNumber());
         contactAddressGraphRepository.save(contactAddress);
         return addressVerificationService.saveAndUpdateClientAddress(currentClient, contactAddress, type);
-        */
-    return null;
 
     }
 
@@ -295,12 +291,10 @@ public class ExternalClientService extends UserBaseService {
             }
             saveAddressDetails(patientWrapper, client, unitId);
             saveContactDetails(client, patientWrapper);
-            logger.info("client civilian status------------1->"+citizenStatus.getName());
             if (citizenStatus != null) {
                 client.setCivilianStatus(citizenStatusGraphRepository.findOne(citizenStatus.getId()));
             }
             save(client);
-            logger.info("client civilian status------------2->"+client.getCivilianStatus().getName());
             return client;
 
         }
@@ -309,7 +303,7 @@ public class ExternalClientService extends UserBaseService {
 
     public ContactDetail saveContactDetails(Client currentClient, PatientWrapper patientWrapper) {
         // Client Contact Details
-        logger.debug("Client found to set Social details: " + currentClient.getFirstName() + " with id: " + currentClient.getId());
+       // logger.debug("Client found to set Social details: " + currentClient.getFirstName() + " with id: " + currentClient.getId());
 
         if (currentClient != null) {
             ContactDetail contactDetail = currentClient.getContactDetail();

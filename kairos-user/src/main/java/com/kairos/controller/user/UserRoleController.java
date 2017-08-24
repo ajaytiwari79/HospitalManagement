@@ -1,4 +1,5 @@
 package com.kairos.controller.user;
+
 import com.kairos.persistence.model.user.auth.Role;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.auth.UserRole;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 
 import static com.kairos.constants.ApiConstants.API_V1;
+
 
 /**
  * Created by oodles on 30/8/16.

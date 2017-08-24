@@ -1,18 +1,17 @@
 package com.kairos.persistence.model.user.skill;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.auth.User;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.auth.User;
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.APPROVED_BY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CATEGORY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.REQUESTED_BY;
 
 
 /**

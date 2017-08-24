@@ -1,13 +1,12 @@
 package com.kairos.persistence.model.user.expertise;
 
+import com.kairos.persistence.model.user.skill.Skill;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
-import com.kairos.persistence.model.user.skill.Skill;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.EXPERTISE_HAS_SKILLS;
 
 /**
  * Created by prabjot on 4/4/17.

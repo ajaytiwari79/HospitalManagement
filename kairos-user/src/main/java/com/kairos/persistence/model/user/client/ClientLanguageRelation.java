@@ -1,17 +1,15 @@
 package com.kairos.persistence.model.user.client;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.language.Language;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
-
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.language.Language;
 
 /**
  * Created by oodles on 17/1/17.
  */
 @RelationshipEntity(type = "KNOWS")
-public class ClientLanguageRelation extends UserBaseEntity{
+public class ClientLanguageRelation extends UserBaseEntity {
 
 
     @StartNode

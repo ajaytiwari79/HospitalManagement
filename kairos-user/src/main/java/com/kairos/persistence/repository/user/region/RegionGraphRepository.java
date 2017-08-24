@@ -1,14 +1,12 @@
 package com.kairos.persistence.repository.user.region;
-
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.region.Municipality;
+import com.kairos.persistence.model.user.region.Region;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.persistence.model.user.region.Region;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 

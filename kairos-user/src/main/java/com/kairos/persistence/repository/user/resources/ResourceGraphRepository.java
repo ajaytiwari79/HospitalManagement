@@ -4,14 +4,13 @@ package com.kairos.persistence.repository.user.resources;
  * Created by oodles on 17/10/16.
  */
 
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.resources.Resource;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.resources.Resource;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -29,11 +28,13 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
     @Query(" MATCH (o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource) WHERE  id(o)={0} WITH r as res " +
             "OPTIONAL MATCH (res)-[:RESOURCE_NOT_AVAILABLE_ON]->(ra:ResourceUnAvailability)  RETURN " +
             "{ name:res.name, " +
+            " id:id(res), " +
             "registrationNumber:res.registrationNumber, " +
             "number:res.number, " +
             " modelDescription:res.modelDescription, " +
             "costPerKM:res.costPerKM , " +
             "fuelType:res.fuelType ,  " +
+            "isEnabled:res.isEnabled ,  " +
             "unavailability:collect({ " +
             "     notAvailableFrom:ra.notAvailableFrom, " +
             "     notAvailableTo:ra.notAvailableTo })  " +

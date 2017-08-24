@@ -1,14 +1,14 @@
 package com.kairos.persistence.model.user.auth;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TEAM_LEADER;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.team.Team;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.team.Team;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TEAM_LEADER;
+
 
 /**
  * Created by oodles on 21/10/16.

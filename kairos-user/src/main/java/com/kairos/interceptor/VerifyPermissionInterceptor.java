@@ -1,20 +1,12 @@
 package com.kairos.interceptor;
-import com.kairos.persistence.repository.user.access_profile.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.kairos.constants.AppConstants.GET;
-import static com.kairos.constants.AppConstants.OPTIONS;
 
 /**
  * Created by prabjot on 21/11/16.

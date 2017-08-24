@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.user.country;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * Created by oodles on 23/11/16.

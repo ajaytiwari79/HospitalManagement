@@ -1,7 +1,6 @@
 package com.kairos.service.auth;
-
-import javax.inject.Inject;
-
+import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,8 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import javax.inject.Inject;
 
 /**
  *  UserDetailService
@@ -29,9 +27,6 @@ public class UserDetailService {
 
     @Inject
     private PasswordEncoder passwordEncoder;
-
-    @Inject
-     TokenService tokenService;
 
     /**
      * Calls UserGraphRepository and find user by provided Username & password &

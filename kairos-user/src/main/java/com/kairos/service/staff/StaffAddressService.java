@@ -1,18 +1,5 @@
 package com.kairos.service.staff;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.utils.DistanceCalculator;
-import com.kairos.utils.FormatUtil;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;
@@ -30,9 +17,20 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.client.AddressVerificationService;
+import com.kairos.util.DistanceCalculator;
+import com.kairos.util.FormatUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
+
 
 /**
  * Created by prabjot on 19/5/17.
@@ -40,6 +38,7 @@ import static com.kairos.constants.AppConstants.ORGANIZATION;
 @Transactional
 @Service
 public class StaffAddressService extends UserBaseService {
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject

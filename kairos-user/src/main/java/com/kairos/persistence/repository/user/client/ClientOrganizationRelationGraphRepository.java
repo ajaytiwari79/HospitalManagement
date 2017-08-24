@@ -1,10 +1,8 @@
 package com.kairos.persistence.repository.user.client;
-
+import com.kairos.persistence.model.user.client.ClientOrganizationRelation;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
-
-import com.kairos.persistence.model.user.client.ClientOrganizationRelation;
 
 /**
  * Created by oodles on 15/11/16.

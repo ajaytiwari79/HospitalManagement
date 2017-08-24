@@ -1,13 +1,12 @@
 package com.kairos.persistence.repository.user.language;
 
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.language.Language;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.language.Language;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prabjot on 28/11/16.

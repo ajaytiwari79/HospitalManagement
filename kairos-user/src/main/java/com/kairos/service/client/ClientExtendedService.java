@@ -1,61 +1,18 @@
 package com.kairos.service.client;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.utils.FileUtil;
-import com.kairos.persistence.Gender;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.client.AccessToLocation;
-import com.kairos.persistence.model.user.client.Client;
-import com.kairos.persistence.model.user.client.ClientAllergies;
-import com.kairos.persistence.model.user.client.ClientDiagnose;
-import com.kairos.persistence.model.user.client.ClientDoctor;
-import com.kairos.persistence.model.user.client.ClientLanguageRelation;
-import com.kairos.persistence.model.user.client.ClientOrganizationRelation;
-import com.kairos.persistence.model.user.client.ClientRelativeRelation;
-import com.kairos.persistence.model.user.client.ClientStaffRelation;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.model.user.client.ContactDetailSocialDTO;
-import com.kairos.persistence.model.user.client.NextToKinDTO;
+import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.client.AccessToLocationGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientAllergiesGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientDiagnoseGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientLanguageRelationGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientRelativeGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientStaffRelationGraphRepository;
-import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
-import com.kairos.persistence.repository.user.client.ContactDetailsGraphRepository;
+import com.kairos.persistence.repository.user.client.*;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
@@ -63,8 +20,20 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.FileUtil;
+import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.IMAGES_PATH;
+
 
 /**
  * Created by Jasgeet on 22/5/17.
@@ -677,7 +646,6 @@ public class ClientExtendedService  extends UserBaseService {
     public String uploadAccessToLocationImage(Long accessToLocationId, MultipartFile multipartFile) {
         AccessToLocation accessToLocation = accessToLocationGraphRepository.findOne(accessToLocationId);
         if (accessToLocation == null) {
-            logger.debug("accessToLocation is null");
             return null;
         }
 
@@ -698,6 +666,15 @@ public class ClientExtendedService  extends UserBaseService {
         accessToLocation.setAccessPhotoURL(fileName);
         accessToLocationGraphRepository.save(accessToLocation);
         return envConfig.getServerHost() + File.separator + fileName;
+    }
+
+    public void removeAccessToLocationImage(long accessToLocationId){
+        AccessToLocation accessToLocation = accessToLocationGraphRepository.findOne(accessToLocationId);
+        if (accessToLocation == null) {
+           throw new InternalError("Access to location is null");
+        }
+        accessToLocation.setAccessPhotoURL(null);
+        accessToLocationGraphRepository.save(accessToLocation);
     }
 
 
@@ -754,5 +731,6 @@ public class ClientExtendedService  extends UserBaseService {
         clientGraphRepository.save(currentClient);
         return false;
     }
+
 
 }

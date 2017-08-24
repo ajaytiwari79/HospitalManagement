@@ -1,24 +1,21 @@
 package com.kairos.service.organization;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.service.UserBaseService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.AppConstants.GROUP_LABEL;
+
 
 /**
  * Created by oodles on 7/10/16.
@@ -27,7 +24,7 @@ import static com.kairos.constants.AppConstants.GROUP_LABEL;
 @Service
 public class GroupService extends UserBaseService {
     @Inject
-    private  GroupGraphRepository groupGraphRepository;
+    private GroupGraphRepository groupGraphRepository;
 
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
@@ -71,7 +68,7 @@ public class GroupService extends UserBaseService {
         return  organizationGraphRepository.getGroupAllSelectedServices(groupId);
     }
 
-    public List<OrganizationService>  addGroupSelectedService(Long groupId, Long[] service) {
+    public List<com.kairos.persistence.model.organization.OrganizationService>  addGroupSelectedService(Long groupId, Long[] service) {
         return groupGraphRepository.addSelectedService(groupId,service);
 
     }
@@ -90,10 +87,6 @@ public class GroupService extends UserBaseService {
     public List<Skill> addGroupSelectedSkills(Long groupId, Long[] skill) {
         return groupGraphRepository.saveSkill(groupId,skill);
     }
-
-   /* public List<TaskType> getAllAvailableTaskType(Long groupId) {
-        return null;
-    }*/
 
     public Group updateGroupGeneralDetails(long groupId, Group group) {
 

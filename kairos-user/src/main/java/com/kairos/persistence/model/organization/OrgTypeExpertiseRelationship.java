@@ -1,12 +1,12 @@
 package com.kairos.persistence.model.organization;
 
+import com.kairos.persistence.model.user.expertise.Expertise;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
-import com.kairos.persistence.model.user.expertise.Expertise;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORG_TYPE_HAS_EXPERTISE;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by prabjot on 12/4/17.

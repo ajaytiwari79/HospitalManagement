@@ -1,8 +1,7 @@
 package com.kairos.persistence.model.user.client;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * Created by oodles on 25/10/16.
@@ -173,10 +172,4 @@ public class AccessToLocation extends UserBaseEntity {
         this.remarks = remarks;
     }
 
-    @Override
-    public AccessToLocation clone() throws CloneNotSupportedException {
-        AccessToLocation accessToLocation = (AccessToLocation) super.clone();
-        accessToLocation.setId(null);
-        return accessToLocation;
-    }
 }

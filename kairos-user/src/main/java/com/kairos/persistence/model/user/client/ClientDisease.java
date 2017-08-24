@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.client;
 
+
 import com.kairos.persistence.model.common.UserBaseEntity;
 
 /**

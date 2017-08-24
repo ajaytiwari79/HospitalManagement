@@ -1,11 +1,9 @@
 package com.kairos.persistence.model.user.country;
+import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-
-import com.kairos.persistence.model.common.UserBaseEntity;
 
 /**
  * CountryHolidayCalender Domain extending Base Entity

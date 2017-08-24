@@ -3,21 +3,22 @@ package com.kairos.controller.resources;
 /**
  * Created by oodles on 17/10/16.
  */
+
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.service.resources.ResourceService;
-import com.kairos.utils.response.ResponseHandler;
+import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.API_V1;
-
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
+
+import static com.kairos.constants.ApiConstants.API_V1;
+
 
 /**
  * ResourceController

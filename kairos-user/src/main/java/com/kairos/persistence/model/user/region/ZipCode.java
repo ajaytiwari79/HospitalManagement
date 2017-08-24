@@ -1,29 +1,24 @@
 package com.kairos.persistence.model.user.region;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Range;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.common.UserBaseEntity;
+import javax.validation.constraints.NotNull;
+import java.util.*;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.MUNICIPALITY;
+
 
 /**
  * Created by oodles on 28/12/16.
  */
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ZipCode extends UserBaseEntity{
+public class ZipCode extends UserBaseEntity {
 
     @NotEmpty(message = "error.ZipCode.name.notEmpty") @NotNull(message = "error.ZipCode.name.notnull")
     private String name;
@@ -87,12 +82,5 @@ public class ZipCode extends UserBaseEntity{
         response.put("geoFence",this.geoFence);
         return  response;
 
-    }
-
-    @Override
-    public ZipCode clone() throws CloneNotSupportedException {
-        ZipCode zipCode = (ZipCode) super.clone();
-        zipCode.setId(null);
-        return zipCode;
     }
 }

@@ -1,12 +1,13 @@
 package com.kairos.persistence.model.deserializer;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.kairos.persistence.model.user.auth.User;
+
+
+import java.io.IOException;
 
 /**
  * Custom Serializer for User domain

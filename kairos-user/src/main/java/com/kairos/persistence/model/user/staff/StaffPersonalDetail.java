@@ -1,10 +1,8 @@
 package com.kairos.persistence.model.user.staff;
-
-import javax.validation.constraints.NotNull;
-
+import com.kairos.persistence.model.user.client.ContactDetail;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.kairos.persistence.model.user.client.ContactDetail;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by prabjot on 10/1/17.

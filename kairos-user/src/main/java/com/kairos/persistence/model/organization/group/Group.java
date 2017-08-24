@@ -1,19 +1,17 @@
 package com.kairos.persistence.model.organization.group;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotEmpty;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.skill.Skill;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 

@@ -1,12 +1,10 @@
 package com.kairos.persistence.repository.user.country;
-
-import java.util.List;
-
+import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.country.CountryHolidayCalender;
+import java.util.List;
 
 /**
  * Created by oodles on 20/9/16.

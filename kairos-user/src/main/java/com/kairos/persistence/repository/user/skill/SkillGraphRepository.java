@@ -1,14 +1,17 @@
 package com.kairos.persistence.repository.user.skill;
 
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.skill.Skill;
+import com.kairos.persistence.model.user.skill.SkillCategory;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.skill.SkillCategory;
+import java.util.List;
+import java.util.Map;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANISATION_HAS_SKILL;
+import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_SKILLS;
+
 
 /**
  * SkillGraphRepository
@@ -27,7 +30,7 @@ public interface SkillGraphRepository extends GraphRepository<Skill>{
     List<Skill> findById(List<Long> ids);
 
     @Query("MATCH (s:Skill  {isEnabled:true} )-[:HAS_CATEGORY]->(sc:SkillCategory) WHERE id(sc)={0} AND s.name=~ {1} return s")
-    List<Skill> checkDuplicateSkill(long categoryId,String name);
+    List<Skill> checkDuplicateSkill(long categoryId, String name);
 
     /**
      *
@@ -66,8 +69,12 @@ public interface SkillGraphRepository extends GraphRepository<Skill>{
     @Query("MATCH (skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory{isEnabled:true}) return {id:id(skillCategory),name:skillCategory.name,skills:collect({skillId:id(skill),name:skill.name,parentId:id(skillCategory)})} AS data")
     List<Map<String,Object>> getSkillsForTaskType();
 
-    @Query("Match (organization:Organization)-[r:ORGANISATION_HAS_SKILL]->(skill:Skill) where id(organization)={0} AND id(skill)={1} set r.visitourId={2} return r is not null")
-    boolean updateVisitourIdOfSkill(long unitId,long skillId,String visitourId);
+    @Query("Match (organization:Organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={0} AND id(skill)={1} set r.visitourId={2} return r is not null")
+    boolean updateVisitourIdOfSkillInOrganization(long unitId, long skillId, String visitourId);
+
+    @Query("Match (team:Team)-[r:"+TEAM_HAS_SKILLS+"]->(skill:Skill) where id (team)={0} AND id(skill)={1} with r\n" +
+            "set r.visitourId={2} return r is not null")
+    boolean updateVisitourIdOfSkillInTeam(long unitId, long skillId, String visitourId);
 
 
 

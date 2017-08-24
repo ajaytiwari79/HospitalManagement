@@ -1,16 +1,13 @@
 package com.kairos.service.organization;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import com.kairos.persistence.model.organization.AbsenceTypes;
+import com.kairos.persistence.repository.organization.AbsenceTypesRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kairos.persistence.model.organization.AbsenceTypes;
-import com.kairos.persistence.repository.organization.AbsenceTypesRepository;
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oodles on 16/12/16.
@@ -58,4 +55,5 @@ public class AbsenceTypesService {
         else workScheduleMetaData.put("type", absenceTypes.getATVTID());
         return workScheduleMetaData;
     }
+
 }

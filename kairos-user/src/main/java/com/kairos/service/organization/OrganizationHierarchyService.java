@@ -1,21 +1,20 @@
 package com.kairos.service.organization;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.service.tree_structure.TreeStructureService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import static com.kairos.constants.AppConstants.*;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static com.kairos.constants.AppConstants.ORGANIZATION_LABEL;
+
 
 /**
  * Created by prabjot on 19/5/17.

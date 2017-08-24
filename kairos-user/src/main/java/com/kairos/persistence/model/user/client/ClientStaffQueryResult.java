@@ -1,11 +1,9 @@
 package com.kairos.persistence.model.user.client;
+import com.kairos.persistence.model.enums.Gender;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.data.neo4j.annotation.QueryResult;
-
-import com.kairos.persistence.Gender;
 
 /**
  * Created by prabjot on 25/4/17.

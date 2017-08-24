@@ -1,16 +1,12 @@
 package com.kairos.service.auth;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.persistence.model.user.auth.UserRole;
 import com.kairos.persistence.repository.user.auth.UserRoleGraphRepository;
 import com.kairos.service.UserBaseService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
+import java.util.List;
 
 
 /**

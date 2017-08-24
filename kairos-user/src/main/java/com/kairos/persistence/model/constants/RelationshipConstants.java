@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
  */
 
 public class RelationshipConstants {
+
     // Organization
     public final static String COUNTRY = "BELONGS_TO";
     public final static String HAS_GROUP = "HAS_GROUP";
@@ -35,6 +36,8 @@ public class RelationshipConstants {
     public final static String ORGANIZATION_HAS_OFFICE_RESOURCE ="ORGANIZATION_HAS_OFFICE_RESOURCE";
 
 
+    public final static String HAS_POSITION_NAME ="HAS_POSITION_NAME";
+    public final static String HAS_POSITION ="HAS_POSITION";
 
 
     // Group
@@ -102,6 +105,11 @@ public class RelationshipConstants {
     public static final String BELONGS_TO = "BELONGS_TO";
     public static final String HAS_EXPERTISE = "HAS_EXPERTISE";
 
+
+    public static final String HAS_CTA = "HAS_CTA";
+    public static final String HAS_WTA = "HAS_WTA";
+
+
     public static final String HAS_ORGANIZATION_SERVICES = "HAS_ORGANIZATION_SERVICES";
     public static final String CIVILIAN_STATUS = "CIVILIAN_STATUS";
     public static final String HAS_EXPERTISE_IN = "HAS_EXPERTISE_IN";
@@ -150,7 +158,10 @@ public class RelationshipConstants {
     public final static String KAIROS_STATUS = "KAIROS_STATUS";
     public final static String TYPE_OF_HOUSING = "TYPE_OF_HOUSING";
 
-
+    // RULE Template
+    public final static String HAS_RULE_TEMPLATE="HAS_RULE_TEMPLATE";
+    public final static String HAS_RULE_TEMPLATE_CATEGORY="HAS_RULE_TEMPLATE_CATEGORY";
+    public final static String HAS_RULE_TEMPLATES = "HAS_RULE_TEMPLATES";
 
     /**
      * Default constructor

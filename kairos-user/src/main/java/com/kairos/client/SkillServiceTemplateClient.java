@@ -1,7 +1,7 @@
 package com.kairos.client;
 
 import com.kairos.response.dto.web.ResponseEnvelope;
-import com.kairos.utils.userContext.UserContext;
+import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

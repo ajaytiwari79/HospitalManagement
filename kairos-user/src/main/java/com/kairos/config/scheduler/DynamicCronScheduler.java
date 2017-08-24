@@ -5,8 +5,8 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.service.control_panel.ControlPanelService;
-import com.kairos.utils.BeanFactoryUtil;
-import com.kairos.utils.timeCareShift.Transstatus;
+import com.kairos.util.BeanFactoryUtil;
+import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,24 +54,24 @@ public class DynamicCronScheduler implements  DisposableBean  {
     private static final Logger logger = LoggerFactory.getLogger(DynamicCronScheduler.class);
 
     public String setCronScheduling(ControlPanel controlPanel){
-           logger.debug("cron----> " + controlPanel.getCronExpression());
-           CronTrigger trigger = new CronTrigger(controlPanel.getCronExpression(), TimeZone.getTimeZone("Denmark"));
-           ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-           threadPoolTaskScheduler.setThreadNamePrefix(controlPanel.getIntegrationConfiguration().getId().toString());
-           threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
-           threadPoolTaskScheduler.initialize();
-           Runnable runnable = getTask(controlPanel, trigger, TimeZone.getTimeZone("Denmark"));
-           threadPoolTaskScheduler.schedule(runnable, trigger);
+        logger.debug("cron----> " + controlPanel.getCronExpression());
+        CronTrigger trigger = new CronTrigger(controlPanel.getCronExpression(), TimeZone.getTimeZone("Denmark"));
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setThreadNamePrefix(controlPanel.getIntegrationConfiguration().getId().toString());
+        threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
+        threadPoolTaskScheduler.initialize();
+        Runnable runnable = getTask(controlPanel, trigger, TimeZone.getTimeZone("Denmark"));
+        threadPoolTaskScheduler.schedule(runnable, trigger);
 
-           logger.info("Name of cron job is --> " + "scheduler" + controlPanel.getId());
+        logger.info("Name of cron job is --> " + "scheduler" + controlPanel.getId());
         BeanFactoryUtil.registerSingleton("scheduler" + controlPanel.getId(), threadPoolTaskScheduler);
-     //   context.getBeanFactory().registerSingleton("scheduler" + controlPanel.getId(), threadPoolTaskScheduler);
-       //    context.register(ThreadPoolTaskScheduler.class);
-     //      context.refresh();
-           logger.info("Name of cron job is --> " + "scheduler" + controlPanel.getId());
-           //  context.close();
+        //   context.getBeanFactory().registerSingleton("scheduler" + controlPanel.getId(), threadPoolTaskScheduler);
+        //    context.register(ThreadPoolTaskScheduler.class);
+        //      context.refresh();
+        logger.info("Name of cron job is --> " + "scheduler" + controlPanel.getId());
+        //  context.close();
 
-           return "scheduler" + controlPanel.getId();
+        return "scheduler" + controlPanel.getId();
 
 
     }
@@ -110,7 +110,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
             String scheduler = "scheduler"+controlPanel.getId();
             logger.info("Start scheduler from BootStrap--> "+scheduler);
             CronTrigger trigger = new CronTrigger(controlPanel.getCronExpression(),  TimeZone.getTimeZone("Denmark"));
-           Runnable task = getTask(controlPanel,  trigger, TimeZone.getTimeZone("Denmark"));
+            Runnable task = getTask(controlPanel,  trigger, TimeZone.getTimeZone("Denmark"));
 
             ThreadPoolTaskScheduler scheduler2 = BeanFactoryUtil.getDefaultListableBeanFactory()
                     .getBean(scheduler, ThreadPoolTaskScheduler.class);
@@ -143,14 +143,14 @@ public class DynamicCronScheduler implements  DisposableBean  {
                 headers.add("Authorization", "Basic " + base64ClientCredentials);
                 HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
                 String importShiftStatusXMLURI = envConfig.getCarteServerHost()+KETTLE_TRANS_STATUS;
-               //   String startDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-              //     String endDate = DateFormatUtils.format(DateUtil.addWeeksInDate(new Date(), 5), "yyyy-MM-dd");
-              //  String startDate = DateFormatUtils.format(controlPanel.getStartDate(), "yyyy-MM-dd");
-              //  String endDate = DateFormatUtils.format(controlPanel.getEndDate(), "yyyy-MM-dd");
+                //   String startDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+                //     String endDate = DateFormatUtils.format(DateUtil.addWeeksInDate(new Date(), 5), "yyyy-MM-dd");
+                //  String startDate = DateFormatUtils.format(controlPanel.getStartDate(), "yyyy-MM-dd");
+                //  String endDate = DateFormatUtils.format(controlPanel.getEndDate(), "yyyy-MM-dd");
                 Long workplaceId = Long.valueOf(String.valueOf("15"));
                 if(controlPanel.getUnitId() != null){
                     Organization organization = organizationGraphRepository.findOne(controlPanel.getUnitId());
-                   if(organization.getExternalId() != null) workplaceId = Long.valueOf(organization.getExternalId());
+                    if(organization.getExternalId() != null) workplaceId = Long.valueOf(organization.getExternalId());
                 }
                 String importShiftURI = "";
                 int weeks = 35;
@@ -168,10 +168,10 @@ public class DynamicCronScheduler implements  DisposableBean  {
                             ResponseEntity<String> resultStatusXml = restTemplate.exchange(importShiftStatusXMLURI, HttpMethod.GET, entity, String.class);
                             Date stopped = new Date();
                             try {
-                                JAXBContext jaxbContext = JAXBContext.newInstance(com.kairos.utils.timeCareShift.Transstatus.class);
+                                JAXBContext jaxbContext = JAXBContext.newInstance(Transstatus.class);
                                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
                                 StringReader reader = new StringReader(resultStatusXml.getBody());
-                                com.kairos.utils.timeCareShift.Transstatus transstatus = (Transstatus) jaxbUnmarshaller.unmarshal(reader);
+                                Transstatus transstatus = (Transstatus) jaxbUnmarshaller.unmarshal(reader);
                                 logger.info("trans status---> " + transstatus.getId());
 
                                 controlPanelService.createJobScheduleDetails(controlPanel, transstatus, started, stopped);
@@ -194,7 +194,15 @@ public class DynamicCronScheduler implements  DisposableBean  {
                         break;
                     case IMPORT_KMD_CITIZEN_GRANTS:
                         importShiftURI = envConfig.getServerHost()+API_KMD_CARE_CITIZEN_GRANTS;
-                       restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+                        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+                        break;
+                    case IMPORT_KMD_STAFF_AND_WORKING_HOURS:
+                        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_STAFF_SHIFTS+controlPanel.getUnitId()+"/getShifts/"+controlPanel.getFilterId();
+                        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+                        break;
+                    case IMPORT_KMD_TASKS:
+                        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_STAFF_SHIFTS+controlPanel.getUnitId()+"/getTasks/"+controlPanel.getFilterId();
+                        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
                         break;
                 }
 

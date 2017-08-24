@@ -4,6 +4,7 @@ package com.kairos.persistence.model.user.access_permission;
  * Created by prabjot on 23/5/17.
  */
 public class AccessPermissionDTO {
+
     private boolean isRead;
     private boolean isWrite;
     private long pageId;

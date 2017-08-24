@@ -1,16 +1,14 @@
 package com.kairos.persistence.model.user.office_esources_and_metadata;
-
-import java.util.List;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
+import java.util.List;
 
 /**
  * Created by @pankaj on 9/2/17.
  */
 @NodeEntity
-public class OfficeResourceTypeMetadata extends UserBaseEntity{
+public class OfficeResourceTypeMetadata extends UserBaseEntity {
     private List<String> officeResource;
     private List<String> vehicleResource;
 

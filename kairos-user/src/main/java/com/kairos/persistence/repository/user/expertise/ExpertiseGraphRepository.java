@@ -1,15 +1,17 @@
 package com.kairos.persistence.repository.user.expertise;
 
-import java.util.List;
-
+import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
+import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.EXPERTISE_HAS_SKILLS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CATEGORY;
+
 
 /**
  * Created by prabjot on 28/10/16.
@@ -25,7 +27,7 @@ public interface ExpertiseGraphRepository extends GraphRepository<Expertise> {
     List<Expertise> findAll();
 
     @Query("Match (expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"]->(skill:Skill) where id(expertise)={0} AND id(skill)={1} return count(r) as countOfRel")
-    int expertiseHasAlreadySkill(long expertiseId,long skillId);
+    int expertiseHasAlreadySkill(long expertiseId, long skillId);
 
     @Query("Match (expertise:Expertise),(skill:Skill) where id (expertise)={0} AND id(skill)={1} create (expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{creationDate:{2},lastModificationDate:{3},isEnabled:true}]->(skill) return skill")
     void addSkillInExpertise(long expertiseId, long skillId, long creationDate, long lastModificationDate);

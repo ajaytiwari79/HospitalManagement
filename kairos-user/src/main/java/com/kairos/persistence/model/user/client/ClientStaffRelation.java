@@ -1,13 +1,12 @@
 package com.kairos.persistence.model.user.client;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.staff.Staff;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.staff.Staff;
+import static com.kairos.persistence.model.constants.RelationshipConstants.SERVED_BY_STAFF;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by oodles on 3/10/16.

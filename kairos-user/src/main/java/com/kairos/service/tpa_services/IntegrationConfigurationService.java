@@ -1,26 +1,23 @@
 package com.kairos.service.tpa_services;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
 import com.kairos.service.UserBaseService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prabjot on 17/1/17.
  */
 @Service
 @Transactional
-public class IntegrationConfigurationService extends UserBaseService{
+public class IntegrationConfigurationService extends UserBaseService {
 
     @Inject
     CountryGraphRepository countryGraphRepository;

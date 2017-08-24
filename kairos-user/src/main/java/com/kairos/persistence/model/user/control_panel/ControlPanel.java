@@ -1,21 +1,19 @@
 package com.kairos.persistence.model.user.control_panel;
-
-import java.util.Date;
-import java.util.List;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Jasgeet on 29/12/16.
  */
 
 @NodeEntity
-public class ControlPanel extends UserBaseEntity{
+public class ControlPanel extends UserBaseEntity {
 
 
     private String name;
@@ -35,6 +33,7 @@ public class ControlPanel extends UserBaseEntity{
     private Date endDate;
     private Integer weeks;
     private Long unitId;
+    private String filterId;
 
     public List<String> getSelectedHours() {
         return selectedHours;
@@ -61,7 +60,7 @@ public class ControlPanel extends UserBaseEntity{
     }
 
     @Relationship(direction = "OUTGOING")
-    private  IntegrationConfiguration integrationConfiguration;
+    private IntegrationConfiguration integrationConfiguration;
 
     @Relationship(type = "UNITS")
     private Organization organization;
@@ -193,5 +192,13 @@ public class ControlPanel extends UserBaseEntity{
 
     public void setWeeks(Integer weeks) {
         this.weeks = weeks;
+    }
+
+    public String getFilterId() {
+        return filterId;
+    }
+
+    public void setFilterId(String filterId) {
+        this.filterId = filterId;
     }
 }

@@ -1,16 +1,16 @@
 package com.kairos.persistence.repository.organization;
 
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.organization.OrganizationTimeSlotRelationship;
+import com.kairos.persistence.model.organization.TimeSlot;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.organization.OrganizationTimeSlotRelationship;
-import com.kairos.persistence.model.organization.TimeSlot;
+import java.util.List;
+import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_TIME_SLOT;
+
 
 /**
  * Created by prabjot on 23/1/17.

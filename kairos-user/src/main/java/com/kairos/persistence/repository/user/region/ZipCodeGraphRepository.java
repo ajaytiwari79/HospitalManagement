@@ -1,16 +1,16 @@
 package com.kairos.persistence.repository.user.region;
 
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.region.Municipality;
+import com.kairos.persistence.model.user.region.ZipCode;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.persistence.model.user.region.ZipCode;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
 
 /**
  * Created by oodles on 28/12/16.
@@ -18,6 +18,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface ZipCodeGraphRepository extends GraphRepository<ZipCode>{
 
+
+    @Query("Match (n:ZipCode{isEnable:true}) where n.zipCode={0} return n")
     ZipCode findByZipCode(int zipCode);
 
     List<ZipCode> findAll();
@@ -30,7 +32,7 @@ public interface ZipCodeGraphRepository extends GraphRepository<ZipCode>{
     List<Map<String,Object>> getAllZipCodeByCountryId(Long countryId);
 
 
-    @Query("MATCH (c:Country)<-[*4]-(z:ZipCode{isEnable:true}) where id(c)={0} return DISTINCT { value:id(z),name:z.name ,label:z.zipCode} as result")
+    @Query("MATCH (c:Country)<-[:BELONGS_TO]-(r:Region)<-[:REGION]-(p:Province)<-[:PROVINCE]-(m:Municipality)<-[:MUNICIPALITY]-(z:ZipCode{isEnable:true})  where id(c)={0} return DISTINCT { value:id(z),name:z.name ,label:z.zipCode} as result")
     List<Map<String,Object>> getAllZipCodeByCountryIdAnotherFormat(Long countryId);
 
 

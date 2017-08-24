@@ -1,24 +1,5 @@
 package com.kairos.service.region;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.utils.FormatUtil;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -32,6 +13,20 @@ import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.FormatUtil;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.inject.Inject;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * Created by prabjot on 12/12/16.
@@ -156,7 +151,7 @@ public class RegionService extends UserBaseService {
             throw new InternalError("Zipcode can't be null");
         }
         HashMap<String,Object> responseData = new HashMap<>();
-        responseData.put("geographyData",FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(zipcodeId)));
+        responseData.put("geographyData", FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(zipcodeId)));
 
         return responseData;
     }

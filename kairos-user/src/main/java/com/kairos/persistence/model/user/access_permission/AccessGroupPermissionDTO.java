@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.user.access_permission;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.util.List;
 
 /**
  * Created by prabjot on 30/12/16.

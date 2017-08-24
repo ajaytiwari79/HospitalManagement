@@ -1,16 +1,17 @@
 package com.kairos.persistence.model.user.staff;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.EmploymentStatus;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.position.Position;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.kairos.persistence.EmploymentStatus;
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.Organization;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
 
 /**
  * Created by prabjot on 24/10/16.
@@ -42,15 +43,14 @@ public class UnitEmployment extends UserBaseEntity {
     private Organization organization;
 
 
+    @Relationship(type = HAS_POSITION)
+    private List<Position> positions;
+
     @Relationship(type = HAS_WAGES)
     private List<Wage> wages = new ArrayList<>();
 
     @Relationship(type = HAS_PARTIAL_LEAVES)
     List<PartialLeave> partialLeaves = new ArrayList<>();
-
-    @Relationship(type = HAS_ACCESS_PERMISSION)
-    List<AccessPermission> accessPermissions = new ArrayList<>();
-
 
 
     public UnitEmployment(){}
@@ -146,15 +146,6 @@ public class UnitEmployment extends UserBaseEntity {
         this.partialLeaves = partialLeaves;
     }
 
-    public void setAccessPermissions(List<AccessPermission> accessPermissions) {
-        this.accessPermissions = accessPermissions;
-    }
-
-    public List<AccessPermission> getAccessPermissions() {
-
-        return accessPermissions;
-    }
-
     public void setEmploymentNumber(String employmentNumber) {
         this.employmentNumber = employmentNumber;
     }
@@ -162,5 +153,13 @@ public class UnitEmployment extends UserBaseEntity {
     public String getEmploymentNumber() {
 
         return employmentNumber;
+    }
+
+    public List<Position> getPositions() {
+        return Optional.ofNullable(positions).orElse(new ArrayList<Position>());
+    }
+
+    public void setPositions(List<Position> positions) {
+        this.positions = positions;
     }
 }

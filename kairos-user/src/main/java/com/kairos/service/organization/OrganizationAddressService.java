@@ -1,20 +1,7 @@
 package com.kairos.service.organization;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.utils.FormatUtil;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
@@ -37,6 +24,17 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.payment_type.PaymentTypeService;
+import com.kairos.util.FormatUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
@@ -48,7 +46,6 @@ import static com.kairos.constants.AppConstants.ORGANIZATION;
 @Transactional
 @Service
 public class OrganizationAddressService {
-
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -355,6 +352,7 @@ public class OrganizationAddressService {
         }
         return null;
     }
+
 
 
 

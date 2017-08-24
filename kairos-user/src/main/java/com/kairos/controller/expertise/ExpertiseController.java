@@ -1,10 +1,11 @@
 package com.kairos.controller.expertise;
 import com.kairos.service.expertise.ExpertiseService;
-import com.kairos.utils.response.ResponseHandler;
+import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -21,12 +22,13 @@ import static com.kairos.constants.ApiConstants.API_V1;
 public class ExpertiseController {
 
     @Inject
-    ExpertiseService expertiseService;
+    private ExpertiseService expertiseService;
 
 
 
     @ApiOperation(value = "Assign Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
+    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setExpertiseToStaff(@PathVariable Long staffId, @RequestBody  Map<String, Object> expertise) {
         Long expertiseId = Long.valueOf(expertise.get("id").toString());
         Map<String, Object> expertiseObj = expertiseService.setExpertiseToStaff(staffId,expertiseId);
@@ -38,6 +40,7 @@ public class ExpertiseController {
 
     @ApiOperation(value = "Get Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.GET)
+    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseToStaff(@PathVariable Long staffId) {
         Map<String, Object> expertise = expertiseService.getExpertiseToStaff(staffId);
         if (expertise == null) {

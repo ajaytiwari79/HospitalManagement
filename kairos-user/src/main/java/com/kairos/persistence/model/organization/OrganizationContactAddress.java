@@ -1,10 +1,9 @@
 package com.kairos.persistence.model.organization;
 
-import org.springframework.data.neo4j.annotation.QueryResult;
-
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
  * Created by prabjot on 3/3/17.

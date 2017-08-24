@@ -1,27 +1,9 @@
 package com.kairos.service.client;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.utils.DateConverter;
-import com.kairos.utils.FormatUtil;
 import com.kairos.persistence.model.organization.AddressDTO;
-import com.kairos.persistence.model.user.client.AccessToLocation;
-import com.kairos.persistence.model.user.client.Client;
-import com.kairos.persistence.model.user.client.ClientAddressQueryResult;
-import com.kairos.persistence.model.user.client.ClientTempAddressQueryResult;
-import com.kairos.persistence.model.user.client.ClientTemporaryAddress;
-import com.kairos.persistence.model.user.client.ContactAddress;
+import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.country.HousingType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -36,8 +18,18 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.HousingTypeService;
+import com.kairos.util.DateConverter;
+import com.kairos.util.FormatUtil;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TEMPORARY_ADDRESS;
+
 
 /**
  * Created by oodles on 22/5/17.
@@ -45,7 +37,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_T
 @Service
 @Transactional
 public class ClientAddressService extends UserBaseService {
-
     private final Logger logger = Logger.getLogger(this.getClass());
 
     @Inject
@@ -70,6 +61,8 @@ public class ClientAddressService extends UserBaseService {
     private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
     private AccessToLocationGraphRepository accessToLocationGraphRepository;
+    @Inject
+    private EnvConfig envConfig;
 
     public Map<String, Object> getAddressDetails(Long clientId, Long unitId) {
         Client client = clientGraphRepository.findOne(clientId, 0);
@@ -159,6 +152,7 @@ public class ClientAddressService extends UserBaseService {
         address.put("endDate", DateConverter.getDate(contactAddress.getEndDate()));
         address.put("description", contactAddress.getDescription());
         address.put("street1", contactAddress.getStreet1());
+        address.put("locationName",contactAddress.getLocationName());
         return address;
     }
 
@@ -287,6 +281,7 @@ public class ClientAddressService extends UserBaseService {
         contactAddress.setZipCode(zipCode);
         contactAddress.setCity(zipCode.getName());
         contactAddress.setDescription(addressDTO.getDescription());
+        contactAddress.setLocationName(addressDTO.getLocationName());
         return contactAddress;
     }
 
@@ -373,7 +368,7 @@ public class ClientAddressService extends UserBaseService {
     }
 
     public List<Object> getAccessLocationDetails(Long clientId) {
-        return (List) accessToLocationGraphRepository.findHomeAccessToLocation(clientId).get("accessDetails");
+        return (List) accessToLocationGraphRepository.findHomeAccessToLocation(clientId,envConfig.getServerHost() + File.separator).get("accessDetails");
 
     }
 

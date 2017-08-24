@@ -14,7 +14,6 @@ import com.kairos.persistence.repository.user.client.ContactAddressGraphReposito
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
-import com.lowagie.text.pdf.codec.Base64;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -25,13 +24,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.KAIROS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
+
 
 /**
  * Created by oodles on 22/5/17.
@@ -421,6 +420,5 @@ public class ClientBatchService {
         logger.info("-----------------House Not Verified-----------------------");
         return clientList;
     }
-
 
 }

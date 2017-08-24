@@ -1,10 +1,8 @@
 package com.kairos.persistence.repository.user.contact;
-
-import java.util.List;
-
+import com.kairos.persistence.model.user.contract.Contract;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
-import com.kairos.persistence.model.user.contract.Contract;
+import java.util.List;
 
 /**
  * Created by oodles on 23/11/16.

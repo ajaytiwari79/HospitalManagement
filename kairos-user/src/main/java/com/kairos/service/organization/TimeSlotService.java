@@ -1,16 +1,5 @@
 package com.kairos.service.organization;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.InvalidTimeSlotException;
 import com.kairos.persistence.model.organization.Organization;
@@ -21,6 +10,11 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.organization.OrganizationTimeSlotGraphRepository;
 import com.kairos.persistence.repository.organization.TimeSlotGraphRepository;
 import com.kairos.service.UserBaseService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
 
@@ -52,7 +46,7 @@ public class TimeSlotService extends UserBaseService {
             return null;
         }
         if(timeSlotDTO.isShiftStartTime()){
-            timeSlotGraphRepository.updateShiftStartTime(unitId,TimeSlot.TYPE.ADVANCE);
+            timeSlotGraphRepository.updateShiftStartTime(unitId, TimeSlot.TYPE.ADVANCE);
         }
         TimeSlot timeSlot = new TimeSlot();
         timeSlot.setName(timeSlotDTO.getName());
@@ -220,6 +214,6 @@ public class TimeSlotService extends UserBaseService {
     public List<Map<String,Object>> getCurrentTimeSlotOfUnit(Long unitId){
         List<Map<String,Object>> currentTimeSlots= timeSlotGraphRepository.getUnitCurrentTimeSlots(unitId);
 
-    return currentTimeSlots;
+        return currentTimeSlots;
     }
 }

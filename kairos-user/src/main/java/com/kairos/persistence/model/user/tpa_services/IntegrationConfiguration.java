@@ -1,15 +1,14 @@
 package com.kairos.persistence.model.user.tpa_services;
-
-import javax.validation.constraints.NotNull;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.country.Country;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.country.Country;
+import javax.validation.constraints.NotNull;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+
 
 /**
  * Created by prabjot on 17/1/17.

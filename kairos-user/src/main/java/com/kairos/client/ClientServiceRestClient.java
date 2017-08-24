@@ -4,7 +4,7 @@ import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.TableConfiguration;
 import com.kairos.client.dto.TaskTypeAggregateResult;
 import com.kairos.response.dto.web.ResponseEnvelope;
-import com.kairos.utils.userContext.UserContext;
+import com.kairos.util.userContext.UserContext;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  *

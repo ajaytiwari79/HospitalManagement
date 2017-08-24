@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.user.client;
-
-import org.neo4j.ogm.annotation.GraphId;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.GraphId;
 
 /**
  * Created by oodles on 28/9/16.

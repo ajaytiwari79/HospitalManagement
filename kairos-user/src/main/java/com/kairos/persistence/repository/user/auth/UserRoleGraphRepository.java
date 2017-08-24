@@ -1,12 +1,11 @@
 package com.kairos.persistence.repository.user.auth;
 
-import java.util.List;
-
+import com.kairos.persistence.model.user.auth.Role;
+import com.kairos.persistence.model.user.auth.UserRole;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
-import com.kairos.persistence.model.user.auth.Role;
-import com.kairos.persistence.model.user.auth.UserRole;
+import java.util.List;
 
 /**
  * Interface for CRUD operation on UserRole

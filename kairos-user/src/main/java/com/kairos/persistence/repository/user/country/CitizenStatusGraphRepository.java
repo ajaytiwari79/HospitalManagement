@@ -1,13 +1,11 @@
 package com.kairos.persistence.repository.user.country;
-
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.country.CitizenStatus;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.country.CitizenStatus;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oodles on 5/1/17.

@@ -1,18 +1,20 @@
 package com.kairos.persistence.repository.organization;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
-import org.springframework.stereotype.Repository;
-
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.user.skill.Skill;
+import org.springframework.data.neo4j.annotation.Query;
+import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.stereotype.Repository;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import java.util.List;
+import java.util.Map;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.GROUP_HAS_SKILLS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_GROUP;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANISATION_HAS_SKILL;
+
 
 /**
  * Created by oodles on 7/10/16.

@@ -1,7 +1,7 @@
 package com.kairos.controller.control_panel;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.service.control_panel.ControlPanelService;
-import com.kairos.utils.response.ResponseHandler;
+import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_CONTROL_PANEL_URL;

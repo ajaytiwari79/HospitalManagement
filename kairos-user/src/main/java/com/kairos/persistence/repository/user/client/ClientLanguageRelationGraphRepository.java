@@ -1,12 +1,10 @@
 package com.kairos.persistence.repository.user.client;
-
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.client.ClientLanguageRelation;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
-import com.kairos.persistence.model.user.client.ClientLanguageRelation;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oodles on 17/1/17.

@@ -1,15 +1,15 @@
 package com.kairos.persistence.repository.user.client;
 
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.client.AccessToLocation;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.client.AccessToLocation;
+import java.util.List;
+import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ADDRESS_ACCESS_DEAILS;
+
 
 /**
  * Created by oodles on 23/11/16.
@@ -36,10 +36,10 @@ public interface AccessToLocationGraphRepository extends GraphRepository<AccessT
             "      alarmCodeDescription:ac.alarmCodeDescription," +
             "      haveAlarmCode:ac.haveAlarmCode," +
             "      howToAccessAddress:ac.howToAccessAddress," +
-            "       accessPhotoURL: ac.accessPhotoURL, "+
+            "       profilePic: {1} + ac.accessPhotoURL, "+
             "      addressType:type(r)"+
             "})} as accessDetails")
-    Map<String,Object> findHomeAccessToLocation(Long clientId);
+    Map<String,Object> findHomeAccessToLocation(long clientId, String imageUrl);
 
 
     @Query("MATCH (c:Client)-[]->(cd:ContactAddress) WHERE id(c)={0}   WITH cd " +

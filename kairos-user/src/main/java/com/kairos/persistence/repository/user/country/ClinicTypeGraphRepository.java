@@ -1,12 +1,11 @@
 package com.kairos.persistence.repository.user.country;
 
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.country.ClinicType;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
-import com.kairos.persistence.model.user.country.ClinicType;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oodles on 9/1/17.

@@ -1,8 +1,7 @@
 package com.kairos.persistence.model.organization;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * Created by oodles on 14/10/16.

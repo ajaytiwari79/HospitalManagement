@@ -1,14 +1,13 @@
 package com.kairos.persistence.model.user.country;
-
-import javax.validation.constraints.NotNull;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
+import javax.validation.constraints.NotNull;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.RELATED_TO;
+
 
 /**
  * Created by prabjot on 9/1/17.

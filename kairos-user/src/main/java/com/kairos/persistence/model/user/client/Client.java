@@ -1,36 +1,21 @@
 package com.kairos.persistence.model.user.client;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ALLERGY;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CONTACT_DETAIL;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_DIAGNOSE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_DISEASE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_DOCTOR;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_OFFICE_ADDRESS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PARTNER_ADDRESS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SECONDARY_ADDRESS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TEMPORARY_ADDRESS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.NEXT_TO_KIN;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.ClientEnum;
-import com.kairos.persistence.Gender;
+import com.kairos.persistence.model.enums.ClientEnum;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.staff.Staff;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+
+import java.util.*;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
 
 /**
  * Created by oodles on 27/9/16.
@@ -46,6 +31,7 @@ public class Client extends User {
     private CitizenStatus civilianStatus;
     private String profilePic;
 
+    @JsonIgnore
     @Relationship(type = NEXT_TO_KIN)
     private Client nextToKin;
 
@@ -156,6 +142,8 @@ public class Client extends User {
     private int onEscalationListMinPKm;
     private int unplannedMinPKm;
     private int longDrivingTimeInMin;
+    private int noOfVisitationHours;
+    private int noOfVisitationTasks;
 
     public int getMostDrivenKm() {
         return mostDrivenKm;
@@ -166,6 +154,9 @@ public class Client extends User {
     }
 
     private int mostDrivenKm;
+
+
+
 
     // Constructors
     public Client() {
@@ -719,13 +710,13 @@ public class Client extends User {
         Map<String, Object> map = new HashMap<>();
 
         map.put("id", super.getId());
-        map.put("cprNumber", cprNumber);
+        map.put("cprNumber", this.cprNumber);
         map.put("firstName", this.firstName);
         map.put("lastName", this.lastName);
         map.put("nameAmongStaff", this.nameAmongStaff);
-        map.put("civilianStatus", this.civilianStatus);
-        map.put("age", age);
-        map.put("gender", gender);
+    //    map.put("civilianStatus", this.civilianStatus);
+        map.put("age", this.age);
+        map.put("gender", this.gender);
         map.put("profilePic", this.profilePic);
         map.put("citizenDead", this.citizenDead);
         map.put("visitourTeamId", this.visitourTeamId);
@@ -881,6 +872,26 @@ public class Client extends User {
         response.put("name", this.firstName + " " + this.lastName);
 
         return response;
+    }
+
+    public int getNoOfVisitationHours() {
+        return noOfVisitationHours;
+    }
+
+    public void setNoOfVisitationHours(int noOfVisitationHours) {
+        this.noOfVisitationHours = noOfVisitationHours;
+    }
+
+    public int getNoOfVisitationTasks() {
+        return noOfVisitationTasks;
+    }
+
+    public void setNoOfVisitationTasks(int noOfVisitationTasks) {
+        this.noOfVisitationTasks = noOfVisitationTasks;
+    }
+
+    public String getFullName(){
+        return this.firstName+" "+this.lastName;
     }
 
     @Override

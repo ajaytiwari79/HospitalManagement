@@ -1,14 +1,13 @@
 package com.kairos.persistence.repository.user.skill;
 
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.skill.Skill;
+import com.kairos.persistence.model.user.skill.SkillCategory;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.skill.SkillCategory;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oodles on 15/9/16.
@@ -50,6 +49,6 @@ public interface SkillCategoryGraphRepository extends GraphRepository<SkillCateg
 
 
     @Query("MATCH (sc:SkillCategory {isEnabled:true})-[:BELONGS_TO]->(c:Country) WHERE id(c)={0} AND sc.name=~ {1} return sc")
-    List<SkillCategory> checkDuplicateSkillCategory(long countryId,String name);
+    List<SkillCategory> checkDuplicateSkillCategory(long countryId, String name);
 
 }

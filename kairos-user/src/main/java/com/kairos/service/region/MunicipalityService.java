@@ -1,14 +1,4 @@
 package com.kairos.service.region;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.kairos.utils.FormatUtil;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -16,13 +6,20 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.ProvinceGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.FormatUtil;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oodles on 22/12/16.
  */
 @Service
 @Transactional
-public class MunicipalityService extends UserBaseService{
+public class MunicipalityService extends UserBaseService {
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
@@ -80,7 +77,9 @@ public class MunicipalityService extends UserBaseService{
         if(municipality == null){
             throw new InternalError("Municipality is null");
         }
-        zipCode.getMunicipalities().add(municipality);
+        List<Municipality> municipalities = zipCode.getMunicipalities();
+        municipalities.add(municipality);
+        zipCode.setMunicipalities(municipalities);
         save(zipCode);
         return  zipCode.retrieveDetails();
     }

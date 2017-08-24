@@ -1,22 +1,19 @@
 package com.kairos.service.country;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.persistence.model.user.country.CountryTimeType;
 import com.kairos.persistence.repository.user.country.CountryTimeTypeGraphRepository;
 import com.kairos.service.UserBaseService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.List;
 
 /**
  * Created by oodles on 23/11/16.
  */
 @Service
 @Transactional
-public class CountryTimeTypeService extends UserBaseService{
+public class CountryTimeTypeService extends UserBaseService {
 
 
     @Inject

@@ -1,8 +1,9 @@
 package com.kairos.config;
+
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.constants.AppConstants;
-import com.kairos.persistence.ClientEnum;
-import com.kairos.persistence.Gender;
+import com.kairos.persistence.model.enums.ClientEnum;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
@@ -26,12 +27,9 @@ import com.kairos.persistence.model.user.resources.ResourceUnAvailability;
 import com.kairos.persistence.model.user.resources.VehicleType;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.model.user.staff.AccessPermission;
-import com.kairos.persistence.model.user.staff.Employment;
-import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.UnitEmployment;
+import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.*;
-import com.kairos.persistence.repository.user.access_profile.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientLanguageRelationGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
@@ -50,9 +48,10 @@ import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
-import com.kairos.service.access_profile.AccessGroupService;
-import com.kairos.service.access_profile.AccessPageService;
+import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.auth.RoleServiceUser;
 import com.kairos.service.auth.UserRoleServiceUser;
 import com.kairos.service.auth.UserService;
@@ -61,7 +60,6 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.control_panel.ControlPanelService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.organization.OpenningHourService;
-import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationTypeService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
@@ -87,7 +85,7 @@ public class BootDataService {
     @Inject
     UserService userService;
     @Inject
-    OrganizationService organizationService;
+    com.kairos.service.organization.OrganizationService organizationService;
     @Inject
     SkillService skillService;
     @Inject
@@ -164,6 +162,8 @@ public class BootDataService {
     private OpenningHourService openningHourService;
     @Inject
     private AccessPageService accessPageService;
+    @Inject
+    private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
 
 
 
@@ -858,8 +858,9 @@ public class BootDataService {
         UnitEmployment unitEmployment = new UnitEmployment();
         unitEmployment.setOrganization(kairosCountryLevel);
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        unitEmployment.getAccessPermissions().add(accessPermission);
         unitEmploymentGraphRepository.save(unitEmployment);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
         accessPageService.setPagePermissionToAdmin(accessPermission);
         employmentForAdmin.getUnitEmployments().add(unitEmployment);
         kairosCountryLevel.getEmployments().add(employmentForAdmin);
@@ -971,9 +972,9 @@ public class BootDataService {
         UnitEmployment unitEmployment = new UnitEmployment();
         unitEmployment.setOrganization(oodlesCityLevel);
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        unitEmployment.getAccessPermissions().add(accessPermission);
-        unitEmploymentGraphRepository.save(unitEmployment);
-        accessPageService.setPagePermissionToStaff(accessPermission);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+        accessPageService.setPagePermissionToStaff(accessPermission,accessGroup.getId());
         employmentForMichal.getUnitEmployments().add(unitEmployment);
         oodlesCityLevel.getEmployments().add(employmentForMichal);
 
@@ -981,9 +982,9 @@ public class BootDataService {
         unitEmployment = new UnitEmployment();
         unitEmployment.setOrganization(oodlesCityLevel);
         accessPermission = new AccessPermission(accessGroup);
-        unitEmployment.getAccessPermissions().add(accessPermission);
-        unitEmploymentGraphRepository.save(unitEmployment);
-        accessPageService.setPagePermissionToStaff(accessPermission);
+        UnitEmpAccessRelationship taskGiverAccess = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        unitEmpAccessGraphRepository.save(taskGiverAccess);
+        accessPageService.setPagePermissionToStaff(accessPermission,accessGroup.getId());
         employmentForAlma.getUnitEmployments().add(unitEmployment);
         oodlesCityLevel.getEmployments().add(employmentForAlma);
 
@@ -991,9 +992,9 @@ public class BootDataService {
         unitEmployment = new UnitEmployment();
         unitEmployment.setOrganization(oodlesCityLevel);
         accessPermission = new AccessPermission(accessGroup);
-        unitEmployment.getAccessPermissions().add(accessPermission);
-        unitEmploymentGraphRepository.save(unitEmployment);
-        accessPageService.setPagePermissionToStaff(accessPermission);
+        UnitEmpAccessRelationship plannerAccess = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        unitEmpAccessGraphRepository.save(plannerAccess);
+        accessPageService.setPagePermissionToStaff(accessPermission,accessGroup.getId());
         employmentForLiva.getUnitEmployments().add(unitEmployment);
         oodlesCityLevel.getEmployments().add(employmentForLiva);
         organizationGraphRepository.save(oodlesCityLevel);
@@ -1021,4 +1022,5 @@ public class BootDataService {
         currency.setLastModificationDate(new Date().getTime());
         currency.setCountry(denmark);
         currencyGraphRepository.save(currency);
-    }}
+    }
+}

@@ -1,21 +1,18 @@
 package com.kairos.service.integration;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.persistence.model.user.integration.TimeCare;
 import com.kairos.persistence.model.user.integration.Twillio;
 import com.kairos.persistence.model.user.integration.Visitour;
 import com.kairos.persistence.repository.user.integration.TimeCareGraphRepository;
 import com.kairos.persistence.repository.user.integration.TwillioGraphRepository;
 import com.kairos.persistence.repository.user.integration.VisitourGraphRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by oodles on 21/2/17.
@@ -52,18 +49,13 @@ public class IntegrationService {
     }
 
     public Twillio saveTwillioIntegrationData (Long unitId, Twillio twillio){
-       try {
-           logger.info("twillio----account--> "+twillio.getAccountId());
-           Twillio twillio1 = twillioGraphRepository.findByOrganizationId(unitId);
-           if (twillio1 == null) twillio1 = new Twillio();
-           twillio1 = (Twillio) twillio.clone();
-           twillio1.setOrganizationId(unitId);
-           twillioGraphRepository.save(twillio1);
-           return twillio1;
-       }catch (CloneNotSupportedException exception){
-           return null;
-       }
-
+        logger.info("twillio----account--> "+twillio.getAccountId());
+        Twillio twillio1 = twillioGraphRepository.findByOrganizationId(unitId);
+        if (twillio1 == null) twillio1 = new Twillio();
+        twillio1 = Twillio.copyProperties(twillio,Twillio.getInstance());
+        twillio1.setOrganizationId(unitId);
+        twillioGraphRepository.save(twillio1);
+        return twillio1;
     }
 
     public Twillio fetchTwillioIntegrationData(Long unitId){
@@ -73,16 +65,12 @@ public class IntegrationService {
     }
 
     public Visitour saveVisitourIntegrationData(Long unitId, Visitour visitour){
-        try {
-            Visitour visitour1 = visitourGraphRepository.findByOrganizationId(unitId);
-            if (visitour1 == null) visitour1 = new Visitour();
-            visitour1 = (Visitour) visitour.clone();
-            visitour1.setOrganizationId(unitId);
-            visitourGraphRepository.save(visitour1);
-            return visitour1;
-        }catch (CloneNotSupportedException exception){
-            return null;
-        }
+        Visitour visitour1 = visitourGraphRepository.findByOrganizationId(unitId);
+        if (visitour1 == null) visitour1 = new Visitour();
+        visitour1 = Visitour.copyProperties(visitour,Visitour.getInstance());
+        visitour1.setOrganizationId(unitId);
+        visitourGraphRepository.save(visitour1);
+        return visitour1;
     }
 
     public Visitour fetchVisitourIntegrationData(Long unitId){

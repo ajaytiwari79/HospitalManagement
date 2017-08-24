@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.organization.team;
 
-
 /**
  * Created by prabjot on 16/2/17.
  */

@@ -1,38 +1,9 @@
 package com.kairos.service.staff;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import com.kairos.client.StaffServiceRestTemplate;
-import com.kairos.service.access_profile.AccessGroupService;
-import com.kairos.service.access_profile.AccessPageService;
-import com.kairos.service.fls_visitour.schedule.Scheduler;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.client.StaffServiceRestTemplate;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
-import com.kairos.utils.DateConverter;
-import com.kairos.utils.FileUtil;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -45,44 +16,48 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.staff.AccessPermission;
-import com.kairos.persistence.model.user.staff.Employment;
-import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.StaffAdditionalInfoQueryResult;
-import com.kairos.persistence.model.user.staff.StaffCreationPOJOData;
-import com.kairos.persistence.model.user.staff.StaffDTO;
-import com.kairos.persistence.model.user.staff.StaffPersonalDetail;
-import com.kairos.persistence.model.user.staff.UnitEmployment;
+import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.access_profile.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
-import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
-import com.kairos.persistence.repository.user.staff.PartialLeaveGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.util.DateConverter;
+import com.kairos.util.FileUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.util.*;
+
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.utils.FileUtil.createDirectory;
+import static com.kairos.util.FileUtil.createDirectory;
 
 /**
  * Created by prabjot on 24/10/16.
@@ -141,6 +116,10 @@ public class StaffService extends UserBaseService {
 
     @Autowired
     StaffServiceRestTemplate staffServiceRestTemplate;
+    @Autowired
+    UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+
+
 
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
@@ -173,6 +152,9 @@ public class StaffService extends UserBaseService {
         save(staff);
         return true;
     }
+
+
+
 
     public boolean updatePassword(long staffId, final String oldPassword, final String newPassword) {
 
@@ -258,6 +240,7 @@ public class StaffService extends UserBaseService {
 
     }
 
+
     public Map<String, Object> retrievePersonalInfo(Staff staff) {
         Map<String, Object> map = new HashMap<>();
         map.put("firstName", staff.getFirstName());
@@ -303,6 +286,9 @@ public class StaffService extends UserBaseService {
         }
         return staff.retrieveNotes();
     }
+
+
+
 
     public Map<String, Object> getStaff(String type, long id) {
 
@@ -674,6 +660,8 @@ public class StaffService extends UserBaseService {
 
     }
 
+
+
     public User createCountryAdmin(User admin) {
         User user = userGraphRepository.findByEmail(admin.getEmail());
         if (user != null) {
@@ -705,8 +693,9 @@ public class StaffService extends UserBaseService {
             UnitEmployment unitEmployment = new UnitEmployment();
             unitEmployment.setOrganization(organization);
             AccessPermission accessPermission = new AccessPermission(accessGroup);
-            unitEmployment.getAccessPermissions().add(accessPermission);
-            unitEmploymentGraphRepository.save(unitEmployment);
+            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+            unitEmpAccessRelationship.setEnabled(true);
+            unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
             accessPageService.setPagePermissionToAdmin(accessPermission);
             employment.getUnitEmployments().add(unitEmployment);
             organization.getEmployments().add(employment);
@@ -716,6 +705,9 @@ public class StaffService extends UserBaseService {
         }
         return admin;
     }
+
+
+
 
     public Staff createStaffFromPlanningWorkflow(StaffDTO data, long unitId) {
         if (data == null) {
@@ -740,11 +732,12 @@ public class StaffService extends UserBaseService {
                 logger.info("Assigned Number of Skills to staff: " + result.size());
             }
             staffServiceRestTemplate.updateTaskForStaff(staff.getId(),data.getAnonymousStaffId());
-
             return staff;
         }
         return null;
     }
+
+
 
     public Map<String, String> createStaffSchedule(long organizationId, Long unitId) throws ParseException {
 
@@ -773,6 +766,7 @@ public class StaffService extends UserBaseService {
         workScheduleStatus.put("message", "success");
         return workScheduleStatus;
     }
+
 
     public Staff createStaffFromWeb(long unitId, StaffCreationPOJOData payload) {
         Staff staff = new Staff();
@@ -823,6 +817,8 @@ public class StaffService extends UserBaseService {
         return staffGraphRepository.save(staff);
     }
 
+
+
     private ContactDetail getContactDetailsObject(StaffCreationPOJOData payload) {
         if (payload.getPrivateEmail() == null && payload.getPrivatePhone() == null && payload.getPrivatePhone() == null && payload.getWorkPhone() == null && payload.getWorkEmail() == null)
             return null;
@@ -834,7 +830,7 @@ public class StaffService extends UserBaseService {
         return contactDetail;
     }
 
-    private Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
+    public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
         if (contactAddress != null)
             staff.setContactAddress(contactAddress);
@@ -856,9 +852,13 @@ public class StaffService extends UserBaseService {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
         if (parent == null) {
-            employmentGraphRepository.createEmployments(unit.getId(), Arrays.asList(staff.getId()), unit.getId());
+            if(employmentGraphRepository.findEmployment(unit.getId(), staff.getId()) == null) {
+                employmentGraphRepository.createEmployments(unit.getId(), Arrays.asList(staff.getId()), unit.getId());
+            }
         } else {
-            employmentGraphRepository.createEmployments(parent.getId(), Arrays.asList(staff.getId()), unit.getId());
+            if(employmentGraphRepository.findEmployment(parent.getId(), staff.getId()) == null) {
+                employmentGraphRepository.createEmployments(parent.getId(), Arrays.asList(staff.getId()), unit.getId());
+            }
         }
         return staff;
     }
@@ -881,6 +881,7 @@ public class StaffService extends UserBaseService {
         int code = scheduler.createEngineer(engineerMetaData, flsCredentials);
         logger.info(" Status code :: " + code);
     }
+
 
     public void updateStaffFromExcel(MultipartFile multipartFile) {
 
@@ -934,6 +935,8 @@ public class StaffService extends UserBaseService {
         }
         logger.info("total staff updated  " + staffUpdated);
     }
+
+
 
 
     public Map createUnitManager(long unitId, UnitManagerDTO unitManagerDTO) {
@@ -1018,6 +1021,7 @@ public class StaffService extends UserBaseService {
         return map;
     }
 
+
     private void sendEmailToUnitManager(UnitManagerDTO unitManagerDTO, String password) {
 
         String body = "Hi,\n\n" + "You are assigned as an unit manager and to get access in KairosPlanning.\n" + "Your username " + unitManagerDTO.getEmail() + " and password is " + password + "\n\n Thanks";
@@ -1028,6 +1032,59 @@ public class StaffService extends UserBaseService {
     public List<Staff> getUploadedStaffByOrganizationId(Long organizationId) {
         return staffGraphRepository.getUploadedStaffByOrganizationId(organizationId);
     }
+
+
+   /* public Map<String, Object> getStaffTaskTypes(Long staffId) {
+
+        List taskTypeData = taskService.getStaffTaskTypes(staffId);
+        if (taskTypeData != null) {
+            Map<String, Object> completeData = new HashMap<>();
+            completeData.put("taskTypes", taskTypeData);
+            logger.info("Complete data: " + completeData);
+            return completeData;
+        }
+        return null;
+    }*/
+
+    public UnitManagerDTO updateUnitManager(Long staffId, UnitManagerDTO unitManagerDTO) {
+
+        Staff staff = staffGraphRepository.findOne(staffId);
+        User user = userGraphRepository.findByEmail(unitManagerDTO.getEmail());
+        staff.setFirstName(unitManagerDTO.getFirstName());
+        staff.setLastName(unitManagerDTO.getLastName());
+        staff.setContactDetail(unitManagerDTO.getContactDetail());
+        user.setFirstName(unitManagerDTO.getFirstName().trim());
+        user.setLastName(unitManagerDTO.getLastName().trim());
+        user.setContactDetail(unitManagerDTO.getContactDetail());
+        userGraphRepository.save(user);
+        staffGraphRepository.save(staff);
+        unitManagerDTO.setStaffId(staffId);
+        return unitManagerDTO;
+
+    }
+
+   /* public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId,String date){
+
+        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId,staffId);
+        if(staff == null){
+            throw new InternalError("Staff not found");
+        }
+        List<StaffAssignedTasksWrapper> tasks = taskService.getAssignedTasksOfStaff(date,staffId,unitId);
+        List<Long> citizenIds = tasks.stream().map(task -> task.getId()).collect(Collectors.toList());
+        List<Client> clients = clientGraphRepository.findByIdIn(citizenIds);
+        ObjectMapper objectMapper = new ObjectMapper();
+        StaffTaskDTO staffTaskDTO;
+        List<StaffTaskDTO> staffTaskDTOS = new ArrayList<>(clients.size());
+        int taskIndex = 0;
+        for(Client client : clients){
+            staffTaskDTO = objectMapper.convertValue(client,StaffTaskDTO.class);
+            staffTaskDTO.setTasks(tasks.get(taskIndex).getTasks());
+            staffTaskDTOS.add(staffTaskDTO);
+            taskIndex++;
+        }
+        return staffTaskDTOS;
+    }*/
+
 
   //move this in task service
   /*  public Map<String, Object> getStaffTasks(Long staffId) {

@@ -1,9 +1,8 @@
 package com.kairos.persistence.model.user.staff;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * Created by prabjot on 6/12/16.

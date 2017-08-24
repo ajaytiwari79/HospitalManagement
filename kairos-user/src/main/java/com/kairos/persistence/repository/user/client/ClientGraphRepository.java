@@ -1,31 +1,25 @@
 package com.kairos.persistence.repository.user.client;
-
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.client.Client;
-import com.kairos.persistence.model.user.client.ClientAddressQueryResult;
-import com.kairos.persistence.model.user.client.ClientHomeAddressQueryResult;
-import com.kairos.persistence.model.user.client.ClientStaffQueryResult;
-import com.kairos.persistence.model.user.client.ClientStaffRelation;
-import com.kairos.persistence.model.user.client.ClientTempAddressQueryResult;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
+
 /**
  * Created by oodles on 28/9/16.
  */
 
 @Repository
 public interface ClientGraphRepository extends GraphRepository<Client>{
-
 
     @Query("MATCH (c:Client) return c order by c.firstName")
     List<Client> findAll();
@@ -54,6 +48,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "  longitude:ca.longitude, " +
             "  isAddressProtected:ca.isAddressProtected, " +
             "  description:ca.description, " +
+            "  locationName:ca.locationName, " +
             "  zipCode:{  " +
             "        name:zc.name, " +
             "        zipCode:zc.zipCode, " +
@@ -148,7 +143,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "             OPTIONAL MATCH (staff)-[r:STAFF_HAS_SKILLS{isEnabled:true}]-(s:Skill)\n" +
             "             with staff, served_by_staff, s as skill, r as r,user\n" +
             "            return  DISTINCT { id:id(staff), staffType:served_by_staff.type, lastName:staff.lastName , firstName:staff.firstName, profilePic: {2} + staff.profilePic, gender:user.gender, isActive:staff.isActive,  skillList: collect ({name: skill.name,level:r.skillLevel})  }as staffList" )
-    List<Map<String,Object>> getTeamMembers(Long teamID, Long clientId,String imageUrl);
+    List<Map<String,Object>> getTeamMembers(Long teamID, Long clientId, String imageUrl);
 
     @Query("MATCH (c:Client)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress) where id(ca)= {0} return c")
     Client getClientsByHomeAddressId(Long homeAddressId);
@@ -189,19 +184,19 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "MERGE (client)-[r:"+SERVED_BY_STAFF+"]->(staff) \n" +
             "ON CREATE SET r.type = {2},r.creationDate = {3},r.lastModificationDate = {4} \t\n" +
             "ON MATCH SET r.type = {2},r.lastModificationDate = {4} return true")
-    void  assignStaffToClient(long clientId, long staffId, ClientStaffRelation.StaffType staffType,long creationDate,long lastModificationDate);
+    void  assignStaffToClient(long clientId, long staffId, ClientStaffRelation.StaffType staffType, long creationDate, long lastModificationDate);
 
     @Query("MATCH (client:Client)-[:GET_SERVICE_FROM]-(org:Organization),(staff:Staff) where id(org)={0} AND id(staff) IN {1}\n" +
             "MERGE (client)-[r:SERVED_BY_STAFF]->(staff)\n" +
             "ON CREATE SET r.type = {2},r.creationDate = {3},r.lastModificationDate = {4}\n" +
             "ON MATCH SET r.type = {2},r.lastModificationDate = {4} return true")
-    void assignMultipleStaffToClient(long unitId,List<Long> staffId, ClientStaffRelation.StaffType staffType,long creationDate,long lastModificationDate);
+    void assignMultipleStaffToClient(long unitId, List<Long> staffId, ClientStaffRelation.StaffType staffType, long creationDate, long lastModificationDate);
 
     @Query("Match (client:Client{citizenDead:false})-[:"+GET_SERVICE_FROM+"]->(organization:Organization) where id(organization)={0} with client\n" +
             "Match (staff:Staff) where id(staff) in {1} with staff,client\n" +
             "optional Match (client)-[r:"+SERVED_BY_STAFF+"]->(staff) with id(staff) as staffId,client,r\n" +
             "return id(client) as id,client.firstName+\" \" +client.lastName as name,client.gender as gender,client.profilePic as profilePic,client.age as age,collect({id:staffId,type:case when r is null then 'NONE' else r.type end}) as staff")
-    List<ClientStaffQueryResult> getClientStaffRel(long unitId,List<Long> staffId);
+    List<ClientStaffQueryResult> getClientStaffRel(long unitId, List<Long> staffId);
 
     @Query("MATCH (client:Client) where client.kmdNexusExternalId={0} RETURN client")
     Client findByKmdNexusExternalId(String kmdNexusExternalId);
@@ -237,4 +232,10 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
     @Query("MATCH (c:Client{citizenDead:false})-[r:"+GET_SERVICE_FROM+"]-(o:Organization) where id(o)= {0} return id(c) as id")
     List<Long> getCitizenIds(long unitId);
+
+    @Query("Match (n:Client) where id(n) in {0} return n")
+    List<Client> findByIdIn(List<Long> ids);
+
+    @Query("MATCH (c:Client)-[r:GET_SERVICE_FROM]->(o:Organization) where id(c)={0} and id(o)={1}  return c")
+    Client getClientByClientIdAndUnitId(Long clientId, Long unitId);
 }

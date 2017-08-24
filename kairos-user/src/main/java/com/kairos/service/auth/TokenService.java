@@ -1,15 +1,12 @@
 package com.kairos.service.auth;
-
-import java.util.UUID;
-
-import javax.inject.Inject;
-
+import com.kairos.persistence.model.user.auth.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kairos.persistence.model.user.auth.User;
+import javax.inject.Inject;
+import java.util.UUID;
 
 /**
  *  Calls UserGraphRepository to perform CRUD operation on  token

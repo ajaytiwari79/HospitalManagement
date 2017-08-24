@@ -1,15 +1,11 @@
 package com.kairos.config.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.kairos.persistence.model.user.auth.UserAuthentication;
 import com.kairos.service.auth.UserService;
-import com.kairos.utils.response.ResponseHandler;
+import com.kairos.util.response.ResponseHandler;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -17,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import javax.inject.Inject;
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;

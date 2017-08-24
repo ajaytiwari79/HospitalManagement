@@ -1,14 +1,14 @@
 package com.kairos.persistence.model.user.activity_stream;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
+
 
 /**
  * Created by oodles on 27/1/17.
@@ -17,10 +17,11 @@ import com.kairos.persistence.model.organization.Organization;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class Notification extends UserBaseEntity {
-    String name;
-    String message;
-    String resource;
-    Boolean isRead = false;
+    private String name;
+    private String message;
+    private String resource;
+    private Boolean isRead = false;
+    private Long userId;
 
     //RelationShips
     @Relationship(type = ORGANIZATION)
@@ -67,5 +68,13 @@ public class Notification extends UserBaseEntity {
 
     public void setRead(Boolean read) {
         isRead = read;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

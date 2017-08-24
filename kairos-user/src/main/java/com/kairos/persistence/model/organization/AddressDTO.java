@@ -40,8 +40,15 @@ public class AddressDTO {
 
     private String description;
     private Long municipalityId;
+    private String locationName;
 
+    public String getLocationName() {
+        return locationName;
+    }
 
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
 
     public String getDescription() {
         return description;

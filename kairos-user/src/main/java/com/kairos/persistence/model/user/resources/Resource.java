@@ -1,12 +1,10 @@
 package com.kairos.persistence.model.user.resources;
-
-import java.util.List;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.constants.RelationshipConstants;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.constants.RelationshipConstants;
+import java.util.List;
 
 /**
  * Created by arvind on 6/10/16.

@@ -1,21 +1,21 @@
 package com.kairos.persistence.model.user.access_permission;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_PAGE;
-
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.common.UserBaseEntity;
+import java.util.List;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_PAGE;
+
 
 /**
  * Created by arvind on 24/10/16.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class AccessPage extends UserBaseEntity{
+public class AccessPage extends UserBaseEntity {
 
     private String name;
     private boolean isModule;

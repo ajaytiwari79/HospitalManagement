@@ -1,8 +1,7 @@
 package com.kairos.persistence.model.user.office_esources_and_metadata;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 
 /**

@@ -3,18 +3,6 @@ package com.kairos.service.resources;
 /**
  * Created by oodles on 17/10/16.
  */
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.resources.FuelType;
 import com.kairos.persistence.model.user.resources.Resource;
@@ -22,6 +10,11 @@ import com.kairos.persistence.model.user.resources.VehicleType;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.service.UserBaseService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.*;
 
 /**
  * Calls ResourceGraphRepository to perform CRUD operation on Resources.
@@ -143,11 +136,11 @@ public class ResourceService extends UserBaseService {
                 List<Resource> resourceList = organization.getResourceList();
                 resourceList.add(resource);
                 organizationGraphRepository.save(organization);
-                return resource;
+                return resourceGraphRepository.save(resource);
             } else {
                 organization.setResourceList(Arrays.asList(resource));
                 organizationGraphRepository.save(organization);
-                return resource;
+                return resourceGraphRepository.save(resource);
             }
 
         }

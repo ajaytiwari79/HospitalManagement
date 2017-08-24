@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.kairos.utils.userContext.UserContextHolder;
+import com.kairos.util.userContext.UserContextHolder;
 import com.netflix.hystrix.HystrixThreadPoolKey;
 import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestVariable;

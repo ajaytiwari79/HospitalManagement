@@ -1,18 +1,19 @@
 package com.kairos.persistence.repository.organization;
+import com.kairos.persistence.model.organization.OrgTypeExpertiseQueryResult;
+import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import org.springframework.data.neo4j.annotation.Query;
+import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
-import org.springframework.stereotype.Repository;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_TYPE_HAS_SERVICES;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORG_TYPE_HAS_EXPERTISE;
 
-import com.kairos.persistence.model.organization.OrgTypeExpertiseQueryResult;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by oodles on 14/10/16.
@@ -66,10 +67,10 @@ public interface OrganizationTypeGraphRepository extends GraphRepository<Organiz
     @Query("Match (organizationType:OrganizationType{isEnable:true})-[:BELONGS_TO]->(country:Country) where id(country)={0}\n" +
             "optional Match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType{isEnable:true}) with {subTypes:case when subType is null then [] else collect({id:id(subType),name:subType.name,isSelected:id(subType) IN {1}}) end} as subTypes,organizationType\n" +
             "return collect({id:id(organizationType),name:organizationType.name,children: subTypes.subTypes}) as organizationTypes")
-    OrganizationTypeHierarchyQueryResult getOrganizationTypeHierarchy(long countryId,Set<Long> subTypesId);
+    OrganizationTypeHierarchyQueryResult getOrganizationTypeHierarchy(long countryId, Set<Long> subTypesId);
 
     @Query("Match (orgType:OrganizationType)-[r:"+ORG_TYPE_HAS_EXPERTISE+"]->(expertise:Expertise) where id(orgType)={0} AND id(expertise)={1} return count(r) as countOfRel")
-    int orgTypeHasAlreadySkill(long orgTypeId,long expertiseId);
+    int orgTypeHasAlreadySkill(long orgTypeId, long expertiseId);
 
     @Query("Match (orgType:OrganizationType),(expertise:Expertise) where id (orgType)={0} AND id(expertise)={1} create (orgType)-[r:"+ORG_TYPE_HAS_EXPERTISE+"{creationDate:{2},lastModificationDate:{3},isEnabled:true}]->(expertise) return orgType")
     void addExpertiseInOrgType(long orgTypeId, long expertiseId, long creationDate, long lastModificationDate);
@@ -84,5 +85,8 @@ public interface OrganizationTypeGraphRepository extends GraphRepository<Organiz
             "optional Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_EXPERTISE]->(expertise) where id(orgType)={1} return collect({id:id(expertise),name:expertise.name,isSelected:case when r.isEnabled then true else false end}) as expertise")
     OrgTypeExpertiseQueryResult getExpertiseOfOrganizationType(long countryId, long orgTypeId);
 
-
+    @Query("match(o:OrganizationType) where  id(o) in {0} \n" +
+            "match(workingTimeAgreement:WorkingTimeAgreement)-[:BELONGS_TO]->(o)\n" +
+            "return workingTimeAgreement")
+    List<WorkingTimeAgreement> getAllWTAByOrganiationType(List<Long> organizationTypeIds);
 }

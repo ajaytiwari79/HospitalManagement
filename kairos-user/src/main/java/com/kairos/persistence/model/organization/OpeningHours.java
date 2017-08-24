@@ -1,14 +1,13 @@
 package com.kairos.persistence.model.organization;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * Created by oodles on 16/11/16.
  */
 @NodeEntity
-public class OpeningHours extends UserBaseEntity{
+public class OpeningHours extends UserBaseEntity {
 
 
     private DayType.DayTypeEnum day;

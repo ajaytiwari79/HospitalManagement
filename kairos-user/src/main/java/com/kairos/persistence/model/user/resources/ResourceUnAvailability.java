@@ -1,8 +1,7 @@
 package com.kairos.persistence.model.user.resources;
 
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * Created by arvind on 6/10/16.

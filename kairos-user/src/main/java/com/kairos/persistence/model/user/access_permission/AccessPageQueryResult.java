@@ -18,6 +18,16 @@ public class AccessPageQueryResult {
     private boolean isRead;
     private boolean isWrite;
 
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
+    }
+
+    private String moduleId;
+
     public void setRead(boolean read) {
         isRead = read;
     }

@@ -1,17 +1,19 @@
 package com.kairos.persistence.model.organization.team;
 
-import java.util.List;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.skill.Skill;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import java.util.List;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.PROVIDE_TASK_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_LOCATION;
+import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_SKILLS;
+
 
 /**
  * Created by prabjot on 9/20/16.
@@ -40,6 +42,8 @@ public class Team extends UserBaseEntity {
 
     @Relationship(type = PROVIDE_TASK_TYPE)
     private List<String> taskTypeList;
+
+    private boolean isEnabled = true;
 
 
     public List<Skill> getSkillList() {
@@ -92,6 +96,14 @@ public class Team extends UserBaseEntity {
 
     public void setHasAddressOfUnit(boolean hasAddressOfUnit) {
         this.hasAddressOfUnit = hasAddressOfUnit;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 
     public Team() {

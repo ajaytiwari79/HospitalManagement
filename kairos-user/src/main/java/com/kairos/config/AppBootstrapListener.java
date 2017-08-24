@@ -5,23 +5,22 @@ import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.repository.user.access_profile.AccessPageRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.service.country.CountryHolidayCalenderService;
-import org.apache.log4j.Logger;
+import com.kairos.service.fls_visitour.dynamic_change.FLSVisitourChangeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +35,7 @@ import java.util.List;
 @Component
 @PropertySource("classpath:page-id.properties")
 public class AppBootstrapListener implements ApplicationListener<ApplicationReadyEvent> {
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(AppBootstrapListener.class);
 
     @Inject
     SkillCategoryGraphRepository skillCategoryGraphRepository;
@@ -59,11 +58,12 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     @Inject
     BootDataService bootDataService;
 
+
     @Inject
     CountryHolidayCalenderService countryHolidayCalenderService;
-    //task service will used this in task
-   /* @Inject
-    FLSVisitourChangeService flsVisitourChangeService;*/
+
+    @Inject
+    FLSVisitourChangeService flsVisitourChangeService;
     /**
      * Executes on application ready event
      * Check's if data exists & calls createUsersAndRolesData
@@ -72,8 +72,8 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     public void onApplicationEvent(ApplicationReadyEvent event) {
         generateSequence(); // This method create sequence table for mongodb
         //createAccessPages();
-        //bootDataService.createData();
-       // flsVisitourChangeService.registerReceiver("visitourChange");
+        bootDataService.createData();
+        flsVisitourChangeService.registerReceiver("visitourChange");
     }
 
     public void createSkillCategoryAndSkills() {
@@ -214,10 +214,10 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     }
 
     public void generateSequence(){
-       // mongoSequenceRepository.save();
+        // mongoSequenceRepository.save();
     }
-/*
-    @Scheduled(cron = "0 10 15 * * ?")
+
+   /* @Scheduled(cron = "0 10 15 * * ?")
     private void startHolidayDataFetchJob() throws URISyntaxException, ParseException {
         logger.debug("calendar job is running");
         try {

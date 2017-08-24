@@ -1,24 +1,7 @@
 package com.kairos.service.organization;
 
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.kairos.config.env.EnvConfig;
-import com.kairos.service.fls_visitour.schedule.Scheduler;
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.utils.FormatUtil;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
@@ -41,10 +24,19 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.client.AddressVerificationService;
+import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
+import com.kairos.util.FormatUtil;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import static com.kairos.constants.AppConstants.*;
+import javax.inject.Inject;
+import java.io.File;
+import java.util.*;
+
+import static com.kairos.constants.AppConstants.TEAM_LABEL;
 
 /**
  * Created by oodles on 7/10/16.
@@ -61,7 +53,6 @@ public class TeamService extends UserBaseService {
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private OrganizationServiceRepository organizationServiceRepository;
-
 
     @Inject
     private GroupGraphRepository groupGraphRepository;
@@ -85,7 +76,7 @@ public class TeamService extends UserBaseService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
-    com.kairos.service.organization.OrganizationService organizationService;
+    OrganizationService organizationService;
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
@@ -313,7 +304,7 @@ public class TeamService extends UserBaseService {
         int countOfRel = teamGraphRepository.countRelBetweenStaffAndTeam(teamId,staffId);
         if(countOfRel == 0){
 
-            int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId,staffId,new Date().getTime(),new Date().getTime());
+           int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId,staffId,new Date().getTime(),new Date().getTime());
             if(countOfRelCreated>0){
                 if(updateTeamIdOfStaffInVisitour(team.getVisitourId(),staffId, unitId)){
                     staff.setVisitourTeamId(team.getVisitourId());
@@ -393,18 +384,13 @@ public class TeamService extends UserBaseService {
     }
 
     public List<Map<String,Object>> getTeamSelectedSkills(Long teamId) {
-        return  teamGraphRepository.getSelectedSkills(teamId);
+    return  teamGraphRepository.getSelectedSkills(teamId);
 
     }
 
     public List<Map<String, Object>> getTeamAvailableSkills(Long teamId) {
         return organizationGraphRepository.getTeamGroupSkill(teamId);
     }
-
-
-    /*public List<TaskType> getAllAvailableTaskType(Long teamId) {
-        return null;
-    }*/
 
     public List<Map<String, Object>> getAllTeamsInOrganization(Long unitId){
 

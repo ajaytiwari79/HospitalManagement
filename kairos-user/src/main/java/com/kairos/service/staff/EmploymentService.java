@@ -1,34 +1,9 @@
 package com.kairos.service.staff;
 
-import java.io.File;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import com.kairos.persistence.repository.user.access_profile.AccessGroupRepository;
-import com.kairos.persistence.repository.user.access_profile.AccessPageRepository;
-import com.kairos.persistence.repository.user.access_profile.AccessPermissionGraphRepository;
-import com.kairos.service.access_profile.AccessGroupService;
-import com.kairos.service.access_profile.AccessPageService;
-import com.kairos.service.fls_visitour.schedule.Scheduler;
-import com.kairos.service.tree_structure.TreeStructureService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
-import com.kairos.utils.DateConverter;
-import com.kairos.persistence.EmploymentStatus;
 import com.kairos.persistence.model.common.QueryResult;
+import com.kairos.persistence.model.enums.EmploymentStatus;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -38,32 +13,40 @@ import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.model.user.staff.AccessPermission;
-import com.kairos.persistence.model.user.staff.Employment;
-import com.kairos.persistence.model.user.staff.PartialLeave;
-import com.kairos.persistence.model.user.staff.PartialLeaveDTO;
-import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.StaffEmploymentDetail;
-import com.kairos.persistence.model.user.staff.UnitEmployment;
-import com.kairos.persistence.model.user.staff.Wage;
+import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
-import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
-import com.kairos.persistence.repository.user.staff.PartialLeaveGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
+import com.kairos.service.tree_structure.TreeStructureService;
+import com.kairos.util.DateConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.text.ParseException;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
+
 
 /**
  * Created by prabjot on 19/5/17.
  */
 @Transactional
 @Service
-public class EmploymentService extends UserBaseService{
+public class EmploymentService extends UserBaseService {
 
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
@@ -95,6 +78,8 @@ public class EmploymentService extends UserBaseService{
     private EnvConfig envConfig;
     @Inject
     private PartialLeaveGraphRepository partialLeaveGraphRepository;
+    @Inject
+    private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
@@ -292,6 +277,9 @@ public class EmploymentService extends UserBaseService{
     public void createEmploymentForUnitManager(Staff staff, Organization parent, Organization unit, long accessGroupId) {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+        if(accessGroup == null){
+            throw new InternalError("Access group not found");
+        }
         Employment employment = new Employment();
         employment.setName("Working as unit manager");
         employment.setStaff(staff);
@@ -301,8 +289,9 @@ public class EmploymentService extends UserBaseService{
 
         //set permission in unit employment
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        unitEmployment.getAccessPermissions().add(accessPermission);
-        accessPageService.setPagePermissionToStaff(accessPermission);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+        accessPageService.setPagePermissionToStaff(accessPermission,accessGroup.getId());
         employment.getUnitEmployments().add(unitEmployment);
         if (parent == null) {
             unit.getEmployments().add(employment);

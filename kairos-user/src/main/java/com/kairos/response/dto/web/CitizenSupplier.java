@@ -1,7 +1,6 @@
 package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * Created by oodles on 9/5/17.

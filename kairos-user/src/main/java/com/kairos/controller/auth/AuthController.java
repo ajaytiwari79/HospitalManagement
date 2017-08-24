@@ -4,17 +4,15 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
-import com.kairos.utils.response.ResponseHandler;
+import com.kairos.util.response.ResponseHandler;
 import com.twilio.sdk.TwilioRestException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -32,7 +30,7 @@ import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
 @RestController
 @RequestMapping(API_V1)
 @Api(value = API_V1)
-public class AuthController  {
+public class AuthController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject

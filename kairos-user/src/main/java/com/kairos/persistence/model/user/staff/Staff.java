@@ -1,11 +1,5 @@
 package com.kairos.persistence.model.user.staff;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.auth.User;
@@ -14,6 +8,11 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.language.Language;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -85,6 +84,7 @@ public class Staff extends UserBaseEntity {
     private Float costHour;
     private Float costHourOvertime;
     private Integer capacity;
+    private Long kmdExternalId;
 
 
     public Staff(String firstName) {
@@ -346,7 +346,7 @@ public class Staff extends UserBaseEntity {
             map.put("floorNumber",contactAddress.getFloorNumber());
             map.put("street1",contactAddress.getStreet1());
             map.put("zipCodeId",contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
-            map.put("city",contactAddress.getZipCode()!=null? contactAddress.getZipCode().getName(): "");
+            map.put("city",contactAddress.getCity()!=null? contactAddress.getCity(): "");
             map.put("municipalityId",(contactAddress.getMunicipality()==null)?null:contactAddress.getMunicipality().getId());
             map.put("regionName",contactAddress.getRegionName());
             map.put("country",contactAddress.getCountry());
@@ -464,6 +464,14 @@ public class Staff extends UserBaseEntity {
         this.capacity = capacity;
     }
 
+    public Long getKmdExternalId() {
+        return kmdExternalId;
+    }
+
+    public void setKmdExternalId(Long kmdExternalId) {
+        this.kmdExternalId = kmdExternalId;
+    }
+
     @Override
     public String toString() {
         return "{Staff={" +
@@ -483,7 +491,6 @@ public class Staff extends UserBaseEntity {
                 ", lastName='" + lastName + '\'' +
                 ", familyName='" + familyName + '\'' +
                 ", signature='" + signature + '\'' +
-                ", password='" + password + '\'' +
                 ", nationalInsuranceNumber='" + nationalInsuranceNumber + '\'' +
                 ", isActive=" + isActive +
                 ", inactiveFrom=" + inactiveFrom +

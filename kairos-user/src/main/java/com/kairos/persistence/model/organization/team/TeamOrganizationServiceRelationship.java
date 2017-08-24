@@ -1,19 +1,19 @@
 package com.kairos.persistence.model.organization.team;
 
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.OrganizationService;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.OrganizationService;
+import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_SERVICES;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by prabjot on 20/2/17.
  */
 @RelationshipEntity(type=TEAM_HAS_SERVICES)
-public class TeamOrganizationServiceRelationship extends UserBaseEntity{
+public class TeamOrganizationServiceRelationship extends UserBaseEntity {
 
     @StartNode
     private Team team;

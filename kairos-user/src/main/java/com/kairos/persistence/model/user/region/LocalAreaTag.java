@@ -1,17 +1,15 @@
 package com.kairos.persistence.model.user.region;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.common.UserBaseEntity;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.LAT_LNG;
 
 /**
  * Created by neuron on 12/6/17.
@@ -19,10 +17,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LocalAreaTag extends UserBaseEntity{
+public class LocalAreaTag extends UserBaseEntity {
 
     @NotNull
     private String name;
+
+    private String color;
 
     @Relationship(type = LAT_LNG)
     private List<LatLng> paths = new ArrayList<>();
@@ -60,6 +60,14 @@ public class LocalAreaTag extends UserBaseEntity{
 
     public void setPaths(List<LatLng> paths) {
         this.paths = paths;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public String toString(){

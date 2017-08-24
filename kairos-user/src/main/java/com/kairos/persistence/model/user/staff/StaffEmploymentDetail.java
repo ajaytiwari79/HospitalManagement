@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.user.staff;
 
-import javax.validation.constraints.NotNull;
-
 import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by prabjot on 10/1/17.
@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class StaffEmploymentDetail {
 
     private String cardNumber;
-    @NotEmpty(message = "error.Staff.cardnumber.notnull") @NotNull(message = "error.Staff.cardnumber.notnull")
+    //@NotEmpty(message = "error.Staff.cardnumber.notnull") @NotNull(message = "error.Staff.cardnumber.notnull")
     private String sendNotificationBy;
     private String email;
     private boolean copyKariosMailToLogin;

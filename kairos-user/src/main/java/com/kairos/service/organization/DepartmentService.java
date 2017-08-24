@@ -1,20 +1,17 @@
 package com.kairos.service.organization;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.department.Department;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.department.Department;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.service.UserBaseService;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prabjot on 19/5/17.

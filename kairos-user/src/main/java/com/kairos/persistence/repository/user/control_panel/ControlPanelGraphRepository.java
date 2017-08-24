@@ -1,13 +1,12 @@
 package com.kairos.persistence.repository.user.control_panel;
 
-import java.util.List;
-import java.util.Map;
-
+import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import com.kairos.persistence.model.user.control_panel.ControlPanel;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oodles on 29/12/16.

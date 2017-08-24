@@ -1,8 +1,5 @@
 package com.kairos.service.kmdNexus;
-
-import java.util.Date;
-import java.util.Map;
-
+import com.kairos.constants.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;
@@ -20,7 +17,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.kairos.constants.AppConstants;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by oodles on 18/4/17.
@@ -35,7 +33,7 @@ public class AuthService {
     private final long oneHourMS = 3100000;
     public void kmdAuth()  {
         if( new Date().getTime()-lastUpdated < oneHourMS){
-                return;
+            return;
         }
         dokmdAuth();
     }

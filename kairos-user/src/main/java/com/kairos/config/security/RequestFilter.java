@@ -5,16 +5,14 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.auth.UserAuthentication;
 import com.kairos.service.auth.UserService;
-import com.kairos.utils.response.ResponseHandler;
+import com.kairos.util.response.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

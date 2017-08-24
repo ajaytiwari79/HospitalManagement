@@ -4,9 +4,11 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ClientTemporaryAddress;
 import com.kairos.persistence.model.user.client.ContactAddress;
+import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
+import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.country.HousingTypeService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
@@ -27,6 +29,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Service
 public class AddressVerificationService {
     private final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
+
     @Inject
     private Scheduler scheduler;
 
@@ -46,6 +49,9 @@ public class AddressVerificationService {
 
     @Inject
     private ContactAddressGraphRepository contactAddressGraphRepository;
+
+    @Inject
+    private MunicipalityGraphRepository municipalityGraphRepository;
 
     public Map<String, Object> verifyAddress(AddressDTO contactAddress, long unitId) {
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
@@ -80,6 +86,17 @@ public class AddressVerificationService {
         logger.debug("Finding zipcode with value:" + contactAddress.getZipCodeValue());
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         ZipCode zipCode = zipCodeGraphRepository.findByZipCode(contactAddress.getZipCodeValue());
+        String municipalityName;
+        if(contactAddress.getMunicipalityId() != null){
+            Municipality municipality = municipalityGraphRepository.findOne(contactAddress.getMunicipalityId());
+            if(municipality == null){
+                throw new InternalError("municipality not found");
+            }
+            municipalityName = municipality.getName();
+        } else {
+            municipalityName = contactAddress.getMunicipalityName();
+        }
+
         if (zipCode == null) {
             throw new ZipCodeNotFound("Provided ZipCode not exist in database");
         }
@@ -92,7 +109,7 @@ public class AddressVerificationService {
         Map<String, Object> addressToVerify = new HashMap<>();
         addressToVerify.put("country", "DK");
         addressToVerify.put("zip", zipCode.getZipCode());
-        addressToVerify.put("city", contactAddress.getMunicipalityName());
+        addressToVerify.put("city", municipalityName);
         addressToVerify.put("street", contactAddress.getStreet1());
         addressToVerify.put("hnr", contactAddress.getHouseNumber());
         Map<String, Object> geoCodeResponse = scheduler.getGeoCode(addressToVerify, flsCredentials);
@@ -107,7 +124,7 @@ public class AddressVerificationService {
 
 
     public Map<String, Object> verifyAddressSheet(AddressDTO contactAddress, long unitId) {
-        int zipCode = zipCodeGraphRepository.findOne(contactAddress.getZipCodeId()).getZipCode();
+//        int zipCode = zipCodeGraphRepository.findOne(contactAddress.getZipCodeId()).getZipCode();
         logger.debug("Verifying with Information \n house: " + contactAddress.getHouseNumber() + "\n City:" + contactAddress.getCity() + "\n ZipCode: " + contactAddress.getZipCodeValue() +
                 "\n Street: " + contactAddress.getStreet1());
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);

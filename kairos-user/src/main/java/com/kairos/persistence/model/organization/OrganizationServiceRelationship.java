@@ -1,18 +1,18 @@
 package com.kairos.persistence.model.organization;
 
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
+import static com.kairos.persistence.model.constants.RelationshipConstants.PROVIDE_SERVICE;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by prabjot on 11/1/17.
  */
 @RelationshipEntity(type=PROVIDE_SERVICE)
-public class OrganizationServiceRelationship extends UserBaseEntity{
+public class OrganizationServiceRelationship extends UserBaseEntity {
 
     @StartNode
     private Organization organization;

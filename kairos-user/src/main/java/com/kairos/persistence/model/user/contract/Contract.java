@@ -1,14 +1,12 @@
 package com.kairos.persistence.model.user.contract;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * Created by oodles on 23/11/16.
  */
 @NodeEntity
-public class Contract extends UserBaseEntity{
+public class Contract extends UserBaseEntity {
 
     private String name;
     private String level;

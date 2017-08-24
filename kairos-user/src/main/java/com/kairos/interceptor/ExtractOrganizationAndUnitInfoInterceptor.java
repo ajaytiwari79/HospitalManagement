@@ -1,6 +1,6 @@
 package com.kairos.interceptor;
 
-import com.kairos.utils.userContext.UserContext;
+import com.kairos.util.userContext.UserContext;
 import org.apache.log4j.Logger;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;

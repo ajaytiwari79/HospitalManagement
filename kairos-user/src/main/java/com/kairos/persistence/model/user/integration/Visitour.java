@@ -1,8 +1,7 @@
 package com.kairos.persistence.model.user.integration;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Created by oodles on 21/2/17.
@@ -49,7 +48,12 @@ public class Visitour  extends UserBaseEntity implements Cloneable {
     public Visitour() {
     }
 
-    public Object clone()throws CloneNotSupportedException{
-        return super.clone();
+    public static Visitour getInstance(){
+        return new Visitour();
+    }
+
+    public static Visitour copyProperties(Visitour source, Visitour target){
+        BeanUtils.copyProperties(source,target);
+        return target;
     }
 }

@@ -1,13 +1,11 @@
 package com.kairos.service.client;
-
-import javax.inject.Inject;
-
+import com.kairos.persistence.model.user.client.ClientOrganizationRelation;
+import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
+import com.kairos.util.BadgeGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kairos.utils.BadgeGenerator;
-import com.kairos.persistence.model.user.client.ClientOrganizationRelation;
-import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
+import javax.inject.Inject;
 
 /**
  * Created by oodles on 15/11/16.

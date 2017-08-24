@@ -1,20 +1,17 @@
 package com.kairos.service.contract;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.springframework.stereotype.Service;
-
 import com.kairos.persistence.model.user.contract.Contract;
 import com.kairos.persistence.repository.user.contact.ContractGraphRepository;
 import com.kairos.service.UserBaseService;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.util.List;
 
 /**
  * Created by oodles on 23/11/16.
  */
 @Service
-public class ContractService  extends UserBaseService{
+public class ContractService extends UserBaseService {
 
     @Inject
     ContractGraphRepository contractGraphRepository;

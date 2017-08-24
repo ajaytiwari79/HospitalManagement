@@ -1,9 +1,8 @@
 package com.kairos.persistence.model.user.skill;
 
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
-
-import com.kairos.persistence.model.common.UserBaseEntity;
 
 /**
  * Skill Level Domain

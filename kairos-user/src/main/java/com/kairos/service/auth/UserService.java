@@ -1,20 +1,17 @@
 package com.kairos.service.auth;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
-import com.kairos.persistence.repository.user.access_profile.AccessPageRepository;
-import com.kairos.service.access_profile.AccessGroupService;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.auth.UserAuthentication;
+import com.kairos.persistence.model.user.client.ContactDetail;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.service.SmsService;
+import com.kairos.service.UserBaseService;
+import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.util.OtpGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -23,17 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kairos.utils.OtpGenerator;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.auth.UserAuthentication;
-import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.service.SmsService;
-import com.kairos.service.UserBaseService;
+import javax.inject.Inject;
+import java.util.*;
+
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 
 
@@ -155,9 +144,11 @@ public class UserService extends UserBaseService {
         if (currentUser == null) {
             return null;
         }
+        generateTokenToUser(currentUser);
         Map<String, Object> map = new HashMap<>();
         map.put("email", currentUser.getEmail());
         map.put("isPasswordUpdated", currentUser.isPasswordUpdated());
+        map.put("accessToken",currentUser.getAccessToken());
         return map;
 
        /* *//*ContactDetail contactDetail = user.getContactDetail();
@@ -248,7 +239,7 @@ public class UserService extends UserBaseService {
             Map<String, Object> organization = new HashMap<>();
             organization.put("id", orgData.get("id"));
             organization.put("name", orgData.get("name"));
-
+/*
             accessPageModuleIds = new HashSet<>();
             validAccessPage = new ArrayList<>();
             for (Map<String, Object> accessModule : (List<Map<String, Object>>) orgData.get("accessPage")) {
@@ -281,7 +272,7 @@ public class UserService extends UserBaseService {
                 modules.put("tabPermissions", tabs);
                 validAccessPage.add(modules);
             }
-            organization.put("modulePermissions", validAccessPage);
+            organization.put("modulePermissions", validAccessPage);*/
             organizationList.add(organization);
         }
         long endTime = System.currentTimeMillis();
@@ -334,8 +325,6 @@ public class UserService extends UserBaseService {
         if (currentUser == null) {
             return null;
         }
-
-        currentUser = generateTokenToUser(currentUser);
         Map<String, Object> map = new HashMap<>();
         map.put("id", currentUser.getId());
         map.put("userName", currentUser.getUserName());
@@ -441,6 +430,11 @@ public class UserService extends UserBaseService {
      */
     public List<Map<String,Object>> getPermissions(long organizationId) {
 
+        Organization organization = organizationGraphRepository.findOne(organizationId,0);
+        if(organization == null){
+            return Collections.emptyList();
+        }
+
         User currentUser = UserAuthentication.getCurrentUser();
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
         List<AccessPageQueryResult> mainModulePermissions = accessPageRepository.getPermissionOfMainModule(organizationId, currentUser.getId());
@@ -448,7 +442,12 @@ public class UserService extends UserBaseService {
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> unitPermissionMap;
         for (Organization unit : units) {
-            List<AccessPageQueryResult> accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), currentUser.getId());
+            List<AccessPageQueryResult> accessPageQueryResults;
+             if(organization.isKairosHub()){
+                accessPageQueryResults = accessPageRepository.getTabsPermissionForHubMember();
+             } else {
+               accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), currentUser.getId());
+             }
             unitPermissionMap = new HashMap<>();
             unitPermissionMap.put("id", unit.getId());
             unitPermissionMap.put("permissions", getUnionOfPermissions(accessPageQueryResults));
@@ -463,6 +462,7 @@ public class UserService extends UserBaseService {
             response.put("name", mainModule.getName());
             response.put("read", mainModule.isRead());
             response.put("write", mainModule.isWrite());
+            response.put("moduleId",mainModule.getModuleId());
             List<Map<String, Object>> unitPermissionList = new ArrayList<>();
             for (Map<String, Object> unitPermission : list) {
                 Map<String, Object> unitPermissionForModule = new HashMap<>();
@@ -509,7 +509,7 @@ public class UserService extends UserBaseService {
                     if (page.isPresent()) {
                         BeanUtils.copyProperties(page.get(), module);
                     } else {
-                        BeanUtils.copyProperties(page.get(), module);
+                        BeanUtils.copyProperties(accessPageQueryResult, module);
                     }
                     moduleToProceed.put(accessPageQueryResult.getId(), true);
                 } else {
