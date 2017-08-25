@@ -1,10 +1,11 @@
 package com.kairos.client;
 
-import com.kairos.response.dto.web.ResponseEnvelope;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -31,38 +32,41 @@ public class SkillServiceTemplateClient {
      * @param orgId
      * @return
      */
-    public  Map<String, Object> getTaskTypeList(List<Long> serviceIds, long orgId){
-        final String baseUrl=getBaseUrl(false);
+    public  Map<String, Object> getTaskTypeList(List<Long> serviceIds, long orgId) {
+        final String baseUrl = getBaseUrl(false);
 
         try {
 
             HttpEntity<List> request = new HttpEntity<>(serviceIds);
 
-            ResponseEntity<ResponseEnvelope> restExchange =
-                    restTemplate.exchange(baseUrl+"/task_types/getAllAvlSkill",
-                            HttpMethod.
-                                    POST,request, ResponseEnvelope.class);
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
+            };
 
-            ResponseEnvelope response = restExchange.getBody();
+            logger.debug("typeReference "+typeReference);
+            ResponseEntity<RestTemplateResponseEnvelope<Object>> restExchange =
+                    restTemplate.exchange(baseUrl + "/task_types/getAllAvlSkill",
+                            HttpMethod.POST, request, typeReference, orgId);
+
+            logger.info("restExchange.getBody() "+ restExchange.getBody());
+
+            RestTemplateResponseEnvelope<Object> response = restExchange.getBody();
+
             if (restExchange.getStatusCode().is2xxSuccessful()) {
 
-
-                Map<String,Object> taskTypeListInfo= (Map<String,Object>) response.getData();
+                Map<String, Object> taskTypeListInfo = (Map<String, Object>)response.getData();
 
                 return taskTypeListInfo;
 
             } else {
                 throw new RuntimeException(response.getMessage());
             }
-        }catch (HttpClientErrorException e) {
+        } catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
         }
-
     }
-
 
     private final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){
