@@ -641,21 +641,16 @@ public class ClientService extends UserBaseService {
      *
      * @param clientId
      * @return
-     * @throws CloneNotSupportedException
      */
-    public boolean markClientAsDead(Long clientId) throws CloneNotSupportedException {
+    public boolean markClientAsDead(Long clientId)  {
         Client client = clientGraphRepository.findOne(clientId);
-        if (client != null) {
-            client.setCitizenDead(true);
-            logger.debug("Setting client Dead");
-            clientGraphRepository.save(client);
-            //return plannerService.deleteTasksForCitizen(clientId);
-          boolean hasDeleted=clientServiceRestClient.deleteTaskForCitizen(clientId);
-
-           if(!hasDeleted)
-               throw new InternalError("unable to procees request ");
+        if(client == null){
+            throw new DataNotFoundByIdException("Incorrect client id ::" + clientId);
         }
-        throw new DataNotFoundByIdException("Client not found with provided ID: " + clientId);
+        client.setCitizenDead(true);
+        clientGraphRepository.save(client);
+        //return plannerService.deleteTasksForCitizen(clientId);
+        return clientServiceRestClient.deleteTaskForCitizen(clientId);
 
     }
 
