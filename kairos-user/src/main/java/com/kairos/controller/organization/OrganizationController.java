@@ -307,27 +307,27 @@ public class OrganizationController {
 
     }
 
-/* anil m2 move this endpoints in task type controller
-    // TaskType
-    @ApiOperation(value = "Get Available Task from serviceId")
-    @RequestMapping(value = "/unit/{unitId}/service/{subServiceId}/task_type", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getTaskTypes(@PathVariable long subServiceId, @PathVariable long unitId, @RequestParam("type") String type) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationServiceService.getTaskTypes(unitId, subServiceId, type));
-    }
+    /* anil m2 move this endpoints in task type controller
+        // TaskType
+        @ApiOperation(value = "Get Available Task from serviceId")
+        @RequestMapping(value = "/unit/{unitId}/service/{subServiceId}/task_type", method = RequestMethod.GET)
+        @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> getTaskTypes(@PathVariable long subServiceId, @PathVariable long unitId, @RequestParam("type") String type) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    organizationServiceService.getTaskTypes(unitId, subServiceId, type));
+        }
 
-    @ApiOperation(value = "Add/ Remove TaskType to Organization")
-    @RequestMapping(value = "/unit/{unitId}/service/{subServiceId}/task_type", method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addTaskTypeInOrganization(@PathVariable long organizationId, @PathVariable long unitId, @PathVariable long subServiceId,
-                                                                  @RequestBody Map<String, Object> data, @RequestParam("type") String type) {
-        String taskTypeId = data.get("taskTypeId") + "";
-        boolean isSelected = (boolean) data.get("isSelected");
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationServiceService.updateTaskType(unitId, subServiceId, taskTypeId, isSelected, type));
-    }
-*/
+        @ApiOperation(value = "Add/ Remove TaskType to Organization")
+        @RequestMapping(value = "/unit/{unitId}/service/{subServiceId}/task_type", method = RequestMethod.POST)
+        @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> addTaskTypeInOrganization(@PathVariable long organizationId, @PathVariable long unitId, @PathVariable long subServiceId,
+                                                                      @RequestBody Map<String, Object> data, @RequestParam("type") String type) {
+            String taskTypeId = data.get("taskTypeId") + "";
+            boolean isSelected = (boolean) data.get("isSelected");
+            return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    organizationServiceService.updateTaskType(unitId, subServiceId, taskTypeId, isSelected, type));
+        }
+    */
     @ApiOperation(value = "Get Organization Time Slots")
     @RequestMapping(value = "/unit/{unitId}/time_slot", method = RequestMethod.GET)
     @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -413,7 +413,7 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getOrganizationAllClients(@PathVariable long organizationId, @PathVariable long unitId) {
         User loginUser = UserAuthentication.getCurrentUser();
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getOrganizationAllClients(unitId, loginUser.getId()));
+                clientService.getOrganizationAllClients(organizationId,unitId, loginUser.getId()));
     }
 
     @RequestMapping(value = "/unit/{unitId}/client/upload", method = RequestMethod.POST)
@@ -529,7 +529,7 @@ public class OrganizationController {
     @ApiOperation("get child units of parent organization")
     @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getChildUnits(@PathVariable long organizationId, @RequestParam(value = "moduleId") String moduleId,
-                                                      @RequestParam(value = "userId") long userId) {
+                                                             @RequestParam(value = "userId") long userId) {
 
         //TODO there is hardcoded module id,later will get from url @prabjot
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationHierarchyService.getChildUnits(organizationId, userId, moduleId));

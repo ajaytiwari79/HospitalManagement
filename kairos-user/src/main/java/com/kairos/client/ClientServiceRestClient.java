@@ -1,14 +1,17 @@
 package com.kairos.client;
 
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.TableConfiguration;
 import com.kairos.client.dto.TaskTypeAggregateResult;
+import com.kairos.persistence.model.user.access_permission.Tab;
 import com.kairos.response.dto.web.ResponseEnvelope;
 import com.kairos.util.userContext.UserContext;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -44,30 +47,30 @@ public class ClientServiceRestClient {
      *
      */
     public List<Long> getClientTaskServices(Long clientId, Long organizationId1) {
-         final String baseUrl=getBaseUrl();
+        final String baseUrl=getBaseUrl();
 
-         try {
-             ResponseEntity<ResponseEnvelope> restExchange =
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<Long>>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/task/{clientId}/organization/{organizationId1}/service",
                             HttpMethod.GET,
-                            null, ResponseEnvelope.class, clientId, organizationId1);
-             ResponseEnvelope response = restExchange.getBody();
-            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                            null,typeReference,clientId,organizationId1);
 
-                List<Long> clientServiceIds = (List<Long>) response.getData();
-                return clientServiceIds;
+            RestTemplateResponseEnvelope<List<Long>> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
             } else {
                 throw new RuntimeException(response.getMessage());
             }
-          }catch (HttpClientErrorException e) {
+        } catch (HttpClientErrorException e) {
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
-           throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+
+
     }
-
-
-   }
 
 
     /**
@@ -81,16 +84,16 @@ public class ClientServiceRestClient {
         final String baseUrl=getBaseUrl();
 
         try {
-            ResponseEntity<ResponseEnvelope> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/planner/citizen/{citizenId}",
                             HttpMethod.DELETE,
-                            null, ResponseEnvelope.class, citizenId);
+                            null, typeReference, citizenId);
 
-            ResponseEnvelope response = restExchange.getBody();
+            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-
-                return true;
+                return response.getData();
             } else {
                 throw new RuntimeException(response.getMessage());
             }
@@ -114,16 +117,15 @@ public class ClientServiceRestClient {
 
         try {
             HttpEntity<List> request = new HttpEntity<>(citizenIds);
-            ResponseEntity<ResponseEnvelope> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>> restExchange =
                     restTemplate.exchange(
                             "http://zuulservice/activity/api/v1/task_demand/getTaskTypes",
-                            HttpMethod.POST, request, ResponseEnvelope.class);
+                            HttpMethod.POST, request, typeReference);
 
-            ResponseEnvelope response = restExchange.getBody();
+            RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-
-                List<TaskTypeAggregateResult> taskTypesList= (List<TaskTypeAggregateResult>) response.getData();
-                return taskTypesList;
+                return response.getData();
             } else {
                 throw new RuntimeException(response.getMessage());
             }
@@ -147,17 +149,16 @@ public class ClientServiceRestClient {
         final String baseUrl=getBaseUrl();
 
         try {
-            ResponseEntity<ResponseEnvelope> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>> restExchange =
                     restTemplate.exchange(
                             "http://zuulservice/activity/api/v1/task_demand/unit/{unitId}",
                             HttpMethod.
-                            GET,null, ResponseEnvelope.class);
+                                    GET,null, typeReference,unitId);
 
-            ResponseEnvelope response = restExchange.getBody();
+            RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-
-                List<OrgTaskTypeAggregateResult> OrgTaskTypeList= (List<OrgTaskTypeAggregateResult>) response.getData();;
-                return OrgTaskTypeList;
+                return response.getData();
             } else {
                 throw new RuntimeException(response.getMessage());
             }
@@ -181,20 +182,19 @@ public class ClientServiceRestClient {
      * @return
      */
 
-    public Map  getOrganizationClientsWithPlanning(Long staffId,Long organizationId,List<Map<String, Object>> mapList){
+    public Map<String,Object>  getOrganizationClientsWithPlanning(Long staffId,Long organizationId,List<Map<String, Object>> mapList){
 
         try {
             HttpEntity<List> request = new HttpEntity<>(mapList);
-            ResponseEntity<ResponseEnvelope> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<Map<String,Object>>> restExchange =
                     restTemplate.exchange("http://zuulservice/activity/api/v1/task_demand/organization/{organizationId}/{staffId}",
                             HttpMethod.
-                                    POST,request, ResponseEnvelope.class);
+                                    POST,request, typeReference,organizationId,staffId);
 
-            ResponseEnvelope response = restExchange.getBody();
+            RestTemplateResponseEnvelope<Map<String,Object>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-                Map<String,Object> clientsPlanning= (Map<String,Object>) response.getData();
-
-                return clientsPlanning;
+                return response.getData();
 
             } else {
                 throw new RuntimeException(response.getMessage());
@@ -218,29 +218,27 @@ public class ClientServiceRestClient {
     public Map<String, Object> getOrganizationClientsInfo(Long organizationId, List<Map<String, Object>> mapList) {
 
         try {
-              HttpEntity<List> request = new HttpEntity<>(mapList);
-              ResponseEntity<ResponseEnvelope> restExchange =
-                restTemplate.exchange("http://zuulservice/activity/api/v1/task_demand/organization/{organizationId}",
-                        HttpMethod.
-                                POST,request, ResponseEnvelope.class);
+            HttpEntity<List> request = new HttpEntity<>(mapList);
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>>(){};
+            ResponseEntity<RestTemplateResponseEnvelope<Map<String,Object>>> restExchange =
+                    restTemplate.exchange("http://zuulservice/activity/api/v1/task_demand/organization/{organizationId}",
+                            HttpMethod.
+                                    POST,request, typeReference,organizationId);
 
-             ResponseEnvelope response = restExchange.getBody();
-               if (restExchange.getStatusCode().is2xxSuccessful()) {
+            RestTemplateResponseEnvelope<Map<String,Object>> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
 
+                return response.getData();
 
-                    Map<String,Object> clientsinfo= (Map<String,Object>) response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
 
-                return clientsinfo;
-
-             } else {
-                  throw new RuntimeException(response.getMessage());
-                 }
-          }catch (HttpClientErrorException e) {
-
-                  logger.info("status {}",e.getStatusCode());
-                 logger.info("response {}",e.getResponseBodyAsString());
-                  throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
-           }
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
     }
 
 
@@ -313,23 +311,21 @@ public class ClientServiceRestClient {
      * @param unitId
      * @return
      */
-    public TableConfiguration getTableConfiguration(Long staffId,Long organizationId,Long unitId){
+    public TableConfiguration getTableConfiguration(long organizationId,long unitId,Long staffId){
 
         final String baseUrl=getBaseUrl();
 
         try {
-            ResponseEntity<ResponseEnvelope> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<TableConfiguration>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<TableConfiguration>>(){};
+            ResponseEntity<RestTemplateResponseEnvelope<TableConfiguration>> restExchange =
                     restTemplate.exchange(
-                            "/table/{staffId}",
+                            baseUrl + "/table/{staffId}",
                             HttpMethod.
-                                    GET,null, ResponseEnvelope.class);
+                                    GET,null, typeReference,staffId);
 
-            ResponseEnvelope response = restExchange.getBody();
+            RestTemplateResponseEnvelope<TableConfiguration> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-
-                TableConfiguration tableConfiguration= (TableConfiguration) response.getData();
-
-                return tableConfiguration;
+                return response.getData();
             } else {
                 throw new RuntimeException(response.getMessage());
             }
@@ -339,10 +335,10 @@ public class ClientServiceRestClient {
             logger.info("response {}",e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
         }
-}
+    }
 
 
-     //citizen service rest template
+    //citizen service rest template
 
     public void getGrantObject(JSONObject grantObject, Long organizationId, Long subServiceId){
 
@@ -350,7 +346,7 @@ public class ClientServiceRestClient {
     }
 
     private final String getBaseUrl(){
-         String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
+        String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
         return baseUrl;
     }
 

@@ -490,7 +490,7 @@ public class ClientService extends UserBaseService {
     public List<Long> getClientServicesIds(Long clientId, long orgId) {
         logger.debug("Getting Demands  ClientId:" + clientId + " UnitId: " + orgId);
         List<Long> serviceList = new ArrayList<>();
-       // List<Long> serviceIdList = taskService.getClientTaskServices(clientId, orgId);
+        // List<Long> serviceIdList = taskService.getClientTaskServices(clientId, orgId);
         //anil maurya  implements task service rest template client
         List<Long> serviceIdList= clientServiceRestClient.getClientTaskServices(clientId,orgId);
 
@@ -823,7 +823,7 @@ public class ClientService extends UserBaseService {
             filterSkillData.add((Map<String, Object>) map.get("data"));
         }
         orgData.put("taskTypes", clientServiceRestClient.getTaskTypesOfUnit(unitId));
-       // orgData.put("taskTypes", customTaskTypeRepository.getTaskTypesOfUnit(unitId));
+        // orgData.put("taskTypes", customTaskTypeRepository.getTaskTypesOfUnit(unitId));
         orgData.put("skills", filterSkillData);
         orgData.put("teams", teamGraphRepository.getTeamsByOrganization(unitId));
 
@@ -891,7 +891,7 @@ public class ClientService extends UserBaseService {
         List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId,envConfig.getServerHost() + File.separator);
 
         if (mapList.isEmpty()) {
-             return null;
+            return null;
         }
 
         //anilm2 replace it with rest template
@@ -915,7 +915,7 @@ public class ClientService extends UserBaseService {
         List<Long> serviceIds = organizationServiceRepository.getServiceIdsByOrgId(organizationId);
         clientData.put("serviceTypes", organizationServiceRepository.findAll(serviceIds));
 
-            return clientData;
+        return clientData;
 
     }
 
@@ -958,7 +958,7 @@ public class ClientService extends UserBaseService {
         return response;
     }*/
 
-    public HashMap<String, Object> getOrganizationAllClients(long organizationId, long staffId) {
+    public HashMap<String, Object> getOrganizationAllClients(long organizationId,long unitId, long staffId) {
         List<Map<String, Object>> mapList = organizationGraphRepository.getAllClientsOfOrganization(organizationId);
         List<Object> clientList = new ArrayList<>();
         for (Map<String, Object> map : mapList) {
@@ -968,7 +968,7 @@ public class ClientService extends UserBaseService {
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("clients", clientList);
-        response.put("tableSetting", Arrays.asList(clientServiceRestClient.getTableConfiguration(organizationId, staffId,12L)));
+        response.put("tableSetting", Arrays.asList(clientServiceRestClient.getTableConfiguration(organizationId,unitId,staffId)));
         return response;
     }
 
@@ -991,8 +991,8 @@ public class ClientService extends UserBaseService {
      * @return
      */
     public ClientStaffInfoDTO getStaffClientInfo( Long clientId,String authToken){
-         Client client =getCitizenById(clientId);
-         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
+        Client client =getCitizenById(clientId);
+        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
         return new ClientStaffInfoDTO(client.getId(),staff.getId());
     }
 
@@ -1007,7 +1007,7 @@ public class ClientService extends UserBaseService {
         Map<String, Object> staffAndCitizenHouseholdsInfo = new HashMap<>();
         staffAndCitizenHouseholdsInfo.put("lastModifiedBy",staffGraphRepository.findOne(staffId).getFirstName());
         staffAndCitizenHouseholdsInfo.put("citizenHouseholds",getPeopleInHousehold(citizenId));
-       return staffAndCitizenHouseholdsInfo;
+        return staffAndCitizenHouseholdsInfo;
     }
 
     /**
@@ -1053,22 +1053,22 @@ public class ClientService extends UserBaseService {
     public ClientTemporaryAddress changeLocation(ClientExceptionDTO clientExceptionDto, long unitId,Long clientId){
 
         Client client = clientGraphRepository.findOne(clientId);
-                ClientTemporaryAddress clientTemporaryAddress = null;
-                if (clientExceptionDto.getTempAddress() != null) {
-                    clientTemporaryAddress = updateClientTemporaryAddress(clientExceptionDto, unitId, client);
+        ClientTemporaryAddress clientTemporaryAddress = null;
+        if (clientExceptionDto.getTempAddress() != null) {
+            clientTemporaryAddress = updateClientTemporaryAddress(clientExceptionDto, unitId, client);
                     /*if (clientTemporaryAddress != null) {
                         map.put("tempAddress", clientTemporaryAddress);
                     }*/
-                }
-                if (clientExceptionDto.getTemporaryAddress() != null) {
-                    clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
-                    if (clientTemporaryAddress == null) {
-                        throw new InternalError("Address not found");
-                    }
+        }
+        if (clientExceptionDto.getTemporaryAddress() != null) {
+            clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
+            if (clientTemporaryAddress == null) {
+                throw new InternalError("Address not found");
+            }
 
-                }
+        }
 
-                return clientTemporaryAddress;
+        return clientTemporaryAddress;
     }
 
 
@@ -1137,7 +1137,7 @@ public class ClientService extends UserBaseService {
         TaskAddress taskAddress = new TaskAddress();
         ClientHomeAddressQueryResult clientHomeAddressQueryResult = clientGraphRepository.getHomeAddress(client.getId());
         if (clientHomeAddressQueryResult == null) {
-           return null;
+            return null;
         }
         ZipCode zipCode = clientHomeAddressQueryResult.getZipCode();
         ContactAddress homeAddress = clientHomeAddressQueryResult.getHomeAddress();
