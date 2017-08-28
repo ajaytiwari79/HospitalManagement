@@ -1,7 +1,7 @@
 package com.kairos.config;
 
-import com.kairos.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
-import com.kairos.interceptor.VerifyPermissionInterceptor;
+import com.kairos.config.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
+import com.kairos.config.interceptor.VerifyPermissionInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;

@@ -1,6 +1,4 @@
-package com.kairos.hystrix;
-
-import com.kairos.hystrix.ThreadLocalAwareStrategy;
+package com.kairos.config.hystrix;
 import com.netflix.hystrix.strategy.HystrixPlugins;
 import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
 import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;

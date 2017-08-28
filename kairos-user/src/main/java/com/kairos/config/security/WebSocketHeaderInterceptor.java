@@ -18,7 +18,7 @@ public class WebSocketHeaderInterceptor implements HandshakeInterceptor {
         if (request instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
             HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
-            if(httpServletRequest.getHeader("authToken")==null){
+            if(httpServletRequest.getHeader("Authorization")==null){
                 return false;
             }
         }

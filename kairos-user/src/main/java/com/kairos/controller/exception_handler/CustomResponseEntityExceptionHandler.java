@@ -1,9 +1,5 @@
 package com.kairos.controller.exception_handler;
 
-import java.util.*;
-
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 import com.kairos.custom_exception.*;
 import com.kairos.response.dto.web.ResponseEnvelope;
 import org.springframework.beans.ConversionNotSupportedException;
@@ -11,13 +7,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -37,6 +30,12 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
+
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 
 @ControllerAdvice
@@ -303,9 +302,9 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		errorMessage.setMessage(ex.getMessage());
 		return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
-	//@ExceptionHandler({ AccessDeniedException.class,InvalidRequestException.class })
+
 	// 403
-	@ExceptionHandler({InvalidRequestException.class })
+	@ExceptionHandler({ AccessDeniedException.class,InvalidRequestException.class })
 	public ResponseEntity<Object> handleAccessDeniedException(final Exception ex, final WebRequest request) {
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
@@ -322,7 +321,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
-		return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.CONFLICT, request);
+		return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
 	}
 
 	// 500
@@ -364,7 +363,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	}
 
 
-		@ResponseStatus(HttpStatus.CONFLICT)
+	@ResponseStatus(HttpStatus.CONFLICT)
 	@ExceptionHandler(value = FlsCredentialException.class)
 	@ResponseBody
 	public ResponseEnvelope flsCredentialExceptionHandler(FlsCredentialException ex,HttpServletRequest request) {

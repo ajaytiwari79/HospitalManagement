@@ -1,7 +1,6 @@
 package com.kairos.util;
-import java.util.Map;
-import java.util.Properties;
 
+import com.kairos.persistence.model.common.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.MutablePropertyValues;
@@ -12,13 +11,13 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.kairos.persistence.model.common.SpringApplicationContext;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by oodles on 29/1/17.
  */
 public class BeanFactoryUtil {
-
     private static final Logger logger = LoggerFactory.getLogger(BeanFactoryUtil.class);
 
     /**

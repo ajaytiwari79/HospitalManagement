@@ -15,6 +15,7 @@ import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -29,7 +30,7 @@ import java.util.List;
 @SpringBootApplication
 
 @EnableTransactionManagement(proxyTargetClass=true)
-
+@EnableResourceServer
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableNeo4jRepositories(basePackages = {"com.kairos.persistence.repository"})
 @EnableEurekaClient

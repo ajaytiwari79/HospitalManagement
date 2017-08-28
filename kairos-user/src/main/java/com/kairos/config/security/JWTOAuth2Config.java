@@ -1,11 +1,11 @@
 package com.kairos.config.security;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -19,6 +19,9 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableAuthorizationServer
@@ -26,20 +29,23 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private UserDetailsService userDetailsService;
 
 
+
+
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-    	 TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+
+        TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
     	    tokenEnhancerChain.setTokenEnhancers(
     	      Arrays.asList(jwtTokenEnhancer(), jwtAccessTokenConverter()));
-    	 
+
     	    endpoints.tokenStore(tokenStore())
     	             .tokenEnhancer(tokenEnhancerChain)
-    	             .authenticationManager(authenticationManager);
+    	             .authenticationManager(authenticationManager)
+                     .userDetailsService(userDetailsService);
     }
 
 
@@ -50,10 +56,10 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
         clients.inMemory()
                 .withClient("kairos")
                 .secret("kairos")
-                .authorizedGrantTypes("refresh_token", "password", "client_credentials")
+                .authorizedGrantTypes("refresh_token","password","client_credentials")
                 .scopes("webclient", "mobileclient")
      			.and()
-     					.withClient("task-service")
+     					.withClient("activity-service")
      					.secret("task")
      					.authorizedGrantTypes("client_credentials", "refresh_token")
      					.scopes("server")
@@ -62,9 +68,10 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
      					.secret("user")
      					.authorizedGrantTypes("client_credentials", "refresh_token")
      					.scopes("server");
-     			
+
+
     }
-    
+
     @Bean
     public TokenStore tokenStore() {
         return new JwtTokenStore(jwtAccessTokenConverter());
@@ -83,9 +90,16 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Bean
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey("123456");
-       // final KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("mytest.jks"), "mypass".toCharArray());
-       // converter.setKeyPair(keyStoreKeyFactory.getKeyPair("mytest"));
+        //converter.setSigningKey("123456");
+        try{
+            Resource resource=new FileSystemResource("/home/anil/springcert.jks");
+            final KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(resource, "kairos".toCharArray());
+            converter.setKeyPair(keyStoreKeyFactory.getKeyPair("kairos"));
+
+        }catch (Exception e){
+            
+
+        }
         return converter;
     }
 
@@ -93,7 +107,7 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     public TokenEnhancer jwtTokenEnhancer() {
         return new JWTTokenEnhancer();
     }
-   
+
     @Override
     public void configure(final AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
         oauthServer.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");

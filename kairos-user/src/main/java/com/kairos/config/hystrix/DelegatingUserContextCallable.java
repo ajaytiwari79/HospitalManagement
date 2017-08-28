@@ -1,12 +1,11 @@
-package com.kairos.hystrix;
-import java.util.concurrent.Callable;
-
+package com.kairos.config.hystrix;
+import com.kairos.util.userContext.UserContext;
+import com.kairos.util.userContext.UserContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import com.kairos.util.userContext.UserContext;
-import com.kairos.util.userContext.UserContextHolder;
+import java.util.concurrent.Callable;
 
 
 public final class DelegatingUserContextCallable<V> implements Callable<V> {

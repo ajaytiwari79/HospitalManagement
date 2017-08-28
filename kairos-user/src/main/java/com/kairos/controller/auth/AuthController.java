@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -167,5 +170,13 @@ public class AuthController {
     @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/permissions", method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long organizationId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
+    }
+    @PreAuthorize("hasPermission(#id)")
+    @RequestMapping(value = { "/user/{id}" }, produces = "application/json")
+    public Map<String, Object> user(OAuth2Authentication user,@PathVariable Long id) {
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("user", user.getUserAuthentication().getPrincipal());
+        userInfo.put("authorities", AuthorityUtils.authorityListToSet(user.getUserAuthentication().getAuthorities()));
+        return userInfo;
     }
 }

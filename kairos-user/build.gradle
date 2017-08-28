@@ -41,7 +41,7 @@ idea {
 task wrapper(type: Wrapper) { gradleVersion = '4.1' }
 
 ext {
-	springCloudVersion = 'Dalston.SR2'
+	springCloudVersion = 'Dalston.SR3'
 }
 
 
@@ -97,6 +97,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.lowagie/itext
 	compile group: 'com.lowagie', name: 'itext', version: '4.2.1'
 	compile 'org.springframework:springloaded:1.2.7.RELEASE'
+	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-jwt
+	compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
+
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')

@@ -1,4 +1,4 @@
-package com.kairos.interceptor;
+package com.kairos.config.interceptor;
 
 import com.kairos.util.userContext.UserContext;
 import org.apache.log4j.Logger;
