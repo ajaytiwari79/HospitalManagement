@@ -812,6 +812,18 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getUnitVisitationInfo(organizationId,unitId));
     }
 
+    /**
+     * This endpoint in called from task micro service to get time slot info by unit id and time slot name
+     * @param unitId
+     * @param timeSlotName
+     * @return timeslot info map
+     */
+    @ApiOperation("get time slot info by unit id and timeslot name")
+    @RequestMapping(value = "/unit/{unitId}/time_slot_name", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotName(@PathVariable long unitId, @RequestBody String timeSlotName) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotName(unitId, timeSlotName));
+    }
+
 
 }
 
