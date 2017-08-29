@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.organization;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
@@ -20,8 +23,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
+
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -155,6 +157,16 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = VAT_TYPE)
     private VatType vatType;
 
+    @Relationship(type = HAS_LEVEL)
+    private Level level;
+
+    public Level getLevel() {
+        return level;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
+    }
 
     private String description;
     private String externalId; //timeCare External Id
