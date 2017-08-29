@@ -295,7 +295,7 @@ public class OrganizationServiceService extends UserBaseService {
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 
-            Organization organization = organizationGraphRepository.findOne(id);
+            Organization organization = organizationGraphRepository.findOne(id,0);
             if (organization == null) {
                 return null;
             }
@@ -388,7 +388,7 @@ public class OrganizationServiceService extends UserBaseService {
         return response;
     }
 
-    *//**
+    /**
      * @author prabjot
      * to update task type in organization/team based on type of node
      * @param id id of organization or team will be decided by type parameter
@@ -397,8 +397,8 @@ public class OrganizationServiceService extends UserBaseService {
      * @param isSelected if true task type will be added otherwise
      * @param type type can be {organization},{team}
      * @return
-     *//*
-    public Map<String,Object> updateTaskType(long id, long subServiceId, String taskTypeId, boolean isSelected, String type) {
+     */
+    /*public Map<String,Object> updateTaskType(long id, long subServiceId, String taskTypeId, boolean isSelected, String type) {
 
         if(ORGANIZATION.equalsIgnoreCase(type)){
             if(isSelected){

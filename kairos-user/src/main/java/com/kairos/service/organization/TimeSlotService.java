@@ -33,7 +33,7 @@ public class TimeSlotService extends UserBaseService {
 
     public Map<String, Object> getTimeSlots(long unitId) {
 
-        Organization organization = organizationGraphRepository.findOne(unitId);
+        Organization organization = organizationGraphRepository.findOne(unitId,0);
         if(organization == null){
             throw new InternalError("Organization can not found");
         }

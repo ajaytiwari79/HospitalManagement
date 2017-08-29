@@ -286,7 +286,7 @@ public class OrganizationController {
     // Service
     @ApiOperation(value = "Get Available Services")
     @RequestMapping(value = "unit/{unitId}/service/data", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationServiceData(@PathVariable long organizationId, @PathVariable long unitId, @RequestParam("type") String type) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationServiceService.organizationServiceData(unitId, type));
@@ -806,8 +806,8 @@ public class OrganizationController {
      * @param unitId
      * @return
      */
-    @ApiOperation("get assigned staff to citizen")
-    @RequestMapping(value = "/unit_visitation", method = RequestMethod.GET)
+    @ApiOperation("get visitation info for a unit")
+    @RequestMapping(value = "/unit/{unitId}/unit_visitation", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getUnitVisitationInfo(@PathVariable Long organizationId,@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getUnitVisitationInfo(organizationId,unitId));
     }
