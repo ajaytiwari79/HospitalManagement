@@ -480,8 +480,8 @@ public class ClientController {
      * @param staffId
      * @return
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}/{staffId}")
-    @ApiOperation("get client and staff info")
+    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}/staff/{staffId}/getStaffCitizenHouseholds")
+    @ApiOperation("get client households and staff info")
     private ResponseEntity<Map<String, Object>> getStaffCitizenHouseholds(@PathVariable Long citizenId,@PathVariable Long staffId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getStaffAndCitizenHouseholds(citizenId,staffId));
     }

@@ -843,6 +843,14 @@ public class OrganizationService extends UserBaseService {
 
     }
 
+    public Map<String,Object> getTaskDemandSupplierInfo(Long unitId){
+        Map<String, Object> supplierInfo = new HashMap();
+        Organization weekdaySupplier = organizationGraphRepository.findOne(unitId,0);
+        supplierInfo.put("weekdaySupplier", weekdaySupplier.getName());
+        supplierInfo.put("weekdaySupplierId", weekdaySupplier.getId());
+        return supplierInfo;
+    }
+
 }
 
 

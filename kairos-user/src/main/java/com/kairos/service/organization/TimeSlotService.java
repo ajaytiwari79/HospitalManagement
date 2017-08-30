@@ -218,7 +218,6 @@ public class TimeSlotService extends UserBaseService {
     }
 
     public Map<String,Object> getTimeSlotByUnitIdAndTimeSlotName(Long unitId, String timeSlotName){
-        System.out.println("request received in timeslot service "+unitId+ " timeSlotNam e"+timeSlotName);
         Map<String,Object> timeSlot = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotName(unitId, timeSlotName);
         return timeSlot;
     }
