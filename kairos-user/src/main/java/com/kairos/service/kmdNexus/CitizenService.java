@@ -1,13 +1,27 @@
 package com.kairos.service.kmdNexus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.kairos.client.CitizenServiceRestClient;
+import com.kairos.constants.AppConstants;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.client.Client;
+import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.TimeSlotGraphRepository;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.client.ClientGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.response.dto.web.*;
+import com.kairos.service.client.ExternalClientService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.organization.OrganizationServiceService;
+import com.kairos.service.staff.StaffService;
+import com.kairos.util.JsonUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -25,29 +39,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import com.kairos.constants.AppConstants;
-import com.kairos.util.JsonUtils;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.client.Client;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
-import com.kairos.persistence.repository.organization.TimeSlotGraphRepository;
-import com.kairos.persistence.repository.user.client.ClientGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.response.dto.web.AvailableContacts;
-import com.kairos.response.dto.web.CitizenSupplier;
-import com.kairos.response.dto.web.CurrentElements;
-import com.kairos.response.dto.web.OrderGrant;
-import com.kairos.response.dto.web.PatientGrant;
-import com.kairos.response.dto.web.PatientRelative;
-import com.kairos.response.dto.web.PatientWrapper;
-import com.kairos.response.dto.web.RelativeContacts;
-import com.kairos.response.dto.web.RepetitionType;
-import com.kairos.service.client.ExternalClientService;
-import com.kairos.service.organization.OrganizationServiceService;
+import javax.inject.Inject;
+import java.util.*;
 
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
 
 
 /**
@@ -86,6 +81,14 @@ public class CitizenService {
     private AuthService authService;
     @Autowired
     CitizenServiceRestClient citizenServiceRestClient;
+    @Inject
+    private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private UserGraphRepository userGraphRepository;
+    @Inject
+    private StaffService staffService;
+    @Inject
+    private EmploymentGraphRepository employmentGraphRepository;
 
     /**
      * This method is used to import Citizen from KMD Nexus.
@@ -428,4 +431,92 @@ public class CitizenService {
 
     }
 
-   }
+
+    public void getShifts(Long filterId, Long unitId){
+        RestTemplate loginTemplate = new RestTemplate();
+        HttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
+        HttpMessageConverter stringHttpMessageConverterNew = new StringHttpMessageConverter();
+        loginTemplate.getMessageConverters().add(formHttpMessageConverter);
+        loginTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+        loginTemplate.getMessageConverters().add(stringHttpMessageConverterNew);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
+        //   headers.add("Content-Type" , "application/json");
+        logger.info("Auth token--------> "+AppConstants.KMD_NEXUS_ACCESS_TOKEN);
+        Map map = new HashMap<String, String>();
+        map.put("Content-Type", "application/json");
+        //   headers.setAll(map);
+        HttpEntity<String> headersElements = new HttpEntity<String>(headers);
+        logger.info("headers------headersElements-----> "+headersElements);
+        ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_CALENDAR_STAFFS_SHIFT_FILTER, filterId), HttpMethod.POST, headersElements, String.class);
+        JSONObject jsonObject = new JSONObject(responseEntity.getBody());
+        ColumnResource columnResource = JsonUtils.toObject(jsonObject.get("columnResource").toString(), ColumnResource.class);
+        for(KMDShift shift : columnResource.getShifts()){
+            String staffExternalId = shift.getEventResource().getResourceId();
+            staffExternalId = staffExternalId.substring(staffExternalId.indexOf("PROFESSIONAL:")+13);
+            logger.info("Staff External Id----> "+staffExternalId);
+            ResponseEntity<String> staffResponseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_STAFFS_DETAILS, staffExternalId), HttpMethod.GET, headersElements, String.class);
+            StaffDTO staffDTO = JsonUtils.toObject(staffResponseEntity.getBody(), StaffDTO.class);
+            Staff staff = createStaffFromKMD(unitId, staffDTO);
+            citizenServiceRestClient.createTaskFromKMD(staff.getId(),shift,unitId);
+            //anil m2 move this method in task micro service
+            //createTaskFromKMD(staff, shift, unitId);
+            logger.info("staff DTO---------> "+staffDTO.getLastName());
+
+        }
+        //logger.info("result---------> "+columnResource.getShifts().size());
+    }
+
+    public Staff createStaffFromKMD(long unitId, StaffDTO payload) {
+        Staff staff = staffGraphRepository.findByKmdExternalId(payload.getId());
+        if(staff == null) staff = new Staff();
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (unit == null)
+            throw new InternalError("organization not found");
+        staff.setFirstName(payload.getFirstName());
+        staff.setLastName(payload.getLastName());
+        staff.setActive(payload.isActive());
+        staff.setEmail(payload.getPrimaryEmailAddress());
+        staff.setKmdExternalId(payload.getId());
+
+
+        User user =  userGraphRepository.findByKmdExternalId(payload.getId());
+        if(user == null) user = new User();
+        user.setEmail(staff.getEmail());
+        user.setFirstName(staff.getFirstName());
+        user.setLastName(staff.getLastName());
+        userGraphRepository.save(user);
+
+        if (user != null) {
+            Staff alreadyExistStaff = staffGraphRepository.getByUser(user.getId());
+            if (alreadyExistStaff != null)
+                throw new InternalError("Staff already exists");
+            staff = staffService.createStaffObject(user, staff, Long.valueOf("1162"), unit);
+        }
+
+        Organization parent = null;
+        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+
+        } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
+            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+        }
+
+        if (parent == null) {
+            if((staff.getId() == null) || (employmentGraphRepository.findEmployment(unit.getId(), staff.getId()) == null)){
+                employmentGraphRepository.createEmployments(unit.getId(), Arrays.asList(staff.getId()), unit.getId());
+            }
+
+        } else {
+            if((staff.getId() == null) || (employmentGraphRepository.findEmployment(parent.getId(), staff.getId()) == null)) {
+                employmentGraphRepository.createEmployments(parent.getId(), Arrays.asList(staff.getId()), unit.getId());
+            }
+        }
+
+        logger.info("::::::::::::::::;   Saving user :::::::::::::::::: ");
+        return staffGraphRepository.save(staff);
+    }
+
+
+}

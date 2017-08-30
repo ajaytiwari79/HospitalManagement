@@ -39,6 +39,7 @@ import com.kairos.service.staff.StaffService;
 import com.kairos.util.FormatUtil;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -986,13 +987,15 @@ public class ClientService extends UserBaseService {
     /**
      * @auther anil maurya
      * this method is called from task micro service
-     * @param authToken
      * @param clientId
      * @return
      */
-    public ClientStaffInfoDTO getStaffClientInfo( Long clientId,String authToken){
+    public ClientStaffInfoDTO getStaffClientInfo( Long clientId, String loggedInUserName){
         Client client =getCitizenById(clientId);
-        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
+        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(loggedInUserName).getId());
+        if(client==null || staff==null){
+            throw new DataNotFoundByIdException("Either Client or Staff Id is invalid");
+        }
         return new ClientStaffInfoDTO(client.getId(),staff.getId());
     }
 
@@ -1037,6 +1040,12 @@ public class ClientService extends UserBaseService {
         return citizenDetails;
     }
 
+    /**
+     * @auther anil maurya
+     * this method is call from task micro service from planner rest template
+     * @param citizenId
+     * @return
+     */
     public Map<String,Object> getClientAddressInfo(Long citizenId){
 
         Client citizen = clientGraphRepository.findOne(citizenId, 1);
@@ -1053,8 +1062,15 @@ public class ClientService extends UserBaseService {
 
     }
 
-
-    public ClientTemporaryAddress changeLocation(ClientExceptionDTO clientExceptionDto, long unitId,Long clientId){
+    /**
+     * @auther aniil maurya
+     * this method is call from exception service from task micro service
+     * @param clientExceptionDto
+     * @param unitId
+     * @param clientId
+     * @return
+     */
+    public ClientTemporaryAddress changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId,Long clientId){
 
         Client client = clientGraphRepository.findOne(clientId);
         ClientTemporaryAddress clientTemporaryAddress = null;
@@ -1198,6 +1214,7 @@ public class ClientService extends UserBaseService {
 
     }
 
+
     public void mergeMultipleTasks(){
 
 
@@ -1238,6 +1255,5 @@ public class ClientService extends UserBaseService {
 public List<Long> getClientIds(long unitId){
     return clientGraphRepository.getCitizenIds(unitId);
 }
-
 
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.client.StaffServiceRestTemplate;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -26,6 +27,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
+import com.kairos.response.dto.web.ClientStaffInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -1119,5 +1121,18 @@ public class StaffService extends UserBaseService {
       responseMap.put("staffs",staffList);
       return responseMap;
   }
+
+    /**
+     * @auther anil maurya
+     * this method is called from task micro service
+     * @return
+     */
+    public ClientStaffInfoDTO getStaffInfo(String loggedInUserName){
+        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(loggedInUserName).getId());
+        if(staff==null){
+            throw new DataNotFoundByIdException("Staff Id is invalid");
+        }
+        return new ClientStaffInfoDTO(staff.getId());
+    }
 
 }

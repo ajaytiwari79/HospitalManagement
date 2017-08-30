@@ -12,6 +12,10 @@ public class ClientStaffInfoDTO {
         this.staffId=staffId;
     }
 
+    public ClientStaffInfoDTO(Long staffId){
+        this.staffId=staffId;
+    }
+
     public Long getClientId() {
         return clientId;
     }

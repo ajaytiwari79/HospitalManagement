@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -527,6 +528,17 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getTeamStaffAndStaffSkill(unitId,staffIds));
     }
 
+    /**
+     * @auther anil maurya
+     * this endpoint is called from task micro service
+     * @return
+     */
+    @RequestMapping(value = "/getStaffInfo", method = RequestMethod.GET)
+    @ApiOperation("Get loggedin Staff Info")
+    public ResponseEntity<Map<String, Object>> getStaffInfo( OAuth2Authentication user) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffInfo(user.getUserAuthentication().getPrincipal().toString()));
+    }
 
 
 

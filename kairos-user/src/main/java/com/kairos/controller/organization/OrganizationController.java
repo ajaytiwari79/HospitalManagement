@@ -850,6 +850,7 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotName(unitId, timeSlotName));
     }
 
+
     /**
      *
      * @param unitId
@@ -870,6 +871,16 @@ public class OrganizationController {
     @RequestMapping(value = "/unit/{unitId}/auto_generate_task_settings", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> updateAutoGenerateTaskSettings(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateAutoGenerateTaskSettings(unitId));
+    }
+    /*
+     * This endpoint in called from task micro service to get TaskDemand Supplier Info by unit id
+     * @param unitId
+     * @return organization info map
+     */
+    @ApiOperation("get TaskDemand Supplier  info by unit id ")
+    @RequestMapping(value = "/unit/{unitId}/getTaskDemandSupplierInfo", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getTaskDemandSupplierInfo(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getTaskDemandSupplierInfo(unitId));
     }
 
 
