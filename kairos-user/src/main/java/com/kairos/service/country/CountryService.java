@@ -23,12 +23,16 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.google_calender.GoogleCalenderService;
 import com.kairos.util.FormatUtil;
+import com.kairos.util.response.ResponseHandler;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -291,5 +295,9 @@ public class CountryService extends UserBaseService {
         }
         response.put("organizationTypes",organizationTypes);
         return response;
+    }
+
+    public Country getCountryByOrganizationService(long organizationServiceId){
+        return countryGraphRepository.getCountryByOrganizationService(organizationServiceId);
     }
 }

@@ -200,9 +200,6 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
         return longitude;
     }
 
-    public void setLongitude(Float longitude) {
-        this.longitude = longitude;
-    }
 
     public Float getLatitude() {
         return latitude;
@@ -302,10 +299,6 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
 
     public void setLongitude(float longitude) {
         this.longitude = longitude;
-    }
-
-    public void setLatitude(float latitude) {
-        this.latitude = latitude;
     }
 
     public void setMunicipality(Municipality municipality) {

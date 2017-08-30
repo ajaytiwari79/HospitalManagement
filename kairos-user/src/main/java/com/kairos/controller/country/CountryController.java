@@ -514,7 +514,7 @@ public class CountryController {
     //ContractType
     @ApiOperation(value = "Get ContractType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/contractType", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getContractType(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, contractTypeService.getContractTypeByCountryId(countryId));
 
@@ -928,6 +928,27 @@ public class CountryController {
     public ResponseEntity<Map<String,Object>> getExpertise(@PathVariable long countryId,@PathVariable long orgTypeId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getExpertise(countryId,orgTypeId));
     }
+
+    @RequestMapping(value = "/country/organizaton_service/{organizationServiceId}", method = RequestMethod.GET)
+    @ApiOperation("get country by organization service")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getCountryByOrganizationService(@PathVariable long organizationServiceId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getCountryByOrganizationService(organizationServiceId));
+    }
+
+
+    /**
+     * this url will be called by using rest template
+     * @return
+     */
+    @RequestMapping(value = "/country/{countryId}/task_type/skills", method = RequestMethod.GET)
+    @ApiOperation("get skills by organization")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getSkillsForTaskType(@PathVariable long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getSkillsForTaskType(countryId));
+    }
+
+
 
 
 }

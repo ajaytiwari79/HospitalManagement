@@ -26,11 +26,15 @@ import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.response.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -535,4 +539,11 @@ public class SkillService extends UserBaseService {
 
     }
 
+    public List<Map<String,Object>> getSkillsOfOrganization(long organizationId ){;
+        return organizationGraphRepository.getSkillsOfOrganization(organizationId);
+    }
+
+    public List<Map<String,Object>> getSkillsForTaskType(@PathVariable long countryId){
+        return skillGraphRepository.getSkillsByCountryForTaskType(countryId);
+    }
 }

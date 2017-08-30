@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.persistence.model.organization.OrgTypeExpertiseQueryResult;
 import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -146,4 +147,10 @@ public class OrganizationTypeService extends UserBaseService {
         OrgTypeExpertiseQueryResult orgTypeExpertiseQueryResult = organizationTypeGraphRepository.getExpertiseOfOrganizationType(countryId,orgTypeId);
         return orgTypeExpertiseQueryResult.getExpertise();
     }
+
+    public OrganizationTypeHierarchyQueryResult getOrganizationTypeHierarchy(long countryId, Set<Long> orgSubServiceId){
+        return organizationTypeGraphRepository.getOrganizationTypeHierarchy(countryId,orgSubServiceId);
+    }
+
+
 }
