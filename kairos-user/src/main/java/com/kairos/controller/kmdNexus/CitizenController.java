@@ -71,13 +71,14 @@ public class CitizenController {
         citizenService.getCitizensRelativeContact();
         return "Citizen Relative Data Sync";
     }
-    //TODO move code in task micro service
-  /*  *//**
-     * Get Citizen Relative data from KMD Nexus
+
+
+    /**
      *
+     * @param filterId
+     * @param unitId
      * @return
-     * @params
-     *//*
+     */
     @RequestMapping(value = "/unit/{unitId}/getShifts/{filterId}", method = RequestMethod.GET)
     public String getShifts(@PathVariable Long filterId, @PathVariable Long unitId){
         authService.kmdAuth();
@@ -85,16 +86,16 @@ public class CitizenController {
         return "Citizen Relative Data Sync";
     }
 
-    *//**
-     * Get Citizen Relative data from KMD Nexus
-     *
+    /**
+     * @auther anil maurya
+     * moved this URL in task controller
+     * @param filterId
+     * @param unitId
      * @return
-     * @params
-     *//*
-    @RequestMapping(value = "/unit/{unitId}/getTasks/{filterId}", method = RequestMethod.GET)
+     */
+    /*@RequestMapping(value = "/unit/{unitId}/getTasks/{filterId}", method = RequestMethod.GET)
     public String getTasks(@PathVariable Long filterId, @PathVariable Long unitId){
-        authService.kmdAuth();
-        citizenService.getTasks(filterId, unitId);
+
         return "Citizen Relative Data Sync";
     }*/
 }
