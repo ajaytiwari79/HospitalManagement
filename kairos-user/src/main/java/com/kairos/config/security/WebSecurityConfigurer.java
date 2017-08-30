@@ -25,8 +25,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserOauth2Service userDetailsService;
-    @Autowired
-    CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    
 
 
     @Bean
@@ -75,12 +74,8 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     	 http
                   .csrf().disable()
                   .anonymous().disable()
-                   .logout()
-                   .logoutUrl("/oauth/logout")
-                   .addLogoutHandler(customLogoutSuccessHandler)
-                   .and()
                   .sessionManagement()
-                   .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                  .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                    .and()
                   .authorizeRequests()
                   .antMatchers("/oauth/*").permitAll()
