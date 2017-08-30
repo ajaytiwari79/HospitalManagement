@@ -1,4 +1,6 @@
 package com.kairos.controller.client;
+
+import com.kairos.client.dto.ClientExceptionDTO;
 import com.kairos.client.dto.TaskDemandRequestWrapper;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.team.Team;
@@ -26,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
 
 /**
@@ -262,7 +264,7 @@ public class ClientController {
 
     }
 
-  //anil m2 move this endpoints in task controller
+  //anil m2 moved this endpoints in task controller
    /* // Organization tab
     // Get Task
     @RequestMapping(value = "/{clientId}/service/{serviceId}/task")
@@ -485,18 +487,21 @@ public class ClientController {
     }
 
 
-    /**
-     * @auther anil maurya
+
+     /** @auther anil maurya
      * this endpoint is called from task micro service
      * @param citizenId
 
      * @return
      */
-    /*@RequestMapping(method = RequestMethod.GET, value = "/{citizenId}")
+
+    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}")
     @ApiOperation("get client and staff info")
     private ResponseEntity<Map<String, Object>> getCitizenDetails(@PathVariable Long citizenId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getCitizenDetails(citizenId));
-    }*/
+    }
+
+
 
     /**
      * @auther anil maurya
@@ -529,6 +534,51 @@ public class ClientController {
     }
 
 
+
+    @ApiOperation(value = "Get Organization Clients with min details")
+    @RequestMapping(value = "/unit/{unitId}/client", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                clientService.getOrganizationClients(unitId));
+    }
+
+
+    @RequestMapping(value = "/{accessToLocationId}/accessLocation/image", method = RequestMethod.DELETE)
+    @ApiOperation("delete  access to location image")
+    public ResponseEntity<Map<String, Object>> deleteAccessToLocationImage(@PathVariable long accessToLocationId) {
+        clientExtendedService.removeAccessToLocationImage(accessToLocationId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+
+
+    // Organization tab
+    // Get Services
+    @RequestMapping(value = "/{clientId}/organization/{organizationId1}/service")
+    @ApiOperation("Get citizen services")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getClientTaskData(@PathVariable long organizationId1, @PathVariable long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getClientServiceData(clientId, organizationId1));
+
+    }
+
+
+    /**
+     * @auther anil maurya
+     * this endpoint is call from ClientExceptionRestClient in task micro service
+     * @param clientExceptionDto
+     * @param unitId
+     * @param clientId
+     * @return
+     */
+    @RequestMapping(value = "/{clientId}/updateClientTempAddress")
+    @ApiOperation("updateClientTempAddress")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> changeLocationUpdateClientAddress(@RequestBody ClientExceptionDTO clientExceptionDto,@PathVariable Long unitId, @PathVariable Long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.changeLocationUpdateClientAddress(clientExceptionDto,clientId, unitId));
+
+    }
 
 
 }

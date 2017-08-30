@@ -1036,6 +1036,12 @@ public class ClientService extends UserBaseService {
         return citizenDetails;
     }
 
+    /**
+     * @auther anil maurya
+     * this method is call from task micro service from planner rest template
+     * @param citizenId
+     * @return
+     */
     public Map<String,Object> getClientAddressInfo(Long citizenId){
 
         Client citizen = clientGraphRepository.findOne(citizenId, 1);
@@ -1052,8 +1058,15 @@ public class ClientService extends UserBaseService {
 
     }
 
-
-    public ClientTemporaryAddress changeLocation(ClientExceptionDTO clientExceptionDto, long unitId,Long clientId){
+    /**
+     * @auther aniil maurya
+     * this method is call from exception service from task micro service
+     * @param clientExceptionDto
+     * @param unitId
+     * @param clientId
+     * @return
+     */
+    public ClientTemporaryAddress changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId,Long clientId){
 
         Client client = clientGraphRepository.findOne(clientId);
         ClientTemporaryAddress clientTemporaryAddress = null;
@@ -1197,43 +1210,6 @@ public class ClientService extends UserBaseService {
         return taskDemandVisitWrapper;
 
     }
-
-    public void mergeMultipleTasks(){
-
-
-
-    }
-
-    //TODO will make rest template for this
-
-/*
-    public Map<String, Object> getOrganizationClients(Long organizationId) {
-        Map<String, Object> clientData = new HashMap<String, Object>();
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId,envConfig.getServerHost() + File.separator);
-        List<TaskType> taskTypes = taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(organizationId,true);
-        Long countryId = countryGraphRepository.getCountryOfUnit(organizationId);
-        List<Map<String,Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
-        clientData.put("clientList", retreiveClients(mapList, organizationId));
-        clientData.put("taskTypes", taskTypes);
-        clientData.put("clientStatusList", clientStatusList);
-        List<Object> localAreaTagsList = new ArrayList<>();
-        List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
-        for (Map<String, Object> map : tagList) {
-            localAreaTagsList.add(map.get("tags"));
-        }
-        clientData.put("localAreaTags", localAreaTagsList);
-        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-        if (timeSlotData != null) {
-            clientData.put("timeSlotList", timeSlotData);
-        }
-        List<Long> serviceIds = organizationServiceRepository.getServiceIdsByOrgId(organizationId);
-        clientData.put("serviceTypes", organizationServiceRepository.findAll(serviceIds));
-        if (!mapList.isEmpty()) {
-            return clientData;
-        }
-        return null;
-    }
-    */
 
 
 }
