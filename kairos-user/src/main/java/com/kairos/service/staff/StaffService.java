@@ -10,6 +10,7 @@ import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
@@ -21,6 +22,7 @@ import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
@@ -28,6 +30,8 @@ import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.response.dto.web.ClientStaffInfoDTO;
+import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
+import com.kairos.response.dto.web.StaffTaskDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -57,6 +61,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.util.FileUtil.createDirectory;
@@ -120,6 +125,8 @@ public class StaffService extends UserBaseService {
     StaffServiceRestTemplate staffServiceRestTemplate;
     @Autowired
     UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    @Autowired
+    ClientGraphRepository clientGraphRepository;
 
 
 
@@ -1036,18 +1043,6 @@ public class StaffService extends UserBaseService {
     }
 
 
-   /* public Map<String, Object> getStaffTaskTypes(Long staffId) {
-
-        List taskTypeData = taskService.getStaffTaskTypes(staffId);
-        if (taskTypeData != null) {
-            Map<String, Object> completeData = new HashMap<>();
-            completeData.put("taskTypes", taskTypeData);
-            logger.info("Complete data: " + completeData);
-            return completeData;
-        }
-        return null;
-    }*/
-
     public UnitManagerDTO updateUnitManager(Long staffId, UnitManagerDTO unitManagerDTO) {
 
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -1065,13 +1060,21 @@ public class StaffService extends UserBaseService {
 
     }
 
-   /* public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId,String date){
+    /**
+     * @auther anil maurya
+     *
+     * @param unitId
+     * @param staffId
+     * @param date
+     * @return
+     */
+    public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId,String date){
 
         Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId,staffId);
         if(staff == null){
             throw new InternalError("Staff not found");
         }
-        List<StaffAssignedTasksWrapper> tasks = taskService.getAssignedTasksOfStaff(date,staffId,unitId);
+        List<StaffAssignedTasksWrapper> tasks = staffServiceRestTemplate.getAssignedTasksOfStaff(unitId,staffId,date);
         List<Long> citizenIds = tasks.stream().map(task -> task.getId()).collect(Collectors.toList());
         List<Client> clients = clientGraphRepository.findByIdIn(citizenIds);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -1085,21 +1088,9 @@ public class StaffService extends UserBaseService {
             taskIndex++;
         }
         return staffTaskDTOS;
-    }*/
+    }
 
 
-  //move this in task service
-  /*  public Map<String, Object> getStaffTasks(Long staffId) {
-
-        List taskTypeData = taskService.getStaffTaskTypes(staffId);
-        if (taskTypeData != null) {
-            Map<String, Object> completeData = new HashMap<>();
-            completeData.put("taskTypes", taskTypeData);
-            logger.info("Complete data: " + completeData);
-            return completeData;
-        }
-        return null;
-    }*/
 
 
   public Map<String, Object> getTeamStaffAndStaffSkill(Long organizationId, List<Long> staffIds){
@@ -1121,6 +1112,8 @@ public class StaffService extends UserBaseService {
       responseMap.put("staffs",staffList);
       return responseMap;
   }
+
+
 
     /**
      * @auther anil maurya
