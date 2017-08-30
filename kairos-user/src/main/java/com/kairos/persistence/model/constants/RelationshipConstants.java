@@ -162,6 +162,7 @@ public class RelationshipConstants {
     public final static String HAS_RULE_TEMPLATE="HAS_RULE_TEMPLATE";
     public final static String HAS_RULE_TEMPLATE_CATEGORY="HAS_RULE_TEMPLATE_CATEGORY";
     public final static String HAS_RULE_TEMPLATES = "HAS_RULE_TEMPLATES";
+    public final static String HAS_LEVEL = "HAS_LEVEL";
 
     /**
      * Default constructor

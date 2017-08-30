@@ -286,7 +286,7 @@ public class OrganizationController {
     // Service
     @ApiOperation(value = "Get Available Services")
     @RequestMapping(value = "unit/{unitId}/service/data", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationServiceData(@PathVariable long organizationId, @PathVariable long unitId, @RequestParam("type") String type) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationServiceService.organizationServiceData(unitId, type));
@@ -806,13 +806,14 @@ public class OrganizationController {
      * @param unitId
      * @return
      */
-    @ApiOperation("get assigned staff to citizen")
-    @RequestMapping(value = "/unit_visitation", method = RequestMethod.GET)
+    @ApiOperation("get visitation info for a unit")
+    @RequestMapping(value = "/unit/{unitId}/unit_visitation", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getUnitVisitationInfo(@PathVariable Long organizationId,@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getUnitVisitationInfo(organizationId,unitId));
     }
 
     /**
+<<<<<<< HEAD
      * this url will be call from rest template,
      * it provides skills of organization for task type tab
      * @param unitId
@@ -838,8 +839,17 @@ public class OrganizationController {
                 timeSlotService.getCurrentTimeSlotOfUnit(unitId));
     }
 
-
-
+    /*
+     * This endpoint in called from task micro service to get time slot info by unit id and time slot name
+     * @param unitId
+     * @param timeSlotName
+     * @return timeslot info map
+     */
+    @ApiOperation("get time slot info by unit id and timeslot name")
+    @RequestMapping(value = "/unit/{unitId}/time_slot_name", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotName(@PathVariable long unitId, @RequestBody String timeSlotName) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotName(unitId, timeSlotName));
+    }
 
 
 }

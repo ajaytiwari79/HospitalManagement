@@ -33,7 +33,7 @@ public class TimeSlotService extends UserBaseService {
 
     public Map<String, Object> getTimeSlots(long unitId) {
 
-        Organization organization = organizationGraphRepository.findOne(unitId);
+        Organization organization = organizationGraphRepository.findOne(unitId,0);
         if(organization == null){
             throw new InternalError("Organization can not found");
         }
@@ -215,5 +215,11 @@ public class TimeSlotService extends UserBaseService {
         List<Map<String,Object>> currentTimeSlots= timeSlotGraphRepository.getUnitCurrentTimeSlots(unitId);
 
         return currentTimeSlots;
+    }
+
+    public Map<String,Object> getTimeSlotByUnitIdAndTimeSlotName(Long unitId, String timeSlotName){
+        System.out.println("request received in timeslot service "+unitId+ " timeSlotNam e"+timeSlotName);
+        Map<String,Object> timeSlot = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotName(unitId, timeSlotName);
+        return timeSlot;
     }
 }
