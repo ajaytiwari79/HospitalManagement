@@ -812,6 +812,35 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getUnitVisitationInfo(organizationId,unitId));
     }
 
+    /**
+     * this url will be call from rest template,
+     * it provides skills of organization for task type tab
+     * @param unitId
+     * @return
+     */
+    @ApiOperation(value = "Get skills of organization")
+    @RequestMapping(value = "/unit/{unitId}/skills", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getSkillsOfOrganization(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                skillService.getSkillsOfOrganization(unitId));
+    }
+
+    /**
+     * this url will be called by using rest template
+     * provides current time slots
+     * @param unitId
+     * @return
+     */
+    @ApiOperation(value = "Get skills of organization")
+    @RequestMapping(value = "/unit/{unitId}/current/time_slots", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getCurrentTimeSlotsOfOrganization(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                timeSlotService.getCurrentTimeSlotOfUnit(unitId));
+    }
+
+
+
+
 
 }
 

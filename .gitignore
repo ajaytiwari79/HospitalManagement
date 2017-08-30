@@ -5,3 +5,4 @@ gradle/
 logs/
 out/
 .sonar
+kairos-user/logs/

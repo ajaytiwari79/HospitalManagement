@@ -59,8 +59,8 @@ public class ClientController {
      */
     @ApiOperation("Get a Client by Id")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    Client getClientById(@PathVariable Long id) {
-        return clientService.getCitizenById(id);
+    ResponseEntity<Map<String, Object>> getClientById(@PathVariable Long id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getCitizenById(id));
     }
 
 
@@ -492,11 +492,11 @@ public class ClientController {
 
      * @return
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}")
+    /*@RequestMapping(method = RequestMethod.GET, value = "/{citizenId}")
     @ApiOperation("get client and staff info")
     private ResponseEntity<Map<String, Object>> getCitizenDetails(@PathVariable Long citizenId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getCitizenDetails(citizenId));
-    }
+    }*/
 
     /**
      * @auther anil maurya

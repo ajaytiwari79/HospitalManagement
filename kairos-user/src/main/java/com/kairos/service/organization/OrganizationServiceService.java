@@ -49,6 +49,7 @@ public class OrganizationServiceService extends UserBaseService {
 
 
 
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
@@ -447,5 +448,9 @@ public class OrganizationServiceService extends UserBaseService {
         organizationService.setReferenceId(importedServiceId.toString());
         organizationServiceRepository.save(organizationService);
         return organizationService;
+    }
+
+    public Country getCountryByOranizationid(long organizationServiceId){
+        return countryGraphRepository.getCountryByOrganizationService(organizationServiceId);
     }
 }
