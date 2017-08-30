@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -463,13 +464,12 @@ public class ClientController {
      * @auther anil maurya
      * this endpoint is called from task micro service
      * @param citizenId
-     * @param authToken
      * @return
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}/{authToken}")
+    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}/getClientStaffInfo")
     @ApiOperation("get client and staff info")
-    private ResponseEntity<Map<String, Object>> getStaffClientInfo(@PathVariable Long citizenId,@PathVariable String authToken){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getStaffClientInfo(citizenId,authToken));
+    private ResponseEntity<Map<String, Object>> getStaffClientInfo(@PathVariable Long citizenId, OAuth2Authentication user){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getStaffClientInfo(citizenId, user.getUserAuthentication().getPrincipal().toString()));
     }
 
 
