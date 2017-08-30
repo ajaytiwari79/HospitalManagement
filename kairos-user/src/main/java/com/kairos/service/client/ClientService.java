@@ -1015,10 +1015,14 @@ public class ClientService extends UserBaseService {
      * @param citizenId
      * @return
      */
-    public Map<String, Object> getCitizenDetails(Long citizenId){
+    public Map<String, Object> getCitizenDetails(long citizenId){
         Map<String, Object> citizenDetails = new HashMap<>();
 
         Client citizen = clientGraphRepository.findOne(citizenId);
+        if(citizen == null){
+            logger.debug("Searching client in database by id " + citizenId);
+            throw new DataNotFoundByIdException("Incorrect client id " + citizenId);
+        }
         citizenDetails.put("id", citizen.getId());
         citizenDetails.put("name", citizen.getFirstName() + " " + citizen.getLastName());
         citizenDetails.put("age", citizen.getAge());
@@ -1164,12 +1168,11 @@ public class ClientService extends UserBaseService {
 
     /**
      *
-     * @param authToken
      * @param unitId
      * @param citizenId
      * @return
      */
-    public TaskDemandVisitWrapper generateIndividualTask(String authToken, long unitId, long citizenId)  {
+    public TaskDemandVisitWrapper getPrerequisitesForTaskCreation(String userName, long unitId, long citizenId)  {
 
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         Client citizen = clientGraphRepository.findOne(Long.valueOf(citizenId), 0);
@@ -1184,7 +1187,7 @@ public class ClientService extends UserBaseService {
         taskAddress.setStreet(homeAddress.getStreet1());
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
-        Staff loggedInUser = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
+        Staff loggedInUser = staffGraphRepository.getByUser(userGraphRepository.findByUserName(userName).getId());
         List<Long> preferredStaffIds =getPreferredStaffVisitourIds(citizen.getId());
         List<Long> forbiddenStaffIds =getForbiddenStaffVisitourIds(citizen.getId());
         TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(citizen,
@@ -1203,8 +1206,8 @@ public class ClientService extends UserBaseService {
 
     //TODO will make rest template for this
 
-/*
-    public Map<String, Object> getOrganizationClients(Long organizationId) {
+
+   /* public Map<String, Object> getOrganizationClients(Long organizationId) {
         Map<String, Object> clientData = new HashMap<String, Object>();
         List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId,envConfig.getServerHost() + File.separator);
         List<TaskType> taskTypes = taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(organizationId,true);
@@ -1229,8 +1232,12 @@ public class ClientService extends UserBaseService {
             return clientData;
         }
         return null;
-    }
-    */
+    }*/
+
+
+public List<Long> getClientIds(long unitId){
+    return clientGraphRepository.getCitizenIds(unitId);
+}
 
 
 }

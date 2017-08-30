@@ -101,14 +101,14 @@ public class OrganizationController {
     /**
      * Return Organization with given id and return if found.
      *
-     * @param id
      * @return Organization
      */
     @ApiOperation(value = "Get Organization by Id")
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public Organization getOrganizationById(@PathVariable Long id) {
-        return organizationService.getOrganizationById(id);
+    @RequestMapping(value = UNIT_URL, method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationById(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationById(unitId));
     }
 
     /**
@@ -794,7 +794,7 @@ public class OrganizationController {
      * @return
      */
     @ApiOperation("get assigned staff to citizen")
-    @RequestMapping(value = "/unit/{unitId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/unit/{unitId}/common_data", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getCommonDataOfOrganization(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getCommonDataOfOrganization(unitId));
     }
@@ -813,7 +813,6 @@ public class OrganizationController {
     }
 
     /**
-<<<<<<< HEAD
      * this url will be call from rest template,
      * it provides skills of organization for task type tab
      * @param unitId
@@ -849,6 +848,28 @@ public class OrganizationController {
     @RequestMapping(value = "/unit/{unitId}/time_slot_name", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotName(@PathVariable long unitId, @RequestBody String timeSlotName) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotName(unitId, timeSlotName));
+    }
+
+    /**
+     *
+     * @param unitId
+     * @return
+     */
+    @ApiOperation("update one_time sync settings of unit")
+    @RequestMapping(value = "/unit/{unitId}/one_time_sync", method = RequestMethod.PUT)
+    ResponseEntity<Map<String, Object>> updateOnetimeSyncSettings(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateOneTimeSyncsettings(unitId));
+    }
+
+    /**
+     *
+     * @param unitId
+     * @return
+     */
+    @ApiOperation("update one_time sync settings of unit")
+    @RequestMapping(value = "/unit/{unitId}/auto_generate_task_settings", method = RequestMethod.PUT)
+    ResponseEntity<Map<String, Object>> updateAutoGenerateTaskSettings(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateAutoGenerateTaskSettings(unitId));
     }
 
 

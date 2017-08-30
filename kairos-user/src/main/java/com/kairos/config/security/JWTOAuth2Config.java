@@ -91,8 +91,8 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
         //anilm2 use commented code if certificate not install
-        //converter.setSigningKey("123456");
-        try{
+        converter.setSigningKey("123456");
+        /*try{
             Resource resource=new FileSystemResource("/home/anil/springcert.jks");
             final KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(resource, "kairos".toCharArray());
             converter.setKeyPair(keyStoreKeyFactory.getKeyPair("kairos"));
@@ -100,7 +100,7 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
         }catch (Exception e){
 
 
-        }
+        }*/
         return converter;
     }
 

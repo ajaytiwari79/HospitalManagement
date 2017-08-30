@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -492,11 +493,11 @@ public class ClientController {
 
      * @return
      */
-    /*@RequestMapping(method = RequestMethod.GET, value = "/{citizenId}")
-    @ApiOperation("get client and staff info")
-    private ResponseEntity<Map<String, Object>> getCitizenDetails(@PathVariable Long citizenId){
+    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}/info")
+    @ApiOperation("get citizen info")
+    private ResponseEntity<Map<String, Object>> getCitizenDetails(@PathVariable long citizenId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getCitizenDetails(citizenId));
-    }*/
+    }
 
     /**
      * @auther anil maurya
@@ -505,7 +506,7 @@ public class ClientController {
 
      * @return
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/getClientInfo")
+    @RequestMapping(method = RequestMethod.POST, value = "/getClientInfo")
     @ApiOperation("get client and staff info")
     private ResponseEntity<Map<String, Object>> getClientDetailsForTaskDemandVisit(@RequestBody TaskDemandRequestWrapper taskDemandWrapper){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
@@ -517,15 +518,27 @@ public class ClientController {
      * called this endpoints from task micro service
      * @param citizenId
      * @param unitId
-     * @param authToken
      * @return
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/generateIndividualTask/{citizenId}/{unitId}/{authToken}")
-    @ApiOperation("get client and staff info")
+    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}/{unitId}/task_prerequisites")
+    @ApiOperation("get required data for task creation")
     private ResponseEntity<Map<String, Object>> generateIndividualTask(@PathVariable Long  citizenId
-            ,@PathVariable Long  unitId, String authToken){
+            , @PathVariable Long  unitId, OAuth2Authentication authentication){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.generateIndividualTask(authToken,unitId,citizenId));
+                clientService.getPrerequisitesForTaskCreation(authentication.getUserAuthentication().getPrincipal().toString(),unitId,citizenId));
+    }
+
+
+    /**
+     * this method will be called from  task micro service in planner service
+     * @param unitId
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/client_ids")
+    @ApiOperation("get required data for task creation")
+    private ResponseEntity<Map<String,Object>> getClientIdsOfUnit(@PathVariable long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+               clientService.getClientIds(unitId));
     }
 
 
