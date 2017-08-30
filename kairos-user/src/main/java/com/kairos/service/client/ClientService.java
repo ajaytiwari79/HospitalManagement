@@ -39,6 +39,7 @@ import com.kairos.service.staff.StaffService;
 import com.kairos.util.FormatUtil;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -986,13 +987,15 @@ public class ClientService extends UserBaseService {
     /**
      * @auther anil maurya
      * this method is called from task micro service
-     * @param authToken
      * @param clientId
      * @return
      */
-    public ClientStaffInfoDTO getStaffClientInfo( Long clientId,String authToken){
+    public ClientStaffInfoDTO getStaffClientInfo( Long clientId, String loggedInUserName){
         Client client =getCitizenById(clientId);
-        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
+        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(loggedInUserName).getId());
+        if(client==null || staff==null){
+            throw new DataNotFoundByIdException("Either Client or Staff Id is invalid");
+        }
         return new ClientStaffInfoDTO(client.getId(),staff.getId());
     }
 
