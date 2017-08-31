@@ -4,10 +4,9 @@ import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.TableConfiguration;
 import com.kairos.client.dto.TaskTypeAggregateResult;
-import com.kairos.persistence.model.user.access_permission.Tab;
+import com.kairos.response.dto.web.EscalatedTasksWrapper;
 import com.kairos.response.dto.web.ResponseEnvelope;
 import com.kairos.util.userContext.UserContext;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -338,13 +338,9 @@ public class ClientServiceRestClient {
     }
 
 
-    //citizen service rest template
-
-    public void getGrantObject(JSONObject grantObject, Long organizationId, Long subServiceId){
-
-
+    public List<EscalatedTasksWrapper> getStaffNotAssignedTasks(Long unitId){
+        return Collections.emptyList();
     }
-
     private final String getBaseUrl(){
         String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
         return baseUrl;

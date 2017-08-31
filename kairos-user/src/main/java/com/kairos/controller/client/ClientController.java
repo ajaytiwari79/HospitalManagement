@@ -624,6 +624,10 @@ public class ClientController {
     }
 
 
+    @RequestMapping(value = "/clientAggregation",method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getClientAggregation(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.getClientAggregation(unitId));
+    }
 
 
 }

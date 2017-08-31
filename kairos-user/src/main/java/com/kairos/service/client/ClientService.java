@@ -31,6 +31,8 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.ClientStaffInfoDTO;
+import com.kairos.response.dto.web.EscalateTaskWrapper;
+import com.kairos.response.dto.web.EscalatedTasksWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.integration.IntegrationService;
@@ -1255,6 +1257,25 @@ public class ClientService extends UserBaseService {
 
         return organizationClientWrapper;
 
+
+    }
+
+
+    public List<EscalateTaskWrapper> getClientAggregation(Long unitId){
+        List<EscalateTaskWrapper> escalatedTaskData = new ArrayList<>();
+       // List<EscalatedTasksWrapper> escalatedTasksWrappers = taskMongoRepository.getStaffNotAssignedTasksGroupByCitizen(unitId);
+        List<EscalatedTasksWrapper> escalatedTasksWrappers=clientServiceRestClient.getStaffNotAssignedTasks(unitId);
+        for(EscalatedTasksWrapper escalatedTasksWrapper : escalatedTasksWrappers){
+            Client client = clientGraphRepository.findOne(escalatedTasksWrapper.getId());
+            for(EscalateTaskWrapper escalateTaskWrapper : escalatedTasksWrapper.getTasks()){
+                escalateTaskWrapper.setCitizenName(client.getFullName());
+                if(client.getGender() != null)  escalateTaskWrapper.setGender(client.getGender().name());
+                escalateTaskWrapper.setAge(client.getAge());
+                escalateTaskWrapper.setCitizenId(client.getId());
+                escalatedTaskData.add(escalateTaskWrapper);
+            }
+        }
+        return escalatedTaskData;
 
     }
 }
