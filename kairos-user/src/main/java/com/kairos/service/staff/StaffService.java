@@ -1128,4 +1128,13 @@ public class StaffService extends UserBaseService {
         return new ClientStaffInfoDTO(staff.getId());
     }
 
+    public Staff getStaffById(long staffId){
+        Staff staff = staffGraphRepository.findOne(staffId,0);
+        if(staff == null){
+            logger.debug("Searching staff by id " + staffId);
+            throw new DataNotFoundByIdException("Incorrect id of staff " + staffId);
+        }
+        return staff;
+    }
+
 }

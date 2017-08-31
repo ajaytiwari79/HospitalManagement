@@ -272,7 +272,7 @@ public class StaffController {
      */
     @RequestMapping(method = RequestMethod.GET)
     @ApiOperation("get staff")
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaff(@RequestParam String type, @RequestParam long id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaff(type, id));
     }
@@ -519,7 +519,7 @@ public class StaffController {
      */
     @RequestMapping(value = "/getsfAndsfSkill", method = RequestMethod.POST)
     @ApiOperation("getTeamStaffAndStaffSkill")
-    public ResponseEntity<Map<String, Object>> getTeamStaffAndStaffSkill(@PathVariable Long unitId, List<Long> staffIds) {
+    public ResponseEntity<Map<String, Object>> getTeamStaffAndStaffSkill(@PathVariable Long unitId, @RequestBody  List<Long> staffIds) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getTeamStaffAndStaffSkill(unitId,staffIds));
     }
@@ -534,6 +534,14 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getStaffInfo( OAuth2Authentication user) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffInfo(user.getUserAuthentication().getPrincipal().toString()));
+    }
+
+
+    @RequestMapping(value = "/{staffId}", method = RequestMethod.GET)
+    @ApiOperation("get staff by id")
+    public ResponseEntity<Map<String, Object>> getStaffById( @PathVariable long staffId,OAuth2Authentication user) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffById(staffId));
     }
 
 
