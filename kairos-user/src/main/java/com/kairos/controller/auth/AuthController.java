@@ -1,21 +1,26 @@
 package com.kairos.controller.auth;
 
+import com.kairos.client.CitizenServiceRestClient;
+import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
 import com.kairos.util.response.ResponseHandler;
+import com.kairos.util.userContext.UserContext;
 import com.twilio.sdk.TwilioRestException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -44,6 +49,8 @@ public class AuthController {
 
     @Inject
     com.kairos.service.organization.OrganizationService organizationService;
+    @Autowired
+    CitizenServiceRestClient citizenServiceRestClient;
 
     /**
      * Calls userService and Check if user exists
@@ -175,8 +182,14 @@ public class AuthController {
     @RequestMapping(value = { "/user/{id}" }, produces = "application/json")
     public Map<String, Object> user(OAuth2Authentication user,@PathVariable Long id) {
         Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("user", user.getUserAuthentication().getPrincipal());
+        OAuth2AuthenticationDetails oAuth2AuthenticationDetails=(OAuth2AuthenticationDetails)user.getDetails();
         userInfo.put("authorities", AuthorityUtils.authorityListToSet(user.getUserAuthentication().getAuthorities()));
+        userInfo.put("details",((CurrentUserDetails)oAuth2AuthenticationDetails.getDecodedDetails()).getId());
+        userInfo.put("credentials", user.getUserAuthentication().getCredentials());
+        userInfo.put("credentials", UserContext.getUserDetails().getId());
+        userInfo.put("clientId", user.getOAuth2Request().getClientId());
+        userInfo.put("user12", user.getPrincipal());
+
         return userInfo;
     }
 }
