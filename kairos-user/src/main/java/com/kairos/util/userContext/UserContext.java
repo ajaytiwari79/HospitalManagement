@@ -1,5 +1,6 @@
 package com.kairos.util.userContext;
 
+import com.kairos.config.security.CurrentUserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +16,8 @@ public class UserContext {
     private static final ThreadLocal<String> userId = new ThreadLocal<String>();
     private static final ThreadLocal<Long> orgId = new ThreadLocal<Long>();
     private static final ThreadLocal<Long> unitId = new ThreadLocal<Long>();
+    private static final ThreadLocal<CurrentUserDetails> userDetails = new ThreadLocal<CurrentUserDetails>();
+
 
     public static String getCorrelationId() { return correlationId.get(); }
     public static void setCorrelationId(String cid) {correlationId.set(cid);}
@@ -30,6 +33,8 @@ public class UserContext {
 
     public static void setUnitId(Long unitid) {unitId.set(unitid);}
     public static Long getUnitId() {return unitId.get();}
+    public static void setUserDetails(CurrentUserDetails details) {userDetails.set(details);}
+    public static CurrentUserDetails getUserDetails() {return userDetails.get();}
 
 
 }
