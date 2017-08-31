@@ -589,5 +589,41 @@ public class ClientController {
 
     }
 
+    /**
+     * TODO need to verify
+     * @auther anil maurya
+     *  this endpoint is called from planner service in task micro service
+     *
+     * @param organizationId
+     * @param auth2Authentication
+     * @return
+     */
+
+    @RequestMapping(value = "/orgClientsInfo", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getOrgnizationClients(@PathVariable Long organizationId,OAuth2Authentication auth2Authentication) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(organizationId,auth2Authentication));
+
+    }
+
+
+    /** TODO need to verify
+     * @auther anil maurya
+     *  this endpoint is called from planner service in task micro service
+
+     * @param organizationId
+     *
+     * @return
+     */
+
+    @RequestMapping(value = "/orgClientsInfo", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> getOrgnizationClients(@PathVariable Long organizationId,@RequestBody List<Long> citizenId) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(organizationId,citizenId));
+
+    }
+
+
+
 
 }
