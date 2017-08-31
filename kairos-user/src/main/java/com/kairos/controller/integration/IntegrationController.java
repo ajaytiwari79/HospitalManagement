@@ -9,7 +9,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -30,7 +29,7 @@ public class IntegrationController {
 
     @ApiOperation("Save/Update time care integration")
     @RequestMapping(value = "/timeCare",method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> saveTimeCareIntegrationData(@PathVariable long unitId, @RequestBody TimeCare timeCare  )  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationService.saveTimeCareIntegrationData(unitId,timeCare));
@@ -39,7 +38,7 @@ public class IntegrationController {
 
     @ApiOperation("fetch time care integration")
     @RequestMapping(value = "/timeCare",method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> fetchTimeCareIntegrationData(@PathVariable long unitId  )  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationService.fetchTimeCareIntegrationData(unitId));
@@ -48,7 +47,7 @@ public class IntegrationController {
 
     @ApiOperation("Save/Update twillio integration")
     @RequestMapping(value = "/twillio",method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> saveTwillioIntegrationData(@PathVariable long unitId, @RequestBody Twillio twillio  )  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationService.saveTwillioIntegrationData(unitId,twillio));
@@ -57,7 +56,7 @@ public class IntegrationController {
 
     @ApiOperation("fetch twillio integration")
     @RequestMapping(value = "/twillio",method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> fetchTwillioIntegrationData(@PathVariable long unitId  )  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationService.fetchTwillioIntegrationData(unitId));
@@ -66,7 +65,7 @@ public class IntegrationController {
 
     @ApiOperation("Save/Update time care integration")
     @RequestMapping(value = "/visitour",method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> saveVisitourIntegrationData(@PathVariable long unitId, @RequestBody Visitour visitour  )  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationService.saveVisitourIntegrationData(unitId,visitour));
@@ -75,7 +74,7 @@ public class IntegrationController {
 
     @ApiOperation("fetch time care integration")
     @RequestMapping(value = "/visitour",method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> fetchVisitourIntegrationData(@PathVariable long unitId  )  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationService.fetchVisitourIntegrationData(unitId));

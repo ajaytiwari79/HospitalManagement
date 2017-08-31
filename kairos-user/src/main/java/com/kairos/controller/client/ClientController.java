@@ -264,15 +264,6 @@ public class ClientController {
 
     }
 
-  //anil m2 moved this endpoints in task controller
-   /* // Organization tab
-    // Get Task
-    @RequestMapping(value = "/{clientId}/service/{serviceId}/task")
-    @ApiOperation("Get citizen services")
-    private ResponseEntity<Map<String, Object>> getClientTaskServiceTasks(@PathVariable long clientId, @PathVariable long serviceId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getClientTasksByService(clientId, serviceId, unitId));
-    }*/
-
 
     // Medical Tab
     @ApiOperation("Update Medical Information")

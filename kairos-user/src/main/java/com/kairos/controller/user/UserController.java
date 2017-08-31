@@ -107,17 +107,7 @@ public class UserController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissionForModuleInOrganization(moduleId,orgId, userId));
     }
 
-   //TODO move in task micro service
-    //Not in used currently
-   /* @RequestMapping(value = "/generateExcels/citizenFile",method = RequestMethod.GET)
-    public void createCitizenExcelfile(@RequestParam long unitId){
-        taskReportService.generateCitizenList(unitId);
-    }
 
-    @RequestMapping(value = "/generateExcels/staffFile",method = RequestMethod.GET)
-    public void createStaffExcelfile(@RequestParam long unitId){
-        taskReportService.generateStaffList(unitId);
-    }*/
 
 
 }

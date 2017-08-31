@@ -39,6 +39,7 @@ import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.FormatUtil;
+import com.kairos.util.userContext.UserContext;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -836,11 +837,11 @@ public class ClientService extends UserBaseService {
 
     /**
      * @param organizationId
-     * @param authToken
+
      * @return
      * @auther Anil maurya
      */
-    public Map<String, Object> getOrganizationClientsWithPlanning(Long organizationId, String authToken) {
+    public Map<String, Object> getOrganizationClientsWithPlanning(Long organizationId) {
         Map<String, Object> response = new HashMap<>();
         List<Object> clientList = new ArrayList<>();
 
@@ -848,7 +849,7 @@ public class ClientService extends UserBaseService {
         List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + File.separator);
         logger.debug("CitizenList Size: " + mapList.size());
 
-        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
+        Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )
         Map<String, Object> responseFromTask = clientServiceRestClient.getOrganizationClientsWithPlanning(organizationId, staff.getId(), mapList);
         response.putAll(responseFromTask);
@@ -863,21 +864,6 @@ public class ClientService extends UserBaseService {
     }
 
 
-  /*  */
-
-    /**
-     * this line of code moved in visitator service
-     *
-     * @param organizationId
-     * @return
-     *//*
-    public List<Object> getOrganizationClientsExcludeDead(Long organizationId) {
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId,envConfig.getServerHost() + File.separator);
-        if (!mapList.isEmpty()) {
-            return clientServiceRestClient.retreiveClients(organizationId,mapList);
-        }
-        return null;
-    }*/
     public Map<String, Object> getOrganizationClients(Long organizationId) {
 
         Map<String, Object> clientData = new HashMap<String, Object>();
@@ -914,44 +900,6 @@ public class ClientService extends UserBaseService {
 
 
 
-  /*  */
-
-    /**
-     * @param
-     * @param staffId
-     * @return
-     * @auther anil maurya
-     * code commented   used in planner service
-     *//*
-    public Map<String, Object> getClintsWithPlanningByClintIds(List<Long> citizenId, Long unitId) {
-        Map<String, Object> response = new HashMap<>();
-        List<Object> clientList = new ArrayList<>();
-
-        logger.info("Finding citizen with Id: " + citizenId);
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsByClintIdList(citizenId);
-        logger.info("CitizenList Size: " + mapList.size());
-
-        if (mapList != null) {
-            logger.info("Adding Citizen ");
-            for (Map<String, Object> map : mapList) {
-                clientList.add(map.get("Client"));
-            }
-            response.put("clientList", clientList);
-        }
-
-       *//* List<ClientExceptionType> exceptionTypeData = clientExceptionTypeMongoRepository.findAll();
-
-        if (exceptionTypeData != null) {
-            response.put("exceptionTypes", exceptionTypeData);
-        }*//*
-
-        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(unitId);
-
-        if (timeSlotData != null) {
-            response.put("timeSlotList", timeSlotData);
-        }
-        return response;
-    }*/
     public HashMap<String, Object> getOrganizationAllClients(long organizationId, long unitId, long staffId) {
         List<Map<String, Object>> mapList = organizationGraphRepository.getAllClientsOfOrganization(organizationId);
         List<Object> clientList = new ArrayList<>();
@@ -1206,11 +1154,6 @@ public class ClientService extends UserBaseService {
 
     }
 
-
-    public void mergeMultipleTasks() {
-
-
-    }
 
 
     public List<Long> getClientIds(long unitId) {

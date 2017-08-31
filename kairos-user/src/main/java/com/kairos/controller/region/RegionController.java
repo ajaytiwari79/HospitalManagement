@@ -45,14 +45,14 @@ public class RegionController {
 
     @ApiOperation(value = "Get All Region")
     @RequestMapping(value = "", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllRegion(@PathVariable Long countryId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getRegionByCountryId(countryId));
     }
 
     @ApiOperation(value = "Add Region ")
     @RequestMapping(value = "", method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addRegionById(@PathVariable Long countryId,@RequestBody @Validated Region region) {
         if (region != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.createRegionOfCountry(countryId,region));
@@ -63,7 +63,7 @@ public class RegionController {
 
     @ApiOperation(value = "Update Region by Id")
     @RequestMapping(value = "", method = RequestMethod.PUT)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateRegionById(@RequestBody @Validated Region region) {
         if (region != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.updateRegionById(region));
@@ -73,7 +73,7 @@ public class RegionController {
 
     @ApiOperation(value = "Delete Region by Id")
     @RequestMapping(value = "/{regionId}", method = RequestMethod.DELETE)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteRegionById(@PathVariable long regionId) {
            return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.deleteRegion(regionId));
 
@@ -85,7 +85,7 @@ public class RegionController {
     // Province
     @ApiOperation(value = "Add Province to Region")
     @RequestMapping(value = "/{regionId}/province", method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addProvinceToRegion(@PathVariable Long regionId, @Validated @RequestBody Province province) {
         if (province != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, provinceService.addProvinceToRegion(province,regionId));
@@ -95,14 +95,14 @@ public class RegionController {
 
     @ApiOperation(value = "GET Province to Region")
     @RequestMapping(value = "/{regionId}/province", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getProvinceToRegion(@PathVariable Long regionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, provinceService.getProvinceToRegion(regionId));
     }
 
     @ApiOperation(value = "Update Province by Id")
     @RequestMapping(value = "/province", method = RequestMethod.PUT)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateProvinceById(@RequestBody @Validated Province province) {
         if (province != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, provinceService.updateProvinceById(province));
@@ -112,7 +112,7 @@ public class RegionController {
 
     @ApiOperation(value = "Delete Province by Id")
     @RequestMapping(value = "/province/{provinceId}", method = RequestMethod.DELETE)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteProvinceById(@PathVariable long provinceId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, provinceService.deleteProvinceById(provinceId));
     }
@@ -124,7 +124,7 @@ public class RegionController {
     // Municipality
     @ApiOperation(value = "Add Municipality to Province")
     @RequestMapping(value = "/province/{provinceId}/municipality", method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addMunicipalityToProvince(@PathVariable long provinceId, @Validated @RequestBody Municipality municipality) {
         if (municipality != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.addMunicipalityToProvince(municipality,provinceId));
@@ -134,14 +134,14 @@ public class RegionController {
 
     @ApiOperation(value = "GET Municipality to Province")
     @RequestMapping(value = "/province/{provinceId}/municipality", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getMunicipalityToProvince(@PathVariable long provinceId) {
            return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.getMunicipalityToProvince(provinceId));
     }
 
     @ApiOperation(value = "Update municipality by Id")
     @RequestMapping(value = "/province/municipality", method = RequestMethod.PUT)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateMunicipalityById(@RequestBody @Validated Municipality municipality) {
         if (municipality != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.updateMunicipalityById(municipality));
@@ -150,7 +150,7 @@ public class RegionController {
     }
     @ApiOperation(value = "Delete municipality by Id")
     @RequestMapping(value = "/province/municipality/{municipalityId}", method = RequestMethod.DELETE)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteMunicipalityById(@PathVariable long municipalityId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.deleteMunicipalityById(municipalityId));
     }
@@ -160,14 +160,14 @@ public class RegionController {
     // ZipCode
     @ApiOperation(value = "GET all Zip to Municipality")
     @RequestMapping(value = "/province/municipality/{municipalityId}/zipcode", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllZipCodeToMunicipality(@PathVariable Long municipalityId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
                     municipalityService.getAllZipCodeToMunicipality(municipalityId));
     }
     @ApiOperation(value = "Add Zip to Municipality")
     @RequestMapping(value = "/province/municipality/{municipalityId}/zipcode", method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addZipCodeToMunicipality(@PathVariable Long municipalityId , @Validated @RequestBody ZipCode zipCode) {
         if (zipCode != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.addZipCodeToMunicipality(municipalityId,zipCode));
@@ -177,7 +177,7 @@ public class RegionController {
 
     @ApiOperation(value = "Update Zip to Municipality")
     @RequestMapping(value = "/province/municipality/zipcode", method = RequestMethod.PUT)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateZipCodeToMunicipality(@RequestBody @Validated ZipCode zipCode) {
         if (zipCode != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.updateZipCodeToMunicipality(zipCode));
@@ -188,7 +188,7 @@ public class RegionController {
 
     @ApiOperation(value = "Delete Zip to Municipality")
     @RequestMapping(value = "/province/municipality/zipcode/{zipCodeId}", method = RequestMethod.DELETE)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteZipCodeToMunicipality(@PathVariable long zipCodeId) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, municipalityService.deleteZipCodeToMunicipality(zipCodeId));
     }

@@ -86,16 +86,4 @@ public class CitizenController {
         return "Citizen Relative Data Sync";
     }
 
-    /**
-     * @auther anil maurya
-     * moved this URL in task controller
-     * @param filterId
-     * @param unitId
-     * @return
-     */
-    /*@RequestMapping(value = "/unit/{unitId}/getTasks/{filterId}", method = RequestMethod.GET)
-    public String getTasks(@PathVariable Long filterId, @PathVariable Long unitId){
-
-        return "Citizen Relative Data Sync";
-    }*/
 }

@@ -5,7 +5,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -28,7 +27,7 @@ public class ExpertiseController {
 
     @ApiOperation(value = "Assign Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setExpertiseToStaff(@PathVariable Long staffId, @RequestBody  Map<String, Object> expertise) {
         Long expertiseId = Long.valueOf(expertise.get("id").toString());
         Map<String, Object> expertiseObj = expertiseService.setExpertiseToStaff(staffId,expertiseId);
@@ -40,7 +39,7 @@ public class ExpertiseController {
 
     @ApiOperation(value = "Get Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseToStaff(@PathVariable Long staffId) {
         Map<String, Object> expertise = expertiseService.getExpertiseToStaff(staffId);
         if (expertise == null) {
