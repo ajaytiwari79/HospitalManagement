@@ -599,8 +599,8 @@ public class ClientController {
      * @return
      */
 
-    @RequestMapping(value = "/orgClientsInfo", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getOrgnizationClients(@PathVariable Long organizationId,OAuth2Authentication auth2Authentication) {
+    @RequestMapping(value = "/organization_clients", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, OAuth2Authentication auth2Authentication) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(organizationId,auth2Authentication));
 
@@ -616,8 +616,8 @@ public class ClientController {
      * @return
      */
 
-    @RequestMapping(value = "/orgClientsInfo", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> getOrgnizationClients(@PathVariable Long organizationId,@RequestBody List<Long> citizenId) {
+    @RequestMapping(value = "/organization_clients/ids", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> getOrganizationClientsByIds(@PathVariable Long organizationId, @RequestBody List<Long> citizenId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(organizationId,citizenId));
 
