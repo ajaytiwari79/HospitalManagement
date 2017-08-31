@@ -1,18 +1,24 @@
 package com.kairos.client;
 
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.response.dto.web.ResponseEnvelope;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by anil on 8/8/17.
@@ -36,17 +42,16 @@ public class StaffServiceRestTemplate {
         final String baseUrl=getBaseUrl();
 
         try {
-            ResponseEntity<ResponseEnvelope> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(baseUrl+"/task/staff/{staffId}/{anonymousStaffId}",
                             HttpMethod.
-                                    GET,null, ResponseEnvelope.class);
+                                    GET,null, typeReference,staffId,anonymousStaffId);
 
-            ResponseEnvelope response = restExchange.getBody();
+            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-
-
-              return true;
-
+              return response.getData();
             } else {
                 throw new RuntimeException(response.getMessage());
             }
@@ -68,22 +73,30 @@ public class StaffServiceRestTemplate {
      * @param date
      * @return
      */
-    public List<StaffAssignedTasksWrapper> getAssignedTasksOfStaff(long unitId, long staffId,String date){
+    public List<StaffAssignedTasksWrapper> getAssignedTasksOfStaff(long staffId,String date){
 
 
         final String baseUrl=getBaseUrl();
 
         try {
-            ResponseEntity<ResponseEnvelope> restExchange =
-                    restTemplate.exchange(baseUrl+"/task/staff/{staffId}/{anonymousStaffId}",
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>>() {
+            };
+            String url = baseUrl + "/task/staff/{staffId}/assigned_tasks?date=" + date;
+            // URI (URL) parameters
+            Map<String, Object> uriParams = new HashMap<>();
+            uriParams.put("staffId",staffId);
+
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
+                    // Add query parameter
+                    .queryParam("date", date);
+            ResponseEntity<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>> restExchange =
+                    restTemplate.exchange(url,
                             HttpMethod.
-                                    GET,null, ResponseEnvelope.class);
+                                    GET,null, typeReference,staffId);
 
-            ResponseEnvelope response = restExchange.getBody();
+            RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-
-
-                return null;
+                return response.getData();
 
             } else {
                 throw new RuntimeException(response.getMessage());

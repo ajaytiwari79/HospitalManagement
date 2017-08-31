@@ -1074,7 +1074,7 @@ public class StaffService extends UserBaseService {
         if(staff == null){
             throw new InternalError("Staff not found");
         }
-        List<StaffAssignedTasksWrapper> tasks = staffServiceRestTemplate.getAssignedTasksOfStaff(unitId,staffId,date);
+        List<StaffAssignedTasksWrapper> tasks = staffServiceRestTemplate.getAssignedTasksOfStaff(staffId,date);
         List<Long> citizenIds = tasks.stream().map(task -> task.getId()).collect(Collectors.toList());
         List<Client> clients = clientGraphRepository.findByIdIn(citizenIds);
         ObjectMapper objectMapper = new ObjectMapper();

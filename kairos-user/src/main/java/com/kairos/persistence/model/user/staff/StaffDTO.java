@@ -148,10 +148,6 @@ public class StaffDTO {
         this.skills = skills;
     }
 
-    public void setInactiveFrom(Long inactiveFrom) {
-        this.inactiveFrom = inactiveFrom;
-    }
-
     public Long getUnit() {
         return unit;
     }
