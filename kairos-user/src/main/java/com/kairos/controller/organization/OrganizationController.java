@@ -882,7 +882,46 @@ public class OrganizationController {
     ResponseEntity<Map<String, Object>> getTaskDemandSupplierInfo(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getTaskDemandSupplierInfo(unitId));
     }
-
+    /*
+     * This endpoint in called from task micro service to get Parent Organization Of CityLevel unit id
+     * @param unitId
+     * @return OrganizationDTO
+     */
+    @ApiOperation("get ParentOrganizationOfCityLevel by unit id ")
+    @RequestMapping(value = "/unit/{unitId}/getParentOrganizationOfCityLevel", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getParentOrganizationOfCityLevel(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getParentOrganizationOfCityLevel(unitId));
+    }
+    /*
+     * This endpoint in called from task micro service to get Parent Organization Of Unit unit id
+     * @param unitId
+     * @return OrganizationDTO
+     */
+    @ApiOperation("get ParentOfOrganization by unit id ")
+    @RequestMapping(value = "/unit/{unitId}/getParentOfOrganization", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getParentOfOrganization(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getParentOfOrganization(unitId));
+    }
+    /*
+     * This endpoint in called from task micro service to get Organization By TeamId
+     * @param teamId
+     * @return OrganizationDTO
+     */
+    @ApiOperation("get getOrganization By TeamId ")
+    @RequestMapping(value = "/unit/{unitId}/getOrganizationByTeamId", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getOrganizationByTeamId(@PathVariable long teamId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationByTeamId(teamId));
+    }
+    /*
+     * This endpoint in called from task micro service to get TimeSlot By UnitId and TimeSlotId
+     * @param teamId
+     * @return OrganizationDTO
+     */
+    @ApiOperation(value = "Get time slot")
+    @RequestMapping(value = "/unit/{unitId}/time_slot/{timeSlotId}", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotId(@PathVariable long unitId, @PathVariable long timeSlotId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,  timeSlotService.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId));
+    }
 
 }
 

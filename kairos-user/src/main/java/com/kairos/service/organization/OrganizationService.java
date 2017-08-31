@@ -873,6 +873,23 @@ public class OrganizationService extends UserBaseService {
         return supplierInfo;
     }
 
+    public Organization getParentOrganizationOfCityLevel(Long unitId){
+
+        return organizationGraphRepository.getParentOrganizationOfCityLevel(unitId);
+
+    }
+
+    public Organization getParentOfOrganization(Long unitId){
+
+        return organizationGraphRepository.getParentOfOrganization(unitId);
+    }
+
+    public Organization getOrganizationByTeamId(Long teamId){
+
+        return organizationGraphRepository.getOrganizationByTeamId(teamId);
+    }
+
 }
+
 
 
