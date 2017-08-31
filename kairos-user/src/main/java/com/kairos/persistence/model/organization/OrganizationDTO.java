@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -11,7 +12,7 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationDTO {
-
+    private Long id;
     @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;
     private String description;
@@ -20,7 +21,19 @@ public class OrganizationDTO {
     private List<Long> organizationSubTypeId;
     private List<Long> businessTypeId;
     private AddressDTO contactAddress;
+    private int dayShiftTimeDeduction = 4; //in percentage
 
+    private int nightShiftTimeDeduction = 7; //in percentage
+    private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
+    private boolean isOneTimeSyncPerformed;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getDescription() {
         return description;
@@ -76,5 +89,37 @@ public class OrganizationDTO {
 
     public void setBusinessTypeId(List<Long> businessTypeId) {
         this.businessTypeId = businessTypeId;
+    }
+
+    public int getDayShiftTimeDeduction() {
+        return dayShiftTimeDeduction;
+    }
+
+    public void setDayShiftTimeDeduction(int dayShiftTimeDeduction) {
+        this.dayShiftTimeDeduction = dayShiftTimeDeduction;
+    }
+
+    public int getNightShiftTimeDeduction() {
+        return nightShiftTimeDeduction;
+    }
+
+    public void setNightShiftTimeDeduction(int nightShiftTimeDeduction) {
+        this.nightShiftTimeDeduction = nightShiftTimeDeduction;
+    }
+
+    public OrganizationLevel getOrganizationLevel() {
+        return organizationLevel;
+    }
+
+    public void setOrganizationLevel(OrganizationLevel organizationLevel) {
+        this.organizationLevel = organizationLevel;
+    }
+
+    public boolean isOneTimeSyncPerformed() {
+        return isOneTimeSyncPerformed;
+    }
+
+    public void setOneTimeSyncPerformed(boolean oneTimeSyncPerformed) {
+        isOneTimeSyncPerformed = oneTimeSyncPerformed;
     }
 }

@@ -27,7 +27,7 @@ public class CitizenServiceRestClient {
     RestTemplate restTemplate;
 
 
-    /**TODO new rest template
+    /**
      * @auther anil maurya
      * map in task  controller
      * @param unitId
