@@ -111,15 +111,6 @@ public class GroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, this.groupService.addGroupSelectedService(groupId, serviceIds));
     }
 
-     //TODO move this serivce in task micro service
-   /* // TaskType
-    @ApiOperation(value = "Get Available TaskTypes")
-    @RequestMapping(value = "/service/task_type/available/{groupId}", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationAvailableTaskType(@PathVariable Long groupId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                groupService.getAllAvailableTaskType(groupId));
-    }*/
 
 
 }

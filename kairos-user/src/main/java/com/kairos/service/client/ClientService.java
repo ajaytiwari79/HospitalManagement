@@ -101,7 +101,8 @@ public class ClientService extends UserBaseService {
     ClientServiceRestClient clientServiceRestClient;
     @Autowired
     PlannerServiceRestTemplateClient plannerServiceRestTemplateClient;
-    @Autowired AddressVerificationService addressVerificationService;
+    @Autowired
+    AddressVerificationService addressVerificationService;
     @Autowired
     MunicipalityGraphRepository municipalityGraphRepository;
     @Autowired
@@ -228,8 +229,6 @@ public class ClientService extends UserBaseService {
     }
 
 
-
-
     public Client getCitizenById(Long id) {
         return clientGraphRepository.findOne(id);
     }
@@ -327,7 +326,6 @@ public class ClientService extends UserBaseService {
     }
 
 
-
     public Map<String, Object> retrieveGeneralDetails(long clientId, long unitId) {
         Map<String, Object> response = new HashMap<>();
         Client currentClient = clientGraphRepository.findOne(clientId);
@@ -393,7 +391,6 @@ public class ClientService extends UserBaseService {
         }
         return null;
     }
-
 
 
     private List<Map<String, Object>> findLanguageUnderstands(long clientId) {
@@ -466,20 +463,18 @@ public class ClientService extends UserBaseService {
     }
 
 
-
     /**
-     *  @auther anil maurya
-     *
      * @param clientId
      * @param orgId
      * @return
+     * @auther anil maurya
      */
     public List<OrganizationService> getClientServices(Long clientId, long orgId) {
         logger.debug("Getting Demands  ClientId:" + clientId + " UnitId: " + orgId);
         List<OrganizationService> serviceList = new ArrayList<>();
         //List<Long> serviceIdList = taskService.getClientTaskServices(clientId, orgId);
         //implements task service rest template client
-        List<Long> serviceIdList= clientServiceRestClient.getClientTaskServices(clientId,orgId);
+        List<Long> serviceIdList = clientServiceRestClient.getClientTaskServices(clientId, orgId);
 
         for (Long id : serviceIdList) {
             OrganizationService service = organizationServiceRepository.findOne(Long.valueOf(id));
@@ -493,11 +488,11 @@ public class ClientService extends UserBaseService {
         List<Long> serviceList = new ArrayList<>();
         // List<Long> serviceIdList = taskService.getClientTaskServices(clientId, orgId);
         //anil maurya  implements task service rest template client
-        List<Long> serviceIdList= clientServiceRestClient.getClientTaskServices(clientId,orgId);
+        List<Long> serviceIdList = clientServiceRestClient.getClientTaskServices(clientId, orgId);
 
         for (Long id : serviceIdList) {
             OrganizationService service = organizationServiceRepository.findOne(Long.valueOf(id));
-            if(service != null) serviceList.add(service.getId());
+            if (service != null) serviceList.add(service.getId());
         }
         return serviceList;
 
@@ -575,7 +570,6 @@ public class ClientService extends UserBaseService {
     }
 
 
-
     public Map<String, Object> getClientServiceData(Long clientId, Long orgId) {
         Map<String, Object> response = new HashMap<>();
         response.put("services", getClientServices(clientId, orgId));
@@ -589,7 +583,7 @@ public class ClientService extends UserBaseService {
         }
         Client createdHousehold = createCitizen(minimumDTO, unitId);
         Client nextToKin = clientGraphRepository.getNextToKin(clientId);
-        ContactAddress homeAddress = (client.getHomeAddress() == null) ? null : ContactAddress.copyProperties(client.getHomeAddress(),ContactAddress.getInstance());
+        ContactAddress homeAddress = (client.getHomeAddress() == null) ? null : ContactAddress.copyProperties(client.getHomeAddress(), ContactAddress.getInstance());
         createdHousehold.setHomeAddress(homeAddress);
         HouseHoldPeopleRelationship houseHoldPeopleRelationship = new HouseHoldPeopleRelationship();
         houseHoldPeopleRelationship.setClient(client);
@@ -638,14 +632,13 @@ public class ClientService extends UserBaseService {
 
 
     /**
-     *  @auther anil maurya
-     *
      * @param clientId
      * @return
+     * @auther anil maurya
      */
-    public boolean markClientAsDead(Long clientId)  {
+    public boolean markClientAsDead(Long clientId) {
         Client client = clientGraphRepository.findOne(clientId);
-        if(client == null){
+        if (client == null) {
             throw new DataNotFoundByIdException("Incorrect client id ::" + clientId);
         }
         client.setCitizenDead(true);
@@ -654,7 +647,6 @@ public class ClientService extends UserBaseService {
         return clientServiceRestClient.deleteTaskForCitizen(clientId);
 
     }
-
 
 
     public List<Map<String, Object>> setClientStaffPreferredRelations(List<StaffClientData> dataList) {
@@ -800,7 +792,7 @@ public class ClientService extends UserBaseService {
             citizen.put("id", client.getId());
             citizen.put("name", client.getName());
             citizen.put("gender", client.getGender());
-            citizen.put("age",client.getAge());
+            citizen.put("age", client.getAge());
             citizen.put("profilePic", (client.getProfilePic() == null) ? null :
                     envConfig.getServerHost() + File.separator + client.getProfilePic());
             citizen.put("taskTypes", (taskTypeAggregateResult.isPresent()) ? taskTypeAggregateResult.get().getTaskTypeIds() : Collections.emptyList());
@@ -840,26 +832,23 @@ public class ClientService extends UserBaseService {
     }
 
 
-
     /**
-     *
-     * @auther  Anil maurya
-     *
      * @param organizationId
      * @param authToken
      * @return
+     * @auther Anil maurya
      */
     public Map<String, Object> getOrganizationClientsWithPlanning(Long organizationId, String authToken) {
         Map<String, Object> response = new HashMap<>();
         List<Object> clientList = new ArrayList<>();
 
         logger.debug("Finding citizen with Id: " + organizationId);
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId,envConfig.getServerHost() + File.separator);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + File.separator);
         logger.debug("CitizenList Size: " + mapList.size());
 
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
         //anil maurya move some business logic in task demand service (task micro service )
-        Map<String, Object> responseFromTask=clientServiceRestClient.getOrganizationClientsWithPlanning(organizationId,staff.getId(),mapList);
+        Map<String, Object> responseFromTask = clientServiceRestClient.getOrganizationClientsWithPlanning(organizationId, staff.getId(), mapList);
         response.putAll(responseFromTask);
 
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
@@ -872,8 +861,11 @@ public class ClientService extends UserBaseService {
     }
 
 
-  /*  *//**
+  /*  */
+
+    /**
      * this line of code moved in visitator service
+     *
      * @param organizationId
      * @return
      *//*
@@ -884,21 +876,19 @@ public class ClientService extends UserBaseService {
         }
         return null;
     }*/
-
-
     public Map<String, Object> getOrganizationClients(Long organizationId) {
 
         Map<String, Object> clientData = new HashMap<String, Object>();
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId,envConfig.getServerHost() + File.separator);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + File.separator);
 
         if (mapList.isEmpty()) {
             return null;
         }
 
         //anilm2 replace it with rest template
-        Map<String, Object> clientInfo =clientServiceRestClient.getOrganizationClientsInfo(organizationId,mapList);
+        Map<String, Object> clientInfo = clientServiceRestClient.getOrganizationClientsInfo(organizationId, mapList);
         Long countryId = countryGraphRepository.getCountryOfUnit(organizationId);
-        List<Map<String,Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
+        List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
 
         clientData.putAll(clientInfo);
 
@@ -922,12 +912,14 @@ public class ClientService extends UserBaseService {
 
 
 
-  /*  *//**
-     *  @auther anil maurya
-     *   code commented   used in planner service
+  /*  */
+
+    /**
      * @param
      * @param staffId
      * @return
+     * @auther anil maurya
+     * code commented   used in planner service
      *//*
     public Map<String, Object> getClintsWithPlanningByClintIds(List<Long> citizenId, Long unitId) {
         Map<String, Object> response = new HashMap<>();
@@ -958,8 +950,7 @@ public class ClientService extends UserBaseService {
         }
         return response;
     }*/
-
-    public HashMap<String, Object> getOrganizationAllClients(long organizationId,long unitId, long staffId) {
+    public HashMap<String, Object> getOrganizationAllClients(long organizationId, long unitId, long staffId) {
         List<Map<String, Object>> mapList = organizationGraphRepository.getAllClientsOfOrganization(organizationId);
         List<Object> clientList = new ArrayList<>();
         for (Map<String, Object> map : mapList) {
@@ -969,90 +960,90 @@ public class ClientService extends UserBaseService {
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("clients", clientList);
-        response.put("tableSetting", Arrays.asList(clientServiceRestClient.getTableConfiguration(organizationId,unitId,staffId)));
+        response.put("tableSetting", Arrays.asList(clientServiceRestClient.getTableConfiguration(organizationId, unitId, staffId)));
         return response;
     }
 
 
     /**
-     * @auther anil maurya
      * @param organizationId
      * @return
+     * @auther anil maurya
      */
     public List<Map<String, Object>> getOrganizationClientsExcludeDead(Long organizationId) {
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId,envConfig.getServerHost() + File.separator);
-        return  mapList;
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + File.separator);
+        return mapList;
     }
 
     /**
-     * @auther anil maurya
-     * this method is called from task micro service
      * @param clientId
      * @return
+     * @auther anil maurya
+     * this method is called from task micro service
      */
-    public ClientStaffInfoDTO getStaffClientInfo( Long clientId, String loggedInUserName){
-        Client client =getCitizenById(clientId);
+    public ClientStaffInfoDTO getStaffClientInfo(Long clientId, String loggedInUserName) {
+        Client client = getCitizenById(clientId);
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(loggedInUserName).getId());
-        if(client==null || staff==null){
+        if (client == null || staff == null) {
             throw new DataNotFoundByIdException("Either Client or Staff Id is invalid");
         }
-        return new ClientStaffInfoDTO(client.getId(),staff.getId());
+        return new ClientStaffInfoDTO(client.getId(), staff.getId());
     }
 
     /**
-     * @atuher anil maurya
-     * this method is called from task micro service
      * @param citizenId
      * @param staffId
      * @return
+     * @atuher anil maurya
+     * this method is called from task micro service
      */
-    public Map<String, Object> getStaffAndCitizenHouseholds(Long citizenId,Long staffId){
+    public Map<String, Object> getStaffAndCitizenHouseholds(Long citizenId, Long staffId) {
         Map<String, Object> staffAndCitizenHouseholdsInfo = new HashMap<>();
-        staffAndCitizenHouseholdsInfo.put("lastModifiedBy",staffGraphRepository.findOne(staffId).getFirstName());
-        staffAndCitizenHouseholdsInfo.put("citizenHouseholds",getPeopleInHousehold(citizenId));
+        staffAndCitizenHouseholdsInfo.put("lastModifiedBy", staffGraphRepository.findOne(staffId).getFirstName());
+        staffAndCitizenHouseholdsInfo.put("citizenHouseholds", getPeopleInHousehold(citizenId));
         return staffAndCitizenHouseholdsInfo;
     }
 
     /**
-     * @auther anil maurya this method is called from task micro service
      * @param citizenId
      * @return
+     * @auther anil maurya this method is called from task micro service
      */
-    public Map<String, Object> getCitizenDetails(long citizenId){
+    public Map<String, Object> getCitizenDetails(long citizenId) {
         Map<String, Object> citizenDetails = new HashMap<>();
 
         Client citizen = clientGraphRepository.findOne(citizenId);
-        if(citizen == null){
+        if (citizen == null) {
             logger.debug("Searching client in database by id " + citizenId);
             throw new DataNotFoundByIdException("Incorrect client id " + citizenId);
         }
         citizenDetails.put("id", citizen.getId());
         citizenDetails.put("name", citizen.getFirstName() + " " + citizen.getLastName());
         citizenDetails.put("age", citizen.getAge());
-        citizenDetails.put("profilePic", citizen.getProfilePic()!=null? envConfig.getServerHost() + File.separator + citizen.getProfilePic() : "");
+        citizenDetails.put("profilePic", citizen.getProfilePic() != null ? envConfig.getServerHost() + File.separator + citizen.getProfilePic() : "");
         citizenDetails.put("phone", citizen.getContactDetail() != null ? citizen.getContactDetail().retreiveContactNumbers() : "");
         citizenDetails.put("address", citizen.getHomeAddress());
         citizenDetails.put("cprNumber", citizen.getCprNumber());
-        citizenDetails.put("privateNumber",citizen.getContactDetail()!=null ? citizen.getContactDetail().getPrivatePhone() : "NA");
-        citizenDetails.put("privateAddress",citizen.getHomeAddress());
-        citizenDetails.put("gender",citizen.getGender());
-        citizenDetails.put("status",citizen.getCivilianStatus());
+        citizenDetails.put("privateNumber", citizen.getContactDetail() != null ? citizen.getContactDetail().getPrivatePhone() : "NA");
+        citizenDetails.put("privateAddress", citizen.getHomeAddress());
+        citizenDetails.put("gender", citizen.getGender());
+        citizenDetails.put("status", citizen.getCivilianStatus());
         return citizenDetails;
     }
 
     /**
-     * @auther anil maurya
-     * this method is call from task micro service from planner rest template
      * @param citizenId
      * @return
+     * @auther anil maurya
+     * this method is call from task micro service from planner rest template
      */
-    public Map<String,Object> getClientAddressInfo(Long citizenId){
+    public Map<String, Object> getClientAddressInfo(Long citizenId) {
 
         Client citizen = clientGraphRepository.findOne(citizenId, 1);
         if (citizen.getHomeAddress() == null) {
             throw new DataNotFoundByIdException(citizen.getFirstName() + "'s HomeAddress in not available");
         }
-        Map<String,Object>citizenPlanningMap=new HashMap<>();
+        Map<String, Object> citizenPlanningMap = new HashMap<>();
         List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(citizenId);
         citizenPlanningMap.put("temporaryAddressList", !temporaryAddressList.isEmpty() ? FormatUtil.formatNeoResponse(temporaryAddressList) : Collections.EMPTY_LIST);
         ContactAddress address = citizen.getHomeAddress();
@@ -1063,14 +1054,14 @@ public class ClientService extends UserBaseService {
     }
 
     /**
-     * @auther aniil maurya
-     * this method is call from exception service from task micro service
      * @param clientExceptionDto
      * @param unitId
      * @param clientId
      * @return
+     * @auther aniil maurya
+     * this method is call from exception service from task micro service
      */
-    public ClientTemporaryAddress changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId,Long clientId){
+    public ClientTemporaryAddress changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId, Long clientId) {
 
         Client client = clientGraphRepository.findOne(clientId);
         ClientTemporaryAddress clientTemporaryAddress = null;
@@ -1148,10 +1139,10 @@ public class ClientService extends UserBaseService {
     }
 
 
-    public TaskDemandVisitWrapper getClientDetailsForTaskDemandVisit(TaskDemandRequestWrapper taskDemandWrapper){
+    public TaskDemandVisitWrapper getClientDetailsForTaskDemandVisit(TaskDemandRequestWrapper taskDemandWrapper) {
         Client client = clientGraphRepository.findOne(taskDemandWrapper.getCitizenId());
-        List<Long> forbiddenStaff =getForbiddenStaffVisitourIds(taskDemandWrapper.getCitizenId());
-        List<Long> preferredStaff =getPreferredStaffVisitourIds(taskDemandWrapper.getCitizenId());
+        List<Long> forbiddenStaff = getForbiddenStaffVisitourIds(taskDemandWrapper.getCitizenId());
+        List<Long> preferredStaff = getPreferredStaffVisitourIds(taskDemandWrapper.getCitizenId());
 
 
         TaskAddress taskAddress = new TaskAddress();
@@ -1167,13 +1158,13 @@ public class ClientService extends UserBaseService {
         taskAddress.setStreet(homeAddress.getStreet1());
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(),taskDemandWrapper.getTimeSlotId());
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId());
         Long countryId = countryGraphRepository.getCountryOfUnit(taskDemandWrapper.getUnitId());
 
-        List<Long> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(),taskDemandWrapper.getEndDate().getTime());
+        List<Long> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(), taskDemandWrapper.getEndDate().getTime());
 
         TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(client,
-                forbiddenStaff, preferredStaff,taskAddress).timeSlotMap(timeSlotMap).countryId(countryId)
+                forbiddenStaff, preferredStaff, taskAddress).timeSlotMap(timeSlotMap).countryId(countryId)
                 .publicHolidayList(publicHolidayList).build();
 
         return taskDemandVisitWrapper;
@@ -1183,12 +1174,11 @@ public class ClientService extends UserBaseService {
 
 
     /**
-     *
      * @param unitId
      * @param citizenId
      * @return
      */
-    public TaskDemandVisitWrapper getPrerequisitesForTaskCreation(String userName, long unitId, long citizenId)  {
+    public TaskDemandVisitWrapper getPrerequisitesForTaskCreation(String userName, long unitId, long citizenId) {
 
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         Client citizen = clientGraphRepository.findOne(Long.valueOf(citizenId), 0);
@@ -1204,10 +1194,10 @@ public class ClientService extends UserBaseService {
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
         Staff loggedInUser = staffGraphRepository.getByUser(userGraphRepository.findByUserName(userName).getId());
-        List<Long> preferredStaffIds =getPreferredStaffVisitourIds(citizen.getId());
-        List<Long> forbiddenStaffIds =getForbiddenStaffVisitourIds(citizen.getId());
+        List<Long> preferredStaffIds = getPreferredStaffVisitourIds(citizen.getId());
+        List<Long> forbiddenStaffIds = getForbiddenStaffVisitourIds(citizen.getId());
         TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(citizen,
-                preferredStaffIds, forbiddenStaffIds,taskAddress)
+                preferredStaffIds, forbiddenStaffIds, taskAddress)
                 .staffId(loggedInUser.getId())
                 .flsCredentials(flsCredentials).build();
         return taskDemandVisitWrapper;
@@ -1215,45 +1205,56 @@ public class ClientService extends UserBaseService {
     }
 
 
-    public void mergeMultipleTasks(){
-
+    public void mergeMultipleTasks() {
 
 
     }
 
-    //TODO will make rest template for this
+
+    public List<Long> getClientIds(long unitId) {
+        return clientGraphRepository.getCitizenIds(unitId);
+    }
 
 
-   /* public Map<String, Object> getOrganizationClients(Long organizationId) {
-        Map<String, Object> clientData = new HashMap<String, Object>();
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId,envConfig.getServerHost() + File.separator);
-        List<TaskType> taskTypes = taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(organizationId,true);
-        Long countryId = countryGraphRepository.getCountryOfUnit(organizationId);
-        List<Map<String,Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
-        clientData.put("clientList", retreiveClients(mapList, organizationId));
-        clientData.put("taskTypes", taskTypes);
-        clientData.put("clientStatusList", clientStatusList);
-        List<Object> localAreaTagsList = new ArrayList<>();
-        List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
-        for (Map<String, Object> map : tagList) {
-            localAreaTagsList.add(map.get("tags"));
-        }
-        clientData.put("localAreaTags", localAreaTagsList);
+    /**
+     *  @auther anil maurya
+     *  method is called from task micro service
+     * @param organizationId
+     * @param auth2Authentication
+     * @return
+     */
+   public OrganizationClientWrapper getOrgnizationClients(Long organizationId, OAuth2Authentication auth2Authentication){
+
+       logger.debug("Finding citizen with Id: " + organizationId);
+       List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId,envConfig.getServerHost() + File.separator);
+       logger.debug("CitizenList Size: " + mapList.size());
+
+       Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(auth2Authentication.getUserAuthentication().getPrincipal().toString()).getId());
+       Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
+       OrganizationClientWrapper organizationClientWrapper=new OrganizationClientWrapper(mapList,timeSlotData);
+       organizationClientWrapper.setStaffId(staff.getId());
+       return organizationClientWrapper;
+
+
+   }
+
+    /**
+     *  @auther anil maurya
+     *  method is called from task micro service
+     * @param organizationId
+     *
+     * @return
+     */
+    public OrganizationClientWrapper getOrgnizationClients(Long organizationId,List<Long> citizenId){
+
+        logger.info("Finding citizen with Id: " + citizenId);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsByClintIdList(citizenId);
+        logger.info("CitizenList Size: " + mapList.size());
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-        if (timeSlotData != null) {
-            clientData.put("timeSlotList", timeSlotData);
-        }
-        List<Long> serviceIds = organizationServiceRepository.getServiceIdsByOrgId(organizationId);
-        clientData.put("serviceTypes", organizationServiceRepository.findAll(serviceIds));
-        if (!mapList.isEmpty()) {
-            return clientData;
-        }
-        return null;
-    }*/
+        OrganizationClientWrapper organizationClientWrapper=new OrganizationClientWrapper(mapList,timeSlotData);
+
+        return organizationClientWrapper;
 
 
-public List<Long> getClientIds(long unitId){
-    return clientGraphRepository.getCitizenIds(unitId);
-}
-
+    }
 }

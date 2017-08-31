@@ -108,6 +108,7 @@ public class UserController {
     }
 
    //TODO move in task micro service
+    //Not in used currently
    /* @RequestMapping(value = "/generateExcels/citizenFile",method = RequestMethod.GET)
     public void createCitizenExcelfile(@RequestParam long unitId){
         taskReportService.generateCitizenList(unitId);

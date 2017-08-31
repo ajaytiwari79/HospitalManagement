@@ -1,6 +1,7 @@
 package com.kairos.client;
 
 import com.kairos.response.dto.web.ResponseEnvelope;
+import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 /**
  * Created by anil on 8/8/17.
@@ -56,6 +59,46 @@ public class StaffServiceRestTemplate {
 
 
     }
+
+    /**
+     * @auther anil maurya
+     * map this endpoint on task controller
+     * @param unitId
+     * @param staffId
+     * @param date
+     * @return
+     */
+    public List<StaffAssignedTasksWrapper> getAssignedTasksOfStaff(long unitId, long staffId,String date){
+
+
+        final String baseUrl=getBaseUrl();
+
+        try {
+            ResponseEntity<ResponseEnvelope> restExchange =
+                    restTemplate.exchange(baseUrl+"/task/staff/{staffId}/{anonymousStaffId}",
+                            HttpMethod.
+                                    GET,null, ResponseEnvelope.class);
+
+            ResponseEnvelope response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+
+
+                return null;
+
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+
+
+    }
+
+
     private final String getBaseUrl(){
         String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
         return baseUrl;

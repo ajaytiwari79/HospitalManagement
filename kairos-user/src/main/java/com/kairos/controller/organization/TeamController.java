@@ -139,15 +139,5 @@
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
                     teamService.getUserStaffType(userId));
         }
-        //---------------------------------------Staff--------------------------------------------------//
 
-        //TODO Move this in task
-       /* // TaskType
-        @ApiOperation(value = "Get Available TaskTypes")
-        @RequestMapping(value = "/service/task_type/available/{teamId}", method = RequestMethod.GET)
-        @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> getOrganizationAvailableTaskType(@PathVariable Long teamId) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.getAllAvailableTaskType(teamId));
-        }*/
     }

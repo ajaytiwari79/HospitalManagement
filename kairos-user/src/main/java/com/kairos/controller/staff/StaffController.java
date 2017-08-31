@@ -488,24 +488,20 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
     }
 
-    //TODO move this endpoint in task service
-   /* @RequestMapping(value = "/{staffId}/taskTypes", method = RequestMethod.GET)
-    @ApiOperation("Get All Task types of a Staff")
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffTaskTypes(@PathVariable long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,staffService
-                .getStaffTaskTypes(staffId));
-    }
 
     @RequestMapping(value = "/{staffId}/assigned_tasks", method = RequestMethod.GET)
     @ApiOperation("Get All Task types of a Staff")
     public ResponseEntity<Map<String, Object>> getAssignedTasksOfStaff(@PathVariable long unitId, @PathVariable long staffId, @RequestParam("date") String date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,staffService
                 .getAssignedTasksOfStaff(unitId,staffId,date));
-    }*/
+    }
 
-    //anil m2
-
+    /**
+     *
+     * @param unitId
+     * @param staffDTO
+     * @return
+     */
     @RequestMapping(value = "/createStaff", method = RequestMethod.POST)
     @ApiOperation("createStaff")
     public ResponseEntity<Map<String, Object>> createStaff(@PathVariable long unitId, @RequestBody StaffDTO staffDTO) {
