@@ -581,11 +581,11 @@ public class ClientController {
      * @param clientId
      * @return
      */
-    @RequestMapping(value = "/{clientId}/updateClientTempAddress")
+    @RequestMapping(value = "/{clientId}/updateClientTempAddress", method = RequestMethod.POST)
     @ApiOperation("updateClientTempAddress")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> changeLocationUpdateClientAddress(@RequestBody ClientExceptionDTO clientExceptionDto,@PathVariable Long unitId, @PathVariable Long clientId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.changeLocationUpdateClientAddress(clientExceptionDto,clientId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.changeLocationUpdateClientAddress(clientExceptionDto, unitId, clientId));
 
     }
 
@@ -599,8 +599,8 @@ public class ClientController {
      * @return
      */
 
-    @RequestMapping(value = "/orgClientsInfo", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getOrgnizationClients(@PathVariable Long organizationId,OAuth2Authentication auth2Authentication) {
+    @RequestMapping(value = "/organization_clients", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getOrganizationClients(@PathVariable Long organizationId, OAuth2Authentication auth2Authentication) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(organizationId,auth2Authentication));
 
@@ -616,8 +616,8 @@ public class ClientController {
      * @return
      */
 
-    @RequestMapping(value = "/orgClientsInfo", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> getOrgnizationClients(@PathVariable Long organizationId,@RequestBody List<Long> citizenId) {
+    @RequestMapping(value = "/organization_clients/ids", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> getOrganizationClientsByIds(@PathVariable Long organizationId, @RequestBody List<Long> citizenId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getOrgnizationClients(organizationId,citizenId));
 
