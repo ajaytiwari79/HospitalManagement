@@ -68,4 +68,16 @@ public class ControlPanelController {
     public ResponseEntity<Map<String, Object>> deleteJob(@PathVariable long controlPanelId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, controlPanelService.deleteJob(controlPanelId));
     }
+
+    /**
+     * this end point will be called from
+     * activity micro service
+     * @param controlPanelId
+     * @return
+     */
+    @RequestMapping(value = "/{controlPanelId}/control_panel_details", method = RequestMethod.GET)
+    @ApiOperation("Update Control Panel ")
+    public ResponseEntity<Map<String, Object>> getRequiredControlPanelDataForTask(@PathVariable long controlPanelId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, controlPanelService.getControlPanelData(controlPanelId));
+    }
 }

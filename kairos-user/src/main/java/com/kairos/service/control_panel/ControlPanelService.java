@@ -1,4 +1,5 @@
 package com.kairos.service.control_panel;
+import com.kairos.client.dto.ControlPanelDTO;
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
@@ -9,6 +10,7 @@ import com.kairos.persistence.repository.user.control_panel.ControlPanelGraphRep
 import com.kairos.persistence.repository.user.control_panel.jobDetails.JobDetailsRepository;
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.integration.IntegrationService;
 import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -47,6 +49,8 @@ public class ControlPanelService extends UserBaseService {
     DynamicCronScheduler dynamicCronScheduler;
     @Inject
     JobDetailsRepository jobDetailsRepository;
+    @Inject
+    IntegrationService integrationService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(ControlPanelService.class);
@@ -239,10 +243,54 @@ public class ControlPanelService extends UserBaseService {
         }
     }
 
+
+    /**
+     * data needs to move into neo4j
+     * @param controlPanelId
+     * @return
+     */
+    public String getRecentJobId(Long controlPanelId){
+       /* Aggregation aggregation = Aggregation.newAggregation(
+                match(
+                        Criteria.where("controlPanelId").is(controlPanelId)
+                ),
+                sort(Sort.Direction.DESC, "createdAt"),
+                limit(1)
+        );
+        AggregationResults<Map> finalResult =
+                mongoTemplate.aggregate(aggregation, JobDetails.class, Map.class);
+        if(finalResult.getMappedResults().size() > 0) {
+            String jobDetailId = finalResult.getMappedResults().get(0).get("_id").toString();
+            return jobDetailId;
+        }else {
+            return null;
+        }*/
+
+       return "";
+
+
+    }
+
+
+
+
     public Long getControlPanelUnitId(Long controlPanelId){
         ControlPanel panel = controlPanelGraphRepository.findOne(controlPanelId);
         return panel.getUnitId();
     }
+
+    public ControlPanelDTO getControlPanelData(long controlPanelId){
+        String jobId = getRecentJobId(controlPanelId);
+        Long unitId = getControlPanelUnitId(controlPanelId);
+        Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
+        ControlPanelDTO controlPanelDTO = new ControlPanelDTO();
+        controlPanelDTO.setFlsCredentails(flsCredentials);
+        controlPanelDTO.setJobId(jobId);
+        controlPanelDTO.setUnitId(unitId);
+        return controlPanelDTO;
+    }
+
+
 
 }
 

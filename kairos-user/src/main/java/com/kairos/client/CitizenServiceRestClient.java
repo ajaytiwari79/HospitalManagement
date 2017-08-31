@@ -3,6 +3,7 @@ package com.kairos.client;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.TaskTypeAggregateResult;
 import com.kairos.response.dto.web.KMDShift;
+import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,18 +33,19 @@ public class CitizenServiceRestClient {
      * @param unitId
      * @return
      */
-    public void createTaskFromKMD(Long staffId, KMDShift shift, Long unitId){
+    public Boolean createTaskFromKMD(Long staffId, KMDShift shift, Long unitId){
+        String baseUrl = getBaseUrl(false);
         try {
             HttpEntity<KMDShift> request = new HttpEntity<>(shift);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>>() {};
-            ResponseEntity<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
-                            "http://zuulservice/activity/api/v1/unit/{unitId}/createTask/{staffId}",
-                            HttpMethod.POST, request, typeReference);
+                            baseUrl + "/unit/{unitId}/createTask/{staffId}",
+                            HttpMethod.POST, request, typeReference,unitId,staffId);
 
-            RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-
+                return response.getData();
             } else {
                 throw new RuntimeException(response.getMessage());
             }
@@ -52,6 +54,17 @@ public class CitizenServiceRestClient {
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+
+    }
+
+    private final String getBaseUrl(boolean hasUnitInUrl){
+        if(hasUnitInUrl){
+            String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
+            return baseUrl;
+        }else{
+            String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
+            return baseUrl;
         }
 
     }

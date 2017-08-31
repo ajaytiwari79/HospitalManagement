@@ -9,6 +9,7 @@ import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -20,6 +21,7 @@ import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepos
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.AddressVerificationService;
@@ -33,6 +35,8 @@ import com.kairos.util.DateConverter;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
+import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,6 +124,9 @@ public class OrganizationService extends UserBaseService {
     @Inject
     private OpenningHourService openningHourService;
 
+    @Inject
+    StaffGraphRepository staffGraphRepository;
+
     @Autowired TeamService teamService;
     @Autowired
     OrganizationMetadataRepository organizationMetadataRepository;
@@ -130,6 +137,9 @@ public class OrganizationService extends UserBaseService {
 
     @Autowired
     CitizenStatusService citizenStatusService;
+
+    @Inject
+    AbsenceTypesRepository absenceTypesRepository;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id,0);
@@ -871,6 +881,23 @@ public class OrganizationService extends UserBaseService {
         supplierInfo.put("weekdaySupplier", weekdaySupplier.getName());
         supplierInfo.put("weekdaySupplierId", weekdaySupplier.getId());
         return supplierInfo;
+    }
+
+    public Map<String,Object> getPrerequisitesForTimeCareTask(GetWorkShiftsFromWorkPlaceByIdResult workShift) {
+
+        Organization organization = organizationGraphRepository.findByExternalId(workShift.getWorkPlace().getId().toString());
+        if(organization == null){
+            throw new DataNotFoundByIdException("Incorrect id of an organization");
+        }
+        Map<String,Object> requiredDataForTimeCareTask = new HashedMap();
+        OrganizationContactAddress organizationContactData = organizationGraphRepository.getContactAddressOfOrg(organization.getId());
+        Staff staff = staffGraphRepository.findByExternalId(workShift.getPerson().getId());
+        AbsenceTypes absenceTypes = absenceTypesRepository.findByName(workShift.getActivity().getName());
+        requiredDataForTimeCareTask.put("organizationContactAddress",organizationContactData);
+        requiredDataForTimeCareTask.put("staff",staff);
+        requiredDataForTimeCareTask.put("absenceTypes",absenceTypes);
+        requiredDataForTimeCareTask.put("organization",organization);
+        return requiredDataForTimeCareTask;
     }
 
 }

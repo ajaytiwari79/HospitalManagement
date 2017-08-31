@@ -21,6 +21,7 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.util.response.ResponseHandler;
+import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -882,6 +883,27 @@ public class OrganizationController {
     ResponseEntity<Map<String, Object>> getTaskDemandSupplierInfo(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getTaskDemandSupplierInfo(unitId));
     }
+
+    /*
+     * This endpoint in called from task micro service to get TaskDemand Supplier Info by unit id
+     * @param unitId
+     * @return organization info map
+     */
+    @ApiOperation("get organization by external id ")
+    @RequestMapping(value = "/external/{externalId}", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getOrganizationByExternalId(@PathVariable String externalId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationByExternalId(externalId));
+    }
+
+    @RequestMapping(value = "/timecare_task/prerequisites", method = RequestMethod.POST)
+    @ApiOperation("get required data for creation of time care task")
+    public ResponseEntity<Map<String,Object>> getPrerequisitesForTimeCareTask(@RequestBody GetWorkShiftsFromWorkPlaceByIdResult workShift) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getPrerequisitesForTimeCareTask(workShift));
+    }
+
+
+
 
 
 }
