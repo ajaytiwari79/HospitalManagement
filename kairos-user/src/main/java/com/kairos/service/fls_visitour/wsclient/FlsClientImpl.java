@@ -191,7 +191,9 @@ public class FlsClientImpl implements  FlsClient{
      */
     @Override
     public FieldManagerResponse sendFieldManagerRequest(FieldManager fieldManager, Map<String, String> flsCredentials){
-
+        if(flsCredentials.get("flsDefaultUrl") == ""){
+            throw new FlsCredentialException("FLS URL is not present");
+        }
         try {
             FieldManagerResponse fieldManagerResponse =  (FieldManagerResponse) webServiceTemplate(flsCredentials)
                     .marshalSendAndReceive(flsCredentials.get("flsDefaultUrl") + "/" + FlsUrlPaths.FIELD_MANAGER, fieldManager);
