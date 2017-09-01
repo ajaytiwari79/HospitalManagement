@@ -5,15 +5,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.TokenEnhancer;
-import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
@@ -23,21 +21,23 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-
-
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-
         endpoints.authenticationManager(authenticationManager).accessTokenConverter(jwtAccessTokenConverter())
-                .tokenServices(tokenServices());
-
+                .tokenServices(customTokenServices());
     }
 
-
+    @Bean
+    @Primary
+    public AuthorizationServerTokenServices customTokenServices() {
+        DefaultTokenServices defaultTokenServices =new  CustomDefaultTokenServices();
+        final JwtTokenStore jwtTokenStore = new JwtTokenStore(this.jwtAccessTokenConverter());
+        defaultTokenServices.setTokenStore(jwtTokenStore);
+        defaultTokenServices.setTokenEnhancer(this.jwtAccessTokenConverter());
+        defaultTokenServices.setSupportRefreshToken(true);
+        return defaultTokenServices;
+    }
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -61,23 +61,9 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
 
     }
 
-    @Bean
-    public TokenStore tokenStore() {
-        return new JwtTokenStore(jwtAccessTokenConverter());
-    }
 
     @Bean
     @Primary
-    public DefaultTokenServices tokenServices() {
-        DefaultTokenServices defaultTokenServices =new  CustomDefaultTokenServices();
-        defaultTokenServices.setTokenStore(tokenStore());
-        defaultTokenServices.setTokenEnhancer(this.jwtAccessTokenConverter());
-        defaultTokenServices.setSupportRefreshToken(true);
-        return defaultTokenServices;
-    }
-
-
-    @Bean
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
         JwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
         //anilm2 use commented code if certificate not install
@@ -92,11 +78,6 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
 
         }*/
         return converter;
-    }
-
-    @Bean
-    public TokenEnhancer jwtTokenEnhancer() {
-        return new JWTTokenEnhancer();
     }
 
     @Override

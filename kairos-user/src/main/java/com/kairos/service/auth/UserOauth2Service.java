@@ -29,7 +29,6 @@ public class UserOauth2Service implements UserDetailsService {
             throw new UsernameNotFoundException(
                     "User " + username + " not found.");
         }
-    System.out.print(">>>>>>>>>>>>"+user);
         return new UserPrincipal(user,getPermission());
 
     }

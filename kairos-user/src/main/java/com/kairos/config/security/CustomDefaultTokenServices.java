@@ -9,6 +9,9 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @auther anil maurya
  *
@@ -20,9 +23,11 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
     @Transactional
     @Override
     public OAuth2AccessToken createAccessToken(OAuth2Authentication authentication) throws AuthenticationException {
-        log.debug("adding user details information into oauth2 token");
-         UserPrincipal user=(UserPrincipal)authentication.getUserAuthentication().getPrincipal();
-         authentication.setDetails(user.getDetails());
+        log.info("adding user details information into oauth2 token");
+        UserPrincipal user=(UserPrincipal)authentication.getUserAuthentication().getPrincipal();
+        final Map<String, Object> userDetails = new HashMap<>();
+         userDetails.put("details", user.getDetails());
+         authentication.setDetails(userDetails);
         return super.createAccessToken(authentication);
 
     }
