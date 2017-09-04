@@ -1,6 +1,6 @@
 package com.kairos.service.kmdNexus;
 
-import com.kairos.client.CitizenServiceRestClient;
+import com.kairos.client.TaskServiceRestClient;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -79,8 +79,7 @@ public class CitizenService {
 
     @Inject
     private AuthService authService;
-    @Autowired
-    CitizenServiceRestClient citizenServiceRestClient;
+
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -89,6 +88,8 @@ public class CitizenService {
     private StaffService staffService;
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
+    @Autowired
+    TaskServiceRestClient taskServiceRestClient;
 
     /**
      * This method is used to import Citizen from KMD Nexus.
@@ -459,7 +460,7 @@ public class CitizenService {
             ResponseEntity<String> staffResponseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_STAFFS_DETAILS, staffExternalId), HttpMethod.GET, headersElements, String.class);
             StaffDTO staffDTO = JsonUtils.toObject(staffResponseEntity.getBody(), StaffDTO.class);
             Staff staff = createStaffFromKMD(unitId, staffDTO);
-            citizenServiceRestClient.createTaskFromKMD(staff.getId(),shift,unitId);
+            taskServiceRestClient.createTaskFromKMD(staff.getId(),shift,unitId);
             //anil m2 move this method in task micro service
             //createTaskFromKMD(staff, shift, unitId);
             logger.info("staff DTO---------> "+staffDTO.getLastName());
