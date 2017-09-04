@@ -1,6 +1,5 @@
 package com.kairos.controller.auth;
 
-import com.kairos.client.CitizenServiceRestClient;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.service.auth.UserService;
@@ -12,7 +11,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,8 +45,6 @@ public class AuthController {
 
     @Inject
     com.kairos.service.organization.OrganizationService organizationService;
-    @Autowired
-    CitizenServiceRestClient citizenServiceRestClient;
 
     /**
      * Calls userService and Check if user exists
