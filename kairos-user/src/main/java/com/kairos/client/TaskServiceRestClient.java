@@ -207,10 +207,10 @@ public class TaskServiceRestClient {
      * @param date
      * @return
      */
-    public List<StaffAssignedTasksWrapper> getAssignedTasksOfStaff(long staffId,String date){
+    public List<StaffAssignedTasksWrapper> getAssignedTasksOfStaff(long staffId,String date) {
 
 
-        final String baseUrl=getBaseUrl(true);
+        final String baseUrl = getBaseUrl(true);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>>() {
@@ -218,7 +218,7 @@ public class TaskServiceRestClient {
             String url = baseUrl + "/task/staff/{staffId}/assigned_tasks?date=" + date;
             // URI (URL) parameters
             Map<String, Object> uriParams = new HashMap<>();
-            uriParams.put("staffId",staffId);
+            uriParams.put("staffId", staffId);
 
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
                     // Add query parameter
@@ -226,7 +226,7 @@ public class TaskServiceRestClient {
             ResponseEntity<RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>>> restExchange =
                     restTemplate.exchange(url,
                             HttpMethod.
-                                    GET,null, typeReference,staffId);
+                                    GET, null, typeReference, staffId);
 
             RestTemplateResponseEnvelope<List<StaffAssignedTasksWrapper>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
@@ -235,17 +235,14 @@ public class TaskServiceRestClient {
             } else {
                 throw new RuntimeException(response.getMessage());
             }
-        }catch (HttpClientErrorException e) {
+        } catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
         }
 
-
     }
-
-
 
     private final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){
