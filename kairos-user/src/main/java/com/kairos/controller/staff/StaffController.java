@@ -527,12 +527,12 @@ public class StaffController {
     }
 
 
-    @RequestMapping(value = "/{staffId}", method = RequestMethod.GET)
+    /*@RequestMapping(value = "/{staffId}", method = RequestMethod.GET)
     @ApiOperation("get staff by id")
     public ResponseEntity<Map<String, Object>> getStaffById( @PathVariable long staffId,OAuth2Authentication user) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffById(staffId));
-    }
+    }*/
 
 
 

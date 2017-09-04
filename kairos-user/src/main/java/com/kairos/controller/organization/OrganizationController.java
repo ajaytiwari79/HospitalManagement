@@ -22,6 +22,7 @@ import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.util.userContext.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -392,9 +393,9 @@ public class OrganizationController {
     @RequestMapping(value = "/unit/{unitId}/client/all", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationAllClients(@PathVariable long organizationId, @PathVariable long unitId) {
-        User loginUser = UserAuthentication.getCurrentUser();
+        long userId = UserContext.getUserDetails().getId();
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getOrganizationAllClients(organizationId,unitId, loginUser.getId()));
+                clientService.getOrganizationAllClients(organizationId,unitId, userId));
     }
 
     @RequestMapping(value = "/unit/{unitId}/client/upload", method = RequestMethod.POST)
@@ -890,7 +891,7 @@ public class OrganizationController {
      * @return OrganizationDTO
      */
     @ApiOperation("get getOrganization By TeamId ")
-    @RequestMapping(value = "/unit/{unitId}/getOrganizationByTeamId", method = RequestMethod.GET)
+    @RequestMapping(value = "/unit/{unitId}/getOrganizationByTeamId/{teamId}", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getOrganizationByTeamId(@PathVariable long teamId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationByTeamId(teamId));
     }

@@ -120,7 +120,7 @@ public class ClientServiceRestClient {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>> restExchange =
                     restTemplate.exchange(
-                            "http://zuulservice/activity/api/v1/task_demand/getTaskTypes",
+                            "http://zuulservice/activity/api/v1/task_demand/citizen/task_types",
                             HttpMethod.POST, request, typeReference);
 
             RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>> response = restExchange.getBody();
