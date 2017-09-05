@@ -1,11 +1,11 @@
 package com.kairos.persistence.model.user.agreement.wta.templates;
 
-
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATE_CATEGORY;
 
 /**

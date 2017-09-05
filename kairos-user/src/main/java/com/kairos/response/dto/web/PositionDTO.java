@@ -27,15 +27,15 @@ public class PositionDTO {
     }
 
 
-    public PositionDTO( Long positionNameId, Long expertiseId) {
+    public PositionDTO(Long positionNameId, Long expertiseId) {
         this.positionNameId = positionNameId;
         this.expertiseId = expertiseId;
     }
 
 
 
-    public PositionDTO(String name, String description, Long positionNameId, Long expertiseId,Long startDate, Long endDate, int totalWeeklyHours,
-                       float avgMonthlyWorkingHours, float hourlyWages, float salary,Position.EmploymentType employmentType) {
+    public PositionDTO(String name, String description, Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours,
+                       float avgMonthlyWorkingHours, float hourlyWages, float salary, Position.EmploymentType employmentType) {
         this.salary=salary;
         this.avgMonthlyWorkingHours=avgMonthlyWorkingHours;
         this.totalWeeklyHours=totalWeeklyHours;
