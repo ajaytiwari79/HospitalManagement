@@ -37,7 +37,7 @@ public class TaskDemandRestClient {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>> restExchange =
                     restTemplate.exchange(
-                            "http://zuulservice/activity/api/v1/task_demand/citizen/task_types",
+                            "http://zuulservice/kairos/activity/api/v1/task_demand/citizen/task_types",
                             HttpMethod.POST, request, typeReference);
 
             RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>> response = restExchange.getBody();
@@ -69,7 +69,7 @@ public class TaskDemandRestClient {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>> restExchange =
                     restTemplate.exchange(
-                            "http://zuulservice/activity/api/v1/task_demand/unit/{unitId}",
+                            "http://zuulservice/kairos/activity/api/v1/task_demand/unit/{unitId}",
                             HttpMethod.
                                     GET,null, typeReference,unitId);
 
@@ -105,7 +105,7 @@ public class TaskDemandRestClient {
             HttpEntity<List> request = new HttpEntity<>(mapList);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Map<String,Object>>> restExchange =
-                    restTemplate.exchange("http://zuulservice/activity/api/v1/task_demand/organization/{organizationId}/{staffId}",
+                    restTemplate.exchange("http://zuulservice/kairos/activity/api/v1/task_demand/organization/{organizationId}/{staffId}",
                             HttpMethod.
                                     POST,request, typeReference,organizationId,staffId);
 
@@ -138,7 +138,7 @@ public class TaskDemandRestClient {
             HttpEntity<List> request = new HttpEntity<>(mapList);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>>(){};
             ResponseEntity<RestTemplateResponseEnvelope<Map<String,Object>>> restExchange =
-                    restTemplate.exchange("http://zuulservice/activity/api/v1/task_demand/organization/{organizationId}",
+                    restTemplate.exchange("http://zuulservice/kairos/activity/api/v1/task_demand/organization/{organizationId}",
                             HttpMethod.
                                     POST,request, typeReference,organizationId);
 
@@ -163,10 +163,10 @@ public class TaskDemandRestClient {
 
     private final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
+            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
             return baseUrl;
         }else{
-            String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
+            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
             return baseUrl;
         }
 
