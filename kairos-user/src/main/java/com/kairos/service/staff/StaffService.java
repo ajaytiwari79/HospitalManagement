@@ -1,7 +1,7 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.client.StaffServiceRestTemplate;
+import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -122,11 +122,11 @@ public class StaffService extends UserBaseService {
     private AccessGroupService accessGroupService;
 
     @Autowired
-    StaffServiceRestTemplate staffServiceRestTemplate;
-    @Autowired
     UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Autowired
     ClientGraphRepository clientGraphRepository;
+    @Autowired
+    TaskServiceRestClient taskServiceRestClient;
 
 
 
@@ -740,7 +740,7 @@ public class StaffService extends UserBaseService {
                 List<Map<String, Object>> result = skillService.assignSkillToStaff(staff.getId(), data.getSkills(), false, unitId);
                 logger.info("Assigned Number of Skills to staff: " + result.size());
             }
-            staffServiceRestTemplate.updateTaskForStaff(staff.getId(),data.getAnonymousStaffId());
+            taskServiceRestClient.updateTaskForStaff(staff.getId(),data.getAnonymousStaffId());
             return staff;
         }
         return null;
@@ -1074,7 +1074,7 @@ public class StaffService extends UserBaseService {
         if(staff == null){
             throw new InternalError("Staff not found");
         }
-        List<StaffAssignedTasksWrapper> tasks = staffServiceRestTemplate.getAssignedTasksOfStaff(staffId,date);
+        List<StaffAssignedTasksWrapper> tasks = taskServiceRestClient.getAssignedTasksOfStaff(staffId,date);
         List<Long> citizenIds = tasks.stream().map(task -> task.getId()).collect(Collectors.toList());
         List<Client> clients = clientGraphRepository.findByIdIn(citizenIds);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -1126,6 +1126,15 @@ public class StaffService extends UserBaseService {
             throw new DataNotFoundByIdException("Staff Id is invalid");
         }
         return new ClientStaffInfoDTO(staff.getId());
+    }
+
+    public Staff getStaffById(long staffId){
+        Staff staff = staffGraphRepository.findOne(staffId,0);
+        if(staff == null){
+            logger.debug("Searching staff by id " + staffId);
+            throw new DataNotFoundByIdException("Incorrect id of staff " + staffId);
+        }
+        return staff;
     }
 
 }

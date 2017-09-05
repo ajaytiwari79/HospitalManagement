@@ -1,14 +1,12 @@
 package com.kairos.client;
 
+import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.client.dto.TaskTypeAggregateResult;
-import com.kairos.response.dto.web.KMDShift;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -16,34 +14,32 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-
-/**
- * Created by anil on 8/8/17.
- */
 @Component
-public class CitizenServiceRestClient {
-    private static final Logger logger = LoggerFactory.getLogger(SkillServiceTemplateClient.class);
+public class TaskTypeRestClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(PlannerRestClient.class);
+
     @Autowired
     RestTemplate restTemplate;
 
-
-    /**
-     * @auther anil maurya
-     * map in task  controller
+      /** @auther anil maurya
+     * map in task demand controller
      * @param unitId
      * @return
-     */
-    public Boolean createTaskFromKMD(Long staffId, KMDShift shift, Long unitId){
-        String baseUrl = getBaseUrl(false);
-        try {
-            HttpEntity<KMDShift> request = new HttpEntity<>(shift);
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
-            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl + "/unit/{unitId}/createTask/{staffId}",
-                            HttpMethod.POST, request, typeReference,unitId,staffId);
+             */
+    public List<OrgTaskTypeAggregateResult> getTaskTypesOfUnit(Long unitId) {
 
-            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
+        final String baseUrl=getBaseUrl(true);
+
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>> restExchange =
+                    restTemplate.exchange(
+                            "http://zuulservice/activity/api/v1/task_demand/unit/{unitId}",
+                            HttpMethod.
+                                    GET,null, typeReference,unitId);
+
+            RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
@@ -57,6 +53,7 @@ public class CitizenServiceRestClient {
         }
 
     }
+
 
     private final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){

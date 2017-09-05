@@ -1,7 +1,6 @@
 package com.kairos.service.client;
 
-import com.kairos.client.ClientServiceRestClient;
-import com.kairos.client.PlannerServiceRestTemplateClient;
+import com.kairos.client.*;
 import com.kairos.client.dto.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -99,11 +98,6 @@ public class ClientService extends UserBaseService {
     private TimeSlotService timeSlotService;
     @Inject
     private OrganizationMetadataRepository organizationMetadataRepository;
-
-    @Autowired
-    ClientServiceRestClient clientServiceRestClient;
-    @Autowired
-    PlannerServiceRestTemplateClient plannerServiceRestTemplateClient;
     @Autowired
     AddressVerificationService addressVerificationService;
     @Autowired
@@ -116,6 +110,16 @@ public class ClientService extends UserBaseService {
     TimeSlotGraphRepository timeSlotGraphRepository;
     @Autowired
     IntegrationService integrationService;
+    @Autowired
+    TaskServiceRestClient taskServiceRestClient;
+    @Autowired
+    PlannerRestClient plannerRestClient;
+    @Autowired
+    TaskTypeRestClient taskTypeRestClient;
+    @Autowired
+    TaskDemandRestClient taskDemandRestClient;
+    @Autowired
+    TableConfigRestClient tableConfigRestClient;
 
     public Client createCitizen(Client client) {
 
@@ -477,7 +481,7 @@ public class ClientService extends UserBaseService {
         List<OrganizationService> serviceList = new ArrayList<>();
         //List<Long> serviceIdList = taskService.getClientTaskServices(clientId, orgId);
         //implements task service rest template client
-        List<Long> serviceIdList = clientServiceRestClient.getClientTaskServices(clientId, orgId);
+        List<Long> serviceIdList = taskServiceRestClient.getClientTaskServices(clientId, orgId);
 
         for (Long id : serviceIdList) {
             OrganizationService service = organizationServiceRepository.findOne(Long.valueOf(id));
@@ -491,7 +495,7 @@ public class ClientService extends UserBaseService {
         List<Long> serviceList = new ArrayList<>();
         // List<Long> serviceIdList = taskService.getClientTaskServices(clientId, orgId);
         //anil maurya  implements task service rest template client
-        List<Long> serviceIdList = clientServiceRestClient.getClientTaskServices(clientId, orgId);
+        List<Long> serviceIdList = taskServiceRestClient.getClientTaskServices(clientId, orgId);
 
         for (Long id : serviceIdList) {
             OrganizationService service = organizationServiceRepository.findOne(Long.valueOf(id));
@@ -647,7 +651,7 @@ public class ClientService extends UserBaseService {
         client.setCitizenDead(true);
         clientGraphRepository.save(client);
         //return plannerService.deleteTasksForCitizen(clientId);
-        return clientServiceRestClient.deleteTaskForCitizen(clientId);
+        return plannerRestClient.deleteTaskForCitizen(clientId);
 
     }
 
@@ -786,7 +790,7 @@ public class ClientService extends UserBaseService {
         clientStaffQueryResults.forEach(clientStaffQueryResult -> citizenIds.add(clientStaffQueryResult.getId()));
         //List<TaskTypeAggregateResult> results = customTaskTypeRepository.getTaskTypesOfCitizens(citizenIds);
         //anil maurya implements rest template here to call task service
-        List<TaskTypeAggregateResult> results = clientServiceRestClient.getTaskTypesOfCitizens(citizenIds);
+        List<TaskTypeAggregateResult> results = taskDemandRestClient.getTaskTypesOfCitizens(citizenIds);
 
         clientStaffQueryResults.forEach(client -> {
 
@@ -818,7 +822,7 @@ public class ClientService extends UserBaseService {
         for (Map<String, Object> map : skills) {
             filterSkillData.add((Map<String, Object>) map.get("data"));
         }
-        orgData.put("taskTypes", clientServiceRestClient.getTaskTypesOfUnit(unitId));
+        orgData.put("taskTypes", taskTypeRestClient.getTaskTypesOfUnit(unitId));
         // orgData.put("taskTypes", customTaskTypeRepository.getTaskTypesOfUnit(unitId));
         orgData.put("skills", filterSkillData);
         orgData.put("teams", teamGraphRepository.getTeamsByOrganization(unitId));
@@ -851,7 +855,7 @@ public class ClientService extends UserBaseService {
 
         Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )
-        Map<String, Object> responseFromTask = clientServiceRestClient.getOrganizationClientsWithPlanning(organizationId, staff.getId(), mapList);
+        Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(organizationId, staff.getId(), mapList);
         response.putAll(responseFromTask);
 
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
@@ -874,7 +878,7 @@ public class ClientService extends UserBaseService {
         }
 
         //anilm2 replace it with rest template
-        Map<String, Object> clientInfo = clientServiceRestClient.getOrganizationClientsInfo(organizationId, mapList);
+        Map<String, Object> clientInfo = taskDemandRestClient.getOrganizationClientsInfo(organizationId, mapList);
         Long countryId = countryGraphRepository.getCountryOfUnit(organizationId);
         List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
 
@@ -910,7 +914,7 @@ public class ClientService extends UserBaseService {
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("clients", clientList);
-        response.put("tableSetting", Arrays.asList(clientServiceRestClient.getTableConfiguration(organizationId, unitId, staffId)));
+        response.put("tableSetting", Arrays.asList(tableConfigRestClient.getTableConfiguration(organizationId, unitId, staffId)));
         return response;
     }
 
@@ -1207,7 +1211,7 @@ public class ClientService extends UserBaseService {
     public List<EscalateTaskWrapper> getClientAggregation(Long unitId){
         List<EscalateTaskWrapper> escalatedTaskData = new ArrayList<>();
        // List<EscalatedTasksWrapper> escalatedTasksWrappers = taskMongoRepository.getStaffNotAssignedTasksGroupByCitizen(unitId);
-        List<EscalatedTasksWrapper> escalatedTasksWrappers=clientServiceRestClient.getStaffNotAssignedTasks(unitId);
+        List<EscalatedTasksWrapper> escalatedTasksWrappers=taskServiceRestClient.getStaffNotAssignedTasks(unitId);
         for(EscalatedTasksWrapper escalatedTasksWrapper : escalatedTasksWrappers){
             Client client = clientGraphRepository.findOne(escalatedTasksWrapper.getId());
             for(EscalateTaskWrapper escalateTaskWrapper : escalatedTasksWrapper.getTasks()){

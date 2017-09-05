@@ -12,6 +12,7 @@ import com.kairos.service.SmsService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.util.OtpGenerator;
+import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -435,9 +436,9 @@ public class UserService extends UserBaseService {
             return Collections.emptyList();
         }
 
-        User currentUser = UserAuthentication.getCurrentUser();
+        long loggedinUserId = UserContext.getUserDetails().getId();
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
-        List<AccessPageQueryResult> mainModulePermissions = accessPageRepository.getPermissionOfMainModule(organizationId, currentUser.getId());
+        List<AccessPageQueryResult> mainModulePermissions = accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
         List<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> unitPermissionMap;
@@ -446,7 +447,7 @@ public class UserService extends UserBaseService {
              if(organization.isKairosHub()){
                 accessPageQueryResults = accessPageRepository.getTabsPermissionForHubMember();
              } else {
-               accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), currentUser.getId());
+               accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId);
              }
             unitPermissionMap = new HashMap<>();
             unitPermissionMap.put("id", unit.getId());

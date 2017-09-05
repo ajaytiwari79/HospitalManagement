@@ -10,6 +10,10 @@ public class TaskTypeAggregateResult {
     private long id;
     private List<Integer> taskTypeIds;
 
+    public TaskTypeAggregateResult() {
+        //default constructor
+    }
+
     public void setId(long id) {
         this.id = id;
     }
