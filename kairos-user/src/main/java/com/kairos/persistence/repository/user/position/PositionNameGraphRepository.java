@@ -15,7 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 public interface PositionNameGraphRepository extends GraphRepository<PositionName> {
 
 
-    @Query("MATCH (o:Organization)-[:"+HAS_POSITION_NAME+"]->(pn:PositionName) WHERE id(o)={0} AND pn.name=~ {1} return pn ")
+    @Query("MATCH (o:Organization)-[:"+HAS_POSITION_NAME+"]->(pn:PositionName{ isEnabled:true }) WHERE id(o)={0} AND pn.name=~ {1} return pn ")
     PositionName checkDuplicatePositionName(long orgId, String positionName);
 
 

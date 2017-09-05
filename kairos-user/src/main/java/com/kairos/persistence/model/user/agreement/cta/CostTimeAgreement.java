@@ -8,12 +8,10 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
-
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -36,10 +34,6 @@ public class CostTimeAgreement extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
     private Country country;
-
-
-
-
 
     @Relationship(type = HAS_CTA)
     private CostTimeAgreement cta;

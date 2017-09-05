@@ -924,6 +924,16 @@ public class OrganizationController {
                 organizationService.getPrerequisitesForTimeCareTask(workShift));
     }
 
+    /**
+     * @return List of Organization- All organization in db.
+     */
+    @ApiOperation(value = "Get all Organization Ids")
+    @RequestMapping(value = "/ids",method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public List<Map<String, Object>> getAllOrganizationIds() {
+        return organizationService.getAllOrganization();
+    }
+
 }
 
 

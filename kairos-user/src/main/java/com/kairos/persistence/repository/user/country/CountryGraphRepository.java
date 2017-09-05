@@ -1,7 +1,9 @@
 package com.kairos.persistence.repository.user.country;
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplateDTO;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import com.kairos.persistence.model.user.country.Country;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
@@ -112,28 +114,59 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
 
 
 
-   @Query("MATCH (n:Country{isEnabled:true}) where id(n)={0} with n " +
-           "Match (n)-[:HAS_RULE_TEMPLATE]->(t:WTABaseRuleTemplate) with t " +
-           "Match (t)<-[:"+HAS_RULE_TEMPLATES+"]-(r:RuleTemplateCategory) with t,r " +
-           "Return id(t) as id ," + "t.name as name ," +"t.templateType as templateType," +"r as ruleTemplateCategory," + "t.isActive as isActive,"+"t.description as description," + "t.daysWorked as daysWorked,"+"t.number as number,"+
-           "t.creationDate as creationDate,"+ "t.lastModificationDate as lastModificationDate,"+ "t.time as time,"+ "t.days as days,"+"t.minimumRest as minimumRest,"+"t.checkAgainstTimeRules as checkAgainstTimeRules,"+
-           "t.nightsWorked as nightsWorked,"+ "t.minimumDaysOff as minimumDaysOff,"+"t.balanceAdjustment as balanceAdjustment,"+  "t.calculatedShift as calculatedShift,"+ "t.maximumAvgTime as maximumAvgTime,"+ "t.maximumVeto as maximumVeto,"+
-           "t.numberShiftsPerPeriod as numberShiftsPerPeriod,"+ "t.numberOfWeeks as numberOfWeeks,"+ "t.fromDayOfWeek as fromDayOfWeek,"+ "t.fromTime as fromTime,"+ "t.proportional as proportional,"+
-           "t.minimumDurationBetweenShifts as minimumDurationBetweenShifts,"+"t.continuousWeekRest as continuousWeekRest ,"+ "t.continuousDayRestHours as continuousDayRestHours,"+"t.averageRest as averageRest,"+
-           "t.shiftAffiliation as shiftAffiliation,"+"t.balanceType as balanceType,"+"t.onlyCompositeShifts as onlyCompositeShifts,"+"t.interval as interval,"+"t.intervalUnit as intervalUnit,"+"t.validationStartDate as validationStartDate,"+
-           "t.activityCode as activityCode")
-    List<WTABaseRuleTemplateDTO> getRuleTemplatesAndCategories(long countryId);
-
-   @Query("MATCH (c:Country{isEnabled:true})-[HAS_RULE_TEMPLATE]->(t:WTABaseRuleTemplate) WHERE id(c)={0} and t.templateType=~ {1} return t")
-   WTABaseRuleTemplate getTemplateByType(long countryId, String templateType);
 
 
-
-
-    @Query("MATCH (n:Country{isEnabled:true}) where id(n)=53 with n " +
+    @Query("MATCH (n:Country{isEnabled:true}) where id(n)={0} with n " +
             "Match (n)-[:HAS_RULE_TEMPLATE]->(t:WTABaseRuleTemplate) with t " +
-            "return id(t)")
-    List<Long> getAllRuleTemplateId(long countryId);
+            "Match (t)<-[:"+HAS_RULE_TEMPLATES+"]-(r:RuleTemplateCategory{deleted:false}) with t,r " +
+            "Return id(t) as id ,"+
+            "t.timeLimit as timeLimit,"+
+            "t.balanceType as balanceType,"+
+            "t.checkAgainstTimeRules as checkAgainstTimeRules,"+
+            "t.minimumRest as minimumRest,"+
+            "t.daysWorked as daysWorked,"+
+            "t.name as name ," +
+            "t.templateType as templateType," +
+            "r as ruleTemplateCategory," +
+            "t.isActive as isActive,"+
+            "t.description as description," +
+            "t.daysLimit as daysLimit,"+
+            "t.creationDate as creationDate,"+
+            "t.lastModificationDate as lastModificationDate,"+
+            "t.nightsWorked as nightsWorked,"+
+            "t.intervalLength as intervalLength,"+
+            "t.intervalUnit as intervalUnit,"+
+            "t.validationStartDateMillis as validationStartDateMillis,"+
+            "t.balanceAdjustment as balanceAdjustment,"+
+            "t.useShiftTimes as useShiftTimes,"+
+            "t.maximumAvgTime as maximumAvgTime,"+
+            "t.maximumVetoPercentage as maximumVetoPercentage,"+
+            "t.numberShiftsPerPeriod as numberShiftsPerPeriod,"+
+            "t.numberOfWeeks as numberOfWeeks,"+
+            "t.fromDayOfWeek as fromDayOfWeek,"+
+            "t.fromTime as fromTime,"+
+            "t.proportional as proportional,"+
+            "t.toTime as toTime,"+
+            "t.toDayOfWeek as toDayOfWeek,"+
+            "t.continuousDayRestHours as continuousDayRestHours,"+
+            "t.minimumDurationBetweenShifts as minimumDurationBetweenShifts,"+
+            "t.continuousWeekRest as continuousWeekRest,"+
+            "t.averageRest as averageRest,"+
+            "t.shiftAffiliation as shiftAffiliation,"+
+            "t.shiftsLimit as shiftsLimit,"+
+            "t.activityCode as activityCode,"+
+            "t.onlyCompositeShifts as onlyCompositeShifts")
+    List<WTARuleTemplateQueryResponse> getRuleTemplatesAndCategories (long countryId);
+
+    @Query("MATCH (c:Country{isEnabled:true})-[HAS_RULE_TEMPLATE]->(t:WTABaseRuleTemplate) WHERE id(c)={0} and t.templateType=~ {1} return t")
+    WTABaseRuleTemplate getTemplateByType(long countryId, String templateType);
+
+    @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level)={1} return level")
+    Level getLevel(long countryId, long levelId);
+
+    @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} return level")
+    List<Level> getLevelsByCountry(long countryId);
+
 
 
 

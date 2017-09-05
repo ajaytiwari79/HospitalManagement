@@ -1,4 +1,5 @@
 package com.kairos.service.position;
+
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position.Position;
@@ -6,8 +7,8 @@ import com.kairos.persistence.model.user.position.PositionName;
 import com.kairos.persistence.model.user.position.PositionQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.UnitEmployment;
-import com.kairos.persistence.repository.user.cta_wta.CollectiveTimeAgreementGraphRepository;
-import com.kairos.persistence.repository.user.cta_wta.WorkingTimeAgreementGraphRepository;
+import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
+import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.position.PositionGraphRepository;
 import com.kairos.persistence.repository.user.position.PositionNameGraphRepository;
@@ -32,7 +33,7 @@ import java.util.List;
 public class PositionService extends UserBaseService {
 
     @Inject
-    StaffGraphRepository staffGraphRepository;
+    private StaffGraphRepository staffGraphRepository;
     @Inject
     private PositionGraphRepository positionGraphRepository;
     @Inject
