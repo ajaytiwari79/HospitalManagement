@@ -111,7 +111,7 @@ public class TaskServiceRestClient {
 
         ResponseEntity<List> restExchange =
                 restTemplate.exchange(
-                        "http://zuulservice/activity/api/v1/task/{clientId}/{serviceId}/{unitId}",
+                        "http://zuulservice/kairos/activity/api/v1/task/{clientId}/{serviceId}/{unitId}",
                         HttpMethod.GET,
                         null,List.class);
 
@@ -128,12 +128,12 @@ public class TaskServiceRestClient {
     public  List<Object> getTaskTypesByOrganizarion(Long orgainationId){
 
 
-        final String baseUrl=getBaseUrl(true);
+        final String baseUrl=getBaseUrl(false);
 
         try {
             ResponseEntity<ResponseEnvelope> restExchange =
                     restTemplate.exchange(
-                            "http://zuulservice/activity/api/v1/organization/{organizationId}/task_types",
+                            baseUrl + "/task_types",
                             HttpMethod.
                                     GET,null, ResponseEnvelope.class);
 
@@ -265,10 +265,10 @@ public class TaskServiceRestClient {
 
     private final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
+            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
             return baseUrl;
         }else{
-            String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
+            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
             return baseUrl;
         }
 

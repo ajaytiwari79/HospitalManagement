@@ -895,8 +895,7 @@ public class ClientService extends UserBaseService {
         if (timeSlotData != null) {
             clientData.put("timeSlotList", timeSlotData);
         }
-        List<Long> serviceIds = organizationServiceRepository.getServiceIdsByOrgId(organizationId);
-        clientData.put("serviceTypes", organizationServiceRepository.findAll(serviceIds));
+        clientData.put("serviceTypes", organizationServiceRepository.getOrganizationServiceByOrgId(organizationId));
 
         return clientData;
 
@@ -1224,5 +1223,9 @@ public class ClientService extends UserBaseService {
         }
         return escalatedTaskData;
 
+    }
+
+    public List<Client> getClientsByIdsInList(List<Long> citizenIds){
+        return clientGraphRepository.findByIdIn(citizenIds);
     }
 }

@@ -21,6 +21,8 @@ public class ContactDetailSocialDTO {
     private boolean hideWorkPhone;
     private boolean hideMobilePhone;
     private boolean protectedIdentity;
+    private String emergencyPhone;
+    private boolean hideEmergencyPhone;
 
     public String getWorkEmail() {
         return workEmail;
@@ -140,5 +142,21 @@ public class ContactDetailSocialDTO {
 
     public void setProtectedIdentity(boolean protectedIdentity) {
         this.protectedIdentity = protectedIdentity;
+    }
+
+    public String getEmergencyPhone() {
+        return emergencyPhone;
+    }
+
+    public void setEmergencyPhone(String emergencyPhone) {
+        this.emergencyPhone = emergencyPhone;
+    }
+
+    public boolean isHideEmergencyPhone() {
+        return hideEmergencyPhone;
+    }
+
+    public void setHideEmergencyPhone(boolean hideEmergencyPhone) {
+        this.hideEmergencyPhone = hideEmergencyPhone;
     }
 }

@@ -56,4 +56,8 @@ public interface RegionGraphRepository extends GraphRepository<Region> {
             "Match (municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region)-[:"+BELONGS_TO+"]->(country:Country) return \n" +
             "{provinceName:province.name,provinceId:id(province),regionId:id(region),regionName:region.name,countryId:id(country),countryName:country.name} as data")
     Map<String,Object> getGeographicData(long municipalityId);
+
+    @Query("match (e:Region{isEnable:true}) where id(e) in {0} \n" +
+            "return count (e) as matched")
+    Long findAllRegionCountMatchedByIds(List<Long> ids);
 }

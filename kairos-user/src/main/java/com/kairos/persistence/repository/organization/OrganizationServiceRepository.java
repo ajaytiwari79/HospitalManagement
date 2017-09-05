@@ -57,4 +57,7 @@ public interface OrganizationServiceRepository extends GraphRepository<Organizat
     OrganizationService checkDuplicateSubServiceWithSpecialCharacters(Long id, String name);
 
     OrganizationService findByKmdExternalId(String kmdExternalId);
+
+    @Query("MATCH (o:Organization)-[:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}  return os ")
+    List<OrganizationService> getOrganizationServiceByOrgId(Long organizationId);
 }

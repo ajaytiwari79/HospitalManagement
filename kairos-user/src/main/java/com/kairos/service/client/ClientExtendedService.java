@@ -585,6 +585,9 @@ public class ClientExtendedService  extends UserBaseService {
             detail.setMobilePhone(String.valueOf(socialMediaDetail.getMobilePhone()));
             detail.setWorkPhone(String.valueOf(socialMediaDetail.getWorkPhone()));
             detail.setPrivatePhone(String.valueOf(socialMediaDetail.getPrivatePhone()));
+            detail.setWorkEmail(String.valueOf(socialMediaDetail.getWorkEmail()));
+            detail.setEmergencyPhone(String.valueOf(socialMediaDetail.getEmergencyPhone()));
+            detail.setHideEmergencyPhone(socialMediaDetail.isHideEmergencyPhone());
             currentClient.setContactDetail(contactDetailsGraphRepository.save(detail));
 
             // try saving with native repo of Node

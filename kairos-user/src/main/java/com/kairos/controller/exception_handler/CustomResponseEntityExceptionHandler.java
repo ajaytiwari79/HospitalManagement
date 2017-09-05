@@ -349,6 +349,17 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	}
 
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	@ExceptionHandler(value=ActionNotPermittedException.class)
+	@ResponseBody
+	public ResponseEnvelope actionNotPermittedExceptionHandler(ActionNotPermittedException ex,HttpServletRequest request) {
+		ResponseEnvelope errorMessage=new ResponseEnvelope();
+		errorMessage.setSuccess(false);
+		errorMessage.setPath(request.getRequestURL().toString());
+		errorMessage.setMessage(ex.getMessage());
+		return  errorMessage;
+
+	}
 
 	@ResponseStatus(HttpStatus.CONFLICT)
 	@ExceptionHandler(value = TaskDemandException.class)
@@ -362,6 +373,17 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	}
 
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ExceptionHandler(value = DataNotMatchedException.class)
+	@ResponseBody
+	public ResponseEnvelope dataNotMatchedExceptionHandler(DataNotMatchedException ex,HttpServletRequest request) {
+		ResponseEnvelope errorMessage=new ResponseEnvelope();
+		errorMessage.setSuccess(false);
+		errorMessage.setPath(request.getRequestURL().toString());
+		errorMessage.setMessage(ex.getMessage());
+		return  errorMessage;
+
+	}
 
 	@ResponseStatus(HttpStatus.CONFLICT)
 	@ExceptionHandler(value = FlsCredentialException.class)
