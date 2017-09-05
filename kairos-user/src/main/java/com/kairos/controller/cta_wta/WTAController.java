@@ -1,7 +1,7 @@
 package com.kairos.controller.cta_wta;
 
 import com.kairos.response.dto.web.WtaDTO;
-import com.kairos.service.cta_wta.WTAService;
+import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -1,4 +1,5 @@
 package com.kairos.controller.position;
+
 import com.kairos.persistence.model.user.position.PositionName;
 import com.kairos.service.position.PositionNameService;
 import com.kairos.util.response.ResponseHandler;

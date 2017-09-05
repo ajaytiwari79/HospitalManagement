@@ -12,7 +12,6 @@ import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATES;
 
-
 /**
  * Created by vipul on 2/8/17.
  * used to store Rule Template Category

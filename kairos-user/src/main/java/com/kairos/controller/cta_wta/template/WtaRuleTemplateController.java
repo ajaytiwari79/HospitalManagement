@@ -2,7 +2,7 @@ package com.kairos.controller.cta_wta.template;
 
 import com.kairos.response.dto.web.WTARuleTemplateDTO;
 import com.kairos.response.dto.web.WtaRuleTemplateDTO;
-import com.kairos.service.cta_wta.template.WtaRuleTemplateService;
+import com.kairos.service.agreement.wta.WtaRuleTemplateService;
 import com.kairos.util.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

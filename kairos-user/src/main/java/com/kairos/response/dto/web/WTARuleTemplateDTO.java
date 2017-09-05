@@ -7,50 +7,40 @@ import java.util.List;
  */
 public class WTARuleTemplateDTO {
 
-    protected String name;
-    protected String templateType;
-
-    protected String category;
-    protected boolean isActive;
-    protected String description;
-
-    protected String time;
-    protected List<String> balanceType;//multiple check boxes
-    protected boolean checkAgainstTimeRules;
-    protected long days;//no of days
-    protected String minimumRest;//hh:mm
-    protected long daysWorked;
-    protected long nightsWorked;
-    protected long interval;//
-    protected String intervalUnit;
-    protected long validationStartDate;
-    protected long minimumDaysOff;
-    protected long maximumVeto;
-    protected long numberShiftsPerPeriod;
-    protected long numberOfWeeks;
-    protected String fromDayOfWeek; //(day of week)
-    protected long fromTime;
-    protected long proportional;
-    protected String toDayOfWeek;
-    protected long toTime;// (number)
-    protected String continousDayRestHours;// (number)
-    protected String minimumDurationBetweenShifts ;//hours(number)
-    protected String continuousWeekRest;//(hours number)
-    protected String averageRest;//(hours number)
-    protected String shiftAffiliation;//(List checkbox)
-    protected long number;
-    protected boolean onlyCompositeShifts;//(checkbox)
-    protected List<String> activityType;// checkbox)
-    protected String activityCode;
-    protected String maximumAvgTime;
-
-    public String getMaximumAvgTime() {
-        return maximumAvgTime;
-    }
-
-    public void setMaximumAvgTime(String maximumAvgTime) {
-        this.maximumAvgTime = maximumAvgTime;
-    }
+    private String name;
+    private String templateType;
+    private String category;
+    private long timeLimit;//1,2,5
+    private List<String> balanceType;//1,2,5
+    private boolean checkAgainstTimeRules;//1,2,5
+    private long daysLimit;//3,6
+    private long minimumRest;//4,8
+    private long daysWorked;//4,7,8
+    private boolean isActive;
+    private String description;
+    private long nightsWorked;//9
+    private long intervalLength;//11
+    private String intervalUnit;//11
+    private long validationStartDateMillis;//9
+    private boolean balanceAdjustment;//11
+    private boolean useShiftTimes;//11
+    private long maximumAvgTime;//11
+    private double maximumVetoPercentage;//12
+    private long numberShiftsPerPeriod;//13
+    private long numberOfWeeks;//13
+    private String fromDayOfWeek;//13
+    private long fromTime;//13
+    private boolean proportional;//13
+    private long toTime;//13
+    private String toDayOfWeek;//13
+    private long continuousDayRestHours;// 15
+    private long minimumDurationBetweenShifts ;//16
+    private long continuousWeekRest;//17
+    private long averageRest;//(18
+    private String shiftAffiliation;//18
+    private long shiftsLimit;//19
+    private boolean onlyCompositeShifts;//19
+    private String activityCode;//20
 
     public String getName() {
         return name;
@@ -92,12 +82,12 @@ public class WTARuleTemplateDTO {
         this.description = description;
     }
 
-    public String getTime() {
-        return time;
+    public long getTimeLimit() {
+        return timeLimit;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setTimeLimit(long timeLimit) {
+        this.timeLimit = timeLimit;
     }
 
     public List<String> getBalanceType() {
@@ -116,67 +106,19 @@ public class WTARuleTemplateDTO {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
     }
 
-
-    @Override
-    public String toString() {
-        return "WTARuleTemplateDTO{" +
-                "name='" + name + '\'' +
-                ", templateType='" + templateType + '\'' +
-                ", ruleTemplateCategory='" + category + '\'' +
-                ", isActive=" + isActive +
-                ", description='" + description + '\'' +
-                ", time='" + time + '\'' +
-                ", balanceType=" + balanceType +
-                ", checkAgainstTimeRules=" + checkAgainstTimeRules +
-                ", days=" + days +
-                ", minimumRest='" + minimumRest + '\'' +
-                ", daysWorked=" + daysWorked +
-                ", nightsWorked=" + nightsWorked +
-                ", interval=" + interval +
-                ", intervalUnit='" + intervalUnit + '\'' +
-                ", validationStartDate=" + validationStartDate +
-                ", minimumDaysOff=" + minimumDaysOff +
-                ", maximumVeto=" + maximumVeto +
-                ", numberShiftsPerPeriod=" + numberShiftsPerPeriod +
-                ", numberOfWeeks=" + numberOfWeeks +
-                ", fromDayOfWeek='" + fromDayOfWeek + '\'' +
-                ", fromTime=" + fromTime +
-                ", proportional=" + proportional +
-                ", toDayOfWeek='" + toDayOfWeek + '\'' +
-                ", toTime=" + toTime +
-                ", continousDayRestHours='" + continousDayRestHours + '\'' +
-                ", minimumDurationBetweenShifts='" + minimumDurationBetweenShifts + '\'' +
-                ", continuousWeekRest='" + continuousWeekRest + '\'' +
-                ", averageRest='" + averageRest + '\'' +
-                ", shiftAffiliation=" + shiftAffiliation +
-                ", number=" + number +
-                ", onlyCompositeShifts=" + onlyCompositeShifts +
-                ", activityType=" + activityType +
-                ", activityCode=" + activityCode +
-                '}';
+    public long getDaysLimit() {
+        return daysLimit;
     }
 
-    public String getActivityCode() {
-        return activityCode;
+    public void setDaysLimit(long daysLimit) {
+        this.daysLimit = daysLimit;
     }
 
-    public void setActivityCode(String activityCode) {
-        this.activityCode = activityCode;
-    }
-
-    public long getDays() {
-        return days;
-    }
-
-    public void setDays(long days) {
-        this.days = days;
-    }
-
-    public String getMinimumRest() {
+    public long getMinimumRest() {
         return minimumRest;
     }
 
-    public void setMinimumRest(String minimumRest) {
+    public void setMinimumRest(long minimumRest) {
         this.minimumRest = minimumRest;
     }
 
@@ -188,6 +130,14 @@ public class WTARuleTemplateDTO {
         this.daysWorked = daysWorked;
     }
 
+    public long getValidationStartDateMillis() {
+        return validationStartDateMillis;
+    }
+
+    public void setValidationStartDateMillis(long validationStartDateMillis) {
+        this.validationStartDateMillis = validationStartDateMillis;
+    }
+
     public long getNightsWorked() {
         return nightsWorked;
     }
@@ -196,12 +146,28 @@ public class WTARuleTemplateDTO {
         this.nightsWorked = nightsWorked;
     }
 
-    public long getInterval() {
-        return interval;
+    public boolean isUseShiftTimes() {
+        return useShiftTimes;
     }
 
-    public void setInterval(long interval) {
-        this.interval = interval;
+    public void setUseShiftTimes(boolean useShiftTimes) {
+        this.useShiftTimes = useShiftTimes;
+    }
+
+    public long getMaximumAvgTime() {
+        return maximumAvgTime;
+    }
+
+    public void setMaximumAvgTime(long maximumAvgTime) {
+        this.maximumAvgTime = maximumAvgTime;
+    }
+
+    public long getIntervalLength() {
+        return intervalLength;
+    }
+
+    public void setIntervalLength(long intervalLength) {
+        this.intervalLength = intervalLength;
     }
 
     public String getIntervalUnit() {
@@ -212,28 +178,20 @@ public class WTARuleTemplateDTO {
         this.intervalUnit = intervalUnit;
     }
 
-    public long getValidationStartDate() {
-        return validationStartDate;
+    public boolean isBalanceAdjustment() {
+        return balanceAdjustment;
     }
 
-    public void setValidationStartDate(long validationStartDate) {
-        this.validationStartDate = validationStartDate;
+    public void setBalanceAdjustment(boolean balanceAdjustment) {
+        this.balanceAdjustment = balanceAdjustment;
     }
 
-    public long getMinimumDaysOff() {
-        return minimumDaysOff;
+    public double getMaximumVetoPercentage() {
+        return maximumVetoPercentage;
     }
 
-    public void setMinimumDaysOff(long minimumDaysOff) {
-        this.minimumDaysOff = minimumDaysOff;
-    }
-
-    public long getMaximumVeto() {
-        return maximumVeto;
-    }
-
-    public void setMaximumVeto(long maximumVeto) {
-        this.maximumVeto = maximumVeto;
+    public void setMaximumVetoPercentage(double maximumVetoPercentage) {
+        this.maximumVetoPercentage = maximumVetoPercentage;
     }
 
     public long getNumberShiftsPerPeriod() {
@@ -268,11 +226,11 @@ public class WTARuleTemplateDTO {
         this.fromTime = fromTime;
     }
 
-    public long getProportional() {
+    public boolean getProportional() {
         return proportional;
     }
 
-    public void setProportional(long proportional) {
+    public void setProportional(boolean proportional) {
         this.proportional = proportional;
     }
 
@@ -292,35 +250,35 @@ public class WTARuleTemplateDTO {
         this.toTime = toTime;
     }
 
-    public String getContinousDayRestHours() {
-        return continousDayRestHours;
+    public long getContinuousDayRestHours() {
+        return continuousDayRestHours;
     }
 
-    public void setContinousDayRestHours(String continousDayRestHours) {
-        this.continousDayRestHours = continousDayRestHours;
+    public void setContinuousDayRestHours(long continuousDayRestHours) {
+        this.continuousDayRestHours = continuousDayRestHours;
     }
 
-    public String getMinimumDurationBetweenShifts() {
+    public long getMinimumDurationBetweenShifts() {
         return minimumDurationBetweenShifts;
     }
 
-    public void setMinimumDurationBetweenShifts(String minimumDurationBetweenShifts) {
+    public void setMinimumDurationBetweenShifts(long minimumDurationBetweenShifts) {
         this.minimumDurationBetweenShifts = minimumDurationBetweenShifts;
     }
 
-    public String getContinuousWeekRest() {
+    public long getContinuousWeekRest() {
         return continuousWeekRest;
     }
 
-    public void setContinuousWeekRest(String continuousWeekRest) {
+    public void setContinuousWeekRest(long continuousWeekRest) {
         this.continuousWeekRest = continuousWeekRest;
     }
 
-    public String getAverageRest() {
+    public long getAverageRest() {
         return averageRest;
     }
 
-    public void setAverageRest(String averageRest) {
+    public void setAverageRest(long averageRest) {
         this.averageRest = averageRest;
     }
 
@@ -332,12 +290,12 @@ public class WTARuleTemplateDTO {
         this.shiftAffiliation = shiftAffiliation;
     }
 
-    public long getNumber() {
-        return number;
+    public long getShiftsLimit() {
+        return shiftsLimit;
     }
 
-    public void setNumber(long number) {
-        this.number = number;
+    public void setShiftsLimit(long shiftsLimit) {
+        this.shiftsLimit = shiftsLimit;
     }
 
     public boolean isOnlyCompositeShifts() {
@@ -348,11 +306,11 @@ public class WTARuleTemplateDTO {
         this.onlyCompositeShifts = onlyCompositeShifts;
     }
 
-    public List<String> getActivityType() {
-        return activityType;
+    public String getActivityCode() {
+        return activityCode;
     }
 
-    public void setActivityType(List<String> activityType) {
-        this.activityType = activityType;
+    public void setActivityCode(String activityCode) {
+        this.activityCode = activityCode;
     }
 }
