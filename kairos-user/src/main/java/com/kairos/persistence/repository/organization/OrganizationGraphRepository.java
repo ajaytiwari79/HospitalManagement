@@ -240,10 +240,11 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     List<Map<String, Object>> getSubOrgHierarchy(long organizationId);
 
     @Query("MATCH (c:Client{citizenDead:false})-[r:GET_SERVICE_FROM]-(o:Organization) where id(o)= {0}  with c,r\n" +
-            "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r\n" +
-            "OPTIONAL MATCH (ca)-[:ZIP_CODE]->(zipCode:ZipCode) with ca,c,r,zipCode \n" +
-            "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail)  with cd,ca,c,r,zipCode\n" +
-            "return {name:c.firstName+\" \"+c.lastName,id:id(c),age:c.age,joiningDate:r.joinDate,gender:c.gender,emailId:c.email,  citizenDead:c.citizenDead ,  civilianStatus:c.civilianStatus,contactNo:cd.privatePhone,drivingDistance:c.drivingDistance,emergencyNo:cd.emergencyNo,city:ca.city,address:ca.street1+\", \"+ca.houseNumber,zipcode:zipCode.zipCode } as Client ORDER BY c.firstName")
+            "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus)  with cs,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r,cs\n" +
+            "OPTIONAL MATCH (ca)-[:ZIP_CODE]->(zipCode:ZipCode) with ca,c,r,zipCode,cs \n" +
+            "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail)  with cd,ca,c,r,zipCode,cs\n" +
+            "return {name:c.firstName+\" \"+c.lastName,id:id(c),age:c.age,joiningDate:r.joinDate,gender:c.gender,emailId:cd.workEmail,  citizenDead:c.citizenDead ,  civilianStatus:cs.name,contactNo:cd.privatePhone,emergencyNo:cd.emergencyPhone,city:zipCode.name,address:ca.street1+\", \"+ca.houseNumber,zipcode:zipCode.zipCode } as Client ORDER BY c.firstName")
     List<Map<String, Object>> getAllClientsOfOrganization(long organizationId);
 
 
@@ -297,7 +298,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("Match (n:Organization) where id(n)={0}\n" +
             "Match (n)-[:"+TYPE_OF+"]->(orgType:OrganizationType) with collect(distinct id(orgType)) as orgId,n\n" +
             "optional match (n)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with collect(distinct id(subType)) as subTypeId,orgId,n\n" +
-            "match (n)-[:"+BUSINESS_TYPE+"]->(businessType:BusinessType) with subTypeId,orgId,n,collect(distinct id(businessType)) as businessTypeId\n" +
+            "optional match (n)-[:"+BUSINESS_TYPE+"]->(businessType:BusinessType) with subTypeId,orgId,n,collect(distinct id(businessType)) as businessTypeId\n" +
             "match (n)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) with subTypeId,orgId,n,businessTypeId,municipality\n" +
             "optional match (n)-[:"+INDUSTRY_TYPE+"]->(industryType:IndustryType) with orgId,subTypeId,businessTypeId,industryType,n,municipality\n" +
             "optional match  (n)-[:"+EMPLOYEE_LIMIT+"]->(employeeLimit:EmployeeLimit) with orgId,subTypeId,businessTypeId,employeeLimit,n,municipality,industryType\n" +

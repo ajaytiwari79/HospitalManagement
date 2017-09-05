@@ -57,7 +57,7 @@ public class TableConfigRestClient {
     }
 
     private final String getBaseUrl(){
-        String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
+        String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
         return baseUrl;
     }
 }

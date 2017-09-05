@@ -30,6 +30,8 @@ public class ContactDetail extends UserBaseEntity {
     private boolean hideWorkPhone;
     private boolean hideMobilePhone;
     private boolean protectedIdentity;
+    private String emergencyPhone;
+    private boolean hideEmergencyPhone;
 
 
     public ContactDetail(String workEmail, String privateEmail, String workPhone, String landLinePhone, String privatePhone, String mobilePhone, String facebookAccount, String twitterAccount) {
@@ -174,6 +176,22 @@ public class ContactDetail extends UserBaseEntity {
         this.protectedIdentity = protectedIdentity;
     }
 
+    public String getEmergencyPhone() {
+        return emergencyPhone;
+    }
+
+    public void setEmergencyPhone(String emergencyPhone) {
+        this.emergencyPhone = emergencyPhone;
+    }
+
+    public boolean isHideEmergencyPhone() {
+        return hideEmergencyPhone;
+    }
+
+    public void setHideEmergencyPhone(boolean hideEmergencyPhone) {
+        this.hideEmergencyPhone = hideEmergencyPhone;
+    }
+
     public void updateContactInfo(String workEmail, String workPhone, String landLinePhone) {
         this.workEmail = workEmail;
         this.workPhone = workPhone;
@@ -190,6 +208,8 @@ public class ContactDetail extends UserBaseEntity {
             contactNumbers.put("landLinePhone",this.landLinePhone);
         if(this.hideWorkPhone == false)
             contactNumbers.put("workPhone",this.workPhone);
+        if(this.hideEmergencyPhone == false)
+             contactNumbers.put("emergencyPhone",this.emergencyPhone);
         return contactNumbers;
     }
 }

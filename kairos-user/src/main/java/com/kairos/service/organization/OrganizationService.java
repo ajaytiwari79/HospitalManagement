@@ -849,8 +849,7 @@ public class OrganizationService extends UserBaseService {
             localAreaTagsList.add(map.get("tags"));
         }
         unitData.put("localAreaTags", localAreaTagsList);
-        List<Long> serviceIds = organizationServiceRepository.getServiceIdsByOrgId(unitId);
-        unitData.put("serviceTypes", organizationServiceRepository.findAll(serviceIds));
+        unitData.put("serviceTypes", organizationServiceRepository.getOrganizationServiceByOrgId(unitId));
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
 
         if (timeSlotData != null) {
