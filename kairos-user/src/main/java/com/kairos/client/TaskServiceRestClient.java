@@ -157,9 +157,28 @@ public class TaskServiceRestClient {
 
 
     public List<EscalatedTasksWrapper> getStaffNotAssignedTasks(Long unitId){
-        return Collections.emptyList();
 
+        final String baseUrl=getBaseUrl(true);
 
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EscalatedTasksWrapper>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EscalatedTasksWrapper>>>(){};
+            ResponseEntity<RestTemplateResponseEnvelope<List<EscalatedTasksWrapper>>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/getStaffNotAssignedTasks",
+                            HttpMethod.GET,null, typeReference);
+
+            RestTemplateResponseEnvelope<List<EscalatedTasksWrapper>> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
     }
 
 
