@@ -1,10 +1,12 @@
 package com.kairos.service.agreement.wta;
 
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
+import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
@@ -26,8 +28,10 @@ public class RuleTemplateCategoryService extends UserBaseService {
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
     @Inject
     private CountryService countryService;
+
     @Inject
-    private CountryGraphRepository countryGraphRepository;
+    WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
+    @Inject private CountryGraphRepository countryGraphRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -78,13 +82,21 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
 
     public boolean deleteRuleTemplateCategory(long countryId, long templateCategoryId) {
-        if (countryService.getCountryById(countryId) == null) {
-            throw new DataNotFoundByIdException("Country does not exist");
+        RuleTemplateCategory ruleTemplateCategory=ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
+        if (ruleTemplateCategory==null) {
+            throw new DataNotFoundByIdException("RULE template ruleTemplateCategory does not exist"+templateCategoryId);
+        }
+        if(ruleTemplateCategory.getName().equals("NONE"))
+        {
+            throw new ActionNotPermittedException("Can't delete none template category "+templateCategoryId);
         }
 
-        if (!exists(templateCategoryId)) {
-            throw new DataNotFoundByIdException("RULE template ruleTemplateCategory does not exist");
-        }
+        List<Long> wtaBaseRuleTemplateList =wtaBaseRuleTemplateGraphRepository.findAllWTABelongsByTemplateCategoryId(templateCategoryId);
+        RuleTemplateCategory noneRuleTemplateCategory=ruleTemplateCategoryGraphRepository.findByName(countryId,"NONE");
+
+        wtaBaseRuleTemplateGraphRepository.deleteRelationOfRuleTemplateCategoryAndWTA(templateCategoryId,wtaBaseRuleTemplateList);
+
+        wtaBaseRuleTemplateGraphRepository.setAllWTAWithCategoryNone(noneRuleTemplateCategory.getId(),wtaBaseRuleTemplateList);
 
         ruleTemplateCategoryGraphRepository.softDelete(templateCategoryId);
         return true;
@@ -97,9 +109,14 @@ public class RuleTemplateCategoryService extends UserBaseService {
             throw new DataNotFoundByIdException("Country does not exist");
         }
 
+
         RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if (ruleTemplateCategoryObj.getName() == ruleTemplateCategory.getName()) {
             throw new DuplicateDataException("Can't update, rule template ruleTemplateCategory name already in country");
+        }
+        if(ruleTemplateCategoryObj.getName().equals("NONE"))
+        {
+            throw new ActionNotPermittedException("Can't rename NONE template category "+templateCategoryId);
         }
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategory.getDescription());
