@@ -803,6 +803,9 @@ public class Client extends User {
         map.put("hideWorkPhone", this.contactDetail != null ? this.contactDetail.isHideWorkPhone() : "");
         map.put("hidePrivatePhone", this.contactDetail != null ? this.contactDetail.isHidePrivatePhone() : "");
 
+        map.put("emergencyPhone", this.contactDetail != null ? this.contactDetail.getEmergencyPhone() : "");
+        map.put("hideEmergencyPhone", this.contactDetail != null ? this.contactDetail.isHideEmergencyPhone() : "");
+
         return map;
     }
 

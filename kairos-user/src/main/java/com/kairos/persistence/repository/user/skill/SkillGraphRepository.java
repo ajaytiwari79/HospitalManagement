@@ -63,7 +63,7 @@ public interface SkillGraphRepository extends GraphRepository<Skill>{
     @Query("MATCH (skill:Skill)-[:HAS_CATEGORY]->(skillCategory:SkillCategory)-[:BELONGS_TO]-(country:Country) where id(country) = {0} return {skills: case when skill is NULL then [] else collect({id:id(skill),name:skill.name,description:skill.description}) END,id:id(skillCategory),name:skillCategory.name,description:skillCategory.description} AS result")
     List<Map<String,Object>> getSkillsByCountryId(long countryId);
 
-    @Query("MATCH (skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory{isEnabled:true})-[:BELONGS_TO]->(country:Country) where id(country)={0} return {id:id(skillCategory),name:skillCategory.name,skills:collect({skillId:id(skill),name:skill.name,parentId:id(skillCategory)})} AS data")
+    @Query("MATCH (skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory{isEnabled:true})-[:BELONGS_TO]->(country:Country) where id(country)={0} return {id:id(skillCategory),name:skillCategory.name,skills:collect({id:id(skill),name:skill.name,parentId:id(skillCategory)})} AS data")
     List<Map<String,Object>> getSkillsByCountryForTaskType(long countryId);
 
     @Query("MATCH (skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory{isEnabled:true}) return {id:id(skillCategory),name:skillCategory.name,skills:collect({skillId:id(skill),name:skill.name,parentId:id(skillCategory)})} AS data")
