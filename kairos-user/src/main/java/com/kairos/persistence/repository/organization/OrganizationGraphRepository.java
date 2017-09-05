@@ -202,14 +202,6 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "collect ({name:co.name,id:id(co),level:co.organizationLevel}) as organizationList")
     List<Map<String, Object>> getOrganizationChildList(Long id);
 
-    @Query("MATCH (s:Staff)-[BELONGS_TO]->(u:User) WHERE id(s) = 35  with u as user  " +
-            "MATCH (s:Staff)-[:BELONGS_TO]->(user) with s as staff  " +
-            "MATCH (t:Team)-[r:TEAM_HAS_MEMBER]->(staff) where r.role =\"VISITATOR\" with t as team  " +
-            "MATCH (g:Group)-[:HAS_TEAM]-(team) with g as group " +
-            "MATCH (o:Organization)-[:HAS_GROUP]->(group) " +
-            "with o as org OPTIONAL " +
-            "MATCH (org)-[:HAS_SUB_ORGANIZATION]->(co:Organization) return org")
-    List<Map<String, Object>> getUnitHierarchy(Long clientId);
 
     @Query("MATCH (o:Organization)-[:HAS_GROUP]-(g:Group) where id(o)={0} with g as grp MATCH (grp)-[:HAS_TEAM]-(t:Team) return { id:id(t) , name:t.name} as result")
     List<Map<String, Object>> getUnitTeams(Long unitId);

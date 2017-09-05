@@ -620,5 +620,10 @@ public class ClientController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.getClientAggregation(unitId));
     }
 
+    @RequestMapping(value = "/clientsByIds",method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getClientsByIds(@RequestBody List<Long> citizenIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.getClientsByIdsInList(citizenIds));
+    }
+
 
 }
