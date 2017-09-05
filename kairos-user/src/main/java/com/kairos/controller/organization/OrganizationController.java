@@ -46,7 +46,7 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 /**
  * OrganizationController
  * 1.Calls Organization Service
- * 2. Call for CRUD operatio`n on Organization using OrganizationService.
+ * 2. Call for CRUD operation on Organization using OrganizationService.
  */
 @RestController
 @RequestMapping(API_ORGANIZATION_URL)
@@ -922,6 +922,15 @@ public class OrganizationController {
     public ResponseEntity<Map<String,Object>> getPrerequisitesForTimeCareTask(@RequestBody GetWorkShiftsFromWorkPlaceByIdResult workShift) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getPrerequisitesForTimeCareTask(workShift));
+    }
+
+
+    @RequestMapping(value = "/verifyOrganizationExpertise", method = RequestMethod.POST)
+    @ApiOperation("verify organization skill and  and expertize are in DB")
+    public ResponseEntity<Map<String,Object>>
+    verifyOrganizationExpertise(@RequestBody OrganizationMappingActivityTypeDTO organizationMappingActivityTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.verifyOrganizationExpertise(organizationMappingActivityTypeDTO));
     }
 
 }
