@@ -28,14 +28,11 @@ public class TaskTypeRestClient {
      * @return
              */
     public List<OrgTaskTypeAggregateResult> getTaskTypesOfUnit(Long unitId) {
-
-        final String baseUrl=getBaseUrl(true);
-
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<OrgTaskTypeAggregateResult>>> restExchange =
                     restTemplate.exchange(
-                            "http://zuulservice/activity/api/v1/task_demand/unit/{unitId}",
+                            "http://zuulservice/kairos/activity/api/v1/task_demand/unit/{unitId}",
                             HttpMethod.
                                     GET,null, typeReference,unitId);
 
@@ -57,10 +54,10 @@ public class TaskTypeRestClient {
 
     private final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
+            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
             return baseUrl;
         }else{
-            String baseUrl=new StringBuilder("http://zuulservice/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
+            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
             return baseUrl;
         }
 
