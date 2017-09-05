@@ -14,43 +14,53 @@ import java.util.List;
 @QueryResult
 public class WTABaseRuleTemplateDTO {
 
+    private Long id;
     private String name;
     private String templateType;
-    private Long id;
     private RuleTemplateCategory ruleTemplateCategory;
+    private Long timeLimit;
+    private List<String> balanceType;
+    private Boolean checkAgainstTimeRules;
+    private Long daysLimit;
+    private Long minimumRest;//hh:mm
+    private Long daysWorked;
     private Boolean isActive;
     private String description;
-    private Long daysWorked;
-    private Long number;
     private Long creationDate;
     private Long lastModificationDate;
-    private String time;
-    private Long days;//no of days
-    private String minimumRest;
-    private Boolean checkAgainstTimeRules;
     private Long nightsWorked;
-    private Long minimumDaysOff;
+    private Long interval;
+    private String intervalUnit;
+    private Long validationStartDateMillis;
+
     private Boolean balanceAdjustment;
-    private Boolean calculatedShift;
-    private String maximumAvgTime;
-    private Long maximumVeto;
+    private Boolean useShiftTimes;
+    private Long maximumAvgTime;
+    private Double maximumVetoPercentage;
+
     private Long numberShiftsPerPeriod;
     private Long numberOfWeeks;
-    private String fromDayOfWeek; //(day of week)
+    private String fromDayOfWeek;
     private Long fromTime;
     private Long proportional;
-    private String minimumDurationBetweenShifts;
-    private String continuousWeekRest;
-    private String continuousDayRestHours;
-    private String averageRest;//(hours number)
-    private String shiftAffiliation;//(List checkbox)
-    private List<String> balanceType;//multiple check boxes
-    private Boolean onlyCompositeShifts;//(checkbox)
-    private Long interval;//
-    private String intervalUnit;
-    private Long validationStartDate;
-    private String activityCode;// checkbox)
+    private Long toTime;
+    private String toDayOfWeek;
+    private Long continuousDayRestHours;
+    private Long minimumDurationBetweenShifts;
+    private Long continuousWeekRest;
+    private Long averageRest;
+    private String shiftAffiliation;
+    private Long shiftsLimit;
+    private Boolean onlyCompositeShifts;
+    private String activityCode;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -68,20 +78,60 @@ public class WTABaseRuleTemplateDTO {
         this.templateType = templateType;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public RuleTemplateCategory getRuleTemplateCategory() {
         return ruleTemplateCategory;
     }
 
     public void setRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
         this.ruleTemplateCategory = ruleTemplateCategory;
+    }
+
+    public Long getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Long timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
+    public List<String> getBalanceType() {
+        return balanceType;
+    }
+
+    public void setBalanceType(List<String> balanceType) {
+        this.balanceType = balanceType;
+    }
+
+    public Boolean getCheckAgainstTimeRules() {
+        return checkAgainstTimeRules;
+    }
+
+    public void setCheckAgainstTimeRules(Boolean checkAgainstTimeRules) {
+        this.checkAgainstTimeRules = checkAgainstTimeRules;
+    }
+
+    public Long getDaysLimit() {
+        return daysLimit;
+    }
+
+    public void setDaysLimit(Long daysLimit) {
+        this.daysLimit = daysLimit;
+    }
+
+    public Long getMinimumRest() {
+        return minimumRest;
+    }
+
+    public void setMinimumRest(Long minimumRest) {
+        this.minimumRest = minimumRest;
+    }
+
+    public Long getDaysWorked() {
+        return daysWorked;
+    }
+
+    public void setDaysWorked(Long daysWorked) {
+        this.daysWorked = daysWorked;
     }
 
     public Boolean getActive() {
@@ -100,22 +150,6 @@ public class WTABaseRuleTemplateDTO {
         this.description = description;
     }
 
-    public Long getDaysWorked() {
-        return daysWorked;
-    }
-
-    public void setDaysWorked(Long daysWorked) {
-        this.daysWorked = daysWorked;
-    }
-
-    public Long getNumber() {
-        return number;
-    }
-
-    public void setNumber(Long number) {
-        this.number = number;
-    }
-
     public Long getCreationDate() {
         return creationDate;
     }
@@ -132,38 +166,6 @@ public class WTABaseRuleTemplateDTO {
         this.lastModificationDate = lastModificationDate;
     }
 
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public Long getDays() {
-        return days;
-    }
-
-    public void setDays(Long days) {
-        this.days = days;
-    }
-
-    public String getMinimumRest() {
-        return minimumRest;
-    }
-
-    public void setMinimumRest(String minimumRest) {
-        this.minimumRest = minimumRest;
-    }
-
-    public Boolean getCheckAgainstTimeRules() {
-        return checkAgainstTimeRules;
-    }
-
-    public void setCheckAgainstTimeRules(Boolean checkAgainstTimeRules) {
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-    }
-
     public Long getNightsWorked() {
         return nightsWorked;
     }
@@ -172,12 +174,28 @@ public class WTABaseRuleTemplateDTO {
         this.nightsWorked = nightsWorked;
     }
 
-    public Long getMinimumDaysOff() {
-        return minimumDaysOff;
+    public Long getInterval() {
+        return interval;
     }
 
-    public void setMinimumDaysOff(Long minimumDaysOff) {
-        this.minimumDaysOff = minimumDaysOff;
+    public void setInterval(Long interval) {
+        this.interval = interval;
+    }
+
+    public String getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
+
+    public Long getValidationStartDateMillis() {
+        return validationStartDateMillis;
+    }
+
+    public void setValidationStartDateMillis(Long validationStartDateMillis) {
+        this.validationStartDateMillis = validationStartDateMillis;
     }
 
     public Boolean getBalanceAdjustment() {
@@ -188,28 +206,28 @@ public class WTABaseRuleTemplateDTO {
         this.balanceAdjustment = balanceAdjustment;
     }
 
-    public Boolean getCalculatedShift() {
-        return calculatedShift;
+    public Boolean getUseShiftTimes() {
+        return useShiftTimes;
     }
 
-    public void setCalculatedShift(Boolean calculatedShift) {
-        this.calculatedShift = calculatedShift;
+    public void setUseShiftTimes(Boolean useShiftTimes) {
+        this.useShiftTimes = useShiftTimes;
     }
 
-    public String getMaximumAvgTime() {
+    public Long getMaximumAvgTime() {
         return maximumAvgTime;
     }
 
-    public void setMaximumAvgTime(String maximumAvgTime) {
+    public void setMaximumAvgTime(Long maximumAvgTime) {
         this.maximumAvgTime = maximumAvgTime;
     }
 
-    public Long getMaximumVeto() {
-        return maximumVeto;
+    public Double getMaximumVetoPercentage() {
+        return maximumVetoPercentage;
     }
 
-    public void setMaximumVeto(Long maximumVeto) {
-        this.maximumVeto = maximumVeto;
+    public void setMaximumVetoPercentage(Double maximumVetoPercentage) {
+        this.maximumVetoPercentage = maximumVetoPercentage;
     }
 
     public Long getNumberShiftsPerPeriod() {
@@ -252,35 +270,51 @@ public class WTABaseRuleTemplateDTO {
         this.proportional = proportional;
     }
 
-    public String getMinimumDurationBetweenShifts() {
-        return minimumDurationBetweenShifts;
+    public Long getToTime() {
+        return toTime;
     }
 
-    public void setMinimumDurationBetweenShifts(String minimumDurationBetweenShifts) {
-        this.minimumDurationBetweenShifts = minimumDurationBetweenShifts;
+    public void setToTime(Long toTime) {
+        this.toTime = toTime;
     }
 
-    public String getContinuousWeekRest() {
-        return continuousWeekRest;
+    public String getToDayOfWeek() {
+        return toDayOfWeek;
     }
 
-    public void setContinuousWeekRest(String continuousWeekRest) {
-        this.continuousWeekRest = continuousWeekRest;
+    public void setToDayOfWeek(String toDayOfWeek) {
+        this.toDayOfWeek = toDayOfWeek;
     }
 
-    public String getContinuousDayRestHours() {
+    public Long getContinuousDayRestHours() {
         return continuousDayRestHours;
     }
 
-    public void setContinuousDayRestHours(String continuousDayRestHours) {
+    public void setContinuousDayRestHours(Long continuousDayRestHours) {
         this.continuousDayRestHours = continuousDayRestHours;
     }
 
-    public String getAverageRest() {
+    public Long getMinimumDurationBetweenShifts() {
+        return minimumDurationBetweenShifts;
+    }
+
+    public void setMinimumDurationBetweenShifts(Long minimumDurationBetweenShifts) {
+        this.minimumDurationBetweenShifts = minimumDurationBetweenShifts;
+    }
+
+    public Long getContinuousWeekRest() {
+        return continuousWeekRest;
+    }
+
+    public void setContinuousWeekRest(Long continuousWeekRest) {
+        this.continuousWeekRest = continuousWeekRest;
+    }
+
+    public Long getAverageRest() {
         return averageRest;
     }
 
-    public void setAverageRest(String averageRest) {
+    public void setAverageRest(Long averageRest) {
         this.averageRest = averageRest;
     }
 
@@ -292,12 +326,12 @@ public class WTABaseRuleTemplateDTO {
         this.shiftAffiliation = shiftAffiliation;
     }
 
-    public List<String> getBalanceType() {
-        return balanceType;
+    public Long getShiftsLimit() {
+        return shiftsLimit;
     }
 
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
+    public void setShiftsLimit(Long shiftsLimit) {
+        this.shiftsLimit = shiftsLimit;
     }
 
     public Boolean getOnlyCompositeShifts() {
@@ -306,30 +340,6 @@ public class WTABaseRuleTemplateDTO {
 
     public void setOnlyCompositeShifts(Boolean onlyCompositeShifts) {
         this.onlyCompositeShifts = onlyCompositeShifts;
-    }
-
-    public Long getInterval() {
-        return interval;
-    }
-
-    public void setInterval(Long interval) {
-        this.interval = interval;
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
-
-    public Long getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(Long validationStartDate) {
-        this.validationStartDate = validationStartDate;
     }
 
     public String getActivityCode() {
