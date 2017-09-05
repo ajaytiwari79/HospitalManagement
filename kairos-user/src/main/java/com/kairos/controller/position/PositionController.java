@@ -1,5 +1,6 @@
 package com.kairos.controller.position;
 
+
 import com.kairos.response.dto.web.PositionDTO;
 import com.kairos.service.position.PositionService;
 import com.kairos.util.response.ResponseHandler;
@@ -13,7 +14,6 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -67,10 +67,6 @@ public class PositionController {
     ResponseEntity<Map<String, Object>> getAllPositionByStaff(@PathVariable Long organizationId,@PathVariable Long staffId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,positionService.getAllPositionByStaff(organizationId,staffId));
     }
-
-
-
-
 
 
 }

@@ -12,50 +12,12 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class WTABaseRuleTemplate extends UserBaseEntity {
+public class WTABaseRuleTemplate extends UserBaseEntity{
 
     protected String name;
     protected String templateType;
     protected boolean isActive=true;
     protected String description;
-    protected RuleTemplateCategory ruleTemplateCategory;
-
-    public RuleTemplateCategory getRuleTemplateCategory() {
-        return ruleTemplateCategory;
-    }
-
-    public void setRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
-        this.ruleTemplateCategory = ruleTemplateCategory;
-    }
-    //
-  /* protected String time;
-    protected List<String> balanceType;//multiple check boxes
-    protected boolean checkAgainstTimeRules;
-    protected long days;//no of days
-    protected String minimumRest;//hh:mm
-    protected long daysWorked;
-    protected long nightsWorked;      // corrected Spellings
-    protected long interval;//
-    protected String intervalUnit;
-    protected long validationStartDate;
-    protected long minimumDaysOff;
-    protected long maximumVeto;
-    protected long numberShiftsPerPeriod;
-    protected long numberOfWeeks;
-    protected String fromDayOfWeek; //(day of week)
-    protected long fromTime;
-    protected long proportional;
-    protected String toDayOfWeek;
-    protected long toTime;// (number)
-    protected long continuousDayRestHours;// (number)         // corrected Spelling
-    protected long minimumDurationBetweenShifts ;//hours(number)
-    protected long continuousWeekRest;//(hours number)
-    protected long averageRest;//(hours number)
-    protected List<String> shiftAffiliation;//(List checkbox)
-    protected long number;
-    protected boolean onlyCompositeShifts;//(checkbox)
-    protected List<String> activityType;// checkbox)
-*/
 
     public WTABaseRuleTemplate(){}
 
@@ -64,7 +26,6 @@ public class WTABaseRuleTemplate extends UserBaseEntity {
         this.templateType = templateType;
         this.description = description;
     }
-
 
     public String getName() {
         return name;
@@ -82,7 +43,6 @@ public class WTABaseRuleTemplate extends UserBaseEntity {
         this.templateType = templateType;
     }
 
-
     public boolean isActive() {
         return isActive;
     }
@@ -99,13 +59,5 @@ public class WTABaseRuleTemplate extends UserBaseEntity {
         this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return "WTABaseRuleTemplate{" +
-                "name='" + name + '\'' +
-                ", templateType='" + templateType + '\'' +
-                 ", isActive=" + isActive +
-                ", description='" + description + '\'' +
-                '}';
-    }
+
 }
