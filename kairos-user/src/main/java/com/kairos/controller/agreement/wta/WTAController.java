@@ -1,4 +1,4 @@
-package com.kairos.controller.cta_wta;
+package com.kairos.controller.agreement.wta;
 
 import com.kairos.response.dto.web.WtaDTO;
 import com.kairos.service.agreement.wta.WTAService;
@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_V1;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.PARENT_ORGANIZATION_URL;
-
+import static com.kairos.constants.ApiConstants.*;
 
 /**
  * Created by pawanmandhan on 2/8/17.
@@ -39,7 +36,7 @@ public class WTAController {
 
     @ApiOperation(value = "Update WTA")
     @PutMapping(value = "/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long wtaId,@RequestBody WtaDTO wta) {
+    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long wtaId, @RequestBody WtaDTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWta(wtaId,wta));
     }
 
@@ -104,8 +101,13 @@ public class WTAController {
     * */
     @ApiOperation(value = "Get All organization and suborganization based on ruleTemplateId")
     @RequestMapping(value = "organization_type/{organizationTypeId}/wta/{wtaId}", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getAllWTAWithWTAId(@PathVariable long wtaId,@PathVariable long countryId) {
+    public ResponseEntity<Map<String, Object>> getAllWTAWithWTAId(@PathVariable long wtaId, @PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAWithWTAId(countryId,wtaId));
     }
 
+    @ApiOperation(value = "link unlink wta with org Type")
+    @PutMapping(value = "organization_type/{organizationTypeId}/wta/{wtaId}")
+    public ResponseEntity<Map<String, Object>> setWtaWithOrganizationType(@PathVariable long wtaId, @PathVariable long organizationTypeId, @RequestParam(value="checked") boolean checked) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setWtaWithOrganizationType(wtaId,organizationTypeId,checked));
+    }
 }

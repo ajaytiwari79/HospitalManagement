@@ -1,4 +1,4 @@
-package com.kairos.controller.cta_wta.template;
+package com.kairos.controller.agreement.wta;
 
 import com.kairos.response.dto.web.WTARuleTemplateDTO;
 import com.kairos.response.dto.web.WtaRuleTemplateDTO;
@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
-
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -38,7 +37,7 @@ public class WtaRuleTemplateController {
     }
 
     @RequestMapping(value = "/rule_templates/{templateType}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId,@PathVariable String templateType, @RequestBody WTARuleTemplateDTO templateDTO) {
+    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @RequestBody WTARuleTemplateDTO templateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaRuleTemplateService.updateRuleTemplate(countryId,templateType, templateDTO));
     }
 

@@ -1,4 +1,4 @@
-package com.kairos.controller.cta_wta.template;
+package com.kairos.controller.agreement.wta;
 
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.service.agreement.wta.RuleTemplateCategoryService;
@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
-
 
 /**
  * Created by vipul on 2/8/17.
