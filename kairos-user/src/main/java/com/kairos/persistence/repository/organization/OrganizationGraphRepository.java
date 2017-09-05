@@ -308,7 +308,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("Match (n:Organization) where id(n)={0}\n" +
             "Match (n)-[:"+TYPE_OF+"]->(orgType:OrganizationType) with collect(distinct id(orgType)) as orgId,n\n" +
             "optional match (n)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with collect(distinct id(subType)) as subTypeId,orgId,n\n" +
-            "match (n)-[:"+BUSINESS_TYPE+"]->(businessType:BusinessType) with subTypeId,orgId,n,collect(distinct id(businessType)) as businessTypeId\n" +
+            "optional match (n)-[:"+BUSINESS_TYPE+"]->(businessType:BusinessType) with subTypeId,orgId,n,collect(distinct id(businessType)) as businessTypeId\n" +
             "match (n)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) with subTypeId,orgId,n,businessTypeId,municipality\n" +
             "optional match (n)-[:"+INDUSTRY_TYPE+"]->(industryType:IndustryType) with orgId,subTypeId,businessTypeId,industryType,n,municipality\n" +
             "optional match  (n)-[:"+EMPLOYEE_LIMIT+"]->(employeeLimit:EmployeeLimit) with orgId,subTypeId,businessTypeId,employeeLimit,n,municipality,industryType\n" +
