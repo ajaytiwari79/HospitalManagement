@@ -1224,4 +1224,8 @@ public class ClientService extends UserBaseService {
         return escalatedTaskData;
 
     }
+
+    public List<Client> getClientsByIdsInList(List<Long> citizenIds){
+        return clientGraphRepository.findByIdIn(citizenIds);
+    }
 }

@@ -1,9 +1,6 @@
 package com.kairos.persistence.repository.organization;
 
-import com.kairos.persistence.model.organization.OpeningHours;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
-import com.kairos.persistence.model.organization.OrganizationQueryResult;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.user.client.Client;
@@ -205,14 +202,6 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "collect ({name:co.name,id:id(co),level:co.organizationLevel}) as organizationList")
     List<Map<String, Object>> getOrganizationChildList(Long id);
 
-    @Query("MATCH (s:Staff)-[BELONGS_TO]->(u:User) WHERE id(s) = 35  with u as user  " +
-            "MATCH (s:Staff)-[:BELONGS_TO]->(user) with s as staff  " +
-            "MATCH (t:Team)-[r:TEAM_HAS_MEMBER]->(staff) where r.role =\"VISITATOR\" with t as team  " +
-            "MATCH (g:Group)-[:HAS_TEAM]-(team) with g as group " +
-            "MATCH (o:Organization)-[:HAS_GROUP]->(group) " +
-            "with o as org OPTIONAL " +
-            "MATCH (org)-[:HAS_SUB_ORGANIZATION]->(co:Organization) return org")
-    List<Map<String, Object>> getUnitHierarchy(Long clientId);
 
     @Query("MATCH (o:Organization)-[:HAS_GROUP]-(g:Group) where id(o)={0} with g as grp MATCH (grp)-[:HAS_TEAM]-(t:Team) return { id:id(t) , name:t.name} as result")
     List<Map<String, Object>> getUnitTeams(Long unitId);
@@ -436,6 +425,23 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as selectedServices return {selectedServices:collect(selectedServices)} as data")
     List<Map<String, Object>> getImportedServicesForUnit(long organizationId);
 
+//    @Query("Match (country:Country) where id(country)={0} with country\n" +
+//            "MATCH (bt:BusinessType{isEnabled:true})-[:"+BELONGS_TO+"]->(country) with collect(bt) as bt,country\n" +
+//            "optional Match (country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) with collect(level) as level,bt,country\n" +
+//            "MATCH (ot:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(country) WITH ot,bt,level\n" +
+//            "OPTIONAL MATCH (ot)-[:"+HAS_SUB_TYPE+"]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else  collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot)} as orgTypes,bt,level\n" +
+//            "return collect(orgTypes) as organizationTypes,bt as businessTypes,level as levels")
+//    OrganizationCreationData getOrganizationCreationData(long countryId);countryId
 
+    @Query("Match (org:Organization)-[:"+HAS_LEVEL+"]->(level:Level) where id(org)={0} return level")
+    Level getLevelOfOrganization(long organizationId);
+
+    @Query("match (org:OrganizationType{isEnable:true}) where id(org) in {0} \n" +
+            "return count(org) as matched ")
+    Long findAllOrgCountMatchedByIds(List<Long> Ids);
+
+    @Query("Match (org:Organization) WHERE NOT ((org)<-[:"+PHASE_BELONGS_TO+"]-(:Phase{disabled:false}))\n" +
+            "return  org")
+    List<Organization> getAllOrganizationIdsWithoutPhases();
 
 }

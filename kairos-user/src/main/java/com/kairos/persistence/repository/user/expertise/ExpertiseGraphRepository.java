@@ -44,4 +44,8 @@ public interface ExpertiseGraphRepository extends GraphRepository<Expertise> {
             "optional Match (expertise)-[r:"+EXPERTISE_HAS_SKILLS+"]->(skill) with collect({id:id(skill),name:skill.name,isSelected:case when r.isEnabled then true else false end}) as skill,skillCategory\n" +
             "return collect({id:id(skillCategory),name:skillCategory.name,children:skill}) as skills")
     ExpertiseSkillQueryResult getExpertiseSkills(long expertiseId, long countryId);
+
+    @Query("match (e:Expertise{isEnabled:true}) where id(e) in {0} \n" +
+            "return count (e) as totalMatched")
+    Long findAllExpertiseCountMatchedByIds(List<Long> ids);
 }
