@@ -1,6 +1,7 @@
 package com.kairos.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.persistence.model.user.auth.UserPrincipal;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
@@ -17,8 +19,15 @@ public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
 
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
+        UserPrincipal user=(UserPrincipal)authentication.getUserAuthentication().getPrincipal();
         final Map<String, Object> authDetails = (Map<String, Object>)authentication.getDetails();
-        ((DefaultOAuth2AccessToken)accessToken).setAdditionalInformation(authDetails);
+
+        Map<String, Object> additionalInfo = new HashMap<>();
+        Map<String, Object> userInfo = new HashMap<>();
+              userInfo.put("isPasswordUpdated",((CurrentUserDetails)user.getDetails()).isPasswordUpdated());
+
+          additionalInfo.put("userInfo",userInfo);
+         ((DefaultOAuth2AccessToken)accessToken).setAdditionalInformation(additionalInfo);
         return super.enhance(accessToken, authentication);
     }
 

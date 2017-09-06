@@ -56,8 +56,9 @@ public class AuthController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation(value = "Authenticate User")
     ResponseEntity<Map<String, Object>> checkUser(@RequestBody User user) {
-//        logger.info("Data:\n Username:" + user.getUserName() + "\n Password:" + user.getPassword());'
-        logger.info("user srevice is"+userService);
+
+        logger.info("user info is {}",user);
+
         Map<String,Object> response = userService.authenticateUser(user);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.UNAUTHORIZED, false, response);
@@ -65,6 +66,9 @@ public class AuthController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
 
     }
+
+
+
 
 
     @RequestMapping(value = "/login/mobile", method = RequestMethod.POST)

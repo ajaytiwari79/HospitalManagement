@@ -145,24 +145,16 @@ public class UserService extends UserBaseService {
         if (currentUser == null) {
             return null;
         }
-        generateTokenToUser(currentUser);
-        Map<String, Object> map = new HashMap<>();
-        map.put("email", currentUser.getEmail());
-        map.put("isPasswordUpdated", currentUser.isPasswordUpdated());
-        map.put("accessToken",currentUser.getAccessToken());
-        return map;
 
-       /* *//*ContactDetail contactDetail = user.getContactDetail();
-        if(contactDetail == null && contactDetail.getMobilePhone() != null){
-            throw new InternalError("phone number is null");
-        }*//*
+
         int otp = OtpGenerator.generateOtp();
         user.setOtp(otp);
         userGraphRepository.save(user);
-        //send otp in sms
-        String message = OTP_MESSAGE + otp;
-        smsService.sendSms("+919643042678", message);*/
-        //return true;
+        Map<String, Object> map = new HashMap<>();
+        map.put("email", currentUser.getEmail());
+        //map.put("isPasswordUpdated", currentUser.isPasswordUpdated());
+        map.put("otp",otp);
+        return map;
 
     }
 

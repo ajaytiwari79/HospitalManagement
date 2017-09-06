@@ -67,5 +67,19 @@ public interface WTABaseRuleTemplateGraphRepository extends GraphRepository<WTAB
     @Query("MATCH (n:WTABaseRuleTemplate) where id(n)={0}\n" +
             "Match (n)<-[r:"+HAS_RULE_TEMPLATES+"]-(category:RuleTemplateCategory) delete r")
     void deleteCategoryFromTemplate(Long ruleTemplateId);
+    @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
+            "match (r:WTABaseRuleTemplate)<-[:"+HAS_RULE_TEMPLATES+"]-(rt)\n" +
+            "return collect(id(r)) as IDs")
+    List<Long> findAllWTABelongsByTemplateCategoryId(long ruleTemplateCategoryId);
 
+    @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
+            "match (r:WTABaseRuleTemplate) where id(r) IN {1}\n" +
+            "match(rt)-[rel:"+HAS_RULE_TEMPLATES+"]->(r)\n" +
+            "delete rel")
+    void deleteRelationOfRuleTemplateCategoryAndWTA(long ruleTemplateId,List<Long> WTAIds );
+
+    @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
+            "match (r:WTABaseRuleTemplate) where id(r) IN {1}\n" +
+            "create (rt)-[rq:"+HAS_RULE_TEMPLATES+"]->(r)")
+    void setAllWTAWithCategoryNone(long ruleTemplateId,List<Long> WTAIds);
 }

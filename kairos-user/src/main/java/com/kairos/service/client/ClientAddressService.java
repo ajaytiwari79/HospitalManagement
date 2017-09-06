@@ -65,9 +65,11 @@ public class ClientAddressService extends UserBaseService {
     private EnvConfig envConfig;
 
     public Map<String, Object> getAddressDetails(Long clientId, Long unitId) {
-        Client client = clientGraphRepository.findOne(clientId, 0);
-        if (client == null) {
-            throw new InternalError("Citizen is null");
+        //Client client = clientGraphRepository.findOne(clientId, 0);
+        Client citizen = clientGraphRepository.getClientByClientIdAndUnitId(clientId,unitId);
+        if (citizen == null) {
+            logger.error("Citizen not found : citizenId " + clientId+" unitId "+unitId);
+            throw new InternalError("Citizen not found : citizenId " + clientId+" unitId "+unitId);
         }
 
         ClientAddressQueryResult clientAddressQueryResult = clientGraphRepository.getAllAddress(clientId);

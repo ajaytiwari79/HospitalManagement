@@ -335,7 +335,8 @@ public class ClientService extends UserBaseService {
 
     public Map<String, Object> retrieveGeneralDetails(long clientId, long unitId) {
         Map<String, Object> response = new HashMap<>();
-        Client currentClient = clientGraphRepository.findOne(clientId);
+        //Client currentClient = clientGraphRepository.findOne(clientId);
+        Client currentClient = clientGraphRepository.getClientByClientIdAndUnitId(clientId,unitId);
 
         // Client Data
         if (currentClient != null) {
@@ -395,8 +396,9 @@ public class ClientService extends UserBaseService {
             // client General
             response.put("clientGeneral", clientGeneralDetails);
             return response;
+        } else {
+            throw new DataNotFoundByIdException("Client not found with provided Client ID: " + clientId+ " and Unit ID: "+unitId);
         }
-        return null;
     }
 
 

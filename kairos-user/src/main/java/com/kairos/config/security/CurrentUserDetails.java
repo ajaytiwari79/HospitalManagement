@@ -7,18 +7,20 @@ public class CurrentUserDetails {
     protected String firstName;
     protected String lastName;
     private String email;
+    private boolean passwordUpdated;
    public CurrentUserDetails(){
     //default constructor
   }
 
     public CurrentUserDetails(Long id, String userName, String nickName,
-                              String firstName, String lastName, String email) {
+                              String firstName, String lastName, String email,boolean passwordUpdated) {
         this.id = id;
         this.userName = userName;
         this.nickName = nickName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.passwordUpdated=passwordUpdated;
     }
 
     public Long getId() {
@@ -67,5 +69,13 @@ public class CurrentUserDetails {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setPasswordUpdated(boolean passwordUpdated) {
+        this.passwordUpdated = passwordUpdated;
+    }
+
+    public boolean isPasswordUpdated() {
+        return passwordUpdated;
     }
 }

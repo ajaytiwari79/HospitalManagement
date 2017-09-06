@@ -222,9 +222,9 @@ public class StaffService extends UserBaseService {
 
     public Map<String, Object> getPersonalInfo(long staffId, long unitId) {
 
-        Staff staff = staffGraphRepository.findOne(staffId);
+        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
         if (staff == null) {
-            return null;
+            throw new DataNotFoundByIdException("Staff not found with provided Staff ID: " + staffId+ " and Unit ID: "+unitId);
         }
         Map<String, Object> personalInfo = new HashMap<>(2);
         Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
