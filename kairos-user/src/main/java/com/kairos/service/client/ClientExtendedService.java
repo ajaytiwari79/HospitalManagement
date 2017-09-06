@@ -40,7 +40,7 @@ import static com.kairos.constants.AppConstants.IMAGES_PATH;
  */
 @Service
 @Transactional
-public class ClientExtendedService  extends UserBaseService {
+public class ClientExtendedService extends UserBaseService {
 
     private final Logger logger = Logger.getLogger(this.getClass());
 
@@ -91,16 +91,10 @@ public class ClientExtendedService  extends UserBaseService {
 
 
     public Map<String, Object> updateNextToKin(NextToKinDTO kinDTO, long unitId, long clientId) {
-        Client nextToKin = null;
-        if (kinDTO.getId() != null) {
-            nextToKin = clientGraphRepository.findOne(kinDTO.getId());
-        } else if (nextToKin == null) {
-            logger.debug("Kin not found  Creating new ");
-            nextToKin = new Client();
+        Client nextToKin = (kinDTO.getId() == null) ? new Client() : clientGraphRepository.findOne(kinDTO.getId());
+        if (nextToKin == null) {
+            throw new InternalError("Next to kin is null");
         }
-
-
-        logger.debug("NextToKin: " + kinDTO.getFirstName());
 
         nextToKin.setFirstName(kinDTO.getFirstName());
         nextToKin.setLastName(kinDTO.getLastName());
@@ -118,16 +112,6 @@ public class ClientExtendedService  extends UserBaseService {
         logger.debug("CPR number: " + cprNumber);
 
         nextToKin = clientService.generateAgeAndGenderFromCPR(nextToKin);
-
-        // Setting Gender from CPR number
-        if (cprNumber != null) {
-            if (cprNumber % 2 == 0) {
-                nextToKin.setGender(Gender.FEMALE);
-            } else {
-                nextToKin.setGender(Gender.MALE);
-            }
-        }
-
 
         // Civilian Status
         Long civilianStatusId = kinDTO.getCivilianStatus().getId();
@@ -158,15 +142,15 @@ public class ClientExtendedService  extends UserBaseService {
 
         // Address Details
         AddressDTO addressDTO = kinDTO.getHomeAddress();
-        ContactAddress homeAddress = nextToKin.getHomeAddress();
         if (addressDTO == null) {
             logger.debug("No Address to verify");
             return null;
         }
-        if (homeAddress == null) {
-            logger.debug("Initializing home Address");
+        ContactAddress homeAddress;
+        if (addressDTO.getId() != null) {
+            homeAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
+        } else {
             homeAddress = new ContactAddress();
-            homeAddress = contactAddressGraphRepository.save(homeAddress);
         }
 
         if (addressDTO.isVerifiedByGoogleMap()) {
@@ -292,81 +276,6 @@ public class ClientExtendedService  extends UserBaseService {
         return nextToKinDetails;
 
     }
-
-    public List<Object> setNeutralStaff(Long clientId, Long[] data) {
-        Client client = clientGraphRepository.findOne(clientId, 0);
-
-        if (client != null) {
-            logger.debug("Iterating id to set Neutal Staff");
-            for (long id : data) {
-                Staff currentStaff = staffGraphRepository.findOne(id);
-                if (currentStaff != null) {
-                    ClientStaffRelation staffRelation = staffGraphRepository.checkRestrictedStaff(clientId, id);
-                    // check if Relation already exists
-                    if (staffRelation != null) {
-                        // if Preferred
-                        if (staffRelation.getType() == ClientStaffRelation.StaffType.NONE) {
-                            logger.debug("Staff already NONE");
-                        } else {
-                            staffRelation.setType(ClientStaffRelation.StaffType.NONE);
-                            staffRelationGraphRepository.save(staffRelation);
-                        }
-                    } else {
-                        logger.debug("Client Staff relation is null");
-                        logger.debug("Staff to None: " + currentStaff.getFirstName() + " " + currentStaff.getLastName());
-                        ClientStaffRelation clientStaffRelation = new ClientStaffRelation(client, currentStaff, ClientStaffRelation.StaffType.NONE);
-                        staffRelationGraphRepository.save(clientStaffRelation);
-                    }
-                } else {
-                    logger.debug("Staff not found with provided id ");
-
-                }
-            }
-        }
-
-        List<Map<String, Object>> mapList = clientGraphRepository.findNeutualStaff(clientId);
-        if (mapList != null) {
-            List<Object> objectList = new ArrayList<>();
-            for (Map<String, Object> map :
-                    mapList) {
-                Object o = map.get("staffList");
-                objectList.add(o);
-            }
-            return objectList;
-        }
-        return null;
-
-    }
-
-    public List<Object> getClientTaskUnits(long orgId, Long clientId) {
-        Client client = clientGraphRepository.findOne(clientId);
-        List<Object> unitList = new ArrayList<>();
-        Set<String> taskTypeIds = new HashSet<>();
-        if (client != null) {
-            List<Map<String, Object>> unitData = organizationGraphRepository.getClientServingOrganizations(client);
-            logger.debug("Number of Organizations: " + unitData.size());
-            // Get All Serving Organization to the Client
-            for (Map<String, Object> map : unitData) {
-                logger.debug("Unit: " + map);
-                unitList.add(map.get("result"));
-            }
-            return unitList;
-        }
-        return null;
-    }
-
-    public ClientOrganizationRelation setOrganizationDetails(ClientOrganizationRelation clientOrganizationRelation) {
-        // Organization Relation
-        ClientOrganizationRelation relation = (ClientOrganizationRelation) findOne(clientOrganizationRelation.getId());
-        if (relation != null) {
-            relation.setJoinDate(clientOrganizationRelation.getJoinDate());
-            return save(clientOrganizationRelation);
-        }
-        return null;
-    }
-
-
-
 
     public Map<String, Object> setTransportationDetails(Client client) {
         Client currentClient = clientGraphRepository.findOne(client.getId());
@@ -623,7 +532,6 @@ public class ClientExtendedService  extends UserBaseService {
     }
 
 
-
     public ClientAllergies updateClientAllergy(ClientAllergies clientAllergies) {
         ClientAllergies allergies = clientAllergiesGraphRepository.findOne(clientAllergies.getId());
         allergies.setAvoidance(clientAllergies.getAvoidance());
@@ -671,10 +579,10 @@ public class ClientExtendedService  extends UserBaseService {
         return envConfig.getServerHost() + File.separator + fileName;
     }
 
-    public void removeAccessToLocationImage(long accessToLocationId){
+    public void removeAccessToLocationImage(long accessToLocationId) {
         AccessToLocation accessToLocation = accessToLocationGraphRepository.findOne(accessToLocationId);
         if (accessToLocation == null) {
-           throw new InternalError("Access to location is null");
+            throw new InternalError("Access to location is null");
         }
         accessToLocation.setAccessPhotoURL(null);
         accessToLocationGraphRepository.save(accessToLocation);

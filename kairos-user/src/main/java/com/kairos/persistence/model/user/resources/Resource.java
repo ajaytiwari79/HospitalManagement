@@ -19,7 +19,8 @@ public class Resource extends UserBaseEntity {
     private String modelDescription;
     private float costPerKM;
     private FuelType fuelType;
-    private boolean isEnabled =true;
+    private boolean enabled ;
+    private boolean deleted ;
 
     @Relationship(type = RelationshipConstants.RESOURCE_NOT_AVAILABLE_ON, direction = "OUTGOING")
     private List<ResourceUnAvailability> resourceAvailabilities;
@@ -69,11 +70,19 @@ public class Resource extends UserBaseEntity {
     }
 
     public boolean isEnabled() {
-        return isEnabled;
+        return enabled;
     }
 
     public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+        this.enabled = enabled;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public VehicleType getName() {
