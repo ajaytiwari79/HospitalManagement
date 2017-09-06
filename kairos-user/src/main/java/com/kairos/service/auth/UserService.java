@@ -148,8 +148,8 @@ public class UserService extends UserBaseService {
 
 
         int otp = OtpGenerator.generateOtp();
-        user.setOtp(otp);
-        userGraphRepository.save(user);
+        currentUser.setOtp(otp);
+        userGraphRepository.save(currentUser);
         Map<String, Object> map = new HashMap<>();
         map.put("email", currentUser.getEmail());
         //map.put("isPasswordUpdated", currentUser.isPasswordUpdated());
