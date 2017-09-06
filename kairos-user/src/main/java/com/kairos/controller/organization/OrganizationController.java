@@ -929,8 +929,9 @@ public class OrganizationController {
     @ApiOperation(value = "Get all Organization Ids")
     @RequestMapping(value = "/ids", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public List<Map<String, Object>> getAllOrganizationIds() {
-        return organizationService.getAllOrganization();
+    public ResponseEntity<Map<String, Object>> getAllOrganizationIds() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getAllOrganizationIds());
     }
 
     @RequestMapping(value = "/country_admins_ids/{countryAdminsOfUnitId}", method = RequestMethod.GET)

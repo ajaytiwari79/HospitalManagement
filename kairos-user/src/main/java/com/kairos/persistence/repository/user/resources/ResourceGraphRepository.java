@@ -25,7 +25,7 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
     @Query("MATCH (r:Resource) where s.isEnabled= true return s")
     List<Resource> findAll();
 
-    @Query(" MATCH (o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource) WHERE  id(o)={0} WITH r as res " +
+    @Query(" MATCH (o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource) WHERE  id(o)={0} AND r.deleted=false WITH r as res " +
             "OPTIONAL MATCH (res)-[:RESOURCE_NOT_AVAILABLE_ON]->(ra:ResourceUnAvailability)  RETURN " +
             "{ name:res.name, " +
             " id:id(res), " +
@@ -49,6 +49,6 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
     @Query("MATCH(o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource)  where id(o)={0} AND (r.name IN {1}) AND NOT (id(r) IN {2})  return r")
     List<Resource> getUnassignedResourceWithBeacon(Long unit, String[] resourceTypes, long[] resourceIds);
 
-    @Query("MATCH(o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource)  where id(o)={0} return r")
+    @Query("MATCH(o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource)  where id(o)={0} AND r.deleted=false  return r")
     List<Resource> getByUnitId(Long organizationId);
 }
