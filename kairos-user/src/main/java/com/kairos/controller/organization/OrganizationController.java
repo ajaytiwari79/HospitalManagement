@@ -745,11 +745,12 @@ public class OrganizationController {
                 organizationServiceService.organizationImportedServiceData(unitId));
     }
 
+
     // Service
     @ApiOperation(value = "Map Imported Services")
-    @RequestMapping(value = "unit/{unitId}/mapImportedService/{imPortedServiceId}", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> mapImportedService(@PathVariable long imPortedServiceId, @RequestBody long serviceId) {
+    @RequestMapping(value = "unit/{unitId}/mapImportedService/{imPortedServiceId}/service/{serviceId}", method = RequestMethod.POST)
+    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> mapImportedService(@PathVariable long imPortedServiceId, @PathVariable long serviceId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationServiceService.mapImportedService(imPortedServiceId, serviceId));
     }
@@ -929,8 +930,9 @@ public class OrganizationController {
     @ApiOperation(value = "Get all Organization Ids")
     @RequestMapping(value = "/ids", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public List<Map<String, Object>> getAllOrganizationIds() {
-        return organizationService.getAllOrganization();
+    public ResponseEntity<Map<String, Object>> getAllOrganizationIds() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getAllOrganizationIds());
     }
 
     @RequestMapping(value = "/country_admins_ids/{countryAdminsOfUnitId}", method = RequestMethod.GET)
