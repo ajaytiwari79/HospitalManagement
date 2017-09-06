@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.organization;
 
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
@@ -12,7 +13,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORG_T
  * Created by prabjot on 12/4/17.
  */
 @RelationshipEntity(type = ORG_TYPE_HAS_EXPERTISE)
-public class OrgTypeExpertiseRelationship {
+public class OrgTypeExpertiseRelationship extends UserBaseEntity {
 
     @StartNode private OrganizationType organizationType;
     @EndNode private Expertise expertise;
