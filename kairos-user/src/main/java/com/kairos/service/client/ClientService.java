@@ -906,7 +906,7 @@ public class ClientService extends UserBaseService {
 
 
     public HashMap<String, Object> getOrganizationAllClients(long organizationId, long unitId, long staffId) {
-        List<Map<String, Object>> mapList = organizationGraphRepository.getAllClientsOfOrganization(organizationId);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getAllClientsOfOrganization(unitId);
         List<Object> clientList = new ArrayList<>();
         for (Map<String, Object> map : mapList) {
             clientList.add(map.get("Client"));

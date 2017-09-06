@@ -49,6 +49,7 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
  * 2. Call for CRUD operation on Organization using OrganizationService.
  */
 @RestController
+
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
 public class OrganizationController {
@@ -482,22 +483,6 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getHolidays(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 openningHourService.getOrganizationHolidays(unitId));
-    }
-
-    @RequestMapping(value = "/parent/{countryId}", method = RequestMethod.PUT)
-    @ApiOperation("Update Parent Organization")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateParentOrganization(@PathVariable Long countryId, @PathVariable long organizationId, @RequestBody ParentOrganizationDTO data) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.updateParentOrganization(data, organizationId));
-    }
-
-    @RequestMapping(value = "/parent/{countryId}", method = RequestMethod.POST)
-    @ApiOperation("Create Parent Organization")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long countryId, @RequestBody ParentOrganizationDTO organization) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.createParentOrganization(organization, countryId));
     }
 
     @RequestMapping(value = "/parent/{countryId}", method = RequestMethod.GET)

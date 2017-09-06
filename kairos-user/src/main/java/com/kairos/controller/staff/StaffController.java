@@ -119,7 +119,7 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.GET)
     @ApiOperation("get personal information of staff")
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPersonalInfo(@PathVariable long unitId,@PathVariable long staffId) {
         Map<String, Object> personalInfo = staffService.getPersonalInfo(staffId,unitId);
         if (personalInfo == null) {
@@ -138,7 +138,7 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/address", method = RequestMethod.GET)
     @ApiOperation("update address")
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAddress(@PathVariable long unitId, @PathVariable long staffId,@RequestParam("type") String type) {
         Map<String, Object> response = staffAddressService.getAddress(unitId, staffId,type);
         if (response == null) {
