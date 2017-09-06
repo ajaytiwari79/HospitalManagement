@@ -1137,4 +1137,32 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
+    public List<Long> getCountryAdminIds(long organizationId) {
+        return staffGraphRepository.getCountryAdminIds(organizationId);
+
+    }
+
+    public List<Long> getUnitManagerIds(long unitId) {
+        Organization unit = organizationGraphRepository.findOne(unitId);
+
+        Organization parent;
+        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+
+        } else {
+            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+        }
+
+
+        List<Long> unitManagers;
+        if (parent == null)
+            unitManagers = staffGraphRepository.getUnitManagersIds(unitId, unitId);
+        else
+            unitManagers = staffGraphRepository.getUnitManagersIds(parent.getId(), unitId);
+
+
+
+        return unitManagers;
+    }
+
 }

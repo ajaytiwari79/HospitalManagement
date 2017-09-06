@@ -948,6 +948,22 @@ public class OrganizationController {
         return organizationService.getAllOrganization();
     }
 
+    @RequestMapping(value = "unit/{unitId}/country_admins_ids/{countryAdminOfUnitId}", method = RequestMethod.GET)
+    @ApiOperation("get unit manager")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryAdminsIds(@PathVariable long organizationId, @PathVariable long countryAdminOfUnitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                staffService.getCountryAdminIds(countryAdminOfUnitId));
+    }
+
+    @RequestMapping(value = "unit/{unitId}/unit_manager_ids/{unitManagerOfUnitId}", method = RequestMethod.GET)
+    @ApiOperation("get unit manager")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnitManagerIds(@PathVariable long organizationId, @PathVariable long unitManagerOfUnitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                staffService.getUnitManagerIds(unitManagerOfUnitId));
+    }
+
 }
 
 
