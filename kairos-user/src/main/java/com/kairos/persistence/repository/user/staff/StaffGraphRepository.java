@@ -254,4 +254,21 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     @Query("Match (e:Employment)-[:"+BELONGS_TO+"]->(staff:Staff) where id(staff)={1} with e,staff\n" +
             "Match (e)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(unitEmp:UnitEmployment)-[:"+PROVIDED_BY+"]->(unit:Organization) where id(unit)={0} return staff")
     Staff getStaffByOrganizationId(long unitId, long staffId);
+
+    @Query("Match (unitEmployment:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployment\n" +
+            "Match (unitEmployment)-[:HAS_ACCESS_PERMISSION]->(accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{name:\"COUNTRY_ADMIN\"}) with unitEmployment\n" +
+            "Match (employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment) with employment,unitEmployment\n" +
+            "MATCH (employment)-[:BELONGS_TO]->(staff:Staff) with staff\n" +
+            "return id(staff)")
+    List<Long> getCountryAdminIds(long organizationId);
+
+    @Query("MATCH (organization:Organization),(unit:Organization) where id(organization)={0} AND id(unit)={1} with organization,unit\n" +
+            "match (organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment{isUnitManagerEmployment:true})-[:PROVIDED_BY]->(unit) with employment,unitEmployment\n" +
+            "MATCH (employment)-[:BELONGS_TO]->(staff:Staff) with staff,unitEmployment\n" +
+            "Match (unitEmployment)-[:HAS_ACCESS_PERMISSION]->(accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,staff\n" +
+            "\n" +
+            "optional Match (staff)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail)\n" +
+            "return id(staff)")
+    List<Long> getUnitManagersIds(long organizationId, long unitId);
+
 }

@@ -1,12 +1,14 @@
 package com.kairos.persistence.model.user.auth;
 
 import com.kairos.config.security.CurrentUserDetails;
+import com.kairos.persistence.model.user.country.Country;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class UserPrincipal implements UserDetails,Authentication {
     private static final long serialVersionUID = 1L;
@@ -66,8 +68,12 @@ public class UserPrincipal implements UserDetails,Authentication {
     @Override
     public  Object getDetails(){
 
-        return new CurrentUserDetails(this.user.getId(),this.user.getUserName(),this.user.nickName,
-                this.user.firstName,this.user.getLastName(),this.user.getEmail());
+        CurrentUserDetails details=new  CurrentUserDetails(this.user.getId(),this.user.getUserName(),this.user.nickName,
+                this.user.firstName,this.user.getLastName(),this.user.getEmail(),this.user.isPasswordUpdated());
+        details.setAge(this.user.getAge());
+        Optional<Country>  country=Optional.ofNullable(this.user.getCountryList()).map(countryList->countryList.get(0));
+        country.ifPresent(c->details.setCountryId(c.getId()));
+        return details;
     }
     @Override
     public   Object getPrincipal(){
@@ -87,6 +93,9 @@ public class UserPrincipal implements UserDetails,Authentication {
 
     }
 
+    public User getUser() {
+        return user;
+    }
 
     @Override
     public String toString() {

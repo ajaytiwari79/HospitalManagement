@@ -70,6 +70,8 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/swagger-ui.html");
         web.ignoring().antMatchers("/v2/api-docs");
         web.ignoring().antMatchers("/ids");
+        web.ignoring().antMatchers("/api/v1/login");
+
     }
 
     @Override

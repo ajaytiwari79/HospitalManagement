@@ -183,7 +183,7 @@ public class CountryController {
 
     @ApiOperation(value = "Delete Organization Types")
     @RequestMapping(value = COUNTRY_URL + "/organization_type/{organizationTypeId}", method = RequestMethod.DELETE)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteOrganizationSubTypeById(@PathVariable Long organizationTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.deleteOrganizationType(organizationTypeId));
     }

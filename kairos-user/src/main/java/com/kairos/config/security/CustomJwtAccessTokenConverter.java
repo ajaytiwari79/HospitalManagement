@@ -1,6 +1,7 @@
 package com.kairos.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.persistence.model.user.auth.UserPrincipal;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +18,16 @@ public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
 
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
+        UserPrincipal user=(UserPrincipal)authentication.getUserAuthentication().getPrincipal();
         final Map<String, Object> authDetails = (Map<String, Object>)authentication.getDetails();
-        ((DefaultOAuth2AccessToken)accessToken).setAdditionalInformation(authDetails);
+
+         ((DefaultOAuth2AccessToken)accessToken).setAdditionalInformation(authDetails);
         return super.enhance(accessToken, authentication);
     }
 
     @Override
     public OAuth2Authentication extractAuthentication(Map<String, ?> map) {
-        log.info("extracting authencation from token ");
+        log.info("extracting authencation from token {}",map);
         final OAuth2Authentication authentication =super.extractAuthentication(map);
         ObjectMapper mapper=new ObjectMapper();
         CurrentUserDetails details=mapper.convertValue(map.get(USER_DETAILS_KEY),CurrentUserDetails.class);

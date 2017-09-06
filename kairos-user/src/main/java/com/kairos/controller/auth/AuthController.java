@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
@@ -56,8 +57,9 @@ public class AuthController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation(value = "Authenticate User")
     ResponseEntity<Map<String, Object>> checkUser(@RequestBody User user) {
-//        logger.info("Data:\n Username:" + user.getUserName() + "\n Password:" + user.getPassword());'
-        logger.info("user srevice is"+userService);
+
+        logger.info("user info is {}",user);
+
         Map<String,Object> response = userService.authenticateUser(user);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.UNAUTHORIZED, false, response);
@@ -65,6 +67,9 @@ public class AuthController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
 
     }
+
+
+
 
 
     @RequestMapping(value = "/login/mobile", method = RequestMethod.POST)
@@ -166,6 +171,12 @@ public class AuthController {
         }
         logger.debug("Data in request body is either null or empty");
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Data in request body is either null or empty");
+    }
+
+    @RequestMapping(value = "/user/organizations", method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getCurrentUserOrganizationList() {
+        List<Map<String, Object>> organizationList =  userService.getOrganizations(UserContext.getUserDetails().getId());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationList);
     }
 
     @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/permissions", method = RequestMethod.GET)

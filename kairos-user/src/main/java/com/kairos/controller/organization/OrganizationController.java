@@ -933,6 +933,22 @@ public class OrganizationController {
         return organizationService.getAllOrganization();
     }
 
+    @RequestMapping(value = "/country_admins_ids/{countryAdminsOfUnitId}", method = RequestMethod.GET)
+    @ApiOperation("get unit manager")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryAdminsIds( @PathVariable long countryAdminsOfUnitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                staffService.getCountryAdminIds(countryAdminsOfUnitId));
+    }
+
+    @RequestMapping(value = "/unit_manager_ids/{unitManagerOfUnitId}", method = RequestMethod.GET)
+    @ApiOperation("get unit manager")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnitManagerIds( @PathVariable long unitManagerOfUnitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                staffService.getUnitManagerIds(unitManagerOfUnitId));
+    }
+
 }
 
 
