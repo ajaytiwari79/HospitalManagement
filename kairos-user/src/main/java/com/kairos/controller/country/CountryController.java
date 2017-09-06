@@ -158,7 +158,7 @@ public class CountryController {
     // Organization Type
     @ApiOperation(value = "Get all Organization Types")
     @RequestMapping(value = COUNTRY_URL + "/organization_type", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrgTypesByCountryId(@PathVariable Long countryId) {
         List<Map<String, Object>> response = organizationTypeService.getOrgTypesByCountryId(countryId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
@@ -182,7 +182,7 @@ public class CountryController {
 
     @ApiOperation(value = "Delete Organization Types")
     @RequestMapping(value = COUNTRY_URL + "/organization_type/{organizationTypeId}", method = RequestMethod.DELETE)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteOrganizationSubTypeById(@PathVariable Long organizationTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.deleteOrganizationType(organizationTypeId));
     }
@@ -222,7 +222,7 @@ public class CountryController {
 
     @RequestMapping(value = COUNTRY_URL + "/skill_category", method = RequestMethod.POST)
     @ApiOperation("Add a new skillCategory")
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addSkillCategory(@PathVariable long countryId, @Validated @RequestBody SkillCategory objectToSave) {
         Object response = skillCategoryService.createSkillCategory(countryId, objectToSave);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
