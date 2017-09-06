@@ -91,7 +91,9 @@ public class ResourceService extends UserBaseService {
      * @param resourceId
      */
     public void safeDeleteResource(Long resourceId){
-        super.safeDeleteEntity(resourceId);
+        Resource resource = resourceGraphRepository.findOne(resourceId);
+        resource.setDeleted(true);
+        resourceGraphRepository.save(resource);
 
     }
 
