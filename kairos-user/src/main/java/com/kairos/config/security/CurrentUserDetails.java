@@ -8,6 +8,8 @@ public class CurrentUserDetails {
     protected String lastName;
     private String email;
     private boolean passwordUpdated;
+    private  int age;
+    private Long countryId;
    public CurrentUserDetails(){
     //default constructor
   }
@@ -78,4 +80,21 @@ public class CurrentUserDetails {
     public boolean isPasswordUpdated() {
         return passwordUpdated;
     }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
+
 }

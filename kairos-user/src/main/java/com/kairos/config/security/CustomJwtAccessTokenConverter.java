@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
@@ -22,18 +21,13 @@ public class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
         UserPrincipal user=(UserPrincipal)authentication.getUserAuthentication().getPrincipal();
         final Map<String, Object> authDetails = (Map<String, Object>)authentication.getDetails();
 
-        Map<String, Object> additionalInfo = new HashMap<>();
-        Map<String, Object> userInfo = new HashMap<>();
-              userInfo.put("isPasswordUpdated",((CurrentUserDetails)user.getDetails()).isPasswordUpdated());
-
-          additionalInfo.put("userInfo",userInfo);
-         ((DefaultOAuth2AccessToken)accessToken).setAdditionalInformation(additionalInfo);
+         ((DefaultOAuth2AccessToken)accessToken).setAdditionalInformation(authDetails);
         return super.enhance(accessToken, authentication);
     }
 
     @Override
     public OAuth2Authentication extractAuthentication(Map<String, ?> map) {
-        log.info("extracting authencation from token ");
+        log.info("extracting authencation from token {}",map);
         final OAuth2Authentication authentication =super.extractAuthentication(map);
         ObjectMapper mapper=new ObjectMapper();
         CurrentUserDetails details=mapper.convertValue(map.get(USER_DETAILS_KEY),CurrentUserDetails.class);
