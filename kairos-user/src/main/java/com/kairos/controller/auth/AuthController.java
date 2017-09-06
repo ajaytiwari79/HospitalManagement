@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
@@ -170,6 +171,12 @@ public class AuthController {
         }
         logger.debug("Data in request body is either null or empty");
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Data in request body is either null or empty");
+    }
+
+    @RequestMapping(value = "/user/organizations", method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getCurrentUserOrganizationList() {
+        List<Map<String, Object>> organizationList =  userService.getOrganizations(UserContext.getUserDetails().getId());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationList);
     }
 
     @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/permissions", method = RequestMethod.GET)
