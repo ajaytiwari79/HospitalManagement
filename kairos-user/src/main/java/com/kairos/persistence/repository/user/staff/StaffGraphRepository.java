@@ -259,7 +259,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
             "Match (unitEmployment)-[:HAS_ACCESS_PERMISSION]->(accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{name:\"COUNTRY_ADMIN\"}) with unitEmployment\n" +
             "Match (employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment) with employment,unitEmployment\n" +
             "MATCH (employment)-[:BELONGS_TO]->(staff:Staff) with staff\n" +
-            "return {id:id(staff)} as data")
+            "return id(staff)")
     List<Long> getCountryAdminIds(long organizationId);
 
     @Query("MATCH (organization:Organization),(unit:Organization) where id(organization)={0} AND id(unit)={1} with organization,unit\n" +
@@ -268,7 +268,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
             "Match (unitEmployment)-[:HAS_ACCESS_PERMISSION]->(accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,staff\n" +
             "\n" +
             "optional Match (staff)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail)\n" +
-            "return {id:id(staff)} as data")
+            "return id(staff)")
     List<Long> getUnitManagersIds(long organizationId, long unitId);
 
 }
