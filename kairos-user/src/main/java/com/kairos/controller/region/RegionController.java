@@ -199,7 +199,7 @@ public class RegionController {
     // All Region by MunicipalityID
     @ApiOperation(value = "GET all Region Data")
     @RequestMapping(value = "/municipality/{municipalityId}", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+  //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllRegionMunicipalityId(@PathVariable long municipalityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getRegionByMunicipalityId(municipalityId));
     }
@@ -207,7 +207,7 @@ public class RegionController {
     // All Municipality by zipCode
     @ApiOperation(value = "GET all Municipality Data")
     @RequestMapping(value = "/municipality/zipCode/{zipCodeId}", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+  //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getMunicipalityByZipCode(@PathVariable long zipCodeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getMunicipalityByZipCode(zipCodeId));
     }
@@ -216,7 +216,7 @@ public class RegionController {
     // All  ZipCode
     @ApiOperation(value = "GET all ZipCode Data")
     @RequestMapping(value = "/municipality/zipCode/", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+  //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllZipCode(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getAllZipCodes());
     }
@@ -226,7 +226,7 @@ public class RegionController {
     // All Region Data
     @ApiOperation(value = "GET all Region Data")
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllRegionData() {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getAllRegionData());
     }
@@ -236,7 +236,7 @@ public class RegionController {
     // Xls Region Data upload
     @ApiOperation(value = "Upload all Region Data via XLSX")
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> uploadRegionXLSX(@PathVariable Long countryId, @RequestParam("file") MultipartFile multipartFile) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.batchProcessGeographyExcelSheet(multipartFile,countryId));
     }
@@ -245,14 +245,14 @@ public class RegionController {
     // Get Address data using zipcodeId
     @ApiOperation(value = "GET all ZipCode Data")
     @RequestMapping(value = "/municipality/zipCode/{zipCodeId}/data", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllZipCodeData(@PathVariable long zipCodeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.getAllZipCodesData(zipCodeId));
     }
 
     @ApiOperation(value = "GET all ZipCode Data")
     @RequestMapping(value = "/contact_address/municipality", method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+   // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setMunicipalityInContactAddress() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, regionService.setMunicipalityInContactAddress());
     }

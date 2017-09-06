@@ -6,3 +6,4 @@ logs/
 out/
 .sonar
 kairos-user/logs/
+kairos-user/logs/spring-boot-logging.log

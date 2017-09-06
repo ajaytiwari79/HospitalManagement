@@ -26,6 +26,15 @@ public class ParentOrganizationDTO {
     private boolean kairosHub;
     private boolean prekairos;
     AddressDTO homeAddress;
+    Long levelId;
+
+    public Long getLevelId() {
+        return levelId;
+    }
+
+    public void setLevelId(Long levelId) {
+        this.levelId = levelId;
+    }
 
     //list of ids of organization type
     private List<Long> typeId;

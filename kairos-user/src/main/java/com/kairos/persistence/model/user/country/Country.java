@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
@@ -60,6 +61,9 @@ public class Country extends UserBaseEntity {
     @JsonIgnore
     @Relationship(type = HAS_ORGANIZATION_SERVICES)
     private List<OrganizationService> organizationServices;
+
+    @Relationship(type = HAS_LEVEL)
+    private List<Level> levels;
 
     public Country() {
     }
@@ -171,5 +175,11 @@ public class Country extends UserBaseEntity {
                 ", code='" + code + '\'' +
                 '}'+
                 '}';
+    }
+
+    public void addLevel(Level level){
+        List<Level> levels = Optional.ofNullable(this.levels).orElse(new ArrayList<>());
+        levels.add(level);
+        this.levels = levels;
     }
 }
