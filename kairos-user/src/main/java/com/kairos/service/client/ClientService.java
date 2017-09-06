@@ -1022,9 +1022,6 @@ public class ClientService extends UserBaseService {
         ClientTemporaryAddress clientTemporaryAddress = null;
         if (clientExceptionDto.getTempAddress() != null) {
             clientTemporaryAddress = updateClientTemporaryAddress(clientExceptionDto, unitId, client);
-                    /*if (clientTemporaryAddress != null) {
-                        map.put("tempAddress", clientTemporaryAddress);
-                    }*/
         }
         if (clientExceptionDto.getTemporaryAddress() != null) {
             clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
