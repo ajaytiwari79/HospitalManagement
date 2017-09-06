@@ -32,9 +32,9 @@ public class UserOauth2Service implements UserDetailsService {
          String otpString=HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
          Optional<Integer>optInt=OptionalUtility.stringToInt(otpString);
 
-        if (loggedUser.filter(u->u.getOtp()==optInt.get()).isPresent()) {
+        if (loggedUser.filter(u->optInt.get().equals(u.getOtp())).isPresent()) {
+            logger.info("user opt match{}",user.getOtp());
             return new UserPrincipal(user,getPermission());
-
         }else{
             // Not found...
             throw new UsernameNotFoundException(
