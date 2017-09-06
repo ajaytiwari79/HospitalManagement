@@ -67,7 +67,7 @@ public class UserPrincipal implements UserDetails,Authentication {
     public  Object getDetails(){
 
         return new CurrentUserDetails(this.user.getId(),this.user.getUserName(),this.user.nickName,
-                this.user.firstName,this.user.getLastName(),this.user.getEmail());
+                this.user.firstName,this.user.getLastName(),this.user.getEmail(),this.user.isPasswordUpdated());
     }
     @Override
     public   Object getPrincipal(){
