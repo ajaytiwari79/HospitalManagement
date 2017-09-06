@@ -445,4 +445,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "return  org")
     List<Organization> getAllOrganizationIdsWithoutPhases();
 
+    @Query("MATCH (o:Organization) return id(o)")
+    List<Long> findAllOrganizationIds();
+
 }
