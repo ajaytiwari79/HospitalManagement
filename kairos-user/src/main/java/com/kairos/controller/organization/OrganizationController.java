@@ -745,11 +745,12 @@ public class OrganizationController {
                 organizationServiceService.organizationImportedServiceData(unitId));
     }
 
+
     // Service
     @ApiOperation(value = "Map Imported Services")
-    @RequestMapping(value = "unit/{unitId}/mapImportedService/{imPortedServiceId}", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> mapImportedService(@PathVariable long imPortedServiceId, @RequestBody long serviceId) {
+    @RequestMapping(value = "unit/{unitId}/mapImportedService/{imPortedServiceId}/service/{serviceId}", method = RequestMethod.POST)
+    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> mapImportedService(@PathVariable long imPortedServiceId, @PathVariable long serviceId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationServiceService.mapImportedService(imPortedServiceId, serviceId));
     }

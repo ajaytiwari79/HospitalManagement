@@ -19,6 +19,7 @@ public final class ApiConstants {
     public static final String API_AGGREGATOR_CITIZEN_URL = API_V1 + "/aggregator/citizen";
     public static final String WS_URL="ws://localhost:8090"+API_V1+"/kairos/ws";
     public static final String API_REQUEST_COMPONENT_URL =  API_V1 + PARENT_ORGANIZATION_URL + "/resourceComponent";
+    public static final String API_RESOURCE_URL =  API_V1 + PARENT_ORGANIZATION_URL  + UNIT_URL + "/resource";
 
     public static final String API_ORGANIZATION_COUNTRY_URL =API_V1+PARENT_ORGANIZATION_URL+COUNTRY_URL;
 
