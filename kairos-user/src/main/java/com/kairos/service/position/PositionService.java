@@ -52,7 +52,7 @@ public class PositionService extends UserBaseService {
     public Position createPosition(long unitEmploymentId, PositionDTO positionDTO) {
         Position position = preparePosition(positionDTO);
 
-        UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
+        UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId,0);
 
         if (unitEmployment == null) {
             throw new DataNotFoundByIdException("Invalid UnitEmployment id");
