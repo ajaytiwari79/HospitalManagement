@@ -29,7 +29,7 @@ public class KairosGatewayApplication {
 
     @Bean
     @Primary
-    public FilterRegistrationBean corsFilter() {
+    public CorsFilter corsFilter() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
@@ -43,10 +43,7 @@ public class KairosGatewayApplication {
         config.addAllowedMethod("DELETE");
         config.addAllowedMethod("PATCH");
         source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return bean;
-
+        return new CorsFilter(source);
     }
 
 }
