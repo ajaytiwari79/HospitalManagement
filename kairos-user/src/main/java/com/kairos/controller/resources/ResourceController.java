@@ -4,6 +4,7 @@ package com.kairos.controller.resources;
  * Created by oodles on 17/10/16.
  */
 
+import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.service.resources.ResourceService;
 import com.kairos.util.response.ResponseHandler;
@@ -17,6 +18,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.ApiConstants.API_RESOURCE_URL;
 import static com.kairos.constants.ApiConstants.API_V1;
 
 
@@ -26,8 +28,8 @@ import static com.kairos.constants.ApiConstants.API_V1;
  * 2. Call for CRUD operation on Resource using ResourceService.
  */
 @RestController
-@RequestMapping(API_V1 + "/resource")
-@Api(API_V1 + "/resource")
+@RequestMapping(API_RESOURCE_URL)
+@Api(API_RESOURCE_URL)
 public class ResourceController {
 
     @Inject
@@ -116,7 +118,7 @@ public class ResourceController {
         if (resourceId != null) {
             if (resourceService.getResourceById(resourceId) != null) {
                 resourceService.safeDeleteResource(resourceId);
-                return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+                return ResponseHandler.generateResponse(HttpStatus.OK, true, AppConstants.SUCCESS);
             }
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }

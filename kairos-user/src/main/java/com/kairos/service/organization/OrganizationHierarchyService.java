@@ -76,6 +76,7 @@ public class OrganizationHierarchyService {
             queryResult.setType(ORGANIZATION_LABEL);
             queryResult.setPreKairos(organization.isPrekairos());
             queryResult.setEnabled(organization.isEnable());
+            queryResult.setParentOrganization(organization.isParentOrganization());
             return queryResult;
         }
 

@@ -88,9 +88,9 @@ public class WTAService extends UserBaseService {
         wta.setDescription(wtaDTO.getDescription());
         wta.setName(wtaDTO.getName());
 
-        Expertise expertise = expertiseRepository.findOne(wtaDTO.getExpertiseId());
+        Expertise expertise = expertiseRepository.findOne(((long) wtaDTO.getExpertiseId()));
         if (expertise == null) {
-            throw new DataNotFoundByIdException("Invalid expertiseId");
+            throw new DataNotFoundByIdException("Invalid expertiseId "+wtaDTO.getExpertiseId());
         }
         wta.setExpertise(expertise);
         List<OrganizationType> organizationTypes = new ArrayList<OrganizationType>();
@@ -98,7 +98,7 @@ public class WTAService extends UserBaseService {
         for (long orgTypeId : wtaDTO.getOrganizationTypes()) {
             OrganizationType orgType = organizationTypeRepository.findOne(orgTypeId);
             if (orgType == null) {
-                throw new DataNotFoundByIdException("Invalid organisation type");
+                throw new DataNotFoundByIdException("Invalid organization type Id "+orgTypeId);
             }
             organizationTypes.add(orgType);
         }
@@ -224,23 +224,22 @@ public class WTAService extends UserBaseService {
     }
 
     public  boolean setWtaWithOrganizationType(long wtaId,long organizationTypeId,boolean checked){
-        List<OrganizationType> orgType=new ArrayList<OrganizationType>();
-         orgType.add( organizationTypeRepository.findOne(organizationTypeId));
+        OrganizationType orgType =organizationTypeRepository.findOne(organizationTypeId);
         if (orgType == null) {
-            throw new DataNotFoundByIdException("Invalid organisation type");
+            throw new DataNotFoundByIdException("Invalid organisation type "+organizationTypeId);
         }
         WorkingTimeAgreement wta = wtaRepository.findOne(wtaId);
         if (wta==null){
             throw new DataNotFoundByIdException("wta not found");
         }
         if(checked){
-            wta.setOrganizationTypes(orgType);
+            wta.getOrganizationTypes().add(orgType);
             save(wta);
         }else {
-            wta.setOrganizationTypes(null);
+            wta.getOrganizationTypes().remove(orgType);
             save(wta);
         }
-            return checked;
+        return checked;
 
     }
 }

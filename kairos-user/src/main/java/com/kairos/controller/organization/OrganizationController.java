@@ -49,6 +49,7 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
  * 2. Call for CRUD operation on Organization using OrganizationService.
  */
 @RestController
+
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
 public class OrganizationController {
@@ -484,22 +485,6 @@ public class OrganizationController {
                 openningHourService.getOrganizationHolidays(unitId));
     }
 
-    @RequestMapping(value = "/parent/{countryId}", method = RequestMethod.PUT)
-    @ApiOperation("Update Parent Organization")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateParentOrganization(@PathVariable Long countryId, @PathVariable long organizationId, @RequestBody ParentOrganizationDTO data) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.updateParentOrganization(data, organizationId));
-    }
-
-    @RequestMapping(value = "/parent/{countryId}", method = RequestMethod.POST)
-    @ApiOperation("Create Parent Organization")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long countryId, @RequestBody ParentOrganizationDTO organization) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.createParentOrganization(organization, countryId));
-    }
-
     @RequestMapping(value = "/parent/{countryId}", method = RequestMethod.GET)
     //@ApiOperation("Get Parent Organization")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -760,11 +745,12 @@ public class OrganizationController {
                 organizationServiceService.organizationImportedServiceData(unitId));
     }
 
+
     // Service
     @ApiOperation(value = "Map Imported Services")
-    @RequestMapping(value = "unit/{unitId}/mapImportedService/{imPortedServiceId}", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> mapImportedService(@PathVariable long imPortedServiceId, @RequestBody long serviceId) {
+    @RequestMapping(value = "unit/{unitId}/mapImportedService/{imPortedServiceId}/service/{serviceId}", method = RequestMethod.POST)
+    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> mapImportedService(@PathVariable long imPortedServiceId, @PathVariable long serviceId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationServiceService.mapImportedService(imPortedServiceId, serviceId));
     }
@@ -944,8 +930,9 @@ public class OrganizationController {
     @ApiOperation(value = "Get all Organization Ids")
     @RequestMapping(value = "/ids", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public List<Map<String, Object>> getAllOrganizationIds() {
-        return organizationService.getAllOrganization();
+    public ResponseEntity<Map<String, Object>> getAllOrganizationIds() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getAllOrganizationIds());
     }
 
     @RequestMapping(value = "/country_admins_ids/{countryAdminsOfUnitId}", method = RequestMethod.GET)

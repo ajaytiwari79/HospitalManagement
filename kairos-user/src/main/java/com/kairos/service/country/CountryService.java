@@ -9,6 +9,7 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.user.country.Country;
@@ -299,5 +300,43 @@ public class CountryService extends UserBaseService {
 
     public Country getCountryByOrganizationService(long organizationServiceId){
         return countryGraphRepository.getCountryByOrganizationService(organizationServiceId);
+    }
+
+    public Level addLevel(long countryId,Level level){
+        Country country = countryGraphRepository.findOne(countryId);
+        if(country == null){
+            logger.debug("Finding country by id::" + countryId);
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+        country.addLevel(level);
+        countryGraphRepository.save(country);
+        return level;
+    }
+
+    public Level updateLevel(long countryId,long levelId,Level level){
+        Level levelToUpdate = countryGraphRepository.getLevel(countryId,levelId);
+        if(levelToUpdate == null){
+            logger.debug("Finding level by id::" + levelId);
+            throw new DataNotFoundByIdException("Incorrect level id " + levelId);
+        }
+        levelToUpdate.setName(level.getName());
+        levelToUpdate.setDescription(level.getDescription());
+        return save(levelToUpdate);
+    }
+
+    public boolean deleteLevel(long countryId,long levelId){
+        Level levelToDelete = countryGraphRepository.getLevel(countryId,levelId);
+        if(levelToDelete == null){
+            logger.debug("Finding level by id::" + levelId);
+            throw new DataNotFoundByIdException("Incorrect level id " + levelId);
+        }
+
+        levelToDelete.setEnabled(false);
+        save(levelToDelete);
+        return true;
+    }
+
+    public List<Level> getLevels(long countryId){
+        return countryGraphRepository.getLevelsByCountry(countryId);
     }
 }

@@ -5,6 +5,7 @@ import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
@@ -187,7 +188,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = new Organization();
         organization.setParentOrganization(true);
         organization.setCountry(country);
-        organization = saveOrganizationDetails(organization, orgDetails, false);
+        organization = saveOrganizationDetails(organization, orgDetails, false,countryId);
         if (organization == null) {
             return null;
         }
@@ -205,13 +206,13 @@ public class OrganizationService extends UserBaseService {
         return organizationResponse(organization, orgDetails);
     }
 
-    public HashMap<String, Object> updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId) {
+    public HashMap<String, Object> updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId,long countryId) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         ;
         if (organization == null) {
             throw new InternalError("Organization not found");
         }
-        organization = saveOrganizationDetails(organization, orgDetails, true);
+        organization = saveOrganizationDetails(organization, orgDetails, true,countryId);
         if (organization == null) {
             return null;
         }
@@ -258,7 +259,7 @@ public class OrganizationService extends UserBaseService {
         return organizationContactAddress;
     }
 
-    private Organization saveOrganizationDetails(Organization organization, ParentOrganizationDTO orgDetails, boolean isUpdateOperation) {
+    private Organization saveOrganizationDetails(Organization organization, ParentOrganizationDTO orgDetails, boolean isUpdateOperation,long countryId) {
         organization.setName(orgDetails.getName());
         List<OrganizationType> organizationTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getTypeId());
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getSubTypeId());
@@ -335,6 +336,12 @@ public class OrganizationService extends UserBaseService {
             throw new InternalError("Geography data not found with provided municipality");
         }
         logger.info("Geography Data: " + geographyData);
+
+        Level level = countryGraphRepository.getLevel(countryId,orgDetails.getLevelId());
+        if(level == null){
+            throw new InternalError("Level can't be null");
+        }
+        organization.setLevel(level);
 
 
         // Geography Data
@@ -633,10 +640,9 @@ public class OrganizationService extends UserBaseService {
     public Map<String, Object> getParentOrganization(Long countryId) {
         Map<String, Object> data = new HashMap<>();
         OrganizationQueryResult organizationQueryResult = organizationGraphRepository.getParentOrganizationOfRegion(countryId);
+        OrganizationCreationData organizationCreationData = organizationGraphRepository.getOrganizationCreationData(countryId);
         List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
-        List<Map<String, Object>> businessTypes = FormatUtil.formatNeoResponse(businessTypeGraphRepository.findBusinesTypeByCountry(countryId));
-        List<Map<String, Object>> organizationTypes = FormatUtil.formatNeoResponse(countryGraphRepository.getAllOrganizationTypes(countryId));
-
+        organizationCreationData.setZipCodes(zipCodes);
         List<Map<String, Object>> orgData = new ArrayList<>();
         for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
             HashMap<String, Object> orgBasicData = new HashMap<>();
@@ -645,12 +651,7 @@ public class OrganizationService extends UserBaseService {
             orgBasicData.put("municipalities", (address.get("zipCode") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCode"))));
             orgData.add(orgBasicData);
         }
-
-        Map<String, Object> globalData = new HashMap<>();
-        globalData.put("organizationTypes", organizationTypes);
-        globalData.put("businessTypes", businessTypes);
-        globalData.put("zipCodes", zipCodes);
-        data.put("globalData", globalData);
+        data.put("globalData", organizationCreationData);
         data.put("organization", orgData);
         return data;
     }
@@ -941,6 +942,10 @@ public class OrganizationService extends UserBaseService {
             throw new DataNotMatchedException("Mismatched organizations while updating organizationMapping ");
         }
         return true;
+    }
+
+    public List<Long> getAllOrganizationIds() {
+        return organizationGraphRepository.findAllOrganizationIds();
     }
 }
 
