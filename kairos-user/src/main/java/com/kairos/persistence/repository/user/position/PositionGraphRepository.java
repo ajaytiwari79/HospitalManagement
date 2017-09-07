@@ -34,7 +34,7 @@ public interface PositionGraphRepository extends GraphRepository<Position> {
             "p.isEnabled as isEnabled," +
             "p.hourlyWages as hourlyWages," +
             "id(p)   as id," +
-            "p.avgMonthlyWorkingHours as avgMonthlyWorkingHours,"+
+            "p.avgDailyWorkingHours as avgDailyWorkingHours,"+
             "p.lastModificationDate as lastModificationDate")
     List<PositionQueryResult> getAllPositionByStaff(long organizationId, long staffId);
 
