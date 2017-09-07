@@ -340,7 +340,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler({DataNotFoundByIdException.class,AddressNotVerifiedByTomTom.class,
 			ZipCodeNotFound.class,CitizenNotFoundException.class})
 	@ResponseBody
-	public ResponseEnvelope handleNotFound(DataNotFoundByIdException ex,HttpServletRequest request) {
+	public ResponseEnvelope handleNotFound(RuntimeException ex,HttpServletRequest request) {
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());

@@ -52,7 +52,7 @@ public class PositionService extends UserBaseService {
     public Position createPosition(long unitEmploymentId, PositionDTO positionDTO) {
         Position position = preparePosition(positionDTO);
 
-        UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
+        UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId,0);
 
         if (unitEmployment == null) {
             throw new DataNotFoundByIdException("Invalid UnitEmployment id");
@@ -159,12 +159,11 @@ public class PositionService extends UserBaseService {
         position.setEndDate(positionDTO.getEndDate());
 
         position.setTotalWeeklyHours(positionDTO.getTotalWeeklyHours());
-        position.setAvgMonthlyWorkingHours(positionDTO.getAvgMonthlyWorkingHours());
+        position.setAvgDailyWorkingHours(positionDTO.getAvgMonthlyWorkingHours());
         position.setHourlyWages(positionDTO.getHourlyWages());
         position.setSalary(positionDTO.getSalary());
 
         position.setEmploymentType(positionDTO.getEmploymentType());
-
 
         return position;
     }
@@ -209,7 +208,7 @@ public class PositionService extends UserBaseService {
         oldPosition.setEndDate(positionDTO.getEndDate());
 
         oldPosition.setTotalWeeklyHours(positionDTO.getTotalWeeklyHours());
-        oldPosition.setAvgMonthlyWorkingHours(positionDTO.getAvgMonthlyWorkingHours());
+        oldPosition.setAvgDailyWorkingHours(positionDTO.getAvgMonthlyWorkingHours());
         oldPosition.setHourlyWages(positionDTO.getHourlyWages());
         oldPosition.setSalary(positionDTO.getSalary());
         oldPosition.setEmploymentType(positionDTO.getEmploymentType());

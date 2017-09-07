@@ -15,7 +15,7 @@ public class PositionQueryResult {
     private Long endDate;
     private Long lastModificationDate;
     private int totalWeeklyHours;
-    private float avgMonthlyWorkingHours;
+    private float avgDailyWorkingHours;
     private float hourlyWages;
     public enum EmploymentType{
         FULL_TIME,PART_TIME
@@ -66,12 +66,12 @@ public class PositionQueryResult {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
-    public float getAvgMonthlyWorkingHours() {
-        return avgMonthlyWorkingHours;
+    public float getAvgDailyWorkingHours() {
+        return avgDailyWorkingHours;
     }
 
-    public void setAvgMonthlyWorkingHours(float avgMonthlyWorkingHours) {
-        this.avgMonthlyWorkingHours = avgMonthlyWorkingHours;
+    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
     }
 
     public float getHourlyWages() {
