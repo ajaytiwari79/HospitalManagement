@@ -42,7 +42,7 @@ public class WTABaseRuleTemplateDTO {
     private Long numberOfWeeks;
     private String fromDayOfWeek;
     private Long fromTime;
-    private Long proportional;
+    private boolean proportional;
     private Long toTime;
     private String toDayOfWeek;
     private Long continuousDayRestHours;
@@ -262,11 +262,11 @@ public class WTABaseRuleTemplateDTO {
         this.fromTime = fromTime;
     }
 
-    public Long getProportional() {
+    public boolean getProportional() {
         return proportional;
     }
 
-    public void setProportional(Long proportional) {
+    public void setProportional(boolean proportional) {
         this.proportional = proportional;
     }
 
