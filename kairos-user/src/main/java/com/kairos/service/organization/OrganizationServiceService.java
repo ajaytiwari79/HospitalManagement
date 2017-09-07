@@ -424,8 +424,7 @@ public class OrganizationServiceService extends UserBaseService {
     }*/
 
     public com.kairos.persistence.model.organization.OrganizationService saveImportedServices(com.kairos.persistence.model.organization.OrganizationService organizationService) {
-        com.kairos.persistence.model.organization.OrganizationService organizationService1 = organizationServiceRepository.findByKmdExternalId(organizationService.getKmdExternalId());
-        organizationServiceRepository.save(organizationService1);
+        organizationServiceRepository.save(organizationService);
         return organizationService;
     }
 

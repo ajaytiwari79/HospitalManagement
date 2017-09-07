@@ -95,9 +95,9 @@ public class CitizenService {
      * This method is used to import Citizen from KMD Nexus.
      * @return
      */
-    public String getCitizensFromKMD() {
+    public String getCitizensFromKMD(Long unitId) {
         try {
-            Organization organization = organizationGraphRepository.findByName(AppConstants.KMD_NEXUS_ORGANIZATION);
+            Organization organization = organizationGraphRepository.findOne(unitId);
             RestTemplate loginTemplate = new RestTemplate();
             HttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
             HttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
@@ -147,6 +147,7 @@ public class CitizenService {
         }
     }
 
+
     /**
      * This method is used to import Citizen's demands from KMD.
      */
@@ -182,11 +183,9 @@ public class CitizenService {
         for (Map<String, Object> map : citizens) {
             authService.dokmdAuth();
             logger.info("citizen----kmdNexusExternalId------> " + map.get("kmdNexusExternalId"));
-            //  if(map.get("kmdNexusExternalId").equals("7") == false) continue;
             client = clientGraphRepository.findByKmdNexusExternalId(map.get("kmdNexusExternalId").toString());
             Organization organization = (Organization) clientGraphRepository.getClientOrganizationIdList(client.getId()).get(0);
 
-            //  logger.info("timeSlots------------> "+timeSlots);
             ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_PATIENT_PATHWAY_PREFERENCE, map.get("kmdNexusExternalId").toString()), HttpMethod.GET, headersElements, String.class);
             JSONObject patientPathwayObject = new JSONObject(responseEntity.getBody());
             JSONArray citizenPathwayArray = patientPathwayObject.getJSONArray("CITIZEN_PATHWAY");
@@ -200,13 +199,14 @@ public class CitizenService {
 
                         JSONObject patientPathway = patientPathways.getJSONObject(i);
                         if (patientPathway.get("type").equals("patientPathwayReference") == true) {
-                            logger.info("services--1-----> "+patientPathway.get("name").toString());
-                            service = organizationServiceRepository.checkDuplicateService(country.getId(), patientPathway.get("name").toString());
-                            logger.info("service--2-----> "+service);
+                            service = organizationServiceRepository.findByKmdExternalId(patientPathway.get("patientPathwayId").toString());
                             if (service == null) {
                                 service = new com.kairos.persistence.model.organization.OrganizationService();
                                 service.setName(patientPathway.get("name").toString());
-                                service = organizationServiceService.createOrganizationService(country.getId(), service);
+                                Optional serviceOptional = Optional.ofNullable(patientPathway.get("patientPathwayId"));
+                                if(serviceOptional.isPresent()) service.setKmdExternalId(patientPathway.get("patientPathwayId").toString());
+                                service.setImported(true);
+                                service = organizationServiceService.saveImportedServices(service);
                             }
                             JSONArray pathwayChildren = patientPathway.getJSONArray("children");
                             boolean hasSubService = false;
@@ -215,11 +215,15 @@ public class CitizenService {
                                     JSONObject subPatientPathway = pathwayChildren.getJSONObject(pC);
                                     if (subPatientPathway.get("type").equals("patientPathwayReference") == true) {
                                         hasSubService = true;
-                                        subService = organizationServiceRepository.checkDuplicateSubServiceWithSpecialCharacters(service.getId(), subPatientPathway.get("name").toString());
+                                        subService = organizationServiceRepository.findByKmdExternalId(subPatientPathway.get("patientPathwayId").toString());
                                         if (subService == null) {
                                             subService = new com.kairos.persistence.model.organization.OrganizationService();
                                             subService.setName(subPatientPathway.get("name").toString());
-                                            organizationServiceService.addSubService(service.getId(), subService);
+                                            Optional serviceOptional = Optional.ofNullable(patientPathway.get("patientPathwayId"));
+                                            if(serviceOptional.isPresent()) service.setKmdExternalId(patientPathway.get("patientPathwayId").toString());
+                                            subService.setImported(true);
+                                            subService = organizationServiceService.saveImportedServices(subService);
+                                            organizationServiceService.updateServiceToOrganization(organization.getId(), subService.getId(), true, ORGANIZATION);
                                         }
                                         JSONArray subPatientPathwayChildren = subPatientPathway.getJSONArray("children");
                                         for (int sPPC = 0; sPPC < subPatientPathwayChildren.length(); sPPC++) {
@@ -368,7 +372,10 @@ public class CitizenService {
                 if (subService == null) {
                     subService = new com.kairos.persistence.model.organization.OrganizationService();
                     subService.setName(service.getName());
-                    organizationServiceService.addSubService(service.getId(), subService);
+                    subService.setKmdExternalId(service.getKmdExternalId());
+                    subService.setImported(true);
+                    subService = organizationServiceService.saveImportedServices(subService);
+                    organizationServiceService.updateServiceToOrganization(organization.getId(), subService.getId(), true, ORGANIZATION);
                 }
             }
 
