@@ -99,7 +99,7 @@ public class OrganizationServiceService extends UserBaseService {
         return true;
     }
 
-    public Map<String, Object> addSubService(final long serviceId,com.kairos.persistence.model.organization.OrganizationService subService) {
+    public com.kairos.persistence.model.organization.OrganizationService addSubService(final long serviceId,com.kairos.persistence.model.organization.OrganizationService subService) {
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         if (organizationService == null) {
             return null;
@@ -126,7 +126,7 @@ public class OrganizationServiceService extends UserBaseService {
         response.put("description", subService.getDescription());
         logger.info("Sending Response: "+response);
 
-        return response;
+        return subService;
 
     }
 
@@ -170,6 +170,7 @@ public class OrganizationServiceService extends UserBaseService {
             }
 
             if(isSelected){
+                logger.info("check if already exist-------> "+organizationGraphRepository.isServiceAlreadyExist(id,organizationService.getId()));
                 if(organizationGraphRepository.isServiceAlreadyExist(id,organizationService.getId()) == 0){
                     organizationGraphRepository.addOrganizationServiceInUnit(id,Arrays.asList(organizationService.getId()),new Date().getTime(),new Date().getTime());
                 }else {
