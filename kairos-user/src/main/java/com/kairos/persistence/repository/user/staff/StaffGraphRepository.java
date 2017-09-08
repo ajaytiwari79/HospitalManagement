@@ -9,6 +9,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.PartialLeave;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.StaffAdditionalInfoQueryResult;
+import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -270,5 +271,16 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
             "optional Match (staff)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail)\n" +
             "return id(staff)")
     List<Long> getUnitManagersIds(long organizationId, long unitId);
+
+
+    @Query("match(u:User)  where id(u)={1} \n" +
+            "match(staff:Staff)-[:BELONGS_TO]->(u) \n" +
+            "return  id(staff) as id, staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.organizationId as organizationId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName")
+    List<StaffPersonalDetailDTO> getStaffInfoById(long unitId, long staffId);
+
+    @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments ,organization\n" +
+            "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments)\n" +
+            "return  id(staff) as id, staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.organizationId as organizationId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName")
+    List<StaffPersonalDetailDTO> getAllStaffByUnitId(long unitId);
 
 }
