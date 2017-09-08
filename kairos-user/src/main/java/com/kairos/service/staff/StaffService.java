@@ -1164,5 +1164,22 @@ public class StaffService extends UserBaseService {
 
         return unitManagers;
     }
+    public List<StaffPersonalDetailDTO> getAllStaffByUnitId(long unitId){
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (unit==null){
+            throw new DataNotFoundByIdException("unit  not found  Unit ID: "+unitId);
+        }
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllStaffByUnitId(unitId);
+        return staffPersonalDetailDTOS;
+    }
+
+    public List<StaffPersonalDetailDTO> getStaffInfoById(long staffId, long unitId) {
+        List<StaffPersonalDetailDTO>  staffPersonalDetailList = staffGraphRepository.getStaffInfoById(unitId, staffId);
+        if (staffPersonalDetailList == null) {
+            throw new DataNotFoundByIdException("Staff not found with provided Staff ID: " + staffId+ " and Unit ID: "+unitId);
+        }
+        return staffPersonalDetailList;
+
+    }
 
 }

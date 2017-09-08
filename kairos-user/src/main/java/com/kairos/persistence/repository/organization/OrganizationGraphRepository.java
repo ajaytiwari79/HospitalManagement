@@ -458,4 +458,10 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("MATCH (o:Organization) return id(o)")
     List<Long> findAllOrganizationIds();
 
+    @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
+            "Match (organization)-[:"+TYPE_OF+"]->(organizationType:OrganizationType) with organizationType,organization\n" +
+            "optional match (organizationType)-[:"+HAS_SUB_TYPE+"]->(subType:OrganizationType)<-[:"+SUB_TYPE_OF+"]-(organization) with subType,organizationType,organization\n" +
+            "return collect(id(organizationType)) as organizationTypes, collect(id(subType)) as organizationSubTypes")
+    OrganizationTypeAndSubTypeDTO getorganizationTypeAndSubTypes(Long unitId);
+
 }

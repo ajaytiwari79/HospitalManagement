@@ -83,4 +83,5 @@ public class OrganizationTypeController {
         organizationTypeService.deleteLinkingOfOrganizationTypeAndService(orgTypeId,organizationServiceId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
+
 }
