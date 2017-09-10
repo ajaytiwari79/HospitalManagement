@@ -432,7 +432,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     List<PositionName> getPositionNames(Long organizationId);
 
     @Query(" Match (organization:Organization) where id(organization)={0} with organization\n" +
-             "Match (organization)-[r:PROVIDE_SERVICE{imported:true}]->(os) with distinct os,r\n" +
+             "Match (organization)-[r:PROVIDE_SERVICE]->(os) where os.imported=true with distinct os,r\n" +
             "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as selectedServices return {selectedServices:collect(selectedServices)} as data")
     List<Map<String, Object>> getImportedServicesForUnit(long organizationId);
 
