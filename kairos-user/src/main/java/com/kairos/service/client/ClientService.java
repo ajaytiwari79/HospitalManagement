@@ -827,7 +827,7 @@ public class ClientService extends UserBaseService {
         orgData.put("taskTypes", taskTypeRestClient.getTaskTypesOfUnit(unitId));
         // orgData.put("taskTypes", customTaskTypeRepository.getTaskTypesOfUnit(unitId));
         orgData.put("skills", filterSkillData);
-        orgData.put("teams", teamGraphRepository.getTeamsByOrganization(unitId));
+        orgData.put("teams", teamGraphRepository.getTeamsByOrganization(    unitId));
 
         long endTime = System.currentTimeMillis();
         logger.info("Time taken by ClientService>>getAssignedStaffOfCitizen " + (endTime - startTime) + "  ms");
@@ -857,7 +857,7 @@ public class ClientService extends UserBaseService {
 
         Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )
-        Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(organizationId, staff.getId(), mapList);
+        Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(),organizationId,mapList);
         response.putAll(responseFromTask);
 
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
