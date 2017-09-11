@@ -948,8 +948,13 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.findAllOrganizationIds();
     }
 
-    public OrganizationTypeAndSubTypeDTO getorganizationTypeAndSubTypes(Long unitId) {
-        return organizationGraphRepository.getorganizationTypeAndSubTypes(unitId);
+    public OrganizationTypeAndSubTypeDTO getOrganizationTypeAndSubTypes(Long unitId) {
+        OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO=null;
+        List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(unitId);
+        List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(unitId);
+        organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
+        organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
+        return organizationTypeAndSubTypeDTO;
     }
 }
 
