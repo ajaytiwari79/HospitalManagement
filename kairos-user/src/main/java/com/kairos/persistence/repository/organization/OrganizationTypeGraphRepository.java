@@ -94,15 +94,16 @@ public interface OrganizationTypeGraphRepository extends GraphRepository<Organiz
     @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
     List<Organization> getOrganizationsByOrganizationType(long orgTypeId);
 
+
     @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
             "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType) with organizationType,organization\n" +
             "optional match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType)<-[:SUB_TYPE_OF]-(organization) with subType,organizationType,organization\n" +
-            "return collect(id(organizationType))")
+            "return id(organizationType)")
     List<Long> getOrganizationTypeIdsByUnitId(long unitId);
 
     @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
             "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType) with organizationType,organization\n" +
             "optional match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType)<-[:SUB_TYPE_OF]-(organization) with subType,organizationType,organization\n" +
-            "return collect(id(subType))")
+            "return id(subType)")
     List<Long> getOrganizationSubTypeIdsByUnitId(long unitId);
 }
