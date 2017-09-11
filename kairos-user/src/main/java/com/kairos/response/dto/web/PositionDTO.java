@@ -13,7 +13,7 @@ public class PositionDTO {
     private Long startDate;
     private Long endDate;
     private int totalWeeklyHours;
-    private float avgMonthlyWorkingHours;
+    private float avgDailyWorkingHours;
     private float hourlyWages;
 
     private float salary;
@@ -35,9 +35,9 @@ public class PositionDTO {
 
 
     public PositionDTO(String name, String description, Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours,
-                       float avgMonthlyWorkingHours, float hourlyWages, float salary, Position.EmploymentType employmentType) {
+                       float avgDailyWorkingHours, float hourlyWages, float salary, Position.EmploymentType employmentType) {
         this.salary=salary;
-        this.avgMonthlyWorkingHours=avgMonthlyWorkingHours;
+        this.avgDailyWorkingHours =avgDailyWorkingHours;
         this.totalWeeklyHours=totalWeeklyHours;
         this.hourlyWages=hourlyWages;
         this.positionNameId = positionNameId;
@@ -89,12 +89,12 @@ public class PositionDTO {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
-    public float getAvgMonthlyWorkingHours() {
-        return avgMonthlyWorkingHours;
+    public float getAvgDailyWorkingHours() {
+        return avgDailyWorkingHours;
     }
 
-    public void setAvgMonthlyWorkingHours(float avgMonthlyWorkingHours) {
-        this.avgMonthlyWorkingHours = avgMonthlyWorkingHours;
+    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
     }
 
     public float getHourlyWages() {

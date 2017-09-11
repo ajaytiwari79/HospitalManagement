@@ -17,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 
+import static com.kairos.constants.AppConstants.*;
+
 
 @Configuration
 @EnableAuthorizationServer
@@ -70,6 +72,12 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/swagger-ui.html");
         web.ignoring().antMatchers("/v2/api-docs");
         web.ignoring().antMatchers("/api/v1/organization/{organizationId}/ids");
+        web.ignoring().antMatchers(API_KMD_CARE_CITIZEN_GRANTS);
+        web.ignoring().antMatchers(API_KMD_CARE_CITIZEN);
+        web.ignoring().antMatchers(API_KMD_CARE_CITIZEN_RELATIVE_DATA);
+        web.ignoring().antMatchers(API_KMD_CARE_STAFF_SHIFTS);
+        web.ignoring().antMatchers(API_TIME_CARE_SHIFTS);
+
         web.ignoring().antMatchers("/api/v1/login");
 
     }
