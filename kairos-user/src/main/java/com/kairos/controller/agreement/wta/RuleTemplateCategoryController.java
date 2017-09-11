@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
@@ -29,7 +30,7 @@ public class RuleTemplateCategoryController {
 
 
     @RequestMapping(value = "/template_category", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> createRuleTemplate(@PathVariable long countryId, @RequestBody RuleTemplateCategory ruleTemplateCategory) {
+    ResponseEntity<Map<String, Object>> createRuleTemplate(@PathVariable long countryId, @RequestBody @Valid RuleTemplateCategory ruleTemplateCategory) {
 
         if (ruleTemplateCategory != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.createRuleTemplate(countryId, ruleTemplateCategory));
