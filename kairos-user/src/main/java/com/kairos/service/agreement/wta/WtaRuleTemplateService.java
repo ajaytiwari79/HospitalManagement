@@ -3,6 +3,7 @@ package com.kairos.service.agreement.wta;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.user.agreement.wta.templates.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
@@ -425,8 +426,15 @@ public class WtaRuleTemplateService extends UserBaseService {
 
     public Map<String, Object> updateRuleTemplateCategory(WtaRuleTemplateDTO wtaRuleTemplateDTO, long countryId) {
 
+
+        if(wtaRuleTemplateDTO.getCategoryName()==null || wtaRuleTemplateDTO.getCategoryName().isEmpty()){
+            throw new InvalidRequestException("category name cant be null or empty!!");
+        }
+
         wtaRuleTemplateGraphRepository.deleteOldCategories(wtaRuleTemplateDTO.getRuleTemplateIds());
+
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaRuleTemplateGraphRepository.getWtaBaseRuleTemplateByIds(wtaRuleTemplateDTO.getRuleTemplateIds());
+
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, wtaRuleTemplateDTO.getCategoryName());
         Map<String, Object> response = new HashedMap();
         if (ruleTemplateCategory == null) {

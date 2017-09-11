@@ -86,7 +86,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
         if (ruleTemplateCategory==null) {
             throw new DataNotFoundByIdException("RULE template ruleTemplateCategory does not exist"+templateCategoryId);
         }
-        if(ruleTemplateCategory.getName().equals("NONE"))
+        if(ruleTemplateCategory.getName()!=null && ruleTemplateCategory.getName().equals("NONE"))
         {
             throw new ActionNotPermittedException("Can't delete none template category "+templateCategoryId);
         }
