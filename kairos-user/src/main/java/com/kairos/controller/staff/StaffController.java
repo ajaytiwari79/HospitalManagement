@@ -547,5 +547,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffInfoById(staffId, unitId));
     }
 
+    @RequestMapping(value = "/{staffId}", method = RequestMethod.GET)
+    @ApiOperation("get Staff by StaffId ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffById(@PathVariable long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffById(staffId));
+    }
+
 
 }

@@ -62,6 +62,7 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.organization.OpenningHourService;
 import com.kairos.service.organization.OrganizationTypeService;
 import com.kairos.service.organization.TeamService;
+import com.kairos.service.phase.PhaseService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import org.joda.time.DateTime;
@@ -164,6 +165,9 @@ public class BootDataService {
     private AccessPageService accessPageService;
     @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    @Inject
+    private PhaseService phaseService;
+
 
 
 
@@ -252,6 +256,9 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
+        phaseService.createPhases();
+        phaseService.linkPhasesWithAllOrganizations();
+
         startRegisteredCronJobs();
 
     }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <springProfile name="development,devdeploy,test,default">
+
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <!-- Log message format -->
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+                </pattern>
+            </encoder>
+        </appender>
+
+        <appender name="timeBasedLogsAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file> logs/kairos-registry.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <!-- daily rollover -->
+                <fileNamePattern>kairos-gateway.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>30</maxHistory>
+            </rollingPolicy>
+
+            <encoder>
+                <pattern>%relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <!-- Setting the root level of logging to INFO -->
+        <root level="INFO">
+            <appender-ref ref="STDOUT" />
+            <appender-ref ref="FILE" />
+            <appender-ref ref="timeBasedLogsAppender" />
+        </root>
+
+    </springProfile>
+    <springProfile name="production">
+        <logger name="com.kairos" level="WARN,INFO" additivity="false">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
+        </logger>
+    </springProfile>
+</configuration>
+
+

@@ -25,6 +25,8 @@ import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,6 +55,7 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 @RequestMapping(API_ORGANIZATION_URL)
 @Api(API_ORGANIZATION_URL)
 public class OrganizationController {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     private OrganizationService organizationService;
@@ -920,6 +923,7 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>>
     verifyOrganizationExpertise(@RequestBody OrganizationMappingActivityTypeDTO organizationMappingActivityTypeDTO) {
+        logger.info("inside the controller------------------");
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.verifyOrganizationExpertise(organizationMappingActivityTypeDTO));
     }
@@ -951,7 +955,7 @@ public class OrganizationController {
                 staffService.getUnitManagerIds(unitManagerOfUnitId));
     }
 
-    @RequestMapping(value = "/unit/{unitId}/organizationTypeAndSubTypes", method = RequestMethod.GET)
+    @RequestMapping(value = UNIT_URL+"/organizationTypeAndSubTypes", method = RequestMethod.GET)
     @ApiOperation("get All organization types and  and Sub org by unitId")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getorganizationTypeAndSubTypes( @PathVariable long unitId) {

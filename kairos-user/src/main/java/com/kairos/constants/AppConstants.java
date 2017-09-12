@@ -172,7 +172,7 @@ public class AppConstants {
     public static final String TEMPLATE3_DESCRIPTION = "Checks maximum number of consecutive scheduled days";
 
     public static final String TEMPLATE4 = "TEMPLATE4";
-    public static final String TEMPLATE4_NAME = "Maximum number of consecutive days";
+    public static final String TEMPLATE4_NAME = "Minimum rest after consecutive days worked";
     public static final String TEMPLATE4_DESCRIPTION = "Checks the least amount of continuous rest after a given number of consecutive days with shifts.";
 
     public static final String TEMPLATE5 = "TEMPLATE5";
@@ -197,7 +197,7 @@ public class AppConstants {
     public static final String TEMPLATE9_DESCRIPTION = "Checks that the number of nights worked in a set interval do not exceed the set value.";
 
     public static final String TEMPLATE10 = "TEMPLATE10";
-    public static final String TEMPLATE10_NAME = "Maximum number of days off per period";
+    public static final String TEMPLATE10_NAME = "Minimum number of days off per period";
     public static final String TEMPLATE10_DESCRIPTION = "Minimum amount of days off per interval. A day off is a non working day. A day off between\n" +
             "00:00-24:00. For persons that work night shifts the day the calculation of hours should be on the day that has the majority of hours.";
 
@@ -214,7 +214,7 @@ public class AppConstants {
     public static final String TEMPLATE13_DESCRIPTION = "This rule is to prevent persons who have already requested weekend shifts (more than the average an employee should do during the period) from being allocated more weekend shifts at optimisation.";
 
     public static final String TEMPLATE14 = "TEMPLATE14";
-    public static final String TEMPLATE14_NAME = "Care days check Category";
+    public static final String TEMPLATE14_NAME = "Care days check";
     public static final String TEMPLATE14_DESCRIPTION = "Care days check.";
 
     public static final String TEMPLATE15 = "TEMPLATE15";
@@ -226,11 +226,11 @@ public class AppConstants {
     public static final String TEMPLATE16_DESCRIPTION = "Minimum duration between shifts.";
 
     public static final String TEMPLATE17 = "TEMPLATE17";
-    public static final String TEMPLATE17_NAME = "Minimum weekly rest period";
+    public static final String TEMPLATE17_NAME = "Minimum weekly rest period,fixed weeks";
     public static final String TEMPLATE17_DESCRIPTION = "Sets the minimum consecutive rest for any 7-days interval. Uses the persons setting for week offset.";
 
     public static final String TEMPLATE18 = "TEMPLATE18";
-    public static final String TEMPLATE18_NAME = "Shortest and average daily rest";
+    public static final String TEMPLATE18_NAME = "Shortest and average daily rest,fixed times";
     public static final String TEMPLATE18_DESCRIPTION = "Daily rest is calculated for all working days within a period. Minimum X h rest and average 11 h rest per period. A working day is defined as having a shift on that day.";
 
     public static final String TEMPLATE19 = "TEMPLATE19";
@@ -247,6 +247,18 @@ public class AppConstants {
     public static final String REQUEST_TO_CREATE_NEW_UTILITY = "Request to create new utility";
     public static final String UNIT = "unit";
     public static final String SUCCESS = "success";
+
+
+    public static final String REQUEST_PHASE_NAME = "REQUEST";
+    public static final String REQUEST_PHASE_DESCRIPTION = "REQUEST PHASE";
+    public static final String PUZZLE_PHASE_NAME = "PUZZLE";
+    public static final String PUZZLE_PHASE_DESCRIPTION = "PUZZLE PHASE";
+    public static final String CONSTRUCTION_PHASE_NAME = "CONSTRUCTION";
+    public static final String CONSTRUCTION_PHASE_DESCRIPTION = "CONSTRUCTION PHASE";
+    public static final String FINAL_PHASE_NAME = "FINAL";
+    public static final String FINAL_PHASE_DESCRIPTION = "FINAL PHASE";
+    public static final Long DURATION_IN_WEEK=4L;
+
 
 
 }
