@@ -64,8 +64,8 @@ public class PositionController {
     * */
     @ApiOperation(value = "Get all positions by organization and staff")
     @RequestMapping(value="/staff/{staffId}/position")
-    ResponseEntity<Map<String, Object>> getAllPositionByStaff(@PathVariable Long organizationId,@PathVariable Long staffId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,positionService.getAllPositionByStaff(organizationId,staffId));
+    ResponseEntity<Map<String, Object>> getAllPositionByStaff(@PathVariable Long unitId,@PathVariable Long staffId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,positionService.getAllPositionByStaff(unitId,staffId));
     }
 
 
