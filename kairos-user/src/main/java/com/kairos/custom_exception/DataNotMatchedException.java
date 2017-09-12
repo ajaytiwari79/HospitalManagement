@@ -8,6 +8,7 @@ public class DataNotMatchedException extends RuntimeException {
     public String message;
 
     public DataNotMatchedException(String message) {
+        super(message);
         this.message = message;
     }
 
