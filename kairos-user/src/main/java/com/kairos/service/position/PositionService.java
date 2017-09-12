@@ -219,13 +219,13 @@ public class PositionService extends UserBaseService {
      * @auth vipul
      * used to get all positions of organization n buy organization and staff Id
      * */
-    public List<PositionQueryResult> getAllPositionByStaff(long organizationId, long staffId) {
+    public List<PositionQueryResult> getAllPositionByStaff(long unitId, long staffId) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
             throw new DataNotFoundByIdException("Invalid Staff Id");
         }
 
-        return positionGraphRepository.getAllPositionByStaff(organizationId, staffId);
+        return positionGraphRepository.getAllPositionByStaff(unitId, staffId);
     }
 
 }
