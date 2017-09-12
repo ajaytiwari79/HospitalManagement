@@ -106,6 +106,7 @@ public class WTAService extends UserBaseService {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<WTABaseRuleTemplate>();
 
        // wtaBaseRuleTemplates = setRuleTemplates(countryId, wta, wtaDTO);
+        if(wtaDTO.getRuleTemplates()!=null || wtaDTO.getRuleTemplates().isEmpty()){
         for (long ruleTemplateId : wtaDTO.getRuleTemplates()) {
             WTABaseRuleTemplate wtaBaseRuleTemplate = wtaBaseRuleTemplateGraphRepository.findOne(ruleTemplateId);
             if (wtaBaseRuleTemplate == null) {
@@ -113,7 +114,7 @@ public class WTAService extends UserBaseService {
 
             }
             wtaBaseRuleTemplates.add(wtaBaseRuleTemplate);
-        }
+        }}
         wta.setRuleTemplates(wtaBaseRuleTemplates);
         Region region = regionRepository.findOne(wtaDTO.getRegionId());
         if (region == null) {
