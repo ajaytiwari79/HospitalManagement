@@ -8,6 +8,7 @@ package com.kairos.custom_exception;
     public String message;
 
     public DataNotFoundByIdException(String message) {
+        super(message);
         this.message = message;
     }
 

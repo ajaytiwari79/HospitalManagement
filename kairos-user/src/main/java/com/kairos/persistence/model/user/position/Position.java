@@ -16,9 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
-
 public class Position extends UserBaseEntity {
-
 
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
@@ -36,7 +34,7 @@ public class Position extends UserBaseEntity {
     private Long startDate;
     private Long endDate;
     private int totalWeeklyHours;
-    private float avgMonthlyWorkingHours;
+    private float avgDailyWorkingHours;
     private float hourlyWages;
     public enum EmploymentType{
         FULL_TIME,PART_TIME
@@ -48,11 +46,9 @@ public class Position extends UserBaseEntity {
     public Position() {
     }
 
-
-
     public Position( Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
                     PositionName positionName, String description, Long startDate, Long endDate, Long expiryDate
-                    ,int totalWeeklyHours ,float avgMonthlyWorkingHours,float hourlyWages,float salary) {
+                    ,int totalWeeklyHours ,float avgDailyWorkingHours,float hourlyWages,float salary) {
 
         this.expertise = expertise;
         this.cta = cta;
@@ -61,7 +57,7 @@ public class Position extends UserBaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.totalWeeklyHours=totalWeeklyHours;
-        this.avgMonthlyWorkingHours=avgMonthlyWorkingHours;
+        this.avgDailyWorkingHours =avgDailyWorkingHours;
         this.salary=salary;
         this.hourlyWages=hourlyWages;
     }
@@ -74,12 +70,12 @@ public class Position extends UserBaseEntity {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
-    public float getAvgMonthlyWorkingHours() {
-        return avgMonthlyWorkingHours;
+    public float getAvgDailyWorkingHours() {
+        return avgDailyWorkingHours;
     }
 
-    public void setAvgMonthlyWorkingHours(float avgMonthlyWorkingHours) {
-        this.avgMonthlyWorkingHours = avgMonthlyWorkingHours;
+    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
     }
 
     public float getHourlyWages() {

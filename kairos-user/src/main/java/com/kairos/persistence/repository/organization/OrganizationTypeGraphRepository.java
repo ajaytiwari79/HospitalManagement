@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.organization;
 import com.kairos.persistence.model.organization.OrgTypeExpertiseQueryResult;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
@@ -46,10 +47,10 @@ public interface OrganizationTypeGraphRepository extends GraphRepository<Organiz
     void selectService(long orgTypeId, long serviceId);
 
     @Query(" Match (o:OrganizationType),(os:OrganizationService) where id(o) IN {0} AND id(os)={1}  " +
-            " CREATE unique (o)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]->(os) return os")
+            "CREATE unique (o)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]->(os) return os")
     void linkOrganizationTypeWithService(Set<Long> orgTypeId, long serviceId);
 
-    @Query("Match (o:OrganizationType)-[rel:ORGANIZATION_TYPE_HAS_SERVICES]->(os:OrganizationService) where id(o) IN {0}  AND  id(os)={1} DELETE rel ")
+    @Query("Match (o:OrganizationType)-[rel:"+ORGANIZATION_TYPE_HAS_SERVICES+"]->(os:OrganizationService) where id(o) IN {0}  AND  id(os)={1} DELETE rel ")
     void deleteRelOrganizationTypeWithService(Set<Long> orgTypeId, long serviceId);
 
     @Query("MATCH (pot:OrganizationType {isEnable:true})-[:HAS_SUB_TYPE]-(ot:OrganizationType{isEnable:true}) WHERE id(pot)={0} return {name:ot.name,id:id(ot),description:ot.description } as result")
@@ -89,4 +90,20 @@ public interface OrganizationTypeGraphRepository extends GraphRepository<Organiz
             "match(workingTimeAgreement:WorkingTimeAgreement)-[:BELONGS_TO]->(o)\n" +
             "return workingTimeAgreement")
     List<WorkingTimeAgreement> getAllWTAByOrganiationType(List<Long> organizationTypeIds);
+
+    @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
+    List<Organization> getOrganizationsByOrganizationType(long orgTypeId);
+
+
+    @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
+            "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType) with organizationType,organization\n" +
+            "optional match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType)<-[:SUB_TYPE_OF]-(organization) with subType,organizationType,organization\n" +
+            "return id(organizationType)")
+    List<Long> getOrganizationTypeIdsByUnitId(long unitId);
+
+    @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
+            "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType) with organizationType,organization\n" +
+            "optional match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType)<-[:SUB_TYPE_OF]-(organization) with subType,organizationType,organization\n" +
+            "return id(subType)")
+    List<Long> getOrganizationSubTypeIdsByUnitId(long unitId);
 }

@@ -4,6 +4,7 @@ buildscript {
 		swaggerVersion = '2.5.0'
 		jacksonVersion= '2.5.4'
 		neo4jBoltDriverVersion = '2.1.1'
+		neo4jOgmVersion="2.1.1"
 	}
 	repositories {
 		mavenCentral()
@@ -84,6 +85,8 @@ dependencies {
 	compile group: 'joda-time', name: 'joda-time', version: '2.9.4'
 
 	compile group: 'org.neo4j', name: 'neo4j-ogm-bolt-driver', version: neo4jBoltDriverVersion
+
+	compile group: 'org.neo4j', name: 'neo4j-ogm-core', version: neo4jOgmVersion
 
 
 	// Swagger

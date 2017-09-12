@@ -491,6 +491,18 @@ public class ClientController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getCitizenDetails(citizenId));
     }
 
+    /** @auther anil maurya
+     * this endpoint is called from task micro service
+     * @param citizenId
+
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/{citizenId}/addressInfo")
+    @ApiOperation("get citizen address info")
+    private ResponseEntity<Map<String, Object>> getCitizenAddressInfo(@PathVariable long citizenId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,clientService.getClientAddressInfo(citizenId));
+    }
+
     /**
      * @auther anil maurya
      * this endpoint is called from task micro service

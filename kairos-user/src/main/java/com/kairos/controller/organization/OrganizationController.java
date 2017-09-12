@@ -3,8 +3,6 @@ package com.kairos.controller.organization;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.TeamDTO;
-import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.auth.UserAuthentication;
 import com.kairos.persistence.model.user.client.ClientStaffDTO;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.resources.Resource;
@@ -949,6 +947,14 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getUnitManagerIds( @PathVariable long unitManagerOfUnitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffService.getUnitManagerIds(unitManagerOfUnitId));
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/organizationTypeAndSubTypes", method = RequestMethod.GET)
+    @ApiOperation("get All organization types and  and Sub org by unitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getorganizationTypeAndSubTypes( @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationTypeAndSubTypes(unitId));
     }
 
 }
