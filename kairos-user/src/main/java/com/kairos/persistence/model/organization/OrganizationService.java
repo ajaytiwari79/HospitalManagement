@@ -34,6 +34,8 @@ public class OrganizationService extends UserBaseEntity {
 
     private boolean imported = false;
 
+    private boolean hasMapped = false;
+
     private String referenceId;
 
     public OrganizationService(String name, List<OrganizationService> organizationSubServicesList) {
@@ -111,5 +113,13 @@ public class OrganizationService extends UserBaseEntity {
 
     public void setReferenceId(String referenceId) {
         this.referenceId = referenceId;
+    }
+
+    public boolean isHasMapped() {
+        return hasMapped;
+    }
+
+    public void setHasMapped(boolean hasMapped) {
+        this.hasMapped = hasMapped;
     }
 }

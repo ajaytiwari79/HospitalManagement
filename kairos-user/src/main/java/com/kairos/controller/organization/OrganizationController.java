@@ -8,6 +8,8 @@ import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
+import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
+import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.language.LanguageService;
@@ -955,6 +957,39 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getorganizationTypeAndSubTypes( @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationTypeAndSubTypes(unitId));
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/saveKMDExternal", method = RequestMethod.POST)
+    @ApiOperation("Save KMD External of unitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> saveKMDExternalId( @PathVariable long unitId, @RequestBody OrganizationExternalIdsDTO organizationExternalIdsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.saveKMDExternalId(unitId, organizationExternalIdsDTO));
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/saveTimeSlotDeduction", method = RequestMethod.POST)
+    @ApiOperation("Save KMD External of unitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> saveTimeSlotDeduction( @PathVariable long unitId, @RequestBody TimeSlotsDeductionDTO timeSlotsDeductionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.saveTimeSlotPercentageDeduction(unitId, timeSlotsDeductionDTO));
+    }
+
+
+    @RequestMapping(value = "/unit/{unitId}/saveKMDExternal", method = RequestMethod.GET)
+    @ApiOperation("Save KMD External of unitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getKMDExternalId( @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getKMDExternalId(unitId));
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/saveTimeSlotDeduction", method = RequestMethod.GET)
+    @ApiOperation("Save KMD External of unitId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeSlotDeduction( @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getTimeSlotPercentageDeduction(unitId));
     }
 
 }

@@ -4,6 +4,7 @@ import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.TaskTypeAggregateResult;
 import com.kairos.util.userContext.UserContext;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +159,37 @@ public class TaskDemandRestClient {
         }
     }
 
+    /**
+     * @auther anil maurya
+     * map endpoind on task demand controller in task micro service
+     * @param organizationId
+     * @return
+     */
+    public Map<String, Object> createGrants(Long subServiceId, Long organizationId, Map<String, Object> grantObject) {
+
+        try {
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(grantObject);
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>>(){};
+            ResponseEntity<RestTemplateResponseEnvelope<Map<String,Object>>> restExchange =
+                    restTemplate.exchange("http://zuulservice/kairos/activity/api/v1/task_demand/organization/{organizationId}/service/{subServiceId}",
+                            HttpMethod.
+                                    POST,request, typeReference,organizationId, subServiceId);
+
+            RestTemplateResponseEnvelope<Map<String,Object>> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+
+                return response.getData();
+
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+    }
 
 
 

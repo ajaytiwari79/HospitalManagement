@@ -174,7 +174,7 @@ public class Organization extends UserBaseEntity {
     private String estimoteAppToken;
     private int endTimeDeduction = 5; //in percentage
 
-    private String kmdExternalId; //timeCare External Id
+    private String kmdExternalId; //kmd External Id
 
     private int dayShiftTimeDeduction = 4; //in percentage
 

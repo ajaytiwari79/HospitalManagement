@@ -25,6 +25,8 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
+import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.AddressVerificationService;
@@ -956,6 +958,42 @@ public class OrganizationService extends UserBaseService {
         organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
         organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
         return organizationTypeAndSubTypeDTO;
+    }
+
+    public OrganizationExternalIdsDTO saveKMDExternalId(Long unitId, OrganizationExternalIdsDTO organizationExternalIdsDTO){
+            Organization organization = organizationGraphRepository.findOne(unitId);
+            organization.setKmdExternalId(organizationExternalIdsDTO.getKmdExternalId());
+        organization.setExternalId(organizationExternalIdsDTO.getTimeCareExternalId());
+            organizationGraphRepository.save(organization);
+            return organizationExternalIdsDTO;
+
+    }
+
+    public TimeSlotsDeductionDTO saveTimeSlotPercentageDeduction(Long unitId, TimeSlotsDeductionDTO timeSlotsDeductionDTO){
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        organization.setDayShiftTimeDeduction(timeSlotsDeductionDTO.getDayShiftTimeDeduction());
+        organization.setNightShiftTimeDeduction(timeSlotsDeductionDTO.getNightShiftTimeDeduction());
+        organizationGraphRepository.save(organization);
+        return timeSlotsDeductionDTO;
+
+    }
+
+    public OrganizationExternalIdsDTO getKMDExternalId(Long unitId){
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        OrganizationExternalIdsDTO organizationExternalIdsDTO = new OrganizationExternalIdsDTO();
+        organizationExternalIdsDTO.setKmdExternalId(organization.getKmdExternalId());
+        organizationExternalIdsDTO.setTimeCareExternalId(organization.getExternalId());
+       return organizationExternalIdsDTO;
+
+    }
+
+    public TimeSlotsDeductionDTO getTimeSlotPercentageDeduction(Long unitId){
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        TimeSlotsDeductionDTO timeSlotsDeductionDTO = new TimeSlotsDeductionDTO();
+        timeSlotsDeductionDTO.setNightShiftTimeDeduction(organization.getNightShiftTimeDeduction());
+        timeSlotsDeductionDTO.setDayShiftTimeDeduction(organization.getDayShiftTimeDeduction());
+        return timeSlotsDeductionDTO;
+
     }
 }
 

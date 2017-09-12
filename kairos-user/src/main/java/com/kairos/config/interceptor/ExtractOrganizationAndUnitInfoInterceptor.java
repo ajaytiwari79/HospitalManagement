@@ -30,12 +30,15 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ orgainzationID ,Unit Id " +orgIdStirng+" ,"+unitIdString+" ]") ;
 
-        if(orgIdStirng!=null&&unitIdString!=null){
-              final Long orgId = Long.valueOf(orgIdStirng);
-              final Long unitId = Long.valueOf(unitIdString);
-              UserContext.setOrgId(orgId);
-              UserContext.setUnitId(unitId);
-          }
+
+        if(orgIdStirng!=null){
+            final Long orgId = Long.valueOf(orgIdStirng);
+            UserContext.setOrgId(orgId);
+        }
+        if(unitIdString!=null){
+            final Long unitId = Long.valueOf(unitIdString);
+            UserContext.setUnitId(unitId);
+        }
 
 
         return true;
