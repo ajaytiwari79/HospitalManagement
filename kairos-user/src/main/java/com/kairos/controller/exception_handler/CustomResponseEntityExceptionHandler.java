@@ -373,10 +373,10 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	}
 
-	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseStatus(HttpStatus.CONFLICT)
 	@ExceptionHandler(value = DataNotMatchedException.class)
 	@ResponseBody
-	public ResponseEnvelope dataNotMatchedExceptionHandler(DataNotMatchedException ex,HttpServletRequest request) {
+	public ResponseEnvelope dataNotMatchedExceptionHandler(RuntimeException ex,HttpServletRequest request) {
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
