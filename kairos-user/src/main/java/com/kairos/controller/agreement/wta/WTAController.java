@@ -36,8 +36,8 @@ public class WTAController {
 
     @ApiOperation(value = "Update WTA")
     @PutMapping(value = "/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long wtaId, @RequestBody WtaDTO wta) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWta(wtaId,wta));
+    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long countryId,@PathVariable long wtaId, @RequestBody WtaDTO wta) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWta(countryId,wtaId,wta));
     }
 
     @ApiOperation(value = "Get WTA")

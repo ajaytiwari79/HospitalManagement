@@ -276,13 +276,12 @@ public class OrganizationService extends UserBaseService {
             workingTimeAgreementObj.setName(obj.getName());
             workingTimeAgreementObj.setDescription(obj.getDescription());
             workingTimeAgreementObj.setCountry(obj.getCountry());
-            workingTimeAgreementObj.setEndDate(obj.getEndDate());
+            workingTimeAgreementObj.setEndDateMillis(obj.getEndDateMillis());
             workingTimeAgreementObj.setExpiryDate(obj.getExpiryDate());
             workingTimeAgreementObj.setExpertise(obj.getExpertise());
-            workingTimeAgreementObj.setRegion(obj.getRegion());
             workingTimeAgreementObj.setEnabled(true);
             workingTimeAgreementObj.setRuleTemplates(obj.getRuleTemplates());
-            workingTimeAgreementObj.setStartDate(obj.getStartDate());
+            workingTimeAgreementObj.setStartDateMillis(obj.getStartDateMillis());
             workingTimeAgreementObj.setWta(obj.getWta());
             allWtaNewObject.add(workingTimeAgreementObj);
         }

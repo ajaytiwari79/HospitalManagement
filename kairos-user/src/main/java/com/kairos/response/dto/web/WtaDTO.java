@@ -13,11 +13,9 @@ public class WtaDTO {
     private long expertiseId;
     private Long organizationType;
     private Long organizationSubType;
-    private Long levelId;
     private List<Long> ruleTemplates;
-    private long regionId;
-    private long startDate;
-    private Long endDate;
+    private long startDateMillis;
+    private Long endDateMillis;
     private Long expiryDate;
 
     public String getName() {
@@ -53,28 +51,20 @@ public class WtaDTO {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public long getRegionId() {
-        return regionId;
+    public long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setRegionId(long regionId) {
-        this.regionId = regionId;
+    public void setStartDateMillis(long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public long getStartDate() {
-        return startDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setStartDate(long startDate) {
-        this.startDate = startDate;
-    }
-
-    public Long getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public Long getExpiryDate() {
@@ -101,11 +91,5 @@ public class WtaDTO {
         this.organizationSubType = organizationSubType;
     }
 
-    public Long getLevelId() {
-        return levelId;
-    }
 
-    public void setLevelId(Long levelId) {
-        this.levelId = levelId;
-    }
 }
