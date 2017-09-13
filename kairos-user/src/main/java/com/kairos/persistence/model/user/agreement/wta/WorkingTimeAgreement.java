@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
@@ -39,8 +40,17 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;//
 
+    @Relationship(type = HAS_REGIONS)
+    private Region region;//
+
+    @Relationship(type = HAS_LEVEL)
+    private Level level;//
+
     @Relationship(type = BELONGS_TO)
-    private List<OrganizationType> organizationTypes;//
+    private OrganizationType organizationType;//
+
+    @Relationship(type = BELONGS_TO)
+    private OrganizationType organizationSubType;//
 
     @JsonIgnore
     @Relationship(type = BELONGS_TO)
@@ -49,8 +59,7 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     @Relationship(type = HAS_RULE_TEMPLATE)
     private List<WTABaseRuleTemplate> ruleTemplates;//
 
-    @Relationship(type = HAS_REGIONS)
-    private Region region;//
+
 
     // to make a history
     @Relationship(type = HAS_WTA)
@@ -102,12 +111,12 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.expertise = expertise;
     }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
+    public OrganizationType getOrganizationTypes() {
+        return organizationType;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public void setOrganizationTypes(OrganizationType organizationTypes) {
+        this.organizationType = organizationTypes;
     }
 
     public Country getCountry() {
@@ -150,6 +159,29 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.expiryDate = expiryDate;
     }
 
+    public Level getLevel() {
+        return level;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
+    }
+
+    public OrganizationType getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(OrganizationType organizationType) {
+        this.organizationType = organizationType;
+    }
+
+    public OrganizationType getOrganizationSubType() {
+        return organizationSubType;
+    }
+
+    public void setOrganizationSubType(OrganizationType organizationSubType) {
+        this.organizationSubType = organizationSubType;
+    }
 
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap();

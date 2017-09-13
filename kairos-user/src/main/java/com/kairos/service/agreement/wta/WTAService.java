@@ -1,6 +1,7 @@
 package com.kairos.service.agreement.wta;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
@@ -62,27 +63,16 @@ public class WTAService extends UserBaseService {
         Country country = countryRepository.findOne(countryId);
 
         if (country == null) {
-            throw new DataNotFoundByIdException("Invalid Country id");
+            throw new DataNotFoundByIdException("Invalid Country id"+countryId);
         }
         wta.setCountry(country);
 
         save(wta);
-        wta.getExpertise().setCountry(null);
-
-       for( OrganizationType orgType:wta.getOrganizationTypes()){
-           orgType.setCountry(null);
-           orgType.setOrganizationTypeList(null);
-           orgType.setOrganizationServiceList(null);
-       }
-
-        logger.info("response wta object : ",wta);
-
         return wta;
     }
 
 
     private WorkingTimeAgreement prepareWta(long countryId, WtaDTO wtaDTO) {
-
         WorkingTimeAgreement wta = new WorkingTimeAgreement();
 
         wta.setDescription(wtaDTO.getDescription());
@@ -93,16 +83,31 @@ public class WTAService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid expertiseId "+wtaDTO.getExpertiseId());
         }
         wta.setExpertise(expertise);
-        List<OrganizationType> organizationTypes = new ArrayList<OrganizationType>();
 
-        for (long orgTypeId : wtaDTO.getOrganizationTypes()) {
-            OrganizationType orgType = organizationTypeRepository.findOne(orgTypeId);
-            if (orgType == null) {
-                throw new DataNotFoundByIdException("Invalid organization type Id "+orgTypeId);
-            }
-            organizationTypes.add(orgType);
+        Region region = regionRepository.findOne(wtaDTO.getRegionId());
+        if (region == null) {
+            throw new DataNotFoundByIdException("Invalid Region"+wtaDTO.getRegionId());
         }
-        wta.setOrganizationTypes(organizationTypes);
+
+        Level level = countryRepository.getLevel(countryId,wtaDTO.getRegionId());
+        if (level == null) {
+            throw new DataNotFoundByIdException("Invalid level"+wtaDTO.getLevelId());
+        }
+
+        wta.setRegion(region);
+        wta.setLevel(level);
+
+        OrganizationType organizationType = organizationTypeRepository.findOne(wtaDTO.getOrganizationType());
+        if (organizationType == null) {
+            throw new DataNotFoundByIdException("Invalid organisation type "+wtaDTO.getOrganizationType());
+        }
+        wta.setOrganizationType(organizationType);
+
+        OrganizationType organizationSubType = organizationTypeRepository.findOne(wtaDTO.getOrganizationSubType());
+        if (organizationSubType == null) {
+            throw new DataNotFoundByIdException("Invalid organisation sub type "+wtaDTO.getOrganizationSubType());
+        }
+        wta.setOrganizationSubType(organizationSubType);
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<WTABaseRuleTemplate>();
 
        // wtaBaseRuleTemplates = setRuleTemplates(countryId, wta, wtaDTO);
@@ -116,11 +121,6 @@ public class WTAService extends UserBaseService {
             wtaBaseRuleTemplates.add(wtaBaseRuleTemplate);
         }}
         wta.setRuleTemplates(wtaBaseRuleTemplates);
-        Region region = regionRepository.findOne(wtaDTO.getRegionId());
-        if (region == null) {
-            throw new DataNotFoundByIdException("Invalid Region");
-        }
-        wta.setRegion(region);
         if (wtaDTO.getStartDate() == 0) {
 
             wta.setStartDate(new Date().getTime());
@@ -234,10 +234,10 @@ public class WTAService extends UserBaseService {
             throw new DataNotFoundByIdException("wta not found");
         }
         if(checked){
-            wta.getOrganizationTypes().add(orgType);
+           // wta.getOrganizationTypes().add(orgType);
             save(wta);
         }else {
-            wta.getOrganizationTypes().remove(orgType);
+            //wta.getOrganizationTypes().remove(orgType);
             save(wta);
         }
         return checked;
