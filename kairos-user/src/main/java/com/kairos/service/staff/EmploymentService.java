@@ -110,7 +110,7 @@ public class EmploymentService extends UserBaseService {
         map.put("email", staff.getEmail());
         map.put("profilePic", envConfig.getServerHost() + File.separator + staff.getProfilePic());
         map.put("visitourId", staff.getVisitourId());
-        map.put("engineerTypeId", (staff.getEngineerType() == null) ? null : staff.getEngineerType().getId());
+        map.put("engineerTypeId", staffGraphRepository.getEngineerTypeIdOfStaff(staff.getId()));
         map.put("timeCareExternalId",staff.getExternalId());
         return map;
     }
