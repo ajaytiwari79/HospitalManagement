@@ -283,4 +283,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
             "return  id(staff) as id, staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.organizationId as organizationId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName")
     List<StaffPersonalDetailDTO> getAllStaffByUnitId(long unitId);
 
+    @Query("MATCH (staff:Staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) where id(staff)={0} return id(engineerType)")
+    Long getEngineerTypeIdOfStaff(Long staffId);
+
 }

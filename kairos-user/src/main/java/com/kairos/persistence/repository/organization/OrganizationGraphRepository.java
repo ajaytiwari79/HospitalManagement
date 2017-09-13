@@ -8,6 +8,8 @@ import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position.PositionName;
+import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
+import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -463,6 +465,12 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "optional match (organizationType)-[:"+HAS_SUB_TYPE+"]->(subType:OrganizationType)<-[:"+SUB_TYPE_OF+"]-(organization) with subType,organizationType,organization\n" +
             "return collect(id(organizationType)) as organizationTypes, collect(id(subType)) as organizationSubTypes")
     OrganizationTypeAndSubTypeDTO getorganizationTypeAndSubTypes(Long unitId);
+
+    @Query("MATCH (o:Organization) where id(o)={0} return o")
+    OrganizationExternalIdsDTO getOrganizationExternalIds(Long unitId);
+
+    @Query("MATCH (o:Organization) where id(o)={0} return o")
+    TimeSlotsDeductionDTO getOrganizationTimeSlotDeductions(Long unitId);
 
 
 

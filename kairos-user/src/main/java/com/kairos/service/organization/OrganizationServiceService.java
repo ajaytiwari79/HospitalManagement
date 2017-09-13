@@ -445,7 +445,10 @@ public class OrganizationServiceService extends UserBaseService {
     public com.kairos.persistence.model.organization.OrganizationService mapImportedService(Long importedServiceId, Long serviceId) {
 
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
+        com.kairos.persistence.model.organization.OrganizationService mappedOrganizationService = organizationServiceRepository.findOne(importedServiceId);
         organizationService.setReferenceId(importedServiceId.toString());
+        mappedOrganizationService.setHasMapped(true);
+        organizationServiceRepository.save(mappedOrganizationService);
         organizationServiceRepository.save(organizationService);
         return organizationService;
     }

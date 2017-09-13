@@ -1,5 +1,6 @@
 package com.kairos.service.kmdNexus;
 
+import com.kairos.client.TaskDemandRestClient;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.organization.Organization;
@@ -22,6 +23,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.JsonUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -90,6 +92,8 @@ public class CitizenService {
     private EmploymentGraphRepository employmentGraphRepository;
     @Autowired
     TaskServiceRestClient taskServiceRestClient;
+    @Autowired
+    TaskDemandRestClient taskDemandRestClient;
 
     /**
      * This method is used to import Citizen from KMD Nexus.
@@ -182,6 +186,8 @@ public class CitizenService {
 
         for (Map<String, Object> map : citizens) {
             authService.dokmdAuth();
+            if(!map.get("kmdNexusExternalId").toString().equals("7")) continue;
+
             client = clientGraphRepository.findByKmdNexusExternalId(map.get("kmdNexusExternalId").toString());
             Organization organization = (Organization) clientGraphRepository.getClientOrganizationIdList(client.getId()).get(0);
 
@@ -296,7 +302,7 @@ public class CitizenService {
      * @param subService
      * @return
      */
-    private JSONObject getGrantObject(int grantId, RestTemplate loginTemplate, HttpEntity<String> headersElements,
+    private Map<String, Object> getGrantObject(int grantId, RestTemplate loginTemplate, HttpEntity<String> headersElements,
                                      Organization organization, Client client,
                                      com.kairos.persistence.model.organization.OrganizationService service, com.kairos.persistence.model.organization.OrganizationService subService) {
         List grantTypes = new ArrayList();
@@ -307,7 +313,7 @@ public class CitizenService {
         grantTypes.add("Serviceloven §83, stk 2");
         grantTypes.add("Sundhedsloven §138");
         grantTypes.add("Sundhedsloven §140");
-        JSONObject grantObject = new JSONObject();
+        Map<String, Object> grantObject = new HashedMap();
         logger.info("grant url----------> " + AppConstants.KMD_NEXUS_PATIENT_GRANTS + grantId);
         ResponseEntity<String> grantResponse = loginTemplate.exchange(AppConstants.KMD_NEXUS_PATIENT_GRANTS + grantId, HttpMethod.GET, headersElements, String.class);
         PatientGrant patientGrant = JsonUtils.toObject(grantResponse.getBody(), PatientGrant.class);
@@ -344,24 +350,30 @@ public class CitizenService {
                     break;
             }
         }
+        grantObject.put("grantName", patientGrant.getName());
+        grantObject.put("grantId",grantId);
+        grantObject.put("clientId",client.getId());
+        grantObject.put("organizationId",organization.getId());
         RepetitionType shiftRepetition = (RepetitionType) grantObject.get("weekDayShifts");
 
         String pattern = (String) grantObject.get("grantPattern");
         if (grantTypes.contains(grantObject.get("grantTypeNameSection")) && (shiftRepetition.getShifts().size() > 0)) {
             CitizenSupplier citizenSupplier = (CitizenSupplier) grantObject.get("supplier");
             Organization supplier = organizationGraphRepository.findByKmdExternalId(citizenSupplier.getId());
-
-            if (supplier == null) {
+            Optional supplierOptional = Optional.ofNullable(supplier);
+            if (!supplierOptional.isPresent()) {
                 supplier = new Organization(citizenSupplier.getName());
                 supplier.setCountry(organization.getCountry());
                 supplier.setKmdExternalId(citizenSupplier.getId());
             }
             if (citizenSupplier.getType().equals("external")) {
-                // organizationService.createOrganization(supplier, null);
+                 //organizationService.createOrganization(supplier, null);
             } else if (citizenSupplier.getType().equals("organization")) {
                 if (organizationService.checkDuplicationOrganizationRelation(organization.getId(), supplier.getId()) == 0)
-                    organizationService.createOrganization(supplier, organization.getId());
+                   supplier = organizationService.createOrganization(supplier, organization.getId());
             }
+
+            if (supplierOptional.isPresent()) grantObject.put("supplierId",supplier.getId());
             Integer weekDayCount = Integer.valueOf(grantObject.get("grantWeekDays").toString());
             Integer weekEndCount = Integer.valueOf(grantObject.get("grantWeekEnds").toString());
             String visitDuration = grantObject.get("visitatedDuration").toString();
@@ -381,8 +393,9 @@ public class CitizenService {
             }
 
             if (organization != null) {
-                organizationServiceService.updateServiceToOrganization(organization.getId(), subService.getId(), true, ORGANIZATION);
 
+                Map<String,Object> response = taskDemandRestClient.createGrants( subService.getId(), organization.getId(), grantObject);
+                logger.info("response-------------------> "+response);
             }
 
 

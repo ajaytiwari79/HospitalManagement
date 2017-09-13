@@ -37,6 +37,7 @@ public class IntegrationService {
             TimeCare timeCare1 = timeCareGraphRepository.findByOrganizationId(unitId);
             if(timeCare1 == null) timeCare1 = new TimeCare();
             timeCare1.setIntegrationId(timeCare.getIntegrationId());
+            timeCare1.setTimeCareExternalId(timeCare.getTimeCareExternalId());
             timeCare1.setOrganizationId(unitId);
             timeCareGraphRepository.save(timeCare1);
             return timeCare1;
