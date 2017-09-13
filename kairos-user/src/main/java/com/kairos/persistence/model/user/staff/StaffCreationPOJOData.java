@@ -155,8 +155,4 @@ public class StaffCreationPOJOData {
     public long getExternalId() {
         return externalId;
     }
-
-    public void setExternalId(long externalId) {
-        this.externalId = externalId;
-    }
 }
