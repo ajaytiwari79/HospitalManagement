@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -204,7 +203,7 @@ public class OrganizationController {
 
     @ApiOperation(value = "Get Department Accessible in organization")
     @RequestMapping(value = "/department/{departmentId}/accessible", method = RequestMethod.GET)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getDepartmentAccessibleOrganization(@PathVariable Long departmentId) {
         if (departmentId != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, departmentService.getDepartmentAccessibleOrganizations(departmentId));
@@ -707,7 +706,7 @@ public class OrganizationController {
 
     @ApiOperation("Assign staff to citizen")
     @RequestMapping(value = "/unit/{unitId}/client/assign/staff", method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> assignStaffToCitizen(@RequestBody ClientStaffDTO clientStaffDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.assignStaffToCitizen(clientStaffDTO.getCitizenId(), clientStaffDTO.getStaffId(), clientStaffDTO.getType()));
     }
@@ -752,7 +751,7 @@ public class OrganizationController {
     // Service
     @ApiOperation(value = "Map Imported Services")
     @RequestMapping(value = "unit/{unitId}/mapImportedService/{imPortedServiceId}/service/{serviceId}", method = RequestMethod.POST)
-    @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> mapImportedService(@PathVariable long imPortedServiceId, @PathVariable long serviceId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationServiceService.mapImportedService(imPortedServiceId, serviceId));
