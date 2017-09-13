@@ -2,6 +2,8 @@ package com.kairos.controller.exception_handler;
 
 import com.kairos.custom_exception.*;
 import com.kairos.response.dto.web.ResponseEnvelope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
@@ -42,12 +44,15 @@ import java.util.Set;
 @Order(1)
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler  {
 
+	private static final Logger logger = LoggerFactory.getLogger(CustomResponseEntityExceptionHandler.class);
+
 	public CustomResponseEntityExceptionHandler() {
 		super();
 	}
 
 	@Override
 	public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
 		List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
 		List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
@@ -64,6 +69,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		ResponseEnvelope errorMessage = new ResponseEnvelope();
 		errorMessage.setErrors(errors);
 		errorMessage.setSuccess(false);
+
 		return new ResponseEntity<Object>(errorMessage, headers, status);
 
 	}
@@ -71,6 +77,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@Override
 	public ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		String unsupported = "Unsupported content type: " + ex.getContentType();
 		String supported = "Supported content types: " + MediaType.toString(ex.getSupportedMediaTypes());
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
@@ -82,6 +89,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@Override
 	public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -90,6 +98,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@Override
 	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(ex.getRequestURL());
@@ -109,7 +118,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleNoSuchRequestHandlingMethod(NoSuchRequestHandlingMethodException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-
+		logger.error("error in user service ",ex);
 		pageNotFoundLogger.warn(ex.getMessage());
 
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
@@ -131,7 +140,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-
+		logger.error("error in user service ",ex);
 		pageNotFoundLogger.warn(ex.getMessage());
 
 		Set<HttpMethod> supportedMethods = ex.getSupportedHttpMethods();
@@ -156,6 +165,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -175,6 +185,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -193,6 +204,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -211,6 +223,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -230,6 +243,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -249,6 +263,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -266,6 +281,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -284,6 +300,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@Override
 	protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -297,6 +314,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@ExceptionHandler({DataIntegrityViolationException.class})
 	public ResponseEntity<Object> handleBadRequest(final Exception ex, final WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -306,6 +324,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	// 403
 	@ExceptionHandler({ AccessDeniedException.class,InvalidRequestException.class })
 	public ResponseEntity<Object> handleAccessDeniedException(final Exception ex, final WebRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -317,6 +336,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@ExceptionHandler({DuplicateDataException.class, DataAccessException.class,InvalidDataAccessApiUsageException.class })
 	protected ResponseEntity<Object> handleConflict(final RuntimeException ex, final WebRequest request) {
+		logger.error("error in user service ",ex);
 		final String bodyOfResponse = "This should be application specific";
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
@@ -328,7 +348,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	@ExceptionHandler({ NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class,Exception.class,MessagingException.class })
 	public ResponseEntity<Object> handleInternal(final Exception ex, final WebRequest request) {
-		logger.error("500 Status Code", ex);
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
@@ -341,6 +361,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 			ZipCodeNotFound.class,CitizenNotFoundException.class})
 	@ResponseBody
 	public ResponseEnvelope handleNotFound(RuntimeException ex,HttpServletRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -353,6 +374,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler(value=ActionNotPermittedException.class)
 	@ResponseBody
 	public ResponseEnvelope actionNotPermittedExceptionHandler(ActionNotPermittedException ex,HttpServletRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -365,6 +387,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler(value = TaskDemandException.class)
 	@ResponseBody
 	public ResponseEnvelope taskDemandExceptionHandler(TaskDemandException ex,HttpServletRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -377,6 +400,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler(value = DataNotMatchedException.class)
 	@ResponseBody
 	public ResponseEnvelope dataNotMatchedExceptionHandler(RuntimeException ex,HttpServletRequest request) {
+		logger.error("error in user service ",ex);
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
@@ -389,12 +413,12 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	@ExceptionHandler(value = FlsCredentialException.class)
 	@ResponseBody
 	public ResponseEnvelope flsCredentialExceptionHandler(FlsCredentialException ex,HttpServletRequest request) {
+		logger.error("error in user service ",ex);
 		 ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setPath(request.getRequestURL().toString());
 		errorMessage.setMessage(ex.getMessage());
 		return  errorMessage;
-
 
 	}
 
