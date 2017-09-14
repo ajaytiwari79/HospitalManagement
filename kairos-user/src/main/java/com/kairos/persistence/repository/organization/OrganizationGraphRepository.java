@@ -430,12 +430,20 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
     List<Organization> getOrganizationsByOrganizationType(long orgTypeId);
 
+
+    @Query("match (n:Organization) where id(n)={0} with n \n" +
+            "match (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true}) \n" +
+            "match (org)-[:" + HAS_POSITION_NAME + "]->(p:PositionName {isEnabled:true}) return p")
+    List<PositionName> getPositionNamesOfParentOrganization(Long organizationId);
+
     @Query("MATCH (o:Organization {isEnable:true} )-[:" + HAS_POSITION_NAME + "]->(p:PositionName {isEnabled:true}) where id(o)={0} return p")
     List<PositionName> getPositionNames(Long organizationId);
 
     @Query(" Match (organization:Organization) where id(organization)={0} with organization\n" +
-             "Match (organization)-[r:PROVIDE_SERVICE]->(os) where os.imported=true with distinct os,r\n" +
-            "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as selectedServices return {selectedServices:collect(selectedServices)} as data")
+            "Match (organization)-[r:PROVIDE_SERVICE]->(os) where os.imported=true with distinct os,r\n" +
+            "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) " +
+            "with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description," +
+            "isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as selectedServices return {selectedServices:collect(selectedServices)} as data")
     List<Map<String, Object>> getImportedServicesForUnit(long organizationId);
 
 //    @Query("Match (country:Country) where id(country)={0} with country\n" +

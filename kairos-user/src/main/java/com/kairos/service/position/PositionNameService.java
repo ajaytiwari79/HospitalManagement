@@ -1,5 +1,6 @@
 package com.kairos.service.position;
 
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
@@ -31,7 +32,6 @@ public class PositionNameService extends UserBaseService {
 
     public PositionName createPositionName(Long unitId, PositionName positionName) {
         PositionName position = null;
-
         String name = "(?i)" + positionName.getName();
         //check if duplicate
         position = positionNameGraphRepository.checkDuplicatePositionName(unitId, name);
@@ -43,7 +43,9 @@ public class PositionNameService extends UserBaseService {
         if (organization == null) {
             throw new DataNotFoundByIdException("Organization not found");
         }
-
+        if(!organization.isParentOrganization()){
+            throw new ActionNotPermittedException("Can only create PositionName in Parent organization");
+        }
 
 
         List<PositionName> positionNameList = organization.getPositionNameList();
@@ -100,7 +102,21 @@ public class PositionNameService extends UserBaseService {
 
 
     public List<PositionName> getAllPositionName(Long unitId) {
-        return  organizationGraphRepository.getPositionNames(unitId);
+        List<PositionName> positionNames = new ArrayList<PositionName>();
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Organization not found");
+        }
+        if(!organization.isParentOrganization()){
+            //return parents(its own)
+            positionNames=organizationGraphRepository.getPositionNames(unitId);
+        }
+        else {
+            positionNames=organizationGraphRepository.getPositionNamesOfParentOrganization(unitId);
+        }
+
+
+        return positionNames;
     }
 
 
