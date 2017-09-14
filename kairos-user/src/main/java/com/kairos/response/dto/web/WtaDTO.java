@@ -8,15 +8,15 @@ import java.util.List;
 public class WtaDTO {
 
 
-    private String      name;
-    private String      description;
-    private long        expertiseId;
-    private List<Long> organizationTypes;
+    private String name;
+    private String description;
+    private long expertiseId;
+    private Long organizationType;
+    private Long organizationSubType;
     private List<Long> ruleTemplates;
-    private long        regionId;
-    private long        startDate;
-    private Long        endDate;
-    private Long        expiryDate;
+    private long startDateMillis;
+    private Long endDateMillis;
+    private Long expiryDate;
 
     public String getName() {
         return name;
@@ -42,13 +42,6 @@ public class WtaDTO {
         this.expertiseId = expertiseId;
     }
 
-    public List<Long> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<Long> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
 
     public List<Long> getRuleTemplates() {
         return ruleTemplates;
@@ -58,28 +51,20 @@ public class WtaDTO {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public long getRegionId() {
-        return regionId;
+    public long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setRegionId(long regionId) {
-        this.regionId = regionId;
+    public void setStartDateMillis(long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public long getStartDate() {
-        return startDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setStartDate(long startDate) {
-        this.startDate = startDate;
-    }
-
-    public Long getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public Long getExpiryDate() {
@@ -89,4 +74,22 @@ public class WtaDTO {
     public void setExpiryDate(Long expiryDate) {
         this.expiryDate = expiryDate;
     }
+
+    public Long getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(Long organizationType) {
+        this.organizationType = organizationType;
+    }
+
+    public Long getOrganizationSubType() {
+        return organizationSubType;
+    }
+
+    public void setOrganizationSubType(Long organizationSubType) {
+        this.organizationSubType = organizationSubType;
+    }
+
+
 }

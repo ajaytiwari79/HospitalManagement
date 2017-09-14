@@ -1,10 +1,11 @@
 package com.kairos.persistence.model.user.agreement.wta;
+import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
-
+import com.kairos.persistence.model.organization.OrganizationTypeDTO;
 import java.util.List;
 
 /**
@@ -19,8 +20,10 @@ public class WorkingTimeAgreementQueryResult {
     private String name;
     private String description;
     private long id;
-    private Expertise expertise;
-    private List<OrganizationType> organizationTypes;//
+    private ExpertiseDTO expertise;
+    private OrganizationTypeDTO organizationTypes;//
+    private OrganizationTypeDTO organizationSubTypes;//
+
     private List<WTABaseRuleTemplate> ruleTemplates;
 
     public Long getStartDate() {
@@ -63,22 +66,13 @@ public class WorkingTimeAgreementQueryResult {
         this.description = description;
     }
 
-    public Expertise getExpertise() {
+    public ExpertiseDTO getExpertise() {
         return expertise;
     }
 
-    public void setExpertise(Expertise expertise) {
+    public void setExpertise(ExpertiseDTO expertise) {
         this.expertise = expertise;
     }
-
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
 
 
     public long getCreationDate() {
@@ -103,5 +97,21 @@ public class WorkingTimeAgreementQueryResult {
 
     public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
+    }
+
+    public OrganizationTypeDTO getOrganizationTypes() {
+        return organizationTypes;
+    }
+
+    public void setOrganizationTypes(OrganizationTypeDTO organizationTypes) {
+        this.organizationTypes = organizationTypes;
+    }
+
+    public OrganizationTypeDTO getOrganizationSubTypes() {
+        return organizationSubTypes;
+    }
+
+    public void setOrganizationSubTypes(OrganizationTypeDTO organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 }

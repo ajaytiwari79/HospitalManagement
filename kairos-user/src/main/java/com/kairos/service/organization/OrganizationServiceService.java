@@ -297,22 +297,26 @@ public class OrganizationServiceService extends UserBaseService {
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 
-            Organization organization = organizationGraphRepository.findOne(id,0);
+            Organization organization = organizationGraphRepository.findOne(id, 0);
             if (organization == null) {
                 return null;
             }
-            Organization parent;
-            if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-                parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
+            if (Optional.ofNullable(organization.getKmdExternalId()).isPresent()) {
+                response = filterSkillData(organizationGraphRepository.getImportedServicesForUnit(id));
+            } else {
+                Organization parent;
+                if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+                    parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
 
-            } else {
-                parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
-            }
-            if(parent != null){
-                response = filterSkillData(organizationGraphRepository.getServicesForUnit(parent.getId(),id));
-            } else {
-                response = filterSkillData(organizationGraphRepository.getServicesForParent(id));
-            }
+                } else {
+                    parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
+                }
+                if (parent != null) {
+                    response = filterSkillData(organizationGraphRepository.getServicesForUnit(parent.getId(), id));
+                } else {
+                    response = filterSkillData(organizationGraphRepository.getServicesForParent(id));
+                }
+        }
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if(team == null){

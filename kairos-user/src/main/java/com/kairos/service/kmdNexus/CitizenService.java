@@ -186,7 +186,6 @@ public class CitizenService {
 
         for (Map<String, Object> map : citizens) {
             authService.dokmdAuth();
-            if(!map.get("kmdNexusExternalId").toString().equals("7")) continue;
 
             client = clientGraphRepository.findByKmdNexusExternalId(map.get("kmdNexusExternalId").toString());
             Organization organization = (Organization) clientGraphRepository.getClientOrganizationIdList(client.getId()).get(0);

@@ -259,9 +259,9 @@ public class StaffService extends UserBaseService {
         map.put("active", staff.isActive());
         map.put("signature", staff.getSignature());
         map.put("inactiveFrom", DateConverter.getDate(staff.getInactiveFrom()));
-        map.put("expertiseId", (staff.getExpertise() != null) ? staff.getExpertise().getId() : null);
-        map.put("languageId", (staff.getLanguage() != null) ? staff.getLanguage().getId() : null);
-        map.put("contactDetail", staff.getContactDetail());
+        map.put("expertiseId", staffGraphRepository.getExpertiseId(staff.getId()));
+        map.put("languageId", staffGraphRepository.getLanguageId(staff.getId()));
+        map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));
         map.put("cprNumber", staff.getCprNumber());
 
         // Visitour Speed Profile
