@@ -84,4 +84,6 @@ public class OrganizationTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
+
+
 }

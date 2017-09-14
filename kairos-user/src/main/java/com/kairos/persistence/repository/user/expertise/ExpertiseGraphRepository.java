@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
@@ -48,4 +49,8 @@ public interface ExpertiseGraphRepository extends GraphRepository<Expertise> {
     @Query("match (e:Expertise{isEnabled:true}) where id(e) in {0} \n" +
             "return count (e) as totalMatched")
     Long findAllExpertiseCountMatchedByIds(List<Long> ids);
+
+    @Query("match (e:Expertise{isEnabled:true}) where id(e) in {0} \n" +
+            "return id(e) as id,e.name as name,e.description as description")
+    List<ExpertiseDTO> getAllFreeExpertises(List<Long> ids);
 }
