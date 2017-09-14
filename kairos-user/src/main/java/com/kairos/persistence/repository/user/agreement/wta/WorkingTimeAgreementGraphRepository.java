@@ -55,11 +55,11 @@ public interface WorkingTimeAgreementGraphRepository  extends GraphRepository<Wo
             "wta.description as description,"+
             "wta.name as name,"+
             "id(wta) as id")*/
-    @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:BELONGS_TO]->(c:Country) where id(c)=53\n" +
-            "match(wta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise)\n" +
-            "match(wta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType)\n" +
-            "match(wta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType)\n" +
-            "match(wta)-[:HAS_RULE_TEMPLATE]->(ruleTemp:WTABaseRuleTemplate)<-[:HAS_RULE_TEMPLATES]-(ruleTemplateCategory:RuleTemplateCategory)\n"+
+    @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:"+BELONGS_TO+"]->(c:Country) where id(c)={0}\n" +
+            "match(wta)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)\n" +
+            "match(wta)-[:"+BELONGS_TO_ORG_TYPE+"]->(orgType:OrganizationType)\n" +
+            "match(wta)-[:"+BELONGS_TO_ORG_SUB_TYPE+"]->(orgSubType:OrganizationType)\n" +
+            "match(wta)-[:"+HAS_RULE_TEMPLATE+"]->(ruleTemp:WTABaseRuleTemplate)<-[:"+HAS_RULE_TEMPLATES+"]-(ruleTemplateCategory:RuleTemplateCategory)\n"+
             "with wta,expertise,orgType,orgSubType, collect({fromDayOfWeek:ruleTemp.fromDayOfWeek,minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts,shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional,toTime:ruleTemp.toTime,toDayOfWeek:ruleTemp.toDayOfWeek,continuousDayRestHours:ruleTemp.continuousDayRestHours,name:ruleTemp.name,id:Id(ruleTemp),minimumRest:ruleTemp.minimumRest,timeLimit:ruleTemp.timeLimit,balanceType:ruleTemp.balanceType,templateType:ruleTemp.templateType,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description, numberShiftsPerPeriod:ruleTemp.numberShiftsPerPeriod,numberOfWeeks:ruleTemp.numberOfWeeks,maximumVetoPercentage:ruleTemp.maximumVetoPercentage,maximumAvgTime:ruleTemp.maximumAvgTime,useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,interval:ruleTemp.interval,intervalUnit:ruleTemp.intervalUnit,validationStartDateMillis:ruleTemp.validationStartDateMillis,daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules,ruleTemplateCategory:ruleTemplateCategory.name,ruleTemplateCategoryId:Id(ruleTemplateCategory)}) as ruleTemplates\n" +
             "return wta.isEnabled as isEnabled,"+
             "wta.startDateMillis as startDateMillis,ruleTemplates as ruleTemplates,"+

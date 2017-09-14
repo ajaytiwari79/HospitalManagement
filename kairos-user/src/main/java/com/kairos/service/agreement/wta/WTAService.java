@@ -215,19 +215,17 @@ public class WTAService extends UserBaseService {
     }
 
     public WorkingTimeAgreement getWta(long wtaId) {
-        return wtaRepository.findOne(wtaId);
+        return wtaRepository.getWta(wtaId);
     }
 
     public boolean removeWta(long wtaId) {
-        WorkingTimeAgreement wta = wtaRepository.findOne(wtaId);
+        WorkingTimeAgreement wta = wtaRepository.getWta(wtaId);
         if (wta == null) {
-            return false;
+            throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
         }
         wta.setEnabled(false);
         save(wta);
-        if (wtaRepository.findOne(wtaId).isEnabled()) {
-            return false;
-        }
+
         return true;
     }
 
