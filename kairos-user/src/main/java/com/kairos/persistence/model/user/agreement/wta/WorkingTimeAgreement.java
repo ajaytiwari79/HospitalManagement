@@ -8,7 +8,6 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.region.Region;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -39,8 +38,11 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;//
 
-    @Relationship(type = BELONGS_TO)
-    private List<OrganizationType> organizationTypes;//
+    @Relationship(type = BELONGS_TO_ORG_TYPE)
+    private OrganizationType organizationType;//
+
+    @Relationship(type = BELONGS_TO_ORG_SUB_TYPE)
+    private OrganizationType organizationSubType;//
 
     @JsonIgnore
     @Relationship(type = BELONGS_TO)
@@ -49,15 +51,14 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     @Relationship(type = HAS_RULE_TEMPLATE)
     private List<WTABaseRuleTemplate> ruleTemplates;//
 
-    @Relationship(type = HAS_REGIONS)
-    private Region region;//
+
 
     // to make a history
     @Relationship(type = HAS_WTA)
     private WorkingTimeAgreement wta;
 
-    private Long startDate;
-    private Long endDate;
+    private Long startDateMillis;
+    private Long endDateMillis;
     private Long expiryDate;
     private boolean isEnabled = true;
 
@@ -68,13 +69,6 @@ public class WorkingTimeAgreement extends UserBaseEntity {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
-    }
-    public Region getRegion() {
-        return region;
-    }
-
-    public void setRegion(Region region) {
-        this.region = region;
     }
 
     public String getName() {
@@ -102,12 +96,12 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.expertise = expertise;
     }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
+    public OrganizationType getOrganizationTypes() {
+        return organizationType;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public void setOrganizationTypes(OrganizationType organizationTypes) {
+        this.organizationType = organizationTypes;
     }
 
     public Country getCountry() {
@@ -126,20 +120,20 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.wta = wta;
     }
 
-    public Long getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public Long getExpiryDate() {
@@ -150,6 +144,21 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.expiryDate = expiryDate;
     }
 
+    public OrganizationType getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(OrganizationType organizationType) {
+        this.organizationType = organizationType;
+    }
+
+    public OrganizationType getOrganizationSubType() {
+        return organizationSubType;
+    }
+
+    public void setOrganizationSubType(OrganizationType organizationSubType) {
+        this.organizationSubType = organizationSubType;
+    }
 
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap();

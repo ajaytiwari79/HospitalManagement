@@ -1,8 +1,11 @@
 package com.kairos.persistence.model.user.agreement.wta;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -10,41 +13,38 @@ import java.util.List;
 /**
  * Created by vipul on 21/8/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
 public class WTAWithCountryAndOrganizationTypeDTO {
-    private Long startDate;
-    private long creationDate;
-    private Long endDate;
+
+    private Long startDateMillis;
+    private Long endDateMillis;
     private Long expiryDate;
     private String name;
     private String description;
     private long id;
+
     private Expertise expertise;
-    private List<OrganizationType> organizationTypes;//
+
+    private OrganizationType organizationTypes;//
+    private OrganizationType organizationSubTypes;//
     private List<WTABaseRuleTemplate> ruleTemplates;
 
-    public Long getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public long getCreationDate() {
-        return creationDate;
+
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setCreationDate(long creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public Long getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public Long getExpiryDate() {
@@ -79,6 +79,15 @@ public class WTAWithCountryAndOrganizationTypeDTO {
         this.id = id;
     }
 
+
+    public OrganizationType getOrganizationTypes() {
+        return organizationTypes;
+    }
+
+    public void setOrganizationTypes(OrganizationType organizationTypes) {
+        this.organizationTypes = organizationTypes;
+    }
+
     public Expertise getExpertise() {
         return expertise;
     }
@@ -87,12 +96,12 @@ public class WTAWithCountryAndOrganizationTypeDTO {
         this.expertise = expertise;
     }
 
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
+    public OrganizationType getOrganizationSubTypes() {
+        return organizationSubTypes;
     }
 
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public void setOrganizationSubTypes(OrganizationType organizationSubTypes) {
+        this.organizationSubTypes = organizationSubTypes;
     }
 
     public List<WTABaseRuleTemplate> getRuleTemplates() {
