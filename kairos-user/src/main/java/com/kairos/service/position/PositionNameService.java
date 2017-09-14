@@ -43,10 +43,10 @@ public class PositionNameService extends UserBaseService {
         if (organization == null) {
             throw new DataNotFoundByIdException("Organization not found");
         }
-        if(!organization.isParentOrganization()){
+       /* if(!organization.isParentOrganization()){
             throw new ActionNotPermittedException("Can only create PositionName in Parent organization");
         }
-
+*/
 
         List<PositionName> positionNameList = organization.getPositionNameList();
         positionNameList = (positionNameList == null) ? new ArrayList<PositionName>() : positionNameList;
@@ -101,7 +101,7 @@ public class PositionNameService extends UserBaseService {
     }
 
 
-    public List<PositionName> getAllPositionName(Long unitId) {
+    /*public List<PositionName> getAllPositionName(Long unitId) {
         List<PositionName> positionNames = new ArrayList<PositionName>();
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
@@ -117,8 +117,11 @@ public class PositionNameService extends UserBaseService {
 
 
         return positionNames;
-    }
+    }*/
 
+    public List<PositionName> getAllPositionName(Long unitId) {
+        return  organizationGraphRepository.getPositionNames(unitId);
+    }
 
 
 
