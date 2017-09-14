@@ -52,7 +52,7 @@ public class PositionService extends UserBaseService {
     public Position createPosition(long unitEmploymentId, PositionDTO positionDTO) {
         Position position = preparePosition(positionDTO);
 
-        UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId,0);
+        UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
 
         if (unitEmployment == null) {
             throw new DataNotFoundByIdException("Invalid UnitEmployment id");
@@ -68,7 +68,7 @@ public class PositionService extends UserBaseService {
     }
 
 
-    public Position updatePosition(long positionId, PositionDTO positionDTO) {
+    public Position     updatePosition(long positionId, PositionDTO positionDTO) {
 
         //Position position=preparePosition(positionDTO);
         Position oldPosition = positionGraphRepository.findOne(positionId);
@@ -116,7 +116,7 @@ public class PositionService extends UserBaseService {
     * used to get all positions based on unitEmployment
     * */
 
-    public List<Position> getAllPositions(long unitEmploymentId) {
+    public List<PositionQueryResult> getAllPositions(long unitEmploymentId) {
         UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
 
         if (unitEmployment == null) {

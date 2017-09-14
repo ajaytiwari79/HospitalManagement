@@ -15,8 +15,25 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface PositionGraphRepository extends GraphRepository<Position> {
 
 
-    @Query("MATCH (position:Position{isEnabled:true})<-[:" + HAS_POSITION + "]-(u:UnitEmployment) where id(u)={0} return position;")
-    List<Position> findAllPositions(long unitEmploymentId);
+    @Query("MATCH (p:Position{isEnabled:true})<-[:" + HAS_POSITION + "]-(u:UnitEmployment) where id(u)={0}\n" +
+            "match (p)-[:"+HAS_POSITION_NAME+"]->(pn:PositionName)\n" +
+            "match (p)-[:"+HAS_EXPERTISE_IN+"]->(e:Expertise)\n" +
+            "return e as expertise," +
+            "pn as positionName," +
+            "p.totalWeeklyHours as totalWeeklyHours," +
+            "p.startDate as startDate,"+
+            "p.endDate as endDate," +
+            "p.salary as salary," +
+            "p.employmentType as employmentType," +
+            "p.isEnabled as isEnabled," +
+            "p.hourlyWages as hourlyWages," +
+            "id(p)   as id," +
+            "p.avgDailyWorkingHours as avgDailyWorkingHours,"+
+            "p.lastModificationDate as lastModificationDate")
+    List<PositionQueryResult> findAllPositions(long unitEmploymentId);
+
+
+
 
     @Query("match(organization:Organization) where id(organization)={0}\n" +
             "match (staff:Staff) where id(staff)={1}\n" +
