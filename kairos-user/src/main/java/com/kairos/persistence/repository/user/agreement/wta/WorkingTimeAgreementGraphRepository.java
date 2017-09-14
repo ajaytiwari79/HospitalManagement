@@ -54,7 +54,7 @@ public interface WorkingTimeAgreementGraphRepository  extends GraphRepository<Wo
     List<WorkingTimeAgreementQueryResult>getAllWTAByOrganizationSubType(long organizationSubTypeId);
 
     @Query("match(c:Country) where id(c)={0}\n" +
-            "match(c)<-[:BELONGS_TO]-(or:OrganizationType)\n" +
+            "match(c)<-[:"+BELONGS_TO+"]-(or:OrganizationType)\n" +
             "optional match(or)-[:"+HAS_SUB_TYPE+"]->(ora:OrganizationType)\n" +
             "optional match(w:WorkingTimeAgreement)-[:"+BELONGS_TO_ORG_SUB_TYPE+"]->(ora)\n" +
             "with or,ora,w\n" +
@@ -88,8 +88,8 @@ public interface WorkingTimeAgreementGraphRepository  extends GraphRepository<Wo
             "return wta")
     WorkingTimeAgreement checkUniquenessOfDataExcludingCurrent(long orgSubTypeId,long orgTypeId,long expertiseId,long countryId,long wtaId);
 
-    @Query("match (linkedEx:Expertise{isEnabled:true})<-[:HAS_EXPERTISE_IN]-(wta:WorkingTimeAgreement{isEnabled:true})-[:BELONGS_TO_ORG_SUB_TYPE]->(o:OrganizationType) where id(o)={1}\n" +
-            "with collect (id(linkedEx)) as linkedExpertiseIds match(allExp:Expertise{isEnabled:true})-[:BELONGS_TO]->(c:Country) where Id(c)={0} \n" +
+    @Query("match (linkedEx:Expertise{isEnabled:true})<-[:"+HAS_EXPERTISE_IN+"]-(wta:WorkingTimeAgreement{isEnabled:true})-[:"+BELONGS_TO_ORG_SUB_TYPE+"]->(o:OrganizationType) where id(o)={1}\n" +
+            "with collect (id(linkedEx)) as linkedExpertiseIds match(allExp:Expertise{isEnabled:true})-[:"+BELONGS_TO+"]->(c:Country) where Id(c)={0} \n" +
             "with linkedExpertiseIds, collect (id(allExp)) as allExpertiseIds\n" +
             "return linkedExpertiseIds,allExpertiseIds")
     ExpertiseIdListDTO getAvailableAndFreeExpertise(long countryId, long organizationSubTypeId);
