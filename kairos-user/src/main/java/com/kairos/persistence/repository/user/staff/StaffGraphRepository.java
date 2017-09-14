@@ -284,6 +284,14 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     List<StaffPersonalDetailDTO> getAllStaffByUnitId(long unitId);
 
     @Query("MATCH (staff:Staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) where id(staff)={0} return id(engineerType)")
-    Long getEngineerTypeIdOfStaff(Long staffId);
+    Long getEngineerTypeId(Long staffId);
+
+    @Query("MATCH (staff:Staff)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) where id(staff)={0} return id(expertise)")
+    Long getExpertiseId(Long staffId);
+
+    @Query("MATCH (staff:Staff)-[:LANGUAGE]->(language:Language) where id(staff)={0} return id(language)")
+    Long getLanguageId(Long staffId);
+
+
 
 }
