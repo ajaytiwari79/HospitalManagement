@@ -123,8 +123,8 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.GET)
     @ApiOperation("get personal information of staff")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getPersonalInfo(@PathVariable long unitId, @PathVariable long staffId) {
-        Map<String, Object> personalInfo = staffService.getPersonalInfo(staffId, unitId);
+    public ResponseEntity<Map<String, Object>> getPersonalInfo(@PathVariable long unitId, @PathVariable long staffId, @RequestParam("type") String type) {
+        Map<String, Object> personalInfo = staffService.getPersonalInfo(staffId, unitId, type);
         if (personalInfo == null) {
             return null;
         }

@@ -220,12 +220,21 @@ public class StaffService extends UserBaseService {
         return staffPersonalDetail;
     }
 
-    public Map<String, Object> getPersonalInfo(long staffId, long unitId) {
+    public Map<String, Object> getPersonalInfo(long staffId, long unitId, String type) {
 
-        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
+        Staff staff = null;
+
+    if(TEAM.equalsIgnoreCase(type)) {
+        staff = staffGraphRepository.getTeamStaff(unitId, staffId);
+    }else if(ORGANIZATION.equalsIgnoreCase(type)) {
+        staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
+    }
+
         if (staff == null) {
-            throw new DataNotFoundByIdException("Staff not found with provided Staff ID: " + staffId+ " and Unit ID: "+unitId);
+            throw new DataNotFoundByIdException("Staff not found with provided Staff ID: " + staffId+ " and "+type+" ID: "+unitId);
         }
+
+
         Map<String, Object> personalInfo = new HashMap<>(2);
         Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
         List<Expertise> expertise;

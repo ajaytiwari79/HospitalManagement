@@ -292,6 +292,9 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     @Query("MATCH (staff:Staff)-[:LANGUAGE]->(language:Language) where id(staff)={0} return id(language)")
     Long getLanguageId(Long staffId);
 
+    @Query("Match (team:Team)-[:TEAM_HAS_MEMBER]->(staff:Staff) where id(staff)= {1} AND id(team)={0}  return staff ")
+             Staff getTeamStaff(Long teamId, Long staffId);
+
 
 
 }
