@@ -24,6 +24,7 @@ public interface PositionGraphRepository extends GraphRepository<Position> {
             "p.startDate as startDate,"+
             "p.endDate as endDate," +
             "p.salary as salary," +
+            "p.workingDaysInWeek as workingDaysInWeek,"+
             "p.employmentType as employmentType," +
             "p.isEnabled as isEnabled," +
             "p.hourlyWages as hourlyWages," +

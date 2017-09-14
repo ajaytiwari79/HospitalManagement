@@ -162,7 +162,7 @@ public class PositionService extends UserBaseService {
         position.setAvgDailyWorkingHours(positionDTO.getAvgDailyWorkingHours());
         position.setHourlyWages(positionDTO.getHourlyWages());
         position.setSalary(positionDTO.getSalary());
-
+        position.setWorkingDaysInWeek(positionDTO.getWorkingDaysInWeek());
         position.setEmploymentType(positionDTO.getEmploymentType());
 
         return position;
@@ -206,7 +206,7 @@ public class PositionService extends UserBaseService {
 
         oldPosition.setStartDate(positionDTO.getStartDate());
         oldPosition.setEndDate(positionDTO.getEndDate());
-
+        oldPosition.setWorkingDaysInWeek(positionDTO.getWorkingDaysInWeek());
         oldPosition.setTotalWeeklyHours(positionDTO.getTotalWeeklyHours());
         oldPosition.setAvgDailyWorkingHours(positionDTO.getAvgDailyWorkingHours());
         oldPosition.setHourlyWages(positionDTO.getHourlyWages());

@@ -11,7 +11,7 @@ public class PositionQueryResult {
     private Expertise expertise;
     private boolean isEnabled = true;
     private Long startDate;
-
+    private int workingDaysInWeek;
     private Long endDate;
     private Long lastModificationDate;
     private int totalWeeklyHours;
@@ -25,6 +25,15 @@ public class PositionQueryResult {
     private float salary;
 
     private PositionName positionName;
+
+
+    public int getWorkingDaysInWeek() {
+        return workingDaysInWeek;
+    }
+
+    public void setWorkingDaysInWeek(int workingDaysInWeek) {
+        this.workingDaysInWeek = workingDaysInWeek;
+    }
 
     public Expertise getExpertise() {
         return expertise;

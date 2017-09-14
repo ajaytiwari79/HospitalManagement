@@ -35,6 +35,7 @@ public class Position extends UserBaseEntity {
     private Long endDate;
     private int totalWeeklyHours;
     private float avgDailyWorkingHours;
+    private int workingDaysInWeek;
     private float hourlyWages;
     public enum EmploymentType{
         FULL_TIME,PART_TIME
@@ -48,7 +49,7 @@ public class Position extends UserBaseEntity {
 
     public Position( Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
                     PositionName positionName, String description, Long startDate, Long endDate, Long expiryDate
-                    ,int totalWeeklyHours ,float avgDailyWorkingHours,float hourlyWages,float salary) {
+                    ,int totalWeeklyHours ,float avgDailyWorkingHours,float hourlyWages,float salary,int workingDaysInWeek) {
 
         this.expertise = expertise;
         this.cta = cta;
@@ -60,6 +61,16 @@ public class Position extends UserBaseEntity {
         this.avgDailyWorkingHours =avgDailyWorkingHours;
         this.salary=salary;
         this.hourlyWages=hourlyWages;
+        this.workingDaysInWeek=workingDaysInWeek;
+    }
+
+
+    public int getWorkingDaysInWeek() {
+        return workingDaysInWeek;
+    }
+
+    public void setWorkingDaysInWeek(int workingDaysInWeek) {
+        this.workingDaysInWeek = workingDaysInWeek;
     }
 
     public int getTotalWeeklyHours() {
