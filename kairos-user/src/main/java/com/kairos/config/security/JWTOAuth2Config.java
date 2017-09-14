@@ -22,6 +22,11 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+
+    private final int REFRESH_TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * 30; // default 30 days.
+
+    private final int ACCESS_TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * 30; // default 12 hours. But we changed it to 30 days(for testing)
+
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints.authenticationManager(authenticationManager).accessTokenConverter(jwtAccessTokenConverter())
@@ -35,6 +40,8 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
         final JwtTokenStore jwtTokenStore = new JwtTokenStore(this.jwtAccessTokenConverter());
         defaultTokenServices.setTokenStore(jwtTokenStore);
         defaultTokenServices.setTokenEnhancer(this.jwtAccessTokenConverter());
+        defaultTokenServices.setRefreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
+        defaultTokenServices.setAccessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS);
         defaultTokenServices.setSupportRefreshToken(true);
         return defaultTokenServices;
     }
