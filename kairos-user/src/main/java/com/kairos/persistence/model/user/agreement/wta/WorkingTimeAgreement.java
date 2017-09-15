@@ -8,9 +8,11 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.integration.Visitour;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.springframework.beans.BeanUtils;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
@@ -177,5 +179,10 @@ public class WorkingTimeAgreement extends UserBaseEntity {
 
     public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
+    }
+
+    public static WorkingTimeAgreement copyProperties(WorkingTimeAgreement source, WorkingTimeAgreement target,Long id){
+        BeanUtils.copyProperties(source,target);
+        return target;
     }
 }

@@ -73,6 +73,17 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> getAllWTAByCountryId(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByCountryId(countryId));
     }
+    /*
+      * get all available expertise by org Sub type Id
+      * Created by vipul on 12 sept 2017
+    */
+
+    @ApiOperation(value = "Get all expertise which are not unlinked with this subOrg type of country")
+    @GetMapping(value = COUNTRY_URL+"/{organizationSubTypeId}/expertises")
+    public ResponseEntity<Map<String, Object>> getAllAvailableExpertise(@PathVariable long organizationSubTypeId, @PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllAvailableExpertise(organizationSubTypeId,countryId));
+    }
+
 
     /*
       *get all WTA by organizationSubType
@@ -81,9 +92,9 @@ public class WTAController {
     */
 
     @ApiOperation(value = "Get WTA by Org subType")
-    @RequestMapping(value = COUNTRY_URL+"organization_type/{organizationTypeId}/wta/OrganizationSubType", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getAllWTAByOrganizationSubType(@PathVariable long organizationTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByOrganizationSubType(organizationTypeId));
+    @RequestMapping(value = COUNTRY_URL+"/organization_type/{organizationSubTypeId}/wta/OrganizationSubType", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getAllWTAByOrganizationSubType(@PathVariable long organizationSubTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByOrganizationSubType(organizationSubTypeId));
     }
 /*
 * vipul
@@ -97,22 +108,18 @@ public class WTAController {
 
     /*
     * vipul
-    * api to get all org and sub-org with selected RuleTemplate
+    * api to get all org and sub-org with selected wtaId
     * */
-    @ApiOperation(value = "Get All organization and sub organization based on ruleTemplateId")
-    @RequestMapping(value = COUNTRY_URL+"organization_type/{organizationTypeId}/wta/{wtaId}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get All organization and sub organization based on wtaId")
+    @RequestMapping(value = COUNTRY_URL+"/organization_type/{organizationTypeId}/wta/{wtaId}", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllWTAWithWTAId(@PathVariable long wtaId, @PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAWithWTAId(countryId,wtaId));
     }
 
     @ApiOperation(value = "link unlink wta with org Type")
-    @PutMapping(value = COUNTRY_URL+"organization_type/{organizationTypeId}/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> setWtaWithOrganizationType(@PathVariable long wtaId, @PathVariable long organizationTypeId, @RequestParam(value="checked") boolean checked) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setWtaWithOrganizationType(wtaId,organizationTypeId,checked));
+    @PutMapping(value = COUNTRY_URL+"/organization_type/{organizationSubTypeId}/wta/{wtaId}")
+    public ResponseEntity<Map<String, Object>> setWtaWithOrganizationType(@PathVariable long wtaId, @PathVariable long organizationSubTypeId, @RequestParam(value="checked") boolean checked) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setWtaWithOrganizationType(wtaId,organizationSubTypeId,checked));
     }
-    @ApiOperation(value = "Get all expertise which are not unlinked with this subOrg type of country")
-    @GetMapping(value = COUNTRY_URL+"/{organizationSubTypeId}/expertises")
-    public ResponseEntity<Map<String, Object>> getAllAvailableExpertise(@PathVariable long organizationSubTypeId, @PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllAvailableExpertise(organizationSubTypeId,countryId));
-    }
+
 }
