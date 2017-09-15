@@ -272,20 +272,25 @@ public class WTAService extends UserBaseService {
         return expertiseDTOS;
 
     }
-    public boolean setWtaWithOrganizationType(long wtaId, long organizationTypeId, boolean checked) {
-        OrganizationType orgType = organizationTypeRepository.findOne(organizationTypeId);
+    public boolean setWtaWithOrganizationType(long wtaId, long organizationSubTypeId, boolean checked) {
+        OrganizationType orgType = organizationTypeRepository.findOne(organizationSubTypeId);
         if (orgType == null) {
-            throw new DataNotFoundByIdException("Invalid organisation type " + organizationTypeId);
+            throw new DataNotFoundByIdException("Invalid organisation Sub type Id " + organizationSubTypeId);
         }
-        WorkingTimeAgreement wta = wtaRepository.findOne(wtaId);
+        WorkingTimeAgreement wta = wtaRepository.getWta(wtaId);
         if (wta == null) {
-            throw new DataNotFoundByIdException("wta not found");
+            throw new DataNotFoundByIdException("wta not found "+wtaId);
         }
+
         if (checked) {
-            // wta.getOrganizationTypes().add(orgType);
-            save(wta);
+            WorkingTimeAgreement newWtaObject=new WorkingTimeAgreement();
+            WorkingTimeAgreement.copyProperties(wta,newWtaObject,wta.getId());
+            newWtaObject.setId(null);
+            newWtaObject.setOrganizationSubType(orgType);
+
+            save(newWtaObject);
         } else {
-            //wta.getOrganizationTypes().remove(orgType);
+            wta.setEnabled(false);
             save(wta);
         }
         return checked;
