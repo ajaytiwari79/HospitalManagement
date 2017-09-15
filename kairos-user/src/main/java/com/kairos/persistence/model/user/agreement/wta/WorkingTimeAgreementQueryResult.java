@@ -1,45 +1,43 @@
 package com.kairos.persistence.model.user.agreement.wta;
-import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 
-import com.kairos.persistence.model.organization.OrganizationType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
-import com.kairos.persistence.model.organization.OrganizationTypeDTO;
+
 import java.util.List;
 
 /**
  * Created by vipul on 9/8/17.
  */
 @QueryResult
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WorkingTimeAgreementQueryResult {
-    private Long startDate;
+    private Long startDateMillis;
     private long creationDate;
-    private Long endDate;
+    private Long endDateMillis;
     private Long expiryDate;
     private String name;
     private String description;
     private long id;
-    private ExpertiseDTO expertise;
-    private OrganizationTypeDTO organizationTypes;//
-    private OrganizationTypeDTO organizationSubTypes;//
+    private Expertise expertise;
 
     private List<WTABaseRuleTemplate> ruleTemplates;
 
-    public Long getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public Long getExpiryDate() {
@@ -66,11 +64,11 @@ public class WorkingTimeAgreementQueryResult {
         this.description = description;
     }
 
-    public ExpertiseDTO getExpertise() {
+    public Expertise getExpertise() {
         return expertise;
     }
 
-    public void setExpertise(ExpertiseDTO expertise) {
+    public void setExpertise(Expertise expertise) {
         this.expertise = expertise;
     }
 
@@ -99,19 +97,5 @@ public class WorkingTimeAgreementQueryResult {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public OrganizationTypeDTO getOrganizationTypes() {
-        return organizationTypes;
-    }
 
-    public void setOrganizationTypes(OrganizationTypeDTO organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
-    public OrganizationTypeDTO getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public void setOrganizationSubTypes(OrganizationTypeDTO organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
 }

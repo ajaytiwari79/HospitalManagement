@@ -9,6 +9,8 @@ import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreementQuery
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
+import com.kairos.persistence.model.user.expertise.ExpertiseIdListDTO;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
@@ -18,6 +20,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.WtaDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.expertise.ExpertiseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -52,7 +55,8 @@ public class WTAService extends UserBaseService {
     private RegionGraphRepository regionRepository;
     @Inject
     private WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
-
+    @Inject
+    ExpertiseService expertiseService;
     public HashMap createWta(long countryId, WtaDTO wtaDTO) {
         Country country = countryRepository.findOne(countryId);
         if (country == null) {
@@ -258,21 +262,35 @@ public class WTAService extends UserBaseService {
         }
         return objectList;
     }
+    public List<ExpertiseDTO> getAllAvailableExpertise(Long organizationSubTypeId,Long countryId){
+        ExpertiseIdListDTO map = wtaRepository.getAvailableAndFreeExpertise(countryId, organizationSubTypeId);
+        List<Long> linkedExpertiseIds= map.getLinkedExpertise();
+        List<Long> allExpertiseIds= map.getAllExpertiseIds();
+        allExpertiseIds.removeAll(linkedExpertiseIds);
+        List<ExpertiseDTO> expertiseDTOS=new ArrayList<ExpertiseDTO>();
+        expertiseDTOS=expertiseService.getAllFreeExpertise(allExpertiseIds);
+        return expertiseDTOS;
 
-    public boolean setWtaWithOrganizationType(long wtaId, long organizationTypeId, boolean checked) {
-        OrganizationType orgType = organizationTypeRepository.findOne(organizationTypeId);
+    }
+    public boolean setWtaWithOrganizationType(long wtaId, long organizationSubTypeId, boolean checked) {
+        OrganizationType orgType = organizationTypeRepository.findOne(organizationSubTypeId);
         if (orgType == null) {
-            throw new DataNotFoundByIdException("Invalid organisation type " + organizationTypeId);
+            throw new DataNotFoundByIdException("Invalid organisation Sub type Id " + organizationSubTypeId);
         }
-        WorkingTimeAgreement wta = wtaRepository.findOne(wtaId);
+        WorkingTimeAgreement wta = wtaRepository.getWta(wtaId);
         if (wta == null) {
-            throw new DataNotFoundByIdException("wta not found");
+            throw new DataNotFoundByIdException("wta not found "+wtaId);
         }
+
         if (checked) {
-            // wta.getOrganizationTypes().add(orgType);
-            save(wta);
+            WorkingTimeAgreement newWtaObject=new WorkingTimeAgreement();
+            WorkingTimeAgreement.copyProperties(wta,newWtaObject,wta.getId());
+            newWtaObject.setId(null);
+            newWtaObject.setOrganizationSubType(orgType);
+
+            save(newWtaObject);
         } else {
-            //wta.getOrganizationTypes().remove(orgType);
+            wta.setEnabled(false);
             save(wta);
         }
         return checked;

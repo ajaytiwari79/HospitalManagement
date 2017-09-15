@@ -1,6 +1,7 @@
 package com.kairos.service.expertise;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -120,5 +121,9 @@ public class ExpertiseService extends UserBaseService {
 
         ExpertiseSkillQueryResult expertiseSkillQueryResult = expertiseGraphRepository.getExpertiseSkills(expertiseId,countryId);
         return expertiseSkillQueryResult.getSkills();
+    }
+
+    public List<ExpertiseDTO> getAllFreeExpertise(List<Long> expertiseIds){
+        return expertiseGraphRepository.getAllFreeExpertises(expertiseIds);
     }
 }
