@@ -14,6 +14,7 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.CountryHolidayCalender;
+import com.kairos.persistence.model.user.country.RelationType;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -338,5 +339,34 @@ public class CountryService extends UserBaseService {
 
     public List<Level> getLevels(long countryId){
         return countryGraphRepository.getLevelsByCountry(countryId);
+    }
+
+    public RelationType addRelationType(long countryId,RelationType relationType){
+        Country country = countryGraphRepository.findOne(countryId);
+        if(country == null){
+            logger.debug("Finding country by id::" + countryId);
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+        List<RelationType> relationTypes = country.getRelationTypes();
+        relationTypes.add(relationType);
+        country.setRelationTypes(relationTypes);
+        countryGraphRepository.save(country);
+        return relationType;
+    }
+
+    public List<RelationType> getRelationTypes(long countryId){
+        return countryGraphRepository.getRelationTypesByCountry(countryId);
+    }
+
+    public boolean deleteRelationType(long countryId,long relationTypeId){
+        RelationType relationType = countryGraphRepository.getRelationType(countryId,relationTypeId);
+        if(relationType == null){
+            logger.debug("Finding relation type by id::" + relationTypeId);
+            throw new DataNotFoundByIdException("Incorrect relation type id " + relationTypeId);
+        }
+
+        relationType.setEnabled(false);
+        save(relationType);
+        return true;
     }
 }

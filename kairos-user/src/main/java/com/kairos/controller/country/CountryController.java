@@ -979,6 +979,27 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getLevels(countryId));
     }
 
+    @RequestMapping(value = COUNTRY_URL + "/relationType", method = RequestMethod.POST)
+    @ApiOperation("Add relation types in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> addRelationType(@PathVariable long countryId, @RequestBody RelationType relationType){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addRelationType(countryId, relationType));
+    }
+
+    @RequestMapping(value = COUNTRY_URL + "/relationType/{relationTypeId}", method = RequestMethod.DELETE)
+    @ApiOperation("Add relation types in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> deleteRelationType(@PathVariable long countryId, @PathVariable Long relationTypeId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.deleteRelationType(countryId, relationTypeId));
+    }
+
+    @RequestMapping(value = COUNTRY_URL + "/relationType", method = RequestMethod.GET)
+    @ApiOperation("Add relation types in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getRelationTypes(@PathVariable long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getRelationTypes(countryId));
+    }
+
 
 
 
