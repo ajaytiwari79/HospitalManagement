@@ -233,7 +233,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client{citizenDead:false})-[r:"+GET_SERVICE_FROM+"]-(o:Organization) where id(o)= {0} return id(c) as id")
     List<Long> getCitizenIds(long unitId);
 
-    @Query("Match (n:Client) where id(n) in {0} return n")
+    @Query("Match (n:Client) where id(n) in {0} return n order by id(n)")
     List<Client> findByIdIn(List<Long> ids);
 
     @Query("MATCH (c:Client)-[r:GET_SERVICE_FROM]->(o:Organization) where id(c)={0} and id(o)={1}  return c")
