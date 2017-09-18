@@ -347,7 +347,10 @@ public class CountryService extends UserBaseService {
             logger.debug("Finding country by id::" + countryId);
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
-        List<RelationType> relationTypes = country.getRelationTypes();
+        List<RelationType> relationTypes = new ArrayList<RelationType>();
+       //check if getRelationTypes is null then it will not add in array list.
+        Optional.ofNullable(country.getRelationTypes()).ifPresent(relationTypesList->relationTypes.addAll(relationTypesList));
+
         relationTypes.add(relationType);
         country.setRelationTypes(relationTypes);
         countryGraphRepository.save(country);
