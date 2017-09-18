@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import java.text.ParseException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -120,10 +121,49 @@ public class ClientController {
 
     // NextToKin
     @ApiOperation("update NextToKin")
-    @RequestMapping(value = "/{clientId}/nextToKin", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateNextToKin(@RequestBody NextToKinDTO client, @PathVariable long unitId, @PathVariable long clientId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKin(client, unitId, clientId));
+    @RequestMapping(value = "/{clientId}/nextToKin/{nextToKinId}", method = RequestMethod.PUT)
+    ResponseEntity<Map<String, Object>> updateNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long nextToKinId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO));
     }
+
+    // NextToKin
+    @ApiOperation("update NextToKin")
+    @RequestMapping(value = "/{clientId}/nextToKin", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> createNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.saveNextToKin(unitId,clientId,nextToKinDTO));
+    }
+
+    // Client Profile Picture
+    @RequestMapping(value = "/{clientId}/next_to_Kin/image", method = RequestMethod.POST)
+    @ApiOperation("upload client picture")
+    public ResponseEntity<Map<String, Object>> uploadImageOfNextToKin(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.emptyMap());
+        }
+        HashMap<String,String> imageUrls = clientExtendedService.uploadImageOfNextToKin(file);
+        if (imageUrls == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.emptyMap());
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, imageUrls);
+    }
+
+    // Client Profile Picture
+    @RequestMapping(value = "/{clientId}/next_to_Kin/{nextToKinId}/image", method = RequestMethod.POST)
+    @ApiOperation("upload client picture")
+    public ResponseEntity<Map<String, Object>> updateImageOfNextToKin(@PathVariable long unitId,
+                                                                      @PathVariable long nextToKinId,
+                                                                      @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.emptyMap());
+        }
+        HashMap<String,String> imageUrls = clientExtendedService.updateImageOfNextToKin(unitId,nextToKinId,file);
+        if (imageUrls == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.emptyMap());
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, imageUrls);
+    }
+
+
 
 
     // Transport Tab

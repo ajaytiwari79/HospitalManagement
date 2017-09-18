@@ -21,6 +21,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface ClientGraphRepository extends GraphRepository<Client>{
 
+
+    @Query("MATCH (client:Client)-[r:"+GET_SERVICE_FROM+"]->(org:Organization) where id(client)={0} and id(org)={1} return client")
+    Client findOne(long clientId,long unitId);
+
     @Query("MATCH (c:Client) return c order by c.firstName")
     List<Client> findAll();
 
@@ -129,12 +133,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client) where c.cprNumber={0}  return c")
     Client findByCPRNumber(String cprNumber);
 
-    @Query("MATCH (c:Client) where c.cprNumber={0}  return c")
-    List<Client> findAllByCPRNumber(String cprNumber);
+    @Query("MATCH (c:Client) where c.cprNumber={0}  return count(c)")
+    int getClientByCPRNumber(String cprNumber);
 
-
-    @Query("MATCH (c:User) where c.email={0}  return c")
-    User findByEmail(String email);
 
     @Query("MATCH (t:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(s:Staff)-[:BELONGS_TO]->(u:User) where id(t)={0} \n" +
             "             with s AS staff , u as user\n" +
@@ -145,18 +146,6 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "            return  DISTINCT { id:id(staff), staffType:served_by_staff.type, lastName:staff.lastName , firstName:staff.firstName, profilePic: {2} + staff.profilePic, gender:user.gender, isActive:staff.isActive,  skillList: collect ({name: skill.name,level:r.skillLevel})  }as staffList" )
     List<Map<String,Object>> getTeamMembers(Long teamID, Long clientId, String imageUrl);
 
-    @Query("MATCH (c:Client)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress) where id(ca)= {0} return c")
-    Client getClientsByHomeAddressId(Long homeAddressId);
-
-    @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='NONE'  " +
-            "RETURN " +
-            "collect ({ " +
-            "id:id(s), " +
-            "firstName:s.firstName, " +
-            "lastName:s.lastName, " +
-            "type:r.type " +
-            "}) As staffList")
-    List<Map<String,Object>> findNeutualStaff(Long clientId);
 
 
     @Query("MATCH (c:Client)-[:PEOPLE_IN_HOUSEHOLD_LIST]->(ps:Client) where id(c)={0}  return {id:id(ps), firstName:ps.firstName , lastName:ps.lastName, name:ps.firstName +' '+ ps.lastName } as result")
@@ -171,8 +160,6 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "RETURN {visitourId:s.visitourId} as ids ")
     List<Map<String,Object>> findForbidStaffVisitourIds(Long id);
 
-    @Query("MATCH(o:Organization) where id(o)={0} with o MATCH(c:Client)-[:GET_SERVICE_FROM]->(o) with c MATCH(h:ContactAddress)-[:HAS_HOME_ADDRESS]-(c) return h as address UNION MATCH(s:ContactAddress)-[:HAS_SECONDARY_ADDRESS]-(c) return s as address;")
-    List<Map<String,Object>> getAllAddressListOfClientsOfAnOrganization(long organizationId);
 
     @Query("MATCH (c:Client), (k:Client) where id(c)={0} AND id(k)={1} Create UNIQUE (c)-[r:NEXT_TO_KIN]->(k) return k")
     void createNextToKinRelation(Long parent, Long kinId);
@@ -238,4 +225,12 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
     @Query("MATCH (c:Client)-[r:GET_SERVICE_FROM]->(o:Organization) where id(c)={0} and id(o)={1}  return c")
     Client getClientByClientIdAndUnitId(Long clientId, Long unitId);
+
+    @Query("Match (c:Client)-[:NEXT_TO_KIN]->(nextToKin:Client) where id(c)={0}\n" +
+            "Match (nextToKin)-[:CIVILIAN_STATUS]->(citizenStatus:CitizenStatus) with nextToKin,citizenStatus\n" +
+            "Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail,nextToKin,citizenStatus\n" +
+            "Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode)\n" +
+            "return id(nextToKin) as id,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1} + nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumer,homeAddress as homeAddress,citizenStatus as citizenStatus,contactDetail as contactDetail,municipality as municipality,zipCode as zipCode")
+    List<NextToKinQueryResult> getNextToKinDetail(long clientId,String imageUrl);
 }

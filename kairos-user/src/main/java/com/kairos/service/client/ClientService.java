@@ -134,7 +134,7 @@ public class ClientService extends UserBaseService {
         if (checkCitizenCPRConstraint(client)) {
             logger.debug("Creating Client..........");
             Client createClient = clientGraphRepository.save(generateAgeAndGenderFromCPR(client));
-            createClient.setNextToKin(new Client());
+            //createClient.setNextToKin(new Client());
             return (Client) save(createClient);
         }
         return null;
@@ -182,11 +182,11 @@ public class ClientService extends UserBaseService {
                     client.setEmail(email);
                     client.setUserName(email);
                     Client nextToKin = new Client();
-                    client.setNextToKin(nextToKin);
+                    //client.setNextToKin(nextToKin);
                 }
 
                 Client createdClient = generateAgeAndGenderFromCPR(client);
-                client.setNextToKin(new Client());
+                //client.setNextToKin(new Client());
                 if (createdClient != null) {
                     save(createdClient);
                     ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(createdClient, organization, new DateTime().getMillis());
@@ -376,17 +376,19 @@ public class ClientService extends UserBaseService {
                 logger.debug("Country not found");
             }
 
-
             // NextToKin
+            List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId,envConfig.getServerHost() + File.separator);
+            response.put("nextToKin", nextToKinDetails);
             Client kin = (Client) clientGraphRepository.getNextToKin(clientId);
-            if (kin != null) {
-                Map<String, Object> nextToKinDetails = clientGraphRepository.findOne(kin.getId(), 2).retrieveNextToKinDetails();
-                if (nextToKinDetails != null) {
+            /*if (kin != null) {
+                //Map<String, Object> nextToKinDetails = clientGraphRepository.findOne(kin.getId(), 2).retrieveNextToKinDetails();
+
+               *//* if (nextToKinDetails != null) {
                     String imageUrl = envConfig.getServerHost() + File.separator + (String) nextToKinDetails.get("profilePic");
                     nextToKinDetails.put("profilePic", imageUrl);
-                }
+                }*//*
                 response.put("nextToKin", nextToKinDetails);
-            }
+            }*/
 
             // Social Media Details
             Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
@@ -598,7 +600,7 @@ public class ClientService extends UserBaseService {
         houseHoldPeopleRelationship.setClient(client);
         houseHoldPeopleRelationship.setPeopleInHouseHold(createdHousehold);
         save(houseHoldPeopleRelationship);
-        client.setNextToKin(nextToKin);
+        //client.setNextToKin(nextToKin);
         save(client);
         return createdHousehold.retrieveMinimumDetails();
     }

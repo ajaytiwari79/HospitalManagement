@@ -9,7 +9,6 @@ import com.kairos.persistence.model.user.country.CitizenStatus;
  */
 
 public class NextToKinDTO {
-    private Long id;
     private String nickName;
     private String firstName;
     private String lastName;
@@ -17,7 +16,7 @@ public class NextToKinDTO {
     private AddressDTO homeAddress;
     private ContactDetail contactDetail;
     private String profilePic;
-    private Long cprNumber;
+    private String cprNumber;
     private String  privateEmail;
     private boolean isVerifiedByGoogleMap;
 
@@ -29,22 +28,13 @@ public class NextToKinDTO {
         isVerifiedByGoogleMap = verifiedByGoogleMap;
     }
 
-    public Long getCprNumber() {
+    public String getCprNumber() {
         return cprNumber;
     }
 
-    public void setCprNumber(Long cprNumber) {
+    public void setCprNumber(String cprNumber) {
         this.cprNumber = cprNumber;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
 
     public String getPrivateEmail() {
         return privateEmail;
@@ -110,4 +100,5 @@ public class NextToKinDTO {
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
     }
+
 }
