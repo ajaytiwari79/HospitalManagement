@@ -5,6 +5,7 @@ import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemp
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.RelationType;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -166,6 +167,12 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} return level")
     List<Level> getLevelsByCountry(long countryId);
+
+    @Query("MATCH (country:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(country)={0} return relationType")
+    List<RelationType> getRelationTypesByCountry(long countryId);
+
+    @Query("MATCH (country:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(country)={0} AND id(relationType)={1} return relationType")
+    RelationType getRelationType(long countryId, long relationTypeId);
 
 
 
