@@ -152,6 +152,9 @@ public class ClientService extends UserBaseService {
 
 
             Client client = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
+            if(client.isCitizenDead()){
+                throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
+            }
 
             if (client != null) {
                 logger.debug("Using Existing Client..........");

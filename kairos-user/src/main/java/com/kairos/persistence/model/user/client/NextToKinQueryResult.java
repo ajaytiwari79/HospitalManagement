@@ -19,10 +19,20 @@ public class NextToKinQueryResult {
     private String nickName;
     private Integer age;
     private String profilePic;
+    private String cprNumber;
     private ContactDetail contactDetail;
     private ContactAddress homeAddress;
     private CitizenStatus citizenStatus;
     private ZipCode zipCode;
+
+    public String getCprNumber() {
+        return cprNumber;
+    }
+
+    public void setCprNumber(String cprNumber) {
+        this.cprNumber = cprNumber;
+    }
+
 
     public Long getId() {
         return id;
@@ -135,6 +145,7 @@ public class NextToKinQueryResult {
         this.zipCode = nextToKin.getHomeAddress().getZipCode();
         this.municipality = nextToKin.getHomeAddress().getMunicipality();
         this.contactDetail = nextToKin.getContactDetail();
+        this.cprNumber = nextToKin.getCprNumber();
         return this;
     }
 }
