@@ -8,6 +8,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.user.resources.Resource;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -67,6 +68,9 @@ public class Country extends UserBaseEntity {
 
     @Relationship(type = HAS_RELATION_TYPES)
     private List<RelationType> relationTypes;
+
+    @Relationship(type = HAS_RESOURCES)
+    private List<Resources> resources;
 
     public Country() {
     }
@@ -184,6 +188,12 @@ public class Country extends UserBaseEntity {
         List<Level> levels = Optional.ofNullable(this.levels).orElse(new ArrayList<>());
         levels.add(level);
         this.levels = levels;
+    }
+
+    public void addResources(Resources resources){
+        List<Resources> resourceList = Optional.ofNullable(this.resources).orElse(new ArrayList<>());
+        resourceList.add(resources);
+        this.resources = resourceList;
     }
 
 

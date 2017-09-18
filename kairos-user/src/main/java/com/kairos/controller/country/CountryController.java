@@ -1000,6 +1000,34 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getRelationTypes(countryId));
     }
 
+    @RequestMapping(value = COUNTRY_URL + "/resources", method = RequestMethod.POST)
+    @ApiOperation("Add resources in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> addResources(@PathVariable long countryId, @RequestBody Resources resources){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addResources(countryId, resources));
+    }
+
+    @RequestMapping(value = COUNTRY_URL + "/resources/{resourcesId}", method = RequestMethod.DELETE)
+    @ApiOperation("Delete resources from country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> deleteResources(@PathVariable Long countryId, @PathVariable Long resourcesId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.deleteResources(countryId, resourcesId));
+    }
+
+    @RequestMapping(value = COUNTRY_URL + "/resources", method = RequestMethod.GET)
+    @ApiOperation("Get resources of country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getResources(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getResourcesList(countryId));
+    }
+
+    @RequestMapping(value = COUNTRY_URL + "/resources/{resourcesId}", method = RequestMethod.PUT)
+    @ApiOperation("Update resources in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> updateResources(@PathVariable Long countryId, @PathVariable Long resourcesId,  @RequestBody Resources resources){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateResources(countryId, resourcesId, resources));
+    }
+
 
 
 

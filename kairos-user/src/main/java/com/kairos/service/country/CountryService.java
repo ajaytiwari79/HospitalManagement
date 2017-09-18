@@ -15,6 +15,7 @@ import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryR
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 import com.kairos.persistence.model.user.country.RelationType;
+import com.kairos.persistence.model.user.country.Resources;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -371,5 +372,44 @@ public class CountryService extends UserBaseService {
         relationType.setEnabled(false);
         save(relationType);
         return true;
+    }
+
+    public Resources addResources(long countryId,Resources resources){
+        Country country = countryGraphRepository.findOne(countryId);
+        if(country == null){
+            logger.debug("Finding country by id::" + countryId);
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+
+        country.addResources(resources);
+        countryGraphRepository.save(country);
+        return resources;
+    }
+
+    public List<Resources> getResourcesList(long countryId){
+        return countryGraphRepository.getResourcesByCountry(countryId);
+    }
+
+    public boolean deleteResources(long countryId,long resourcesId){
+        Resources resources = countryGraphRepository.getResources(countryId,resourcesId);
+        if(resources == null){
+            logger.debug("Finding resources by id::" + resourcesId);
+            throw new DataNotFoundByIdException("Incorrect resources id " + resourcesId);
+        }
+
+        resources.setEnabled(false);
+        save(resources);
+        return true;
+    }
+
+    public Resources updateResources(long countryId,long resourcesId,Resources resources){
+        Resources resourcesToUpdate = countryGraphRepository.getResources(countryId,resourcesId);
+        if(resourcesToUpdate == null){
+            logger.debug("Finding resources by id::" + resourcesId);
+            throw new DataNotFoundByIdException("Incorrect resources id " + resourcesId);
+        }
+        resourcesToUpdate.setName(resources.getName());
+        resourcesToUpdate.setDescription(resources.getDescription());
+        return save(resourcesToUpdate);
     }
 }
