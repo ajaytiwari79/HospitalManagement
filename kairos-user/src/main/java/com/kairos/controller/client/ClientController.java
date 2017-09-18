@@ -470,9 +470,9 @@ public class ClientController {
     // Mark Client Dead
     @RequestMapping(method = RequestMethod.DELETE, value = "/{clientId}/dead")
     @ApiOperation("Delete task exception")
-    public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId) throws ParseException, CloneNotSupportedException {
+    public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId,@RequestBody CitizenDeathInfoDTO citizenDeathInfoDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.markClientAsDead(clientId));
+                clientService.markClientAsDead(clientId,citizenDeathInfoDTO));
     }
 
 

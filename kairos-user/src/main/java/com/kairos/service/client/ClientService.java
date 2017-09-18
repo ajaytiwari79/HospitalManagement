@@ -647,12 +647,13 @@ public class ClientService extends UserBaseService {
      * @return
      * @auther anil maurya
      */
-    public boolean markClientAsDead(Long clientId) {
+    public boolean markClientAsDead(Long clientId,CitizenDeathInfoDTO citizenDeathInfoDTO) {
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
             throw new DataNotFoundByIdException("Incorrect client id ::" + clientId);
         }
         client.setCitizenDead(true);
+        client.setDeathDate(citizenDeathInfoDTO.getDeathDate().getTime());
         clientGraphRepository.save(client);
         //return plannerService.deleteTasksForCitizen(clientId);
         return plannerRestClient.deleteTaskForCitizen(clientId);

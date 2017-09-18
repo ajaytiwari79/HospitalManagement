@@ -9,6 +9,7 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.util.DateConverter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -113,6 +114,15 @@ public class Client extends User {
 
     private String visitourTeamId;
 
+    private long deathDate;
+
+    public long getDeathDate() {
+        return deathDate;
+    }
+
+    public void setDeathDate(long deathDate) {
+        this.deathDate = deathDate;
+    }
 
     @Relationship(type = HAS_ALLERGY)
     private List<ClientAllergies> clientAllergiesList;
@@ -718,6 +728,7 @@ public class Client extends User {
 
         map.put("peopleInHousehold", this.peopleInHousehold);
         map.put("livesAlone", this.livesAlone);
+        map.put("deathDate", DateConverter.getDate(this.deathDate));
         return map;
     }
 
