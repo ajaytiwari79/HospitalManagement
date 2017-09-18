@@ -341,7 +341,7 @@ public class CountryService extends UserBaseService {
         return countryGraphRepository.getLevelsByCountry(countryId);
     }
 
-    public RelationType addRelationType(long countryId,RelationType relationType){
+    public RelationType addRelationType(Long countryId,RelationType relationType){
         Country country = countryGraphRepository.findOne(countryId);
         if(country == null){
             logger.debug("Finding country by id::" + countryId);
@@ -357,11 +357,11 @@ public class CountryService extends UserBaseService {
         return relationType;
     }
 
-    public List<RelationType> getRelationTypes(long countryId){
+    public List<RelationType> getRelationTypes(Long countryId){
         return countryGraphRepository.getRelationTypesByCountry(countryId);
     }
 
-    public boolean deleteRelationType(long countryId,long relationTypeId){
+    public boolean deleteRelationType(Long countryId,Long relationTypeId){
         RelationType relationType = countryGraphRepository.getRelationType(countryId,relationTypeId);
         if(relationType == null){
             logger.debug("Finding relation type by id::" + relationTypeId);

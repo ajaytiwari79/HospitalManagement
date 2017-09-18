@@ -989,14 +989,14 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/relationType/{relationTypeId}", method = RequestMethod.DELETE)
     @ApiOperation("Add relation types in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> deleteRelationType(@PathVariable long countryId, @PathVariable Long relationTypeId){
+    public ResponseEntity<Map<String,Object>> deleteRelationType(@PathVariable Long countryId, @PathVariable Long relationTypeId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.deleteRelationType(countryId, relationTypeId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/relationType", method = RequestMethod.GET)
     @ApiOperation("Add relation types in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> getRelationTypes(@PathVariable long countryId){
+    public ResponseEntity<Map<String,Object>> getRelationTypes(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getRelationTypes(countryId));
     }
 
