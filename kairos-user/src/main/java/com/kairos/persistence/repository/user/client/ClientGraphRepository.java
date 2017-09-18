@@ -133,8 +133,8 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client) where c.cprNumber={0}  return c")
     Client findByCPRNumber(String cprNumber);
 
-    @Query("MATCH (c:Client) where c.cprNumber={0}  return count(c)")
-    int getClientByCPRNumber(String cprNumber);
+    @Query("MATCH (c:Client)-[:GET_SERVICE_FROM]->(unit:Organization) where c.cprNumber={0} and id(unit)={1}  return count(c)")
+    int checkClientWithCprNumber(String cprNumber,Long unitId);
 
 
     @Query("MATCH (t:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(s:Staff)-[:BELONGS_TO]->(u:User) where id(t)={0} \n" +

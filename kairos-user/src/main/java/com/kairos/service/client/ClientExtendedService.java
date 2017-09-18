@@ -3,6 +3,7 @@ package com.kairos.service.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.auth.User;
@@ -97,10 +98,7 @@ public class ClientExtendedService extends UserBaseService {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
-        if (clientGraphRepository.getClientByCPRNumber(String.valueOf(nextToKinDTO.getCprNumber())) > 1) {
-            logger.debug("CPR number already exist " + nextToKinDTO.getCprNumber());
-            throw new DataNotFoundByIdException("CPR number already exist " + nextToKinDTO.getCprNumber());
-        }
+        validateCPRNumber(nextToKinDTO.getCprNumber(),unitId);
         Client nextToKin = new Client();
         nextToKin.saveBasicDetail(nextToKinDTO);
         saveContactDetailOfNextToKIbn(nextToKinDTO, nextToKin);
@@ -114,6 +112,18 @@ public class ClientExtendedService extends UserBaseService {
         createNextToKinRelationship(client, nextToKin);
         assignOrganizationToNextToKin(nextToKin, unitId);
         return new NextToKinQueryResult().buildResponse(nextToKin,envConfig.getServerHost() + File.separator);
+    }
+
+    private boolean validateCPRNumber(String cprNumber,long unitId){
+        Client client = clientGraphRepository.findByCPRNumber(cprNumber.trim());
+        if(Optional.ofNullable(client).isPresent() && client.isCitizenDead()){
+            throw new DuplicateDataException("You can't enter the CPR of dead citizen " + cprNumber);
+        } else if(Optional.ofNullable(client).isPresent() && relationService.checkClientOrganizationRelation(client.getId(), unitId)>0){
+            logger.debug("CPR number already exist " +cprNumber);
+            throw new DataNotFoundByIdException("CPR number already exist " + cprNumber);
+        } else {
+            return true;
+        }
     }
 
     private void createNextToKinRelationship(Client client, Client nextToKin) {
