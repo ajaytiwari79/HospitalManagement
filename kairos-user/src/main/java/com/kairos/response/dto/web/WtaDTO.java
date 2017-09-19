@@ -1,5 +1,9 @@
 package com.kairos.response.dto.web;
 
+
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -7,11 +11,14 @@ import java.util.List;
  */
 public class WtaDTO {
 
-
+    @NotEmpty(message = "error.WtaDTO.name.notEmpty") @NotNull(message = "error.WtaDTO.name.notnull")
     private String name;
     private String description;
+     @NotNull(message = "error.WtaDTO.expertiseId.notnull")
     private long expertiseId;
+     @NotNull(message = "error.WtaDTO.organizationType.notnull")
     private Long organizationType;
+     @NotNull(message = "error.WtaDTO.organizationSubType.notnull")
     private Long organizationSubType;
     private List<Long> ruleTemplates;
     private long startDateMillis;
