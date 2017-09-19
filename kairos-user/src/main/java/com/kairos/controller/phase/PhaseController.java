@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -29,8 +30,8 @@ public class PhaseController {
     @ApiOperation(value = "Create Phases in Organization")
     @PostMapping(value="")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createPhase(@PathVariable Long unitId) {
-        phaseService.createPhasesByUnitId(unitId);
+    public ResponseEntity<Map<String, Object>> createPhase(@PathVariable Long unitId,@RequestBody @Valid  PhaseDTO phaseDTO) {
+        phaseService.createPhasesByUnitId(unitId, phaseDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 

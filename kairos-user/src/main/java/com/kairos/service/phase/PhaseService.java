@@ -1,7 +1,5 @@
 package com.kairos.service.phase;
 
-
-
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.phase.Phase;
@@ -29,24 +27,31 @@ public class PhaseService extends UserBaseService {
     private OrganizationGraphRepository organizationGraphRepository;
 
 
-    public void createPhasesByUnitId(Long unitId) {
+    public void createPhasesByUnitId(Long unitId, PhaseDTO phaseDTO) {
 
         Organization unitOrganization = organizationGraphRepository.findOne(unitId);
         if (unitOrganization == null) {
             throw new DataNotFoundByIdException("Invalid Organization id : " + unitId);
         }
 
+        Phase phase=preparePhase(phaseDTO);
+
         List<Phase> phases = getPhases();
         if (phases == null) {
             throw new DataNotFoundByIdException("Phases not found in DB ");
         }
 
-        for (Phase phase : phases) {
+        /*for (Phase phase : null) {
             PhaseOrganizationRelation phaseOrganizationRelation = new PhaseOrganizationRelation(phase, unitOrganization, 1);
             save(phaseOrganizationRelation);
-        }
+        }*/
 
 
+    }
+
+    private Phase preparePhase(PhaseDTO phaseDTO) {
+
+        return  null;
     }
 
     public  void createPhases(Organization unitOrganization) {
@@ -67,25 +72,25 @@ public class PhaseService extends UserBaseService {
 
         Phase requestPhase = phaseGraphRepository.findByNameAndDisabled(REQUEST_PHASE_NAME, false);
         if (requestPhase == null) {
-            requestPhase = new Phase(REQUEST_PHASE_NAME, REQUEST_PHASE_DESCRIPTION, false);
+            //requestPhase = new Phase(REQUEST_PHASE_NAME, REQUEST_PHASE_DESCRIPTION, false);
             save(requestPhase);
         }
 
         Phase puzzlePhase = phaseGraphRepository.findByNameAndDisabled(PUZZLE_PHASE_NAME, false);
         if (puzzlePhase == null) {
-            puzzlePhase = new Phase(PUZZLE_PHASE_NAME, PUZZLE_PHASE_DESCRIPTION, false);
+           // puzzlePhase = new Phase(PUZZLE_PHASE_NAME, PUZZLE_PHASE_DESCRIPTION, false);
             save(puzzlePhase);
         }
 
         Phase constructionPhase = phaseGraphRepository.findByNameAndDisabled(CONSTRUCTION_PHASE_NAME, false);
         if (constructionPhase == null) {
-            constructionPhase = new Phase(CONSTRUCTION_PHASE_NAME, CONSTRUCTION_PHASE_DESCRIPTION, false);
+            //constructionPhase = new Phase(CONSTRUCTION_PHASE_NAME, CONSTRUCTION_PHASE_DESCRIPTION, false);
             save(constructionPhase);
         }
         Phase finalPhase = phaseGraphRepository.findByNameAndDisabled(FINAL_PHASE_NAME, false);
 
         if (finalPhase == null) {
-            finalPhase = new Phase(FINAL_PHASE_NAME, FINAL_PHASE_DESCRIPTION, false);
+           // finalPhase = new Phase(FINAL_PHASE_NAME, FINAL_PHASE_DESCRIPTION, false);
             save(finalPhase);
         }
 
