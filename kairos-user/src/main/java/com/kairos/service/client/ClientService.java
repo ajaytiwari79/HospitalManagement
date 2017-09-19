@@ -1227,4 +1227,5 @@ public class ClientService extends UserBaseService {
     public List<Client> getClientsByIdsInList(List<Long> citizenIds){
         return clientGraphRepository.findByIdIn(citizenIds);
     }
+
 }

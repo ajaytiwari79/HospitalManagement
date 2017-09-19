@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.agreement.wta;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -10,6 +11,7 @@ import java.util.List;
  * Created by vipul on 9/8/17.
  */
 @QueryResult
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WorkingTimeAgreementQueryResult {
     private Long startDateMillis;
     private long creationDate;

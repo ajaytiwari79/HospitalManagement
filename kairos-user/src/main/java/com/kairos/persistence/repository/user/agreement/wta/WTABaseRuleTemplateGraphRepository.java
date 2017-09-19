@@ -69,7 +69,7 @@ public interface WTABaseRuleTemplateGraphRepository extends GraphRepository<WTAB
     void deleteCategoryFromTemplate(Long ruleTemplateId);
     @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
             "match (r:WTABaseRuleTemplate)<-[:"+HAS_RULE_TEMPLATES+"]-(rt)\n" +
-            "return collect(id(r)) as IDs")
+            "return id(r) as IDs")
     List<Long> findAllWTABelongsByTemplateCategoryId(long ruleTemplateCategoryId);
 
     @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +

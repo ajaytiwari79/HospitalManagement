@@ -45,6 +45,7 @@ public class OrganizationServiceService extends UserBaseService {
     @Inject
     private TaskTypeMongoRepository taskTypeMongoRepository;
     @Inject*/
+    @Inject
     private TeamGraphRepository teamGraphRepository;
 
 

@@ -802,7 +802,7 @@ public class Client extends User {
         map.put("hideMobilePhone", this.contactDetail != null ? this.contactDetail.isHideMobilePhone() : "");
         map.put("hideWorkPhone", this.contactDetail != null ? this.contactDetail.isHideWorkPhone() : "");
         map.put("hidePrivatePhone", this.contactDetail != null ? this.contactDetail.isHidePrivatePhone() : "");
-        map.put("workEmail", this.contactDetail != null ? this.contactDetail.getWorkEmail() : "");
+        map.put("workEmail", this.contactDetail != null ? this.contactDetail.getPrivateEmail() : "");
         map.put("emergencyPhone", this.contactDetail != null ? this.contactDetail.getEmergencyPhone() : "");
         map.put("hideEmergencyPhone", this.contactDetail != null ? this.contactDetail.isHideEmergencyPhone() : "");
 
