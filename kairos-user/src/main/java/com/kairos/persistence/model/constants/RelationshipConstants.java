@@ -90,6 +90,7 @@ public class RelationshipConstants {
     public final static String HAS_PARTNER_ADDRESS = "HAS_PARTNER_ADDRESS";
     public final static String HAS_TEMPORARY_ADDRESS = "HAS_TEMPORARY_ADDRESS";
     public final static String HAS_CONTACT_DETAIL = "HAS_CONTACT_DETAIL";
+    public final static String HAS_LOCAL_AREA_TAG = "HAS_LOCAL_AREA_TAG";
 
     public final static String HAS_DOCTOR = "HAS_DOCTOR";
     public final static String HAS_DISEASE = "HAS_DISEASE";
