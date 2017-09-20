@@ -9,6 +9,7 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.util.DateConverter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -30,10 +31,6 @@ public class Client extends User {
     private boolean isEnabled = true;
     private CitizenStatus civilianStatus;
     private String profilePic;
-
-    @JsonIgnore
-    @Relationship(type = NEXT_TO_KIN)
-    private Client nextToKin;
 
     private String nameAmongStaff;
 
@@ -117,6 +114,15 @@ public class Client extends User {
 
     private String visitourTeamId;
 
+    private long deathDate;
+
+    public long getDeathDate() {
+        return deathDate;
+    }
+
+    public void setDeathDate(long deathDate) {
+        this.deathDate = deathDate;
+    }
 
     @Relationship(type = HAS_ALLERGY)
     private List<ClientAllergies> clientAllergiesList;
@@ -233,14 +239,6 @@ public class Client extends User {
 
     public void setNameAmongStaff(String nameAmongStaff) {
         this.nameAmongStaff = nameAmongStaff;
-    }
-
-    public Client getNextToKin() {
-        return nextToKin;
-    }
-
-    public void setNextToKin(Client nextToKin) {
-        this.nextToKin = nextToKin;
     }
 
     public boolean isUseWheelChair() {
@@ -730,6 +728,7 @@ public class Client extends User {
 
         map.put("peopleInHousehold", this.peopleInHousehold);
         map.put("livesAlone", this.livesAlone);
+        map.put("deathDate", DateConverter.getDate(this.deathDate));
         return map;
     }
 
@@ -902,7 +901,6 @@ public class Client extends User {
         return "{Client={" +
                 "isEnabled=" + isEnabled + '\'' +
                 ", profilePic='" + profilePic + '\'' +
-                ", nextToKin=" + nextToKin +
                 ", nameAmongStaff='" + nameAmongStaff + '\'' +
                 ", requiredEquipmentsList='" + requiredEquipmentsList + '\'' +
                 ", doHaveFreeChoiceServices=" + doHaveFreeChoiceServices +
@@ -957,6 +955,15 @@ public class Client extends User {
                 ", mostDrivenKm=" + mostDrivenKm +
                 '}'+
                 '}';
+    }
+
+    public void saveBasicDetail(NextToKinDTO nextToKinDTO){
+        this.firstName = nextToKinDTO.getFirstName();
+        this.lastName = nextToKinDTO.getLastName();
+        this.nickName = nextToKinDTO.getNickName();
+        this.cprNumber = nextToKinDTO.getCprNumber();
+        Integer ageVariable = Integer.valueOf(nextToKinDTO.getCprNumber().substring(nextToKinDTO.getCprNumber().length() - 1));
+        this.gender = (ageVariable % 2 == 0)?Gender.FEMALE:Gender.MALE;
     }
 }
 
