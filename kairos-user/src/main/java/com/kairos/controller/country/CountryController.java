@@ -981,7 +981,7 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/relationType", method = RequestMethod.POST)
     @ApiOperation("Add relation types in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> addRelationType(@PathVariable long countryId, @RequestBody RelationType relationType){
+    public ResponseEntity<Map<String,Object>> addRelationType(@PathVariable Long countryId, @RequestBody RelationType relationType){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addRelationType(countryId, relationType));
     }
 
@@ -1002,7 +1002,7 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/vehicle", method = RequestMethod.POST)
     @ApiOperation("Add vehicle in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> addVehicle(@PathVariable long countryId, @RequestBody Vehicle vehicle){
+    public ResponseEntity<Map<String,Object>> addVehicle(@PathVariable Long countryId, @RequestBody Vehicle vehicle){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addVehicle(countryId, vehicle));
     }
 
