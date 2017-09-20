@@ -1004,6 +1004,11 @@ public class OrganizationService extends UserBaseService {
         Long countryId = organizationGraphRepository.getCountryId(unitId);
         return countryGraphRepository.getResourcesByCountry(countryId);
     }
+
+    public  List<OrgPhaseDTO> organizationWithPhases(){
+        List<OrgPhaseDTO> orgPhaseDTO=organizationGraphRepository.organizationWithPhases();
+        return orgPhaseDTO;
+    }
 }
 
 
