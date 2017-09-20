@@ -82,11 +82,14 @@ public class ExternalClientService extends UserBaseService {
     private final Logger logger = Logger.getLogger(this.getClass());
 
     public void addClientRelativeDetailsFromKmd(PatientRelative patientRelative, Client client, long unitId) {
-        Client nextToKin = client.getNextToKin();
+        /*Client nextToKin = client.getNextToKin();
         if (nextToKin == null) {
             nextToKin = new Client();
             client.setNextToKin(nextToKin);
-        }
+        }*/
+
+        Client nextToKin = new Client();
+
         // Check if Contact details Exist
         ContactDetail detail = nextToKin.getContactDetail();
         if (detail == null) {
@@ -126,7 +129,7 @@ public class ExternalClientService extends UserBaseService {
         if (patientRelative.getRelatedPatient() != null)
             saveContactAddressFromKmd(patientRelative.getRelatedPatient().getCurrentAddress(), nextToKin.getId(), HAS_HOME_ADDRESS, unitId, homeAddressId);
 
-        client.setNextToKin(nextToKin);
+ //       client.setNextToKin(nextToKin);
         save(client);
         logger.info("nexttokin-----------> " + nextToKin.getId());
 
@@ -278,7 +281,7 @@ public class ExternalClientService extends UserBaseService {
                 String email = cpr + KAIROS;
                 client.setUserName(email);
                 Client nextToKin = new Client();
-                client.setNextToKin(nextToKin);
+//                client.setNextToKin(nextToKin);
             }
 
             client = clientService.generateAgeAndGenderFromCPR(client);

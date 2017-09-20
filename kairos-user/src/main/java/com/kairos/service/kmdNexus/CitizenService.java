@@ -431,7 +431,7 @@ public class CitizenService {
                 ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_PATIENT_RELATIVE_CONTACT, map.get("kmdNexusExternalId").toString()), HttpMethod.GET, headersElements, String.class);
                 AvailableContacts availableContacts = JsonUtils.toObject(responseEntity.getBody(), AvailableContacts.class);
                 if (availableContacts.getRelativeContacts().size() == 0) {
-                    Client nextToKin = client.getNextToKin();
+                    //Client nextToKin = client.getNextToKin();
                 }
                 for (RelativeContacts relativeContacts : availableContacts.getRelativeContacts()) {
                     String relativeContactUrl = relativeContacts.get_links().getSelf().getHref();
