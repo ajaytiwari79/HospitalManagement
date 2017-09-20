@@ -39,6 +39,8 @@ import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
+import io.swagger.annotations.Contact;
+import org.apache.commons.collections.map.HashedMap;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -134,7 +136,7 @@ public class ClientService extends UserBaseService {
         if (checkCitizenCPRConstraint(client)) {
             logger.debug("Creating Client..........");
             Client createClient = clientGraphRepository.save(generateAgeAndGenderFromCPR(client));
-            createClient.setNextToKin(new Client());
+            //createClient.setNextToKin(new Client());
             return (Client) save(createClient);
         }
         return null;
@@ -152,6 +154,9 @@ public class ClientService extends UserBaseService {
 
 
             Client client = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
+            if(client.isCitizenDead()){
+                throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
+            }
 
             if (client != null) {
                 logger.debug("Using Existing Client..........");
@@ -165,8 +170,6 @@ public class ClientService extends UserBaseService {
                 ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, new Date().getTime());
                 relationService.createRelation(relation);
                 return client;
-
-
             } else {
                 logger.debug("Creating New Client..........");
 
@@ -182,11 +185,11 @@ public class ClientService extends UserBaseService {
                     client.setEmail(email);
                     client.setUserName(email);
                     Client nextToKin = new Client();
-                    client.setNextToKin(nextToKin);
+                    //client.setNextToKin(nextToKin);
                 }
 
                 Client createdClient = generateAgeAndGenderFromCPR(client);
-                client.setNextToKin(new Client());
+                //client.setNextToKin(new Client());
                 if (createdClient != null) {
                     save(createdClient);
                     ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(createdClient, organization, new DateTime().getMillis());
@@ -195,8 +198,6 @@ public class ClientService extends UserBaseService {
                     return createdClient;
                 }
             }
-
-
         }
         return null;
     }
@@ -231,7 +232,6 @@ public class ClientService extends UserBaseService {
             defaultPicUrl = "default_male_icon.png";
         }
         client.setProfilePic(defaultPicUrl);
-//        save(client);
         return client;
     }
 
@@ -376,17 +376,23 @@ public class ClientService extends UserBaseService {
                 logger.debug("Country not found");
             }
 
-
             // NextToKin
-            Client kin = (Client) clientGraphRepository.getNextToKin(clientId);
-            if (kin != null) {
-                Map<String, Object> nextToKinDetails = clientGraphRepository.findOne(kin.getId(), 2).retrieveNextToKinDetails();
-                if (nextToKinDetails != null) {
+            List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId,envConfig.getServerHost() + File.separator);
+            nextToKinDetails.forEach(nextToKinQueryResult -> {
+                ContactAddress homeAddress = nextToKinQueryResult.getHomeAddress();
+                homeAddress.setMunicipality(nextToKinQueryResult.getMunicipality());
+                homeAddress.setZipCode(nextToKinQueryResult.getZipCode());
+            });
+            response.put("nextToKin", nextToKinDetails);
+            /*if (kin != null) {
+                //Map<String, Object> nextToKinDetails = clientGraphRepository.findOne(kin.getId(), 2).retrieveNextToKinDetails();
+
+               *//* if (nextToKinDetails != null) {
                     String imageUrl = envConfig.getServerHost() + File.separator + (String) nextToKinDetails.get("profilePic");
                     nextToKinDetails.put("profilePic", imageUrl);
-                }
+                }*//*
                 response.put("nextToKin", nextToKinDetails);
-            }
+            }*/
 
             // Social Media Details
             Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
@@ -585,31 +591,71 @@ public class ClientService extends UserBaseService {
         return response;
     }
 
-    public Map<String, Object> addHouseholdToClient(ClientMinimumDTO minimumDTO, long unitId, long clientId) throws CloneNotSupportedException {
-        Client client = clientGraphRepository.findOne(clientId);
-        if (client == null) {
-            throw new InternalError("Client can't null");
+    public ClientMinimumDTO addHouseholdToClient(ClientMinimumDTO minimumDTO, long unitId, long clientId)  {
+        Client client = clientGraphRepository.findOne(clientId,unitId);
+        if (!Optional.ofNullable(client).isPresent()) {
+            logger.debug("Searching client with id " + clientId + " in unit " + unitId);
+            throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
-        Client createdHousehold = createCitizen(minimumDTO, unitId);
-        Client nextToKin = clientGraphRepository.getNextToKin(clientId);
-        ContactAddress homeAddress = (client.getHomeAddress() == null) ? null : ContactAddress.copyProperties(client.getHomeAddress(), ContactAddress.getInstance());
-        createdHousehold.setHomeAddress(homeAddress);
-        HouseHoldPeopleRelationship houseHoldPeopleRelationship = new HouseHoldPeopleRelationship();
-        houseHoldPeopleRelationship.setClient(client);
-        houseHoldPeopleRelationship.setPeopleInHouseHold(createdHousehold);
-        save(houseHoldPeopleRelationship);
-        client.setNextToKin(nextToKin);
-        save(client);
-        return createdHousehold.retrieveMinimumDetails();
+        Client houseHold = saveDetailsOfHouseHold(minimumDTO,unitId,clientId);
+        saveAddressOfHouseHold(client,houseHold);
+        createHouseHoldRelationship(clientId,houseHold.getId());
+        minimumDTO.setId(houseHold.getId());
+        return minimumDTO;
+    }
+
+    private Client saveDetailsOfHouseHold(ClientMinimumDTO clientMinimumDTO,long unitId,long clientId){
+
+        Client houseHoldPeople = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
+        if(Optional.ofNullable(houseHoldPeople).isPresent()){
+            if(houseHoldPeople.isCitizenDead()){
+                throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
+            }
+        } else {
+            houseHoldPeople = new Client();
+            houseHoldPeople.setFirstName(clientMinimumDTO.getFirstName());
+            houseHoldPeople.setLastName(clientMinimumDTO.getLastName());
+            houseHoldPeople.setCprNumber(clientMinimumDTO.getCprnumber().trim());
+            generateAgeAndGenderFromCPR(houseHoldPeople);
+            final String email = houseHoldPeople.getCprNumber() + KAIROS;
+            houseHoldPeople.setEmail(email);
+            houseHoldPeople.setUserName(email);
+            Organization organization = organizationGraphRepository.findOne(unitId);
+            if(!Optional.ofNullable(organization).isPresent()){
+                throw new DataNotFoundByIdException("Incorrect id of organization " + unitId);
+            }
+            ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(houseHoldPeople, organization, new DateTime().getMillis());
+            relationGraphRepository.save(clientOrganizationRelation);
+        }
+        return houseHoldPeople;
+    }
+
+    private void createHouseHoldRelationship(long clientId,long houseHoldId){
+        clientGraphRepository.createHouseHoldRelationship(clientId,houseHoldId,new Date().getTime(),new Date().getTime());
+    }
+
+    private void saveAddressOfHouseHold(Client client,Client houseHold){
+        ClientHomeAddressQueryResult addressOfClient = clientGraphRepository.getHomeAddress(client.getId());
+        if(Optional.ofNullable(addressOfClient).isPresent()){
+            ClientHomeAddressQueryResult addressOfHouseHoldPerson = clientGraphRepository.getHomeAddress(houseHold.getId());
+            ContactAddress contactAddress;
+            if(Optional.ofNullable(addressOfHouseHoldPerson).isPresent()){
+                contactAddress = addressOfHouseHoldPerson.getHomeAddress();
+            } else {
+                contactAddress = ContactAddress.getInstance();
+            }
+            contactAddress.copyProperties(addressOfClient.getHomeAddress());
+            contactAddress.setMunicipality(addressOfClient.getMunicipality());
+            contactAddress.setZipCode(addressOfClient.getZipCode());
+            houseHold.setHomeAddress(contactAddress);
+        }
     }
 
 
-    public List<Map<String, Object>> getPeopleInHousehold(long clientId) {
-        List<Map<String, Object>> data = clientGraphRepository.getPeopleInHouseholdList(clientId);
-        if (data != null) {
-            return FormatUtil.formatNeoResponse(data);
-        }
-        return null;
+
+
+    public List<ClientMinimumDTO> getPeopleInHousehold(long clientId) {
+        return clientGraphRepository.getPeopleInHouseholdList(clientId);
     }
 
     public List<Long> getPreferredStaffVisitourIds(Long id) {
@@ -645,12 +691,13 @@ public class ClientService extends UserBaseService {
      * @return
      * @auther anil maurya
      */
-    public boolean markClientAsDead(Long clientId) {
+    public boolean markClientAsDead(Long clientId,CitizenDeathInfoDTO citizenDeathInfoDTO) {
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
             throw new DataNotFoundByIdException("Incorrect client id ::" + clientId);
         }
         client.setCitizenDead(true);
+        client.setDeathDate(citizenDeathInfoDTO.getDeathDate().getTime());
         clientGraphRepository.save(client);
         //return plannerService.deleteTasksForCitizen(clientId);
         return plannerRestClient.deleteTaskForCitizen(clientId);
@@ -1226,6 +1273,44 @@ public class ClientService extends UserBaseService {
 
     public List<Client> getClientsByIdsInList(List<Long> citizenIds){
         return clientGraphRepository.findByIdIn(citizenIds);
+    }
+
+    public ClientMinimumDTO findByCPRNumber(long clientId,long unitId,String cprNumber){
+
+        Client client = clientGraphRepository.findOne(clientId,unitId);
+        if(!Optional.ofNullable(client).isPresent()){
+            logger.debug("Finding client by id " + client.getId());
+            throw new DataNotFoundByIdException("Incorrect client id " + clientId);
+        }
+
+        Client houseHoldPerson = clientGraphRepository.findByCPRNumber(cprNumber);
+        if(Optional.ofNullable(houseHoldPerson).isPresent()){
+            if(houseHoldPerson.isCitizenDead()){
+                throw new DataNotFoundByIdException("You can't enter CPR number of dead citizen");
+            } else {
+                ClientMinimumDTO clientMinimumDTO = new ClientMinimumDTO();
+                clientMinimumDTO.setFirstName(houseHoldPerson.getFirstName());
+                clientMinimumDTO.setLastName(houseHoldPerson.getLastName());
+                clientMinimumDTO.setHasSameAddress(hasSameAddress(client,houseHoldPerson));
+                return clientMinimumDTO;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private boolean hasSameAddress(Client client, Client houseHoldPeople){
+        ClientHomeAddressQueryResult addressOfClient = clientGraphRepository.getHomeAddress(client.getId());
+        ClientHomeAddressQueryResult addressOfHouseHoldPerson = clientGraphRepository.getHomeAddress(houseHoldPeople.getId());
+
+        ContactAddress homeAddressOfClient = addressOfClient.getHomeAddress();
+        ZipCode zipCodeOfClient = addressOfClient.getZipCode();
+        ContactAddress homeAddressofHouseHoldPerson = addressOfHouseHoldPerson.getHomeAddress();
+        ZipCode zipCodeOfHouseHoldPerson = addressOfHouseHoldPerson.getZipCode();
+
+        return (homeAddressOfClient.getStreet1().equalsIgnoreCase(homeAddressofHouseHoldPerson.getStreet1()) &&
+                homeAddressOfClient.getHouseNumber().equalsIgnoreCase(homeAddressofHouseHoldPerson.getHouseNumber()) &&
+        zipCodeOfClient.getZipCode().equals(zipCodeOfHouseHoldPerson.getZipCode()));
     }
 
 }

@@ -139,13 +139,7 @@ public class StaffService extends UserBaseService {
         createDirectory(IMAGES_PATH);
         String fileName = new Date().getTime() + multipartFile.getOriginalFilename();
         final String path = IMAGES_PATH + File.separator + fileName;
-        try {
-            FileUtil.writeFile(path, multipartFile);
-        } catch (IOException e) {
-            fileName = null;
-        } catch (Exception e) {
-            fileName = null;
-        }
+        FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
         save(staff);
         return envConfig.getServerHost() + File.separator + fileName;

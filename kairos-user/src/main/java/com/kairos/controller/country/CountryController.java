@@ -28,7 +28,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -982,7 +981,7 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/relationType", method = RequestMethod.POST)
     @ApiOperation("Add relation types in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> addRelationType(@PathVariable long countryId, @RequestBody RelationType relationType){
+    public ResponseEntity<Map<String,Object>> addRelationType(@PathVariable Long countryId, @RequestBody RelationType relationType){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addRelationType(countryId, relationType));
     }
 
@@ -998,6 +997,34 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> getRelationTypes(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getRelationTypes(countryId));
+    }
+
+    @RequestMapping(value = COUNTRY_URL + "/vehicle", method = RequestMethod.POST)
+    @ApiOperation("Add vehicle in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> addVehicle(@PathVariable Long countryId, @RequestBody Vehicle vehicle){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addVehicle(countryId, vehicle));
+    }
+
+    @RequestMapping(value = COUNTRY_URL + "/vehicle/{vehicleId}", method = RequestMethod.DELETE)
+    @ApiOperation("Delete vehicle from country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> deleteVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.deleteVehicle(countryId, vehicleId));
+    }
+
+    @RequestMapping(value = COUNTRY_URL + "/vehicleList", method = RequestMethod.GET)
+    @ApiOperation("Get resources of country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getVehicleList(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getVehicleList(countryId));
+    }
+
+    @RequestMapping(value = COUNTRY_URL + "/vehicle/{vehicleId}", method = RequestMethod.PUT)
+    @ApiOperation("Update vehicle in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> updateVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId,  @RequestBody Vehicle vehicle){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateVehicle(countryId, vehicleId, vehicle));
     }
 
 

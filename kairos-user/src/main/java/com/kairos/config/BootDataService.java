@@ -583,7 +583,7 @@ public class BootDataService {
         contactDetail.setWorkPhone("765436");
         nextKin.setContactDetail(contactDetail);
 
-        johnOliver.setNextToKin(nextKin);
+//        johnOliver.setNextToKin(nextKin);
 
         johnOliver.setClientAllergiesList(Arrays.asList(
                 new ClientAllergies("type1 ", "Allergy1", true, new String[]{"Avoid1", "Avoid2", "Avoid3"}
