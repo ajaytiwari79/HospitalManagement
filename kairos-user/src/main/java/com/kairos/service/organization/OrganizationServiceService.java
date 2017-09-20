@@ -302,9 +302,6 @@ public class OrganizationServiceService extends UserBaseService {
             if (organization == null) {
                 return null;
             }
-            if (Optional.ofNullable(organization.getKmdExternalId()).isPresent()) {
-                response = filterSkillData(organizationGraphRepository.getImportedServicesForUnit(id));
-            } else {
                 Organization parent;
                 if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
                     parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
@@ -317,7 +314,7 @@ public class OrganizationServiceService extends UserBaseService {
                 } else {
                     response = filterSkillData(organizationGraphRepository.getServicesForParent(id));
                 }
-        }
+
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if(team == null){
