@@ -7,6 +7,7 @@ import com.kairos.persistence.model.enums.ClientEnum;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.CitizenStatus;
+import com.kairos.persistence.model.user.country.RelationType;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.util.DateConverter;
@@ -160,6 +161,9 @@ public class Client extends User {
     }
 
     private int mostDrivenKm;
+
+    @Relationship(type = HAS_RELATION_OF)
+    private RelationType relationType;
 
 
 
@@ -857,6 +861,7 @@ public class Client extends User {
         }
         response.put("homeAddress", this.homeAddress);
         response.put("contactDetail", contactDetails);
+        response.put("relation", this.relationType);
 
         return response;
     }
@@ -894,6 +899,14 @@ public class Client extends User {
 
     public String getFullName(){
         return this.firstName+" "+this.lastName;
+    }
+
+    public RelationType getRelationType() {
+        return relationType;
+    }
+
+    public void setRelationType(RelationType relationType) {
+        this.relationType = relationType;
     }
 
     @Override

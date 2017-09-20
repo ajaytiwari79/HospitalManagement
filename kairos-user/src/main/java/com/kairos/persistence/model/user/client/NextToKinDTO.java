@@ -22,6 +22,7 @@ public class NextToKinDTO {
     private String cprNumber;
     private String  privateEmail;
     private boolean isVerifiedByGoogleMap;
+    private long relationTypeId;
 
     public boolean isVerifiedByGoogleMap() {
         return isVerifiedByGoogleMap;
@@ -102,5 +103,13 @@ public class NextToKinDTO {
 
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
+    }
+
+    public long getRelationTypeId() {
+        return relationTypeId;
+    }
+
+    public void setRelationTypeId(long relationTypeId) {
+        this.relationTypeId = relationTypeId;
     }
 }
