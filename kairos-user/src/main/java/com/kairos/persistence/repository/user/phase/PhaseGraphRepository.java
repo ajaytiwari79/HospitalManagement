@@ -17,24 +17,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.PHASE
 @Repository
 public interface PhaseGraphRepository extends GraphRepository<Phase> {
 
-    @Override
-    @Query("MATCH(p:Phase{disabled:false}) return p")
-    List<Phase> findAll();
-
-    @Query("match(phase:Phase)\n" +
-            " Match (o:Organization) where Id(o)={0}\n" +
-            "match (phase)-[ph:PHASE_BELONGS_TO]->(o)\n" +
-            "return phase.name as name,id(phase) as id, ph.durationInWeeks as  duration")
-    List<PhaseDTO> findAllPhaseWithDuration(Long unitId);
-
-    @Query("match(phase:Phase) where Id(phase)={1}\n" +
-            " Match (o:Organization) where Id(o)={0}\n" +
-            "match (phase)-[ph:PHASE_BELONGS_TO]->(o)\n" +
-            " set ph.durationInWeeks={2} return phase")
-    Phase findAndUpdateByPhaseAndDuration(Long unitId, Long phaseId, Long durationInWeek);
-
-    public Phase findByNameAndDisabled(String name, boolean disabled);
-
+    @Query ("Match (org:Organization)  " +
+            "Match (phase :Phase{disabled:false})-[:"+ PHASE_BELONGS_TO +"]->(org) where id(org)={0} and phase.name={1} and p.disabled={2}\n" +
+            "return phase" )
+    public Phase findByNameAndDisabled(Long unitId,String name, boolean disabled);
 
     @Query("Match (phase:Phase{disabled:false}),(org:Organization) where id (phase)={0}  AND id(org) IN {1} with phase,org \n" +
             "Merge (phase)-[r:"+PHASE_BELONGS_TO+"]->(org) \n" +
@@ -42,6 +28,18 @@ public interface PhaseGraphRepository extends GraphRepository<Phase> {
             "ON MATCH SET r.durationInWeeks={2}")
     void addOrganizationInPhase(long phaseId, List<Long> organizationIds, Long durationInWeek);
 
+    @Query("Match (org:Organization) where id(org)={0} \n" +
+            "Match (phase :Phase{disabled:false})-[:"+ PHASE_BELONGS_TO +"]-(org) \n" +
+            "return phase.name," +
+            "phase.description," +
+            "phase.duration," +
+            "phase.sequence," +
+            "phase.constructionPhaseStartsAtDay," +
+            "phase.activityAccess")
+    List<PhaseDTO> getPhasesByUnit(Long unitId);
 
-
+    @Query ("Match (org:Organization)  " +
+            "Match (phase :Phase{disabled:false})-[:"+ PHASE_BELONGS_TO +"]->(org) where id(org)={0} and phase.sequence={1} and p.disabled={2}\n" +
+            "return phase" )
+    Phase findBySequenceAndDisabled(Long unitId, int sequence,boolean disabled);
 }

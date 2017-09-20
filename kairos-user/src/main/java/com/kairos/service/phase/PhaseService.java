@@ -1,12 +1,10 @@
 package com.kairos.service.phase;
 
-
-
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.phase.Phase;
 import com.kairos.persistence.model.user.phase.PhaseDTO;
-import com.kairos.persistence.model.user.phase.PhaseOrganizationRelation;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.phase.PhaseGraphRepository;
 import com.kairos.service.UserBaseService;
@@ -29,134 +27,86 @@ public class PhaseService extends UserBaseService {
     private OrganizationGraphRepository organizationGraphRepository;
 
 
-    public void createPhasesByUnitId(Long unitId) {
+
+
+    public Phase createPhasesByUnitId(Long unitId, PhaseDTO phaseDTO) {
 
         Organization unitOrganization = organizationGraphRepository.findOne(unitId);
         if (unitOrganization == null) {
-            throw new DataNotFoundByIdException("Invalid Organization id : " + unitId);
+            throw new DataNotFoundByIdException("Invalid unitId : " + unitId);
         }
-
-        List<Phase> phases = getPhases();
-        if (phases == null) {
-            throw new DataNotFoundByIdException("Phases not found in DB ");
+        Phase phase=phaseGraphRepository.findByNameAndDisabled(unitId,phaseDTO.getName(),false);
+        if(phase==null){
+            throw new ActionNotPermittedException("Phase with name : "+phaseDTO.getName()+" already exists.");
         }
-
-        for (Phase phase : phases) {
-            PhaseOrganizationRelation phaseOrganizationRelation = new PhaseOrganizationRelation(phase, unitOrganization, 1);
-            save(phaseOrganizationRelation);
+        if(phaseDTO.getDuration()<=0){
+            throw new ActionNotPermittedException("Invalid Phase Duration : "+phaseDTO.getDuration());
         }
-
-
+       // phase=phaseGraphRepository.findBySequenceAndDisabled(unitId,phaseDTO.getSequence(),false);
+        phase=preparePhase(phaseDTO,unitOrganization);
+        save(phase);
+        return phase;
     }
 
-    public  void createPhases(Organization unitOrganization) {
-
-
-        List<Phase> phases = getPhases();
-        if (phases == null) {
-            throw new DataNotFoundByIdException("Phases not found in DB ");
-        }
-
-        for (Phase phase : phases) {
-            PhaseOrganizationRelation phaseOrganizationRelation = new PhaseOrganizationRelation(phase, unitOrganization, 1);
-            save(phaseOrganizationRelation);
-        }
-    }
-
-    public void createPhases() {
-
-        Phase requestPhase = phaseGraphRepository.findByNameAndDisabled(REQUEST_PHASE_NAME, false);
-        if (requestPhase == null) {
-            requestPhase = new Phase(REQUEST_PHASE_NAME, REQUEST_PHASE_DESCRIPTION, false);
-            save(requestPhase);
-        }
-
-        Phase puzzlePhase = phaseGraphRepository.findByNameAndDisabled(PUZZLE_PHASE_NAME, false);
-        if (puzzlePhase == null) {
-            puzzlePhase = new Phase(PUZZLE_PHASE_NAME, PUZZLE_PHASE_DESCRIPTION, false);
-            save(puzzlePhase);
-        }
-
-        Phase constructionPhase = phaseGraphRepository.findByNameAndDisabled(CONSTRUCTION_PHASE_NAME, false);
-        if (constructionPhase == null) {
-            constructionPhase = new Phase(CONSTRUCTION_PHASE_NAME, CONSTRUCTION_PHASE_DESCRIPTION, false);
-            save(constructionPhase);
-        }
-        Phase finalPhase = phaseGraphRepository.findByNameAndDisabled(FINAL_PHASE_NAME, false);
-
-        if (finalPhase == null) {
-            finalPhase = new Phase(FINAL_PHASE_NAME, FINAL_PHASE_DESCRIPTION, false);
-            save(finalPhase);
-        }
-
+    private Phase preparePhase(PhaseDTO phaseDTO,Organization unitOrganization) {
+        Phase phase = new Phase();
+        phase.setName(phaseDTO.getName());
+        phase.setDuration(phaseDTO.getDuration());
+        phase.setSequence(phaseDTO.getSequence());
+        phase.setDescription(phaseDTO.getDescription());
+        phase.setConstructionPhaseStartsAtDay(phaseDTO.getConstructionPhaseStartsAtDay());
+        phase.setActivityAccess(phaseDTO.getActivityAccess());
+        phase.setOrganization(unitOrganization);
+        return  phase;
     }
 
 
-    public void linkPhasesWithAllOrganizations() {
-
-        List<Organization> organizationIdList = organizationGraphRepository.getAllOrganizationIdsWithoutPhases();
-        List<Phase> phases = getPhases();
-
-        if (phases == null || phases.isEmpty()) {
-
-            throw new DataNotFoundByIdException("Phases not found while creating relation with organization at BootService.");
+    public PhaseDTO updatePhase(Long unitId, PhaseDTO phaseDTO) {
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Invalid unitId " + unitId);
         }
-        for (Organization organization : organizationIdList) {
-            for (Phase phase : phases) {
-                PhaseOrganizationRelation phaseOrganizationRelation = new PhaseOrganizationRelation(phase, organization, DURATION_IN_WEEK);
-                save(phaseOrganizationRelation);
-            }
-
+        Phase phase = phaseGraphRepository.findOne(phaseDTO.getId());
+        if (phase == null) {
+            throw new DataNotFoundByIdException("Phase does not Exists Id " + phaseDTO.getId());
         }
-
+        phase=phaseGraphRepository.findByNameAndDisabled(unitId,phaseDTO.getName(),false);
+        if(phase==null){
+            throw new ActionNotPermittedException("Phase with name : "+phaseDTO.getName()+" already exists.");
+        }
+        preparePhase(phase,phaseDTO);
+        save(phase);
+        //phaseGraphRepository.findAndUpdateByPhaseAndDuration(unitId, phaseId, phaseDTO.getDuration());
+        return phaseDTO;
     }
 
-    private List<Phase> getPhases() {
-        List<Phase> phases = phaseGraphRepository.findAll();
-        return phases;
+
+    private void preparePhase(Phase phase, PhaseDTO phaseDTO) {
+        phase.setName(phaseDTO.getName());
+        phase.setDuration(phaseDTO.getDuration());
+        phase.setSequence(phaseDTO.getSequence());
+        phase.setDescription(phaseDTO.getDescription());
+        phase.setConstructionPhaseStartsAtDay(phaseDTO.getConstructionPhaseStartsAtDay());
+        phase.setActivityAccess(phaseDTO.getActivityAccess());
     }
+
 
 
     /*
     *@Author vipul
-    *
-     *
-      *
-      *
-      * */
+    */
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
-
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
             throw new DataNotFoundByIdException("Can't find unit with provided Id " + unitId);
         }
-
-
-        List<PhaseDTO> phases  = phaseGraphRepository.findAllPhaseWithDuration(unitId);
-        if (phases == null || phases.isEmpty()) {
-
-            throw new DataNotFoundByIdException("Phases not found.");
-        }
+        List<PhaseDTO> phases=phaseGraphRepository.getPhasesByUnit(unitId);
         return phases;
-    }
-
-    public PhaseDTO updatePhase(Long unitId, Long phaseId, PhaseDTO phaseDTO) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
-            throw new DataNotFoundByIdException("Can't find unit with provided Id " + unitId);
-        }
-        Phase phase = phaseGraphRepository.findOne(phaseId);
-        if (phase == null) {
-            throw new DataNotFoundByIdException("Phase does not Exists Id " + phaseId);
-        }
-        phaseGraphRepository.findAndUpdateByPhaseAndDuration(unitId, phaseId, phaseDTO.getDuration());
-        return phaseDTO;
     }
 
 
 
     public boolean removePhase(Long phaseId) {
-
         Phase phase = phaseGraphRepository.findOne(phaseId);
         if (phase == null) {
             return false;
@@ -168,4 +118,7 @@ public class PhaseService extends UserBaseService {
         }
         return true;
     }
+
+
+
 }
