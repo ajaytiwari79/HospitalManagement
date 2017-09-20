@@ -1,18 +1,34 @@
 package com.kairos.persistence.model.user.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.data.neo4j.annotation.QueryResult;
+
 /**
  * Created by oodles on 23/1/17.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@QueryResult
 public class ClientMinimumDTO {
     private long id;
     private String firstName;
     private String lastName;
     private String cprnumber;
+    private Boolean hasSameAddress;
 
     public ClientMinimumDTO(String firstName, String lastName, String cprNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.cprnumber = cprNumber;
+    }
+
+    public Boolean getHasSameAddress() {
+        return hasSameAddress;
+    }
+
+    public void setHasSameAddress(Boolean hasSameAddress) {
+        this.hasSameAddress = hasSameAddress;
     }
 
     public String getCprnumber() {

@@ -101,6 +101,7 @@ public class ClientExtendedService extends UserBaseService {
         validateCPRNumber(nextToKinDTO.getCprNumber(),unitId);
         Client nextToKin = new Client();
         nextToKin.saveBasicDetail(nextToKinDTO);
+        nextToKin.setProfilePic(nextToKinDTO.getProfilePic());
         saveContactDetailOfNextToKIbn(nextToKinDTO, nextToKin);
         ContactAddress contactAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),
                 false);
@@ -236,6 +237,7 @@ public class ClientExtendedService extends UserBaseService {
         clientGraphRepository.save(nextToKin);
         return new NextToKinQueryResult().buildResponse(nextToKin,envConfig.getServerHost() + File.separator);
     }
+
 
 
     /*public Map<String, Object> updateNextToKin(NextToKinDTO kinDTO, long unitId, long clientId) {

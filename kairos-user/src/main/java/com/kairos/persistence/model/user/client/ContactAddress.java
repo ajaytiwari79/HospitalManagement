@@ -322,9 +322,15 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
         return contactAddress;
     }
 
-    public  static ContactAddress copyProperties(ContactAddress source, ContactAddress target){
-        BeanUtils.copyProperties(source, target);
-        target.setId(null);
-        return target;
+    public ContactAddress copyProperties(ContactAddress source){
+        this.street1 = source.street1;
+        this.zipCode = source.getZipCode();
+        this.city = source.getCity();
+        this.floorNumber = source.getFloorNumber();
+        this.houseNumber = source.getHouseNumber();
+        this.isVerifiedByVisitour = source.isVerifiedByVisitour;
+        return this;
     }
+
+
 }

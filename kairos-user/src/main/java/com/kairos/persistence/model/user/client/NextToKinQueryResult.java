@@ -142,8 +142,6 @@ public class NextToKinQueryResult {
         this.age = nextToKin.getAge();
         this.nickName = nextToKin.getNickName();
         this.profilePic = serverUrl + nextToKin.getProfilePic();
-        this.zipCode = nextToKin.getHomeAddress().getZipCode();
-        this.municipality = nextToKin.getHomeAddress().getMunicipality();
         this.contactDetail = nextToKin.getContactDetail();
         this.cprNumber = nextToKin.getCprNumber();
         return this;

@@ -1,13 +1,16 @@
 package com.kairos.persistence.model.user.client;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.country.CitizenStatus;
+
+import java.util.Map;
 
 /**
  * Created by oodles on 24/1/17.
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NextToKinDTO {
     private String nickName;
     private String firstName;
@@ -100,5 +103,4 @@ public class NextToKinDTO {
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
     }
-
 }

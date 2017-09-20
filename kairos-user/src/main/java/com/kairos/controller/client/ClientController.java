@@ -106,7 +106,7 @@ public class ClientController {
 
     //People in household
     @ApiOperation("Add People In HouseHold")
-    @RequestMapping(value = "/{clientId}/household", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{clientId}/household", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> updateClientHouseholdList(@RequestBody ClientMinimumDTO client, @PathVariable long unitId, @PathVariable long clientId) throws CloneNotSupportedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.addHouseholdToClient(client, unitId, clientId));
     }
@@ -114,10 +114,16 @@ public class ClientController {
     @ApiOperation("Get People In HouseHold")
     @RequestMapping(value = "/{clientId}/household", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> updateClientHouseholdList(@PathVariable long clientId) {
-        List<Map<String,Object>> createdHouseHold = clientService.getPeopleInHousehold(clientId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, createdHouseHold);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getPeopleInHousehold(clientId));
     }
 
+
+    // NextToKin
+    @ApiOperation("create NextToKin")
+    @RequestMapping(value = "/{clientId}/nextToKin", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> createNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.saveNextToKin(unitId,clientId,nextToKinDTO));
+    }
 
     // NextToKin
     @ApiOperation("update NextToKin")
@@ -126,12 +132,6 @@ public class ClientController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO));
     }
 
-    // NextToKin
-    @ApiOperation("update NextToKin")
-    @RequestMapping(value = "/{clientId}/nextToKin", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> createNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long clientId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.saveNextToKin(unitId,clientId,nextToKinDTO));
-    }
 
     // Client Profile Picture
     @RequestMapping(value = "/{clientId}/next_to_Kin/image", method = RequestMethod.POST)
@@ -676,5 +676,13 @@ public class ClientController {
     public ResponseEntity<Map<String,Object>> getClientsByIds(@RequestBody List<Long> citizenIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.getClientsByIdsInList(citizenIds));
     }
+
+    @RequestMapping(value = "/{clientId}/cpr_number/{cprNumber}",method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getClientByCprNumber(@PathVariable Long clientId,
+                                                                   @PathVariable String cprNumber, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.findByCPRNumber(clientId,unitId,cprNumber));
+    }
+
+
 
 }

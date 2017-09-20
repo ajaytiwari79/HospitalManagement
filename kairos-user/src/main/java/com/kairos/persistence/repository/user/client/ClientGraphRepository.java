@@ -133,10 +133,6 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client) where c.cprNumber={0}  return c")
     Client findByCPRNumber(String cprNumber);
 
-    @Query("MATCH (c:Client)-[:GET_SERVICE_FROM]->(unit:Organization) where c.cprNumber={0} and id(unit)={1}  return count(c)")
-    int checkClientWithCprNumber(String cprNumber,Long unitId);
-
-
     @Query("MATCH (t:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(s:Staff)-[:BELONGS_TO]->(u:User) where id(t)={0} \n" +
             "             with s AS staff , u as user\n" +
             "            OPTIONAL MATCH (c:Client)-[r:SERVED_BY_STAFF]->(staff) where id(c)={1} \n" +
@@ -148,8 +144,8 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
 
 
-    @Query("MATCH (c:Client)-[:PEOPLE_IN_HOUSEHOLD_LIST]->(ps:Client) where id(c)={0}  return {id:id(ps), firstName:ps.firstName , lastName:ps.lastName, name:ps.firstName +' '+ ps.lastName } as result")
-    List<Map<String,Object>> getPeopleInHouseholdList(Long id);
+    @Query("MATCH (c:Client)-[:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(ps:Client) where id(c)={0}  return id(ps) as id, ps.firstName as firstName,ps.lastName as lastName,ps.firstName +' '+ ps.lastName as name,ps.cprNumber as cprNumber")
+    List<ClientMinimumDTO> getPeopleInHouseholdList(Long id);
 
     @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='PREFERRED' " +
             "RETURN {visitourId:s.visitourId} as ids")
@@ -159,10 +155,6 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='FORBIDDEN' " +
             "RETURN {visitourId:s.visitourId} as ids ")
     List<Map<String,Object>> findForbidStaffVisitourIds(Long id);
-
-
-    @Query("MATCH (c:Client), (k:Client) where id(c)={0} AND id(k)={1} Create UNIQUE (c)-[r:NEXT_TO_KIN]->(k) return k")
-    void createNextToKinRelation(Long parent, Long kinId);
 
     @Query("MATCH (client:Client{importFromKMD:true}) RETURN {kmdNexusExternalId:client.kmdNexusExternalId} as data")
     List<Map<String, Object>> findAllCitizensFromKMD();
@@ -188,7 +180,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (client:Client) where client.kmdNexusExternalId={0} RETURN client")
     Client findByKmdNexusExternalId(String kmdNexusExternalId);
 
-    @Query("Match (n)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) where id(n)={0} return zipCode,homeAddress")
+    @Query("Match (n)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) where id(n)=7449 with zipCode,homeAddress\n" +
+            "Match (homeAddress)-[:MUNICIPALITY]->(Municipality:Municipality) with Municipality,zipCode,homeAddress\n" +
+            "return Municipality,zipCode,homeAddress")
     ClientHomeAddressQueryResult getHomeAddress(long clientId);
 
     @Query("Match (client:Client) where id(client)={0}\n" +
@@ -231,6 +225,14 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail,nextToKin,citizenStatus\n" +
             "Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode)\n" +
-            "return id(nextToKin) as id,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1} + nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumer,homeAddress as homeAddress,citizenStatus as citizenStatus,contactDetail as contactDetail,municipality as municipality,zipCode as zipCode")
+            "return id(nextToKin) as id,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1} + nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,homeAddress as homeAddress,citizenStatus as citizenStatus,contactDetail as contactDetail,municipality as municipality,zipCode as zipCode")
     List<NextToKinQueryResult> getNextToKinDetail(long clientId,String imageUrl);
+
+    @Query("Match (client:Client) where id(client)={0} with client\n" +
+            "Match (houseHoldPeople:Client) where id(houseHoldPeople)={1} with client,houseHoldPeople\n" +
+            "Merge (client)-[r:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(houseHoldPeople)\n" +
+            "ON CREATE SET r.creationDate={2},r.lastModificationDate={3}\n" +
+            "ON MATCH SET r.lastModificationDate={3} return true")
+    void createHouseHoldRelationship(long clientId,long houseHoldPeopleId,long creationDate,long lastModificationDate);
+
 }
