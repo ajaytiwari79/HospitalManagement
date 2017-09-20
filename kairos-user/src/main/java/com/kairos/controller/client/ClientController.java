@@ -467,7 +467,7 @@ public class ClientController {
     // Mark Client Dead
     @RequestMapping(method = RequestMethod.DELETE, value = "/{clientId}/dead")
     @ApiOperation("Delete task exception")
-    public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId,@RequestParam("deathDate") Date deathDate) throws ParseException {
+    public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId,@RequestParam("deathDate") String deathDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 clientService.markClientAsDead(clientId,deathDate));
     }

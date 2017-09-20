@@ -37,6 +37,7 @@ import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
 import io.swagger.annotations.Contact;
@@ -49,9 +50,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.text.ParseException;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.KAIROS;
+import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**
  * Created by oodles on 28/9/16.
@@ -691,13 +694,14 @@ public class ClientService extends UserBaseService {
      * @return
      * @auther anil maurya
      */
-    public boolean markClientAsDead(Long clientId,Date deathDate) {
+    public boolean markClientAsDead(Long clientId,String deathDate) throws ParseException {
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
             throw new DataNotFoundByIdException("Incorrect client id ::" + clientId);
         }
+        Date deathDateInDateFormat = DateUtil.convertToOnlyDate(deathDate,MONGODB_QUERY_DATE_FORMAT);
         client.setCitizenDead(true);
-        client.setDeathDate(deathDate.getTime());
+        client.setDeathDate(deathDateInDateFormat.getTime());
         clientGraphRepository.save(client);
         //return plannerService.deleteTasksForCitizen(clientId);
         return plannerRestClient.deleteTaskForCitizen(clientId);
