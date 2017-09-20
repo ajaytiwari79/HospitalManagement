@@ -24,10 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -470,9 +467,9 @@ public class ClientController {
     // Mark Client Dead
     @RequestMapping(method = RequestMethod.DELETE, value = "/{clientId}/dead")
     @ApiOperation("Delete task exception")
-    public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId,@RequestBody CitizenDeathInfoDTO citizenDeathInfoDTO) throws ParseException {
+    public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId,@RequestParam("deathDate") String deathDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.markClientAsDead(clientId,citizenDeathInfoDTO));
+                clientService.markClientAsDead(clientId,deathDate));
     }
 
 

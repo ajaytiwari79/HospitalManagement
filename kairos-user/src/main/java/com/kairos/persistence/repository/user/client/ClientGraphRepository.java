@@ -236,4 +236,11 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "ON MATCH SET r.lastModificationDate={3} return true")
     void createHouseHoldRelationship(long clientId,long houseHoldPeopleId,long creationDate,long lastModificationDate);
 
+    @Query("MATCH (citizen:Client{citizenDead:false})-[:GET_SERVICE_FROM]->(o:Organization)  where id(o)= {0} with citizen\n"+
+            "MATCH (citizen)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) WHERE homeAddress IS NOT NULL return citizen, homeAddress")
+    List<ClientHomeAddressQueryResult> getClientsAndHomeAddressByUnitId(long unitId);
+
+    @Query("MATCH (c:Client{citizenDead:false})-[r:"+HAS_LOCAL_AREA_TAG+"]-(lat:LocalAreaTag) where id(lat)= {0} return c")
+    List<Client> getClientsByLocalAreaTagId(long localAreaTagId);
+
 }

@@ -48,8 +48,8 @@ public class OrganizationMetadataController {
     @ApiOperation(value = "Update Local Area Tag for a unit")
     @RequestMapping(value = localAreaTagUrl,method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> updateLocalAreaTag(@Validated  @RequestBody LocalAreaTag localAreaTag){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.updateTagData(localAreaTag));
+    public ResponseEntity<Map<String,Object>> updateLocalAreaTag(@Validated  @RequestBody LocalAreaTag localAreaTag, @PathVariable long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.updateTagData(localAreaTag, unitId));
     }
 
 

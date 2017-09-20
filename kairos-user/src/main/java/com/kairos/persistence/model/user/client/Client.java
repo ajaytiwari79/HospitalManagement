@@ -9,6 +9,7 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.country.RelationType;
 import com.kairos.persistence.model.user.language.Language;
+import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.util.DateConverter;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -53,6 +54,9 @@ public class Client extends User {
     @JsonIgnore
     @Relationship(type = HAS_TEMPORARY_ADDRESS)
     private List<ClientTemporaryAddress> temporaryAddress;
+
+    @Relationship(type = HAS_LOCAL_AREA_TAG)
+    private LocalAreaTag localAreaTag;
 
     private ClientEnum.CitizenShip citizenship;
     private String nationalityType;
@@ -907,6 +911,13 @@ public class Client extends User {
 
     public void setRelationType(RelationType relationType) {
         this.relationType = relationType;
+    }
+    public LocalAreaTag getLocalAreaTag() {
+        return localAreaTag;
+    }
+
+    public void setLocalAreaTag(LocalAreaTag localAreaTag) {
+        this.localAreaTag = localAreaTag;
     }
 
     @Override
