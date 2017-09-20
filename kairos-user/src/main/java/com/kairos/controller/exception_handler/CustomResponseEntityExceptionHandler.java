@@ -341,7 +341,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		ResponseEnvelope errorMessage=new ResponseEnvelope();
 		errorMessage.setSuccess(false);
 		errorMessage.setMessage(ex.getMessage());
-		return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+		return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.CONFLICT, request);
 	}
 
 	// 500
@@ -356,7 +356,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 	}
 
 
-	@ResponseStatus(HttpStatus.CONFLICT)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler({DataNotFoundByIdException.class,AddressNotVerifiedByTomTom.class,
 			ZipCodeNotFound.class,CitizenNotFoundException.class})
 	@ResponseBody

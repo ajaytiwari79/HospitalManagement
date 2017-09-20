@@ -5,11 +5,9 @@ package com.kairos.custom_exception;
  */
     public class DataNotFoundByIdException extends RuntimeException{
 
-    public String message;
 
     public DataNotFoundByIdException(String message) {
         super(message);
-        this.message = message;
     }
 
 }
