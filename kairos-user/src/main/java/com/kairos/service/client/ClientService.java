@@ -154,12 +154,12 @@ public class ClientService extends UserBaseService {
 
 
             Client client = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
-            if(client.isCitizenDead()){
-                throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
-            }
-
             if (client != null) {
                 logger.debug("Using Existing Client..........");
+
+                if(client.isCitizenDead()){
+                    throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
+                }
 
                 int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
 
@@ -691,13 +691,13 @@ public class ClientService extends UserBaseService {
      * @return
      * @auther anil maurya
      */
-    public boolean markClientAsDead(Long clientId,CitizenDeathInfoDTO citizenDeathInfoDTO) {
+    public boolean markClientAsDead(Long clientId,Date deathDate) {
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
             throw new DataNotFoundByIdException("Incorrect client id ::" + clientId);
         }
         client.setCitizenDead(true);
-        client.setDeathDate(citizenDeathInfoDTO.getDeathDate().getTime());
+        client.setDeathDate(deathDate.getTime());
         clientGraphRepository.save(client);
         //return plannerService.deleteTasksForCitizen(clientId);
         return plannerRestClient.deleteTaskForCitizen(clientId);
