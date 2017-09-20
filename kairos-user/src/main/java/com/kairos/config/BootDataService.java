@@ -256,8 +256,8 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
-        phaseService.createPhases();
-        phaseService.linkPhasesWithAllOrganizations();
+        //phaseService.createPhases();
+        //phaseService.linkPhasesWithAllOrganizations();
 
         startRegisteredCronJobs();
 

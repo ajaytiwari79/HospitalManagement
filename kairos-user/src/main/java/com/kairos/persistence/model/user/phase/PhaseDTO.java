@@ -47,4 +47,44 @@ public class PhaseDTO {
     public void setId(long id) {
         this.id = id;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
+    }
+
+    public int getConstructionPhaseStartsAtDay() {
+        return constructionPhaseStartsAtDay;
+    }
+
+    public void setConstructionPhaseStartsAtDay(int constructionPhaseStartsAtDay) {
+        this.constructionPhaseStartsAtDay = constructionPhaseStartsAtDay;
+    }
+
+    public int getActivityAccess() {
+        return activityAccess;
+    }
+
+    public void setActivityAccess(int activityAccess) {
+        this.activityAccess = activityAccess;
+    }
 }

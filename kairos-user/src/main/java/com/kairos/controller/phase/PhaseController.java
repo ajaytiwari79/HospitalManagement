@@ -31,23 +31,21 @@ public class PhaseController {
     @PostMapping(value="")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createPhase(@PathVariable Long unitId,@RequestBody @Valid  PhaseDTO phaseDTO) {
-        phaseService.createPhasesByUnitId(unitId, phaseDTO);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.createPhasesByUnitId(unitId, phaseDTO));
     }
 
-
-    @ApiOperation(value = "Get ALl phases by unit Id")
+    @ApiOperation(value = "Get All phases by unit Id")
     @GetMapping(value="")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPhasesByUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.getPhasesByUnit(unitId));
     }
 
-    @ApiOperation(value = "update  phases by unit Id and PhaseId")
-    @PutMapping(value = "/{phaseId}")
+    @ApiOperation(value = "update phases by unit Id and PhaseId")
+    @PutMapping(value = "")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updatePhase(@PathVariable Long unitId, @PathVariable Long phaseId, @RequestBody PhaseDTO phaseDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.updatePhase(unitId,phaseId,phaseDTO));
+    public ResponseEntity<Map<String, Object>> updatePhase(@PathVariable Long unitId, @RequestBody @Valid PhaseDTO phaseDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, phaseService.updatePhase(unitId,phaseDTO));
     }
 
     @ApiOperation(value = "Remove phase")

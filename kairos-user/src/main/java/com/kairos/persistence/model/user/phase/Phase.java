@@ -3,9 +3,13 @@ package com.kairos.persistence.model.user.phase;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotNull;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.PHASE_BELONGS_TO;
 
 /**
  * Created by pawanmandhan on 29/8/17.
@@ -23,7 +27,9 @@ public class Phase extends UserBaseEntity {
     private int sequence;
     private int constructionPhaseStartsAtDay;
     private int activityAccess;
-    //activityAccess status
+    @Relationship(type = PHASE_BELONGS_TO)
+    private Organization organization;
+    // activityAccess status
     // 0- activities non editable
     // 1- allowUpdateActivities , restrict new activity creation
     // 2- allowNewActivities & update
@@ -32,6 +38,17 @@ public class Phase extends UserBaseEntity {
     public Phase() {
     }
 
+    public boolean restrictAllOperationsOnActivities() {
+        return (this.activityAccess==0)?true:false;
+    }
+
+    public boolean allowUpdateAndRestrictNewActivities() {
+        return (this.activityAccess==1)?true:false;
+    }
+
+    public boolean allowUpdateAndNewActivities() {
+        return (this.activityAccess==2)?true:false;
+    }
 
     public Phase(String name, String description, boolean disabled, int sequence, int constructionPhaseStartsAtDay, int activityAccess,long duration) {
         this.name = name;
@@ -41,6 +58,14 @@ public class Phase extends UserBaseEntity {
         this.constructionPhaseStartsAtDay = constructionPhaseStartsAtDay;
         this.activityAccess = activityAccess;
         this.duration=duration;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public long getDuration() {
