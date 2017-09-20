@@ -995,6 +995,13 @@ public class OrganizationController {
                 organizationService.getTimeSlotPercentageDeduction(unitId));
     }
 
+    @RequestMapping(value = "/unit/{unitId}/vehicleList", method = RequestMethod.GET)
+    @ApiOperation("Get Vehicle list of unit")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getVehicleList(@PathVariable Long organizationId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getVehicleList(organizationId));
+    }
+
 }
 
 

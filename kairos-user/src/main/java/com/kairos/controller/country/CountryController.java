@@ -28,7 +28,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -1000,32 +999,32 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getRelationTypes(countryId));
     }
 
-    @RequestMapping(value = COUNTRY_URL + "/resources", method = RequestMethod.POST)
-    @ApiOperation("Add resources in country")
+    @RequestMapping(value = COUNTRY_URL + "/vehicle", method = RequestMethod.POST)
+    @ApiOperation("Add vehicle in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> addResources(@PathVariable long countryId, @RequestBody Resources resources){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addResources(countryId, resources));
+    public ResponseEntity<Map<String,Object>> addVehicle(@PathVariable long countryId, @RequestBody Vehicle vehicle){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addVehicle(countryId, vehicle));
     }
 
-    @RequestMapping(value = COUNTRY_URL + "/resources/{resourcesId}", method = RequestMethod.DELETE)
-    @ApiOperation("Delete resources from country")
+    @RequestMapping(value = COUNTRY_URL + "/vehicle/{vehicleId}", method = RequestMethod.DELETE)
+    @ApiOperation("Delete vehicle from country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> deleteResources(@PathVariable Long countryId, @PathVariable Long resourcesId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.deleteResources(countryId, resourcesId));
+    public ResponseEntity<Map<String,Object>> deleteVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.deleteVehicle(countryId, vehicleId));
     }
 
-    @RequestMapping(value = COUNTRY_URL + "/resources", method = RequestMethod.GET)
+    @RequestMapping(value = COUNTRY_URL + "/vehicleList", method = RequestMethod.GET)
     @ApiOperation("Get resources of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> getResources(@PathVariable Long countryId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getResourcesList(countryId));
+    public ResponseEntity<Map<String,Object>> getVehicleList(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getVehicleList(countryId));
     }
 
-    @RequestMapping(value = COUNTRY_URL + "/resources/{resourcesId}", method = RequestMethod.PUT)
-    @ApiOperation("Update resources in country")
+    @RequestMapping(value = COUNTRY_URL + "/vehicle/{vehicleId}", method = RequestMethod.PUT)
+    @ApiOperation("Update vehicle in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> updateResources(@PathVariable Long countryId, @PathVariable Long resourcesId,  @RequestBody Resources resources){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateResources(countryId, resourcesId, resources));
+    public ResponseEntity<Map<String,Object>> updateVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId,  @RequestBody Vehicle vehicle){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateVehicle(countryId, vehicleId, vehicle));
     }
 
 

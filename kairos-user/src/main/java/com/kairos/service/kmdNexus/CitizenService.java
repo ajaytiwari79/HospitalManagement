@@ -108,7 +108,6 @@ public class CitizenService {
             loginTemplate.getMessageConverters().add(formHttpMessageConverter);
             loginTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
             loginTemplate.getMessageConverters().add(stringHttpMessageConverter);
-            logger.info("organization response----------> "+organization);
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
             //headers.setContentType(MediaType.APPLICATION_JSON);
@@ -137,7 +136,6 @@ public class CitizenService {
                     String patientUrl = patients.getJSONObject(k).getJSONObject("_links").getJSONObject("self").getString("href");
                     ResponseEntity<String> patientResponse = loginTemplate.exchange(patientUrl, HttpMethod.GET, headersElements, String.class);
                     PatientWrapper patientWrapper = JsonUtils.toObject(patientResponse.getBody().toString(), PatientWrapper.class);
-                    logger.info("patientWrapper------------> " + patientWrapper.getId());
                     //   if(Integer.valueOf(patientWrapper.getId()) != 7) continue;
                     clientService.createCitizenFromKmd(patientWrapper, organization.getId());
                 }

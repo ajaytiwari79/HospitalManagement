@@ -11,7 +11,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Resources  extends UserBaseEntity {
+public class Vehicle extends UserBaseEntity {
     private String name;
     private String description;
     private boolean enabled = true;
