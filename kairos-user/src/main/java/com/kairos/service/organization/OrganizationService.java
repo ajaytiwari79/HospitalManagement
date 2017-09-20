@@ -994,6 +994,16 @@ public class OrganizationService extends UserBaseService {
         return timeSlotsDeductionDTO;
 
     }
+
+    public List<Vehicle> getVehicleList(long unitId){
+        Organization organization  = organizationGraphRepository.findOne(unitId);
+        if (organization == null) {
+            logger.debug("Searching organization by id " + unitId);
+            throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
+        }
+        Long countryId = organizationGraphRepository.getCountryId(unitId);
+        return countryGraphRepository.getResourcesByCountry(countryId);
+    }
 }
 
 
