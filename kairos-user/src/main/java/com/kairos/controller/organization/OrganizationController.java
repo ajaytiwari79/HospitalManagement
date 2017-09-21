@@ -1002,6 +1002,8 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getVehicleList(organizationId));
     }
 
+
+
 }
 
 
