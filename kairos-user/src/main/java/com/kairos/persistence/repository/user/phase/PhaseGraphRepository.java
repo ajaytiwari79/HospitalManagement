@@ -20,7 +20,7 @@ public interface PhaseGraphRepository extends GraphRepository<Phase> {
     @Query ("Match (org:Organization)  " +
             "Match (phase :Phase{disabled:false})-[:"+ PHASE_BELONGS_TO +"]->(org) where id(org)={0} and phase.name={1} and phase.disabled={2}\n" +
             "return phase" )
-    public Phase findByNameAndDisabled(Long unitId,String name, boolean disabled);
+     Phase findByNameAndDisabled(Long unitId,String name, boolean disabled);
 
     @Query("Match (phase:Phase{disabled:false}),(org:Organization) where id (phase)={0}  AND id(org) IN {1} with phase,org \n" +
             "Merge (phase)-[r:"+PHASE_BELONGS_TO+"]->(org) \n" +
