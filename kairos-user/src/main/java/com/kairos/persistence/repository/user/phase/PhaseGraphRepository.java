@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.PHASE
 public interface PhaseGraphRepository extends GraphRepository<Phase> {
 
     @Query ("Match (org:Organization)  " +
-            "Match (phase :Phase{disabled:false})-[:"+ PHASE_BELONGS_TO +"]->(org) where id(org)={0} and phase.name={1} and p.disabled={2}\n" +
+            "Match (phase :Phase{disabled:false})-[:"+ PHASE_BELONGS_TO +"]->(org) where id(org)={0} and phase.name={1} and phase.disabled={2}\n" +
             "return phase" )
     public Phase findByNameAndDisabled(Long unitId,String name, boolean disabled);
 
@@ -28,18 +28,21 @@ public interface PhaseGraphRepository extends GraphRepository<Phase> {
             "ON MATCH SET r.durationInWeeks={2}")
     void addOrganizationInPhase(long phaseId, List<Long> organizationIds, Long durationInWeek);
 
-    @Query("Match (org:Organization) where id(org)={0} \n" +
-            "Match (phase :Phase{disabled:false})-[:"+ PHASE_BELONGS_TO +"]-(org) \n" +
-            "return phase.name," +
-            "phase.description," +
-            "phase.duration," +
-            "phase.sequence," +
-            "phase.constructionPhaseStartsAtDay," +
-            "phase.activityAccess")
+    @Query(
+            "Match (phase :Phase{disabled:false})-[:"+ PHASE_BELONGS_TO +"]->(org) where id(org)={0}\n" +
+            "return id(phase) as id," +
+            "phase.name as name," +
+            "phase.description as description," +
+            "phase.duration as duration," +
+            "phase.sequence as sequence," +
+            "phase.constructionPhaseStartsAtDay as constructionPhaseStartsAtDay," +
+            "phase.activityAccess as activityAccess")
     List<PhaseDTO> getPhasesByUnit(Long unitId);
 
     @Query ("Match (org:Organization)  " +
             "Match (phase :Phase{disabled:false})-[:"+ PHASE_BELONGS_TO +"]->(org) where id(org)={0} and phase.sequence={1} and p.disabled={2}\n" +
             "return phase" )
     Phase findBySequenceAndDisabled(Long unitId, int sequence,boolean disabled);
+
+   // void detachDeletePhases();
 }

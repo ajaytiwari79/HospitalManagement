@@ -7,6 +7,7 @@ public class ActionNotPermittedException extends  RuntimeException {
     public String message;
 
     public ActionNotPermittedException(String message) {
+        super(message);
         this.message = message;
     }
 }

@@ -35,8 +35,13 @@ public class PhaseService extends UserBaseService {
         if (unitOrganization == null) {
             throw new DataNotFoundByIdException("Invalid unitId : " + unitId);
         }
-        Phase phase=phaseGraphRepository.findByNameAndDisabled(unitId,phaseDTO.getName(),false);
-        if(phase==null){
+        Phase phase=null;
+        try {
+            phase = phaseGraphRepository.findByNameAndDisabled(unitId, phaseDTO.getName(), false);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        if(phase!=null){
             throw new ActionNotPermittedException("Phase with name : "+phaseDTO.getName()+" already exists.");
         }
         if(phaseDTO.getDuration()<=0){
@@ -45,6 +50,7 @@ public class PhaseService extends UserBaseService {
        // phase=phaseGraphRepository.findBySequenceAndDisabled(unitId,phaseDTO.getSequence(),false);
         phase=preparePhase(phaseDTO,unitOrganization);
         save(phase);
+        phase.setOrganization(null);
         return phase;
     }
 
@@ -60,22 +66,25 @@ public class PhaseService extends UserBaseService {
         return  phase;
     }
 
+    public void deleteOldPhase(){
+      //  phaseGraphRepository.detachDeletePhases();
+    }
 
     public PhaseDTO updatePhase(Long unitId, PhaseDTO phaseDTO) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
             throw new DataNotFoundByIdException("Invalid unitId " + unitId);
         }
-        Phase phase = phaseGraphRepository.findOne(phaseDTO.getId());
-        if (phase == null) {
+        Phase oldPhase = phaseGraphRepository.findOne(phaseDTO.getId());
+        if (oldPhase == null) {
             throw new DataNotFoundByIdException("Phase does not Exists Id " + phaseDTO.getId());
         }
-        phase=phaseGraphRepository.findByNameAndDisabled(unitId,phaseDTO.getName(),false);
-        if(phase==null){
+        Phase phase=phaseGraphRepository.findByNameAndDisabled(unitId,phaseDTO.getName(),false);
+        if(phase!=null && !oldPhase.getName().equals(phaseDTO.getName())){
             throw new ActionNotPermittedException("Phase with name : "+phaseDTO.getName()+" already exists.");
         }
-        preparePhase(phase,phaseDTO);
-        save(phase);
+        preparePhase(oldPhase,phaseDTO);
+        save(oldPhase);
         //phaseGraphRepository.findAndUpdateByPhaseAndDuration(unitId, phaseId, phaseDTO.getDuration());
         return phaseDTO;
     }
