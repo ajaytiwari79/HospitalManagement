@@ -224,8 +224,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "Match (nextToKin)-[:CIVILIAN_STATUS]->(citizenStatus:CitizenStatus) with nextToKin,citizenStatus\n" +
             "Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail,nextToKin,citizenStatus\n" +
             "Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode)\n" +
-            "return id(nextToKin) as id,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1} + nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,homeAddress as homeAddress,citizenStatus as citizenStatus,contactDetail as contactDetail,municipality as municipality,zipCode as zipCode")
+            "Optional Match (nextToKin)-[:HAS_RELATION_OF]->(relationType:RelationType) with relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "return id(nextToKin) as id,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1} + nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,homeAddress as homeAddress,citizenStatus as citizenStatus,contactDetail as contactDetail,municipality as municipality,zipCode as zipCode, id(relationType) as relationTypeId")
     List<NextToKinQueryResult> getNextToKinDetail(long clientId,String imageUrl);
 
     @Query("Match (client:Client) where id(client)={0} with client\n" +

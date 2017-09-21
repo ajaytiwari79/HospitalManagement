@@ -50,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.time.LocalDate;
 import java.text.ParseException;
 import java.util.*;
 
@@ -155,8 +156,16 @@ public class ClientService extends UserBaseService {
 
         if (clientMinimumDTO != null) {
 
+            if(!invalidCPRNumber(clientMinimumDTO.getCprnumber())){
+                throw new DataNotFoundByIdException("Invalid CPR Number");
+            }
+
 
             Client client = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
+            if(Optional.ofNullable(client).isPresent() && client.isCitizenDead()){
+                throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
+            }
+
             if (client != null) {
                 logger.debug("Using Existing Client..........");
 
@@ -375,6 +384,7 @@ public class ClientService extends UserBaseService {
                 if (languageData != null) {
                     response.put("languageData", FormatUtil.formatNeoResponse(languageData));
                 }
+                response.put("relationTypes", countryGraphRepository.getRelationTypesByCountry(countryId));
             } else {
                 logger.debug("Country not found");
             }
@@ -1316,5 +1326,62 @@ public class ClientService extends UserBaseService {
                 homeAddressOfClient.getHouseNumber().equalsIgnoreCase(homeAddressofHouseHoldPerson.getHouseNumber()) &&
         zipCodeOfClient.getZipCode().equals(zipCodeOfHouseHoldPerson.getZipCode()));
     }
+
+ private boolean invalidCPRNumber(String cprNumber) {
+     if (cprNumber == null) {
+         return false;
+
+     }
+     if (cprNumber.length() == 9) {
+         cprNumber = "0" + cprNumber;
+     }
+     if (cprNumber.length() != 10) {
+         return false;
+     }
+
+     if (cprNumber != null) {
+         Integer year = Integer.valueOf(cprNumber.substring(4, 6));
+         Integer month = Integer.valueOf(cprNumber.substring(2, 4));
+         Integer day = Integer.valueOf(cprNumber.substring(0, 2));
+         Integer century = Integer.parseInt(cprNumber.substring(6, 7));
+
+         if (century >= 0 && century <= 3) {
+             century = 1900;
+         }
+         if (century == 4) {
+             if (year <= 36) {
+                 century = 2000;
+             } else {
+                 century = 1900;
+             }
+         }
+         if (century >= 5 && century <= 8) {
+             if (year <= 57) {
+                 century = 2000;
+             }
+             if (year >= 58 && year <= 99) {
+                 century = 1800;
+             }
+         }
+         if (century == 9) {
+             if (year <= 36) {
+                 century = 2000;
+             } else {
+                 century = 1900;
+             }
+         }
+         year = century + year;
+         try {
+             LocalDate today = LocalDate.now();
+             LocalDate birthday = LocalDate.of(year, month, day);
+             return true;
+         } catch (Exception e) {
+             return false;// Calculating age in yeas from DOB
+         }
+
+
+     }
+     return false;
+ }
 
 }

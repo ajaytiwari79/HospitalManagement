@@ -9,6 +9,7 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.country.CitizenStatus;
+import com.kairos.persistence.model.user.country.RelationType;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -16,6 +17,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
@@ -90,6 +92,8 @@ public class ClientExtendedService extends UserBaseService {
     private ClientAllergiesGraphRepository clientAllergiesGraphRepository;
     @Inject
     private AccessToLocationGraphRepository accessToLocationGraphRepository;
+    @Inject
+    private CountryGraphRepository countryGraphRepository;
 
 
     public NextToKinQueryResult saveNextToKin(long unitId, long clientId, NextToKinDTO nextToKinDTO) {
@@ -109,6 +113,7 @@ public class ClientExtendedService extends UserBaseService {
             return null;
         }
         saveCivilianStatus(nextToKinDTO,nextToKin);
+        saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin);
         nextToKin.setHomeAddress(contactAddress);
         createNextToKinRelationship(client, nextToKin);
         assignOrganizationToNextToKin(nextToKin, unitId);
@@ -220,6 +225,23 @@ public class ClientExtendedService extends UserBaseService {
         }
     }
 
+
+    private void saveCitizenRelation(Long relationTypeId, Long unitId, Client nextToKin) {
+
+        Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+
+        if (Optional.ofNullable(relationTypeId).isPresent()) {
+            RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);
+            if (!Optional.ofNullable(relationType).isPresent()) {
+                logger.debug("Finding Relation type using id " + relationTypeId);
+                throw new DataNotFoundByIdException("Incorrect id of Relation type " + relationTypeId);
+            }
+            nextToKin.setRelationType(relationType);
+        } else {
+            throw new DataNotFoundByIdException("Relation Type can't be empty");
+        }
+    }
+
     public NextToKinQueryResult updateNextToKinDetail(long unitId,long nextToKinId,NextToKinDTO nextToKinDTO){
         Client nextToKin = clientGraphRepository.findOne(nextToKinId,unitId);
         if(!Optional.ofNullable(nextToKin).isPresent()){
@@ -233,6 +255,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         nextToKin.setHomeAddress(contactAddress);
         saveCivilianStatus(nextToKinDTO,nextToKin);
+        saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin);
         logger.debug("Preparing response");
         clientGraphRepository.save(nextToKin);
         return new NextToKinQueryResult().buildResponse(nextToKin,envConfig.getServerHost() + File.separator);

@@ -24,6 +24,7 @@ public class NextToKinQueryResult {
     private ContactAddress homeAddress;
     private CitizenStatus citizenStatus;
     private ZipCode zipCode;
+    private Long relationTypeId;
 
     public String getCprNumber() {
         return cprNumber;
@@ -132,7 +133,15 @@ public class NextToKinQueryResult {
         this.citizenStatus = citizenStatus;
     }
 
-    public NextToKinQueryResult buildResponse(Client nextToKin,String serverUrl){
+    public Long getRelationTypeId() {
+        return relationTypeId;
+    }
+
+    public void setRelationTypeId(Long relationTypeId) {
+        this.relationTypeId = relationTypeId;
+    }
+
+    public NextToKinQueryResult buildResponse(Client nextToKin, String serverUrl){
         this.id = nextToKin.getId();
         this.firstName = nextToKin.getFirstName();
         this.lastName = nextToKin.getLastName();
