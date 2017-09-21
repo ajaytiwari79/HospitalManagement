@@ -180,7 +180,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (client:Client) where client.kmdNexusExternalId={0} RETURN client")
     Client findByKmdNexusExternalId(String kmdNexusExternalId);
 
-    @Query("Match (n)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) where id(n)=7449 with zipCode,homeAddress\n" +
+    @Query("Match (n)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) where id(n)={0} with zipCode,homeAddress\n" +
             "Match (homeAddress)-[:MUNICIPALITY]->(Municipality:Municipality) with Municipality,zipCode,homeAddress\n" +
             "return Municipality,zipCode,homeAddress")
     ClientHomeAddressQueryResult getHomeAddress(long clientId);
