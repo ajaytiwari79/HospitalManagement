@@ -1302,14 +1302,17 @@ public class ClientService extends UserBaseService {
         ClientHomeAddressQueryResult addressOfClient = clientGraphRepository.getHomeAddress(client.getId());
         ClientHomeAddressQueryResult addressOfHouseHoldPerson = clientGraphRepository.getHomeAddress(houseHoldPeople.getId());
 
-        ContactAddress homeAddressOfClient = addressOfClient.getHomeAddress();
-        ZipCode zipCodeOfClient = addressOfClient.getZipCode();
-        ContactAddress homeAddressofHouseHoldPerson = addressOfHouseHoldPerson.getHomeAddress();
-        ZipCode zipCodeOfHouseHoldPerson = addressOfHouseHoldPerson.getZipCode();
-
-        return (homeAddressOfClient.getStreet1().equalsIgnoreCase(homeAddressofHouseHoldPerson.getStreet1()) &&
-                homeAddressOfClient.getHouseNumber().equalsIgnoreCase(homeAddressofHouseHoldPerson.getHouseNumber()) &&
-        zipCodeOfClient.getZipCode().equals(zipCodeOfHouseHoldPerson.getZipCode()));
+        boolean hasSameAddress = false;
+        if(Optional.of(addressOfClient).isPresent() && Optional.ofNullable(addressOfHouseHoldPerson).isPresent()){
+            ContactAddress homeAddressOfClient = addressOfClient.getHomeAddress();
+            ZipCode zipCodeOfClient = addressOfClient.getZipCode();
+            ContactAddress homeAddressofHouseHoldPerson = addressOfHouseHoldPerson.getHomeAddress();
+            ZipCode zipCodeOfHouseHoldPerson = addressOfHouseHoldPerson.getZipCode();
+            hasSameAddress =  (homeAddressOfClient.getStreet1().equalsIgnoreCase(homeAddressofHouseHoldPerson.getStreet1()) &&
+                    homeAddressOfClient.getHouseNumber().equalsIgnoreCase(homeAddressofHouseHoldPerson.getHouseNumber()) &&
+                    zipCodeOfClient.getZipCode().equals(zipCodeOfHouseHoldPerson.getZipCode()));
+        }
+        return hasSameAddress;
     }
 
  private boolean invalidCPRNumber(String cprNumber) {
