@@ -6,10 +6,10 @@ package com.kairos.custom_exception;
 
 public class CitizenNotFoundException extends RuntimeException{
 
-    public String message;
-
     public CitizenNotFoundException(String message) {
-        this.message = message;
+
+        super(message);
+
     }
 
 }

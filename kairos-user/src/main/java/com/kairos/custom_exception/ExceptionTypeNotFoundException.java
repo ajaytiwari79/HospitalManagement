@@ -6,10 +6,8 @@ package com.kairos.custom_exception;
 
 public class ExceptionTypeNotFoundException extends RuntimeException{
 
-    public String message;
-
     public ExceptionTypeNotFoundException(String message) {
-        this.message = message;
+       super(message);
     }
 
 }
