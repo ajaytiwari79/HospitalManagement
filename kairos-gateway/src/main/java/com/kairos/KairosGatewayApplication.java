@@ -27,7 +27,7 @@ public class KairosGatewayApplication {
         return new RestTemplate();
     }
 
-  /*  @Bean
+   /* @Bean
     @Primary
     public CorsFilter corsFilter() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -44,7 +44,7 @@ public class KairosGatewayApplication {
         config.addAllowedMethod("PATCH");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
-    }*/
-
+    }
+*/
 }
 
