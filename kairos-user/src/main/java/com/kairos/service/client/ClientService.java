@@ -391,22 +391,7 @@ public class ClientService extends UserBaseService {
 
             // NextToKin
             List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId,envConfig.getServerHost() + File.separator);
-            nextToKinDetails.forEach(nextToKinQueryResult -> {
-                ContactAddress homeAddress = nextToKinQueryResult.getHomeAddress();
-                homeAddress.setMunicipality(nextToKinQueryResult.getMunicipality());
-                homeAddress.setZipCode(nextToKinQueryResult.getZipCode());
-            });
             response.put("nextToKin", nextToKinDetails);
-            /*if (kin != null) {
-                //Map<String, Object> nextToKinDetails = clientGraphRepository.findOne(kin.getId(), 2).retrieveNextToKinDetails();
-
-               *//* if (nextToKinDetails != null) {
-                    String imageUrl = envConfig.getServerHost() + File.separator + (String) nextToKinDetails.get("profilePic");
-                    nextToKinDetails.put("profilePic", imageUrl);
-                }*//*
-                response.put("nextToKin", nextToKinDetails);
-            }*/
-
             // Social Media Details
             Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
             response.put("socialMediaDetails", socialMediaDetails != null ? socialMediaDetails : Collections.EMPTY_MAP);

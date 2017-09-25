@@ -125,8 +125,8 @@ public class ClientController {
     // NextToKin
     @ApiOperation("update NextToKin")
     @RequestMapping(value = "/{clientId}/nextToKin/{nextToKinId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long nextToKinId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO));
+    ResponseEntity<Map<String, Object>> updateNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long nextToKinId, @PathVariable long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO,clientId));
     }
 
 
