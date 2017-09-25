@@ -4,6 +4,7 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.country.CitizenStatus;
+import io.swagger.annotations.Contact;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -226,7 +227,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "Optional Match (nextToKin)-[:HAS_RELATION_OF]->(relationType:RelationType) with relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "return id(nextToKin) as id,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1} + nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,homeAddress as homeAddress,citizenStatus as citizenStatus,contactDetail as contactDetail,municipality as municipality,zipCode as zipCode, id(relationType) as relationTypeId")
+            "Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "return id(nextToKin) as id,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,{municipalityId:id(municipality),zipCodeId:id(zipCode), relationTypeId:id(relationType),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
+            ",latitude:homeAddress.latitude,municipalities:result} as homeAddress")
     List<NextToKinQueryResult> getNextToKinDetail(long clientId,String imageUrl);
 
     @Query("Match (client:Client) where id(client)={0} with client\n" +
@@ -243,4 +246,11 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client{citizenDead:false})-[r:"+HAS_LOCAL_AREA_TAG+"]-(lat:LocalAreaTag) where id(lat)= {0} return c")
     List<Client> getClientsByLocalAreaTagId(long localAreaTagId);
 
+    @Query("Match (nextToKin:Client)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) where id(nextToKin)={0} return homeAddress")
+    ContactAddress getHomeAddressOfNextOfKin(Long nextToKinId);
+
+    @Query("Match (citizen:Client) where id(citizen)={0} with citizen\n" +
+            "Match (nextToKin:Client) where id(nextToKin)={1} with nextToKin,citizen\n" +
+            "Match (citizen)-[r:NEXT_TO_KIN]->(nextToKin) return count(r)>0")
+    Boolean hasAlreadyNextToKin(Long clientId,Long nextToKinId);
 }

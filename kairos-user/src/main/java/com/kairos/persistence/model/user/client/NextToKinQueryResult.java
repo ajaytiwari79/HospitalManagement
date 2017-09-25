@@ -1,10 +1,13 @@
 package com.kairos.persistence.model.user.client;
 
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.query_wrapper.AddressQueryResult;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.util.Map;
 
 /**
  * Created by prabjot on 18/9/17.
@@ -21,8 +24,8 @@ public class NextToKinQueryResult {
     private String profilePic;
     private String cprNumber;
     private ContactDetail contactDetail;
-    private ContactAddress homeAddress;
-    private CitizenStatus citizenStatus;
+    private Map homeAddress;
+    private Long civilianStatusId;
     private ZipCode zipCode;
     private Long relationTypeId;
 
@@ -101,11 +104,11 @@ public class NextToKinQueryResult {
         this.contactDetail = contactDetail;
     }
 
-    public ContactAddress getHomeAddress() {
+    public Map getHomeAddress() {
         return homeAddress;
     }
 
-    public void setHomeAddress(ContactAddress homeAddress) {
+    public void setHomeAddress(Map homeAddress) {
         this.homeAddress = homeAddress;
     }
 
@@ -125,12 +128,12 @@ public class NextToKinQueryResult {
         this.municipality = municipality;
     }
 
-    public CitizenStatus getCitizenStatus() {
-        return citizenStatus;
+    public Long getCivilianStatusId() {
+        return civilianStatusId;
     }
 
-    public void setCitizenStatus(CitizenStatus citizenStatus) {
-        this.citizenStatus = citizenStatus;
+    public void setCivilianStatusId(Long civilianStatusId) {
+        this.civilianStatusId = civilianStatusId;
     }
 
     public Long getRelationTypeId() {
@@ -141,18 +144,4 @@ public class NextToKinQueryResult {
         this.relationTypeId = relationTypeId;
     }
 
-    public NextToKinQueryResult buildResponse(Client nextToKin, String serverUrl){
-        this.id = nextToKin.getId();
-        this.firstName = nextToKin.getFirstName();
-        this.lastName = nextToKin.getLastName();
-        this.citizenStatus = nextToKin.getCivilianStatus();
-        this.homeAddress = nextToKin.getHomeAddress();
-        this.gender = nextToKin.getGender();
-        this.age = nextToKin.getAge();
-        this.nickName = nextToKin.getNickName();
-        this.profilePic = serverUrl + nextToKin.getProfilePic();
-        this.contactDetail = nextToKin.getContactDetail();
-        this.cprNumber = nextToKin.getCprNumber();
-        return this;
-    }
 }
