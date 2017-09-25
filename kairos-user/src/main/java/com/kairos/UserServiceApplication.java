@@ -18,8 +18,6 @@ import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConve
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.List;
@@ -41,19 +39,6 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 		SpringApplication.run(UserServiceApplication.class, args);
 	}
 
-		/**
-		 * Allows CORS support
-		 * @return
-		 */
-		@Bean
-		public WebMvcConfigurer corsConfigurer() {
-			return new WebMvcConfigurerAdapter() {
-				@Override
-				public void addCorsMappings(CorsRegistry registry) {
-					registry.addMapping("/**").allowedOrigins("*").allowedMethods("*").allowCredentials(true).allowedHeaders("Keep-Alive","Connection","Transfer-Encoding");
-				}
-			};
-		}
 
 
 		/**
