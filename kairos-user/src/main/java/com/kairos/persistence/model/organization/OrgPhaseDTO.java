@@ -1,9 +1,6 @@
 package com.kairos.persistence.model.organization;
 
-import com.kairos.persistence.model.user.phase.PhaseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
-
-import java.util.List;
 
 /**
  * Created by vipul on 20/9/17.
@@ -13,7 +10,6 @@ public class OrgPhaseDTO {
     private String name;
     private String email;
     private Long id;
-    private List<PhaseDTO> phases;
 
     public String getName() {
         return name;
@@ -39,11 +35,5 @@ public class OrgPhaseDTO {
         this.id = id;
     }
 
-    public List<PhaseDTO> getPhases() {
-        return phases;
-    }
 
-    public void setPhases(List<PhaseDTO> phases) {
-        this.phases = phases;
-    }
 }

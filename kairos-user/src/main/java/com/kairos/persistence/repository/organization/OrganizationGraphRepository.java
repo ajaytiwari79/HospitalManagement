@@ -6,7 +6,6 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position.PositionName;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
@@ -487,12 +486,12 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("MATCH (country:Country)<-[:"+COUNTRY+"]-(o:Organization) where id(o)={0}  return id(country) ")
     Long getCountryId(Long organizationId);
 
-    @Query("match(o:Organization{isEnable:true})-[:"+PHASE_BELONGS_TO+"]-(p:Phase{disabled:false})\n" +
-            "with o ,collect({id:id(p),name:p.name,duration:p.duration}) as phase\n" +
-            "return o.name as name, Id(o) as id,phase as phases")
+    @Query("match(o:Organization{isEnable:true}))\n" +
+            "return o.name as name, Id(o) as id")
     List<OrgPhaseDTO> organizationWithPhases();
 
-
+    @Query("MATCH (n:Organization) RETURN Id(n)")
+    List<Long> allOrganizationIds();
 
 
 }

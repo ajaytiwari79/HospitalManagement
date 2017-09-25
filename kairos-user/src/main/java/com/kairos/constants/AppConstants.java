@@ -38,6 +38,8 @@ public class AppConstants {
     public static final String API_TIME_SLOTS_NAME = "/api/v1/organization/{organizationId}/time_slot_name";
 
     public static final String API_SCHEDULER_PHASE_ORG = "/api/v1/organizationWithPhases";
+    // Used to get all organization Ids at bootLoad
+    public static final String API_INIT_APPLICATION = "/api/v1/allOrganizationIds";
 
     public static final String API_CREDENTIAL_UPDATE_URL = "/api/v1/user/password";
 

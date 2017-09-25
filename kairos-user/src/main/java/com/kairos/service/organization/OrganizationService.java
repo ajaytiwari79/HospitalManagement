@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.client.PhaseRestClient;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.organization.*;
@@ -35,7 +36,6 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.payment_type.PaymentTypeService;
-import com.kairos.service.phase.PhaseService;
 import com.kairos.service.region.RegionService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.FormatUtil;
@@ -139,7 +139,8 @@ public class OrganizationService extends UserBaseService {
     TeamService teamService;
     @Autowired
     OrganizationMetadataRepository organizationMetadataRepository;
-
+    @Autowired
+    private PhaseRestClient phaseRestClient;
     @Autowired
     ClientService clientService;
     @Autowired
@@ -150,9 +151,6 @@ public class OrganizationService extends UserBaseService {
 
     @Inject
     AbsenceTypesRepository absenceTypesRepository;
-    @Autowired
-    private  PhaseService phaseService;
-
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id, 0);
     }
@@ -208,7 +206,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = new Date().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        phaseService.createDefaultPhases();
+        phaseRestClient.createDefaultPhases(organization.getId());
         return organizationResponse(organization, orgDetails);
     }
 
@@ -491,7 +489,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit);
-        phaseService.createDefaultPhases();
+        phaseRestClient.createDefaultPhases(unit.getId());
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
         response.put("name", unit.getName());
@@ -1013,6 +1011,12 @@ public class OrganizationService extends UserBaseService {
         List<OrgPhaseDTO> orgPhaseDTO=organizationGraphRepository.organizationWithPhases();
         return orgPhaseDTO;
     }
+
+    public  List<Long> allOrganizationIds(){
+        List<Long> organizationIds=organizationGraphRepository.allOrganizationIds();
+        return organizationIds;
+    }
+
 }
 
 

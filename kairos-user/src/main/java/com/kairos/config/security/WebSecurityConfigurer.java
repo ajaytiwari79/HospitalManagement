@@ -73,6 +73,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/v2/api-docs");
         web.ignoring().antMatchers("/api/v1/organization/{organizationId}/ids");
         web.ignoring().antMatchers(API_SCHEDULER_PHASE_ORG);
+        web.ignoring().antMatchers(API_INIT_APPLICATION);
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN_GRANTS);
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN);
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN_RELATIVE_DATA);
