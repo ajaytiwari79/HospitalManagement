@@ -1,4 +1,5 @@
 package com.kairos.persistence.repository.user.client;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.auth.User;
@@ -242,5 +243,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
     @Query("MATCH (c:Client{citizenDead:false})-[r:"+HAS_LOCAL_AREA_TAG+"]-(lat:LocalAreaTag) where id(lat)= {0} return c")
     List<Client> getClientsByLocalAreaTagId(long localAreaTagId);
+
+    @Query("MATCH (clientRelationType:ClientRelationType)-[:"+RELATION_TYPE+"]-(relationType:RelationType) where id(relationType)= {0} with clientRelationType\n"+
+         "MATCH (clientRelationType)-[:"+RELATION_WITH_NEXT_TO_KIN+"]-(client:Client) where id(client)= {1} return clientRelationType")
+    ClientRelationType getClientRelationType(long relationTypeId, long clientId);
 
 }
