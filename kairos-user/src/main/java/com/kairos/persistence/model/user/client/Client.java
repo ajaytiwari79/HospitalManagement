@@ -931,7 +931,7 @@ public class Client extends User {
     }
 
     public ContactDetail saveContactDetail(NextToKinDTO nextToKinDTO,ContactDetail contactDetail){
-        if(!Optional.ofNullable(nextToKinDTO.getContactDetail()).isPresent()){
+        if(Optional.ofNullable(nextToKinDTO.getContactDetail()).isPresent()){
             ContactDetail contactDetailToUpdate = nextToKinDTO.getContactDetail();
             contactDetail.setPrivatePhone(contactDetailToUpdate.getPrivatePhone());
             contactDetail.setPrivateEmail(contactDetailToUpdate.getPrivateEmail());
@@ -940,7 +940,7 @@ public class Client extends User {
             contactDetail.setTwitterAccount(contactDetailToUpdate.getTwitterAccount());
             contactDetail.setLinkedInAccount(contactDetailToUpdate.getLinkedInAccount());
             contactDetail.setMessenger(contactDetailToUpdate.getMessenger());
-            contactDetail.setWorkPhone(contactDetail.getWorkPhone());
+            contactDetail.setWorkPhone(contactDetailToUpdate.getWorkPhone());
         }
         return contactDetail;
     }
