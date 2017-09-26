@@ -32,9 +32,12 @@ public class AppConstants {
     public static final String API_TIME_CARE_SHIFTS = "/api/v1/time_care/getShifts";
     public static final String API_TIME_CARE_ACTIVITIES = "/api/v1/time_care/getWorkPlaces";
     public static final String API_KMD_CARE_CITIZEN = "/api/v1/kmdNexus/citizen/preferences/{unitId}";
+    public static final String KMD_CARE_CITIZEN_URL = "/api/v1/kmdNexus/citizen/preferences/";
     public static final String API_KMD_CARE_CITIZEN_GRANTS = "/api/v1/kmdNexus/citizen/grants";
     public static final String API_KMD_CARE_CITIZEN_RELATIVE_DATA = "/api/v1/kmdNexus/citizen/nextToKin";
-    public static final String API_KMD_CARE_STAFF_SHIFTS = "/api/v1/kmdNexus/citizen/unit/";
+    public static final String API_KMD_CARE_STAFF_SHIFTS = "/api/v1/kmdNexus/citizen/unit/{unitId}/getShifts/{filterId}";
+    public static final String API_KMD_CARE_TIME_SLOTS = "/api/v1/kmdNexus/citizen/unit/{unitId}/getTimeSlots";
+    public static final String API_KMD_CARE_URL= "/api/v1/kmdNexus/citizen/unit/";
     public static final String API_TIME_SLOTS_NAME = "/api/v1/organization/{organizationId}/time_slot_name";
 
     public static final String API_CREDENTIAL_UPDATE_URL = "/api/v1/user/password";
@@ -144,6 +147,7 @@ public class AppConstants {
     public static final String KMD_NEXUS_PATIENT_RELATIVE_CONTACT = "https://test.avaleo.net/mobile/unity/v2/patients/%s/overview?relativeContactLimit=3";
     public static final String KMD_NEXUS_CALENDAR_STAFFS_SHIFT_FILTER = "https://test.avaleo.net/mobile/unity/v2/calendar/events/criteria/EVENT/%s";
     public static final String KMD_NEXUS_STAFFS_DETAILS = "https://nexus-test.kmd.dk/mobile/unity/v2/professionals/%s";
+    public static final String KMD_NEXUS_GET_TIME_SLOTS = "https://test.avaleo.net/mobile/unity/v2/shifts";
 
     //Control panel unique keys
     public static final String IMPORT_TIMECARE_SHIFTS = "IMPORT_TIMECARE_SHIFTS";
@@ -152,6 +156,7 @@ public class AppConstants {
     public static final String IMPORT_KMD_CITIZEN_GRANTS = "IMPORT_KMD_CITIZEN_GRANTS";
     public static final String IMPORT_KMD_STAFF_AND_WORKING_HOURS = "IMPORT_KMD_STAFF_AND_WORKING_HOURS";
     public static final String IMPORT_KMD_TASKS = "IMPORT_KMD_TASKS";
+    public static final String IMPORT_KMD_TIME_SLOTS = "IMPORT_KMD_TIME_SLOTS";
     public static final String DATA_SAVED_FROM_SERVICE = "Data saved from Service";
     public static final String REQUEST_FROM_TIME_CARE = "TIME_CARE";
     public static final String REQUEST_FROM_KMD = "KMD";
