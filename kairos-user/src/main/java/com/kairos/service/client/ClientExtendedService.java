@@ -96,7 +96,7 @@ public class ClientExtendedService extends UserBaseService {
 
 
     public NextToKinDTO saveNextToKin(long unitId, long clientId, NextToKinDTO nextToKinDTO) {
-        Client client = clientGraphRepository.findOne(clientId, unitId);
+        Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
@@ -254,7 +254,7 @@ public class ClientExtendedService extends UserBaseService {
     }
 
     public NextToKinDTO updateNextToKinDetail(long unitId,long nextToKinId,NextToKinDTO nextToKinDTO, long clientId){
-        Client nextToKin = clientGraphRepository.findOne(nextToKinId,unitId);
+        Client nextToKin = clientGraphRepository.findOne(nextToKinId);
         if(!Optional.ofNullable(nextToKin).isPresent()){
             logger.debug("Finding next to kin by id " + nextToKinId);
             throw new DataNotFoundByIdException("Incorrect id of next to kin " + nextToKinId);
