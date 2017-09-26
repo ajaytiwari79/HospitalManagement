@@ -1042,7 +1042,7 @@ public class ClientService extends UserBaseService {
 
         Client citizen = clientGraphRepository.findOne(citizenId, 1);
         if (citizen.getHomeAddress() == null) {
-            throw new DataNotFoundByIdException(citizen.getFirstName() + "'s HomeAddress in not available");
+            throw new DataNotFoundByIdException(citizen.getFirstName() + "'s Home Address is not available");
         }
         Map<String, Object> citizenPlanningMap = new HashMap<>();
         List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(citizenId);
