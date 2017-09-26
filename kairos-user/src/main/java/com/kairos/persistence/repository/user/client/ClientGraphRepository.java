@@ -255,9 +255,6 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
 
 
-    @Query("Match (nextToKin:Client)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress) where id(nextToKin)={0} return homeAddress")
-    ContactAddress getHomeAddressOfNextOfKin(Long nextToKinId);
-
     @Query("Match (nextToKin:Client)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress) where id(nextToKin)={0} return id(homeAddress)")
     Long getIdOfHomeAddress(Long nextToKinId);
 
