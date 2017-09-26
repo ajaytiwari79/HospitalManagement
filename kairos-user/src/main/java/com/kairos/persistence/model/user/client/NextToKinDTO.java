@@ -144,7 +144,7 @@ public class NextToKinDTO {
         this.relationTypeId = relationTypeId;
     }
 
-    public NextToKinDTO buildResponse(Client nextToKin, String serverUrl){
+    public NextToKinDTO buildResponse(Client nextToKin, String serverUrl, long relationTypeId){
         ObjectMapper objectMapper = new ObjectMapper();
         this.id = nextToKin.getId();
         this.firstName = nextToKin.getFirstName();
@@ -158,6 +158,7 @@ public class NextToKinDTO {
         this.profilePic = serverUrl + nextToKin.getProfilePic();
         this.contactDetail = nextToKin.getContactDetail();
         this.cprNumber = nextToKin.getCprNumber();
+        this.relationTypeId = relationTypeId;
         return this;
     }
 

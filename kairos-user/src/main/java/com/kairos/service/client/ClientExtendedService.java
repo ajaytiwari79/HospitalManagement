@@ -126,7 +126,7 @@ public class ClientExtendedService extends UserBaseService {
         if(!gettingServicesFromOrganization(nextToKin.getId(),nextToKin.getId())){
             assignOrganizationToNextToKin(nextToKin, unitId);
         }
-        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator);
+        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator, nextToKinDTO.getRelationTypeId());
     }
 
     private Client validateCPRNumber(String cprNumber){
@@ -238,11 +238,8 @@ public class ClientExtendedService extends UserBaseService {
 
         if (Optional.ofNullable(relationTypeId).isPresent()) {
             RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);
-            logger.info("relationType---------------> "+ relationType.getId());
-            logger.info("nextToKin---------------> "+ nextToKin.getId());
 
                 clientGraphRepository.removeClientRelationType( clientId,  nextToKin.getId());
-
             ClientRelationTypeRelationship clientRelationTypeRelationship = new ClientRelationTypeRelationship();
             clientRelationTypeRelationship.setRelationType(relationType);
             clientRelationTypeRelationship.setNextToKin(nextToKin);
@@ -272,7 +269,7 @@ public class ClientExtendedService extends UserBaseService {
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, clientId);
         logger.debug("Preparing response");
         clientGraphRepository.save(nextToKin);
-        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator);
+        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator, nextToKinDTO.getRelationTypeId());
     }
 
     public Map<String, Object> setTransportationDetails(Client client) {

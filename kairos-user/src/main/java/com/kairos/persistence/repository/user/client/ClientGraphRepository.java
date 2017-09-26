@@ -244,9 +244,13 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client{citizenDead:false})-[r:"+HAS_LOCAL_AREA_TAG+"]-(lat:LocalAreaTag) where id(lat)= {0} return c")
     List<Client> getClientsByLocalAreaTagId(long localAreaTagId);
 
-    @Query( "MATCH (client:Client)-[:"+NEXT_TO_KIN+"]->(nextToKin:client) where id(client)= {0} AND id(nextToKin)= {1} with nextToKin\n"+
+    @Query( "MATCH (client:Client)-[:"+NEXT_TO_KIN+"]->(nextToKin:Client) where id(client)= {0} AND id(nextToKin)= {1} with nextToKin\n"+
             "MATCH (nextToKin)-[r:"+HAS_RELATION_OF+"]->(relationType:RelationType) delete r")
     void removeClientRelationType(long clientId, long nextToKinId);
+
+    @Query( "MATCH (client:Client)-[:"+NEXT_TO_KIN+"]->(nextToKin:Client) where id(client)= {0} AND id(nextToKin)= {1} with nextToKin\n"+
+            "MATCH (nextToKin)-[r:"+HAS_RELATION_OF+"]->(relationType:RelationType) return count(r)>0")
+    Boolean hasClientRelationType(long clientId, long nextToKinId);
 
 
 
