@@ -255,8 +255,14 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
 
 
-    @Query("Match (nextToKin:Client)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) where id(nextToKin)={0} return homeAddress")
+    @Query("Match (nextToKin:Client)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress) where id(nextToKin)={0} return homeAddress")
     ContactAddress getHomeAddressOfNextOfKin(Long nextToKinId);
+
+    @Query("Match (nextToKin:Client)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress) where id(nextToKin)={0} return id(homeAddress)")
+    Long getIdOfHomeAddress(Long nextToKinId);
+
+    @Query("Match (nextToKin:Client)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) where id(nextToKin)={0} return contactDetail")
+    ContactDetail getContactDetailOfNextToKin(Long nextToKinId);
 
     @Query("Match (citizen:Client) where id(citizen)={0} with citizen\n" +
             "Match (nextToKin:Client) where id(nextToKin)={1} with nextToKin,citizen\n" +

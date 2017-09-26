@@ -102,28 +102,41 @@ public class ClientExtendedService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
         Client nextToKin = validateCPRNumber(nextToKinDTO.getCprNumber());
+        Long homeAddressId = null;
+        ContactDetail contactDetail = null;
         if(!Optional.ofNullable(nextToKin).isPresent()){
             nextToKin = new Client();
+        } else {
+            homeAddressId = clientGraphRepository.getIdOfHomeAddress(nextToKin.getId());
+             contactDetail = clientGraphRepository.getContactDetailOfNextToKin(nextToKin.getId());
+        }
+        ContactAddress homeAddress;
+        if(!Optional.ofNullable(homeAddressId).isPresent()){
+            homeAddress = ContactAddress.getInstance();
+        } else {
+            homeAddress = contactAddressGraphRepository.findOne(homeAddressId);
         }
 
+        if(!Optional.ofNullable(contactDetail).isPresent()){
+            contactDetail = new ContactDetail();
+        }
         nextToKin.saveBasicDetail(nextToKinDTO);
         nextToKin.setProfilePic(nextToKinDTO.getProfilePic());
-        saveContactDetailOfNextToKin(nextToKinDTO, nextToKin);
-        ContactAddress contactAddress = ContactAddress.getInstance();
-        contactAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),
-                false,contactAddress);
-        if (!Optional.ofNullable(contactAddress).isPresent()) {
+        nextToKin.saveContactDetail(nextToKinDTO, contactDetail);
+        nextToKin.setContactDetail(contactDetail);
+        homeAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),homeAddress);
+        if (!Optional.ofNullable(homeAddress).isPresent()) {
             return null;
         }
         saveCivilianStatus(nextToKinDTO,nextToKin);
 
-        nextToKin.setHomeAddress(contactAddress);
+        nextToKin.setHomeAddress(homeAddress);
         save(nextToKin);
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, client.getId());
         if(!hasAlreadyNextToKin(clientId,nextToKin.getId())){
             createNextToKinRelationship(client, nextToKin);
         }
-        if(!gettingServicesFromOrganization(nextToKin.getId(),nextToKin.getId())){
+        if(!gettingServicesFromOrganization(nextToKin.getId(),unitId)){
             assignOrganizationToNextToKin(nextToKin, unitId);
         }
         return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator, nextToKinDTO.getRelationTypeId());
@@ -159,7 +172,7 @@ public class ClientExtendedService extends UserBaseService {
 
 
     private ContactAddress verifyAndSaveAddressOfNextToKin(long unitId, AddressDTO addressDTO,
-                                                           boolean isAddressToUpdate,ContactAddress contactAddressToSave) {
+                                                           ContactAddress contactAddressToSave) {
 
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
@@ -175,9 +188,7 @@ public class ClientExtendedService extends UserBaseService {
                 throw new DataNotFoundByIdException("Incorrect zip code value " + addressDTO.getZipCodeValue());
             }
         } else {
-            ObjectMapper objectMapper = new ObjectMapper();
-            AddressDTO dto = objectMapper.convertValue(addressDTO,AddressDTO.class);
-            Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(dto, unitId);
+            Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, unitId);
             if (!Optional.ofNullable(tomtomResponse).isPresent()) {
                 logger.debug("Address not verified by TomTom ");
                 return null;
@@ -208,13 +219,6 @@ public class ClientExtendedService extends UserBaseService {
         contactAddressToSave.setFloorNumber(addressDTO.getFloorNumber());
         contactAddressToSave.setCity(zipCode.getName());
         return contactAddressToSave;
-    }
-
-    private void saveContactDetailOfNextToKin(NextToKinDTO nextToKinDTO, Client nextToKin) {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        ContactDetail contactDetail = objectMapper.convertValue(nextToKinDTO.getContactDetail(), ContactDetail.class);
-        nextToKin.setContactDetail(contactDetail);
     }
 
     private void saveCivilianStatus(NextToKinDTO nextToKinDTO, Client nextToKin) {
@@ -256,15 +260,24 @@ public class ClientExtendedService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect id of next to kin " + nextToKinId);
         }
         nextToKin.saveBasicDetail(nextToKinDTO);
-        ContactAddress homeAddress = clientGraphRepository.getHomeAddressOfNextOfKin(nextToKinId);
-        if(!Optional.ofNullable(homeAddress).isPresent()){
+        Long homeAddressId = clientGraphRepository.getIdOfHomeAddress(nextToKinId);
+        if(!Optional.ofNullable(homeAddressId).isPresent()){
             throw new DataNotFoundByIdException("Home address not found");
         }
-        homeAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(), true,homeAddress);
+
+
+        ContactAddress homeAddress = contactAddressGraphRepository.findOne(homeAddressId);
+        homeAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),homeAddress);
         if (!Optional.ofNullable(homeAddress).isPresent()) {
             return null;
         }
         nextToKin.setHomeAddress(homeAddress);
+        ContactDetail contactDetail = clientGraphRepository.getContactDetailOfNextToKin(nextToKinId);
+        if(!Optional.ofNullable(contactDetail).isPresent()){
+            throw new DataNotFoundByIdException("Contact detail not found");
+        }
+        nextToKin.saveContactDetail(nextToKinDTO,contactDetail);
+        nextToKin.setContactDetail(contactDetail);
         saveCivilianStatus(nextToKinDTO,nextToKin);
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, clientId);
         logger.debug("Preparing response");
