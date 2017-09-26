@@ -25,7 +25,7 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
     Map<String,Object> updateStandardTimeSlot(long unitId, long timeSlotId, int startHour, int startMinute, int endHour, int endMinute, boolean isShiftStartTime);
 
     @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND id(timeSlot)={1}\n" +
-            "Match (organization)-[r:"+ORGANIZATION_TIME_SLOT+"]->(timeSlot:TimeSlot) set r.name={2},r.startHour={3},r.startMinute={4},r.endHour={5},r.endMinute={6},r.isShiftStartTime={6} return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
+            "Match (organization)-[r:"+ORGANIZATION_TIME_SLOT+"]->(timeSlot:TimeSlot) set r.name={2},r.startHour={3},r.startMinute={4},r.endHour={5},r.endMinute={6},r.isShiftStartTime={7} return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
     Map<String,Object> updateAdvanceTimeSlot(long unitId, long timeSlotId, String name, int startHour, int startMinute, int endHour, int endMinute, boolean isShiftStartTime);
 
     @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND id(timeSlot)={1}\n" +
