@@ -175,8 +175,7 @@ public class AuthController {
 
     @RequestMapping(value = "/user/organizations", method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getCurrentUserOrganizationList() {
-        List<Map<String, Object>> organizationList =  userService.getOrganizations(UserContext.getUserDetails().getId());
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationList);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getOrganizations(UserContext.getUserDetails().getId()));
     }
 
     @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/permissions", method = RequestMethod.GET)

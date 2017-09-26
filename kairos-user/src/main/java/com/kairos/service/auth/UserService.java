@@ -1,8 +1,11 @@
 package com.kairos.service.auth;
+
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.auth.UserAuthentication;
+import com.kairos.persistence.model.user.auth.UserPermission;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -189,10 +192,6 @@ public class UserService extends UserBaseService {
         return userGraphRepository.findAndRemoveAccessToken(accessToken);
     }
 
-    public User findByUserName(String userName) {
-        return userGraphRepository.findByUserName(userName);
-    }
-
     public User generateTokenToUser(User currentUser) {
         currentUser.setAccessToken(UUID.randomUUID().toString().toUpperCase());
         userGraphRepository.save(currentUser);
@@ -209,68 +208,11 @@ public class UserService extends UserBaseService {
         return true;
     }
 
-    public User validateUserToken(String token) {
-
-        return findByAccessToken(token);
-
-    }
-
-    public List<Map<String, Object>> getOrganizations(long userId) {
-
+    public List<OrganizationWrapper> getOrganizations(long userId) {
         long startTime = System.currentTimeMillis();
-
-        Map<String, Object> orgData;
-        List<Map<String, Object>> organizationList = new ArrayList<>();
-        Set<Long> accessPageModuleIds;
-        Set<Long> accessPageTabIds;
-        List<Map<String, Object>> validAccessPage;
-        boolean isDuplicateElementExist = false;
-        for (Map<String, Object> parentOrganization : userGraphRepository.getOrganizations(userId)) {
-
-            orgData = (Map<String, Object>) parentOrganization.get("result");
-
-            Map<String, Object> organization = new HashMap<>();
-            organization.put("id", orgData.get("id"));
-            organization.put("name", orgData.get("name"));
-/*
-            accessPageModuleIds = new HashSet<>();
-            validAccessPage = new ArrayList<>();
-            for (Map<String, Object> accessModule : (List<Map<String, Object>>) orgData.get("accessPage")) {
-                if (!accessPageModuleIds.add((long) accessModule.get("id")) && (boolean) accessModule.get("read")) {
-                    for (Iterator<Map<String, Object>> iter = validAccessPage.iterator(); iter.hasNext(); ) {
-                        Map<String, Object> map = iter.next();
-                        if ((long) map.get("id") == (long) accessModule.get("id"))
-                            iter.remove();
-                    }
-                }
-                accessPageTabIds = new HashSet<>();
-                List<Map<String, Object>> tabs = new ArrayList<>();
-                for (Map<String, Object> accessTab : (List<Map<String, Object>>) accessModule.get("tabPermissions")) {
-                    if (!accessPageTabIds.add((long) accessTab.get("id")) && (boolean) accessTab.get("read")) {
-                        for (Iterator<Map<String, Object>> iter = tabs.iterator(); iter.hasNext(); ) {
-                            Map<String, Object> map = iter.next();
-                            if ((long) map.get("id") == (long) accessTab.get("id") && !(boolean) map.get("write")) {
-                                iter.remove();
-                                isDuplicateElementExist = true;
-                            }
-                        }
-                    }
-                    if (!isDuplicateElementExist)
-                        tabs.add(accessTab);
-                }
-                Map<String, Object> modules = new HashMap<>();
-                modules.put("id", accessModule.get("id"));
-                modules.put("name", accessModule.get("name"));
-                modules.put("read", accessModule.get("read"));
-                modules.put("tabPermissions", tabs);
-                validAccessPage.add(modules);
-            }
-            organization.put("modulePermissions", validAccessPage);*/
-            organizationList.add(organization);
-        }
         long endTime = System.currentTimeMillis();
         logger.info("Execution Time :(UserService:getOrganizations) " + (endTime - startTime) + " ms");
-        return organizationList;
+        return userGraphRepository.getOrganizations(userId);
     }
 
     /**
@@ -549,5 +491,40 @@ public class UserService extends UserBaseService {
         return subPages;
     }
 
+    public List<UserPermission> getTabPermission(Long userId){
 
+        List<OrganizationWrapper> parentOrganizations = userGraphRepository.getOrganizations(userId);
+        List<UserPermission> userPermissions = new ArrayList<>();
+        parentOrganizations.forEach(parentOrganization->{
+            List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(parentOrganization.getId());
+            List<AccessPageQueryResult> mainModulePermissions = accessPageRepository.getPermissionOfMainModule(parentOrganization.getId(), userId);
+            List<AccessPageQueryResult> tabPermissions;
+            if(parentOrganization.isKairosHub()){
+                tabPermissions = accessPageRepository.getTabsPermissionForHubMember();
+            } else {
+                tabPermissions = accessPageRepository.getTabPermissionForUnit(parentOrganization.getId(), userId);
+            }
+            List<AccessPageQueryResult> allTabPermissionsForParentOrganization = new ArrayList<>();
+            allTabPermissionsForParentOrganization.addAll(mainModulePermissions);
+            allTabPermissionsForParentOrganization.addAll(tabPermissions);
+            UserPermission userPermissionForParentOrganization = new UserPermission(parentOrganization.getId(),allTabPermissionsForParentOrganization);
+            userPermissions.add(userPermissionForParentOrganization);
+            units.forEach(unit->{
+                List<AccessPageQueryResult> modulePermissions = accessPageRepository.getPermissionOfMainModule(unit.getId(), userId);
+                List<AccessPageQueryResult> accessPageQueryResults;
+                if(unit.isKairosHub()){
+                    accessPageQueryResults = accessPageRepository.getTabsPermissionForHubMember();
+                } else {
+                    accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), userId);
+                }
+                List<AccessPageQueryResult> allTabPermissionsForUnit = new ArrayList<>();
+                allTabPermissionsForUnit.addAll(modulePermissions);
+                allTabPermissionsForUnit.addAll(accessPageQueryResults);
+
+                UserPermission userPermissionForUnit = new UserPermission(unit.getId(),allTabPermissionsForUnit);
+                userPermissions.add(userPermissionForUnit);
+            });
+        });
+        return userPermissions;
+    }
 }

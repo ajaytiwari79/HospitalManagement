@@ -1,4 +1,6 @@
 package com.kairos.persistence.repository.user.auth;
+
+import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.auth.User;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
@@ -37,8 +39,8 @@ public interface UserGraphRepository extends GraphRepository<User> {
     void safeDelete(Long aLong);
 
     @Query("Match (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with organization\n" +
-            "return {id:id(organization),name:organization.name} as result")
-    List<Map<String, Object>> getOrganizations(long userId);
+            "return id(organization) as id,organization.name as name,organization.isKairosHub as isKairosHub")
+    List<OrganizationWrapper> getOrganizations(long userId);
 
     @Query("Match (accessPage:AccessPage) where id(accessPage)={0}\n" +
             "Match (accessPage)-[:SUB_PAGE*]->(subPage:AccessPage) with subPage\n" +
