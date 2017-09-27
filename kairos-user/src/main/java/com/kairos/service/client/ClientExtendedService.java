@@ -141,7 +141,8 @@ public class ClientExtendedService extends UserBaseService {
         if(!gettingServicesFromOrganization(nextToKin.getId(),unitId)){
             assignOrganizationToNextToKin(nextToKin, unitId);
         }
-        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator, nextToKinDTO.getRelationTypeId());
+        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator,
+                nextToKinDTO.getRelationTypeId(),nextToKinDTO);
     }
 
     private Client validateCPRNumber(String cprNumber){
@@ -289,7 +290,8 @@ public class ClientExtendedService extends UserBaseService {
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, clientId);
         logger.debug("Preparing response");
         clientGraphRepository.save(nextToKin);
-        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator, nextToKinDTO.getRelationTypeId());
+        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator,
+                nextToKinDTO.getRelationTypeId(),nextToKinDTO);
     }
 
     public Map<String, Object> setTransportationDetails(Client client) {
