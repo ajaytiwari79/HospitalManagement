@@ -62,7 +62,6 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.organization.OpenningHourService;
 import com.kairos.service.organization.OrganizationTypeService;
 import com.kairos.service.organization.TeamService;
-import com.kairos.service.phase.PhaseService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import org.joda.time.DateTime;
@@ -165,13 +164,7 @@ public class BootDataService {
     private AccessPageService accessPageService;
     @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
-    @Inject
-    private PhaseService phaseService;
-
-
-
-
-    private List<Long> skillList;
+     private List<Long> skillList;
     private com.kairos.persistence.model.organization.OrganizationService homeCareService;
 
     private com.kairos.persistence.model.organization.OrganizationService medicalCareService;
@@ -256,8 +249,7 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
-        phaseService.createPhases();
-        phaseService.linkPhasesWithAllOrganizations();
+       // phaseService.linkPhasesWithAllOrganizations();
 
         startRegisteredCronJobs();
 
@@ -583,7 +575,7 @@ public class BootDataService {
         contactDetail.setWorkPhone("765436");
         nextKin.setContactDetail(contactDetail);
 
-        johnOliver.setNextToKin(nextKin);
+//        johnOliver.setNextToKin(nextKin);
 
         johnOliver.setClientAllergiesList(Arrays.asList(
                 new ClientAllergies("type1 ", "Allergy1", true, new String[]{"Avoid1", "Avoid2", "Avoid3"}

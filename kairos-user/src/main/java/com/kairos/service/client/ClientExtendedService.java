@@ -1,15 +1,17 @@
 package com.kairos.service.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.*;
+import com.kairos.persistence.model.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
@@ -90,7 +92,155 @@ public class ClientExtendedService extends UserBaseService {
     private AccessToLocationGraphRepository accessToLocationGraphRepository;
 
 
-    public Map<String, Object> updateNextToKin(NextToKinDTO kinDTO, long unitId, long clientId) {
+    public NextToKinQueryResult saveNextToKin(long unitId, long clientId, NextToKinDTO nextToKinDTO) {
+        Client client = clientGraphRepository.findOne(clientId, unitId);
+        if (client == null) {
+            logger.debug("Searching client with id " + clientId + " in unit " + unitId);
+            throw new DataNotFoundByIdException("Incorrect client " + clientId);
+        }
+        validateCPRNumber(nextToKinDTO.getCprNumber(),unitId);
+        Client nextToKin = new Client();
+        nextToKin.saveBasicDetail(nextToKinDTO);
+        nextToKin.setProfilePic(nextToKinDTO.getProfilePic());
+        saveContactDetailOfNextToKIbn(nextToKinDTO, nextToKin);
+        ContactAddress contactAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),
+                false);
+        if (!Optional.ofNullable(contactAddress).isPresent()) {
+            return null;
+        }
+        saveCivilianStatus(nextToKinDTO,nextToKin);
+        nextToKin.setHomeAddress(contactAddress);
+        createNextToKinRelationship(client, nextToKin);
+        assignOrganizationToNextToKin(nextToKin, unitId);
+        return new NextToKinQueryResult().buildResponse(nextToKin,envConfig.getServerHost() + File.separator);
+    }
+
+    private boolean validateCPRNumber(String cprNumber,long unitId){
+        Client client = clientGraphRepository.findByCPRNumber(cprNumber.trim());
+        if(Optional.ofNullable(client).isPresent() && client.isCitizenDead()){
+            throw new DuplicateDataException("You can't enter the CPR of dead citizen " + cprNumber);
+        } else if(Optional.ofNullable(client).isPresent() && relationService.checkClientOrganizationRelation(client.getId(), unitId)>0){
+            logger.debug("CPR number already exist " +cprNumber);
+            throw new DataNotFoundByIdException("CPR number already exist " + cprNumber);
+        } else {
+            return true;
+        }
+    }
+
+    private void createNextToKinRelationship(Client client, Client nextToKin) {
+        ClientNextToKinRelationship clientNextToKinRelationship = new ClientNextToKinRelationship();
+        clientNextToKinRelationship.setClient(client);
+        clientNextToKinRelationship.setNextToKin(nextToKin);
+        save(clientNextToKinRelationship);
+    }
+
+    private void assignOrganizationToNextToKin(Client nextToKin, long unitId) {
+        relationGraphRepository.createClientRelationWithOrganization(nextToKin.getId(), unitId, new DateTime().getMillis(),
+                UUID.randomUUID().toString().toUpperCase());
+    }
+
+
+    private ContactAddress verifyAndSaveAddressOfNextToKin(long unitId, AddressDTO addressDTO, boolean isAddressToUpdate) {
+
+        ContactAddress contactAddressToSave;
+        if (isAddressToUpdate) {
+            contactAddressToSave = contactAddressGraphRepository.findOne(addressDTO.getId());
+            if (!Optional.ofNullable(contactAddressToSave).isPresent()) {
+                throw new DataNotFoundByIdException("Address not found for update " + addressDTO.getId());
+            }
+        } else {
+            contactAddressToSave = new ContactAddress();
+        }
+
+        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
+        if (municipality == null) {
+            logger.debug("Finding municiplaity using id " + addressDTO.getMunicipalityId());
+            throw new DataNotFoundByIdException("Incorrect municipality id " + addressDTO.getMunicipalityId());
+        }
+
+        ZipCode zipCode;
+        if (addressDTO.isVerifiedByGoogleMap()) {
+            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
+            if (!Optional.ofNullable(zipCode).isPresent()) {
+                logger.debug("Finding zip code in database by zip code value " + addressDTO.getZipCodeValue());
+                throw new DataNotFoundByIdException("Incorrect zip code value " + addressDTO.getZipCodeValue());
+            }
+        } else {
+            Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, unitId);
+            if (!Optional.ofNullable(tomtomResponse).isPresent()) {
+                logger.debug("Address not verified by TomTom ");
+                return null;
+            }
+            contactAddressToSave.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
+            contactAddressToSave.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
+            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
+            if (zipCode == null) {
+                logger.debug("ZipCode Not Found returning null");
+                return null;
+            }
+        }
+        Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
+        if (geographyData == null) {
+            logger.info("Geography  not found with municipality id: " + municipality.getId());
+            throw new InternalError("Geography data not found with provided municipality" + municipality);
+        }
+        contactAddressToSave.setMunicipality(municipality);
+        contactAddressToSave.setProvince(String.valueOf(geographyData.get("provinceName")));
+        contactAddressToSave.setCountry(String.valueOf(geographyData.get("countryName")));
+        contactAddressToSave.setRegionName(String.valueOf(geographyData.get("regionName")));
+        contactAddressToSave.setCountry(String.valueOf(geographyData.get("countryName")));
+        contactAddressToSave.setZipCode(zipCode);
+
+        // Native Details
+        contactAddressToSave.setStreet1(addressDTO.getStreet1());
+        contactAddressToSave.setHouseNumber(addressDTO.getHouseNumber());
+        contactAddressToSave.setFloorNumber(addressDTO.getFloorNumber());
+        contactAddressToSave.setCity(addressDTO.getZipCodeName());
+        return contactAddressToSave;
+    }
+
+    private void saveContactDetailOfNextToKIbn(NextToKinDTO nextToKinDTO, Client nextToKin) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ContactDetail contactDetail = objectMapper.convertValue(nextToKinDTO.getContactDetail(), ContactDetail.class);
+        nextToKin.setContactDetail(contactDetail);
+    }
+
+    private void saveCivilianStatus(NextToKinDTO nextToKinDTO, Client nextToKin) {
+
+        if (Optional.ofNullable(nextToKinDTO.getCivilianStatus()).isPresent()) {
+            CitizenStatus citizenStatus = citizenStatusGraphRepository.findOne(nextToKinDTO.getCivilianStatus().getId());
+            if (!Optional.ofNullable(citizenStatus).isPresent()) {
+                logger.debug("Finding civilian status using id " + nextToKinDTO.getCivilianStatus().getId());
+                throw new DataNotFoundByIdException("Incorrect id of civilian status " + citizenStatus);
+            }
+            nextToKin.setCivilianStatus(citizenStatus);
+        } else {
+            throw new DataNotFoundByIdException("Civilian status can't be empty");
+        }
+    }
+
+    public NextToKinQueryResult updateNextToKinDetail(long unitId,long nextToKinId,NextToKinDTO nextToKinDTO){
+        Client nextToKin = clientGraphRepository.findOne(nextToKinId,unitId);
+        if(!Optional.ofNullable(nextToKin).isPresent()){
+            logger.debug("Finding next to kin by id " + nextToKinId);
+            throw new DataNotFoundByIdException("Incorrect id of next to kin " + nextToKinId);
+        }
+        nextToKin.saveBasicDetail(nextToKinDTO);
+        ContactAddress contactAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(), true);
+        if (!Optional.ofNullable(contactAddress).isPresent()) {
+            return null;
+        }
+        nextToKin.setHomeAddress(contactAddress);
+        saveCivilianStatus(nextToKinDTO,nextToKin);
+        logger.debug("Preparing response");
+        clientGraphRepository.save(nextToKin);
+        return new NextToKinQueryResult().buildResponse(nextToKin,envConfig.getServerHost() + File.separator);
+    }
+
+
+
+    /*public Map<String, Object> updateNextToKin(NextToKinDTO kinDTO, long unitId, long clientId) {
         Client nextToKin = (kinDTO.getId() == null) ? new Client() : clientGraphRepository.findOne(kinDTO.getId());
         if (nextToKin == null) {
             throw new InternalError("Next to kin is null");
@@ -100,10 +250,9 @@ public class ClientExtendedService extends UserBaseService {
         nextToKin.setLastName(kinDTO.getLastName());
         nextToKin.setNickName(kinDTO.getNickName());
 
-        List<Client> clientList = clientGraphRepository.findAllByCPRNumber(String.valueOf(kinDTO.getCprNumber()));
-        if (clientList.size() > 1) {
-            logger.debug("More than 1 Client found with provided  CPR Number");
-            throw new DataNotFoundByIdException("Citizen with provided CPR already exist: " + clientList.get(0).getFirstName() + " " + clientList.get(0).getLastName());
+        if (clientGraphRepository.getClientByCPRNumber(String.valueOf(kinDTO.getCprNumber())) > 1) {
+            logger.debug("CPR number already exist " + kinDTO.getCprNumber());
+            throw new DataNotFoundByIdException("CPR number already exist " + kinDTO.getCprNumber());
         }
 
 
@@ -275,7 +424,7 @@ public class ClientExtendedService extends UserBaseService {
 
         return nextToKinDetails;
 
-    }
+    }*/
 
     public Map<String, Object> setTransportationDetails(Client client) {
         Client currentClient = clientGraphRepository.findOne(client.getId());
@@ -494,7 +643,7 @@ public class ClientExtendedService extends UserBaseService {
             detail.setMobilePhone(String.valueOf(socialMediaDetail.getMobilePhone()));
             detail.setWorkPhone(String.valueOf(socialMediaDetail.getWorkPhone()));
             detail.setPrivatePhone(String.valueOf(socialMediaDetail.getPrivatePhone()));
-            detail.setWorkEmail(String.valueOf(socialMediaDetail.getWorkEmail()));
+            detail.setPrivateEmail(String.valueOf(socialMediaDetail.getWorkEmail()));
             detail.setEmergencyPhone(String.valueOf(socialMediaDetail.getEmergencyPhone()));
             detail.setHideEmergencyPhone(socialMediaDetail.isHideEmergencyPhone());
             currentClient.setContactDetail(contactDetailsGraphRepository.save(detail));
@@ -559,20 +708,12 @@ public class ClientExtendedService extends UserBaseService {
         if (accessToLocation == null) {
             return null;
         }
-
         String fileName = new Date().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
-        try {
-            if (new File(IMAGES_PATH).isDirectory()) {
-                logger.debug("Writing file to: " + path.toString());
-                FileUtil.writeFile(path, multipartFile);
-            }
-        } catch (IOException e) {
-            logger.debug("IO exception " + e);
-            fileName = null;
-        } catch (Exception e) {
-            fileName = null;
+        if(new File(IMAGES_PATH).isDirectory()){
+            logger.debug("Writing file to: " + path.toString());
+            FileUtil.writeFile(path, multipartFile);
         }
         accessToLocation.setAccessPhotoURL(fileName);
         accessToLocationGraphRepository.save(accessToLocation);
@@ -588,6 +729,40 @@ public class ClientExtendedService extends UserBaseService {
         accessToLocationGraphRepository.save(accessToLocation);
     }
 
+    public HashMap<String, String> uploadImageOfNextToKin(MultipartFile multipartFile){
+        String fileName = writeFile(multipartFile);
+        HashMap<String,String> imageurls = new HashMap<>();
+        imageurls.put("profilePic",fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + File.separator + fileName);
+        return imageurls;
+    }
+
+    private String writeFile(MultipartFile multipartFile){
+        String fileName = new Date().getTime() + multipartFile.getOriginalFilename();
+        createDirectory(IMAGES_PATH);
+        final String path = IMAGES_PATH + File.separator + fileName.trim();
+        if(new File(IMAGES_PATH).isDirectory()){
+            logger.debug("Writing file to: " + path.toString());
+            FileUtil.writeFile(path, multipartFile);
+        }
+        return fileName;
+    }
+
+    public HashMap<String,String> updateImageOfNextToKin(long unitId,long nextToKinId,MultipartFile multipartFile){
+        Client nextToKin = clientGraphRepository.findOne(nextToKinId,unitId);
+        if(nextToKin == null){
+            logger.debug("Searching client with id " + nextToKin + " in unit " + unitId);
+            throw new DataNotFoundByIdException("Incorrect client " + nextToKin);
+        }
+        String fileName = writeFile(multipartFile);
+        nextToKin.setProfilePic(fileName);
+        clientGraphRepository.save(nextToKin);
+        HashMap<String,String> imageurls = new HashMap<>();
+        imageurls.put("profilePic",fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + File.separator + fileName);
+        return imageurls;
+    }
+
 
     public String uploadPortrait(Long clientId, MultipartFile multipartFile) {
         Client client = clientGraphRepository.findOne(clientId);
@@ -599,16 +774,9 @@ public class ClientExtendedService extends UserBaseService {
         String fileName = new Date().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
-        try {
-            if (new File(IMAGES_PATH).isDirectory()) {
-                logger.debug("Writing file to: " + path.toString());
-                FileUtil.writeFile(path, multipartFile);
-            }
-        } catch (IOException e) {
-            logger.debug("IO exception " + e);
-            fileName = null;
-        } catch (Exception e) {
-            fileName = null;
+        if(new File(IMAGES_PATH).isDirectory()){
+            logger.debug("Writing file to: " + path.toString());
+            FileUtil.writeFile(path, multipartFile);
         }
         client.setProfilePic(fileName);
         clientGraphRepository.save(client);

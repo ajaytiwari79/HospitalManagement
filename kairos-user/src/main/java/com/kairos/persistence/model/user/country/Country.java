@@ -65,6 +65,12 @@ public class Country extends UserBaseEntity {
     @Relationship(type = HAS_LEVEL)
     private List<Level> levels;
 
+    @Relationship(type = HAS_RELATION_TYPES)
+    private List<RelationType> relationTypes;
+
+    @Relationship(type = HAS_RESOURCES)
+    private List<Vehicle> resources;
+
     public Country() {
     }
 
@@ -181,5 +187,20 @@ public class Country extends UserBaseEntity {
         List<Level> levels = Optional.ofNullable(this.levels).orElse(new ArrayList<>());
         levels.add(level);
         this.levels = levels;
+    }
+
+    public void addResources(Vehicle vehicle){
+        List<Vehicle> resourceList = Optional.ofNullable(this.resources).orElse(new ArrayList<>());
+        resourceList.add(vehicle);
+        this.resources = resourceList;
+    }
+
+
+    public List<RelationType> getRelationTypes() {
+        return relationTypes;
+    }
+
+    public void setRelationTypes(List<RelationType> relationTypes) {
+        this.relationTypes = relationTypes;
     }
 }

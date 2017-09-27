@@ -14,6 +14,8 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.CountryHolidayCalender;
+import com.kairos.persistence.model.user.country.RelationType;
+import com.kairos.persistence.model.user.country.Vehicle;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -24,16 +26,12 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.google_calender.GoogleCalenderService;
 import com.kairos.util.FormatUtil;
-import com.kairos.util.response.ResponseHandler;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -338,5 +336,76 @@ public class CountryService extends UserBaseService {
 
     public List<Level> getLevels(long countryId){
         return countryGraphRepository.getLevelsByCountry(countryId);
+    }
+
+    public RelationType addRelationType(Long countryId,RelationType relationType){
+        Country country = countryGraphRepository.findOne(countryId);
+        if(country == null){
+            logger.debug("Finding country by id::" + countryId);
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+        List<RelationType> relationTypes = new ArrayList<RelationType>();
+       //check if getRelationTypes is null then it will not add in array list.
+        Optional.ofNullable(country.getRelationTypes()).ifPresent(relationTypesList->relationTypes.addAll(relationTypesList));
+
+        relationTypes.add(relationType);
+        country.setRelationTypes(relationTypes);
+        countryGraphRepository.save(country);
+        return relationType;
+    }
+
+    public List<RelationType> getRelationTypes(Long countryId){
+        return countryGraphRepository.getRelationTypesByCountry(countryId);
+    }
+
+    public boolean deleteRelationType(Long countryId,Long relationTypeId){
+        RelationType relationType = countryGraphRepository.getRelationType(countryId,relationTypeId);
+        if(relationType == null){
+            logger.debug("Finding relation type by id::" + relationTypeId);
+            throw new DataNotFoundByIdException("Incorrect relation type id " + relationTypeId);
+        }
+
+        relationType.setEnabled(false);
+        save(relationType);
+        return true;
+    }
+
+    public Vehicle addVehicle(long countryId, Vehicle vehicle){
+        Country country = countryGraphRepository.findOne(countryId);
+        if(country == null){
+            logger.debug("Finding country by id::" + countryId);
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+
+        country.addResources(vehicle);
+        countryGraphRepository.save(country);
+        return vehicle;
+    }
+
+    public List<Vehicle> getVehicleList(long countryId){
+        return countryGraphRepository.getResourcesByCountry(countryId);
+    }
+
+    public boolean deleteVehicle(long countryId,long resourcesId){
+        Vehicle vehicle = countryGraphRepository.getResources(countryId,resourcesId);
+        if(vehicle == null){
+            logger.debug("Finding vehicle by id::" + resourcesId);
+            throw new DataNotFoundByIdException("Incorrect vehicle id " + resourcesId);
+        }
+
+        vehicle.setEnabled(false);
+        save(vehicle);
+        return true;
+    }
+
+    public Vehicle updateVehicle(long countryId, long resourcesId, Vehicle vehicle){
+        Vehicle vehicleToUpdate = countryGraphRepository.getResources(countryId,resourcesId);
+        if(vehicleToUpdate == null){
+            logger.debug("Finding vehicle by id::" + resourcesId);
+            throw new DataNotFoundByIdException("Incorrect vehicle id " + resourcesId);
+        }
+        vehicleToUpdate.setName(vehicle.getName());
+        vehicleToUpdate.setDescription(vehicle.getDescription());
+        return save(vehicleToUpdate);
     }
 }

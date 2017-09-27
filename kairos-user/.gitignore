@@ -1,7 +1,7 @@
 .gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar
-
+classes
 logs/spring-boot-logging.log
 ### STS ###
 .apt_generated

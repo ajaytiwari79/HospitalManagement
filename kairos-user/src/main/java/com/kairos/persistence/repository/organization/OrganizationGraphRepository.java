@@ -256,7 +256,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r,cs\n" +
             "OPTIONAL MATCH (ca)-[:ZIP_CODE]->(zipCode:ZipCode) with ca,c,r,zipCode,cs \n" +
             "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail)  with cd,ca,c,r,zipCode,cs\n" +
-            "return {name:c.firstName+\" \"+c.lastName,id:id(c),age:c.age,joiningDate:r.joinDate,gender:c.gender,emailId:cd.workEmail,  citizenDead:c.citizenDead ,  civilianStatus:cs.name,contactNo:cd.privatePhone,emergencyNo:cd.emergencyPhone,city:zipCode.name,address:ca.street1+\", \"+ca.houseNumber,zipcode:zipCode.zipCode } as Client ORDER BY c.firstName")
+            "return {name:c.firstName+\" \"+c.lastName,id:id(c),age:c.age,joiningDate:r.joinDate,gender:c.gender,emailId:cd.privateEmail,  citizenDead:c.citizenDead ,  civilianStatus:cs.name,contactNo:cd.privatePhone,emergencyNo:cd.emergencyPhone,city:zipCode.name,address:ca.street1+\", \"+ca.houseNumber,zipcode:zipCode.zipCode } as Client ORDER BY c.firstName")
     List<Map<String, Object>> getAllClientsOfOrganization(long organizationId);
 
 
@@ -480,7 +480,14 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("MATCH (o:Organization) where id(o)={0} return o")
     TimeSlotsDeductionDTO getOrganizationTimeSlotDeductions(Long unitId);
 
+    @Query("MATCH (c:Client{imported:true})-[r:GET_SERVICE_FROM]->(o:Organization) where id(o)= {0}  case when c is NULL then false else true ")
+    Boolean isOrganizationHasExternalReference(Long organizationId);
 
+    @Query("MATCH (country:Country)<-[:"+COUNTRY+"]-(o:Organization) where id(o)={0}  return id(country) ")
+    Long getCountryId(Long organizationId);
+
+    @Query("MATCH (n:Organization) RETURN Id(n)")
+    List<Long> allOrganizationIds();
 
 
 }

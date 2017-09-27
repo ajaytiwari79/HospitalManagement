@@ -31,11 +31,14 @@ public class AppConstants {
 
     public static final String API_TIME_CARE_SHIFTS = "/api/v1/time_care/getShifts";
     public static final String API_TIME_CARE_ACTIVITIES = "/api/v1/time_care/getWorkPlaces";
-    public static final String API_KMD_CARE_CITIZEN = "/api/v1/kmdNexus/citizen/preferences/";
+    public static final String API_KMD_CARE_CITIZEN = "/api/v1/kmdNexus/citizen/preferences/{unitId}";
     public static final String API_KMD_CARE_CITIZEN_GRANTS = "/api/v1/kmdNexus/citizen/grants";
     public static final String API_KMD_CARE_CITIZEN_RELATIVE_DATA = "/api/v1/kmdNexus/citizen/nextToKin";
     public static final String API_KMD_CARE_STAFF_SHIFTS = "/api/v1/kmdNexus/citizen/unit/";
     public static final String API_TIME_SLOTS_NAME = "/api/v1/organization/{organizationId}/time_slot_name";
+
+    public static final String API_SCHEDULER_PHASE_ORG = "/api/v1/organizationWithPhases";
+
 
     public static final String API_CREDENTIAL_UPDATE_URL = "/api/v1/user/password";
 
@@ -136,7 +139,7 @@ public class AppConstants {
     public static final String KMD_NEXUS_AUTH_URL = "https://nexus-test.kmd.dk/auth/token";
     public static final String KMD_NEXUS_PATIENT_PREFERENCE = "https://test.avaleo.net/mobile/unity/v2/preferences/";
     public static final String KMD_NEXUS_PATIENT_PATHWAY_PREFERENCE = "https://test.avaleo.net/mobile/unity/v2/patient/%s/preferences/";
-    public static final String KMD_NEXUS_PATIENT_FILTER = "https://test.avaleo.net/mobile/unity/v2/patients?filterId=495";
+    public static final String KMD_NEXUS_PATIENT_FILTER = "https://test.avaleo.net/mobile/unity/v2/patients?filterId=496";
     public static final String KMD_NEXUS_PATIENT_EVENT_GRANTS = "https://test.avaleo.net/mobile/unity/v2/patientGrants/calendar/orderGrants/PATIENT_EVENT?patientId=%s&filterId=420";
     public static final String KMD_NEXUS_PATIENT_PATHWAY = "https://test.avaleo.net/mobile/unity/v2/patients/%s/pathways/references?filterId=";
     public static final String KMD_NEXUS_PATIENT_GRANTS = "https://test.avaleo.net/mobile/unity/v2/patientGrants/";
