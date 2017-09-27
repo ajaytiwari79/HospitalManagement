@@ -3,6 +3,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.country.CitizenStatus;
+import org.springframework.data.neo4j.annotation.Depth;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -129,6 +130,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client)-[r:"+SERVED_BY_TEAM+"]->(t:Team) WHERE id(c)={0} AND r.type='FORBIDDEN'   RETURN t")
     List<Team> findForbidTeam(Long id);
 
+    @Depth(value = 1)
     @Query("MATCH (c:Client) where c.cprNumber={0}  return c")
     Client findByCPRNumber(String cprNumber);
 
@@ -274,4 +276,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "Match (nextToKin:Client) where id(nextToKin)={1} with nextToKin,citizen\n" +
             "Match (citizen)-[r:NEXT_TO_KIN]->(nextToKin) return count(r)>0")
     Boolean hasAlreadyNextToKin(Long clientId,Long nextToKinId);
+
+    @Query("MATCH (client:Client)-[r:"+CIVILIAN_STATUS+"]->(citizenStatus:CitizenStatus) where id(client)={0} delete r")
+    void deleteCivilianStatus(Long clientId);
 }

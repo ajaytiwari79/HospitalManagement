@@ -118,7 +118,7 @@ public class ClientController {
     // NextToKin
     @ApiOperation("create NextToKin")
     @RequestMapping(value = "/{clientId}/nextToKin", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> createNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long clientId) {
+    ResponseEntity<Map<String, Object>> createNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable Long unitId, @PathVariable Long clientId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.saveNextToKin(unitId,clientId,nextToKinDTO));
     }
 
