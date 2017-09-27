@@ -486,9 +486,6 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("MATCH (country:Country)<-[:"+COUNTRY+"]-(o:Organization) where id(o)={0}  return id(country) ")
     Long getCountryId(Long organizationId);
 
-    @Query("match(o:Organization{isEnable:true}) return o.name as name, Id(o) as id")
-    List<OrgPhaseDTO> organizationWithPhases();
-
     @Query("MATCH (n:Organization) RETURN Id(n)")
     List<Long> allOrganizationIds();
 
