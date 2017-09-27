@@ -165,6 +165,9 @@ public class Client extends User {
 
     private int mostDrivenKm;
 
+    @Relationship(type = HAS_RELATION_OF)
+    private List<ClientRelationType> clientRelationTypes;
+
 
 
     // Constructors
@@ -856,6 +859,12 @@ public class Client extends User {
 
     public void setLocalAreaTag(LocalAreaTag localAreaTag) {
         this.localAreaTag = localAreaTag;
+    }
+
+    public void addClientRelations(ClientRelationType clientRelationType){
+        List<ClientRelationType> clientRelationTypes = Optional.ofNullable(this.clientRelationTypes).orElse(new ArrayList<>());
+        clientRelationTypes.add(clientRelationType);
+        this.clientRelationTypes = clientRelationTypes;
     }
 
 
