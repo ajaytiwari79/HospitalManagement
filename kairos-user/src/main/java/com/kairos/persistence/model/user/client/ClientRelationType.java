@@ -6,7 +6,6 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.country.RelationType;
 import org.neo4j.ogm.annotation.*;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RELATION_OF;
 import static com.kairos.persistence.model.constants.RelationshipConstants.RELATION_TYPE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.RELATION_WITH_NEXT_TO_KIN;
 
@@ -15,12 +14,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.RELAT
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@RelationshipEntity(type = HAS_RELATION_OF)
-public class ClientRelationTypeRelationship extends UserBaseEntity {
+@NodeEntity
+public class ClientRelationType extends UserBaseEntity {
 
-    @StartNode
+    @Relationship(type = RELATION_WITH_NEXT_TO_KIN)
     Client nextToKin;
-    @EndNode
+    @Relationship(type = RELATION_TYPE)
     RelationType relationType;
 
 

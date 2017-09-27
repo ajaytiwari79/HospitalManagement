@@ -220,10 +220,11 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     Client getClientByClientIdAndUnitId(Long clientId, Long unitId);
 
     @Query("Match (c:Client)-[:NEXT_TO_KIN]->(nextToKin:Client) where id(c)={0}\n" +
-            "Match (nextToKin)-[:CIVILIAN_STATUS]->(citizenStatus:CitizenStatus) with nextToKin,citizenStatus\n" +
-            "Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail,nextToKin,citizenStatus\n" +
-            "Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "Match (nextToKin)-[:HAS_RELATION_OF]->(relationType:RelationType) with relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "Match (nextToKin)-[:CIVILIAN_STATUS]->(citizenStatus:CitizenStatus) with c, nextToKin,citizenStatus\n" +
+            "Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with c, contactDetail,nextToKin,citizenStatus\n" +
+            "Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with c, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "Match (c)-[:HAS_RELATION_OF]->(clientRelationType:ClientRelationType) with clientRelationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "Match (nextToKin)<-[:RELATION_WITH_NEXT_TO_KIN]-(clientRelationType)-[:RELATION_TYPE]->(relationType:RelationType) with relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "return id(nextToKin) as id, id(relationType) as relationTypeId,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,{municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
@@ -244,13 +245,21 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client{citizenDead:false})-[r:"+HAS_LOCAL_AREA_TAG+"]-(lat:LocalAreaTag) where id(lat)= {0} return c")
     List<Client> getClientsByLocalAreaTagId(long localAreaTagId);
 
-    @Query( "MATCH (client:Client)-[:"+NEXT_TO_KIN+"]->(nextToKin:Client) where id(client)= {0} AND id(nextToKin)= {1} with nextToKin\n"+
-            "MATCH (nextToKin)-[r:"+HAS_RELATION_OF+"]->(relationType:RelationType) delete r")
+    @Query( "MATCH (client:Client)-[:"+NEXT_TO_KIN+"]->(nextToKin:Client) where id(client)= {0} AND id(nextToKin)= {1} with nextToKin, client\n"+
+            "MATCH (client)-[r1:"+HAS_RELATION_OF+"]->(clientRelationType:ClientRelationType) with r1, nextToKin, client, clientRelationType \n"+
+            "MATCH (clientRelationType)-[r2:"+RELATION_TYPE+"]->(relationType:RelationType) with r1, r2, nextToKin, client, clientRelationType \n"+
+            "MATCH (clientRelationType)-[r3:"+RELATION_WITH_NEXT_TO_KIN+"]->(nextToKin) delete r1, r2, r3 ")
     void removeClientRelationType(long clientId, long nextToKinId);
 
-    @Query( "MATCH (client:Client)-[:"+NEXT_TO_KIN+"]->(nextToKin:Client) where id(client)= {0} AND id(nextToKin)= {1} with nextToKin\n"+
-            "MATCH (nextToKin)-[r:"+HAS_RELATION_OF+"]->(relationType:RelationType) return count(r)>0")
-    Boolean hasClientRelationType(long clientId, long nextToKinId);
+    @Query(  "MATCH (client:Client)-[:"+NEXT_TO_KIN+"]->(nextToKin:Client) where id(client)= {0} AND id(nextToKin)= {1} with nextToKin, client\n"+
+            "MATCH (client)-[r1:"+HAS_RELATION_OF+"]->(clientRelationType:ClientRelationType) with  nextToKin, client, clientRelationType \n"+
+            "MATCH (clientRelationType)-[r2:"+RELATION_TYPE+"]->(relationType:RelationType) with nextToKin, client, clientRelationType \n"+
+            "MATCH (clientRelationType)-[r3:"+RELATION_WITH_NEXT_TO_KIN+"]->(nextToKin) return clientRelationType ")
+    ClientRelationType getClientRelationType(long clientId, long nextToKinId);
+
+    @Query("MATCH (clientRelationType:ClientRelationType) where id(clientRelationType)={0} delete clientRelationType ")
+    void removeClientRelationById(long clientRelationTypeId);
+
 
 
 

@@ -1,6 +1,5 @@
 package com.kairos.service.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
@@ -239,15 +238,17 @@ public class ClientExtendedService extends UserBaseService {
     private void saveCitizenRelation(Long relationTypeId, Long unitId, Client nextToKin, Long clientId) {
 
         Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
-
+        Client client = clientGraphRepository.findOne(clientId);
         if (Optional.ofNullable(relationTypeId).isPresent()) {
             RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);
-
-                clientGraphRepository.removeClientRelationType( clientId,  nextToKin.getId());
-            ClientRelationTypeRelationship clientRelationTypeRelationship = new ClientRelationTypeRelationship();
+            ClientRelationType clientRelationTypeRelationship = clientGraphRepository.getClientRelationType(clientId,  nextToKin.getId());
+            clientGraphRepository.removeClientRelationType( clientId,  nextToKin.getId());
+            if(Optional.ofNullable(clientRelationTypeRelationship).isPresent()) clientGraphRepository.removeClientRelationById(clientRelationTypeRelationship.getId());
+             clientRelationTypeRelationship = new ClientRelationType();
             clientRelationTypeRelationship.setRelationType(relationType);
             clientRelationTypeRelationship.setNextToKin(nextToKin);
-            save(clientRelationTypeRelationship);
+            client.addClientRelations(clientRelationTypeRelationship);
+            save(client);
         } else {
             throw new DataNotFoundByIdException("Relation Type can't be empty");
         }
