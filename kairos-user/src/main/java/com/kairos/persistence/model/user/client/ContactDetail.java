@@ -212,4 +212,6 @@ public class ContactDetail extends UserBaseEntity {
              contactNumbers.put("emergencyPhone",this.emergencyPhone);
         return contactNumbers;
     }
+
+
 }

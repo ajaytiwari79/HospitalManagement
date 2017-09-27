@@ -7,7 +7,6 @@ import com.kairos.persistence.model.enums.ClientEnum;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.CitizenStatus;
-import com.kairos.persistence.model.user.country.RelationType;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -165,10 +164,6 @@ public class Client extends User {
     }
 
     private int mostDrivenKm;
-
-    @Relationship(type = HAS_RELATION_OF)
-    private RelationType relationType;
-
 
 
 
@@ -817,58 +812,6 @@ public class Client extends User {
     }
 
 
-    public Map<String, Object> retrieveNextToKinDetails() {
-        Map<String, Object> response = new HashMap<>();
-        Map<String, Object> contactDetails = new HashMap<>();
-        Map<String, Object> homeAddress = new HashMap<>();
-
-        response.put("id", this.id);
-        response.put("firstName", this.firstName != null ? this.firstName : "");
-        response.put("lastName", this.lastName != null ? this.lastName : "");
-        response.put("nickName", this.nickName != null ? this.nickName : "");
-        response.put("name", this.firstName + " " + this.lastName);
-        response.put("cprNumber", this.cprNumber != null ? this.cprNumber : "");
-        response.put("profilePic", this.profilePic);
-        response.put("civilianStatus", this.civilianStatus);
-        response.put("gender", getGender());
-        response.put("age", getAge());
-
-        if (this.homeAddress != null) {
-            homeAddress.put("houseNumber", this.homeAddress.getHouseNumber());
-            homeAddress.put("floorNumber", this.homeAddress.getFloorNumber());
-            homeAddress.put("street1", this.homeAddress.getStreet1());
-            homeAddress.put("latitude", this.homeAddress.getLatitude());
-            homeAddress.put("zipCode", this.homeAddress.getZipCode());
-            homeAddress.put("longitude", this.homeAddress.getLongitude());
-//            homeAddress.put("province", this.homeAddress.getProvince());
-
-        }
-        if (this.contactDetail != null) {
-            if (this.contactDetail.isHidePrivatePhone() == false) {
-                contactDetails.put("privatePhone", this.contactDetail.getPrivatePhone());
-            }
-            if (this.contactDetail.isHideMobilePhone() == false) {
-                contactDetails.put("mobilePhone", this.contactDetail.getMobilePhone());
-            }
-            if (this.contactDetail.isHideWorkPhone() == false) {
-                contactDetails.put("workPhone", this.contactDetail.getWorkPhone());
-            }
-            if (this.contactDetail.isHideLandlinePhone() == false) {
-                contactDetails.put("landLinePhone", this.contactDetail.getLandLinePhone());
-            }
-
-            contactDetails.put("facebookAccount", this.contactDetail.getFacebookAccount());
-            contactDetails.put("linkedInAccount", this.contactDetail.getLinkedInAccount());
-            contactDetails.put("twitterAccount", this.contactDetail.getTwitterAccount());
-            contactDetails.put("privateEmail", this.contactDetail.getPrivateEmail());
-            contactDetails.put("messenger", this.contactDetail.getMessenger());
-        }
-        response.put("homeAddress", this.homeAddress);
-        response.put("contactDetail", contactDetails);
-        response.put("relation", this.relationType);
-
-        return response;
-    }
 
     public void setContactPerson(Staff contactPerson) {
         Staff contactPerson1 = contactPerson;
@@ -905,13 +848,8 @@ public class Client extends User {
         return this.firstName+" "+this.lastName;
     }
 
-    public RelationType getRelationType() {
-        return relationType;
-    }
 
-    public void setRelationType(RelationType relationType) {
-        this.relationType = relationType;
-    }
+
     public LocalAreaTag getLocalAreaTag() {
         return localAreaTag;
     }
@@ -919,6 +857,8 @@ public class Client extends User {
     public void setLocalAreaTag(LocalAreaTag localAreaTag) {
         this.localAreaTag = localAreaTag;
     }
+
+
 
     @Override
     public String toString() {
@@ -988,6 +928,21 @@ public class Client extends User {
         this.cprNumber = nextToKinDTO.getCprNumber();
         Integer ageVariable = Integer.valueOf(nextToKinDTO.getCprNumber().substring(nextToKinDTO.getCprNumber().length() - 1));
         this.gender = (ageVariable % 2 == 0)?Gender.FEMALE:Gender.MALE;
+    }
+
+    public ContactDetail saveContactDetail(NextToKinDTO nextToKinDTO,ContactDetail contactDetail){
+        if(Optional.ofNullable(nextToKinDTO.getContactDetail()).isPresent()){
+            ContactDetail contactDetailToUpdate = nextToKinDTO.getContactDetail();
+            contactDetail.setPrivatePhone(contactDetailToUpdate.getPrivatePhone());
+            contactDetail.setPrivateEmail(contactDetailToUpdate.getPrivateEmail());
+            contactDetail.setMobilePhone(contactDetailToUpdate.getMobilePhone());
+            contactDetail.setFacebookAccount(contactDetailToUpdate.getFacebookAccount());
+            contactDetail.setTwitterAccount(contactDetailToUpdate.getTwitterAccount());
+            contactDetail.setLinkedInAccount(contactDetailToUpdate.getLinkedInAccount());
+            contactDetail.setMessenger(contactDetailToUpdate.getMessenger());
+            contactDetail.setWorkPhone(contactDetailToUpdate.getWorkPhone());
+        }
+        return contactDetail;
     }
 }
 
