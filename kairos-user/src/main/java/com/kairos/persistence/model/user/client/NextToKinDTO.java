@@ -144,13 +144,15 @@ public class NextToKinDTO {
         this.relationTypeId = relationTypeId;
     }
 
-    public NextToKinDTO buildResponse(Client nextToKin, String serverUrl, long relationTypeId){
+    public NextToKinDTO buildResponse(Client nextToKin, String serverUrl, long relationTypeId,
+                                      NextToKinDTO nextToKinDTO){
         ObjectMapper objectMapper = new ObjectMapper();
         this.id = nextToKin.getId();
         this.firstName = nextToKin.getFirstName();
         this.lastName = nextToKin.getLastName();
         this.civilianStatusId = nextToKin.getCivilianStatus().getId();
         this.homeAddress = objectMapper.convertValue(nextToKin.getHomeAddress(),AddressDTO.class);
+        this.homeAddress.setMunicipalityId(nextToKinDTO.getHomeAddress().getMunicipalityId());
         this.homeAddress.setZipCodeId(nextToKin.getHomeAddress().getZipCode().getId());
         this.gender = nextToKin.getGender();
         this.age = nextToKin.getAge();
