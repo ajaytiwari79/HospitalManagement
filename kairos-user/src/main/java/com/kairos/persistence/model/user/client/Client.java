@@ -30,6 +30,7 @@ public class Client extends User {
 
 
     private boolean isEnabled = true;
+    @Relationship(type = CIVILIAN_STATUS)
     private CitizenStatus civilianStatus;
     private String profilePic;
 

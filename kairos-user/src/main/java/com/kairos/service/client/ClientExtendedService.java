@@ -2,6 +2,7 @@ package com.kairos.service.client;
 
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
@@ -94,7 +95,7 @@ public class ClientExtendedService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
 
 
-    public NextToKinDTO saveNextToKin(long unitId, long clientId, NextToKinDTO nextToKinDTO) {
+    public NextToKinDTO saveNextToKin(Long unitId, Long clientId, NextToKinDTO nextToKinDTO) {
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
@@ -106,8 +107,11 @@ public class ClientExtendedService extends UserBaseService {
         if(!Optional.ofNullable(nextToKin).isPresent()){
             nextToKin = new Client();
         } else {
+            if(nextToKin.getId().equals(clientId)){
+                throw new DataNotMatchedException("Add another next to kin");
+            }
             homeAddressId = clientGraphRepository.getIdOfHomeAddress(nextToKin.getId());
-             contactDetail = clientGraphRepository.getContactDetailOfNextToKin(nextToKin.getId());
+            contactDetail = clientGraphRepository.getContactDetailOfNextToKin(nextToKin.getId());
         }
         ContactAddress homeAddress;
         if(!Optional.ofNullable(homeAddressId).isPresent()){
@@ -128,7 +132,6 @@ public class ClientExtendedService extends UserBaseService {
             return null;
         }
         saveCivilianStatus(nextToKinDTO,nextToKin);
-
         nextToKin.setHomeAddress(homeAddress);
         save(nextToKin);
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, client.getId());
@@ -227,6 +230,9 @@ public class ClientExtendedService extends UserBaseService {
             if (!Optional.ofNullable(citizenStatus).isPresent()) {
                 logger.debug("Finding civilian status using id " + nextToKinDTO.getCivilianStatusId());
                 throw new DataNotFoundByIdException("Incorrect id of civilian status " + citizenStatus);
+            }
+            if(Optional.ofNullable(nextToKin.getId()).isPresent()){
+                clientGraphRepository.deleteCivilianStatus(nextToKin.getId());
             }
             nextToKin.setCivilianStatus(citizenStatus);
         } else {

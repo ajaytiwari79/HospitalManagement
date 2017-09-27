@@ -1,10 +1,16 @@
-package com.kairos.response.dto.web;
+package com.kairos.persistence.model.query_wrapper;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.response.dto.web.GroupWrapper;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
 
 /**
  * Created by oodles on 30/11/16.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@QueryResult
 public class OrganizationWrapper {
 
     private Long id;
@@ -13,6 +19,15 @@ public class OrganizationWrapper {
     private boolean IsExpanded = true;
     private List<OrganizationWrapper> children;
     private List<GroupWrapper> groups;
+    private boolean isKairosHub;
+
+    public boolean isKairosHub() {
+        return isKairosHub;
+    }
+
+    public void setKairosHub(boolean kairosHub) {
+        isKairosHub = kairosHub;
+    }
 
     public Long getId() {
         return id;
