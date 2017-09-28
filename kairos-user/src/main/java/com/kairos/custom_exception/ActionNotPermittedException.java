@@ -6,5 +6,6 @@ package com.kairos.custom_exception;
 public class ActionNotPermittedException extends  RuntimeException {
     public ActionNotPermittedException(String message) {
         super(message);
+
     }
 }
