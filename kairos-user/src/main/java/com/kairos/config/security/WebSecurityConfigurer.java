@@ -81,6 +81,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(API_KMD_CARE_STAFF_SHIFTS);
         web.ignoring().antMatchers(API_TIME_CARE_SHIFTS);
         web.ignoring().antMatchers(API_TIME_SLOTS_NAME);
+        web.ignoring().antMatchers(API_KMD_CARE_TIME_SLOTS);
 
 
         web.ignoring().antMatchers("/api/v1/login");
