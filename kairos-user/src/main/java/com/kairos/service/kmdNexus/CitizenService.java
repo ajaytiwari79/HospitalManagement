@@ -202,12 +202,12 @@ public class CitizenService {
                         JSONObject patientPathway = patientPathways.getJSONObject(i);
 
                         if (patientPathway.get("type").equals("patientPathwayReference") == true) {
-                            service = organizationServiceRepository.findByKmdExternalId(patientPathway.get("patientPathwayId").toString());
+                            service = organizationServiceRepository.findByKmdExternalId(patientPathway.get("pathwayTypeId").toString());
                             if (service == null) {
                                 service = new com.kairos.persistence.model.organization.OrganizationService();
                                 service.setName(patientPathway.get("name").toString());
-                                Optional serviceOptional = Optional.ofNullable(patientPathway.get("patientPathwayId"));
-                                if(serviceOptional.isPresent()) service.setKmdExternalId(patientPathway.get("patientPathwayId").toString());
+                                Optional serviceOptional = Optional.ofNullable(patientPathway.get("pathwayTypeId"));
+                                if(serviceOptional.isPresent()) service.setKmdExternalId(patientPathway.get("pathwayTypeId").toString());
                                 service.setImported(true);
                                 service = organizationServiceService.saveImportedServices(service);
                             }
@@ -218,12 +218,12 @@ public class CitizenService {
                                     JSONObject subPatientPathway = pathwayChildren.getJSONObject(pC);
                                     if (subPatientPathway.get("type").equals("patientPathwayReference") == true) {
                                         hasSubService = true;
-                                        subService = organizationServiceRepository.findByKmdExternalId(subPatientPathway.get("patientPathwayId").toString());
+                                        subService = organizationServiceRepository.findByKmdExternalId(subPatientPathway.get("pathwayTypeId").toString());
                                         if (subService == null) {
                                             subService = new com.kairos.persistence.model.organization.OrganizationService();
                                             subService.setName(subPatientPathway.get("name").toString());
-                                            Optional subServiceOptional = Optional.ofNullable(subPatientPathway.get("patientPathwayId"));
-                                            if(subServiceOptional.isPresent()) subService.setKmdExternalId(subPatientPathway.get("patientPathwayId").toString());
+                                            Optional subServiceOptional = Optional.ofNullable(subPatientPathway.get("pathwayTypeId"));
+                                            if(subServiceOptional.isPresent()) subService.setKmdExternalId(subPatientPathway.get("pathwayTypeId").toString());
                                             subService.setImported(true);
                                             subService = organizationServiceService.addSubService(service.getId(), subService);
                                             organizationServiceService.updateServiceToOrganization(organization.getId(), subService.getId(), true, ORGANIZATION);
