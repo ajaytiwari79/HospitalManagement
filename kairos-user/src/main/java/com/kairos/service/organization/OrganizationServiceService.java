@@ -3,7 +3,6 @@ package com.kairos.service.organization;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.team.Team;
@@ -449,12 +448,10 @@ public class OrganizationServiceService extends UserBaseService {
 
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         com.kairos.persistence.model.organization.OrganizationService mappedOrganizationService = organizationServiceRepository.findOne(importedServiceId);
-        organizationServiceRepository.removeOrganizationExternalServiceRelationship(importedServiceId);
-        OrganizationExternalServiceRelationship organizationExternalServiceRelationship = new OrganizationExternalServiceRelationship();
-        organizationExternalServiceRelationship.setExternalService(mappedOrganizationService);
-        organizationExternalServiceRelationship.setService(organizationService);
+        organizationService.setReferenceId(importedServiceId.toString());
         mappedOrganizationService.setHasMapped(true);
-        save(organizationExternalServiceRelationship);
+        organizationServiceRepository.save(mappedOrganizationService);
+        organizationServiceRepository.save(organizationService);
         return organizationService;
     }
 

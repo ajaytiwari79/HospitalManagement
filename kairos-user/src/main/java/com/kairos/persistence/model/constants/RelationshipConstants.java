@@ -100,7 +100,6 @@ public class RelationshipConstants {
     public final static String ORGANIZATION_HAS_RESOURCE = "ORGANIZATION_HAS_RESOURCE";
     public final static String ORGANIZATION_HAS_DEPARTMENT ="ORGANIZATION_HAS_DEPARTMENT";
     public final static String ORGANIZATION_SUB_SERVICE ="ORGANIZATION_SUB_SERVICE";
-    public final static String LINK_WITH_EXTERNAL_SERVICE ="LINK_WITH_EXTERNAL_SERVICE";
 
 
     public static final String RESOURCE_NOT_AVAILABLE_ON="RESOURCE_NOT_AVAILABLE_ON";
