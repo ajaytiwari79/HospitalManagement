@@ -10,12 +10,14 @@ public class UserContext {
     public static final String USER_ID        = "user-id";
     public static final String ORG_ID         = "org-id";
     public static final String UNIT_ID         = "unit-id";
+    public static final String TAB_ID = "tab-id";
 
     private static final ThreadLocal<String> correlationId= new ThreadLocal<String>();
     private static final ThreadLocal<String> authToken= new ThreadLocal<String>();
     private static final ThreadLocal<String> userId = new ThreadLocal<String>();
     private static final ThreadLocal<Long> orgId = new ThreadLocal<Long>();
     private static final ThreadLocal<Long> unitId = new ThreadLocal<Long>();
+    private static final ThreadLocal<String> tabId = new ThreadLocal<String>();
     private static final ThreadLocal<CurrentUserDetails> userDetails = new ThreadLocal<CurrentUserDetails>();
 
 
@@ -36,5 +38,6 @@ public class UserContext {
     public static void setUserDetails(CurrentUserDetails details) {userDetails.set(details);}
     public static CurrentUserDetails getUserDetails() {return userDetails.get();}
 
-
+    public static void setTabId(String aTabId){tabId.set(aTabId);}
+    public static String getTabId() {return tabId.get();}
 }
