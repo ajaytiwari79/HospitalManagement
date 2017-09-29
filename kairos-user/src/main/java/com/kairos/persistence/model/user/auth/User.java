@@ -9,6 +9,7 @@ import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.profile.Profile;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -62,6 +63,9 @@ public class User extends UserBaseEntity {
     private boolean isPasswordUpdated;
 
     private Long kmdExternalId;
+
+    @Transient
+    private Boolean hubMember;
 
     public int getOtp() {
         return otp;
@@ -401,5 +405,13 @@ public class User extends UserBaseEntity {
                 ", isPasswordUpdated=" + isPasswordUpdated +
                 '}'+
                 '}';
+    }
+
+    public Boolean getHubMember() {
+        return hubMember;
+    }
+
+    public void setHubMember(Boolean hubMember) {
+        this.hubMember = hubMember;
     }
 }

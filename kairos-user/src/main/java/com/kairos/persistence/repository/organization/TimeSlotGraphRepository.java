@@ -48,4 +48,14 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
             "return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute,isShiftStartTime:r.isShiftStartTime} as timeSlot order by r.startHour")
     List<Map<String,Object>> getUnitCurrentTimeSlots(long unitId);
 
+    TimeSlot findByKmdExternalId(Long kmdExternalId);
+
+    @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND timeSlot.kmdExternalId={1}\n" +
+            "Match (organization)-[r:ORGANIZATION_TIME_SLOT]->(timeSlot) return count(r)>0")
+    Boolean hasTimeSlotExistByUnitIdAndTimeSlotId(long unitId, long kmdExternalId);
+
+    @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND timeSlot.kmdExternalId={1}\n" +
+            "Match (organization)-[r:ORGANIZATION_TIME_SLOT]->(timeSlot) delete r")
+    void removeTimeSlotExistByUnitIdAndTimeSlotId(long unitId, long kmdExternalId);
+
 }

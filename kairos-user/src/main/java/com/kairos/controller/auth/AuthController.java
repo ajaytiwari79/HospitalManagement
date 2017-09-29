@@ -182,9 +182,10 @@ public class AuthController {
     public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long organizationId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
     }
-    @PreAuthorize("hasPermission(#id)")
-    @RequestMapping(value = { "/user/{id}" }, produces = "application/json")
-    public Map<String, Object> user(OAuth2Authentication user,@PathVariable Long id) {
+
+    @PreAuthorize("hasPermission()")
+    @RequestMapping(value = { "/user/{unitId}" }, produces = "application/json")
+    public Map<String, Object> user(OAuth2Authentication user) {
         Map<String, Object> userInfo = new HashMap<>();
         userInfo.put("authorities", AuthorityUtils.authorityListToSet(user.getUserAuthentication().getAuthorities()));
         userInfo.put("credentials", UserContext.getUserDetails().getId());

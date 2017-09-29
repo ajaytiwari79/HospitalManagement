@@ -1,6 +1,9 @@
 package com.kairos.persistence.repository.user.auth;
 
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
+import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.user.auth.TabPermission;
 import com.kairos.persistence.model.user.auth.User;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
@@ -8,9 +11,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENTS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -52,8 +55,20 @@ public interface UserGraphRepository extends GraphRepository<User> {
     @Query("MATCH (u:User) where u.email= {0} return u")
     User findByEmail(String email);
 
-
-    User findByCprNumber(String cprNumber);
-
     User findByKmdExternalId(Long kmdExternalId);
+
+    @Query("Match (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0} with organization,employment\n" +
+            "optional match (organization)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization) with organization+[unit] as coll,employment\n" +
+            "unwind coll as units with distinct units,employment\n" +
+            "MATCH (employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmp:UnitEmployment)-[:PROVIDED_BY]->(units) with unitEmp,units\n" +
+            "Match (unitEmp)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission) with accessPermission,units\n" +
+            "MATCH (accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,accessPermission,units\n" +
+            "Match (accessPermission)-[modulePermission:HAS_ACCESS_PAGE_PERMISSION]->(accessPage:AccessPage) with accessPage,accessPermission,modulePermission,units\n" +
+            "return id(accessPage) as id,accessPage.moduleId as tabId,modulePermission.isRead as read,modulePermission.isWrite as write,accessPage.isModule as isModule,id(units) as unitId")
+    Set<TabPermission> getAccessPermissionsOfUser(Long userId);
+
+    @Query("Match (emp:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with emp\n" +
+            "Match (emp:Employment)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(unitEmp:UnitEmployment)-[:"+PROVIDED_BY+"]->(org:Organization) with collect(org.isKairosHub) as hubList\n" +
+            "return true in hubList")
+    Boolean isHubMember(Long userId);
 }
