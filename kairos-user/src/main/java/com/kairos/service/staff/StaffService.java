@@ -86,9 +86,9 @@ public class StaffService extends UserBaseService {
     private LanguageGraphRepository languageGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
-    @Inject
+      @Inject
     private PasswordEncoder passwordEncoder;
-    @Inject
+       @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
@@ -129,6 +129,8 @@ public class StaffService extends UserBaseService {
     TaskServiceRestClient taskServiceRestClient;
 
 
+
+
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
@@ -153,6 +155,8 @@ public class StaffService extends UserBaseService {
         save(staff);
         return true;
     }
+
+
 
 
     public boolean updatePassword(long staffId, final String oldPassword, final String newPassword) {
@@ -214,14 +218,14 @@ public class StaffService extends UserBaseService {
 
         Staff staff = null;
 
-        if (TEAM.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getTeamStaff(unitId, staffId);
-        } else if (ORGANIZATION.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
-        }
+    if(TEAM.equalsIgnoreCase(type)) {
+        staff = staffGraphRepository.getTeamStaff(unitId, staffId);
+    }else if(ORGANIZATION.equalsIgnoreCase(type)) {
+        staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
+    }
 
         if (staff == null) {
-            throw new DataNotFoundByIdException("Staff not found with provided Staff ID: " + staffId + " and " + type + " ID: " + unitId);
+            throw new DataNotFoundByIdException("Staff not found with provided Staff ID: " + staffId+ " and "+type+" ID: "+unitId);
         }
 
 
@@ -296,6 +300,8 @@ public class StaffService extends UserBaseService {
     }
 
 
+
+
     public Map<String, Object> getStaff(String type, long id) {
 
         List<Map<String, Object>> staff = null;
@@ -309,12 +315,12 @@ public class StaffService extends UserBaseService {
             countryId = countryGraphRepository.getCountryOfUnit(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
         } else if (GROUP.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByGroupId(id, envConfig.getServerHost() + File.separator);
+            staff = staffGraphRepository.getStaffByGroupId(id,envConfig.getServerHost() + File.separator);
             Organization organization = organizationGraphRepository.getOrganizationByGroupId(id).getOrganization();
             countryId = countryGraphRepository.getCountryOfUnit(organization.getId());
             roles = accessGroupService.getAccessGroups(organization.getId());
         } else if (TEAM.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + File.separator);
+            staff = staffGraphRepository.getStaffByTeamId(id,envConfig.getServerHost() + File.separator);
             Organization organization = organizationGraphRepository.getOrganizationByTeamId(id);
             roles = accessGroupService.getAccessGroups(organization.getId());
             countryId = countryGraphRepository.getCountryOfUnit(organization.getId());
@@ -346,9 +352,9 @@ public class StaffService extends UserBaseService {
         }
 
         if (parent == null) {
-            return staffGraphRepository.getStaffWithBasicInfo(unit.getId(), unit.getId(), envConfig.getServerHost() + File.separator);
+            return staffGraphRepository.getStaffWithBasicInfo(unit.getId(), unit.getId(),envConfig.getServerHost() + File.separator);
         } else {
-            return staffGraphRepository.getStaffInfoForFilters(parent.getId(), unit.getId(), envConfig.getServerHost() + File.separator);
+            return staffGraphRepository.getStaffInfoForFilters(parent.getId(), unit.getId(),envConfig.getServerHost() + File.separator);
         }
     }
 
@@ -485,14 +491,14 @@ public class StaffService extends UserBaseService {
 
                         staff = new Staff();
                         staff.setExternalId(externalId);
-                        if (row.getCell(17) != null) staff.setBadgeNumber(row.getCell(17).toString());
+                        if(row.getCell(17) != null)   staff.setBadgeNumber(row.getCell(17).toString());
                         staff.setFirstName(row.getCell(20).toString());
                         staff.setLastName(row.getCell(21).toString());
                         staff.setFamilyName(row.getCell(21).toString());
                         staff.setUserName(row.getCell(19).toString());
 
                         cell = row.getCell(24);
-                        if (cell != null) {
+                        if(cell != null){
                             cell.setCellType(Cell.CELL_TYPE_STRING);
                             ZipCode zipCode = zipCodeGraphRepository.findByZipCode((cell.getStringCellValue() == null || cell.getStringCellValue().isEmpty()) ? 0 : Integer.parseInt(cell.getStringCellValue()));
                             if (zipCode != null) {
@@ -536,7 +542,7 @@ public class StaffService extends UserBaseService {
                         }
                         staff.setContactAddress(contactAddress);
                         cell = row.getCell(26);
-                        if (cell != null) {
+                        if(cell != null){
                             cell.setCellType(Cell.CELL_TYPE_STRING);
                             String telephoneNumber = cell.getStringCellValue();
                             if (telephoneNumber != null && !telephoneNumber.isEmpty()) {
@@ -547,7 +553,7 @@ public class StaffService extends UserBaseService {
 
 
                         cell = row.getCell(27);
-                        if (cell != null) {
+                        if(cell != null) {
                             cell.setCellType(Cell.CELL_TYPE_STRING);
                             String cellPhoneNumber = cell.getStringCellValue();
 
@@ -559,7 +565,7 @@ public class StaffService extends UserBaseService {
                             }
                         }
                         cell = row.getCell(28);
-                        if (cell != null) {
+                        if(cell != null) {
                             cell.setCellType(Cell.CELL_TYPE_STRING);
                             String email = cell.getStringCellValue();
                             if (email != null && !email.isEmpty()) {
@@ -571,7 +577,7 @@ public class StaffService extends UserBaseService {
                             staff.setContactDetail(contactDetail);
                         }
                         cell = row.getCell(2);
-                        if (cell != null) {
+                        if(cell != null) {
                             cell.setCellType(Cell.CELL_TYPE_STRING);
                             user = userGraphRepository.findByTimeCareExternalId(cell.getStringCellValue());
                             if (user == null) {
@@ -667,6 +673,7 @@ public class StaffService extends UserBaseService {
     }
 
 
+
     public User createCountryAdmin(User admin) {
         User user = userGraphRepository.findByEmail(admin.getEmail());
         if (user != null) {
@@ -698,7 +705,7 @@ public class StaffService extends UserBaseService {
             UnitEmployment unitEmployment = new UnitEmployment();
             unitEmployment.setOrganization(organization);
             AccessPermission accessPermission = new AccessPermission(accessGroup);
-            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
             unitEmpAccessRelationship.setEnabled(true);
             unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
             accessPageService.setPagePermissionToAdmin(accessPermission);
@@ -710,6 +717,8 @@ public class StaffService extends UserBaseService {
         }
         return admin;
     }
+
+
 
 
     public Staff createStaffFromPlanningWorkflow(StaffDTO data, long unitId) {
@@ -734,11 +743,12 @@ public class StaffService extends UserBaseService {
                 List<Map<String, Object>> result = skillService.assignSkillToStaff(staff.getId(), data.getSkills(), false, unitId);
                 logger.info("Assigned Number of Skills to staff: " + result.size());
             }
-            taskServiceRestClient.updateTaskForStaff(staff.getId(), data.getAnonymousStaffId());
+            taskServiceRestClient.updateTaskForStaff(staff.getId(),data.getAnonymousStaffId());
             return staff;
         }
         return null;
     }
+
 
 
     public Map<String, String> createStaffSchedule(long organizationId, Long unitId) throws ParseException {
@@ -800,8 +810,7 @@ public class StaffService extends UserBaseService {
         user.setFirstName(staff.getFirstName());
         user.setGender(payload.getGender());
         user.setLastName(staff.getLastName());
-        if (payload.getCprNumber() != null)
-            user.setAge(Integer.valueOf(payload.getCprNumber().substring(payload.getCprNumber().length() - 1)));
+        if(payload.getCprNumber() != null) user.setAge(Integer.valueOf(payload.getCprNumber().substring(payload.getCprNumber().length() - 1)));
 
         Long engineerTypeId = payload.getEngineerTypeId();
         User alreadyExistUser = userGraphRepository.findByTimeCareExternalId(payload.getExternalId() + "");
@@ -819,6 +828,7 @@ public class StaffService extends UserBaseService {
         logger.info("::::::::::::::::;   Saving user :::::::::::::::::: ");
         return staffGraphRepository.save(staff);
     }
+
 
 
     private ContactDetail getContactDetailsObject(StaffCreationPOJOData payload) {
@@ -854,11 +864,11 @@ public class StaffService extends UserBaseService {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
         if (parent == null) {
-            if (employmentGraphRepository.findEmployment(unit.getId(), staff.getId()) == null) {
+            if(employmentGraphRepository.findEmployment(unit.getId(), staff.getId()) == null) {
                 employmentGraphRepository.createEmployments(unit.getId(), Arrays.asList(staff.getId()), unit.getId());
             }
         } else {
-            if (employmentGraphRepository.findEmployment(parent.getId(), staff.getId()) == null) {
+            if(employmentGraphRepository.findEmployment(parent.getId(), staff.getId()) == null) {
                 employmentGraphRepository.createEmployments(parent.getId(), Arrays.asList(staff.getId()), unit.getId());
             }
         }
@@ -937,6 +947,8 @@ public class StaffService extends UserBaseService {
         }
         logger.info("total staff updated  " + staffUpdated);
     }
+
+
 
 
     public Map createUnitManager(long unitId, UnitManagerDTO unitManagerDTO) {
@@ -1052,27 +1064,28 @@ public class StaffService extends UserBaseService {
     }
 
     /**
+     * @auther anil maurya
+     *
      * @param unitId
      * @param staffId
      * @param date
      * @return
-     * @auther anil maurya
      */
-    public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId, String date) {
+    public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId,String date){
 
-        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
-        if (staff == null) {
+        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId,staffId);
+        if(staff == null){
             throw new InternalError("Staff not found");
         }
-        List<StaffAssignedTasksWrapper> tasks = taskServiceRestClient.getAssignedTasksOfStaff(staffId, date);
+        List<StaffAssignedTasksWrapper> tasks = taskServiceRestClient.getAssignedTasksOfStaff(staffId,date);
         List<Long> citizenIds = tasks.stream().map(task -> task.getId()).collect(Collectors.toList());
         List<Client> clients = clientGraphRepository.findByIdIn(citizenIds);
         ObjectMapper objectMapper = new ObjectMapper();
         StaffTaskDTO staffTaskDTO;
         List<StaffTaskDTO> staffTaskDTOS = new ArrayList<>(clients.size());
         int taskIndex = 0;
-        for (Client client : clients) {
-            staffTaskDTO = objectMapper.convertValue(client, StaffTaskDTO.class);
+        for(Client client : clients){
+            staffTaskDTO = objectMapper.convertValue(client,StaffTaskDTO.class);
             staffTaskDTO.setTasks(tasks.get(taskIndex).getTasks());
             staffTaskDTOS.add(staffTaskDTO);
             taskIndex++;
@@ -1080,43 +1093,47 @@ public class StaffService extends UserBaseService {
         return staffTaskDTOS;
     }
 
-      public Map<String, Object> getTeamStaffAndStaffSkill(Long organizationId, List<Long> staffIds) {
-        Map<String, Object> responseMap = new HashMap();
-        List<Object> teamStaffList = new ArrayList<>();
-        List<Object> staffList = new ArrayList<>();
-        List<Map<String, Object>> teamStaffs = staffGraphRepository.getTeamStaffList(organizationId, staffIds);
-        List<Map<String, Object>> staffs = staffGraphRepository.getSkillsOfStaffs(staffIds);
-        for (Map<String, Object> map : teamStaffs) {
-            Object o = map.get("data");
-            teamStaffList.add(o);
-        }
-        for (Map<String, Object> map : staffs) {
-            Object o = map.get("data");
-            staffList.add(o);
-        }
 
-        responseMap.put("teamStaffList", teamStaffList);
-        responseMap.put("staffs", staffList);
-        return responseMap;
-    }
+
+
+  public Map<String, Object> getTeamStaffAndStaffSkill(Long organizationId, List<Long> staffIds){
+      Map<String, Object> responseMap = new HashMap();
+      List<Object> teamStaffList = new ArrayList<>();
+      List<Object> staffList = new ArrayList<>();
+      List<Map<String, Object>> teamStaffs = staffGraphRepository.getTeamStaffList(organizationId, staffIds);
+      List<Map<String, Object>> staffs = staffGraphRepository.getSkillsOfStaffs(staffIds);
+      for(Map<String, Object> map : teamStaffs){
+          Object o = map.get("data");
+          teamStaffList.add(o);
+      }
+      for(Map<String, Object> map : staffs){
+          Object o = map.get("data");
+          staffList.add(o);
+      }
+
+      responseMap.put("teamStaffList",teamStaffList);
+      responseMap.put("staffs",staffList);
+      return responseMap;
+  }
+
 
 
     /**
-     * @return
      * @auther anil maurya
      * this method is called from task micro service
+     * @return
      */
-    public ClientStaffInfoDTO getStaffInfo(String loggedInUserName) {
+    public ClientStaffInfoDTO getStaffInfo(String loggedInUserName){
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(loggedInUserName).getId());
-        if (staff == null) {
+        if(staff==null){
             throw new DataNotFoundByIdException("Staff Id is invalid");
         }
         return new ClientStaffInfoDTO(staff.getId());
     }
 
-    public Staff getStaffById(long staffId) {
-        Staff staff = staffGraphRepository.findOne(staffId, 0);
-        if (staff == null) {
+    public Staff getStaffById(long staffId){
+        Staff staff = staffGraphRepository.findOne(staffId,0);
+        if(staff == null){
             logger.debug("Searching staff by id " + staffId);
             throw new DataNotFoundByIdException("Incorrect id of staff " + staffId);
         }
@@ -1147,33 +1164,25 @@ public class StaffService extends UserBaseService {
             unitManagers = staffGraphRepository.getUnitManagersIds(parent.getId(), unitId);
 
 
+
         return unitManagers;
     }
-
-    public List<StaffPersonalDetailDTO> getAllStaffByUnitId(long unitId) {
+    public List<StaffPersonalDetailDTO> getAllStaffByUnitId(long unitId){
         Organization unit = organizationGraphRepository.findOne(unitId);
-        if (unit == null) {
-            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
+        if (unit==null){
+            throw new DataNotFoundByIdException("unit  not found  Unit ID: "+unitId);
         }
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(unitId);
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllStaffByUnitId(unitId);
         return staffPersonalDetailDTOS;
     }
 
-    public List<StaffPersonalDetailDTO> getStaffInfoById(long userId, long unitId) {
-        List<StaffPersonalDetailDTO> staffPersonalDetailList = staffGraphRepository.getStaffInfoById(unitId, userId);
+    public List<StaffPersonalDetailDTO> getStaffInfoById(long staffId, long unitId) {
+        List<StaffPersonalDetailDTO>  staffPersonalDetailList = staffGraphRepository.getStaffInfoById(unitId, staffId);
         if (staffPersonalDetailList == null) {
-            throw new DataNotFoundByIdException("Staff not found with provided Staff ID: " + userId + " and Unit ID: " + unitId);
+            throw new DataNotFoundByIdException("Staff not found with provided Staff ID: " + staffId+ " and Unit ID: "+unitId);
         }
         return staffPersonalDetailList;
 
     }
-    public boolean verifyStaffBelongsToUnit( long staffId,long unitId) {
-        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
-        if (staff == null) {
-            return false;
-        }
-        return true;
-    }
-
 
 }
