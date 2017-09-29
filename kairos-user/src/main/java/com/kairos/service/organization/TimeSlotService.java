@@ -227,8 +227,8 @@ public class TimeSlotService extends UserBaseService {
         return currentTimeSlots;
     }
 
-    public Map<String,Object> getTimeSlotByUnitIdAndTimeSlotName(Long unitId, String timeSlotName){
-        Map<String,Object> timeSlot = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotName(unitId, timeSlotName);
+    public Map<String,Object> getTimeSlotByUnitIdAndTimeSlotExternalId(Long unitId, Long kmdExternalId){
+        Map<String,Object> timeSlot = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotExternalId(unitId, kmdExternalId);
         return timeSlot;
     }
 

@@ -39,7 +39,7 @@ public class AppConstants {
     public static final String API_KMD_CARE_STAFF_SHIFTS = "/api/v1/kmdNexus/citizen/unit/{unitId}/getShifts/{filterId}";
     public static final String API_KMD_CARE_TIME_SLOTS = "/api/v1/kmdNexus/citizen/unit/{unitId}/getTimeSlots";
     public static final String API_KMD_CARE_URL= "/api/v1/kmdNexus/citizen/unit/";
-    public static final String API_TIME_SLOTS_NAME = "/api/v1/organization/{organizationId}/time_slot_name";
+    public static final String API_TIME_SLOTS_NAME = "/api/v1/organization/{organizationId}/unit/{unitId}/time_slot_name";
 
     public static final String API_CREDENTIAL_UPDATE_URL = "/api/v1/user/password";
 

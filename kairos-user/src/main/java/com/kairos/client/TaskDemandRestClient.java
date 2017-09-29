@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,10 @@ public class TaskDemandRestClient {
     private static final Logger logger = LoggerFactory.getLogger(TaskDemandRestClient.class);
     @Autowired
     RestTemplate restTemplate;
+    @Autowired
+    @Qualifier("schedulerRestTemplate")
+    RestTemplate schedulerRestTemplate;
+
 
     /**
      * @auther anil maurya
@@ -171,7 +176,7 @@ public class TaskDemandRestClient {
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(grantObject);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>>(){};
             ResponseEntity<RestTemplateResponseEnvelope<Map<String,Object>>> restExchange =
-                    restTemplate.exchange("http://zuulservice/kairos/activity/api/v1/task_demand/organization/{organizationId}/service/{subServiceId}",
+                    schedulerRestTemplate.exchange("http://zuulservice/kairos/activity/api/v1/task_demand/organization/{organizationId}/service/{subServiceId}",
                             HttpMethod.
                                     POST,request, typeReference,organizationId, subServiceId);
 

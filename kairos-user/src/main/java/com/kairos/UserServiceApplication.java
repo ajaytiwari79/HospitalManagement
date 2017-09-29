@@ -85,5 +85,14 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
+	@LoadBalanced
+	@Bean(name ="schedulerRestTemplate")
+	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
+		RestTemplate template =restTemplateBuilder
+				.messageConverters(mappingJackson2HttpMessageConverter())
+				.build();
+		return template;
 	}
+
+}
 
