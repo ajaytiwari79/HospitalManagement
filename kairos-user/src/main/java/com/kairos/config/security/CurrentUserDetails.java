@@ -10,9 +10,7 @@ public class CurrentUserDetails {
     private boolean passwordUpdated;
     private  int age;
     private Long countryId;
-    private boolean hubMember;
-
-    public CurrentUserDetails(){
+   public CurrentUserDetails(){
     //default constructor
   }
 
@@ -98,14 +96,5 @@ public class CurrentUserDetails {
     public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
-
-    public boolean isHubMember() {
-        return hubMember;
-    }
-
-    public void setHubMember(boolean hubMember) {
-        this.hubMember = hubMember;
-    }
-
 
 }

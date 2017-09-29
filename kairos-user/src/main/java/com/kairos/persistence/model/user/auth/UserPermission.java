@@ -11,8 +11,12 @@ import java.util.Set;
 public class UserPermission {
 
     private Long unitId;
+    private List<AccessPageQueryResult> tabPermissions;
 
-    private Set<TabPermission> tabPermissions;
+    public UserPermission(Long unitId, List<AccessPageQueryResult> tabPermissions) {
+        this.unitId = unitId;
+        this.tabPermissions = tabPermissions;
+    }
 
     public Long getUnitId() {
         return unitId;
@@ -22,11 +26,11 @@ public class UserPermission {
         this.unitId = unitId;
     }
 
-    public Set<TabPermission> getTabPermissions() {
+    public List<AccessPageQueryResult> getTabPermissions() {
         return tabPermissions;
     }
 
-    public void setTabPermissions(Set<TabPermission> tabPermissions) {
+    public void setTabPermissions(List<AccessPageQueryResult> tabPermissions) {
         this.tabPermissions = tabPermissions;
     }
 }

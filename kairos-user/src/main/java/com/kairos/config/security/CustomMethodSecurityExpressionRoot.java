@@ -1,17 +1,11 @@
 package com.kairos.config.security;
 
-import com.kairos.util.userContext.UserContext;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.util.Assert;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 import java.util.Set;
 
 public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
@@ -26,38 +20,10 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
     }
 
     //
-    public boolean hasPermission() {
+    public boolean hasPermission(Long tabId) {
         OAuth2Authentication oAuth2Authentication= (OAuth2Authentication)this.authentication;
         Set<String> authorities= AuthorityUtils.authorityListToSet(oAuth2Authentication.getUserAuthentication().getAuthorities());
-        CurrentUserDetails currentUserDetails= UserContext.getUserDetails();
-        Long organizationId = extractIdOrgIdFromUrl();
-        Assert.notNull(currentUserDetails,"User can not be null");
-        Assert.notNull(UserContext.getTabId(),"Tab id can not be null");
-        Assert.notNull(organizationId,"Organization id can not be null");
-        ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest req = sra.getRequest();
-        String permissionString;
-
-        if("GET".equals(req.getMethod())){
-            permissionString = organizationId + "_" + UserContext.getTabId() + "_" + "r";
-        } else {
-            permissionString = organizationId + "_" + UserContext.getTabId() + "_" + "rw";
-        }
-        Optional<String> permission = authorities.stream().filter(s -> s.startsWith(permissionString)).findFirst();
-
-        return permission.isPresent();
-    }
-
-    private Long extractIdOrgIdFromUrl(){
-
-
-        if(Optional.ofNullable(UserContext.getUnitId()).isPresent()){
-            return UserContext.getUnitId();
-        } else if(Optional.ofNullable(UserContext.getOrgId()).isPresent()){
-            return UserContext.getOrgId();
-        }else {
-            return null;
-        }
+        return authorities.contains(tabId.toString());
     }
 
     //

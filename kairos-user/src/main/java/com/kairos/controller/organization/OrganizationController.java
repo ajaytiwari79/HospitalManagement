@@ -115,19 +115,6 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationById(unitId));
     }
-    //TODO
-    /**
-     * Return Organization with given id and return if found.
-     *
-     * @return Organization
-     */
-    @ApiOperation(value = "Get Organization by Id")
-    @RequestMapping(value = UNIT_URL+"/WithoutAuth", method = RequestMethod.GET)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationWithoutAuth(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.getOrganizationById(unitId));
-    }
 
     /**
      * Create new organization in db and return created organization
@@ -1014,8 +1001,6 @@ public class OrganizationController {
     public ResponseEntity<Map<String,Object>> getVehicleList(@PathVariable Long organizationId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getVehicleList(organizationId));
     }
-
-
 
 }
 
