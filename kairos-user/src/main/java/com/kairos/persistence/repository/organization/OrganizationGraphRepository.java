@@ -6,7 +6,6 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position.PositionName;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
@@ -481,21 +480,12 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "return collect(id(organizationType)) as organizationTypes, collect(id(subType)) as organizationSubTypes")
     OrganizationTypeAndSubTypeDTO getorganizationTypeAndSubTypes(Long unitId);
 
-    @Query("MATCH (o:Organization) where id(o)={0} return o")
-    OrganizationExternalIdsDTO getOrganizationExternalIds(Long unitId);
-
-    @Query("MATCH (o:Organization) where id(o)={0} return o")
-    TimeSlotsDeductionDTO getOrganizationTimeSlotDeductions(Long unitId);
-
     @Query("MATCH (c:Client{imported:true})-[r:GET_SERVICE_FROM]->(o:Organization) where id(o)= {0}  case when c is NULL then false else true ")
     Boolean isOrganizationHasExternalReference(Long organizationId);
 
     @Query("MATCH (country:Country)<-[:"+COUNTRY+"]-(o:Organization) where id(o)={0}  return id(country) ")
     Long getCountryId(Long organizationId);
 
-
-
-
-
-
+    @Query("MATCH (n:Organization) RETURN Id(n)")
+    List<Long> allOrganizationIds();
 }

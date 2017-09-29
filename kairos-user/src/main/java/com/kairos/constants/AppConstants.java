@@ -37,6 +37,9 @@ public class AppConstants {
     public static final String API_KMD_CARE_STAFF_SHIFTS = "/api/v1/kmdNexus/citizen/unit/";
     public static final String API_TIME_SLOTS_NAME = "/api/v1/organization/{organizationId}/time_slot_name";
 
+    public static final String API_SCHEDULER_PHASE_ORG = "/api/v1/organizationWithPhases";
+
+
     public static final String API_CREDENTIAL_UPDATE_URL = "/api/v1/user/password";
 
     public static final String SCHEDULE = "SCHEDULE";

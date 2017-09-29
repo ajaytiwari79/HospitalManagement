@@ -37,10 +37,6 @@ public class CustomDefaultTokenServices extends DefaultTokenServices {
         UserPrincipal user=(UserPrincipal)authentication.getUserAuthentication().getPrincipal();
         final Map<String, Object> userDetails = new HashMap<>();
          userDetails.put("details", user.getDetails());
-
-        System.out.println("permissions " + userService.getTabPermission(user.getUser().getId()));
-
-        // userDetails.put("userPermissions",userService.getTabPermission(user.getUser().getId()));
          authentication.setDetails(userDetails);
         return super.createAccessToken(authentication);
 

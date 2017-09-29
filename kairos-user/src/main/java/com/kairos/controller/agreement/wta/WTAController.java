@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -30,13 +31,13 @@ public class WTAController {
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value = COUNTRY_URL+"/wta")
-    public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @RequestBody WtaDTO wta) {
+    public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @RequestBody @Valid WtaDTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.createWta(countryId,wta));
     }
 
     @ApiOperation(value = "Update WTA")
     @PutMapping(value = COUNTRY_URL+"/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long countryId,@PathVariable long wtaId, @RequestBody WtaDTO wta) {
+    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long countryId,@PathVariable long wtaId, @RequestBody @Valid WtaDTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWta(countryId,wtaId,wta));
     }
 
