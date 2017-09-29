@@ -28,22 +28,22 @@ public class PhaseRestClient {
      * @param unitId
      * @return
      */
-    public boolean createDefaultPhases (Long unitId){
+    public void createDefaultPhases (Long unitId){
 
-        final String baseUrl=getBaseUrl(true);
+        final String baseUrl=getBaseUrl(false);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference =
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/phase/default",
+                            baseUrl + "/unit/{unitId}/phase/default",
                             HttpMethod.POST,
                             null, typeReference, unitId);
 
             RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
-                return response.getData();
+                logger.info("RestExchange",restExchange);
             } else {
                 throw new RuntimeException(response.getMessage());
             }
