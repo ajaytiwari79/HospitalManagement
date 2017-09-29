@@ -21,12 +21,22 @@ public class TimeSlot extends UserBaseEntity {
 
     private TYPE timeSlotType;
 
+    private Long kmdExternalId; // for importing time slots from KMD
+
     public TYPE getTimeSlotType() {
         return timeSlotType;
     }
 
     public void setTimeSlotType(TYPE timeSlotType) {
         this.timeSlotType = timeSlotType;
+    }
+
+    public Long getKmdExternalId() {
+        return kmdExternalId;
+    }
+
+    public void setKmdExternalId(Long kmdExternalId) {
+        this.kmdExternalId = kmdExternalId;
     }
 
     public enum TYPE{

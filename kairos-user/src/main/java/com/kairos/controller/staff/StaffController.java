@@ -540,11 +540,11 @@ public class StaffController {
     }
 
 
-    @RequestMapping(value = "/{userId}/personal_details", method = RequestMethod.GET)
+    @RequestMapping(value = "/{staffId}/personal_details", method = RequestMethod.GET)
     @ApiOperation("get only personal details of staff by StaffId ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffInfoById(@PathVariable long unitId, @PathVariable long userId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffInfoById(userId, unitId));
+    public ResponseEntity<Map<String, Object>> getStaffInfoById(@PathVariable long unitId, @PathVariable long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffInfoById(staffId, unitId));
     }
 
     @RequestMapping(value = "/{staffId}", method = RequestMethod.GET)
@@ -554,13 +554,5 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffById(staffId));
     }
 
-
-
-    @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
-    @ApiOperation("verify staff has unit employment in unit or not ")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> verifyStaffBelongsToUnit(@PathVariable long unitId, @PathVariable long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.verifyStaffBelongsToUnit(staffId, unitId));
-    }
 
 }
