@@ -115,6 +115,7 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationById(unitId));
     }
+
     //TODO
     /**
      * Return Organization with given id and return if found.
