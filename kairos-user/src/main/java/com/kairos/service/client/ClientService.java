@@ -37,10 +37,9 @@ import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
-import io.swagger.annotations.Contact;
-import org.apache.commons.collections.map.HashedMap;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -49,9 +48,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.KAIROS;
+import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**
  * Created by oodles on 28/9/16.
@@ -152,14 +154,22 @@ public class ClientService extends UserBaseService {
 
         if (clientMinimumDTO != null) {
 
+            if (!invalidCPRNumber(clientMinimumDTO.getCprnumber())) {
+                throw new DataNotFoundByIdException("Invalid CPR Number");
+            }
+
 
             Client client = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
-            if(client.isCitizenDead()){
+            if (Optional.ofNullable(client).isPresent() && client.isCitizenDead()) {
                 throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
             }
 
             if (client != null) {
                 logger.debug("Using Existing Client..........");
+
+                if (client.isCitizenDead()) {
+                    throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
+                }
 
                 int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
 
@@ -336,7 +346,7 @@ public class ClientService extends UserBaseService {
     public Map<String, Object> retrieveGeneralDetails(long clientId, long unitId) {
         Map<String, Object> response = new HashMap<>();
         //Client currentClient = clientGraphRepository.findOne(clientId);
-        Client currentClient = clientGraphRepository.getClientByClientIdAndUnitId(clientId,unitId);
+        Client currentClient = clientGraphRepository.getClientByClientIdAndUnitId(clientId, unitId);
 
         // Client Data
         if (currentClient != null) {
@@ -372,28 +382,14 @@ public class ClientService extends UserBaseService {
                 if (languageData != null) {
                     response.put("languageData", FormatUtil.formatNeoResponse(languageData));
                 }
+                response.put("relationTypes", countryGraphRepository.getRelationTypesByCountry(countryId));
             } else {
                 logger.debug("Country not found");
             }
 
             // NextToKin
-            List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId,envConfig.getServerHost() + File.separator);
-            nextToKinDetails.forEach(nextToKinQueryResult -> {
-                ContactAddress homeAddress = nextToKinQueryResult.getHomeAddress();
-                homeAddress.setMunicipality(nextToKinQueryResult.getMunicipality());
-                homeAddress.setZipCode(nextToKinQueryResult.getZipCode());
-            });
+            List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId, envConfig.getServerHost() + File.separator);
             response.put("nextToKin", nextToKinDetails);
-            /*if (kin != null) {
-                //Map<String, Object> nextToKinDetails = clientGraphRepository.findOne(kin.getId(), 2).retrieveNextToKinDetails();
-
-               *//* if (nextToKinDetails != null) {
-                    String imageUrl = envConfig.getServerHost() + File.separator + (String) nextToKinDetails.get("profilePic");
-                    nextToKinDetails.put("profilePic", imageUrl);
-                }*//*
-                response.put("nextToKin", nextToKinDetails);
-            }*/
-
             // Social Media Details
             Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
             response.put("socialMediaDetails", socialMediaDetails != null ? socialMediaDetails : Collections.EMPTY_MAP);
@@ -403,7 +399,7 @@ public class ClientService extends UserBaseService {
             response.put("clientGeneral", clientGeneralDetails);
             return response;
         } else {
-            throw new DataNotFoundByIdException("Client not found with provided Client ID: " + clientId+ " and Unit ID: "+unitId);
+            throw new DataNotFoundByIdException("Client not found with provided Client ID: " + clientId + " and Unit ID: " + unitId);
         }
     }
 
@@ -591,24 +587,28 @@ public class ClientService extends UserBaseService {
         return response;
     }
 
-    public ClientMinimumDTO addHouseholdToClient(ClientMinimumDTO minimumDTO, long unitId, long clientId)  {
-        Client client = clientGraphRepository.findOne(clientId,unitId);
+    public ClientMinimumDTO addHouseholdToClient(ClientMinimumDTO minimumDTO, long unitId, long clientId) {
+        Client client = clientGraphRepository.findOne(clientId);
         if (!Optional.ofNullable(client).isPresent()) {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
-        Client houseHold = saveDetailsOfHouseHold(minimumDTO,unitId,clientId);
-        saveAddressOfHouseHold(client,houseHold);
-        createHouseHoldRelationship(clientId,houseHold.getId());
+        Client houseHold = saveDetailsOfHouseHold(minimumDTO);
+        saveAddressOfHouseHold(client, houseHold);
+        if (!Optional.ofNullable(houseHold.getId()).isPresent()) {
+            addHouseHoldInOrganization(houseHold, unitId);
+        }
+        save(houseHold);
+        createHouseHoldRelationship(clientId, houseHold.getId());
         minimumDTO.setId(houseHold.getId());
         return minimumDTO;
     }
 
-    private Client saveDetailsOfHouseHold(ClientMinimumDTO clientMinimumDTO,long unitId,long clientId){
+    private Client saveDetailsOfHouseHold(ClientMinimumDTO clientMinimumDTO) {
 
         Client houseHoldPeople = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
-        if(Optional.ofNullable(houseHoldPeople).isPresent()){
-            if(houseHoldPeople.isCitizenDead()){
+        if (Optional.ofNullable(houseHoldPeople).isPresent()) {
+            if (houseHoldPeople.isCitizenDead()) {
                 throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
             }
         } else {
@@ -620,38 +620,29 @@ public class ClientService extends UserBaseService {
             final String email = houseHoldPeople.getCprNumber() + KAIROS;
             houseHoldPeople.setEmail(email);
             houseHoldPeople.setUserName(email);
-            Organization organization = organizationGraphRepository.findOne(unitId);
-            if(!Optional.ofNullable(organization).isPresent()){
-                throw new DataNotFoundByIdException("Incorrect id of organization " + unitId);
-            }
-            ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(houseHoldPeople, organization, new DateTime().getMillis());
-            relationGraphRepository.save(clientOrganizationRelation);
         }
         return houseHoldPeople;
     }
 
-    private void createHouseHoldRelationship(long clientId,long houseHoldId){
-        clientGraphRepository.createHouseHoldRelationship(clientId,houseHoldId,new Date().getTime(),new Date().getTime());
+    private void addHouseHoldInOrganization(Client houseHold, long organizationId) {
+        Organization organization = organizationGraphRepository.findOne(organizationId);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            throw new DataNotFoundByIdException("Incorrect id of organization " + organizationId);
+        }
+        ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(houseHold, organization, new DateTime().getMillis());
+        relationGraphRepository.save(clientOrganizationRelation);
+
     }
 
-    private void saveAddressOfHouseHold(Client client,Client houseHold){
-        ClientHomeAddressQueryResult addressOfClient = clientGraphRepository.getHomeAddress(client.getId());
-        if(Optional.ofNullable(addressOfClient).isPresent()){
-            ClientHomeAddressQueryResult addressOfHouseHoldPerson = clientGraphRepository.getHomeAddress(houseHold.getId());
-            ContactAddress contactAddress;
-            if(Optional.ofNullable(addressOfHouseHoldPerson).isPresent()){
-                contactAddress = addressOfHouseHoldPerson.getHomeAddress();
-            } else {
-                contactAddress = ContactAddress.getInstance();
-            }
-            contactAddress.copyProperties(addressOfClient.getHomeAddress());
-            contactAddress.setMunicipality(addressOfClient.getMunicipality());
-            contactAddress.setZipCode(addressOfClient.getZipCode());
-            houseHold.setHomeAddress(contactAddress);
+    private void createHouseHoldRelationship(long clientId, long houseHoldId) {
+        clientGraphRepository.createHouseHoldRelationship(clientId, houseHoldId, new Date().getTime(), new Date().getTime());
+    }
+
+    private void saveAddressOfHouseHold(Client client, Client houseHold) {
+        if (Optional.ofNullable(client.getHomeAddress()).isPresent()) {
+            houseHold.setHomeAddress(client.getHomeAddress());
         }
     }
-
-
 
 
     public List<ClientMinimumDTO> getPeopleInHousehold(long clientId) {
@@ -691,13 +682,14 @@ public class ClientService extends UserBaseService {
      * @return
      * @auther anil maurya
      */
-    public boolean markClientAsDead(Long clientId,CitizenDeathInfoDTO citizenDeathInfoDTO) {
+    public boolean markClientAsDead(Long clientId, String deathDate) throws ParseException {
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
             throw new DataNotFoundByIdException("Incorrect client id ::" + clientId);
         }
+        Date deathDateInDateFormat = DateUtil.convertToOnlyDate(deathDate, MONGODB_QUERY_DATE_FORMAT);
         client.setCitizenDead(true);
-        client.setDeathDate(citizenDeathInfoDTO.getDeathDate().getTime());
+        client.setDeathDate(deathDateInDateFormat.getTime());
         clientGraphRepository.save(client);
         //return plannerService.deleteTasksForCitizen(clientId);
         return plannerRestClient.deleteTaskForCitizen(clientId);
@@ -874,7 +866,7 @@ public class ClientService extends UserBaseService {
         orgData.put("taskTypes", taskTypeRestClient.getTaskTypesOfUnit(unitId));
         // orgData.put("taskTypes", customTaskTypeRepository.getTaskTypesOfUnit(unitId));
         orgData.put("skills", filterSkillData);
-        orgData.put("teams", teamGraphRepository.getTeamsByOrganization(    unitId));
+        orgData.put("teams", teamGraphRepository.getTeamsByOrganization(unitId));
 
         long endTime = System.currentTimeMillis();
         logger.info("Time taken by ClientService>>getAssignedStaffOfCitizen " + (endTime - startTime) + "  ms");
@@ -890,7 +882,6 @@ public class ClientService extends UserBaseService {
 
     /**
      * @param organizationId
-
      * @return
      * @auther Anil maurya
      */
@@ -904,7 +895,7 @@ public class ClientService extends UserBaseService {
 
         Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )
-        Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(),organizationId,mapList);
+        Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), organizationId, mapList);
         response.putAll(responseFromTask);
 
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
@@ -949,7 +940,6 @@ public class ClientService extends UserBaseService {
         return clientData;
 
     }
-
 
 
     public HashMap<String, Object> getOrganizationAllClients(long organizationId, long unitId, long staffId) {
@@ -1043,7 +1033,7 @@ public class ClientService extends UserBaseService {
 
         Client citizen = clientGraphRepository.findOne(citizenId, 1);
         if (citizen.getHomeAddress() == null) {
-            throw new DataNotFoundByIdException(citizen.getFirstName() + "'s HomeAddress in not available");
+            throw new DataNotFoundByIdException(citizen.getFirstName() + "'s Home Address is not available");
         }
         Map<String, Object> citizenPlanningMap = new HashMap<>();
         List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(citizenId);
@@ -1204,48 +1194,46 @@ public class ClientService extends UserBaseService {
     }
 
 
-
     public List<Long> getClientIds(long unitId) {
         return clientGraphRepository.getCitizenIds(unitId);
     }
 
 
     /**
-     *  @auther anil maurya
-     *  method is called from task micro service
      * @param organizationId
      * @param auth2Authentication
      * @return
+     * @auther anil maurya
+     * method is called from task micro service
      */
-   public OrganizationClientWrapper getOrgnizationClients(Long organizationId, OAuth2Authentication auth2Authentication){
+    public OrganizationClientWrapper getOrgnizationClients(Long organizationId, OAuth2Authentication auth2Authentication) {
 
-       logger.debug("Finding citizen with Id: " + organizationId);
-       List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId,envConfig.getServerHost() + File.separator);
-       logger.debug("CitizenList Size: " + mapList.size());
+        logger.debug("Finding citizen with Id: " + organizationId);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + File.separator);
+        logger.debug("CitizenList Size: " + mapList.size());
 
-       Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(auth2Authentication.getUserAuthentication().getPrincipal().toString()).getId());
-       Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-       OrganizationClientWrapper organizationClientWrapper=new OrganizationClientWrapper(mapList,timeSlotData);
-       organizationClientWrapper.setStaffId(staff.getId());
-       return organizationClientWrapper;
+        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(auth2Authentication.getUserAuthentication().getPrincipal().toString()).getId());
+        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
+        OrganizationClientWrapper organizationClientWrapper = new OrganizationClientWrapper(mapList, timeSlotData);
+        organizationClientWrapper.setStaffId(staff.getId());
+        return organizationClientWrapper;
 
 
-   }
+    }
 
     /**
-     *  @auther anil maurya
-     *  method is called from task micro service
      * @param organizationId
-     *
      * @return
+     * @auther anil maurya
+     * method is called from task micro service
      */
-    public OrganizationClientWrapper getOrgnizationClients(Long organizationId,List<Long> citizenId){
+    public OrganizationClientWrapper getOrgnizationClients(Long organizationId, List<Long> citizenId) {
 
         logger.info("Finding citizen with Id: " + citizenId);
         List<Map<String, Object>> mapList = organizationGraphRepository.getClientsByClintIdList(citizenId);
         logger.info("CitizenList Size: " + mapList.size());
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-        OrganizationClientWrapper organizationClientWrapper=new OrganizationClientWrapper(mapList,timeSlotData);
+        OrganizationClientWrapper organizationClientWrapper = new OrganizationClientWrapper(mapList, timeSlotData);
 
         return organizationClientWrapper;
 
@@ -1253,15 +1241,15 @@ public class ClientService extends UserBaseService {
     }
 
 
-    public List<EscalateTaskWrapper> getClientAggregation(Long unitId){
+    public List<EscalateTaskWrapper> getClientAggregation(Long unitId) {
         List<EscalateTaskWrapper> escalatedTaskData = new ArrayList<>();
-       // List<EscalatedTasksWrapper> escalatedTasksWrappers = taskMongoRepository.getStaffNotAssignedTasksGroupByCitizen(unitId);
-        List<EscalatedTasksWrapper> escalatedTasksWrappers=taskServiceRestClient.getStaffNotAssignedTasks(unitId);
-        for(EscalatedTasksWrapper escalatedTasksWrapper : escalatedTasksWrappers){
+        // List<EscalatedTasksWrapper> escalatedTasksWrappers = taskMongoRepository.getStaffNotAssignedTasksGroupByCitizen(unitId);
+        List<EscalatedTasksWrapper> escalatedTasksWrappers = taskServiceRestClient.getStaffNotAssignedTasks(unitId);
+        for (EscalatedTasksWrapper escalatedTasksWrapper : escalatedTasksWrappers) {
             Client client = clientGraphRepository.findOne(escalatedTasksWrapper.getId());
-            for(EscalateTaskWrapper escalateTaskWrapper : escalatedTasksWrapper.getTasks()){
+            for (EscalateTaskWrapper escalateTaskWrapper : escalatedTasksWrapper.getTasks()) {
                 escalateTaskWrapper.setCitizenName(client.getFullName());
-                if(client.getGender() != null)  escalateTaskWrapper.setGender(client.getGender().name());
+                if (client.getGender() != null) escalateTaskWrapper.setGender(client.getGender().name());
                 escalateTaskWrapper.setAge(client.getAge());
                 escalateTaskWrapper.setCitizenId(client.getId());
                 escalatedTaskData.add(escalateTaskWrapper);
@@ -1271,27 +1259,27 @@ public class ClientService extends UserBaseService {
 
     }
 
-    public List<Client> getClientsByIdsInList(List<Long> citizenIds){
+    public List<Client> getClientsByIdsInList(List<Long> citizenIds) {
         return clientGraphRepository.findByIdIn(citizenIds);
     }
 
-    public ClientMinimumDTO findByCPRNumber(long clientId,long unitId,String cprNumber){
+    public ClientMinimumDTO findByCPRNumber(long clientId, long unitId, String cprNumber) {
 
-        Client client = clientGraphRepository.findOne(clientId,unitId);
-        if(!Optional.ofNullable(client).isPresent()){
+        Client client = clientGraphRepository.findOne(clientId, unitId);
+        if (!Optional.ofNullable(client).isPresent()) {
             logger.debug("Finding client by id " + client.getId());
             throw new DataNotFoundByIdException("Incorrect client id " + clientId);
         }
 
         Client houseHoldPerson = clientGraphRepository.findByCPRNumber(cprNumber);
-        if(Optional.ofNullable(houseHoldPerson).isPresent()){
-            if(houseHoldPerson.isCitizenDead()){
+        if (Optional.ofNullable(houseHoldPerson).isPresent()) {
+            if (houseHoldPerson.isCitizenDead()) {
                 throw new DataNotFoundByIdException("You can't enter CPR number of dead citizen");
             } else {
                 ClientMinimumDTO clientMinimumDTO = new ClientMinimumDTO();
                 clientMinimumDTO.setFirstName(houseHoldPerson.getFirstName());
                 clientMinimumDTO.setLastName(houseHoldPerson.getLastName());
-                clientMinimumDTO.setHasSameAddress(hasSameAddress(client,houseHoldPerson));
+                clientMinimumDTO.setHasSameAddress(hasSameAddress(client, houseHoldPerson));
                 return clientMinimumDTO;
             }
         } else {
@@ -1299,18 +1287,78 @@ public class ClientService extends UserBaseService {
         }
     }
 
-    private boolean hasSameAddress(Client client, Client houseHoldPeople){
+    private boolean hasSameAddress(Client client, Client houseHoldPeople) {
         ClientHomeAddressQueryResult addressOfClient = clientGraphRepository.getHomeAddress(client.getId());
         ClientHomeAddressQueryResult addressOfHouseHoldPerson = clientGraphRepository.getHomeAddress(houseHoldPeople.getId());
 
-        ContactAddress homeAddressOfClient = addressOfClient.getHomeAddress();
-        ZipCode zipCodeOfClient = addressOfClient.getZipCode();
-        ContactAddress homeAddressofHouseHoldPerson = addressOfHouseHoldPerson.getHomeAddress();
-        ZipCode zipCodeOfHouseHoldPerson = addressOfHouseHoldPerson.getZipCode();
+        boolean hasSameAddress = false;
+        if (Optional.ofNullable(addressOfClient).isPresent() && Optional.ofNullable(addressOfHouseHoldPerson).isPresent()) {
+            ContactAddress homeAddressOfClient = addressOfClient.getHomeAddress();
+            ZipCode zipCodeOfClient = addressOfClient.getZipCode();
+            ContactAddress homeAddressofHouseHoldPerson = addressOfHouseHoldPerson.getHomeAddress();
+            ZipCode zipCodeOfHouseHoldPerson = addressOfHouseHoldPerson.getZipCode();
+            hasSameAddress = (homeAddressOfClient.getStreet1().equalsIgnoreCase(homeAddressofHouseHoldPerson.getStreet1()) &&
+                    homeAddressOfClient.getHouseNumber().equalsIgnoreCase(homeAddressofHouseHoldPerson.getHouseNumber()) &&
+                    zipCodeOfClient.getZipCode().equals(zipCodeOfHouseHoldPerson.getZipCode()));
+        }
+        return hasSameAddress;
+    }
 
-        return (homeAddressOfClient.getStreet1().equalsIgnoreCase(homeAddressofHouseHoldPerson.getStreet1()) &&
-                homeAddressOfClient.getHouseNumber().equalsIgnoreCase(homeAddressofHouseHoldPerson.getHouseNumber()) &&
-        zipCodeOfClient.getZipCode().equals(zipCodeOfHouseHoldPerson.getZipCode()));
+    private boolean invalidCPRNumber(String cprNumber) {
+        if (cprNumber == null) {
+            return false;
+
+        }
+        if (cprNumber.length() == 9) {
+            cprNumber = "0" + cprNumber;
+        }
+        if (cprNumber.length() != 10) {
+            return false;
+        }
+
+        if (cprNumber != null) {
+            Integer year = Integer.valueOf(cprNumber.substring(4, 6));
+            Integer month = Integer.valueOf(cprNumber.substring(2, 4));
+            Integer day = Integer.valueOf(cprNumber.substring(0, 2));
+            Integer century = Integer.parseInt(cprNumber.substring(6, 7));
+
+            if (century >= 0 && century <= 3) {
+                century = 1900;
+            }
+            if (century == 4) {
+                if (year <= 36) {
+                    century = 2000;
+                } else {
+                    century = 1900;
+                }
+            }
+            if (century >= 5 && century <= 8) {
+                if (year <= 57) {
+                    century = 2000;
+                }
+                if (year >= 58 && year <= 99) {
+                    century = 1800;
+                }
+            }
+            if (century == 9) {
+                if (year <= 36) {
+                    century = 2000;
+                } else {
+                    century = 1900;
+                }
+            }
+            year = century + year;
+            try {
+                LocalDate today = LocalDate.now();
+                LocalDate birthday = LocalDate.of(year, month, day);
+                return true;
+            } catch (Exception e) {
+                return false;// Calculating age in yeas from DOB
+            }
+
+
+        }
+        return false;
     }
 
 }

@@ -86,4 +86,17 @@ public class AccessPageQueryResult {
     public void setModule(boolean module) {
         isModule = module;
     }
+
+    @Override
+    public String toString() {
+        return "AccessPageQueryResult{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", isRead=" + isRead +
+                ", isWrite=" + isWrite +
+                ", moduleId='" + moduleId + '\'' +
+                '}';
+    }
+
+
 }

@@ -1,6 +1,5 @@
 package com.kairos.service.organization;
 
-import com.kairos.client.PhaseRestClient;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.organization.*;
@@ -139,8 +138,7 @@ public class OrganizationService extends UserBaseService {
     TeamService teamService;
     @Autowired
     OrganizationMetadataRepository organizationMetadataRepository;
-    @Autowired
-    private PhaseRestClient phaseRestClient;
+
     @Autowired
     ClientService clientService;
     @Autowired
@@ -151,6 +149,7 @@ public class OrganizationService extends UserBaseService {
 
     @Inject
     AbsenceTypesRepository absenceTypesRepository;
+
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id, 0);
     }
@@ -206,7 +205,6 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = new Date().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        phaseRestClient.createDefaultPhases(organization.getId());
         return organizationResponse(organization, orgDetails);
     }
 
@@ -370,6 +368,7 @@ public class OrganizationService extends UserBaseService {
 
     public Map<String, Object> createNewUnit(OrganizationDTO organizationDTO, long unitId) {
 
+        logger.info("vipul to check                                                                 ");
 
         Organization parent = organizationGraphRepository.findOne(unitId);
 
@@ -469,7 +468,6 @@ public class OrganizationService extends UserBaseService {
                 contactAddress.setZipCode(zipCode);
                 contactAddress.setCity(zipCode.getName());
                 unit.setContactAddress(contactAddress);
-
             }
             return null;
 
@@ -489,7 +487,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit);
-        phaseRestClient.createDefaultPhases(unit.getId());
+
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
         response.put("name", unit.getName());
@@ -1007,11 +1005,11 @@ public class OrganizationService extends UserBaseService {
         return countryGraphRepository.getResourcesByCountry(countryId);
     }
 
-
     public  List<Long> allOrganizationIds(){
         List<Long> organizationIds=organizationGraphRepository.allOrganizationIds();
         return organizationIds;
     }
+
 
 }
 

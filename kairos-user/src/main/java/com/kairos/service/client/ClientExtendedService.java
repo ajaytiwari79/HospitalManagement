@@ -1,14 +1,15 @@
 package com.kairos.service.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.country.CitizenStatus;
+import com.kairos.persistence.model.user.country.RelationType;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -16,6 +17,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
@@ -31,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.IMAGES_PATH;
@@ -90,41 +91,74 @@ public class ClientExtendedService extends UserBaseService {
     private ClientAllergiesGraphRepository clientAllergiesGraphRepository;
     @Inject
     private AccessToLocationGraphRepository accessToLocationGraphRepository;
+    @Inject
+    private CountryGraphRepository countryGraphRepository;
 
 
-    public NextToKinQueryResult saveNextToKin(long unitId, long clientId, NextToKinDTO nextToKinDTO) {
-        Client client = clientGraphRepository.findOne(clientId, unitId);
+    public NextToKinDTO saveNextToKin(Long unitId, Long clientId, NextToKinDTO nextToKinDTO) {
+        Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
-        validateCPRNumber(nextToKinDTO.getCprNumber(),unitId);
-        Client nextToKin = new Client();
+        Client nextToKin = validateCPRNumber(nextToKinDTO.getCprNumber());
+        Long homeAddressId = null;
+        ContactDetail contactDetail = null;
+        if(!Optional.ofNullable(nextToKin).isPresent()){
+            nextToKin = new Client();
+        } else {
+            if(nextToKin.getId().equals(clientId)){
+                throw new DataNotMatchedException("Add another next to kin");
+            }
+            homeAddressId = clientGraphRepository.getIdOfHomeAddress(nextToKin.getId());
+            contactDetail = clientGraphRepository.getContactDetailOfNextToKin(nextToKin.getId());
+        }
+        ContactAddress homeAddress;
+        if(!Optional.ofNullable(homeAddressId).isPresent()){
+            homeAddress = ContactAddress.getInstance();
+        } else {
+            homeAddress = contactAddressGraphRepository.findOne(homeAddressId);
+        }
+
+        if(!Optional.ofNullable(contactDetail).isPresent()){
+            contactDetail = new ContactDetail();
+        }
         nextToKin.saveBasicDetail(nextToKinDTO);
         nextToKin.setProfilePic(nextToKinDTO.getProfilePic());
-        saveContactDetailOfNextToKIbn(nextToKinDTO, nextToKin);
-        ContactAddress contactAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),
-                false);
-        if (!Optional.ofNullable(contactAddress).isPresent()) {
+        nextToKin.saveContactDetail(nextToKinDTO, contactDetail);
+        nextToKin.setContactDetail(contactDetail);
+        homeAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),homeAddress);
+        if (!Optional.ofNullable(homeAddress).isPresent()) {
             return null;
         }
         saveCivilianStatus(nextToKinDTO,nextToKin);
-        nextToKin.setHomeAddress(contactAddress);
-        createNextToKinRelationship(client, nextToKin);
-        assignOrganizationToNextToKin(nextToKin, unitId);
-        return new NextToKinQueryResult().buildResponse(nextToKin,envConfig.getServerHost() + File.separator);
+        nextToKin.setHomeAddress(homeAddress);
+        save(nextToKin);
+        saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, client.getId());
+        if(!hasAlreadyNextToKin(clientId,nextToKin.getId())){
+            createNextToKinRelationship(client, nextToKin);
+        }
+        if(!gettingServicesFromOrganization(nextToKin.getId(),unitId)){
+            assignOrganizationToNextToKin(nextToKin, unitId);
+        }
+        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator,
+                nextToKinDTO.getRelationTypeId(),nextToKinDTO);
     }
 
-    private boolean validateCPRNumber(String cprNumber,long unitId){
+    private Client validateCPRNumber(String cprNumber){
         Client client = clientGraphRepository.findByCPRNumber(cprNumber.trim());
         if(Optional.ofNullable(client).isPresent() && client.isCitizenDead()){
             throw new DuplicateDataException("You can't enter the CPR of dead citizen " + cprNumber);
-        } else if(Optional.ofNullable(client).isPresent() && relationService.checkClientOrganizationRelation(client.getId(), unitId)>0){
-            logger.debug("CPR number already exist " +cprNumber);
-            throw new DataNotFoundByIdException("CPR number already exist " + cprNumber);
-        } else {
-            return true;
         }
+        return client;
+    }
+
+    private Boolean hasAlreadyNextToKin(Long clientId,Long nextToKinId){
+        return clientGraphRepository.hasAlreadyNextToKin(clientId,nextToKinId);
+    }
+
+    private Boolean gettingServicesFromOrganization(Long clientId,Long unitId){
+        return  relationService.checkClientOrganizationRelation(clientId, unitId)>0;
     }
 
     private void createNextToKinRelationship(Client client, Client nextToKin) {
@@ -140,21 +174,12 @@ public class ClientExtendedService extends UserBaseService {
     }
 
 
-    private ContactAddress verifyAndSaveAddressOfNextToKin(long unitId, AddressDTO addressDTO, boolean isAddressToUpdate) {
-
-        ContactAddress contactAddressToSave;
-        if (isAddressToUpdate) {
-            contactAddressToSave = contactAddressGraphRepository.findOne(addressDTO.getId());
-            if (!Optional.ofNullable(contactAddressToSave).isPresent()) {
-                throw new DataNotFoundByIdException("Address not found for update " + addressDTO.getId());
-            }
-        } else {
-            contactAddressToSave = new ContactAddress();
-        }
+    private ContactAddress verifyAndSaveAddressOfNextToKin(long unitId, AddressDTO addressDTO,
+                                                           ContactAddress contactAddressToSave) {
 
         Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
         if (municipality == null) {
-            logger.debug("Finding municiplaity using id " + addressDTO.getMunicipalityId());
+            logger.debug("Finding municipality using id " + addressDTO.getMunicipalityId());
             throw new DataNotFoundByIdException("Incorrect municipality id " + addressDTO.getMunicipalityId());
         }
 
@@ -195,24 +220,20 @@ public class ClientExtendedService extends UserBaseService {
         contactAddressToSave.setStreet1(addressDTO.getStreet1());
         contactAddressToSave.setHouseNumber(addressDTO.getHouseNumber());
         contactAddressToSave.setFloorNumber(addressDTO.getFloorNumber());
-        contactAddressToSave.setCity(addressDTO.getZipCodeName());
+        contactAddressToSave.setCity(zipCode.getName());
         return contactAddressToSave;
-    }
-
-    private void saveContactDetailOfNextToKIbn(NextToKinDTO nextToKinDTO, Client nextToKin) {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        ContactDetail contactDetail = objectMapper.convertValue(nextToKinDTO.getContactDetail(), ContactDetail.class);
-        nextToKin.setContactDetail(contactDetail);
     }
 
     private void saveCivilianStatus(NextToKinDTO nextToKinDTO, Client nextToKin) {
 
-        if (Optional.ofNullable(nextToKinDTO.getCivilianStatus()).isPresent()) {
-            CitizenStatus citizenStatus = citizenStatusGraphRepository.findOne(nextToKinDTO.getCivilianStatus().getId());
+        if (Optional.ofNullable(nextToKinDTO.getCivilianStatusId()).isPresent()) {
+            CitizenStatus citizenStatus = citizenStatusGraphRepository.findOne(nextToKinDTO.getCivilianStatusId());
             if (!Optional.ofNullable(citizenStatus).isPresent()) {
-                logger.debug("Finding civilian status using id " + nextToKinDTO.getCivilianStatus().getId());
+                logger.debug("Finding civilian status using id " + nextToKinDTO.getCivilianStatusId());
                 throw new DataNotFoundByIdException("Incorrect id of civilian status " + citizenStatus);
+            }
+            if(Optional.ofNullable(nextToKin.getId()).isPresent()){
+                clientGraphRepository.deleteCivilianStatus(nextToKin.getId());
             }
             nextToKin.setCivilianStatus(citizenStatus);
         } else {
@@ -220,211 +241,58 @@ public class ClientExtendedService extends UserBaseService {
         }
     }
 
-    public NextToKinQueryResult updateNextToKinDetail(long unitId,long nextToKinId,NextToKinDTO nextToKinDTO){
-        Client nextToKin = clientGraphRepository.findOne(nextToKinId,unitId);
+
+    private void saveCitizenRelation(Long relationTypeId, Long unitId, Client nextToKin, Long clientId) {
+
+        Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+        Client client = clientGraphRepository.findOne(clientId);
+        if (Optional.ofNullable(relationTypeId).isPresent()) {
+            RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);
+            ClientRelationType clientRelationTypeRelationship = clientGraphRepository.getClientRelationType(clientId,  nextToKin.getId());
+            clientGraphRepository.removeClientRelationType( clientId,  nextToKin.getId());
+            if(Optional.ofNullable(clientRelationTypeRelationship).isPresent()) clientGraphRepository.removeClientRelationById(clientRelationTypeRelationship.getId());
+             clientRelationTypeRelationship = new ClientRelationType();
+            clientRelationTypeRelationship.setRelationType(relationType);
+            clientRelationTypeRelationship.setNextToKin(nextToKin);
+            client.addClientRelations(clientRelationTypeRelationship);
+            save(client);
+        } else {
+            throw new DataNotFoundByIdException("Relation Type can't be empty");
+        }
+    }
+
+    public NextToKinDTO updateNextToKinDetail(long unitId,long nextToKinId,NextToKinDTO nextToKinDTO, long clientId){
+        Client nextToKin = clientGraphRepository.findOne(nextToKinId);
         if(!Optional.ofNullable(nextToKin).isPresent()){
             logger.debug("Finding next to kin by id " + nextToKinId);
             throw new DataNotFoundByIdException("Incorrect id of next to kin " + nextToKinId);
         }
         nextToKin.saveBasicDetail(nextToKinDTO);
-        ContactAddress contactAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(), true);
-        if (!Optional.ofNullable(contactAddress).isPresent()) {
+        Long homeAddressId = clientGraphRepository.getIdOfHomeAddress(nextToKinId);
+        if(!Optional.ofNullable(homeAddressId).isPresent()){
+            throw new DataNotFoundByIdException("Home address not found");
+        }
+
+
+        ContactAddress homeAddress = contactAddressGraphRepository.findOne(homeAddressId);
+        homeAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),homeAddress);
+        if (!Optional.ofNullable(homeAddress).isPresent()) {
             return null;
-        }
-        nextToKin.setHomeAddress(contactAddress);
-        saveCivilianStatus(nextToKinDTO,nextToKin);
-        logger.debug("Preparing response");
-        clientGraphRepository.save(nextToKin);
-        return new NextToKinQueryResult().buildResponse(nextToKin,envConfig.getServerHost() + File.separator);
-    }
-
-
-
-    /*public Map<String, Object> updateNextToKin(NextToKinDTO kinDTO, long unitId, long clientId) {
-        Client nextToKin = (kinDTO.getId() == null) ? new Client() : clientGraphRepository.findOne(kinDTO.getId());
-        if (nextToKin == null) {
-            throw new InternalError("Next to kin is null");
-        }
-
-        nextToKin.setFirstName(kinDTO.getFirstName());
-        nextToKin.setLastName(kinDTO.getLastName());
-        nextToKin.setNickName(kinDTO.getNickName());
-
-        if (clientGraphRepository.getClientByCPRNumber(String.valueOf(kinDTO.getCprNumber())) > 1) {
-            logger.debug("CPR number already exist " + kinDTO.getCprNumber());
-            throw new DataNotFoundByIdException("CPR number already exist " + kinDTO.getCprNumber());
-        }
-
-
-        Long cprNumber = kinDTO.getCprNumber();
-        nextToKin.setCprNumber(cprNumber.toString());
-        logger.debug("CPR number: " + cprNumber);
-
-        nextToKin = clientService.generateAgeAndGenderFromCPR(nextToKin);
-
-        // Civilian Status
-        Long civilianStatusId = kinDTO.getCivilianStatus().getId();
-        nextToKin.setCivilianStatus(citizenStatusGraphRepository.findOne(civilianStatusId));
-
-
-        // Check if Contact details Exist
-        ContactDetail detail = nextToKin.getContactDetail();
-        if (detail == null) {
-            detail = new ContactDetail();
-        }
-        // Contact details
-        detail.setMobilePhone(kinDTO.getContactDetail().getMobilePhone());
-        detail.setPrivatePhone(kinDTO.getContactDetail().getPrivatePhone());
-        detail.setWorkPhone(kinDTO.getContactDetail().getWorkPhone());
-
-
-        //Social Media Details
-        detail.setFacebookAccount(kinDTO.getContactDetail().getFacebookAccount());
-        detail.setMessenger(kinDTO.getContactDetail().getMessenger());
-        detail.setLinkedInAccount(kinDTO.getContactDetail().getLinkedInAccount());
-        detail.setTwitterAccount(kinDTO.getContactDetail().getTwitterAccount());
-        detail.setPrivateEmail(kinDTO.getContactDetail().getPrivateEmail());
-        detail = contactDetailsGraphRepository.save(detail);
-
-        nextToKin.setContactDetail(detail);
-
-
-        // Address Details
-        AddressDTO addressDTO = kinDTO.getHomeAddress();
-        if (addressDTO == null) {
-            logger.debug("No Address to verify");
-            return null;
-        }
-        ContactAddress homeAddress;
-        if (addressDTO.getId() != null) {
-            homeAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
-        } else {
-            homeAddress = new ContactAddress();
-        }
-
-        if (addressDTO.isVerifiedByGoogleMap()) {
-            logger.debug("Google Map verified address received ");
-            // -------Parse Address from DTO -------- //
-            //ZipCode
-            if (addressDTO.getZipCodeValue() == 0) {
-                logger.debug("No ZipCode value received");
-                return null;
-            }
-            ZipCode zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
-            if (zipCode == null) {
-                logger.debug("ZipCode Not Found returning null");
-                return null;
-            }
-            Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
-            if (municipality == null) {
-                throw new InternalError("Municpality not found");
-            }
-
-
-            Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
-            if (geographyData == null) {
-                logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                throw new InternalError("Geography data not found with provided municipality");
-            }
-            logger.info("Geography Data: " + geographyData);
-
-
-            // Geography Data
-            homeAddress.setMunicipality(municipality);
-            homeAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
-            homeAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-            homeAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
-            homeAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-
-
-            // Coordinates
-            homeAddress.setLongitude(addressDTO.getLongitude());
-            homeAddress.setLatitude(addressDTO.getLatitude());
-
-
-            // Native Details
-            homeAddress.setStreet1(addressDTO.getStreet1());
-            homeAddress.setHouseNumber(addressDTO.getHouseNumber());
-            homeAddress.setFloorNumber(addressDTO.getFloorNumber());
-            homeAddress.setZipCode(zipCode);
-
-        } else {
-            logger.debug("Sending address to verify from TOM TOM server");
-            // Send Address to verify
-            Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, unitId);
-            if (tomtomResponse == null) {
-                logger.debug("Address not verified by TomTom ");
-                return null;
-            }
-            // -------Parse Address from DTO -------- //
-
-            // Coordinates
-            homeAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
-            homeAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
-
-
-            ZipCode zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
-            if (zipCode == null) {
-                logger.debug("ZipCode Not Found returning null");
-                return null;
-            }
-            Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
-            if (municipality == null) {
-                throw new InternalError("Municpality not found");
-            }
-
-
-            Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
-            if (geographyData == null) {
-                logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
-                throw new InternalError("Geography data not found with provided municipality");
-            }
-            logger.info("Geography Data: " + geographyData);
-
-
-            // Geography Data
-            homeAddress.setMunicipality(municipality);
-            homeAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
-            homeAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-            homeAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
-            homeAddress.setZipCode(zipCode);
-
-            // Native Details
-            homeAddress.setStreet1(addressDTO.getStreet1());
-            homeAddress.setHouseNumber(addressDTO.getHouseNumber());
-            homeAddress.setFloorNumber(addressDTO.getFloorNumber());
-            homeAddress.setCity(addressDTO.getZipCodeName());
-
         }
         nextToKin.setHomeAddress(homeAddress);
-
-
-        // Creating kin organizationRelation
-        Client parentClient = clientGraphRepository.findOne(clientId);
-        logger.debug("Saving Kin Object");
-        clientGraphRepository.save(nextToKin);
-        logger.debug("Creating  Kin Relationship With " + parentClient.getFirstName() + " " + parentClient.getLastName());
-        clientGraphRepository.createNextToKinRelation(parentClient.getId(), nextToKin.getId());
-
-        int count = relationService.checkClientOrganizationRelation(nextToKin.getId(), unitId);
-        if (count == 0) {
-            logger.debug("Creating KIN relationship with Organization");
-            relationGraphRepository.createClientRelationWithOrganization(nextToKin.getId(), unitId, new DateTime().getMillis(), UUID.randomUUID().toString().toUpperCase());
+        ContactDetail contactDetail = clientGraphRepository.getContactDetailOfNextToKin(nextToKinId);
+        if(!Optional.ofNullable(contactDetail).isPresent()){
+            throw new DataNotFoundByIdException("Contact detail not found");
         }
-
-
+        nextToKin.saveContactDetail(nextToKinDTO,contactDetail);
+        nextToKin.setContactDetail(contactDetail);
+        saveCivilianStatus(nextToKinDTO,nextToKin);
+        saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, clientId);
         logger.debug("Preparing response");
-
-        //Preparing response
-        Map<String, Object> nextToKinDetails = nextToKin.retrieveNextToKinDetails();
-        logger.debug("Next To Kin Map:  " + nextToKinDetails);
-
-        nextToKinDetails.put("profilePic", envConfig.getServerHost() + File.separator + nextToKin.getProfilePic());
-        logger.debug("Profile: " + nextToKin.getProfilePic());
-
-        return nextToKinDetails;
-
-    }*/
+        clientGraphRepository.save(nextToKin);
+        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator,
+                nextToKinDTO.getRelationTypeId(),nextToKinDTO);
+    }
 
     public Map<String, Object> setTransportationDetails(Client client) {
         Client currentClient = clientGraphRepository.findOne(client.getId());

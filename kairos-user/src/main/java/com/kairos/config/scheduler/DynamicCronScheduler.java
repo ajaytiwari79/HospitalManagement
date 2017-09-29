@@ -185,7 +185,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
                         }
                         break;
                     case IMPORT_KMD_CITIZEN:
-                        importShiftURI = envConfig.getServerHost()+API_KMD_CARE_CITIZEN+controlPanel.getUnitId();
+                        importShiftURI = envConfig.getServerHost()+KMD_CARE_CITIZEN_URL+controlPanel.getUnitId();
                         restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
                         break;
                     case IMPORT_KMD_CITIZEN_NEXT_TO_KIN:
@@ -197,13 +197,18 @@ public class DynamicCronScheduler implements  DisposableBean  {
                         restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
                         break;
                     case IMPORT_KMD_STAFF_AND_WORKING_HOURS:
-                        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_STAFF_SHIFTS+controlPanel.getUnitId()+"/getShifts/"+controlPanel.getFilterId();
+                        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+controlPanel.getUnitId()+"/getShifts/"+controlPanel.getFilterId();
                         restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
                         break;
                     case IMPORT_KMD_TASKS:
-                        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_STAFF_SHIFTS+controlPanel.getUnitId()+"/getTasks/"+controlPanel.getFilterId();
+                        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+controlPanel.getUnitId()+"/getTasks/"+controlPanel.getFilterId();
                         restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
                         break;
+                    case IMPORT_KMD_TIME_SLOTS:
+                        importShiftURI=envConfig.getServerHost()+API_KMD_CARE_URL+controlPanel.getUnitId()+"/getTimeSlots";
+                        restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
+                        break;
+
                 }
 
 

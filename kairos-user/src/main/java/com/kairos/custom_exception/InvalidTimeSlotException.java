@@ -5,9 +5,7 @@ package com.kairos.custom_exception;
  */
 public class InvalidTimeSlotException extends RuntimeException {
 
-    public String message;
-
     public InvalidTimeSlotException(String message) {
-        this.message = message;
+        super(message);
     }
 }

@@ -1,8 +1,12 @@
 package com.kairos.service.auth;
+
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.user.auth.TabPermission;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.auth.UserAuthentication;
+import com.kairos.persistence.model.user.auth.UserPermission;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -13,16 +17,20 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.util.OtpGenerator;
 import com.kairos.util.userContext.UserContext;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 
@@ -189,10 +197,6 @@ public class UserService extends UserBaseService {
         return userGraphRepository.findAndRemoveAccessToken(accessToken);
     }
 
-    public User findByUserName(String userName) {
-        return userGraphRepository.findByUserName(userName);
-    }
-
     public User generateTokenToUser(User currentUser) {
         currentUser.setAccessToken(UUID.randomUUID().toString().toUpperCase());
         userGraphRepository.save(currentUser);
@@ -209,68 +213,8 @@ public class UserService extends UserBaseService {
         return true;
     }
 
-    public User validateUserToken(String token) {
-
-        return findByAccessToken(token);
-
-    }
-
-    public List<Map<String, Object>> getOrganizations(long userId) {
-
-        long startTime = System.currentTimeMillis();
-
-        Map<String, Object> orgData;
-        List<Map<String, Object>> organizationList = new ArrayList<>();
-        Set<Long> accessPageModuleIds;
-        Set<Long> accessPageTabIds;
-        List<Map<String, Object>> validAccessPage;
-        boolean isDuplicateElementExist = false;
-        for (Map<String, Object> parentOrganization : userGraphRepository.getOrganizations(userId)) {
-
-            orgData = (Map<String, Object>) parentOrganization.get("result");
-
-            Map<String, Object> organization = new HashMap<>();
-            organization.put("id", orgData.get("id"));
-            organization.put("name", orgData.get("name"));
-/*
-            accessPageModuleIds = new HashSet<>();
-            validAccessPage = new ArrayList<>();
-            for (Map<String, Object> accessModule : (List<Map<String, Object>>) orgData.get("accessPage")) {
-                if (!accessPageModuleIds.add((long) accessModule.get("id")) && (boolean) accessModule.get("read")) {
-                    for (Iterator<Map<String, Object>> iter = validAccessPage.iterator(); iter.hasNext(); ) {
-                        Map<String, Object> map = iter.next();
-                        if ((long) map.get("id") == (long) accessModule.get("id"))
-                            iter.remove();
-                    }
-                }
-                accessPageTabIds = new HashSet<>();
-                List<Map<String, Object>> tabs = new ArrayList<>();
-                for (Map<String, Object> accessTab : (List<Map<String, Object>>) accessModule.get("tabPermissions")) {
-                    if (!accessPageTabIds.add((long) accessTab.get("id")) && (boolean) accessTab.get("read")) {
-                        for (Iterator<Map<String, Object>> iter = tabs.iterator(); iter.hasNext(); ) {
-                            Map<String, Object> map = iter.next();
-                            if ((long) map.get("id") == (long) accessTab.get("id") && !(boolean) map.get("write")) {
-                                iter.remove();
-                                isDuplicateElementExist = true;
-                            }
-                        }
-                    }
-                    if (!isDuplicateElementExist)
-                        tabs.add(accessTab);
-                }
-                Map<String, Object> modules = new HashMap<>();
-                modules.put("id", accessModule.get("id"));
-                modules.put("name", accessModule.get("name"));
-                modules.put("read", accessModule.get("read"));
-                modules.put("tabPermissions", tabs);
-                validAccessPage.add(modules);
-            }
-            organization.put("modulePermissions", validAccessPage);*/
-            organizationList.add(organization);
-        }
-        long endTime = System.currentTimeMillis();
-        logger.info("Execution Time :(UserService:getOrganizations) " + (endTime - startTime) + " ms");
-        return organizationList;
+    public List<OrganizationWrapper> getOrganizations(long userId) {
+        return userGraphRepository.getOrganizations(userId);
     }
 
     /**
@@ -549,5 +493,55 @@ public class UserService extends UserBaseService {
         return subPages;
     }
 
+    public List<GrantedAuthority> getTabPermission(Long userId){
+        long startTime = System.currentTimeMillis();
+        Set<TabPermission> tabPermissions = userGraphRepository.getAccessPermissionsOfUser(userId);
+        Map<Long,List<TabPermission>> tabPermissionsByUnit = tabPermissions.stream().collect(Collectors.groupingBy(TabPermission::getUnitId));
+        Set<Map.Entry<Long,List<TabPermission>>> entries = tabPermissionsByUnit.entrySet();
+        Iterator<Map.Entry<Long,List<TabPermission>>> entryIterator = entries.iterator();
+        List<GrantedAuthority> permissions = new ArrayList<>();
+        while (entryIterator.hasNext()){
+            Map.Entry<Long,List<TabPermission>> unitPermissions = entryIterator.next();
+            Map<String,TabPermission> processedTabs = new HashedMap();
+            unitPermissions.getValue().stream().forEach(tabPermission -> {
+                if(processedTabs.containsKey(tabPermission.getTabId())){
+                    if(tabPermission.isWrite() || !processedTabs.get(tabPermission.getTabId()).isRead() && tabPermission.isRead()){
+                        processedTabs.put(tabPermission.getTabId(),tabPermission);
+                    }
+                } else {
+                    processedTabs.put(tabPermission.getTabId(),tabPermission);
+                }
+            });
+            permissions.addAll(getAuthoritiesList(processedTabs,unitPermissions.getKey()));
+        }
+        long endTime = System.currentTimeMillis();
+        logger.info("Total time taken by : UserService:getTabPermission() " + (endTime-startTime) + " ms");
+        return permissions;
+    }
+
+    private List<GrantedAuthority> getAuthoritiesList(Map<String,TabPermission> permissionByUnit,Long unitId) {
+
+        Set<Map.Entry<String, TabPermission>> entries = permissionByUnit.entrySet();
+        List<GrantedAuthority> permissionList = entries.stream().map(stringTabPermissionEntry -> {
+            String permission = "";
+            if (stringTabPermissionEntry.getValue().isRead() && stringTabPermissionEntry.getValue().isWrite()) {
+                permission = unitId + "_" + stringTabPermissionEntry.getValue().getTabId()
+                        + "_" + "rw";
+            } else if (stringTabPermissionEntry.getValue().isRead()) {
+                permission = unitId + "_" + stringTabPermissionEntry.getValue().getTabId() +
+                        "_" + "r";
+            }
+            return new SimpleGrantedAuthority(permission);
+        }).collect(Collectors.toList());
+        return permissionList;
+    }
+
+    public boolean isHubMember(Long userId){
+        Boolean hubMember = userGraphRepository.isHubMember(userId);
+        if(hubMember instanceof Boolean){
+            return hubMember;
+        }
+        return false;
+    }
 
 }

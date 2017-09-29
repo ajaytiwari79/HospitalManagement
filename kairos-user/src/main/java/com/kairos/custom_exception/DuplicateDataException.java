@@ -5,10 +5,7 @@ package com.kairos.custom_exception;
  */
     public class DuplicateDataException extends RuntimeException{
 
-    public String message;
-
     public DuplicateDataException(String message) {
-        this.message = message;
+        super(message);
     }
-
 }

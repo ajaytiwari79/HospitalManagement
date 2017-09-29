@@ -276,7 +276,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     @Query("match(u:User)  where id(u)={1} \n" +
             "match(staff:Staff)-[:BELONGS_TO]->(u) \n" +
             "return  id(staff) as id, staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.organizationId as organizationId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName")
-    List<StaffPersonalDetailDTO> getStaffInfoById(long unitId, long userId);
+    List<StaffPersonalDetailDTO> getStaffInfoById(long unitId, long staffId);
 
     @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments ,organization\n" +
             "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments)\n" +

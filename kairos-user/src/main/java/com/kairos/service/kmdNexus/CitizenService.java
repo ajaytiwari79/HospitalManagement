@@ -21,6 +21,7 @@ import com.kairos.response.dto.web.*;
 import com.kairos.service.client.ExternalClientService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
+import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.JsonUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -94,6 +95,8 @@ public class CitizenService {
     TaskServiceRestClient taskServiceRestClient;
     @Autowired
     TaskDemandRestClient taskDemandRestClient;
+    @Inject
+    private TimeSlotService timeSlotService;
 
     /**
      * This method is used to import Citizen from KMD Nexus.
@@ -202,12 +205,12 @@ public class CitizenService {
                         JSONObject patientPathway = patientPathways.getJSONObject(i);
 
                         if (patientPathway.get("type").equals("patientPathwayReference") == true) {
-                            service = organizationServiceRepository.findByKmdExternalId(patientPathway.get("patientPathwayId").toString());
+                            service = organizationServiceRepository.findByKmdExternalId(patientPathway.get("pathwayTypeId").toString());
                             if (service == null) {
                                 service = new com.kairos.persistence.model.organization.OrganizationService();
                                 service.setName(patientPathway.get("name").toString());
-                                Optional serviceOptional = Optional.ofNullable(patientPathway.get("patientPathwayId"));
-                                if(serviceOptional.isPresent()) service.setKmdExternalId(patientPathway.get("patientPathwayId").toString());
+                                Optional serviceOptional = Optional.ofNullable(patientPathway.get("pathwayTypeId"));
+                                if(serviceOptional.isPresent()) service.setKmdExternalId(patientPathway.get("pathwayTypeId").toString());
                                 service.setImported(true);
                                 service = organizationServiceService.saveImportedServices(service);
                             }
@@ -218,12 +221,12 @@ public class CitizenService {
                                     JSONObject subPatientPathway = pathwayChildren.getJSONObject(pC);
                                     if (subPatientPathway.get("type").equals("patientPathwayReference") == true) {
                                         hasSubService = true;
-                                        subService = organizationServiceRepository.findByKmdExternalId(subPatientPathway.get("patientPathwayId").toString());
+                                        subService = organizationServiceRepository.findByKmdExternalId(subPatientPathway.get("pathwayTypeId").toString());
                                         if (subService == null) {
                                             subService = new com.kairos.persistence.model.organization.OrganizationService();
                                             subService.setName(subPatientPathway.get("name").toString());
-                                            Optional subServiceOptional = Optional.ofNullable(subPatientPathway.get("patientPathwayId"));
-                                            if(subServiceOptional.isPresent()) subService.setKmdExternalId(subPatientPathway.get("patientPathwayId").toString());
+                                            Optional subServiceOptional = Optional.ofNullable(subPatientPathway.get("pathwayTypeId"));
+                                            if(subServiceOptional.isPresent()) subService.setKmdExternalId(subPatientPathway.get("pathwayTypeId").toString());
                                             subService.setImported(true);
                                             subService = organizationServiceService.addSubService(service.getId(), subService);
                                             organizationServiceService.updateServiceToOrganization(organization.getId(), subService.getId(), true, ORGANIZATION);
@@ -462,12 +465,10 @@ public class CitizenService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
         //   headers.add("Content-Type" , "application/json");
-        logger.info("Auth token--------> "+AppConstants.KMD_NEXUS_ACCESS_TOKEN);
         Map map = new HashMap<String, String>();
         map.put("Content-Type", "application/json");
         //   headers.setAll(map);
         HttpEntity<String> headersElements = new HttpEntity<String>(headers);
-        logger.info("headers------headersElements-----> "+headersElements);
         ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_CALENDAR_STAFFS_SHIFT_FILTER, filterId), HttpMethod.POST, headersElements, String.class);
         JSONObject jsonObject = new JSONObject(responseEntity.getBody());
         ColumnResource columnResource = JsonUtils.toObject(jsonObject.get("columnResource").toString(), ColumnResource.class);
@@ -536,6 +537,34 @@ public class CitizenService {
         logger.info("::::::::::::::::;   Saving user :::::::::::::::::: ");
         return staffGraphRepository.save(staff);
     }
+
+    public void getTimeSlots(Long unitId){
+        RestTemplate loginTemplate = new RestTemplate();
+        HttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
+        HttpMessageConverter stringHttpMessageConverterNew = new StringHttpMessageConverter();
+        loginTemplate.getMessageConverters().add(formHttpMessageConverter);
+        loginTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+        loginTemplate.getMessageConverters().add(stringHttpMessageConverterNew);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
+        //   headers.add("Content-Type" , "application/json");
+        Map map = new HashMap<String, String>();
+        map.put("Content-Type", "application/json");
+        //   headers.setAll(map);
+        HttpEntity<String> headersElements = new HttpEntity<String>(headers);
+        ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_GET_TIME_SLOTS), HttpMethod.GET, headersElements, String.class);
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray(responseEntity.getBody());
+        jsonObject.put("kmdTimeSlotDTOList", jsonArray);
+        KMDTimeSlotListDTO kmdTimeSlotListDTO = JsonUtils.toObject(jsonObject.toString(), KMDTimeSlotListDTO.class);
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        kmdTimeSlotListDTO.getKmdTimeSlotDTOList().forEach(kmdTimeSlotDTO -> {
+            timeSlotService.importTimeSlotsFromKMD( unit,  kmdTimeSlotDTO);
+        });
+        timeSlotService.updateTimeSlotType(unitId,false);
+    }
+
 
 
 }

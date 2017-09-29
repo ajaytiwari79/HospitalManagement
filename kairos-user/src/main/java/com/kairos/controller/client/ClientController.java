@@ -24,10 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -121,15 +118,15 @@ public class ClientController {
     // NextToKin
     @ApiOperation("create NextToKin")
     @RequestMapping(value = "/{clientId}/nextToKin", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> createNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long clientId) {
+    ResponseEntity<Map<String, Object>> createNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable Long unitId, @PathVariable Long clientId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.saveNextToKin(unitId,clientId,nextToKinDTO));
     }
 
     // NextToKin
     @ApiOperation("update NextToKin")
     @RequestMapping(value = "/{clientId}/nextToKin/{nextToKinId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long nextToKinId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO));
+    ResponseEntity<Map<String, Object>> updateNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long nextToKinId, @PathVariable long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO,clientId));
     }
 
 
@@ -470,9 +467,9 @@ public class ClientController {
     // Mark Client Dead
     @RequestMapping(method = RequestMethod.DELETE, value = "/{clientId}/dead")
     @ApiOperation("Delete task exception")
-    public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId,@RequestBody CitizenDeathInfoDTO citizenDeathInfoDTO) throws ParseException {
+    public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId,@RequestParam("deathDate") String deathDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.markClientAsDead(clientId,citizenDeathInfoDTO));
+                clientService.markClientAsDead(clientId,deathDate));
     }
 
 
