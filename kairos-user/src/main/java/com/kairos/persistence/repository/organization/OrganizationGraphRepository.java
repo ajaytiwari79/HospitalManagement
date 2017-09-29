@@ -6,6 +6,7 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
+import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position.PositionName;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
@@ -492,8 +493,9 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("MATCH (country:Country)<-[:"+COUNTRY+"]-(o:Organization) where id(o)={0}  return id(country) ")
     Long getCountryId(Long organizationId);
 
-    @Query("MATCH (n:Organization) RETURN Id(n)")
-    List<Long> allOrganizationIds();
+
+
+
 
 
 }
