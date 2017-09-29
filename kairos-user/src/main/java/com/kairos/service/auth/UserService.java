@@ -3,6 +3,7 @@ package com.kairos.service.auth;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.user.auth.TabPermission;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.auth.UserAuthentication;
 import com.kairos.persistence.model.user.auth.UserPermission;
@@ -16,16 +17,20 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.util.OtpGenerator;
 import com.kairos.util.userContext.UserContext;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 
@@ -209,9 +214,6 @@ public class UserService extends UserBaseService {
     }
 
     public List<OrganizationWrapper> getOrganizations(long userId) {
-        long startTime = System.currentTimeMillis();
-        long endTime = System.currentTimeMillis();
-        logger.info("Execution Time :(UserService:getOrganizations) " + (endTime - startTime) + " ms");
         return userGraphRepository.getOrganizations(userId);
     }
 
@@ -491,40 +493,55 @@ public class UserService extends UserBaseService {
         return subPages;
     }
 
-    public List<UserPermission> getTabPermission(Long userId){
-
-        List<OrganizationWrapper> parentOrganizations = userGraphRepository.getOrganizations(userId);
-        List<UserPermission> userPermissions = new ArrayList<>();
-        parentOrganizations.forEach(parentOrganization->{
-            List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(parentOrganization.getId());
-            List<AccessPageQueryResult> mainModulePermissions = accessPageRepository.getPermissionOfMainModule(parentOrganization.getId(), userId);
-            List<AccessPageQueryResult> tabPermissions;
-            if(parentOrganization.isKairosHub()){
-                tabPermissions = accessPageRepository.getTabsPermissionForHubMember();
-            } else {
-                tabPermissions = accessPageRepository.getTabPermissionForUnit(parentOrganization.getId(), userId);
-            }
-            List<AccessPageQueryResult> allTabPermissionsForParentOrganization = new ArrayList<>();
-            allTabPermissionsForParentOrganization.addAll(mainModulePermissions);
-            allTabPermissionsForParentOrganization.addAll(tabPermissions);
-            UserPermission userPermissionForParentOrganization = new UserPermission(parentOrganization.getId(),allTabPermissionsForParentOrganization);
-            userPermissions.add(userPermissionForParentOrganization);
-            units.forEach(unit->{
-                List<AccessPageQueryResult> modulePermissions = accessPageRepository.getPermissionOfMainModule(unit.getId(), userId);
-                List<AccessPageQueryResult> accessPageQueryResults;
-                if(unit.isKairosHub()){
-                    accessPageQueryResults = accessPageRepository.getTabsPermissionForHubMember();
+    public List<GrantedAuthority> getTabPermission(Long userId){
+        long startTime = System.currentTimeMillis();
+        Set<TabPermission> tabPermissions = userGraphRepository.getAccessPermissionsOfUser(userId);
+        Map<Long,List<TabPermission>> tabPermissionsByUnit = tabPermissions.stream().collect(Collectors.groupingBy(TabPermission::getUnitId));
+        Set<Map.Entry<Long,List<TabPermission>>> entries = tabPermissionsByUnit.entrySet();
+        Iterator<Map.Entry<Long,List<TabPermission>>> entryIterator = entries.iterator();
+        List<GrantedAuthority> permissions = new ArrayList<>();
+        while (entryIterator.hasNext()){
+            Map.Entry<Long,List<TabPermission>> unitPermissions = entryIterator.next();
+            Map<String,TabPermission> processedTabs = new HashedMap();
+            unitPermissions.getValue().stream().forEach(tabPermission -> {
+                if(processedTabs.containsKey(tabPermission.getTabId())){
+                    if(tabPermission.isWrite() || !processedTabs.get(tabPermission.getTabId()).isRead() && tabPermission.isRead()){
+                        processedTabs.put(tabPermission.getTabId(),tabPermission);
+                    }
                 } else {
-                    accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), userId);
+                    processedTabs.put(tabPermission.getTabId(),tabPermission);
                 }
-                List<AccessPageQueryResult> allTabPermissionsForUnit = new ArrayList<>();
-                allTabPermissionsForUnit.addAll(modulePermissions);
-                allTabPermissionsForUnit.addAll(accessPageQueryResults);
-
-                UserPermission userPermissionForUnit = new UserPermission(unit.getId(),allTabPermissionsForUnit);
-                userPermissions.add(userPermissionForUnit);
             });
-        });
-        return userPermissions;
+            permissions.addAll(getAuthoritiesList(processedTabs,unitPermissions.getKey()));
+        }
+        long endTime = System.currentTimeMillis();
+        logger.info("Total time taken by : UserService:getTabPermission() " + (endTime-startTime) + " ms");
+        return permissions;
     }
+
+    private List<GrantedAuthority> getAuthoritiesList(Map<String,TabPermission> permissionByUnit,Long unitId) {
+
+        Set<Map.Entry<String, TabPermission>> entries = permissionByUnit.entrySet();
+        List<GrantedAuthority> permissionList = entries.stream().map(stringTabPermissionEntry -> {
+            String permission = "";
+            if (stringTabPermissionEntry.getValue().isRead() && stringTabPermissionEntry.getValue().isWrite()) {
+                permission = unitId + "_" + stringTabPermissionEntry.getValue().getTabId()
+                        + "_" + "rw";
+            } else if (stringTabPermissionEntry.getValue().isRead()) {
+                permission = unitId + "_" + stringTabPermissionEntry.getValue().getTabId() +
+                        "_" + "r";
+            }
+            return new SimpleGrantedAuthority(permission);
+        }).collect(Collectors.toList());
+        return permissionList;
+    }
+
+    public boolean isHubMember(Long userId){
+        Boolean hubMember = userGraphRepository.isHubMember(userId);
+        if(hubMember instanceof Boolean){
+            return hubMember;
+        }
+        return false;
+    }
+
 }

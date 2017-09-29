@@ -24,30 +24,29 @@ public class UserOauth2Service implements UserDetailsService {
     private final Logger logger = LoggerFactory.getLogger(UserOauth2Service.class);
     @Autowired
     private UserGraphRepository userGraphRepository;
+    @Autowired
+    private UserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
          User user=  userGraphRepository.findByUserName(username);
+         user.setHubMember(userService.isHubMember(user.getId()));
          Optional<User> loggedUser=Optional.ofNullable(user);
          String otpString=HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
          Optional<Integer>optInt=OptionalUtility.stringToInt(otpString);
 
         if (loggedUser.filter(u->optInt.get().equals(u.getOtp())).isPresent()) {
             logger.info("user opt match{}",user.getOtp());
-            return new UserPrincipal(user,getPermission());
+            return new UserPrincipal(user,getPermission(user));
         }else{
             // Not found...
             throw new UsernameNotFoundException(
                     "User " + username + " not found.");
         }
-
-
     }
 
-    private List<GrantedAuthority> getPermission(){
-
-       // List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
-        List<GrantedAuthority> grantedAuthorities= Stream.of("1","2","3","4").map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-        return grantedAuthorities;
+    private List<GrantedAuthority> getPermission(User user){
+       List<GrantedAuthority> permissions = userService.getTabPermission(user.getId());
+        return permissions;
     }
 }

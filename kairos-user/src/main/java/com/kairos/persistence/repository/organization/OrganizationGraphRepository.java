@@ -480,12 +480,6 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "return collect(id(organizationType)) as organizationTypes, collect(id(subType)) as organizationSubTypes")
     OrganizationTypeAndSubTypeDTO getorganizationTypeAndSubTypes(Long unitId);
 
-    @Query("MATCH (o:Organization) where id(o)={0} return o")
-    OrganizationExternalIdsDTO getOrganizationExternalIds(Long unitId);
-
-    @Query("MATCH (o:Organization) where id(o)={0} return o")
-    TimeSlotsDeductionDTO getOrganizationTimeSlotDeductions(Long unitId);
-
     @Query("MATCH (c:Client{imported:true})-[r:GET_SERVICE_FROM]->(o:Organization) where id(o)= {0}  case when c is NULL then false else true ")
     Boolean isOrganizationHasExternalReference(Long organizationId);
 
@@ -494,6 +488,4 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
 
     @Query("MATCH (n:Organization) RETURN Id(n)")
     List<Long> allOrganizationIds();
-
-
 }
