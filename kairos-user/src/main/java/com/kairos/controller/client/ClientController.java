@@ -582,6 +582,18 @@ public class ClientController {
                clientService.getClientIds(unitId));
     }
 
+    /**
+     * this method will be called from  task micro service in planner service
+     * @param unitIds
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/client_ids_by_unitIds")
+    @ApiOperation("get required data for task creation")
+    private ResponseEntity<Map<String,Object>> getCitizenIdsByUnitIds(@RequestBody List<Long> unitIds){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                clientService.getCitizenIdsByUnitIds(unitIds));
+    }
+
 
 
     @ApiOperation(value = "Get Organization Clients with min details")
@@ -679,6 +691,7 @@ public class ClientController {
                                                                    @PathVariable String cprNumber, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.findByCPRNumber(clientId,unitId,cprNumber));
     }
+
 
 
 

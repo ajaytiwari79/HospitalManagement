@@ -279,4 +279,8 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
     @Query("MATCH (client:Client)-[r:"+CIVILIAN_STATUS+"]->(citizenStatus:CitizenStatus) where id(client)={0} delete r")
     void deleteCivilianStatus(Long clientId);
+
+    @Query("MATCH (c:Client{citizenDead:false})-[r:"+GET_SERVICE_FROM+"]-(o:Organization) where id(o)in {0} with id(c) as citizenId, id(o) as organizationId\n" +
+            "return citizenId, organizationId")
+    List<ClientOrganizationIdsDTO> getCitizenIdsByUnitIds(List<Long> unitIds);
 }

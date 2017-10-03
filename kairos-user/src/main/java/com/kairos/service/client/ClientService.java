@@ -1198,6 +1198,10 @@ public class ClientService extends UserBaseService {
         return clientGraphRepository.getCitizenIds(unitId);
     }
 
+    public List<ClientOrganizationIdsDTO> getCitizenIdsByUnitIds(List<Long> unitIds) {
+        return clientGraphRepository.getCitizenIdsByUnitIds(unitIds);
+    }
+
 
     /**
      * @param organizationId
