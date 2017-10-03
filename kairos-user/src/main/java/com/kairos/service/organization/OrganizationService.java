@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.organization.*;
@@ -36,6 +37,7 @@ import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
+import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
@@ -149,6 +151,8 @@ public class OrganizationService extends UserBaseService {
 
     @Inject
     AbsenceTypesRepository absenceTypesRepository;
+    @Inject
+    private SkillService skillService;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id, 0);
@@ -993,6 +997,18 @@ public class OrganizationService extends UserBaseService {
         timeSlotsDeductionDTO.setDayShiftTimeDeduction(organization.getDayShiftTimeDeduction());
         return timeSlotsDeductionDTO;
 
+    }
+
+
+    /**
+     * @auther anil maurya
+     * @param unitId
+     * @return
+     */
+    public OrganizationSkillAndOrganizationTypesDTO getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(Long unitId){
+         Map<String, Object> availableSkills=skillService.getAllAvailableSkills(unitId,"organization");
+        OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO=this.getOrganizationTypeAndSubTypes(unitId);
+        return new OrganizationSkillAndOrganizationTypesDTO(organizationTypeAndSubTypeDTO,availableSkills);
     }
 }
 

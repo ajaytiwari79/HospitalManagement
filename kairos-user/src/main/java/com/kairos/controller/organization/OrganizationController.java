@@ -995,6 +995,20 @@ public class OrganizationController {
                 organizationService.getTimeSlotPercentageDeduction(unitId));
     }
 
+    /**
+     * @auther anil maurya
+     * use this endpoint from activity micro service via rest client
+     * @param unitId
+     * @return
+     */
+    @ApiOperation(value = "Get skills and organizationTypes of organization")
+    @RequestMapping(value = "/unit/{unitId}/skill/orgTypes", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(unitId));
+    }
+
 }
 
 
