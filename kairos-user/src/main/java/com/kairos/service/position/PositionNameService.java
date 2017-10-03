@@ -125,7 +125,7 @@ public class PositionNameService extends UserBaseService {
 
     public List<PositionName> getAllPositionName(Long id, String type) {
         Long unitId;
-        Organization organization = new Organization();
+        Organization organization = null;
         List<PositionName> positionNames = new ArrayList<PositionName>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             organization = organizationGraphRepository.findOne(id);
