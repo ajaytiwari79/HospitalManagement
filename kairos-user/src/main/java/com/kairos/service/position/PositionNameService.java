@@ -43,10 +43,10 @@ public class PositionNameService extends UserBaseService {
         if (organization == null) {
             throw new DataNotFoundByIdException("Organization not found");
         }
-       /* if(!organization.isParentOrganization()){
+       if(!organization.isParentOrganization()){
             throw new ActionNotPermittedException("Can only create PositionName in Parent organization");
         }
-*/
+
 
         List<PositionName> positionNameList = organization.getPositionNameList();
         positionNameList = (positionNameList == null) ? new ArrayList<PositionName>() : positionNameList;
@@ -71,6 +71,13 @@ public class PositionNameService extends UserBaseService {
                 (positionNameGraphRepository.checkDuplicatePositionName(unitId, positionName.getName()) != null)) {
             throw new DuplicateDataException("PositionName can't be updated");
         }
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Organization not found");
+        }
+        if(!organization.isParentOrganization()){
+            throw new ActionNotPermittedException("Can only update PositionName in Parent organization");
+        }
 
         oldPositionName.setName(positionName.getName());
         oldPositionName.setDescription(positionName.getDescription());
@@ -82,16 +89,22 @@ public class PositionNameService extends UserBaseService {
     }
 
 
-    public boolean deletePositionName(Long positionId) {
+    public boolean deletePositionName(Long unitId,Long positionId) {
         PositionName position = positionNameGraphRepository.findOne(positionId);
         if (position == null) {
-            return false;
+            throw new DataNotFoundByIdException("position_name  not found "+positionId);
         }
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Organization not found "+unitId);
+        }
+        if(!organization.isParentOrganization()){
+            throw new ActionNotPermittedException("Only parent Organization can remove/edit position names.");
+        }
+
+
         position.setEnabled(false);
         save(position);
-        if (positionNameGraphRepository.findOne(positionId).isEnabled()){
-            return false;
-        }
         return true;
     }
 
@@ -101,7 +114,7 @@ public class PositionNameService extends UserBaseService {
     }
 
 
-    /*public List<PositionName> getAllPositionName(Long unitId) {
+    public List<PositionName> getAllPositionName(Long unitId) {
         List<PositionName> positionNames = new ArrayList<PositionName>();
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
@@ -117,11 +130,11 @@ public class PositionNameService extends UserBaseService {
 
 
         return positionNames;
-    }*/
-
-    public List<PositionName> getAllPositionName(Long unitId) {
-        return  organizationGraphRepository.getPositionNames(unitId);
     }
+
+//    public List<PositionName> getAllPositionName(Long unitId) {
+//        return  organizationGraphRepository.getPositionNames(unitId);
+//    }
 
 
 

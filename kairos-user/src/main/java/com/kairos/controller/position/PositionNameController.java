@@ -41,8 +41,8 @@ public class PositionNameController {
 
     @ApiOperation("Delete PositionName")
     @DeleteMapping(value = "/position_name/{positionNameId}")
-    ResponseEntity<Map<String, Object>> deletePositionName( @PathVariable Long positionNameId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.deletePositionName(positionNameId));
+    ResponseEntity<Map<String, Object>> deletePositionName(@PathVariable Long unitId,  @PathVariable Long positionNameId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.deletePositionName(unitId,positionNameId));
     }
 
     @ApiOperation("Get PositionName")
