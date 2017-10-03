@@ -9,11 +9,19 @@ import com.kairos.persistence.model.organization.TimeSlotDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTimeSlotGraphRepository;
 import com.kairos.persistence.repository.organization.TimeSlotGraphRepository;
+import com.kairos.response.dto.web.KMDTimeSlotDTO;
 import com.kairos.service.UserBaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalField;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
@@ -30,6 +38,8 @@ public class TimeSlotService extends UserBaseService {
     private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject
     private OrganizationTimeSlotGraphRepository organizationTimeSlotGraphRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(TimeSlotService.class);
 
     public Map<String, Object> getTimeSlots(long unitId) {
 
@@ -217,13 +227,52 @@ public class TimeSlotService extends UserBaseService {
         return currentTimeSlots;
     }
 
-    public Map<String,Object> getTimeSlotByUnitIdAndTimeSlotName(Long unitId, String timeSlotName){
-        Map<String,Object> timeSlot = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotName(unitId, timeSlotName);
+    public Map<String,Object> getTimeSlotByUnitIdAndTimeSlotExternalId(Long unitId, Long kmdExternalId){
+        Map<String,Object> timeSlot = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotExternalId(unitId, kmdExternalId);
         return timeSlot;
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long unitId, Long timeSlotId){
         Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId);
         return timeSlotMap;
+    }
+
+    public TimeSlot importTimeSlotsFromKMD(Organization unit, KMDTimeSlotDTO kmdTimeSlotDTO){
+        try {
+            TimeSlot timeSlot = timeSlotGraphRepository.findByKmdExternalId(kmdTimeSlotDTO.getId());
+            if (unit == null) {
+                throw new InternalError("Couldn't find any  organization");
+            }
+            if (!Optional.ofNullable(timeSlot).isPresent()) {
+                timeSlot = new TimeSlot();
+            }
+
+            timeSlot.setName(kmdTimeSlotDTO.getTitle());
+            timeSlot.setTimeSlotType(TimeSlot.TYPE.ADVANCE);
+            timeSlot.setKmdExternalId(kmdTimeSlotDTO.getId());
+            timeSlotGraphRepository.removeTimeSlotExistByUnitIdAndTimeSlotId(unit.getId(), kmdTimeSlotDTO.getId());
+            Boolean hasTimeSlotForGivenUnit = timeSlotGraphRepository.hasTimeSlotExistByUnitIdAndTimeSlotId(unit.getId(), kmdTimeSlotDTO.getId());
+            if (!hasTimeSlotForGivenUnit) {
+
+                OrganizationTimeSlotRelationship organizationTimeSlotRelationship = new OrganizationTimeSlotRelationship();
+                //validateTimeSlot(unitId,organizationTimeSlotRelationship,TimeSlot.TYPE.ADVANCE);
+                LocalTime startDuration = LocalTime.parse(kmdTimeSlotDTO.getStart());
+                LocalTime endDuration = LocalTime.parse(kmdTimeSlotDTO.getEnd());
+                organizationTimeSlotRelationship.setEnabled(true);
+                organizationTimeSlotRelationship.setStartHour(startDuration.getHour());
+                organizationTimeSlotRelationship.setStartMinute(startDuration.getMinute());
+                organizationTimeSlotRelationship.setEndHour(endDuration.getHour());
+                organizationTimeSlotRelationship.setEndMinute(endDuration.getMinute());
+                organizationTimeSlotRelationship.setTimeSlot(timeSlot);
+                organizationTimeSlotRelationship.setOrganization(unit);
+                save(organizationTimeSlotRelationship);
+
+            }
+            return timeSlot;
+        }catch (Exception exception){
+            logger.error("Exception while importing time slot from KMD", exception);
+            return null;
+        }
+
     }
 }

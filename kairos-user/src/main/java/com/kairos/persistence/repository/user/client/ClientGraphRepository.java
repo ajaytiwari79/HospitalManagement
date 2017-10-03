@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.user.client;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.country.CitizenStatus;
+import org.springframework.data.neo4j.annotation.Depth;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -20,6 +20,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface ClientGraphRepository extends GraphRepository<Client>{
+
+
+    @Query("MATCH (client:Client)-[r:"+GET_SERVICE_FROM+"]->(org:Organization) where id(client)={0} and id(org)={1} return client")
+    Client findOne(long clientId,long unitId);
 
     @Query("MATCH (c:Client) return c order by c.firstName")
     List<Client> findAll();
@@ -126,15 +130,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client)-[r:"+SERVED_BY_TEAM+"]->(t:Team) WHERE id(c)={0} AND r.type='FORBIDDEN'   RETURN t")
     List<Team> findForbidTeam(Long id);
 
+    @Depth(value = 1)
     @Query("MATCH (c:Client) where c.cprNumber={0}  return c")
     Client findByCPRNumber(String cprNumber);
-
-    @Query("MATCH (c:Client) where c.cprNumber={0}  return c")
-    List<Client> findAllByCPRNumber(String cprNumber);
-
-
-    @Query("MATCH (c:User) where c.email={0}  return c")
-    User findByEmail(String email);
 
     @Query("MATCH (t:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(s:Staff)-[:BELONGS_TO]->(u:User) where id(t)={0} \n" +
             "             with s AS staff , u as user\n" +
@@ -145,22 +143,10 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "            return  DISTINCT { id:id(staff), staffType:served_by_staff.type, lastName:staff.lastName , firstName:staff.firstName, profilePic: {2} + staff.profilePic, gender:user.gender, isActive:staff.isActive,  skillList: collect ({name: skill.name,level:r.skillLevel})  }as staffList" )
     List<Map<String,Object>> getTeamMembers(Long teamID, Long clientId, String imageUrl);
 
-    @Query("MATCH (c:Client)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress) where id(ca)= {0} return c")
-    Client getClientsByHomeAddressId(Long homeAddressId);
-
-    @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='NONE'  " +
-            "RETURN " +
-            "collect ({ " +
-            "id:id(s), " +
-            "firstName:s.firstName, " +
-            "lastName:s.lastName, " +
-            "type:r.type " +
-            "}) As staffList")
-    List<Map<String,Object>> findNeutualStaff(Long clientId);
 
 
-    @Query("MATCH (c:Client)-[:PEOPLE_IN_HOUSEHOLD_LIST]->(ps:Client) where id(c)={0}  return {id:id(ps), firstName:ps.firstName , lastName:ps.lastName, name:ps.firstName +' '+ ps.lastName } as result")
-    List<Map<String,Object>> getPeopleInHouseholdList(Long id);
+    @Query("MATCH (c:Client)-[:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(ps:Client) where id(c)={0}  return id(ps) as id, ps.firstName as firstName,ps.lastName as lastName,ps.firstName +' '+ ps.lastName as name,ps.cprNumber as cprNumber")
+    List<ClientMinimumDTO> getPeopleInHouseholdList(Long id);
 
     @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='PREFERRED' " +
             "RETURN {visitourId:s.visitourId} as ids")
@@ -170,12 +156,6 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='FORBIDDEN' " +
             "RETURN {visitourId:s.visitourId} as ids ")
     List<Map<String,Object>> findForbidStaffVisitourIds(Long id);
-
-    @Query("MATCH(o:Organization) where id(o)={0} with o MATCH(c:Client)-[:GET_SERVICE_FROM]->(o) with c MATCH(h:ContactAddress)-[:HAS_HOME_ADDRESS]-(c) return h as address UNION MATCH(s:ContactAddress)-[:HAS_SECONDARY_ADDRESS]-(c) return s as address;")
-    List<Map<String,Object>> getAllAddressListOfClientsOfAnOrganization(long organizationId);
-
-    @Query("MATCH (c:Client), (k:Client) where id(c)={0} AND id(k)={1} Create UNIQUE (c)-[r:NEXT_TO_KIN]->(k) return k")
-    void createNextToKinRelation(Long parent, Long kinId);
 
     @Query("MATCH (client:Client{importFromKMD:true}) RETURN {kmdNexusExternalId:client.kmdNexusExternalId} as data")
     List<Map<String, Object>> findAllCitizensFromKMD();
@@ -201,7 +181,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (client:Client) where client.kmdNexusExternalId={0} RETURN client")
     Client findByKmdNexusExternalId(String kmdNexusExternalId);
 
-    @Query("Match (n)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) where id(n)={0} return zipCode,homeAddress")
+    @Query("Match (n)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) where id(n)={0} with zipCode,homeAddress\n" +
+            "Match (homeAddress)-[:MUNICIPALITY]->(Municipality:Municipality) with Municipality,zipCode,homeAddress\n" +
+            "return Municipality,zipCode,homeAddress")
     ClientHomeAddressQueryResult getHomeAddress(long clientId);
 
     @Query("Match (client:Client) where id(client)={0}\n" +
@@ -238,4 +220,63 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
     @Query("MATCH (c:Client)-[r:GET_SERVICE_FROM]->(o:Organization) where id(c)={0} and id(o)={1}  return c")
     Client getClientByClientIdAndUnitId(Long clientId, Long unitId);
+
+    @Query("Match (c:Client)-[:NEXT_TO_KIN]->(nextToKin:Client) where id(c)={0}\n" +
+            "Match (nextToKin)-[:CIVILIAN_STATUS]->(citizenStatus:CitizenStatus) with c, nextToKin,citizenStatus\n" +
+            "Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with c, contactDetail,nextToKin,citizenStatus\n" +
+            "Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with c, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "Match (c)-[:HAS_RELATION_OF]->(clientRelationType:ClientRelationType) with clientRelationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "Match (nextToKin)<-[:RELATION_WITH_NEXT_TO_KIN]-(clientRelationType)-[:RELATION_TYPE]->(relationType:RelationType) with relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, relationType, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "return id(nextToKin) as id, id(relationType) as relationTypeId,nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,{municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
+            ",latitude:homeAddress.latitude,municipalities:result} as homeAddress")
+    List<NextToKinQueryResult> getNextToKinDetail(long clientId,String imageUrl);
+
+    @Query("Match (client:Client) where id(client)={0} with client\n" +
+            "Match (houseHoldPeople:Client) where id(houseHoldPeople)={1} with client,houseHoldPeople\n" +
+            "Merge (client)-[r:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(houseHoldPeople)\n" +
+            "ON CREATE SET r.creationDate={2},r.lastModificationDate={3}\n" +
+            "ON MATCH SET r.lastModificationDate={3} return true")
+    void createHouseHoldRelationship(long clientId,long houseHoldPeopleId,long creationDate,long lastModificationDate);
+
+    @Query("MATCH (citizen:Client{citizenDead:false})-[:GET_SERVICE_FROM]->(o:Organization)  where id(o)= {0} with citizen\n"+
+            "MATCH (citizen)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) WHERE homeAddress IS NOT NULL return citizen, homeAddress")
+    List<ClientHomeAddressQueryResult> getClientsAndHomeAddressByUnitId(long unitId);
+
+    @Query("MATCH (c:Client{citizenDead:false})-[r:"+HAS_LOCAL_AREA_TAG+"]-(lat:LocalAreaTag) where id(lat)= {0} return c")
+    List<Client> getClientsByLocalAreaTagId(long localAreaTagId);
+
+    @Query( "MATCH (client:Client)-[:"+NEXT_TO_KIN+"]->(nextToKin:Client) where id(client)= {0} AND id(nextToKin)= {1} with nextToKin, client\n"+
+            "MATCH (client)-[r1:"+HAS_RELATION_OF+"]->(clientRelationType:ClientRelationType) with r1, nextToKin, client, clientRelationType \n"+
+            "MATCH (clientRelationType)-[r2:"+RELATION_TYPE+"]->(relationType:RelationType) with r1, r2, nextToKin, client, clientRelationType \n"+
+            "MATCH (clientRelationType)-[r3:"+RELATION_WITH_NEXT_TO_KIN+"]->(nextToKin) delete r1, r2, r3 ")
+    void removeClientRelationType(long clientId, long nextToKinId);
+
+    @Query(  "MATCH (client:Client)-[:"+NEXT_TO_KIN+"]->(nextToKin:Client) where id(client)= {0} AND id(nextToKin)= {1} with nextToKin, client\n"+
+            "MATCH (client)-[r1:"+HAS_RELATION_OF+"]->(clientRelationType:ClientRelationType) with  nextToKin, client, clientRelationType \n"+
+            "MATCH (clientRelationType)-[r2:"+RELATION_TYPE+"]->(relationType:RelationType) with nextToKin, client, clientRelationType \n"+
+            "MATCH (clientRelationType)-[r3:"+RELATION_WITH_NEXT_TO_KIN+"]->(nextToKin) return clientRelationType ")
+    ClientRelationType getClientRelationType(long clientId, long nextToKinId);
+
+    @Query("MATCH (clientRelationType:ClientRelationType) where id(clientRelationType)={0} delete clientRelationType ")
+    void removeClientRelationById(long clientRelationTypeId);
+
+
+
+
+
+    @Query("Match (nextToKin:Client)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress) where id(nextToKin)={0} return id(homeAddress)")
+    Long getIdOfHomeAddress(Long nextToKinId);
+
+    @Query("Match (nextToKin:Client)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) where id(nextToKin)={0} return contactDetail")
+    ContactDetail getContactDetailOfNextToKin(Long nextToKinId);
+
+    @Query("Match (citizen:Client) where id(citizen)={0} with citizen\n" +
+            "Match (nextToKin:Client) where id(nextToKin)={1} with nextToKin,citizen\n" +
+            "Match (citizen)-[r:NEXT_TO_KIN]->(nextToKin) return count(r)>0")
+    Boolean hasAlreadyNextToKin(Long clientId,Long nextToKinId);
+
+    @Query("MATCH (client:Client)-[r:"+CIVILIAN_STATUS+"]->(citizenStatus:CitizenStatus) where id(client)={0} delete r")
+    void deleteCivilianStatus(Long clientId);
 }

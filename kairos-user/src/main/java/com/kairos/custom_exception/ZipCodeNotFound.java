@@ -5,10 +5,8 @@ package com.kairos.custom_exception;
  */
     public class ZipCodeNotFound extends RuntimeException{
 
-    public String message;
-
     public ZipCodeNotFound(String message) {
-        this.message = message;
+        super(message);
     }
 
 }

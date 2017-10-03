@@ -24,9 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -105,7 +103,7 @@ public class ClientController {
 
     //People in household
     @ApiOperation("Add People In HouseHold")
-    @RequestMapping(value = "/{clientId}/household", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{clientId}/household", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> updateClientHouseholdList(@RequestBody ClientMinimumDTO client, @PathVariable long unitId, @PathVariable long clientId) throws CloneNotSupportedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.addHouseholdToClient(client, unitId, clientId));
     }
@@ -113,17 +111,56 @@ public class ClientController {
     @ApiOperation("Get People In HouseHold")
     @RequestMapping(value = "/{clientId}/household", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> updateClientHouseholdList(@PathVariable long clientId) {
-        List<Map<String,Object>> createdHouseHold = clientService.getPeopleInHousehold(clientId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, createdHouseHold);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getPeopleInHousehold(clientId));
     }
 
 
     // NextToKin
-    @ApiOperation("update NextToKin")
-    @RequestMapping(value = "/{clientId}/nextToKin", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateNextToKin(@RequestBody NextToKinDTO client, @PathVariable long unitId, @PathVariable long clientId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKin(client, unitId, clientId));
+    @ApiOperation("create NextToKin")
+    @RequestMapping(value = "/{clientId}/nextToKin", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> createNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable Long unitId, @PathVariable Long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.saveNextToKin(unitId,clientId,nextToKinDTO));
     }
+
+    // NextToKin
+    @ApiOperation("update NextToKin")
+    @RequestMapping(value = "/{clientId}/nextToKin/{nextToKinId}", method = RequestMethod.PUT)
+    ResponseEntity<Map<String, Object>> updateNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long nextToKinId, @PathVariable long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO,clientId));
+    }
+
+
+    // Client Profile Picture
+    @RequestMapping(value = "/{clientId}/next_to_Kin/image", method = RequestMethod.POST)
+    @ApiOperation("upload client picture")
+    public ResponseEntity<Map<String, Object>> uploadImageOfNextToKin(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.emptyMap());
+        }
+        HashMap<String,String> imageUrls = clientExtendedService.uploadImageOfNextToKin(file);
+        if (imageUrls == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.emptyMap());
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, imageUrls);
+    }
+
+    // Client Profile Picture
+    @RequestMapping(value = "/{clientId}/next_to_Kin/{nextToKinId}/image", method = RequestMethod.POST)
+    @ApiOperation("upload client picture")
+    public ResponseEntity<Map<String, Object>> updateImageOfNextToKin(@PathVariable long unitId,
+                                                                      @PathVariable long nextToKinId,
+                                                                      @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.emptyMap());
+        }
+        HashMap<String,String> imageUrls = clientExtendedService.updateImageOfNextToKin(unitId,nextToKinId,file);
+        if (imageUrls == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.emptyMap());
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, imageUrls);
+    }
+
+
 
 
     // Transport Tab
@@ -430,9 +467,9 @@ public class ClientController {
     // Mark Client Dead
     @RequestMapping(method = RequestMethod.DELETE, value = "/{clientId}/dead")
     @ApiOperation("Delete task exception")
-    public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId) throws ParseException, CloneNotSupportedException {
+    public ResponseEntity<Map<String, Object>> markClientAsDead(@PathVariable Long clientId,@RequestParam("deathDate") String deathDate) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.markClientAsDead(clientId));
+                clientService.markClientAsDead(clientId,deathDate));
     }
 
 
@@ -636,5 +673,13 @@ public class ClientController {
     public ResponseEntity<Map<String,Object>> getClientsByIds(@RequestBody List<Long> citizenIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.getClientsByIdsInList(citizenIds));
     }
+
+    @RequestMapping(value = "/{clientId}/cpr_number/{cprNumber}",method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getClientByCprNumber(@PathVariable Long clientId,
+                                                                   @PathVariable String cprNumber, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.findByCPRNumber(clientId,unitId,cprNumber));
+    }
+
+
 
 }

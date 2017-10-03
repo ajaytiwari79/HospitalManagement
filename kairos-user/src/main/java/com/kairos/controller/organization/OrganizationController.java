@@ -116,6 +116,19 @@ public class OrganizationController {
                 organizationService.getOrganizationById(unitId));
     }
 
+    //TODO
+    /**
+     * Return Organization with given id and return if found.
+     *
+     * @return Organization
+     */
+    @ApiOperation(value = "Get Organization by Id")
+    @RequestMapping(value = UNIT_URL+"/WithoutAuth", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationWithoutAuth(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationById(unitId));
+    }
     /**
      * Create new organization in db and return created organization
      *
@@ -819,8 +832,8 @@ public class OrganizationController {
      */
     @ApiOperation("get time slot info by unit id and timeslot name")
     @RequestMapping(value = "/unit/{unitId}/time_slot_name", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotName(@PathVariable long unitId, @RequestBody String timeSlotName) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotName(unitId, timeSlotName));
+    ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotName(@PathVariable long unitId, @RequestBody Long timeSlotExternalId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotExternalId(unitId, timeSlotExternalId));
     }
 
 
@@ -1007,6 +1020,14 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(unitId));
+    }
+
+    @RequestMapping(value = "/vehicleList", method = RequestMethod.GET)
+    @ApiOperation("Get Vehicle list of unit")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getVehicleList(@PathVariable Long organizationId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getVehicleList(organizationId));
+
     }
 
 }

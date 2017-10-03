@@ -8,7 +8,9 @@ import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.language.Language;
+import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.util.DateConverter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -28,12 +30,9 @@ public class Client extends User {
 
 
     private boolean isEnabled = true;
+    @Relationship(type = CIVILIAN_STATUS)
     private CitizenStatus civilianStatus;
     private String profilePic;
-
-    @JsonIgnore
-    @Relationship(type = NEXT_TO_KIN)
-    private Client nextToKin;
 
     private String nameAmongStaff;
 
@@ -55,6 +54,9 @@ public class Client extends User {
     @JsonIgnore
     @Relationship(type = HAS_TEMPORARY_ADDRESS)
     private List<ClientTemporaryAddress> temporaryAddress;
+
+    @Relationship(type = HAS_LOCAL_AREA_TAG)
+    private LocalAreaTag localAreaTag;
 
     private ClientEnum.CitizenShip citizenship;
     private String nationalityType;
@@ -117,6 +119,15 @@ public class Client extends User {
 
     private String visitourTeamId;
 
+    private long deathDate;
+
+    public long getDeathDate() {
+        return deathDate;
+    }
+
+    public void setDeathDate(long deathDate) {
+        this.deathDate = deathDate;
+    }
 
     @Relationship(type = HAS_ALLERGY)
     private List<ClientAllergies> clientAllergiesList;
@@ -155,6 +166,8 @@ public class Client extends User {
 
     private int mostDrivenKm;
 
+    @Relationship(type = HAS_RELATION_OF)
+    private List<ClientRelationType> clientRelationTypes;
 
 
 
@@ -233,14 +246,6 @@ public class Client extends User {
 
     public void setNameAmongStaff(String nameAmongStaff) {
         this.nameAmongStaff = nameAmongStaff;
-    }
-
-    public Client getNextToKin() {
-        return nextToKin;
-    }
-
-    public void setNextToKin(Client nextToKin) {
-        this.nextToKin = nextToKin;
     }
 
     public boolean isUseWheelChair() {
@@ -730,6 +735,7 @@ public class Client extends User {
 
         map.put("peopleInHousehold", this.peopleInHousehold);
         map.put("livesAlone", this.livesAlone);
+        map.put("deathDate", DateConverter.getDate(this.deathDate));
         return map;
     }
 
@@ -810,57 +816,6 @@ public class Client extends User {
     }
 
 
-    public Map<String, Object> retrieveNextToKinDetails() {
-        Map<String, Object> response = new HashMap<>();
-        Map<String, Object> contactDetails = new HashMap<>();
-        Map<String, Object> homeAddress = new HashMap<>();
-
-        response.put("id", this.id);
-        response.put("firstName", this.firstName != null ? this.firstName : "");
-        response.put("lastName", this.lastName != null ? this.lastName : "");
-        response.put("nickName", this.nickName != null ? this.nickName : "");
-        response.put("name", this.firstName + " " + this.lastName);
-        response.put("cprNumber", this.cprNumber != null ? this.cprNumber : "");
-        response.put("profilePic", this.profilePic);
-        response.put("civilianStatus", this.civilianStatus);
-        response.put("gender", getGender());
-        response.put("age", getAge());
-
-        if (this.homeAddress != null) {
-            homeAddress.put("houseNumber", this.homeAddress.getHouseNumber());
-            homeAddress.put("floorNumber", this.homeAddress.getFloorNumber());
-            homeAddress.put("street1", this.homeAddress.getStreet1());
-            homeAddress.put("latitude", this.homeAddress.getLatitude());
-            homeAddress.put("zipCode", this.homeAddress.getZipCode());
-            homeAddress.put("longitude", this.homeAddress.getLongitude());
-//            homeAddress.put("province", this.homeAddress.getProvince());
-
-        }
-        if (this.contactDetail != null) {
-            if (this.contactDetail.isHidePrivatePhone() == false) {
-                contactDetails.put("privatePhone", this.contactDetail.getPrivatePhone());
-            }
-            if (this.contactDetail.isHideMobilePhone() == false) {
-                contactDetails.put("mobilePhone", this.contactDetail.getMobilePhone());
-            }
-            if (this.contactDetail.isHideWorkPhone() == false) {
-                contactDetails.put("workPhone", this.contactDetail.getWorkPhone());
-            }
-            if (this.contactDetail.isHideLandlinePhone() == false) {
-                contactDetails.put("landLinePhone", this.contactDetail.getLandLinePhone());
-            }
-
-            contactDetails.put("facebookAccount", this.contactDetail.getFacebookAccount());
-            contactDetails.put("linkedInAccount", this.contactDetail.getLinkedInAccount());
-            contactDetails.put("twitterAccount", this.contactDetail.getTwitterAccount());
-            contactDetails.put("privateEmail", this.contactDetail.getPrivateEmail());
-            contactDetails.put("messenger", this.contactDetail.getMessenger());
-        }
-        response.put("homeAddress", this.homeAddress);
-        response.put("contactDetail", contactDetails);
-
-        return response;
-    }
 
     public void setContactPerson(Staff contactPerson) {
         Staff contactPerson1 = contactPerson;
@@ -897,12 +852,29 @@ public class Client extends User {
         return this.firstName+" "+this.lastName;
     }
 
+
+
+    public LocalAreaTag getLocalAreaTag() {
+        return localAreaTag;
+    }
+
+    public void setLocalAreaTag(LocalAreaTag localAreaTag) {
+        this.localAreaTag = localAreaTag;
+    }
+
+    public void addClientRelations(ClientRelationType clientRelationType){
+        List<ClientRelationType> clientRelationTypes = Optional.ofNullable(this.clientRelationTypes).orElse(new ArrayList<>());
+        clientRelationTypes.add(clientRelationType);
+        this.clientRelationTypes = clientRelationTypes;
+    }
+
+
+
     @Override
     public String toString() {
         return "{Client={" +
                 "isEnabled=" + isEnabled + '\'' +
                 ", profilePic='" + profilePic + '\'' +
-                ", nextToKin=" + nextToKin +
                 ", nameAmongStaff='" + nameAmongStaff + '\'' +
                 ", requiredEquipmentsList='" + requiredEquipmentsList + '\'' +
                 ", doHaveFreeChoiceServices=" + doHaveFreeChoiceServices +
@@ -957,6 +929,30 @@ public class Client extends User {
                 ", mostDrivenKm=" + mostDrivenKm +
                 '}'+
                 '}';
+    }
+
+    public void saveBasicDetail(NextToKinDTO nextToKinDTO){
+        this.firstName = nextToKinDTO.getFirstName();
+        this.lastName = nextToKinDTO.getLastName();
+        this.nickName = nextToKinDTO.getNickName();
+        this.cprNumber = nextToKinDTO.getCprNumber();
+        Integer ageVariable = Integer.valueOf(nextToKinDTO.getCprNumber().substring(nextToKinDTO.getCprNumber().length() - 1));
+        this.gender = (ageVariable % 2 == 0)?Gender.FEMALE:Gender.MALE;
+    }
+
+    public ContactDetail saveContactDetail(NextToKinDTO nextToKinDTO,ContactDetail contactDetail){
+        if(Optional.ofNullable(nextToKinDTO.getContactDetail()).isPresent()){
+            ContactDetail contactDetailToUpdate = nextToKinDTO.getContactDetail();
+            contactDetail.setPrivatePhone(contactDetailToUpdate.getPrivatePhone());
+            contactDetail.setPrivateEmail(contactDetailToUpdate.getPrivateEmail());
+            contactDetail.setMobilePhone(contactDetailToUpdate.getMobilePhone());
+            contactDetail.setFacebookAccount(contactDetailToUpdate.getFacebookAccount());
+            contactDetail.setTwitterAccount(contactDetailToUpdate.getTwitterAccount());
+            contactDetail.setLinkedInAccount(contactDetailToUpdate.getLinkedInAccount());
+            contactDetail.setMessenger(contactDetailToUpdate.getMessenger());
+            contactDetail.setWorkPhone(contactDetailToUpdate.getWorkPhone());
+        }
+        return contactDetail;
     }
 }
 

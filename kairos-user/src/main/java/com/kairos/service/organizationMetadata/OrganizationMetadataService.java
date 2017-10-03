@@ -1,9 +1,13 @@
 package com.kairos.service.organizationMetadata;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.client.Client;
+import com.kairos.persistence.model.user.client.ClientHomeAddressQueryResult;
+import com.kairos.persistence.model.user.region.LatLng;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
+import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +36,8 @@ public class OrganizationMetadataService extends UserBaseService {
     OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private EnvConfig envConfig;
+    @Inject
+    private ClientGraphRepository clientGraphRepository;
 
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationMetadataService.class);
@@ -78,23 +84,72 @@ public class OrganizationMetadataService extends UserBaseService {
     }
 
 
-    public LocalAreaTag updateTagData(LocalAreaTag localAreaTag) {
-        LocalAreaTag localAreaTag1 = organizationMetadataRepository.findOne(localAreaTag.getId());
-        localAreaTag1.setPaths(localAreaTag.getPaths());
-        localAreaTag1.setName(localAreaTag.getName());
+    public LocalAreaTag updateTagData(LocalAreaTag localAreaTag, long unitId) {
+        LocalAreaTag existingLocalAreaTag = organizationMetadataRepository.findOne(localAreaTag.getId());
+        existingLocalAreaTag.setPaths(localAreaTag.getPaths());
+        existingLocalAreaTag.setName(localAreaTag.getName());
        // localAreaTag1.setColor(localAreaTag.getColor());
-        return save(localAreaTag1);
+
+
+        List<ClientHomeAddressQueryResult> clientHomeAddressQueryResults = clientGraphRepository.getClientsAndHomeAddressByUnitId(unitId);
+        List<Client> citizenList = new ArrayList<>(clientHomeAddressQueryResults.size());
+        for (ClientHomeAddressQueryResult clientHomeAddressQueryResult: clientHomeAddressQueryResults) {
+            if(clientHomeAddressQueryResult != null){
+                boolean isVerified = isCoordinateInsidePolygon(existingLocalAreaTag.getPaths(), clientHomeAddressQueryResult.getHomeAddress().getLatitude(),
+                        clientHomeAddressQueryResult.getHomeAddress().getLongitude());
+                if(isVerified){
+                    Client citizen = clientHomeAddressQueryResult.getCitizen();
+                    citizen.setLocalAreaTag(existingLocalAreaTag);
+                    citizenList.add(citizen);
+                }
+            }
+        }
+        clientGraphRepository.save(citizenList);
+
+        return save(existingLocalAreaTag);
     }
 
     public boolean deleteTagData(Long localAreaTagId) {
         LocalAreaTag localAreaTag = organizationMetadataRepository.findOne(localAreaTagId);
         localAreaTag.setDeleted(true);
+
+        List<Client> citizenList = clientGraphRepository.getClientsByLocalAreaTagId(localAreaTagId);
+        for(Client citizen  : citizenList){
+            citizen.setLocalAreaTag(null);
+        }
+        clientGraphRepository.save(citizenList);
+
         organizationMetadataRepository.save(localAreaTag);
         if (localAreaTag.isDeleted()) {
             return true;
         } else {
             return false;
         }
+    }
+
+    /*
+This method accepts Latitude and Longitude of Citizen Home address.
+It searches whether citizen's address lies within LocalAreaTag coordinates list or not
+ */
+    boolean isCoordinateInsidePolygon(List<LatLng> coordinatesList, float latitude, float longitude) {
+        float x =  latitude;
+        float y = longitude;
+        boolean coordinateInPolygon = false;
+
+        for (int i = 0, j = coordinatesList.size() - 1; i < coordinatesList.size(); j = i++) {
+
+            float xi =  coordinatesList.get(i).getLat();
+            float yi =  coordinatesList.get(i).getLng();
+
+            float xj =  coordinatesList.get(j).getLat();
+            float yj =  coordinatesList.get(j).getLng();
+
+            boolean intersect = ((yi > y) != (yj > y))  && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+            if (intersect){
+                coordinateInPolygon = !coordinateInPolygon;
+            }
+        }
+        return coordinateInPolygon;
     }
 
 

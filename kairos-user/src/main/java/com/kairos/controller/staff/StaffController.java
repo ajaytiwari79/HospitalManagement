@@ -554,5 +554,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffById(staffId));
     }
 
+    @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> verifyStaffBelongsToUnit(@PathVariable long unitId, @PathVariable long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.verifyStaffBelongsToUnit(staffId, unitId));
+    }
+
 
 }

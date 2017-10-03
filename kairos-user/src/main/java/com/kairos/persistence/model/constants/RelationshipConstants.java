@@ -90,6 +90,7 @@ public class RelationshipConstants {
     public final static String HAS_PARTNER_ADDRESS = "HAS_PARTNER_ADDRESS";
     public final static String HAS_TEMPORARY_ADDRESS = "HAS_TEMPORARY_ADDRESS";
     public final static String HAS_CONTACT_DETAIL = "HAS_CONTACT_DETAIL";
+    public final static String HAS_LOCAL_AREA_TAG = "HAS_LOCAL_AREA_TAG";
 
     public final static String HAS_DOCTOR = "HAS_DOCTOR";
     public final static String HAS_DISEASE = "HAS_DISEASE";
@@ -99,6 +100,7 @@ public class RelationshipConstants {
     public final static String ORGANIZATION_HAS_RESOURCE = "ORGANIZATION_HAS_RESOURCE";
     public final static String ORGANIZATION_HAS_DEPARTMENT ="ORGANIZATION_HAS_DEPARTMENT";
     public final static String ORGANIZATION_SUB_SERVICE ="ORGANIZATION_SUB_SERVICE";
+    public final static String LINK_WITH_EXTERNAL_SERVICE ="LINK_WITH_EXTERNAL_SERVICE";
 
 
     public static final String RESOURCE_NOT_AVAILABLE_ON="RESOURCE_NOT_AVAILABLE_ON";
@@ -166,6 +168,10 @@ public class RelationshipConstants {
     public final static String HAS_LEVEL = "HAS_LEVEL";
     public final static String PHASE_BELONGS_TO="PHASE_BELONGS_TO";
     public final static String HAS_RELATION_TYPES="HAS_RELATION_TYPES";
+    public final static String RELATION_TYPE="RELATION_TYPE";
+    public final static String RELATION_WITH_NEXT_TO_KIN="RELATION_WITH_NEXT_TO_KIN";
+    public final static String HAS_RELATION_OF="HAS_RELATION_OF";
+    public final static String HAS_RESOURCES="HAS_RESOURCES";
 
     /**
      * Default constructor

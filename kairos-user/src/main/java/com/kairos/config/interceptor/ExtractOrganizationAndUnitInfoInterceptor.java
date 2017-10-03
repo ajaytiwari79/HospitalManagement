@@ -2,12 +2,15 @@ package com.kairos.config.interceptor;
 
 import com.kairos.util.userContext.UserContext;
 import org.apache.log4j.Logger;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by anil on 10/8/17.
@@ -38,6 +41,14 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(unitIdString!=null){
             final Long unitId = Long.valueOf(unitIdString);
             UserContext.setUnitId(unitId);
+        }
+
+        ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest httpServletRequest = servletRequest.getRequest();
+
+        String tabId = httpServletRequest.getParameter("moduleId");
+        if(Optional.ofNullable(tabId).isPresent()){
+            UserContext.setTabId(tabId);
         }
 
 

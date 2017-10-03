@@ -5,9 +5,7 @@ package com.kairos.custom_exception;
  */
 public class TaskDemandException extends RuntimeException {
 
-    public String message;
-
     public TaskDemandException(String message) {
-        this.message = message;
+       super(message);
     }
 }

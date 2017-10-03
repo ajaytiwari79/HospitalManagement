@@ -1010,6 +1010,23 @@ public class OrganizationService extends UserBaseService {
         OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO=this.getOrganizationTypeAndSubTypes(unitId);
         return new OrganizationSkillAndOrganizationTypesDTO(organizationTypeAndSubTypeDTO,availableSkills);
     }
+
+    public List<Vehicle> getVehicleList(long unitId){
+        Organization organization  = organizationGraphRepository.findOne(unitId);
+        if (organization == null) {
+            logger.debug("Searching organization by id " + unitId);
+            throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
+        }
+        Long countryId = organizationGraphRepository.getCountryId(unitId);
+        return countryGraphRepository.getResourcesByCountry(countryId);
+    }
+
+    public  List<Long> allOrganizationIds(){
+        List<Long> organizationIds=organizationGraphRepository.allOrganizationIds();
+        return organizationIds;
+    }
+
+
 }
 
 

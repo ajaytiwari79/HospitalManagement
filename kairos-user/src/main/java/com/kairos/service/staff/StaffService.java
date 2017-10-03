@@ -139,13 +139,7 @@ public class StaffService extends UserBaseService {
         createDirectory(IMAGES_PATH);
         String fileName = new Date().getTime() + multipartFile.getOriginalFilename();
         final String path = IMAGES_PATH + File.separator + fileName;
-        try {
-            FileUtil.writeFile(path, multipartFile);
-        } catch (IOException e) {
-            fileName = null;
-        } catch (Exception e) {
-            fileName = null;
-        }
+        FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
         save(staff);
         return envConfig.getServerHost() + File.separator + fileName;
@@ -1189,6 +1183,13 @@ public class StaffService extends UserBaseService {
         }
         return staffPersonalDetailList;
 
+    }
+    public boolean verifyStaffBelongsToUnit( long staffId,long unitId) {
+        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
+        if (staff == null) {
+            return false;
+        }
+        return true;
     }
 
 }

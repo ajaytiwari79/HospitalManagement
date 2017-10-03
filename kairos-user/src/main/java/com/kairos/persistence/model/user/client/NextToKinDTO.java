@@ -1,25 +1,58 @@
 package com.kairos.persistence.model.user.client;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
-import com.kairos.persistence.model.user.country.CitizenStatus;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
  * Created by oodles on 24/1/17.
  */
-
+@QueryResult
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NextToKinDTO {
-    private Long id;
     private String nickName;
     private String firstName;
     private String lastName;
-    private CitizenStatus civilianStatus;
     private AddressDTO homeAddress;
     private ContactDetail contactDetail;
     private String profilePic;
-    private Long cprNumber;
+    private String cprNumber;
     private String  privateEmail;
     private boolean isVerifiedByGoogleMap;
+    private Long relationTypeId;
+    private Gender gender;
+    private Integer age;
+
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public Long getCivilianStatusId() {
+        return civilianStatusId;
+    }
+
+    public void setCivilianStatusId(Long civilianStatusId) {
+        this.civilianStatusId = civilianStatusId;
+    }
+
+    private Long civilianStatusId;
+    private Long id;
 
     public boolean isVerifiedByGoogleMap() {
         return isVerifiedByGoogleMap;
@@ -29,22 +62,13 @@ public class NextToKinDTO {
         isVerifiedByGoogleMap = verifiedByGoogleMap;
     }
 
-    public Long getCprNumber() {
+    public String getCprNumber() {
         return cprNumber;
     }
 
-    public void setCprNumber(Long cprNumber) {
+    public void setCprNumber(String cprNumber) {
         this.cprNumber = cprNumber;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
 
     public String getPrivateEmail() {
         return privateEmail;
@@ -74,18 +98,19 @@ public class NextToKinDTO {
         return lastName;
     }
 
+    public Long getId() {
+
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-
-    public CitizenStatus getCivilianStatus() {
-        return civilianStatus;
-    }
-
-    public void setCivilianStatus(CitizenStatus civilianStatus) {
-        this.civilianStatus = civilianStatus;
-    }
 
     public AddressDTO getHomeAddress() {
         return homeAddress;
@@ -110,4 +135,34 @@ public class NextToKinDTO {
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
     }
+
+    public Long getRelationTypeId() {
+        return relationTypeId;
+    }
+
+    public void setRelationTypeId(Long relationTypeId) {
+        this.relationTypeId = relationTypeId;
+    }
+
+    public NextToKinDTO buildResponse(Client nextToKin, String serverUrl, long relationTypeId,
+                                      NextToKinDTO nextToKinDTO){
+        ObjectMapper objectMapper = new ObjectMapper();
+        this.id = nextToKin.getId();
+        this.firstName = nextToKin.getFirstName();
+        this.lastName = nextToKin.getLastName();
+        this.civilianStatusId = nextToKin.getCivilianStatus().getId();
+        this.homeAddress = objectMapper.convertValue(nextToKin.getHomeAddress(),AddressDTO.class);
+        this.homeAddress.setMunicipalityId(nextToKinDTO.getHomeAddress().getMunicipalityId());
+        this.homeAddress.setZipCodeId(nextToKin.getHomeAddress().getZipCode().getId());
+        this.gender = nextToKin.getGender();
+        this.age = nextToKin.getAge();
+        this.nickName = nextToKin.getNickName();
+        this.profilePic = serverUrl + nextToKin.getProfilePic();
+        this.contactDetail = nextToKin.getContactDetail();
+        this.cprNumber = nextToKin.getCprNumber();
+        this.relationTypeId = relationTypeId;
+        return this;
+    }
+
+
 }
