@@ -58,8 +58,8 @@ public interface GroupGraphRepository extends GraphRepository<Group> {
     @Query(" MATCH (grp:Group) where id(grp)={0} with grp AS group ")
     Organization getUnitForThisGroup(Long groupId);
 
-    @Query("start s=node({0})\n" +
-            "match(s)-[:"+HAS_GROUP+"]-(o:Organization)\n" +
-            "return id(o)")
-    Long getUnitIdByGroupId(Long groupId);
+    @Query("start group=node({0})\n" +
+            "match(group)-[:"+HAS_GROUP+"]-(org:Organization)\n" +
+            "return org")
+    Organization getUnitByGroupId(Long groupId);
 }

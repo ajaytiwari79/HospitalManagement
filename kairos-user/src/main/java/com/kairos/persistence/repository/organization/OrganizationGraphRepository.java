@@ -490,9 +490,5 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("MATCH (n:Organization) RETURN Id(n)")
     List<Long> allOrganizationIds();
 
-    @Query("start s=node({0}) \n" +
-            "match(s)<-[:HAS_SUB_ORGANIZATION*]-(o:Organization)\n" +
-            "return id(o) as Ids")
-    List<Long> getAllParentOrganization(Long organizationId);
 
 }

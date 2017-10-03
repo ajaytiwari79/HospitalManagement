@@ -101,8 +101,8 @@ public class GroupService extends UserBaseService {
         return group;
     }
 
-    public Long getUnitIdByGroupId(Long groupId) {
-        return groupGraphRepository.getUnitIdByGroupId(groupId);
+    public Organization getUnitByGroupId(Long groupId) {
+        return groupGraphRepository.getUnitByGroupId(groupId);
     }
 
 

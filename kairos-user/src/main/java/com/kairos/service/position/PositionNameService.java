@@ -125,21 +125,22 @@ public class PositionNameService extends UserBaseService {
 
     public List<PositionName> getAllPositionName(Long id, String type) {
         Long unitId;
+        Organization organization = new Organization();
         List<PositionName> positionNames = new ArrayList<PositionName>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unitId = id;
+            organization = organizationGraphRepository.findOne(id);
         } else if (GROUP.equalsIgnoreCase(type)) {
-            unitId = groupService.getUnitIdByGroupId(id);
+            organization = groupService.getUnitByGroupId(id);
         } else if (TEAM.equalsIgnoreCase(type)) {
-            unitId = teamService.getOrganizationIdByTeamId(id);
+            organization = teamService.getOrganizationByTeamId(id);
         } else {
             throw new InternalError("Type is not valid");
         }
 
-        Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Organization not found-" + unitId);
+            throw new DataNotFoundByIdException("Organization not found-" + id);
         }
+        unitId = organization.getId();
         if (organization.isParentOrganization()) {
             //return parents(its own)
             positionNames = organizationGraphRepository.getPositionNames(unitId);
