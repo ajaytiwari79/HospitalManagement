@@ -408,7 +408,10 @@ public class TeamService extends UserBaseService {
         Organization organization = organizationGraphRepository.getOrganizationByTeamId(teamId);
         return organization.getId();
     }
-
+    public Organization getOrganizationByTeamId(Long teamId){
+        Organization organization = organizationGraphRepository.getOrganizationByTeamId(teamId);
+        return organization;
+    }
     public TeamDTO updateTeamGeneralDetails(long teamId, TeamDTO teamDTO) {
 
         Team team = teamGraphRepository.findOne(teamId);

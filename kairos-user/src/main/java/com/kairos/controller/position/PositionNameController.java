@@ -41,8 +41,8 @@ public class PositionNameController {
 
     @ApiOperation("Delete PositionName")
     @DeleteMapping(value = "/position_name/{positionNameId}")
-    ResponseEntity<Map<String, Object>> deletePositionName( @PathVariable Long positionNameId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.deletePositionName(positionNameId));
+    ResponseEntity<Map<String, Object>> deletePositionName(@PathVariable Long unitId,  @PathVariable Long positionNameId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.deletePositionName(unitId,positionNameId));
     }
 
     @ApiOperation("Get PositionName")
@@ -51,10 +51,12 @@ public class PositionNameController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.getPositionName(positionNameId));
     }
 
+    //TODO  fixture og rest call
+
     @ApiOperation("Get All PositionName")
     @GetMapping(value = "/position_name")
-    ResponseEntity<Map<String, Object>> getAllPositionName(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.getAllPositionName(unitId));
+    ResponseEntity<Map<String, Object>> getAllPositionName(@RequestParam("type") String type,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.getAllPositionName(unitId,type));
     }
 
 
