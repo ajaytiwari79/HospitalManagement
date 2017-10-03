@@ -20,10 +20,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORGAN
  * Created by oodles on 7/10/16.
  */
 @Repository
-public interface GroupGraphRepository extends GraphRepository<Group>{
+public interface GroupGraphRepository extends GraphRepository<Group> {
 
-    @Query(" MATCH (o:Organization)-[:"+HAS_GROUP+"]->(g:Group) where id(g) = {0} with o as org " +
-            " MATCH (org)-[:"+ORGANISATION_HAS_SKILL+"]->(s:Skill)  with s AS skill " +
+    @Query(" MATCH (o:Organization)-[:" + HAS_GROUP + "]->(g:Group) where id(g) = {0} with o as org " +
+            " MATCH (org)-[:" + ORGANISATION_HAS_SKILL + "]->(s:Skill)  with s AS skill " +
             " MATCH (sc:SkillCategory)-[:HAS_CATEGORY]-(skill) return " +
             " { id:id(sc), " +
             "  name:sc.name, " +
@@ -32,7 +32,7 @@ public interface GroupGraphRepository extends GraphRepository<Group>{
             "  name:skill.name " +
             " }) " +
             " } AS skillList ")
-    List<Map<String,Object>> getGroupOrganizationSkills(Long groupId);
+    List<Map<String, Object>> getGroupOrganizationSkills(Long groupId);
 
 
     @Query(" Match (g:Group),(s:Skill) where id(g) IN {0} AND id(s)={1}  " +
@@ -43,7 +43,7 @@ public interface GroupGraphRepository extends GraphRepository<Group>{
             " CREATE (g)-[:GROUP_HAS_SERVICES]->(os) return os")
     List<OrganizationService> addSelectedService(Long groupId, Long[] service);
 
-    @Query("MATCH(g:Group)-[:"+GROUP_HAS_SKILLS+"]->(s:Skill) where id(g)={0}" +
+    @Query("MATCH(g:Group)-[:" + GROUP_HAS_SKILLS + "]->(s:Skill) where id(g)={0}" +
             " with s AS skill " +
             "MATCH (sc:SkillCategory)-[:HAS_CATEGORY]-(skill) return  " +
             "{ id:id(sc), " +
@@ -53,9 +53,13 @@ public interface GroupGraphRepository extends GraphRepository<Group>{
             "  name:skill.name " +
             "}) " +
             "} AS skillList ")
-    List<Map<String,Object>> getGroupSelectedSkills(Long groupId);
+    List<Map<String, Object>> getGroupSelectedSkills(Long groupId);
 
     @Query(" MATCH (grp:Group) where id(grp)={0} with grp AS group ")
     Organization getUnitForThisGroup(Long groupId);
 
+    @Query("start s=node({0})\n" +
+            "match(s)-[:"+HAS_GROUP+"]-(o:Organization)\n" +
+            "return id(o)")
+    Long getUnitIdByGroupId(Long groupId);
 }

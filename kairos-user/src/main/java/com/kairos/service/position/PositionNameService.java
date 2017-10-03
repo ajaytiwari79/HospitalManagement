@@ -8,12 +8,18 @@ import com.kairos.persistence.model.user.position.PositionName;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.position.PositionNameGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.organization.GroupService;
+import com.kairos.service.organization.TeamService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.constants.AppConstants.GROUP;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
+import static com.kairos.constants.AppConstants.TEAM;
 
 /**
  * Created by pawanmandhan on 27/7/17.
@@ -28,7 +34,10 @@ public class PositionNameService extends UserBaseService {
 
     @Inject
     private PositionNameGraphRepository positionNameGraphRepository;
-
+    @Inject
+    private GroupService groupService;
+    @Inject
+    private TeamService teamService;
 
     public PositionName createPositionName(Long unitId, PositionName positionName) {
         PositionName position = null;
@@ -43,7 +52,7 @@ public class PositionNameService extends UserBaseService {
         if (organization == null) {
             throw new DataNotFoundByIdException("Organization not found");
         }
-       if(!organization.isParentOrganization()){
+        if (!organization.isParentOrganization()) {
             throw new ActionNotPermittedException("Can only create PositionName in Parent organization");
         }
 
@@ -75,7 +84,7 @@ public class PositionNameService extends UserBaseService {
         if (organization == null) {
             throw new DataNotFoundByIdException("Organization not found");
         }
-        if(!organization.isParentOrganization()){
+        if (!organization.isParentOrganization()) {
             throw new ActionNotPermittedException("Can only update PositionName in Parent organization");
         }
 
@@ -89,16 +98,16 @@ public class PositionNameService extends UserBaseService {
     }
 
 
-    public boolean deletePositionName(Long unitId,Long positionId) {
+    public boolean deletePositionName(Long unitId, Long positionId) {
         PositionName position = positionNameGraphRepository.findOne(positionId);
         if (position == null) {
-            throw new DataNotFoundByIdException("position_name  not found "+positionId);
+            throw new DataNotFoundByIdException("position_name  not found " + positionId);
         }
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Organization not found "+unitId);
+            throw new DataNotFoundByIdException("Organization not found " + unitId);
         }
-        if(!organization.isParentOrganization()){
+        if (!organization.isParentOrganization()) {
             throw new ActionNotPermittedException("Only parent Organization can remove/edit position names.");
         }
 
@@ -114,18 +123,30 @@ public class PositionNameService extends UserBaseService {
     }
 
 
-    public List<PositionName> getAllPositionName(Long unitId) {
+    public List<PositionName> getAllPositionName(Long id, String type) {
+        Long unitId;
         List<PositionName> positionNames = new ArrayList<PositionName>();
+        if (ORGANIZATION.equalsIgnoreCase(type)) {
+            unitId = id;
+        } else if (GROUP.equalsIgnoreCase(type)) {
+            unitId = groupService.getUnitIdByGroupId(id);
+        } else if (TEAM.equalsIgnoreCase(type)) {
+            unitId = teamService.getOrganizationIdByTeamId(id);
+        } else {
+            throw new InternalError("Type is not valid");
+        }
+
+        //List<Long> allOrgIds=organizationGraphRepository.getAllParentOrganization(unitId);
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
-            throw new DataNotFoundByIdException("Organization not found");
+            throw new DataNotFoundByIdException("Organization not found-" + unitId);
         }
-        if(!organization.isParentOrganization()){
+        System.out.println(organization.isParentOrganization());
+        if (organization.isParentOrganization()) {
             //return parents(its own)
-            positionNames=organizationGraphRepository.getPositionNames(unitId);
-        }
-        else {
-            positionNames=organizationGraphRepository.getPositionNamesOfParentOrganization(unitId);
+            positionNames = organizationGraphRepository.getPositionNames(unitId);
+        } else {
+            positionNames = organizationGraphRepository.getPositionNamesOfParentOrganization(unitId);
         }
 
 
@@ -135,7 +156,6 @@ public class PositionNameService extends UserBaseService {
 //    public List<PositionName> getAllPositionName(Long unitId) {
 //        return  organizationGraphRepository.getPositionNames(unitId);
 //    }
-
 
 
 }
