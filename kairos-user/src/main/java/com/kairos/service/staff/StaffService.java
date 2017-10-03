@@ -1184,5 +1184,12 @@ public class StaffService extends UserBaseService {
         return staffPersonalDetailList;
 
     }
+    public boolean verifyStaffBelongsToUnit( long staffId,long unitId) {
+        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
+        if (staff == null) {
+            return false;
+        }
+        return true;
+    }
 
 }
