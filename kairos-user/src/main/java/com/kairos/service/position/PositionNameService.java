@@ -136,26 +136,18 @@ public class PositionNameService extends UserBaseService {
             throw new InternalError("Type is not valid");
         }
 
-        //List<Long> allOrgIds=organizationGraphRepository.getAllParentOrganization(unitId);
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
             throw new DataNotFoundByIdException("Organization not found-" + unitId);
         }
-        System.out.println(organization.isParentOrganization());
         if (organization.isParentOrganization()) {
             //return parents(its own)
             positionNames = organizationGraphRepository.getPositionNames(unitId);
         } else {
             positionNames = organizationGraphRepository.getPositionNamesOfParentOrganization(unitId);
         }
-
-
         return positionNames;
     }
-
-//    public List<PositionName> getAllPositionName(Long unitId) {
-//        return  organizationGraphRepository.getPositionNames(unitId);
-//    }
 
 
 }
