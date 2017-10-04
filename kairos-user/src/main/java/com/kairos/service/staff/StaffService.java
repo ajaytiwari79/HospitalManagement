@@ -42,6 +42,7 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.FileUtil;
+import com.kairos.util.OrganizationUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -127,7 +128,7 @@ public class StaffService extends UserBaseService {
     ClientGraphRepository clientGraphRepository;
     @Autowired
     TaskServiceRestClient taskServiceRestClient;
-
+    @Inject private OrganizationUtil organizationUtil;
 
 
 
@@ -1184,12 +1185,13 @@ public class StaffService extends UserBaseService {
         return staffPersonalDetailList;
 
     }
-    public boolean verifyStaffBelongsToUnit( long staffId,long unitId) {
+    public Long verifyStaffBelongsToUnit( long staffId,long id,String type) {
+        Long unitId = organizationUtil.getOrganization(id, type);
         Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
         if (staff == null) {
-            return false;
+            return -1L;
         }
-        return true;
+        return unitId;
     }
 
 }

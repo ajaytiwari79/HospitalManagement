@@ -38,6 +38,7 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.FormatUtil;
+import com.kairos.util.OrganizationUtil;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
@@ -149,6 +150,8 @@ public class OrganizationService extends UserBaseService {
 
     @Inject
     AbsenceTypesRepository absenceTypesRepository;
+    @Inject
+    private OrganizationUtil organizationUtil;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id, 0);
@@ -190,7 +193,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = new Organization();
         organization.setParentOrganization(true);
         organization.setCountry(country);
-        organization = saveOrganizationDetails(organization, orgDetails, false,countryId);
+        organization = saveOrganizationDetails(organization, orgDetails, false, countryId);
         if (organization == null) {
             return null;
         }
@@ -208,13 +211,13 @@ public class OrganizationService extends UserBaseService {
         return organizationResponse(organization, orgDetails);
     }
 
-    public HashMap<String, Object> updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId,long countryId) {
+    public HashMap<String, Object> updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId, long countryId) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         ;
         if (organization == null) {
             throw new InternalError("Organization not found");
         }
-        organization = saveOrganizationDetails(organization, orgDetails, true,countryId);
+        organization = saveOrganizationDetails(organization, orgDetails, true, countryId);
         if (organization == null) {
             return null;
         }
@@ -261,7 +264,7 @@ public class OrganizationService extends UserBaseService {
         return organizationContactAddress;
     }
 
-    private Organization saveOrganizationDetails(Organization organization, ParentOrganizationDTO orgDetails, boolean isUpdateOperation,long countryId) {
+    private Organization saveOrganizationDetails(Organization organization, ParentOrganizationDTO orgDetails, boolean isUpdateOperation, long countryId) {
         organization.setName(orgDetails.getName());
         List<OrganizationType> organizationTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getTypeId());
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getSubTypeId());
@@ -338,8 +341,8 @@ public class OrganizationService extends UserBaseService {
         }
         logger.info("Geography Data: " + geographyData);
 
-        Level level = countryGraphRepository.getLevel(countryId,orgDetails.getLevelId());
-        if(level == null){
+        Level level = countryGraphRepository.getLevel(countryId, orgDetails.getLevelId());
+        if (level == null) {
             throw new InternalError("Level can't be null");
         }
         organization.setLevel(level);
@@ -949,26 +952,28 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.findAllOrganizationIds();
     }
 
-    public OrganizationTypeAndSubTypeDTO getOrganizationTypeAndSubTypes(Long unitId) {
-        OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO= new OrganizationTypeAndSubTypeDTO();
+    public OrganizationTypeAndSubTypeDTO getOrganizationTypeAndSubTypes(Long id, String type) {
+        Long unitId = organizationUtil.getOrganization(id, type);
+
+        OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = new OrganizationTypeAndSubTypeDTO();
         List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(unitId);
         List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(unitId);
-
+        organizationTypeAndSubTypeDTO.setUnitId(unitId);
         organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
         organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
         return organizationTypeAndSubTypeDTO;
     }
 
-    public OrganizationExternalIdsDTO saveKMDExternalId(Long unitId, OrganizationExternalIdsDTO organizationExternalIdsDTO){
-            Organization organization = organizationGraphRepository.findOne(unitId);
-            organization.setKmdExternalId(organizationExternalIdsDTO.getKmdExternalId());
+    public OrganizationExternalIdsDTO saveKMDExternalId(Long unitId, OrganizationExternalIdsDTO organizationExternalIdsDTO) {
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        organization.setKmdExternalId(organizationExternalIdsDTO.getKmdExternalId());
         organization.setExternalId(organizationExternalIdsDTO.getTimeCareExternalId());
-            organizationGraphRepository.save(organization);
-            return organizationExternalIdsDTO;
+        organizationGraphRepository.save(organization);
+        return organizationExternalIdsDTO;
 
     }
 
-    public TimeSlotsDeductionDTO saveTimeSlotPercentageDeduction(Long unitId, TimeSlotsDeductionDTO timeSlotsDeductionDTO){
+    public TimeSlotsDeductionDTO saveTimeSlotPercentageDeduction(Long unitId, TimeSlotsDeductionDTO timeSlotsDeductionDTO) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         organization.setDayShiftTimeDeduction(timeSlotsDeductionDTO.getDayShiftTimeDeduction());
         organization.setNightShiftTimeDeduction(timeSlotsDeductionDTO.getNightShiftTimeDeduction());
@@ -977,16 +982,16 @@ public class OrganizationService extends UserBaseService {
 
     }
 
-    public OrganizationExternalIdsDTO getKMDExternalId(Long unitId){
+    public OrganizationExternalIdsDTO getKMDExternalId(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         OrganizationExternalIdsDTO organizationExternalIdsDTO = new OrganizationExternalIdsDTO();
         organizationExternalIdsDTO.setKmdExternalId(organization.getKmdExternalId());
         organizationExternalIdsDTO.setTimeCareExternalId(organization.getExternalId());
-       return organizationExternalIdsDTO;
+        return organizationExternalIdsDTO;
 
     }
 
-    public TimeSlotsDeductionDTO getTimeSlotPercentageDeduction(Long unitId){
+    public TimeSlotsDeductionDTO getTimeSlotPercentageDeduction(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         TimeSlotsDeductionDTO timeSlotsDeductionDTO = new TimeSlotsDeductionDTO();
         timeSlotsDeductionDTO.setNightShiftTimeDeduction(organization.getNightShiftTimeDeduction());
@@ -995,8 +1000,8 @@ public class OrganizationService extends UserBaseService {
 
     }
 
-    public List<Vehicle> getVehicleList(long unitId){
-        Organization organization  = organizationGraphRepository.findOne(unitId);
+    public List<Vehicle> getVehicleList(long unitId) {
+        Organization organization = organizationGraphRepository.findOne(unitId);
         if (organization == null) {
             logger.debug("Searching organization by id " + unitId);
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
@@ -1005,8 +1010,8 @@ public class OrganizationService extends UserBaseService {
         return countryGraphRepository.getResourcesByCountry(countryId);
     }
 
-    public  List<Long> allOrganizationIds(){
-        List<Long> organizationIds=organizationGraphRepository.allOrganizationIds();
+    public List<Long> allOrganizationIds() {
+        List<Long> organizationIds = organizationGraphRepository.allOrganizationIds();
         return organizationIds;
     }
 
