@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+
 /**
  * Created by neuron on 12/6/17.
  */
@@ -47,7 +49,7 @@ public class OrganizationMetadataService extends UserBaseService {
         Map<String, Object> localAreaTagData = new HashMap<String, Object>();
         List<Object> clientList = new ArrayList<>();
         List<Object> localAreaTagsList = new ArrayList<>();
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(unitId,envConfig.getServerHost() + File.separator);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(unitId,envConfig.getServerHost() + FORWARD_SLASH);
         for (Map<String, Object> map : mapList) {
             clientList.add(map.get("Client"));
         }

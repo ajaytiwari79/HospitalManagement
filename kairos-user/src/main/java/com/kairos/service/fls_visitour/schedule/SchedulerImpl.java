@@ -252,7 +252,7 @@ Need just TIME (excluding Date) to send it to FLS Visitour.
                /* Staff staff = staffGraphRepository.findOne(Long.parseLong(appointment.getFMExtID()));
                 taskAppointmentSuggestionDTO.setFirstName(staff.getFirstName());
                 taskAppointmentSuggestionDTO.setLastName(staff.getLastName());
-                taskAppointmentSuggestionDTO.setProfilePic(staff.getProfilePic()!=null? envConfig.getServerHost() + File.separator + staff.getProfilePic() : "");*/
+                taskAppointmentSuggestionDTO.setProfilePic(staff.getProfilePic()!=null? envConfig.getServerHost() + FORWARD_SLASH + staff.getProfilePic() : "");*/
 
                 taskAppointmentSuggestionDTO.setSuggestedDate(appointment.getDate().toGregorianCalendar().getTime());
                 taskAppointmentSuggestionDTO.setInfo(appointment.getInfo());
