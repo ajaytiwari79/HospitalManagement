@@ -97,7 +97,7 @@ public class ClientController {
     @ApiOperation("Get General Information for a Client")
     @RequestMapping(value = "/{clientId}/general", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getClientGeneralInformation(@PathVariable long clientId, @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.retrieveGeneralDetails(clientId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.retrieveCompleteDetails(clientId, unitId));
     }
 
 

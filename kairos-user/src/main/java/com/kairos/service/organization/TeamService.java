@@ -263,7 +263,7 @@ public class TeamService extends UserBaseService {
     public Map<String,Object> getTeams(long groupId) {
         OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getOrganizationByGroupId(groupId);
 
-        Long countryId = countryGraphRepository.getCountryOfUnit(organizationContactAddress.getOrganization().getId());
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(organizationContactAddress.getOrganization().getId());
 
         List<Map<String,Object>> teams = teamGraphRepository.getTeams(groupId);
         Map<String,Object> map = new HashMap<>();

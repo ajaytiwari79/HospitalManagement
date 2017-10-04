@@ -244,7 +244,7 @@ public class ClientExtendedService extends UserBaseService {
 
     private void saveCitizenRelation(Long relationTypeId, Long unitId, Client nextToKin, Long clientId) {
 
-        Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         Client client = clientGraphRepository.findOne(clientId);
         if (Optional.ofNullable(relationTypeId).isPresent()) {
             RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);

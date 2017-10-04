@@ -75,7 +75,7 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
 
     @Query("Match (organization:Organization) where id(organization)={0} with organization  Match (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:MUNICIPALITY]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
             "Match (region)-[:"+BELONGS_TO+"]->(country:Country) return id(country)")
-    Long getCountryOfUnit(long unitId);
+    Long getCountryIdByUnitId(long unitId);
 
     @Query("MATCH (c:Country{isEnabled:true}) return { id:id(c),name:c.name ,code:c.code,googleCalendarCode:c.googleCalendarCode} as result")
     List<Map<String,Object>> findAllCountriesMinimum();

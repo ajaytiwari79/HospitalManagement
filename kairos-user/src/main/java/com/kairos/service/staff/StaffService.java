@@ -230,7 +230,7 @@ public class StaffService extends UserBaseService {
 
 
         Map<String, Object> personalInfo = new HashMap<>(2);
-        Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         List<Expertise> expertise;
         List<Language> languages;
         List<EngineerType> engineerTypes;
@@ -312,18 +312,18 @@ public class StaffService extends UserBaseService {
             staff = getStaffWithBasicInfo(id);
             roles = accessGroupService.getAccessGroups(id);
 
-            countryId = countryGraphRepository.getCountryOfUnit(id);
+            countryId = countryGraphRepository.getCountryIdByUnitId(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
         } else if (GROUP.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getStaffByGroupId(id,envConfig.getServerHost() + File.separator);
             Organization organization = organizationGraphRepository.getOrganizationByGroupId(id).getOrganization();
-            countryId = countryGraphRepository.getCountryOfUnit(organization.getId());
+            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
             roles = accessGroupService.getAccessGroups(organization.getId());
         } else if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getStaffByTeamId(id,envConfig.getServerHost() + File.separator);
             Organization organization = organizationGraphRepository.getOrganizationByTeamId(id);
             roles = accessGroupService.getAccessGroups(organization.getId());
-            countryId = countryGraphRepository.getCountryOfUnit(organization.getId());
+            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
         }
 
         List<Map<String, Object>> response = new ArrayList<>();

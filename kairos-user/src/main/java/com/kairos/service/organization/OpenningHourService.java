@@ -68,7 +68,7 @@ public class OpenningHourService {
     }
 
     public List<Object> getOrganizationHolidays(long unitId) {
-        Long id = countryGraphRepository.getCountryOfUnit(unitId);
+        Long id = countryGraphRepository.getCountryIdByUnitId(unitId);
         List<Object> response = new ArrayList<>();
         if (id != null) {
             List<Map<String, Object>> data = countryGraphRepository.getAllCountryHolidays(id);

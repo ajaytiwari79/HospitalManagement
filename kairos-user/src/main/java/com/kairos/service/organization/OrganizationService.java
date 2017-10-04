@@ -527,7 +527,7 @@ public class OrganizationService extends UserBaseService {
                 throw new InternalError("Organization is null");
             }
             Map<String, Object> metaData = null;
-            Long countryId = countryGraphRepository.getCountryOfUnit(id);
+            Long countryId = countryGraphRepository.getCountryIdByUnitId(id);
             List<Map<String, Object>> data = organizationGraphRepository.getGeneralTabMetaData(countryId);
             for (Map<String, Object> map : data) {
                 metaData = (Map<String, Object>) map.get("data");
@@ -680,7 +680,7 @@ public class OrganizationService extends UserBaseService {
             throw new InternalError("organization is null");
         }
 
-        Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
         Map<String, Object> response = new HashMap<>(2);
         List<Map<String, Object>> units = organizationGraphRepository.getUnits(unitId);
@@ -842,7 +842,7 @@ public class OrganizationService extends UserBaseService {
         Map<String, Object> organizationTimeSlotList = timeSlotService.getTimeSlots(unitId);
         unitData.put("organizationTimeSlotList", organizationTimeSlotList.get("timeSlots"));
 
-        Long countryId = countryGraphRepository.getCountryOfUnit(organizationId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(organizationId);
         List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
         unitData.put("clientStatusList", clientStatusList);
         List<Object> localAreaTagsList = new ArrayList<>();

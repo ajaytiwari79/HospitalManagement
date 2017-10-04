@@ -80,7 +80,7 @@ public class OrganizationAddressService {
 
         HashMap<String, Object> response = new HashMap<>(2);
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            Long countryId = countryGraphRepository.getCountryOfUnit(id);
+            Long countryId = countryGraphRepository.getCountryIdByUnitId(id);
             OrganizationContactAddress contactAddressData = organizationGraphRepository.getContactAddressOfOrg(id);
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> map = objectMapper.convertValue(contactAddressData.getContactAddress(), Map.class);
