@@ -57,6 +57,7 @@ public class WTAService extends UserBaseService {
     private WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
     @Inject
     ExpertiseService expertiseService;
+
     public HashMap createWta(long countryId, WtaDTO wtaDTO) {
         Country country = countryRepository.findOne(countryId);
         if (country == null) {
@@ -66,15 +67,15 @@ public class WTAService extends UserBaseService {
         WorkingTimeAgreement wta = prepareWta(countryId, wtaDTO);
         wta.setCountry(country);
         save(wta);
-        HashMap hs=new HashMap();
-        hs.put("id",wta.getId());
-        hs.put("name",wta.getName());
+        HashMap hs = new HashMap();
+        hs.put("id", wta.getId());
+        hs.put("name", wta.getName());
         return hs;
     }
 
     private void checkUniquenessOfData(long countryId, WtaDTO wtaDTO) {
         WorkingTimeAgreement wta =
-                wtaRepository.checkUniquenessOfData( wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId(), countryId);
+                wtaRepository.checkUniquenessOfData(wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId(), countryId);
         if (wta != null) {
             throw new InvalidRequestException("WTA combination of exp,org,level,region already exist.");
 
@@ -141,7 +142,7 @@ public class WTAService extends UserBaseService {
 
     private void checkUniquenessOfDataExcludingCurrent(long countryId, long wtaId, WtaDTO wtaDTO) {
         WorkingTimeAgreement wta =
-                wtaRepository.checkUniquenessOfDataExcludingCurrent( wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId(), countryId, wtaId);
+                wtaRepository.checkUniquenessOfDataExcludingCurrent(wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId(), countryId, wtaId);
         if (wta != null) {
             throw new InvalidRequestException("WTA combination of exp,org,level,region already exist.");
 
@@ -262,38 +263,36 @@ public class WTAService extends UserBaseService {
         }
         return objectList;
     }
-    public List<ExpertiseDTO> getAllAvailableExpertise(Long organizationSubTypeId,Long countryId){
+
+    public List<ExpertiseDTO> getAllAvailableExpertise(Long organizationSubTypeId, Long countryId) {
         ExpertiseIdListDTO map = wtaRepository.getAvailableAndFreeExpertise(countryId, organizationSubTypeId);
-        List<Long> linkedExpertiseIds= map.getLinkedExpertise();
-        List<Long> allExpertiseIds= map.getAllExpertiseIds();
+        List<Long> linkedExpertiseIds = map.getLinkedExpertise();
+        List<Long> allExpertiseIds = map.getAllExpertiseIds();
         allExpertiseIds.removeAll(linkedExpertiseIds);
-        List<ExpertiseDTO> expertiseDTOS=new ArrayList<ExpertiseDTO>();
-        expertiseDTOS=expertiseService.getAllFreeExpertise(allExpertiseIds);
+        List<ExpertiseDTO> expertiseDTOS = new ArrayList<ExpertiseDTO>();
+        expertiseDTOS = expertiseService.getAllFreeExpertise(allExpertiseIds);
         return expertiseDTOS;
 
     }
+
     public boolean setWtaWithOrganizationType(long wtaId, long organizationSubTypeId, boolean checked) {
         OrganizationType orgType = organizationTypeRepository.findOne(organizationSubTypeId);
         if (orgType == null) {
             throw new DataNotFoundByIdException("Invalid organisation Sub type Id " + organizationSubTypeId);
         }
-        WorkingTimeAgreement wta = wtaRepository.getWta(wtaId);
+        WorkingTimeAgreement wta = wtaRepository.findOne(wtaId);
         if (wta == null) {
-            throw new DataNotFoundByIdException("wta not found "+wtaId);
+            throw new DataNotFoundByIdException("wta not found " + wtaId);
         }
-
         if (checked) {
-            WorkingTimeAgreement newWtaObject=null;
-            WorkingTimeAgreement.copyProperties(wta,newWtaObject);
-            newWtaObject.setOrganizationSubType(orgType);
+            WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
+            WorkingTimeAgreement.copyProperties(wta, newWtaObject);
             newWtaObject.setId(null);
-            newWtaObject.setExpertise(wta.getExpertise());
-            newWtaObject.setOrganizationType(wta.getOrganizationType());
-            newWtaObject.setRuleTemplates(wta.getRuleTemplates());
+            newWtaObject.setOrganizationSubType(orgType);
             save(newWtaObject);
-
         } else {
             wta.setEnabled(false);
+
             save(wta);
         }
         return checked;

@@ -202,4 +202,16 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.expiryDate = expiryDate;
         this.isEnabled = isEnabled;
     }
+
+    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<WTABaseRuleTemplate> ruleTemplates, Long startDateMillis, Long endDateMillis, Long expiryDate) {
+        this.name = name;
+        this.description = description;
+        this.expertise = expertise;
+        this.organizationType = organizationType;
+        this.organizationSubType = organizationSubType;
+        this.ruleTemplates = ruleTemplates;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.expiryDate = expiryDate;
+    }
 }
