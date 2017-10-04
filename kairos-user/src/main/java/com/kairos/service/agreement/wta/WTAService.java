@@ -283,12 +283,15 @@ public class WTAService extends UserBaseService {
         }
 
         if (checked) {
-            WorkingTimeAgreement newWtaObject=new WorkingTimeAgreement();
-            WorkingTimeAgreement.copyProperties(wta,newWtaObject,wta.getId());
-            newWtaObject.setId(null);
+            WorkingTimeAgreement newWtaObject=null;
+            WorkingTimeAgreement.copyProperties(wta,newWtaObject);
             newWtaObject.setOrganizationSubType(orgType);
-
+            newWtaObject.setId(null);
+            newWtaObject.setExpertise(wta.getExpertise());
+            newWtaObject.setOrganizationType(wta.getOrganizationType());
+            newWtaObject.setRuleTemplates(wta.getRuleTemplates());
             save(newWtaObject);
+
         } else {
             wta.setEnabled(false);
             save(wta);
