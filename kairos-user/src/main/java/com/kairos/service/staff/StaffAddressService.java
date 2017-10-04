@@ -209,7 +209,7 @@ public class StaffAddressService extends UserBaseService {
     }
 
     public Map<String, Object> getAddress(long unitId, long staffId, String type) {
-        Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
 
         Staff staff = staffGraphRepository.findOne(staffId, 2);

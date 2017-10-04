@@ -127,7 +127,7 @@ public class ClientService extends UserBaseService {
 
     public Client createCitizen(Client client) {
 
-
+        Client createClient = null;
         if (client.getEmail() == null) {
             logger.debug("Creating email with CPR");
             String cpr = client.getCprNumber();
@@ -137,11 +137,11 @@ public class ClientService extends UserBaseService {
         }
         if (checkCitizenCPRConstraint(client)) {
             logger.debug("Creating Client..........");
-            Client createClient = clientGraphRepository.save(generateAgeAndGenderFromCPR(client));
+            createClient = clientGraphRepository.save(generateAgeAndGenderFromCPR(client));
             //createClient.setNextToKin(new Client());
-            return (Client) save(createClient);
+            save(createClient);
         }
-        return null;
+        return createClient;
 
     }
 
@@ -214,11 +214,14 @@ public class ClientService extends UserBaseService {
 
     public boolean checkCitizenCPRConstraint(Client client) {
         logger.debug("Checking CRP Constraints...");
+        boolean cprExists = true;
         if (client.getCprNumber() != null && clientGraphRepository.findByCPRNumber(client.getCprNumber()) != null) {
             logger.debug("CPR number matched !");
-            return false;
+            //return false;
+            cprExists = false;
         }
-        return true;
+        //return true;
+        return cprExists;
     }
 
 
@@ -332,7 +335,7 @@ public class ClientService extends UserBaseService {
             data.put("profilePic", imageUrl);
 
 
-            List<Map<String, Object>> languageUnderstands = findLanguageUnderstands(updatedClient.getId());
+            List<Map<String, Object>> languageUnderstands = languagesKnownToCitizen(updatedClient.getId());
             if (languageUnderstands != null) {
                 data.put("languageUnderstands", languageUnderstands);
 
@@ -343,7 +346,7 @@ public class ClientService extends UserBaseService {
     }
 
 
-    public Map<String, Object> retrieveGeneralDetails(long clientId, long unitId) {
+    public Map<String, Object> retrieveCompleteDetails(long clientId, long unitId) {
         Map<String, Object> response = new HashMap<>();
         //Client currentClient = clientGraphRepository.findOne(clientId);
         Client currentClient = clientGraphRepository.getClientByClientIdAndUnitId(clientId, unitId);
@@ -360,10 +363,10 @@ public class ClientService extends UserBaseService {
             clientGeneralDetails.put("civilianStatus", clientGraphRepository.findCitizenCivilianStatus(clientId));
 
             // Client Language Data
-            clientGeneralDetails.put("languageUnderstands", findLanguageUnderstands(clientId));
+            clientGeneralDetails.put("languageUnderstands", languagesKnownToCitizen(clientId));
 
             clientGeneralDetails.put("languageUnderstandsIds", clientLanguageRelationGraphRepository.findClientLanguagesId(clientId).toArray());
-            Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+            Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
             if (countryId != null) {
                 logger.debug("Country Found");
@@ -404,7 +407,7 @@ public class ClientService extends UserBaseService {
     }
 
 
-    private List<Map<String, Object>> findLanguageUnderstands(long clientId) {
+    private List<Map<String, Object>> languagesKnownToCitizen(long clientId) {
         List<Map<String, Object>> languageData = clientLanguageRelationGraphRepository.findClientLanguages(clientId);
         List<Map<String, Object>> responseMapList = new ArrayList<>();
         if (languageData != null && languageData.size() != 0) {
@@ -919,7 +922,7 @@ public class ClientService extends UserBaseService {
 
         //anilm2 replace it with rest template
         Map<String, Object> clientInfo = taskDemandRestClient.getOrganizationClientsInfo(organizationId, mapList);
-        Long countryId = countryGraphRepository.getCountryOfUnit(organizationId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(organizationId);
         List<Map<String, Object>> clientStatusList = citizenStatusService.getCitizenStatusByCountryId(countryId);
 
         clientData.putAll(clientInfo);
@@ -1148,7 +1151,7 @@ public class ClientService extends UserBaseService {
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
         Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId());
-        Long countryId = countryGraphRepository.getCountryOfUnit(taskDemandWrapper.getUnitId());
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(taskDemandWrapper.getUnitId());
 
         List<Long> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(), taskDemandWrapper.getEndDate().getTime());
 
@@ -1196,6 +1199,10 @@ public class ClientService extends UserBaseService {
 
     public List<Long> getClientIds(long unitId) {
         return clientGraphRepository.getCitizenIds(unitId);
+    }
+
+    public List<ClientOrganizationIdsDTO> getCitizenIdsByUnitIds(List<Long> unitIds) {
+        return clientGraphRepository.getCitizenIdsByUnitIds(unitIds);
     }
 
 
