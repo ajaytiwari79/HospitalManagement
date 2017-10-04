@@ -127,7 +127,7 @@ public class ClientService extends UserBaseService {
 
     public Client createCitizen(Client client) {
 
-
+        Client createClient = null;
         if (client.getEmail() == null) {
             logger.debug("Creating email with CPR");
             String cpr = client.getCprNumber();
@@ -137,11 +137,11 @@ public class ClientService extends UserBaseService {
         }
         if (checkCitizenCPRConstraint(client)) {
             logger.debug("Creating Client..........");
-            Client createClient = clientGraphRepository.save(generateAgeAndGenderFromCPR(client));
+            createClient = clientGraphRepository.save(generateAgeAndGenderFromCPR(client));
             //createClient.setNextToKin(new Client());
-            return (Client) save(createClient);
+            save(createClient);
         }
-        return null;
+        return createClient;
 
     }
 
@@ -214,11 +214,14 @@ public class ClientService extends UserBaseService {
 
     public boolean checkCitizenCPRConstraint(Client client) {
         logger.debug("Checking CRP Constraints...");
+        boolean cprExists = true;
         if (client.getCprNumber() != null && clientGraphRepository.findByCPRNumber(client.getCprNumber()) != null) {
             logger.debug("CPR number matched !");
-            return false;
+            //return false;
+            cprExists = false;
         }
-        return true;
+        //return true;
+        return cprExists;
     }
 
 
