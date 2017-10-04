@@ -32,6 +32,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1029,5 +1030,11 @@ public class CountryController {
 
 
 
+    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.GET)
+    @ApiOperation("get dayType in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getDayTypee(@PathVariable Long countryId,@RequestParam("date")Date date){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypeByDate(countryId,date));
+    }
 
 }

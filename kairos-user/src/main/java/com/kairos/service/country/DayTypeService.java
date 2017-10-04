@@ -1,7 +1,10 @@
 package com.kairos.service.country;
+
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.FormatUtil;
@@ -9,8 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 /**
  * Created by oodles on 9/1/17.
@@ -23,6 +29,8 @@ public class DayTypeService extends UserBaseService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private CountryHolidayCalenderGraphRepository countryHolidayCalenderGraphRepository;
 
     public Map<String, Object> createDayType(DayType dayType, long countryId){
         Country country = countryGraphRepository.findOne(countryId);
@@ -64,6 +72,70 @@ public class DayTypeService extends UserBaseService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * @auther anil maurya
+     * @param
+     * @return
+     */
+    public DayType getDayTypeByDate(Long countryId,Date date){
+        Calendar calendar=Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date startDate=calendar.getTime();
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        Date endDate=calendar.getTime();
+        Optional<CountryHolidayCalender> countryHolidayCalender=countryHolidayCalenderGraphRepository.
+                findByIdAndHolidayDateBetween(countryId,startDate.getTime(),endDate.getTime());
+
+        if(countryHolidayCalender.isPresent()){
+          return countryHolidayCalender.get().getDayType();
+        }else{
+            Instant instant = Instant.ofEpochMilli(date.getTime());
+            LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+            LocalDate localDate = localDateTime.toLocalDate();
+            String day=localDate.getDayOfWeek().name();
+            DayType dayType=dayTypeGraphRepository.findByName(getDanishNameByDay(day));
+            return dayType;
+        }
+
+    }
+
+    private String getDanishNameByDay(String day) {
+        String danishName="";
+        switch (day) {
+
+            case "MONDAY":
+                danishName = "Hverdag";
+                break;
+            case "TUESDAY":
+                danishName = "Hverdag";
+                break;
+            case "WEDNESDAY":
+                danishName = "Hverdag";
+                break;
+            case "THURSDAY":
+                danishName = "Hverdag";
+                break;
+            case "FRIDAY":
+                danishName = "Hverdag";
+                break;
+            case "SATURDAY":
+                danishName = "Loerdag";
+                break;
+            case "SUNDAY":
+                danishName = "Soendag";
+                break;
+            default:
+                throw new UnsupportedOperationException("invalid day");
+
+
+        }
+        return danishName;
     }
 
 }

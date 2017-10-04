@@ -17,4 +17,5 @@ public interface DayTypeGraphRepository extends GraphRepository<DayType> {
 
     @Query("MATCH (c:Country)-[:BELONGS_TO]-(dt:DayType {isEnabled:true}) where id(c)={0} return {id:id(dt), name:dt.name, description:dt.description,code:dt.code, colorCode:dt.colorCode } as result ")
     List<Map<String,Object>> findByCountryId(long countryId);
+     DayType findByName(String name);
 }
