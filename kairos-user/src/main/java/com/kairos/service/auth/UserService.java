@@ -6,7 +6,6 @@ import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult
 import com.kairos.persistence.model.user.auth.TabPermission;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.auth.UserAuthentication;
-import com.kairos.persistence.model.user.auth.UserPermission;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -137,7 +136,7 @@ public class UserService extends UserBaseService {
      * @return User
      */
     public User getUserByName(String name) {
-        return userGraphRepository.findByUserName(name);
+        return userGraphRepository.findByUserNameIgnoreCase(name);
     }
 
 
@@ -153,8 +152,6 @@ public class UserService extends UserBaseService {
         if (currentUser == null) {
             return null;
         }
-
-
         int otp = OtpGenerator.generateOtp();
         currentUser.setOtp(otp);
         userGraphRepository.save(currentUser);

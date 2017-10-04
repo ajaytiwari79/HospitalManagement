@@ -128,8 +128,8 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     @Query("MATCH (s:Staff)-[:BELONGS_TO]->(u:User) where id(u)={0} return s")
     Staff getByUser(Long userId);
 
-    @Query("Match (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff:Staff{externalId:{1}}) where id(organization)={0} return count(staff) as data")
-    int isStaffExist(long organizationId, long externalId);
+    @Query("Match (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff:Staff{kmdExternalId:{1}}) where id(organization)={0} return count(staff)>0")
+    Boolean isStaffExist(long organizationId, long externalId);
 
 
     @Query("MATCH (organization:Organization),(unit:Organization) where id(organization)={0} AND id(unit)={1} with organization,unit\n" +

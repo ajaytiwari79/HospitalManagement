@@ -5,6 +5,7 @@ import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -780,66 +781,56 @@ public class StaffService extends UserBaseService {
     }
 
 
-    public Staff createStaffFromWeb(long unitId, StaffCreationPOJOData payload) {
-        Staff staff = new Staff();
+    public Staff createStaffFromWeb(Long unitId, StaffCreationPOJOData payload) {
+
         Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null)
-            throw new InternalError("organization not found");
-        if (staffGraphRepository.isStaffExist(organization.getId(), payload.getExternalId()) != 0)
-            throw new InternalError("Staff already exist with same externalId");
-        if (payload.getUserName() != null && staffGraphRepository.findByUserName(payload.getUserName().toLowerCase()).size() > 0) {
-            throw new InternalError("Staff already exists with same username");
-        } else if (payload.getUserName() != null) {
-            staff.setUserName(payload.getUserName().toLowerCase());
+        if(!Optional.ofNullable(organization).isPresent()){
+            throw new DataNotFoundByIdException("Incorrect id of an organization  " + unitId);
         }
-        staff.setFirstName(payload.getFirstName());
-        staff.setFamilyName(payload.getFamilyName());
-        staff.setLastName(payload.getLastName());
-        staff.setActive(payload.isActive());
-        staff.setEmail(payload.getPrivateEmail());
-        staff.setExternalId(payload.getExternalId());
-        staff.setCprNumber(payload.getCprNumber());
-        if (payload.getInactiveFrom() != 0)
-            staff.setInactiveFrom(payload.getInactiveFrom());
-        if (payload.getEmployedSince() != 0)
-            staff.setEmployedSince(payload.getEmployedSince());
-
-        User user = new User();
-        //  user.setCprNumber(staff.getCprNumber());
-        user.setEmail(staff.getEmail());
-        user.setFirstName(staff.getFirstName());
-        user.setGender(payload.getGender());
-        user.setLastName(staff.getLastName());
-        if(payload.getCprNumber() != null) user.setAge(Integer.valueOf(payload.getCprNumber().substring(payload.getCprNumber().length() - 1)));
-
-        Long engineerTypeId = payload.getEngineerTypeId();
-        User alreadyExistUser = userGraphRepository.findByTimeCareExternalId(payload.getExternalId() + "");
-        if (alreadyExistUser != null) {
-            Staff alreadyExistStaff = staffGraphRepository.getByUser(alreadyExistUser.getId());
-            if (alreadyExistStaff != null)
-                throw new InternalError("Staff already exists");
-            staff = createStaffObject(alreadyExistUser, staff, engineerTypeId, organization);
-        } else {
-            user.setTimeCareExternalId(payload.getExternalId() + "");
-            User createdUser = userGraphRepository.save(user);
-            staff = createStaffObject(createdUser, staff, engineerTypeId, organization);
+        User user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
+        if(staffGraphRepository.isStaffExist(organization.getId(), payload.getExternalId())){
+            throw new DuplicateDataException("Staff already exist in organization");
         }
-        staff.setContactDetail(getContactDetailsObject(payload));
-        logger.info("::::::::::::::::;   Saving user :::::::::::::::::: ");
-        return staffGraphRepository.save(staff);
+        setBasicDetailsOfUser(user,payload);
+        Staff staff = new Staff();
+        staff.setUser(user);
+        createStaffObject(staff,payload,organization);
+        save(staff);
+        createEmployment(organization,staff,payload);
+        return staff;
     }
 
+    private void setBasicDetailsOfUser(User user,StaffCreationPOJOData staffCreationDTO) {
+        user.setEmail(staffCreationDTO.getPrivateEmail());
+        user.setUserName(staffCreationDTO.getPrivateEmail());
+        user.setFirstName(staffCreationDTO.getFirstName());
+        user.setGender(staffCreationDTO.getGender());
+        user.setLastName(staffCreationDTO.getLastName());
+        String defaultPassword = user.getFirstName() + "@kairos";
+        user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
+        if (Optional.of(staffCreationDTO.getCprNumber()).isPresent()) {
+            user.setAge(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1)));
+        }
+    }
 
-
-    private ContactDetail getContactDetailsObject(StaffCreationPOJOData payload) {
-        if (payload.getPrivateEmail() == null && payload.getPrivatePhone() == null && payload.getPrivatePhone() == null && payload.getWorkPhone() == null && payload.getWorkEmail() == null)
-            return null;
-        ContactDetail contactDetail = new ContactDetail();
-        contactDetail.setPrivateEmail(payload.getPrivateEmail());
-        contactDetail.setPrivatePhone(payload.getPrivatePhone());
-        contactDetail.setWorkEmail(payload.getWorkEmail());
-        contactDetail.setWorkPhone(payload.getWorkPhone());
-        return contactDetail;
+    private void createStaffObject(Staff staff, StaffCreationPOJOData payload, Organization organization){
+        staff.setEmail(payload.getPrivateEmail());
+        staff.setInactiveFrom(payload.getInactiveFrom());
+        staff.setEmployedSince(payload.getEmployedSince());
+        staff.setKmdExternalId(payload.getExternalId());
+        staff.setFirstName(payload.getFirstName());
+        staff.setLastName(payload.getLastName());
+        staff.setFamilyName(payload.getFamilyName());
+        staff.setCprNumber(payload.getCprNumber());
+        ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(organization);
+        staff.setContactAddress(contactAddress);
+        ObjectMapper objectMapper = new ObjectMapper();
+        ContactDetail contactDetail = objectMapper.convertValue(payload,ContactDetail.class);
+        staff.setContactDetail(contactDetail);
+        if(Optional.ofNullable(payload.getEngineerTypeId()).isPresent()){
+            EngineerType engineerType = engineerTypeGraphRepository.findOne(payload.getExternalId());
+            staff.setEngineerType(engineerType);
+        }
     }
 
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
@@ -873,6 +864,41 @@ public class StaffService extends UserBaseService {
             }
         }
         return staff;
+    }
+
+
+    private void createEmployment(Organization unit,Staff staff,StaffCreationPOJOData payload){
+        AccessGroup accessGroup = accessGroupRepository.findOne(payload.getAccessGroupId());
+        if(!Optional.ofNullable(accessGroup).isPresent()){
+            throw new DataNotFoundByIdException("Access group not found " + payload.getAccessGroupId());
+        }
+        Employment employment = new Employment();
+        employment.setName("Working as staff");
+        employment.setStaff(staff);
+        UnitEmployment unitEmployment = new UnitEmployment();
+        unitEmployment.setOrganization(unit);
+        //set permission in unit employment
+        AccessPermission accessPermission = new AccessPermission(accessGroup);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+        accessPageService.setPagePermissionToStaff(accessPermission,accessGroup.getId());
+        employment.getUnitEmployments().add(unitEmployment);
+
+        Organization parent;
+        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+
+        } else {
+            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+        }
+        if(Optional.ofNullable(parent).isPresent()){
+            parent.getEmployments().add(employment);
+            organizationGraphRepository.save(parent);
+        } else {
+            unit.getEmployments().add(employment);
+            organizationGraphRepository.save(unit);
+        }
+
     }
 
     private void updateStaffPersonalInfoInFLS(Staff staff, long unitId) {
@@ -1124,7 +1150,7 @@ public class StaffService extends UserBaseService {
      * @return
      */
     public ClientStaffInfoDTO getStaffInfo(String loggedInUserName){
-        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(loggedInUserName).getId());
+        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(loggedInUserName).getId());
         if(staff==null){
             throw new DataNotFoundByIdException("Staff Id is invalid");
         }

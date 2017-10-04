@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.staff;
 
 
 import com.kairos.persistence.model.enums.Gender;
+import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -17,6 +18,7 @@ public class StaffCreationPOJOData {
     private String cprNumber;
     private String familyName;
     private String workPhone;
+    @Email(message = "error.email.valid")
     private String privateEmail;
     private Gender gender;
     private Long engineerTypeId;
@@ -29,6 +31,17 @@ public class StaffCreationPOJOData {
     @NotNull(message = "error.staff.externalid.notnull")
     private Long externalId;
 
+    @NotNull(message = "error.staff.accessGroup.id.notnull")
+    private Long accessGroupId;
+
+    public Long getAccessGroupId() {
+        return accessGroupId;
+    }
+
+    public void setAccessGroupId(Long accessGroupId) {
+        this.accessGroupId = accessGroupId;
+    }
+
     public StaffCreationPOJOData() {
     }
 
@@ -37,7 +50,7 @@ public class StaffCreationPOJOData {
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        this.firstName = firstName.trim();
     }
 
     public String getLastName() {
@@ -45,7 +58,7 @@ public class StaffCreationPOJOData {
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        this.lastName = lastName.trim();
     }
 
     public String getCprNumber() {
@@ -61,7 +74,7 @@ public class StaffCreationPOJOData {
     }
 
     public void setFamilyName(String familyName) {
-        this.familyName = familyName;
+        this.familyName = familyName.trim();
     }
 
     public String getWorkPhone() {
@@ -69,7 +82,7 @@ public class StaffCreationPOJOData {
     }
 
     public void setWorkPhone(String workPhone) {
-        this.workPhone = workPhone;
+        this.workPhone = workPhone.trim();
     }
 
     public String getPrivateEmail() {
@@ -77,7 +90,7 @@ public class StaffCreationPOJOData {
     }
 
     public void setPrivateEmail(String privateEmail) {
-        this.privateEmail = privateEmail;
+        this.privateEmail = privateEmail.trim().toLowerCase();
     }
 
     public Gender getGender() {
@@ -141,7 +154,7 @@ public class StaffCreationPOJOData {
     }
 
     public void setWorkEmail(String workEmail) {
-        this.workEmail = workEmail;
+        this.workEmail = workEmail.trim().toLowerCase();
     }
 
     public String getUserName() {

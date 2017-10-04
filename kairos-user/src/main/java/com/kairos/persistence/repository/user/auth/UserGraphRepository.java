@@ -23,7 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface UserGraphRepository extends GraphRepository<User> {
 
 
-    User findByUserName(String userName);
+    User findByUserNameIgnoreCase(String userName);
 
     User findOne(Long id);
 

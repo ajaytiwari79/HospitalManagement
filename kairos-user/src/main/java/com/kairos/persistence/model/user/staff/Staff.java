@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.auth.User;
@@ -20,6 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 /**
  * Created by prabjot on 24/10/16.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 public class Staff extends UserBaseEntity {
