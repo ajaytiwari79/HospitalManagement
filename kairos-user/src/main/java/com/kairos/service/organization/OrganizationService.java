@@ -211,12 +211,11 @@ public class OrganizationService extends UserBaseService {
 
     public HashMap<String, Object> updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId, long countryId) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
-        ;
-        if (organization == null) {
-            throw new InternalError("Organization not found");
+        if (!Optional.ofNullable(organization).isPresent()) {
+            throw new InternalError("Organization not found by Id "+organizationId);
         }
         organization = saveOrganizationDetails(organization, orgDetails, true, countryId);
-        if (organization == null) {
+        if (!Optional.ofNullable(organization).isPresent()) {
             return null;
         }
         save(organization);
@@ -369,15 +368,13 @@ public class OrganizationService extends UserBaseService {
 
     public Map<String, Object> createNewUnit(OrganizationDTO organizationDTO, long unitId) {
 
-        logger.info("vipul to check                                                                 ");
-
         Organization parent = organizationGraphRepository.findOne(unitId);
 
         Organization unit = new Organization();
         ContactAddress contactAddress = new ContactAddress();
 
-        if (parent == null) {
-            throw new DataNotFoundByIdException("Can't find Organization with provided Id");
+        if (!Optional.ofNullable(parent).isPresent()) {
+            throw new DataNotFoundByIdException("Can't find Organization with provided Id"+unitId);
         }
 
         unit.setName(organizationDTO.getName());
@@ -1000,7 +997,7 @@ public class OrganizationService extends UserBaseService {
 
     public List<Vehicle> getVehicleList(long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
+        if (!Optional.ofNullable(organization).isPresent()) {
             logger.debug("Searching organization by id " + unitId);
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
         }
@@ -1027,7 +1024,7 @@ public class OrganizationService extends UserBaseService {
             default:
                 throw new UnsupportedOperationException("Type is not valid");
         }
-        if (organization == null) {
+        if (!Optional.ofNullable(organization).isPresent()) {
             throw new DataNotFoundByIdException("Organization not found-" + id);
         }
         return organization.getId();
