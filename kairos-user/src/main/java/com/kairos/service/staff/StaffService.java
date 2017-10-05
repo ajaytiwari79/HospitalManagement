@@ -6,6 +6,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.FlsCredentialException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -43,6 +44,7 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.FileUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -887,7 +889,6 @@ public class StaffService extends UserBaseService {
         Organization parent;
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
@@ -899,6 +900,13 @@ public class StaffService extends UserBaseService {
             organizationGraphRepository.save(unit);
         }
 
+        if(accessGroup.isTypeOfTaskGiver()){
+            Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unit.getId());
+            if(StringUtils.isBlank(flsCredentials.get("flsDefaultUrl"))){
+               throw new FlsCredentialException("Fls credentials not found");
+            }
+            employmentService.syncStaffInVisitour(staff,unit.getId(),flsCredentials);
+        }
     }
 
     private void updateStaffPersonalInfoInFLS(Staff staff, long unitId) {
