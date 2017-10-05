@@ -295,6 +295,10 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     @Query("Match (team:Team)-[:TEAM_HAS_MEMBER]->(staff:Staff) where id(staff)= {1} AND id(team)={0}  return staff ")
              Staff getTeamStaff(Long teamId, Long staffId);
 
+    @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments ,organization\n" +
+            "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments)\n" +
+            "return  id(staff) as id, staff.firstName as firstName,staff.lastName as lastName")
+    List<StaffPersonalDetailDTO> getAllStaffDetailByUnitId(long unitId);
 
 
 }

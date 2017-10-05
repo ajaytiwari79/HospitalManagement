@@ -13,17 +13,43 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
 public class ClientContactPersonQueryResult {
-    private Long staffId;
+    private Long primaryStaffId;
+    private Long secondaryStaffId;
+    private Long secondaryTwoStaffId;
+    private Long secondaryThreeStaffId;
     private Long serviceId;
-    private String  relationType;
     private List<Long> households;
 
-    public Long getStaffId() {
-        return staffId;
+    public Long getPrimaryStaffId() {
+        return primaryStaffId;
     }
 
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
+    public void setPrimaryStaffId(Long primaryStaffId) {
+        this.primaryStaffId = primaryStaffId;
+    }
+
+    public Long getSecondaryStaffId() {
+        return secondaryStaffId;
+    }
+
+    public void setSecondaryStaffId(Long secondaryStaffId) {
+        this.secondaryStaffId = secondaryStaffId;
+    }
+
+    public Long getSecondaryTwoStaffId() {
+        return secondaryTwoStaffId;
+    }
+
+    public void setSecondaryTwoStaffId(Long secondaryTwoStaffId) {
+        this.secondaryTwoStaffId = secondaryTwoStaffId;
+    }
+
+    public Long getSecondaryThreeStaffId() {
+        return secondaryThreeStaffId;
+    }
+
+    public void setSecondaryThreeStaffId(Long secondaryThreeStaffId) {
+        this.secondaryThreeStaffId = secondaryThreeStaffId;
     }
 
     public Long getServiceId() {
@@ -32,14 +58,6 @@ public class ClientContactPersonQueryResult {
 
     public void setServiceId(Long serviceId) {
         this.serviceId = serviceId;
-    }
-
-    public String getRelationType() {
-        return relationType;
-    }
-
-    public void setRelationType(String relationType) {
-        this.relationType = relationType;
     }
 
     public List<Long> getHouseholds() {

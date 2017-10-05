@@ -1371,7 +1371,7 @@ public class ClientService extends UserBaseService {
 
     public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId){
         List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllStaffByUnitId(unitId);
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllStaffDetailByUnitId(unitId);
         List<ClientMinimumDTO> clientMinimumDTOs =  getPeopleInHousehold(clientId);
         List<Long> houseHoldIds = clientGraphRepository.getPeopleInHouseholdIdList(clientId);
         houseHoldIds.add(clientId);
