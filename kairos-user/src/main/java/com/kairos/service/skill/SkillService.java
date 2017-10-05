@@ -247,7 +247,7 @@ public class SkillService extends UserBaseService {
         }
         response.put("staffList", staffList);
         response.put("localAreaTags", localAreaTagsList);
-        response.put("serviceTypes", organizationServiceRepository.findAll(serviceIds));
+        response.put("serviceTypes", organizationServiceRepository.getOrganizationServiceByOrgId(unitId));
 
         return response;
 

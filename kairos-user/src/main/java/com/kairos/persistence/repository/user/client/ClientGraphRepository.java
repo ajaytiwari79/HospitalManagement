@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.client;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import org.springframework.data.neo4j.annotation.Depth;
@@ -283,4 +284,42 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client{citizenDead:false})-[r:"+GET_SERVICE_FROM+"]-(o:Organization) where id(o)in {0} with id(c) as citizenId, id(o) as organizationId\n" +
             "return citizenId, organizationId")
     List<ClientOrganizationIdsDTO> getCitizenIdsByUnitIds(List<Long> unitIds);
+
+    @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='PREFERRED' " +
+            "RETURN " +
+            " DISTINCT{ " +
+            "id:id(s), " +
+            "clientId:id(c), " +
+            " firstName:s.firstName, " +
+            " lastName:s.lastName, " +
+            "type:r.type " +
+            "} As result ")
+    List<Map<String,Object>> findClientStaff(Long id);
+
+    @Query("Match (client:Client)-[:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client) in {0} with clientContactPerson\n"+
+            "MATCH (clientContactPerson)-[r1:"+CLIENT_CONTACT_PERSON_STAFF+"]->(staff:Staff) with r1,clientContactPerson \n"+
+            "MATCH (clientContactPerson)-[r2:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(organizationService:OrganizationService) delete r1,r2 \n")
+     void removeClientContactPersonRelations(List<Long> clientIds, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType);
+
+    @Query("Match (client:Client)-[r:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client) in {0} delete r")
+     void removeClientContactPersonRelationship(List<Long> clientIds, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType);
+
+    @Query("Match (client:Client)-[r:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client)={0} return clientContactPerson")
+     ClientContactPerson getClientContactPerson(Long clientId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType);
+
+    @Query("Match (clientContactPerson:ClientContactPerson) where id(clientContactPerson)={0} delete clientContactPerson")
+    void removeClientContactPerson(Long clientContactPersonId);
+
+    @Query("MATCH (c:Client)-[:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(ps:Client) where id(c)={0}  return id(ps)")
+    List<Long> getPeopleInHouseholdIdList(Long id);
+
+    @Query("Match (client:Client)-[r:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson:ClientContactPerson) where id(client)={0} with client,clientContactPerson,r\n" +
+            "MATCH (client)-[:PEOPLE_IN_HOUSEHOLD_LIST]-(ps:Client) with ps,clientContactPerson,r\n" +
+            "Match (ps)-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson)  with ps, clientContactPerson,r\n" +
+            "Match (clientContactPerson)-[:CLIENT_CONTACT_PERSON_STAFF]->(staff:Staff)  with staff, ps, clientContactPerson,r\n" +
+            "Match (clientContactPerson)-[:CLIENT_CONTACT_PERSON_SERVICE]->(organizationService:OrganizationService)  with staff, ps, clientContactPerson,r,organizationService\n" +
+            "return id(staff) as staffId, id(organizationService) as serviceId, r.contactPersonRelationType as relationType, collect(id(ps)) as households")
+    List<ClientContactPersonQueryResult> getClientContactPersonDataList(Long clientId);
+
+
 }

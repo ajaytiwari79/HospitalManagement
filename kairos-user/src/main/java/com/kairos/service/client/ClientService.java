@@ -10,6 +10,7 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
@@ -18,6 +19,7 @@ import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.user.staff.StaffClientData;
+import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
@@ -29,9 +31,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.response.dto.web.ClientStaffInfoDTO;
-import com.kairos.response.dto.web.EscalateTaskWrapper;
-import com.kairos.response.dto.web.EscalatedTasksWrapper;
+import com.kairos.response.dto.web.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.integration.IntegrationService;
@@ -1367,6 +1367,71 @@ public class ClientService extends UserBaseService {
 
         }
         return false;
+    }
+
+    public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId){
+        List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllStaffByUnitId(unitId);
+        List<ClientMinimumDTO> clientMinimumDTOs =  getPeopleInHousehold(clientId);
+        List<Long> houseHoldIds = clientGraphRepository.getPeopleInHouseholdIdList(clientId);
+        houseHoldIds.add(clientId);
+List<ClientContactPersonQueryResult> clientContactPersonQueryResults = clientGraphRepository.getClientContactPersonDataList(clientId);
+        ContactPersonTabDataDTO contactPersonTabDataDTO = new ContactPersonTabDataDTO();
+        contactPersonTabDataDTO.setOrganizationServices(organizationServices);
+        contactPersonTabDataDTO.setStaffPersonalDetailDTOS(staffPersonalDetailDTOS);
+        contactPersonTabDataDTO.setPeopleHouseHolds(clientMinimumDTOs);
+        contactPersonTabDataDTO.setContactPersonDataList(clientContactPersonQueryResults);
+        return contactPersonTabDataDTO;
+
+    }
+
+    public ContactPersonDTO saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO){
+        try{
+            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()){
+                saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getPrimaryStaffId(), ClientContactPersonRelationship.ContactPersonRelationType.PRIMARY, contactPersonDTO.getHouseHoldMembers());
+            }
+            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()) {
+                saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId1(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_ONE, contactPersonDTO.getHouseHoldMembers());
+            }
+            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()) {
+                saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId2(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_TWO, contactPersonDTO.getHouseHoldMembers());
+            }
+            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId3()).isPresent()){
+                saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId3(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_THREE, contactPersonDTO.getHouseHoldMembers());
+            }
+
+        }catch (Exception exception){
+            logger.error("Error occurs while save contact person for client : "+clientId, exception);
+            contactPersonDTO = null;
+        }
+        return contactPersonDTO;
+    }
+
+    public void saveContactPersonWithGivenRelation(Long clientId, Long serviceId, Long staffId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, List<Long> households){
+        ClientContactPerson clientContactPerson = clientGraphRepository.getClientContactPerson(clientId, contactPersonRelationType);
+        OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
+        Staff staff = staffGraphRepository.findOne(staffId);
+        households.add(clientId);
+        if(Optional.ofNullable(clientContactPerson).isPresent()){
+            clientGraphRepository.removeClientContactPersonRelations(households, contactPersonRelationType);
+            clientGraphRepository.removeClientContactPersonRelationship(households, contactPersonRelationType);
+            clientGraphRepository.removeClientContactPerson(clientContactPerson.getId());
+        }
+        ClientContactPerson clientContactPersonNew = new ClientContactPerson();
+        clientContactPersonNew.setOrganizationService(organizationService);
+        clientContactPersonNew.setStaff(staff);
+
+
+       clientGraphRepository.findAll(households).forEach(client1 -> {
+           ClientContactPersonRelationship clientContactPersonRelationship = new ClientContactPersonRelationship();
+           clientContactPersonRelationship.setClient(client1);
+           clientContactPersonRelationship.setClientContactPerson(clientContactPersonNew);
+           clientContactPersonRelationship.setContactPersonRelationType(contactPersonRelationType);
+           save(clientContactPersonRelationship);
+       });
+
+
+
     }
 
 }
