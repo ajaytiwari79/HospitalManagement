@@ -234,7 +234,7 @@ public class SkillService extends UserBaseService {
         response.put("teamList", teamService.getAllTeamsInOrganization(unitId));
         response.put("civilianStatus", citizenStatusService.getCitizenStatusByCountryIdAnotherFormat(countryGraphRepository.getCountryIdByUnitId(unitId)));
 
-        List<Map<String, Object>> staff = staffGraphRepository.getStaffWithBasicInfo(unitId, unitId,envConfig.getServerHost() + File.separator);
+        List<Map<String, Object>> staff = staffGraphRepository.getStaffWithBasicInfo(unitId, unitId,envConfig.getServerHost() + FORWARD_SLASH);
 
         List<Map<String, Object>> staffList = new ArrayList<>();
         for (Map<String, Object> map : staff) {
@@ -464,7 +464,7 @@ public class SkillService extends UserBaseService {
             skills = organizationGraphRepository.getAssignedSkillsOfStaffByOrganization(id, staffIds);
 
         } else if (TEAM.equalsIgnoreCase(type)) {
-            List<Map<String, Object>> staffList = staffGraphRepository.getStaffByTeamId(id,envConfig.getServerHost() + File.separator);
+            List<Map<String, Object>> staffList = staffGraphRepository.getStaffByTeamId(id,envConfig.getServerHost() + FORWARD_SLASH);
             List<Long> staffIds = new ArrayList<>(staffList.size());
             for (Map<String, Object> map : staffList) {
                 response.add((Map<String, Object>) map.get("data"));
