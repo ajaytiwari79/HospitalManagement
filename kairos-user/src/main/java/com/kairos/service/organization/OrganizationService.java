@@ -38,7 +38,6 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.FormatUtil;
-import com.kairos.util.OrganizationUtil;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
@@ -134,7 +133,7 @@ public class OrganizationService extends UserBaseService {
     OrganizationGraphRepository organizationGraphRepository;
     @Inject
     StaffGraphRepository staffGraphRepository;
-
+    @Inject private GroupService groupService;
     @Autowired
     TeamService teamService;
     @Autowired
@@ -150,8 +149,7 @@ public class OrganizationService extends UserBaseService {
 
     @Inject
     AbsenceTypesRepository absenceTypesRepository;
-    @Inject
-    private OrganizationUtil organizationUtil;
+
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id, 0);
@@ -953,7 +951,7 @@ public class OrganizationService extends UserBaseService {
     }
 
     public OrganizationTypeAndSubTypeDTO getOrganizationTypeAndSubTypes(Long id, String type) {
-        Long unitId = organizationUtil.getOrganization(id, type);
+        Long unitId = getOrganization(id, type);
 
         OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = new OrganizationTypeAndSubTypeDTO();
         List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(unitId);
@@ -1013,6 +1011,26 @@ public class OrganizationService extends UserBaseService {
     public List<Long> allOrganizationIds() {
         List<Long> organizationIds = organizationGraphRepository.allOrganizationIds();
         return organizationIds;
+    }
+    public Long getOrganization(Long id, String type) {
+        Organization organization = null;
+        switch (type.toLowerCase()) {
+            case ORGANIZATION:
+                organization = organizationGraphRepository.findOne(id);
+                break;
+            case GROUP:
+                organization = groupService.getUnitByGroupId(id);
+                break;
+            case TEAM:
+                organization = teamService.getOrganizationByTeamId(id);
+                break;
+            default:
+                throw new UnsupportedOperationException("Type is not valid");
+        }
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Organization not found-" + id);
+        }
+        return organization.getId();
     }
 
 
