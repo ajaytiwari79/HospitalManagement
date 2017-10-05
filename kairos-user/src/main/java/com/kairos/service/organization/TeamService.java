@@ -36,6 +36,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.*;
 
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.TEAM_LABEL;
 
 /**
@@ -339,7 +340,7 @@ public class TeamService extends UserBaseService {
         if(team == null){
             throw new InternalError("Team not found");
         }
-        List<Map<String,Object>> queryResult = teamGraphRepository.getAllStaffByOrganization(teamId,envConfig.getServerHost() + File.separator);
+        List<Map<String,Object>> queryResult = teamGraphRepository.getAllStaffByOrganization(teamId,envConfig.getServerHost() + FORWARD_SLASH);
         List<Map<String,Object>> staff = new ArrayList<>();
         for(Map<String,Object> staffInfo : queryResult){
             staff.add((Map<String,Object>) staffInfo.get("data"));

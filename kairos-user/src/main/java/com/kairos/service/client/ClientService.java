@@ -52,6 +52,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.KAIROS;
 import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
@@ -331,7 +332,7 @@ public class ClientService extends UserBaseService {
 
             // Profile Picture
             String image = (String) data.get("profilePic");
-            String imageUrl = envConfig.getServerHost() + File.separator + image;
+            String imageUrl = envConfig.getServerHost() + FORWARD_SLASH + image;
             data.put("profilePic", imageUrl);
 
 
@@ -357,7 +358,7 @@ public class ClientService extends UserBaseService {
             Map<String, Object> clientGeneralDetails = currentClient.retrieveClientGeneralDetails();
 
             // Client Profile Picture
-            String url = envConfig.getServerHost() + File.separator;
+            String url = envConfig.getServerHost() + FORWARD_SLASH;
 
             clientGeneralDetails.put("profilePic", url + (String) clientGeneralDetails.get("profilePic"));
             clientGeneralDetails.put("civilianStatus", clientGraphRepository.findCitizenCivilianStatus(clientId));
@@ -391,7 +392,7 @@ public class ClientService extends UserBaseService {
             }
 
             // NextToKin
-            List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId, envConfig.getServerHost() + File.separator);
+            List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId, envConfig.getServerHost() + FORWARD_SLASH);
             response.put("nextToKin", nextToKinDetails);
             // Social Media Details
             Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
@@ -557,7 +558,7 @@ public class ClientService extends UserBaseService {
     }
 
     public List<Object> getAllUsers(Long teamID, Long clientId) {
-        List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + File.separator);
+        List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + FORWARD_SLASH);
         List<Object> response = new ArrayList<>();
 
         if (data == null) {
@@ -823,7 +824,7 @@ public class ClientService extends UserBaseService {
         staffAdditionalInfoQueryResults.forEach(staff -> {
             staffIds.add(staff.getId());
             if (staff.getProfilePic() != null)
-                staff.setProfilePic(envConfig.getServerHost() + File.separator + staff.getProfilePic());
+                staff.setProfilePic(envConfig.getServerHost() + FORWARD_SLASH + staff.getProfilePic());
         });
 
         List<ClientStaffQueryResult> clientStaffQueryResults = clientGraphRepository.getClientStaffRel(unitId, staffIds);
@@ -845,7 +846,7 @@ public class ClientService extends UserBaseService {
             citizen.put("gender", client.getGender());
             citizen.put("age", client.getAge());
             citizen.put("profilePic", (client.getProfilePic() == null) ? null :
-                    envConfig.getServerHost() + File.separator + client.getProfilePic());
+                    envConfig.getServerHost() + FORWARD_SLASH + client.getProfilePic());
             citizen.put("taskTypes", (taskTypeAggregateResult.isPresent()) ? taskTypeAggregateResult.get().getTaskTypeIds() : Collections.emptyList());
             Map<Long, Object> staffData = new HashMap<>();
             client.getStaff().forEach(staff -> {
@@ -893,7 +894,7 @@ public class ClientService extends UserBaseService {
         List<Object> clientList = new ArrayList<>();
 
         logger.debug("Finding citizen with Id: " + organizationId);
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + File.separator);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH);
         logger.debug("CitizenList Size: " + mapList.size());
 
         Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
@@ -914,7 +915,7 @@ public class ClientService extends UserBaseService {
     public Map<String, Object> getOrganizationClients(Long organizationId) {
 
         Map<String, Object> clientData = new HashMap<String, Object>();
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + File.separator);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH);
 
         if (mapList.isEmpty()) {
             return null;
@@ -966,7 +967,7 @@ public class ClientService extends UserBaseService {
      * @auther anil maurya
      */
     public List<Map<String, Object>> getOrganizationClientsExcludeDead(Long organizationId) {
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + File.separator);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH);
         return mapList;
     }
 
@@ -1015,7 +1016,7 @@ public class ClientService extends UserBaseService {
         citizenDetails.put("id", citizen.getId());
         citizenDetails.put("name", citizen.getFirstName() + " " + citizen.getLastName());
         citizenDetails.put("age", citizen.getAge());
-        citizenDetails.put("profilePic", citizen.getProfilePic() != null ? envConfig.getServerHost() + File.separator + citizen.getProfilePic() : "");
+        citizenDetails.put("profilePic", citizen.getProfilePic() != null ? envConfig.getServerHost() + FORWARD_SLASH + citizen.getProfilePic() : "");
         citizenDetails.put("phone", citizen.getContactDetail() != null ? citizen.getContactDetail().retreiveContactNumbers() : "");
         citizenDetails.put("address", citizen.getHomeAddress());
         citizenDetails.put("cprNumber", citizen.getCprNumber());
@@ -1216,7 +1217,7 @@ public class ClientService extends UserBaseService {
     public OrganizationClientWrapper getOrgnizationClients(Long organizationId, OAuth2Authentication auth2Authentication) {
 
         logger.debug("Finding citizen with Id: " + organizationId);
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + File.separator);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH);
         logger.debug("CitizenList Size: " + mapList.size());
 
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(auth2Authentication.getUserAuthentication().getPrincipal().toString()).getId());

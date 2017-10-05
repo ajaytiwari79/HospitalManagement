@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.*;
 
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TEMPORARY_ADDRESS;
 
 
@@ -370,7 +371,7 @@ public class ClientAddressService extends UserBaseService {
     }
 
     public List<Object> getAccessLocationDetails(Long clientId) {
-        return (List) accessToLocationGraphRepository.findHomeAccessToLocation(clientId,envConfig.getServerHost() + File.separator).get("accessDetails");
+        return (List) accessToLocationGraphRepository.findHomeAccessToLocation(clientId,envConfig.getServerHost() + FORWARD_SLASH).get("accessDetails");
 
     }
 
