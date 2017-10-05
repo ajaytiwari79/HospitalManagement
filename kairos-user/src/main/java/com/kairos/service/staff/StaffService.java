@@ -38,6 +38,7 @@ import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.mail.MailService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
@@ -127,7 +128,7 @@ public class StaffService extends UserBaseService {
     ClientGraphRepository clientGraphRepository;
     @Autowired
     TaskServiceRestClient taskServiceRestClient;
-
+    @Inject private OrganizationService organizationService;
 
 
 
@@ -221,7 +222,7 @@ public class StaffService extends UserBaseService {
     if(TEAM.equalsIgnoreCase(type)) {
         staff = staffGraphRepository.getTeamStaff(unitId, staffId);
     }else if(ORGANIZATION.equalsIgnoreCase(type)) {
-        staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
+        staff = staffGraphRepository.getStaffByOrganizationIdAndUnitId(unitId, staffId);
     }
 
         if (staff == null) {
@@ -1073,7 +1074,7 @@ public class StaffService extends UserBaseService {
      */
     public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId,String date){
 
-        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId,staffId);
+        Staff staff = staffGraphRepository.getStaffByOrganizationIdAndUnitId(unitId,staffId);
         if(staff == null){
             throw new InternalError("Staff not found");
         }
@@ -1169,7 +1170,7 @@ public class StaffService extends UserBaseService {
     }
     public List<StaffPersonalDetailDTO> getAllStaffByUnitId(long unitId){
         Organization unit = organizationGraphRepository.findOne(unitId);
-        if (unit==null){
+        if ( !Optional.ofNullable(unit).isPresent()){
             throw new DataNotFoundByIdException("unit  not found  Unit ID: "+unitId);
         }
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllStaffByUnitId(unitId);
@@ -1178,18 +1179,20 @@ public class StaffService extends UserBaseService {
 
     public List<StaffPersonalDetailDTO> getStaffInfoById(long staffId, long unitId) {
         List<StaffPersonalDetailDTO>  staffPersonalDetailList = staffGraphRepository.getStaffInfoById(unitId, staffId);
-        if (staffPersonalDetailList == null) {
+        if (!Optional.ofNullable(staffPersonalDetailList).isPresent()) {
             throw new DataNotFoundByIdException("Staff not found with provided Staff ID: " + staffId+ " and Unit ID: "+unitId);
         }
         return staffPersonalDetailList;
 
     }
-    public boolean verifyStaffBelongsToUnit( long staffId,long unitId) {
-        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
-        if (staff == null) {
-            return false;
+    public Long verifyStaffBelongsToUnit( long staffId,long id,String type) {
+        Long unitId = -1L;
+        unitId = organizationService.getOrganization(id, type);
+        Staff staff = staffGraphRepository.getStaffByOrganizationIdAndUnitId(unitId, staffId);
+        if (!Optional.ofNullable(staff).isPresent()) {
+            unitId= -1L;
         }
-        return true;
+        return unitId;
     }
 
 }

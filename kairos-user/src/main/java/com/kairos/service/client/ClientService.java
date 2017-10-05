@@ -463,7 +463,7 @@ public class ClientService extends UserBaseService {
     }
 
 
-    public List<Map<String, Object>> getOrganizationHierarchy(Long clientId) {
+    public List<Map<String, Object>> getOrganizationsByClient(Long clientId) {
         logger.debug("Creating:");
         List<Organization> list = clientGraphRepository.getClientOrganizationIdList(clientId);
         List<Map<String, Object>> mapList = new ArrayList<>();
@@ -515,7 +515,7 @@ public class ClientService extends UserBaseService {
 
     public Map<String, Object> getUnitData(Long clientId, long unitId) {
         Map<String, Object> response = new HashMap<>();
-        response.put("units", getOrganizationHierarchy(clientId));
+        response.put("units", getOrganizationsByClient(clientId));
         return response;
     }
     //TODO not used
@@ -663,7 +663,7 @@ public class ClientService extends UserBaseService {
             visitourIds.add((long) visitourId.get("visitourId"));
         }
 
-        return (visitourIds.size() > 0 ? visitourIds : Collections.EMPTY_LIST);
+        return visitourIds;
     }
 
     public List<Long> getForbiddenStaffVisitourIds(Long id) {
@@ -677,7 +677,7 @@ public class ClientService extends UserBaseService {
             visitourIds.add((long) visitourId.get("visitourId"));
         }
 
-        return (visitourIds.size() > 0 ? visitourIds : Collections.EMPTY_LIST);
+        return visitourIds;
     }
 
 
@@ -891,7 +891,6 @@ public class ClientService extends UserBaseService {
      */
     public Map<String, Object> getOrganizationClientsWithPlanning(Long organizationId) {
         Map<String, Object> response = new HashMap<>();
-        List<Object> clientList = new ArrayList<>();
 
         logger.debug("Finding citizen with Id: " + organizationId);
         List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH);

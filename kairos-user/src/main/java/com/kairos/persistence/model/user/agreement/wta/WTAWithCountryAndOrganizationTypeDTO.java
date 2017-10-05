@@ -2,10 +2,8 @@ package com.kairos.persistence.model.user.agreement.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -23,6 +21,7 @@ public class WTAWithCountryAndOrganizationTypeDTO {
     private String name;
     private String description;
     private long id;
+    private boolean isEnabled ;
 
     private Expertise expertise;
 
@@ -110,5 +109,13 @@ public class WTAWithCountryAndOrganizationTypeDTO {
 
     public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+    public WorkingTimeAgreement build(){
+        WorkingTimeAgreement wta=new WorkingTimeAgreement(this.name, this.description, this.expertise,this.organizationTypes, this.organizationSubTypes, this.ruleTemplates, this.startDateMillis, this.endDateMillis,this.expiryDate);
+        return wta;
     }
 }
