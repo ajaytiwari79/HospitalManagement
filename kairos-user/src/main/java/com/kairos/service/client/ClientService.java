@@ -841,10 +841,12 @@ public class ClientService extends UserBaseService {
 
             Optional<TaskTypeAggregateResult> taskTypeAggregateResult = results.stream().filter(citizenTaskType -> citizenTaskType.getId() == client.getId()).findFirst();
             HashMap<String, Object> citizen = new HashMap<>();
+            HashMap<String, Object> clientMap = new HashMap<>();
             citizen.put("id", client.getId());
             citizen.put("name", client.getName());
             citizen.put("gender", client.getGender());
             citizen.put("age", client.getAge());
+            citizen.put("address", client.getAddress());
             citizen.put("profilePic", (client.getProfilePic() == null) ? null :
                     envConfig.getServerHost() + FORWARD_SLASH + client.getProfilePic());
             citizen.put("taskTypes", (taskTypeAggregateResult.isPresent()) ? taskTypeAggregateResult.get().getTaskTypeIds() : Collections.emptyList());
@@ -853,10 +855,8 @@ public class ClientService extends UserBaseService {
                 staffData.put((Long) staff.get("id"), staff.get("type"));
             });
             citizen.put("staff", staffData);
-            //  Map<String , String> clientDemandsHoursTasksData = taskDemandService.countCitizenTaskDemandsHoursAndTasks(client.getId(), unitId);
-            citizen.put("noOfVisitationHours", 0);
-            citizen.put("noOfVisitationTasks", 0);
-            citizenStaffList.add(citizen);
+            clientMap.put("Client", citizen);
+            citizenStaffList.add(clientMap);
         });
 
         //meta data preparation
@@ -874,10 +874,11 @@ public class ClientService extends UserBaseService {
 
         long endTime = System.currentTimeMillis();
         logger.info("Time taken by ClientService>>getAssignedStaffOfCitizen " + (endTime - startTime) + "  ms");
+        Map<String, Object> clientInfo = taskDemandRestClient.getOrganizationClientsInfo(unitId, citizenStaffList);
         HashMap<String, Object> response = new HashMap<>();
         response.put("staffList", staffAdditionalInfoQueryResults);
-        response.put("clientList", citizenStaffList);
         response.put("organization", orgData);
+        response.putAll(clientInfo);
         return response;
 
 
@@ -1384,7 +1385,7 @@ List<ClientContactPersonQueryResult> clientContactPersonQueryResults = clientGra
 
     }
 
-    public ContactPersonDTO saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO){
+    public List<ClientContactPersonQueryResult> saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO){
         try{
             if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()){
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getPrimaryStaffId(), ClientContactPersonRelationship.ContactPersonRelationType.PRIMARY, contactPersonDTO.getHouseHoldMembers());
@@ -1403,7 +1404,8 @@ List<ClientContactPersonQueryResult> clientContactPersonQueryResults = clientGra
             logger.error("Error occurs while save contact person for client : "+clientId, exception);
             contactPersonDTO = null;
         }
-        return contactPersonDTO;
+        return clientGraphRepository.getClientContactPersonDataList(clientId);
+
     }
 
     public void saveContactPersonWithGivenRelation(Long clientId, Long serviceId, Long staffId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, List<Long> households){

@@ -16,6 +16,7 @@ public class ClientStaffQueryResult {
     private Gender gender;
     private String profilePic;
     private int age;
+    private String address;
 
     public int getAge() {
         return age;
@@ -72,6 +73,14 @@ public class ClientStaffQueryResult {
     }
 
     List<Map<String,Object>> staff;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     @Override
     public String toString() {
