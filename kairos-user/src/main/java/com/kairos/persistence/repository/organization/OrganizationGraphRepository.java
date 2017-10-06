@@ -468,9 +468,6 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "return count(org) as matched ")
     Long findAllOrgCountMatchedByIds(List<Long> Ids);
 
-    @Query("Match (org:Organization) WHERE NOT ((org)<-[:" + PHASE_BELONGS_TO + "]-(:Phase{disabled:false}))\n" +
-            "return  org")
-    List<Organization> getAllOrganizationIdsWithoutPhases();
 
     @Query("MATCH (o:Organization) return id(o)")
     List<Long> findAllOrganizationIds();

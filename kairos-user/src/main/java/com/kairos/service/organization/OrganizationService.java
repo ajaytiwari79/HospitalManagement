@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.client.PhaseRestClient;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.organization.*;
@@ -138,7 +139,8 @@ public class OrganizationService extends UserBaseService {
     TeamService teamService;
     @Autowired
     OrganizationMetadataRepository organizationMetadataRepository;
-
+    @Autowired
+    private PhaseRestClient phaseRestClient;
     @Autowired
     ClientService clientService;
     @Autowired
@@ -206,6 +208,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = new Date().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
+        phaseRestClient.createDefaultPhases(organization.getId());
         return organizationResponse(organization, orgDetails);
     }
 
@@ -482,6 +485,7 @@ public class OrganizationService extends UserBaseService {
         OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
         unit.setOrganizationSetting(organizationSetting);
         organizationGraphRepository.save(unit);
+        phaseRestClient.createDefaultPhases(unit.getId());
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit);

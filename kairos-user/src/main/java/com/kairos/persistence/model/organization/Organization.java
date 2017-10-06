@@ -179,7 +179,7 @@ public class Organization extends UserBaseEntity {
     private int dayShiftTimeDeduction = 4; //in percentage
 
     private int nightShiftTimeDeduction = 7; //in percentage
-    private boolean phaseGenerated=false;
+    private boolean phaseGenerated=true;
 
     @Relationship(type = HAS_POSITION_NAME)
     private List<PositionName> positionNameList = new ArrayList<>();
