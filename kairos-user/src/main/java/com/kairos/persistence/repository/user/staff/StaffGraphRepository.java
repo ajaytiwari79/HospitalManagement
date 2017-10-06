@@ -254,7 +254,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
 
     @Query("Match (e:Employment)-[:"+BELONGS_TO+"]->(staff:Staff) where id(staff)={1} with e,staff\n" +
             "Match (e)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(unitEmp:UnitEmployment)-[:"+PROVIDED_BY+"]->(unit:Organization) where id(unit)={0} return staff")
-    Staff getStaffByOrganizationId(long unitId, long staffId);
+    Staff getStaffByOrganizationIdAndUnitId(long unitId, long staffId);
 
     @Query("Match (unitEmployment:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployment\n" +
             "Match (unitEmployment)-[:HAS_ACCESS_PERMISSION]->(accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{name:\"COUNTRY_ADMIN\"}) with unitEmployment\n" +

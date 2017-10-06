@@ -51,7 +51,7 @@ public class PositionNameController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.getPositionName(positionNameId));
     }
 
-    //TODO  fixture og rest call
+    //TODO  fixture org rest call
 
     @ApiOperation("Get All PositionName")
     @GetMapping(value = "/position_name")
