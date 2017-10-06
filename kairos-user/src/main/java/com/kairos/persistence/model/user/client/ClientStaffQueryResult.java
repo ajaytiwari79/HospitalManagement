@@ -17,6 +17,7 @@ public class ClientStaffQueryResult {
     private String profilePic;
     private int age;
     private Map<String,Object> localAreaTag;
+    private String address;
 
     public Map<String, Object> getLocalAreaTag() {
         return localAreaTag;
@@ -25,7 +26,6 @@ public class ClientStaffQueryResult {
     public void setLocalAreaTag(Map<String, Object> localAreaTag) {
         this.localAreaTag = localAreaTag;
     }
-
     public int getAge() {
         return age;
     }
@@ -81,6 +81,14 @@ public class ClientStaffQueryResult {
     }
 
     List<Map<String,Object>> staff;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     @Override
     public String toString() {

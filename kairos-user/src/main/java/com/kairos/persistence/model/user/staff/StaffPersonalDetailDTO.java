@@ -1,11 +1,15 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
  * Created by vipul on 8/9/17.
  */
 @QueryResult
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class StaffPersonalDetailDTO {
     private long id;
     private String lastName;
@@ -24,6 +28,7 @@ public class StaffPersonalDetailDTO {
     private long mostUnderStaffingHours;
     private long accumulatedTimeBank;
     private long accumulatedPoints;
+    private String name;
 
     public long getId() {
         return id;
@@ -159,5 +164,9 @@ public class StaffPersonalDetailDTO {
 
     public void setAccumulatedPoints(long accumulatedPoints) {
         this.accumulatedPoints = accumulatedPoints;
+    }
+
+    public String getName() {
+        return this.firstName+" "+this.lastName;
     }
 }
