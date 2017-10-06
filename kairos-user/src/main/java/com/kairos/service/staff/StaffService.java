@@ -5,6 +5,7 @@ import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.FlsCredentialException;
 import com.kairos.persistence.model.organization.Organization;
@@ -32,6 +33,7 @@ import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.response.dto.web.ClientStaffInfoDTO;
+import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.response.dto.web.StaffTaskDTO;
 import com.kairos.service.UserBaseService;
@@ -62,6 +64,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -158,15 +161,24 @@ public class StaffService extends UserBaseService {
     }
 
 
-    public boolean updatePassword(long staffId, final String oldPassword, final String newPassword) {
+    public boolean updatePassword(long staffId, PasswordUpdateDTO passwordUpdateDTO) {
 
-        Staff staff = staffGraphRepository.findOne(staffId);
-        if (staff == null || !passwordEncoder.matches(oldPassword, staff.getPassword())) {
-            return false;
+        User user = userGraphRepository.getUserByStaffId(staffId);
+        if(!Optional.ofNullable(user).isPresent()){
+            logger.error("User not found belongs to this staff id " + staffId);
+            throw new DataNotFoundByIdException("User not found belongs to this staff id " + staffId);
         }
-        staff.setPassword(new BCryptPasswordEncoder().encode(newPassword));
-        save(staff);
+        CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
+        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+            CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
+            user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            save(user);
+        } else {
+            logger.error("Password not matched ");
+            throw new DataNotMatchedException("Password not matched");
+        }
         return true;
+
     }
 
     public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {

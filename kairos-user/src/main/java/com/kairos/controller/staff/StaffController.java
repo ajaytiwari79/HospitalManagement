@@ -4,6 +4,7 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.skill.SkillService;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
@@ -94,18 +96,9 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/password", method = RequestMethod.PUT)
     @ApiOperation("update password")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable long staffId, @RequestBody Map<String, Object> passwordDetails) {
+    public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable long staffId, @Valid @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
 
-        if (passwordDetails.get("oldPassword") != null && passwordDetails.get("newPassword") != null && passwordDetails.get("confirmPassword") != null) {
-            String oldPassword = passwordDetails.get("oldPassword").toString().trim();
-            String newPassword = passwordDetails.get("newPassword").toString().trim();
-            String confirmPassword = passwordDetails.get("confirmPassword").toString().trim();
-
-            if (!newPassword.isEmpty() && newPassword.equals(confirmPassword) && staffService.updatePassword(staffId, oldPassword, newPassword)) {
-                return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
-            }
-        }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Data in request body is either null or empty");
+        return ResponseHandler.generateResponse(HttpStatus.OK, false, staffService.updatePassword(staffId, passwordUpdateDTO));
     }
 
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
