@@ -16,6 +16,15 @@ public class ClientStaffQueryResult {
     private Gender gender;
     private String profilePic;
     private int age;
+    private Map<String,Object> localAreaTag;
+
+    public Map<String, Object> getLocalAreaTag() {
+        return localAreaTag;
+    }
+
+    public void setLocalAreaTag(Map<String, Object> localAreaTag) {
+        this.localAreaTag = localAreaTag;
+    }
 
     public int getAge() {
         return age;

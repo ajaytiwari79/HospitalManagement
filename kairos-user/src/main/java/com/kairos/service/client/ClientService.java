@@ -845,6 +845,8 @@ public class ClientService extends UserBaseService {
             citizen.put("name", client.getName());
             citizen.put("gender", client.getGender());
             citizen.put("age", client.getAge());
+            logger.info("client.getLocalAreaTag() >>>>>>>>>>>>> "+client.getLocalAreaTag());
+            citizen.put("localAreaTag", client.getLocalAreaTag());
             citizen.put("profilePic", (client.getProfilePic() == null) ? null :
                     envConfig.getServerHost() + FORWARD_SLASH + client.getProfilePic());
             citizen.put("taskTypes", (taskTypeAggregateResult.isPresent()) ? taskTypeAggregateResult.get().getTaskTypeIds() : Collections.emptyList());

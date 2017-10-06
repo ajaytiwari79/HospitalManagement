@@ -176,7 +176,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("Match (client:Client{citizenDead:false})-[:"+GET_SERVICE_FROM+"]->(organization:Organization) where id(organization)={0} with client\n" +
             "Match (staff:Staff) where id(staff) in {1} with staff,client\n" +
             "optional Match (client)-[r:"+SERVED_BY_STAFF+"]->(staff) with id(staff) as staffId,client,r\n" +
-            "return id(client) as id,client.firstName+\" \" +client.lastName as name,client.gender as gender,client.profilePic as profilePic,client.age as age,collect({id:staffId,type:case when r is null then 'NONE' else r.type end}) as staff")
+            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,staffId,client,r\n" +
+            "return id(client) as id,client.firstName+\" \" +client.lastName as name,client.gender as gender,client.profilePic as profilePic,client.age as age," +
+            "CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END as localAreaTag, collect({id:staffId,type:case when r is null then 'NONE' else r.type end}) as staff")
     List<ClientStaffQueryResult> getClientStaffRel(long unitId, List<Long> staffId);
 
     @Query("MATCH (client:Client) where client.kmdNexusExternalId={0} RETURN client")
