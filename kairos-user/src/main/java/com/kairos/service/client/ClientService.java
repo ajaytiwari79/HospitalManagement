@@ -11,6 +11,8 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
@@ -1375,7 +1377,7 @@ public class ClientService extends UserBaseService {
         List<ClientMinimumDTO> clientMinimumDTOs =  getPeopleInHousehold(clientId);
         List<Long> houseHoldIds = clientGraphRepository.getPeopleInHouseholdIdList(clientId);
         houseHoldIds.add(clientId);
-List<ClientContactPersonQueryResult> clientContactPersonQueryResults = clientGraphRepository.getClientContactPersonDataList(clientId);
+List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refactorContactPersonList(clientId, clientGraphRepository.getClientContactPersonDataList(clientId));
         ContactPersonTabDataDTO contactPersonTabDataDTO = new ContactPersonTabDataDTO();
         contactPersonTabDataDTO.setOrganizationServices(organizationServices);
         contactPersonTabDataDTO.setStaffPersonalDetailDTOS(staffPersonalDetailDTOS);
@@ -1385,12 +1387,20 @@ List<ClientContactPersonQueryResult> clientContactPersonQueryResults = clientGra
 
     }
 
-    public List<ClientContactPersonQueryResult> saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO){
+    public ClientContactPersonStructuredData saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO){
+        ClientContactPersonStructuredData clientContactPersonStructuredData = new ClientContactPersonStructuredData();
         try{
-            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()){
+
+            clientContactPersonStructuredData.setHouseHolds(contactPersonDTO.getHouseHoldMembers());
+            clientContactPersonStructuredData.setPrimaryStaffId(contactPersonDTO.getPrimaryStaffId());
+            clientContactPersonStructuredData.setSecondaryStaffId(contactPersonDTO.getSecondaryStaffId1());
+            clientContactPersonStructuredData.setSecondaryTwoStaffId(contactPersonDTO.getSecondaryStaffId2());
+            clientContactPersonStructuredData.setSecondaryThreeStaffId(contactPersonDTO.getSecondaryStaffId3());
+            clientContactPersonStructuredData.setServiceId(contactPersonDTO.getServiceTypeId());
+            if(Optional.ofNullable(contactPersonDTO.getPrimaryStaffId()).isPresent()){
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getPrimaryStaffId(), ClientContactPersonRelationship.ContactPersonRelationType.PRIMARY, contactPersonDTO.getHouseHoldMembers());
             }
-            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()) {
+            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId1()).isPresent()) {
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId1(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_ONE, contactPersonDTO.getHouseHoldMembers());
             }
             if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()) {
@@ -1402,36 +1412,67 @@ List<ClientContactPersonQueryResult> clientContactPersonQueryResults = clientGra
 
         }catch (Exception exception){
             logger.error("Error occurs while save contact person for client : "+clientId, exception);
-            contactPersonDTO = null;
+            clientContactPersonStructuredData = null;
         }
-        return clientGraphRepository.getClientContactPersonDataList(clientId);
+
+        return clientContactPersonStructuredData;
 
     }
 
     public void saveContactPersonWithGivenRelation(Long clientId, Long serviceId, Long staffId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, List<Long> households){
-        ClientContactPerson clientContactPerson = clientGraphRepository.getClientContactPerson(clientId, contactPersonRelationType);
+        ClientContactPerson clientContactPerson = clientGraphRepository.getClientContactPerson(clientId, contactPersonRelationType, serviceId);
         OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         Staff staff = staffGraphRepository.findOne(staffId);
         households.add(clientId);
         if(Optional.ofNullable(clientContactPerson).isPresent()){
-            clientGraphRepository.removeClientContactPersonRelations(households, contactPersonRelationType);
-            clientGraphRepository.removeClientContactPersonRelationship(households, contactPersonRelationType);
-            clientGraphRepository.removeClientContactPerson(clientContactPerson.getId());
+            clientGraphRepository.removeClientContactPersonRelationship(households, contactPersonRelationType, serviceId);
         }
-        ClientContactPerson clientContactPersonNew = new ClientContactPerson();
-        clientContactPersonNew.setOrganizationService(organizationService);
-        clientContactPersonNew.setStaff(staff);
+       if(!Optional.ofNullable(clientContactPerson).isPresent()) clientContactPerson  = new ClientContactPerson();
+        clientContactPerson.setOrganizationService(organizationService);
+        clientContactPerson.setStaff(staff);
+
+        for(Client client : clientGraphRepository.findAll(households) ){
+            ClientContactPersonRelationship clientContactPersonRelationship = new ClientContactPersonRelationship();
+            clientContactPersonRelationship.setClient(client);
+            clientContactPersonRelationship.setClientContactPerson(clientContactPerson);
+            clientContactPersonRelationship.setContactPersonRelationType(contactPersonRelationType);
+            save(clientContactPersonRelationship);
+        }
 
 
-       clientGraphRepository.findAll(households).forEach(client1 -> {
-           ClientContactPersonRelationship clientContactPersonRelationship = new ClientContactPersonRelationship();
-           clientContactPersonRelationship.setClient(client1);
-           clientContactPersonRelationship.setClientContactPerson(clientContactPersonNew);
-           clientContactPersonRelationship.setContactPersonRelationType(contactPersonRelationType);
-           save(clientContactPersonRelationship);
-       });
 
 
+
+
+
+    }
+
+    public List<ClientContactPersonStructuredData> refactorContactPersonList(Long clientId, List<ClientContactPersonQueryResultByService> clientContactPersonQueryResultByServices){
+
+List<ClientContactPersonStructuredData> clientContactPersonStructuredDataList = new ArrayList<>();
+        for(ClientContactPersonQueryResultByService clientContactPersonQueryResultByService : clientContactPersonQueryResultByServices){
+            ClientContactPersonStructuredData clientContactPersonStructuredData = new ClientContactPersonStructuredData();
+            clientContactPersonStructuredData.setServiceId(clientContactPersonQueryResultByService.getServiceId());
+            logger.info("clientContactPersonQueryResultByService.getServiceId()------> "+clientContactPersonQueryResultByService.getServiceId());
+            List<Long> houseHolds = new ArrayList();
+            logger.info("clientContactPersonQueryResultByService.getClientContactPersonQueryResults()----> "+clientContactPersonQueryResultByService.getClientContactPersonQueryResults().size());
+            for(Map<String, Object> clientContactPersonQueryResult : clientContactPersonQueryResultByService.getClientContactPersonQueryResults()){
+                if(Optional.ofNullable(clientContactPersonQueryResult.get("primaryStaffId")).isPresent()) clientContactPersonStructuredData.setPrimaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("primaryStaffId").toString()));
+                if(Optional.ofNullable(clientContactPersonQueryResult.get("secondaryStaffId")).isPresent()) clientContactPersonStructuredData.setSecondaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryStaffId").toString()));
+                if(Optional.ofNullable(clientContactPersonQueryResult.get("secondaryTwoStaffId")).isPresent()) clientContactPersonStructuredData.setSecondaryTwoStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryTwoStaffId").toString()));
+                if(Optional.ofNullable(clientContactPersonQueryResult.get("secondaryThreeStaffId")).isPresent()) clientContactPersonStructuredData.setSecondaryThreeStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryThreeStaffId").toString()));
+                if(Optional.ofNullable(clientContactPersonQueryResult.get("houseHold")).isPresent()) {
+                    Long houseHoldId = Long.valueOf(clientContactPersonQueryResult.get("houseHold").toString());
+                    if(!houseHoldId.equals(clientId) && !houseHolds.contains(houseHoldId))
+                    houseHolds.add(houseHoldId);
+                }
+
+            }
+
+            clientContactPersonStructuredData.setHouseHolds(houseHolds);
+            clientContactPersonStructuredDataList.add(clientContactPersonStructuredData);
+        }
+        return clientContactPersonStructuredDataList;
 
     }
 

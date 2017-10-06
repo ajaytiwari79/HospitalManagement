@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.client;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import org.springframework.data.neo4j.annotation.Depth;
@@ -299,14 +300,16 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
     @Query("Match (client:Client)-[:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client) in {0} with clientContactPerson\n"+
             "MATCH (clientContactPerson)-[r1:"+CLIENT_CONTACT_PERSON_STAFF+"]->(staff:Staff) with r1,clientContactPerson \n"+
-            "MATCH (clientContactPerson)-[r2:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(organizationService:OrganizationService) delete r1,r2 \n")
-     void removeClientContactPersonRelations(List<Long> clientIds, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType);
+            "MATCH (clientContactPerson)-[r2:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(organizationService:OrganizationService) where id(organizationService)={2} delete r1,r2 \n")
+     void removeClientContactPersonRelations(List<Long> clientIds, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, Long serviceId);
 
-    @Query("Match (client:Client)-[r:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client) in {0} delete r")
-     void removeClientContactPersonRelationship(List<Long> clientIds, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType);
+    @Query("Match (client:Client)-[r:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client)={0} with r \n" +
+            "MATCH (clientContactPerson)-[:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(organizationService:OrganizationService) where id(organizationService)={2}  delete r")
+    void removeClientContactPersonRelationship(List<Long> clientIds, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, Long serviceId);
 
-    @Query("Match (client:Client)-[r:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client)={0} return clientContactPerson")
-     ClientContactPerson getClientContactPerson(Long clientId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType);
+    @Query("Match (client:Client)-[r:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client)={0} \n" +
+            "MATCH (clientContactPerson)-[:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(organizationService:OrganizationService) where id(organizationService)={2}  return clientContactPerson")
+     ClientContactPerson getClientContactPerson(Long clientId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, Long serviceId);
 
     @Query("Match (clientContactPerson:ClientContactPerson) where id(clientContactPerson)={0} delete clientContactPerson")
     void removeClientContactPerson(Long clientContactPersonId);
@@ -314,22 +317,12 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client)-[:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(ps:Client) where id(c)={0}  return id(ps)")
     List<Long> getPeopleInHouseholdIdList(Long id);
 
-    @Query("Match (client:Client)-[:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:\"PRIMARY\"}]->(primaryClientContactPerson:ClientContactPerson) where id(client)={0} with client,primaryClientContactPerson\n" +
-            "OPTIONAL Match (client)-[:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:\"SECONDARY_ONE\"}]->(seconDaryclientContactPerson:ClientContactPerson)  with client,primaryClientContactPerson,seconDaryclientContactPerson\n" +
-            "OPTIONAL Match (client)-[:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:\"SECONDARY_TWO\"}]->(secondaryTwoClientContactPerson:ClientContactPerson) with client,primaryClientContactPerson,secondaryTwoClientContactPerson,seconDaryclientContactPerson\n" +
-            "OPTIONAL Match (client)-[:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:\"SECONDARY_THREE\"}]->(seconDaryThreeclientContactPerson:ClientContactPerson)  with client,primaryClientContactPerson,seconDaryclientContactPerson, secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson\n" +
-            "OPTIONAL MATCH (client)-[:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(ps:Client) with ps,primaryClientContactPerson,seconDaryclientContactPerson,secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson\n" +
-            "Match (ps)-[:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"]->(primaryClientContactPerson)  with ps, primaryClientContactPerson,seconDaryclientContactPerson, secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson\n" +
-            "Match (primaryClientContactPerson)-[:"+CLIENT_CONTACT_PERSON_STAFF+"]->(primaryStaff:Staff)  with primaryStaff, ps,primaryClientContactPerson,seconDaryclientContactPerson, secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson\n" +
-            "Match (primaryClientContactPerson)-[:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(primaryOrganizationService:OrganizationService)  with primaryStaff, primaryOrganizationService, ps,primaryClientContactPerson,seconDaryclientContactPerson,secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson\n" +
-            "OPTIONAL Match (secondaryTwoClientContactPerson)-[:"+CLIENT_CONTACT_PERSON_STAFF+"]->(secondaryTwoStaff:Staff)  with primaryStaff, ps,primaryClientContactPerson,seconDaryclientContactPerson,secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson, primaryOrganizationService,secondaryTwoStaff\n" +
-            "OPTIONAL Match (secondaryTwoClientContactPerson)-[:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(secondaryTwoOrganizationService:OrganizationService)  with primaryStaff, ps,primaryClientContactPerson,seconDaryclientContactPerson,secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson, primaryOrganizationService, secondaryTwoOrganizationService,secondaryTwoStaff\n" +
-            "OPTIONAL Match (seconDaryThreeclientContactPerson)-[:"+CLIENT_CONTACT_PERSON_STAFF+"]->(secondaryThreeStaff:Staff)  with primaryStaff, ps, primaryClientContactPerson,seconDaryclientContactPerson,secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson, primaryOrganizationService, secondaryTwoOrganizationService, secondaryThreeStaff,secondaryTwoStaff\n" +
-            "OPTIONAL Match (seconDaryThreeclientContactPerson)-[:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(secondaryThreeOrganizationService:OrganizationService)  with primaryStaff, ps, primaryClientContactPerson,primaryOrganizationService,seconDaryclientContactPerson,secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson, secondaryTwoOrganizationService, secondaryThreeStaff,secondaryThreeOrganizationService,secondaryTwoStaff\n" +
-            "OPTIONAL Match (seconDaryclientContactPerson)-[:"+CLIENT_CONTACT_PERSON_STAFF+"]->(secondaryStaff:Staff)  with secondaryStaff, primaryStaff, ps, primaryClientContactPerson,primaryOrganizationService,seconDaryclientContactPerson,secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson, secondaryTwoOrganizationService, secondaryThreeStaff, secondaryThreeOrganizationService,secondaryTwoStaff\n" +
-            "OPTIONAL Match (seconDaryclientContactPerson)-[:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(secondaryOrganizationService:OrganizationService)  with secondaryOrganizationService, secondaryStaff, primaryStaff, ps, primaryClientContactPerson,seconDaryclientContactPerson,secondaryTwoClientContactPerson, seconDaryThreeclientContactPerson, primaryOrganizationService, secondaryTwoOrganizationService, secondaryThreeStaff,secondaryThreeOrganizationService,secondaryTwoStaff \n" +
-            "return id(primaryStaff) as primaryStaffId, id(secondaryStaff) as secondaryStaffId, id(secondaryTwoStaff) as secondaryTwoStaffId, id(secondaryThreeStaff) as secondaryThreeStaffId, id(primaryOrganizationService) as serviceId, collect(id(ps)) as households")
-    List<ClientContactPersonQueryResult> getClientContactPersonDataList(Long clientId);
+    @Query("Match (client:Client)-[r:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson:ClientContactPerson) where id(client)=5800 with clientContactPerson,r\n" +
+            "OPTIONAL MATCH (client)-[:PEOPLE_IN_HOUSEHOLD_LIST]-(ps:Client) with ps,clientContactPerson,r\n" +
+            "Match (ps)-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson)  with ps,clientContactPerson,r\n" +
+            "Match (staff:Staff)<-[:CLIENT_CONTACT_PERSON_STAFF]-(clientContactPerson)-[:CLIENT_CONTACT_PERSON_SERVICE]->(os:OrganizationService) with os,clientContactPerson as cp,r,staff,ps\n" +
+            "return id(os) as serviceId,collect({primaryStaffId:case when r.contactPersonRelationType='PRIMARY' then id(staff) else null end,secondaryStaffId:case when r.contactPersonRelationType='SECONDARY_ONE' then id(staff) else null end,secondaryTwoStaffId:case when r.contactPersonRelationType='SECONDARY_TWO' then id(staff) else null end,secondaryThreeStaffId:case when r.contactPersonRelationType='SECONDARY_THREE' then id(staff) else null end,houseHold:id(ps)}) as clientContactPersonQueryResults")
+    List<ClientContactPersonQueryResultByService> getClientContactPersonDataList(Long clientId);
 
 
 }
