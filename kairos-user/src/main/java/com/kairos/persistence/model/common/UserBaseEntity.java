@@ -1,11 +1,13 @@
 package com.kairos.persistence.model.common;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.neo4j.ogm.annotation.GraphId;
 
 /**
  * Contains common fields of an entitiy
  *
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserBaseEntity {
 
     @GraphId protected Long id;
