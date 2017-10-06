@@ -2,6 +2,8 @@ package com.kairos.response.dto.web;
 
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 
@@ -15,7 +17,7 @@ public class ContactPersonTabDataDTO {
     List<OrganizationService> organizationServices;
     List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
     List<ClientMinimumDTO> peopleHouseHolds;
-    List<ClientContactPersonQueryResult> contactPersonDataList;
+    List<ClientContactPersonStructuredData> contactPersonDataList;
 
     public List<OrganizationService> getOrganizationServices() {
         return organizationServices;
@@ -41,11 +43,11 @@ public class ContactPersonTabDataDTO {
         this.peopleHouseHolds = peopleHouseHolds;
     }
 
-    public List<ClientContactPersonQueryResult> getContactPersonDataList() {
+    public List<ClientContactPersonStructuredData> getContactPersonDataList() {
         return contactPersonDataList;
     }
 
-    public void setContactPersonDataList(List<ClientContactPersonQueryResult> contactPersonDataList) {
+    public void setContactPersonDataList(List<ClientContactPersonStructuredData> contactPersonDataList) {
         this.contactPersonDataList = contactPersonDataList;
     }
 }

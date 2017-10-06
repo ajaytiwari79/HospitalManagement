@@ -7,18 +7,18 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import java.util.List;
 
 /**
- * Created by Jasgeet on 5/10/17.
+ * Created by oodles on 6/10/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-public class ClientContactPersonQueryResult {
+public class ClientContactPersonStructuredData {
     private Long primaryStaffId;
     private Long secondaryStaffId;
     private Long secondaryTwoStaffId;
     private Long secondaryThreeStaffId;
-
-    private Long houseHold;
+    private Long serviceId;
+    private List<Long> houseHolds;
 
     public Long getPrimaryStaffId() {
         return primaryStaffId;
@@ -52,11 +52,19 @@ public class ClientContactPersonQueryResult {
         this.secondaryThreeStaffId = secondaryThreeStaffId;
     }
 
-    public Long getHouseHold() {
-        return houseHold;
+    public Long getServiceId() {
+        return serviceId;
     }
 
-    public void setHouseHold(Long houseHold) {
-        this.houseHold = houseHold;
+    public void setServiceId(Long serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public List<Long> getHouseHolds() {
+        return houseHolds;
+    }
+
+    public void setHouseHolds(List<Long> houseHolds) {
+        this.houseHolds = houseHolds;
     }
 }
