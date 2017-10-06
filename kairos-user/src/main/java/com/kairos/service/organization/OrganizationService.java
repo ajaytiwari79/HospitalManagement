@@ -1005,8 +1005,8 @@ public class OrganizationService extends UserBaseService {
         return countryGraphRepository.getResourcesByCountry(countryId);
     }
 
-    public List<Long> allOrganizationIds() {
-        List<Long> organizationIds = organizationGraphRepository.allOrganizationIds();
+    public List<Long> getAllOrganizationWithoutPhases() {
+        List<Long> organizationIds = organizationGraphRepository.getAllOrganizationWithoutPhases();
         return organizationIds;
     }
     public Long getOrganization(Long id, String type) {
@@ -1028,6 +1028,11 @@ public class OrganizationService extends UserBaseService {
             throw new DataNotFoundByIdException("Organization not found-" + id);
         }
         return organization.getId();
+    }
+
+    public  void updateOrganizationWithoutPhases( List<Long> organizationIds){
+
+        organizationGraphRepository.updateOrganizationWithoutPhases(organizationIds);
     }
 
 
