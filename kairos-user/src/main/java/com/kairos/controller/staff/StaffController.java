@@ -17,7 +17,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -384,9 +383,11 @@ public class StaffController {
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     @ApiOperation("Upload XLSX file ")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> batchCreateStaff(@PathVariable long unitId, @RequestParam("file") MultipartFile multipartFile) throws ParseException {
+    public ResponseEntity<Map<String, Object>> batchCreateStaff(@PathVariable long unitId,
+                                                                @RequestParam("file") MultipartFile multipartFile,
+                                                                @RequestParam("accessGroupId") Long accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffService.batchAddStaffToDatabase(unitId, multipartFile));
+                staffService.batchAddStaffToDatabase(unitId, multipartFile,accessGroupId));
     }
 
     @RequestMapping(value = "/{staffId}/access_permissions", method = RequestMethod.GET)

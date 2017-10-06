@@ -6,10 +6,7 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientStaffRelation;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.staff.PartialLeave;
-import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.StaffAdditionalInfoQueryResult;
-import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.user.staff.*;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -227,9 +224,6 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
             "set r.isEnabled=false return true")
     void removeSkillsByExpertise(long staffId, long expertiseId);
 
-    @Query("Match (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff:Staff{externalId:{1}}) where id(organization)={0} return staff")
-    Staff getStaffByExternalIdAndOrganizationId(long organizationId, long externalId);
-
     @Query("MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment) where id(organization)={0} with employment\n" +
             "OPTIONAL MATCH (staff:Staff)<-[:BELONGS_TO]-(employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment)-[:PROVIDED_BY]->(unit:Organization) where id(unit)={1} with unitEmployment, staff\n" +
             "OPTIONAL MATCH (staff)<-[:BELONGS_TO]-(employment)-[:HAS_UNIT_EMPLOYMENTS]->(subUnitEmployment:UnitEmployment)-[:PROVIDED_BY]->(unit:Organization) with unit, unitEmployment, staff\n" +
@@ -293,7 +287,18 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     Long getLanguageId(Long staffId);
 
     @Query("Match (team:Team)-[:TEAM_HAS_MEMBER]->(staff:Staff) where id(staff)= {1} AND id(team)={0}  return staff ")
-             Staff getTeamStaff(Long teamId, Long staffId);
+    Staff getTeamStaff(Long teamId, Long staffId);
+
+    @Query("Match (unitEmployment:UnitEmployment)-[:"+PROVIDED_BY+"]->(unit:Organization) where id(unit)={1} with unitEmployment\n" +
+            "Match (unitEmployment)<-[:"+HAS_UNIT_EMPLOYMENTS+"]-(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff{externalId:{0}}) return count(staff)>0")
+    Boolean staffAlreadyInUnit(Long externalId,Long unitId);
+
+    @Query("Match (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]->(emp:Employment)-[:"+BELONGS_TO+"]->(staff:Staff{externalId:{1}}) \n" +
+            "where id(organization)={0} with staff\n" +
+            "optional match (staff)-[:"+HAS_CONTACT_ADDRESS+"]->(contactAddress:ContactAddress) with staff,contactAddress\n" +
+            "optional match (staff)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) with staff,contactDetail,contactAddress\n" +
+            "return staff,id(contactAddress) as contactAddressId,id(contactDetail) as contactDetailId")
+    StaffQueryResult getStaffByExternalIdInOrganization(Long organizationId, Long externalId);
 
 
 

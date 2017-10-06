@@ -165,7 +165,7 @@ public class StaffCreationPOJOData {
         this.userName = userName;
     }
 
-    public long getExternalId() {
+    public Long getExternalId() {
         return externalId;
     }
 }
