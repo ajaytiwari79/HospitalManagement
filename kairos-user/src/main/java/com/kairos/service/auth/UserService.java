@@ -1,5 +1,6 @@
 package com.kairos.service.auth;
 
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
@@ -11,6 +12,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.response.dto.web.FirstTimePasswordUpdateDTO;
 import com.kairos.service.SmsService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -345,11 +348,13 @@ public class UserService extends UserBaseService {
 
     }
 
-    public boolean updatePassword(String email, String password) {
-        User user = userGraphRepository.findByEmail(email);
+    public boolean updatePassword(FirstTimePasswordUpdateDTO firstTimePasswordUpdateDTO) {
+        User user = userGraphRepository.findByEmail(firstTimePasswordUpdateDTO.getEmail());
         if (user == null) {
-            throw new InternalError("user is null");
+            logger.error("User not found belongs to this email " + firstTimePasswordUpdateDTO.getEmail());
+            throw new DataNotFoundByIdException("User not found belongs to this this email " + firstTimePasswordUpdateDTO.getEmail());
         }
+        CharSequence password = CharBuffer.wrap(firstTimePasswordUpdateDTO.getPassword2());
         user.setPassword(new BCryptPasswordEncoder().encode(password));
         user.setPasswordUpdated(true);
         userGraphRepository.save(user);

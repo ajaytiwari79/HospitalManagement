@@ -98,7 +98,7 @@ public class StaffController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable long staffId, @Valid @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, false, staffService.updatePassword(staffId, passwordUpdateDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updatePassword(staffId, passwordUpdateDTO));
     }
 
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
