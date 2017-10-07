@@ -319,7 +319,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client)-[:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(ps:Client) where id(c)={0}  return id(ps)")
     List<Long> getPeopleInHouseholdIdList(Long id);
 
-    @Query("Match (client:Client)-[r:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson:ClientContactPerson) where id(client)=5800 with clientContactPerson,r\n" +
+    @Query("Match (client:Client)-[r:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson:ClientContactPerson) where id(client)={0} with clientContactPerson,r\n" +
             "OPTIONAL MATCH (client)-[:PEOPLE_IN_HOUSEHOLD_LIST]-(ps:Client) with ps,clientContactPerson,r\n" +
             "Match (ps)-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson)  with ps,clientContactPerson,r\n" +
             "Match (staff:Staff)<-[:CLIENT_CONTACT_PERSON_STAFF]-(clientContactPerson)-[:CLIENT_CONTACT_PERSON_SERVICE]->(os:OrganizationService) with os,clientContactPerson as cp,r,staff,ps\n" +
