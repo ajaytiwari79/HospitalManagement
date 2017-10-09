@@ -983,7 +983,7 @@ public class ClientService extends UserBaseService {
      */
     public ClientStaffInfoDTO getStaffClientInfo(Long clientId, String loggedInUserName) {
         Client client = getCitizenById(clientId);
-        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(loggedInUserName).getId());
+        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(loggedInUserName).getId());
         if (client == null || staff == null) {
             throw new DataNotFoundByIdException("Either Client or Staff Id is invalid");
         }
@@ -1190,7 +1190,7 @@ public class ClientService extends UserBaseService {
         taskAddress.setStreet(homeAddress.getStreet1());
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
-        Staff loggedInUser = staffGraphRepository.getByUser(userGraphRepository.findByUserName(userName).getId());
+        Staff loggedInUser = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(userName).getId());
         List<Long> preferredStaffIds = getPreferredStaffVisitourIds(citizen.getId());
         List<Long> forbiddenStaffIds = getForbiddenStaffVisitourIds(citizen.getId());
         TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(citizen,
@@ -1224,7 +1224,7 @@ public class ClientService extends UserBaseService {
         List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH);
         logger.debug("CitizenList Size: " + mapList.size());
 
-        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserName(auth2Authentication.getUserAuthentication().getPrincipal().toString()).getId());
+        Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(auth2Authentication.getUserAuthentication().getPrincipal().toString()).getId());
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
         OrganizationClientWrapper organizationClientWrapper = new OrganizationClientWrapper(mapList, timeSlotData);
         organizationClientWrapper.setStaffId(staff.getId());

@@ -330,7 +330,7 @@ public class EmploymentService extends UserBaseService {
      * @param unitId
      * @return
      */
-    private boolean syncStaffInVisitour(Staff staff,long unitId, Map<String, String> flsCredentials){
+    public boolean syncStaffInVisitour(Staff staff,long unitId, Map<String, String> flsCredentials){
         logger.info("Syncing staff in fls");
         ContactDetail staffContactDetail = staffGraphRepository.getContactDetail(staff.getId());
 

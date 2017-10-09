@@ -70,7 +70,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		errorMessage.setErrors(errors);
 		errorMessage.setSuccess(false);
 
-		return new ResponseEntity<Object>(errorMessage, headers, status);
+		return new ResponseEntity<Object>(errorMessage, headers, HttpStatus.UNPROCESSABLE_ENTITY);
 
 	}
 

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -11,6 +12,7 @@ import java.util.Map;
  * Created by oodles on 28/9/16.
  */
 @NodeEntity
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContactDetail extends UserBaseEntity {
 
