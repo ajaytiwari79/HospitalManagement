@@ -1,4 +1,6 @@
 package com.kairos.persistence.model.user.expertise;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.country.Country;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -15,6 +17,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 /**
  * Created by prabjot on 28/10/16.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 public class Expertise extends UserBaseEntity {
 

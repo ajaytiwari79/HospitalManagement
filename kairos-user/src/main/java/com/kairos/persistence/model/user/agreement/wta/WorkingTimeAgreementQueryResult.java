@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.agreement.wta;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -12,6 +13,7 @@ import java.util.List;
  */
 @QueryResult
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkingTimeAgreementQueryResult {
     private Long startDateMillis;
     private long creationDate;
