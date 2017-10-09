@@ -1439,7 +1439,9 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
                save(clientContactPersonRelationship);
            }
        }else{
+           clientGraphRepository.removeClientContactPersonStaffRelation(clientContactPerson.getId());
            clientContactPerson.setOrganizationService(organizationService);
+
            clientContactPerson.setStaff(staff);
            save(clientContactPerson);
        }
