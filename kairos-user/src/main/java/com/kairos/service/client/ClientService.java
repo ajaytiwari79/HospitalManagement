@@ -1424,32 +1424,43 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
         ClientContactPerson clientContactPerson = clientGraphRepository.getClientContactPerson(clientId, contactPersonRelationType, serviceId);
         OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         Staff staff = staffGraphRepository.findOne(staffId);
-        households.add(clientId);
+
      /*   if(Optional.ofNullable(clientContactPerson).isPresent()){
             clientGraphRepository.removeClientContactPersonRelationship(households, contactPersonRelationType, serviceId);
         }*/
        if(!Optional.ofNullable(clientContactPerson).isPresent()){
+           households.add(clientId);
            clientContactPerson  = new ClientContactPerson();
            clientContactPerson.setOrganizationService(organizationService);
            clientContactPerson.setStaff(staff);
-           for(Client client : clientGraphRepository.findAll(households) ){
-               ClientContactPersonRelationship clientContactPersonRelationship = new ClientContactPersonRelationship();
-               clientContactPersonRelationship.setClient(client);
-               clientContactPersonRelationship.setClientContactPerson(clientContactPerson);
-               clientContactPersonRelationship.setContactPersonRelationType(contactPersonRelationType);
-               save(clientContactPersonRelationship);
-           }
+           addClientContactPersonRelationShip(households, contactPersonRelationType, clientContactPerson);
+
+           households.remove(clientId);
        }else{
            clientGraphRepository.removeClientContactPersonStaffRelation(clientContactPerson.getId());
            clientContactPerson.setOrganizationService(organizationService);
-
            clientContactPerson.setStaff(staff);
            save(clientContactPerson);
+           if(households.isEmpty()){
+               //when household is  empty then we need to check existing housholds who may connected with contact person
+               clientGraphRepository.removeClientContactPersonRelationship(clientGraphRepository.getPeopleInHouseholdIdList(clientId),clientContactPerson.getId());
+           }else{
+               clientGraphRepository.removeClientContactPersonRelationship(households,clientContactPerson.getId());
+               addClientContactPersonRelationShip(households, contactPersonRelationType, clientContactPerson);
+           }
+
        }
 
+    }
 
-        households.remove(clientId);
-
+    public void addClientContactPersonRelationShip(List<Long> households, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, ClientContactPerson clientContactPerson){
+        for(Client client : clientGraphRepository.findAll(households) ) {
+            ClientContactPersonRelationship clientContactPersonRelationship = new ClientContactPersonRelationship();
+            clientContactPersonRelationship.setClient(client);
+            clientContactPersonRelationship.setClientContactPerson(clientContactPerson);
+            clientContactPersonRelationship.setContactPersonRelationType(contactPersonRelationType);
+            save(clientContactPersonRelationship);
+        }
     }
 
     public List<ClientContactPersonStructuredData> refactorContactPersonList(Long clientId, List<ClientContactPersonQueryResultByService> clientContactPersonQueryResultByServices){
