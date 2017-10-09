@@ -1425,38 +1425,38 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
         OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         Staff staff = staffGraphRepository.findOne(staffId);
         households.add(clientId);
-        if(Optional.ofNullable(clientContactPerson).isPresent()){
+     /*   if(Optional.ofNullable(clientContactPerson).isPresent()){
             clientGraphRepository.removeClientContactPersonRelationship(households, contactPersonRelationType, serviceId);
-        }
-       if(!Optional.ofNullable(clientContactPerson).isPresent()) clientContactPerson  = new ClientContactPerson();
-        clientContactPerson.setOrganizationService(organizationService);
-        clientContactPerson.setStaff(staff);
+        }*/
+       if(!Optional.ofNullable(clientContactPerson).isPresent()){
+           clientContactPerson  = new ClientContactPerson();
+           clientContactPerson.setOrganizationService(organizationService);
+           clientContactPerson.setStaff(staff);
+           for(Client client : clientGraphRepository.findAll(households) ){
+               ClientContactPersonRelationship clientContactPersonRelationship = new ClientContactPersonRelationship();
+               clientContactPersonRelationship.setClient(client);
+               clientContactPersonRelationship.setClientContactPerson(clientContactPerson);
+               clientContactPersonRelationship.setContactPersonRelationType(contactPersonRelationType);
+               save(clientContactPersonRelationship);
+           }
+       }else{
+           clientContactPerson.setOrganizationService(organizationService);
+           clientContactPerson.setStaff(staff);
+       }
 
-        for(Client client : clientGraphRepository.findAll(households) ){
-            ClientContactPersonRelationship clientContactPersonRelationship = new ClientContactPersonRelationship();
-            clientContactPersonRelationship.setClient(client);
-            clientContactPersonRelationship.setClientContactPerson(clientContactPerson);
-            clientContactPersonRelationship.setContactPersonRelationType(contactPersonRelationType);
-            save(clientContactPersonRelationship);
-        }
 
 
-
-
-
-
+        households.remove(clientId);
 
     }
 
     public List<ClientContactPersonStructuredData> refactorContactPersonList(Long clientId, List<ClientContactPersonQueryResultByService> clientContactPersonQueryResultByServices){
 
-List<ClientContactPersonStructuredData> clientContactPersonStructuredDataList = new ArrayList<>();
+        List<ClientContactPersonStructuredData> clientContactPersonStructuredDataList = new ArrayList<>();
         for(ClientContactPersonQueryResultByService clientContactPersonQueryResultByService : clientContactPersonQueryResultByServices){
             ClientContactPersonStructuredData clientContactPersonStructuredData = new ClientContactPersonStructuredData();
             clientContactPersonStructuredData.setServiceId(clientContactPersonQueryResultByService.getServiceId());
-            logger.info("clientContactPersonQueryResultByService.getServiceId()------> "+clientContactPersonQueryResultByService.getServiceId());
             List<Long> houseHolds = new ArrayList();
-            logger.info("clientContactPersonQueryResultByService.getClientContactPersonQueryResults()----> "+clientContactPersonQueryResultByService.getClientContactPersonQueryResults().size());
             for(Map<String, Object> clientContactPersonQueryResult : clientContactPersonQueryResultByService.getClientContactPersonQueryResults()){
                 if(Optional.ofNullable(clientContactPersonQueryResult.get("primaryStaffId")).isPresent()) clientContactPersonStructuredData.setPrimaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("primaryStaffId").toString()));
                 if(Optional.ofNullable(clientContactPersonQueryResult.get("secondaryStaffId")).isPresent()) clientContactPersonStructuredData.setSecondaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryStaffId").toString()));
@@ -1467,9 +1467,7 @@ List<ClientContactPersonStructuredData> clientContactPersonStructuredDataList = 
                     if(!houseHoldId.equals(clientId) && !houseHolds.contains(houseHoldId))
                     houseHolds.add(houseHoldId);
                 }
-
             }
-
             clientContactPersonStructuredData.setHouseHolds(houseHolds);
             clientContactPersonStructuredDataList.add(clientContactPersonStructuredData);
         }
