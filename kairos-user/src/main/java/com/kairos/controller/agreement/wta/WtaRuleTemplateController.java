@@ -37,7 +37,7 @@ public class WtaRuleTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaRuleTemplateService.getRuleTemplate(countryId));
     }
 
-    @RequestMapping(value = "/rule_templates/{templateType}", method = RequestMethod.POST)
+    @RequestMapping(value = "/rule_templates/{templateType}", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @Valid @RequestBody WTARuleTemplateDTO templateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaRuleTemplateService.updateRuleTemplate(countryId,templateType, templateDTO));
     }
