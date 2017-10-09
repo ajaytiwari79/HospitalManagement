@@ -42,6 +42,7 @@ import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.mail.MailService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
@@ -133,7 +134,8 @@ public class StaffService extends UserBaseService {
     ClientGraphRepository clientGraphRepository;
     @Autowired
     TaskServiceRestClient taskServiceRestClient;
-
+    @Inject
+    private OrganizationService organizationService;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -164,7 +166,7 @@ public class StaffService extends UserBaseService {
     public boolean updatePassword(long staffId, PasswordUpdateDTO passwordUpdateDTO) {
 
         User user = userGraphRepository.getUserByStaffId(staffId);
-        if(!Optional.ofNullable(user).isPresent()){
+        if (!Optional.ofNullable(user).isPresent()) {
             logger.error("User not found belongs to this staff id " + staffId);
             throw new DataNotFoundByIdException("User not found belongs to this staff id " + staffId);
         }
@@ -232,7 +234,7 @@ public class StaffService extends UserBaseService {
         if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getTeamStaff(unitId, staffId);
         } else if (ORGANIZATION.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
+            staff = staffGraphRepository.getStaffByUnitId(unitId, staffId);
         }
 
         if (staff == null) {
@@ -315,12 +317,11 @@ public class StaffService extends UserBaseService {
 
         List<Map<String, Object>> staff = null;
         Long countryId = null;
-        List<Map<String, Object>> roles = null;
+        List<AccessGroup> roles = null;
         List<EngineerType> engineerTypes = null;
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             staff = getStaffWithBasicInfo(id);
             roles = accessGroupService.getAccessGroups(id);
-
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
         } else if (GROUP.equalsIgnoreCase(type)) {
@@ -438,7 +439,7 @@ public class StaffService extends UserBaseService {
     public List<Staff> batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-        if(!Optional.ofNullable(accessGroup).isPresent()){
+        if (!Optional.ofNullable(accessGroup).isPresent()) {
             logger.error("Access group not found");
             throw new InternalError("Access group not found " + accessGroupId);
         }
@@ -456,7 +457,7 @@ public class StaffService extends UserBaseService {
         } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-        try(InputStream stream = multipartFile.getInputStream()) {
+        try (InputStream stream = multipartFile.getInputStream()) {
             //Get the workbook instance for XLS file
             XSSFWorkbook workbook = new XSSFWorkbook(stream);
             //Get first sheet from the workbook
@@ -499,7 +500,7 @@ public class StaffService extends UserBaseService {
                     }
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
-                    if (row.getCell(17) != null){
+                    if (row.getCell(17) != null) {
                         staff.setBadgeNumber(row.getCell(17).toString());
                     }
                     staff.setFirstName(row.getCell(20).toString());
@@ -511,13 +512,13 @@ public class StaffService extends UserBaseService {
                         contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
                     }
                     ContactDetail contactDetail = extractContactDetailFromRow(row);
-                    if(Optional.ofNullable(staffQueryResult).isPresent()){
+                    if (Optional.ofNullable(staffQueryResult).isPresent()) {
 
-                        if(Optional.ofNullable(contactDetail).isPresent()){
+                        if (Optional.ofNullable(contactDetail).isPresent()) {
                             contactDetail.setId(staffQueryResult.getContactDetailId());
                         }
 
-                        if(Optional.ofNullable(contactAddress).isPresent()){
+                        if (Optional.ofNullable(contactAddress).isPresent()) {
                             contactAddress.setId(staffQueryResult.getContactAddressId());
                         }
                     }
@@ -532,7 +533,7 @@ public class StaffService extends UserBaseService {
                             user.setFirstName(row.getCell(20).toString());
                             user.setLastName(row.getCell(21).toString());
                             user.setTimeCareExternalId(cell.getStringCellValue());
-                            if(Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()){
+                            if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
                                 user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
                                 user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
                             }
@@ -543,7 +544,7 @@ public class StaffService extends UserBaseService {
                     }
                     staffGraphRepository.save(staff);
                     staffList.add(staff);
-                    if(!staffGraphRepository.staffAlreadyInUnit(externalId,unit.getId())){
+                    if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
                         createEmployment(parent, unit, staff, accessGroupId, isEmploymentExist);
                     }
                 }
@@ -785,7 +786,7 @@ public class StaffService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect id of an organization  " + unitId);
         }
         User user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
-        if (staffGraphRepository.staffAlreadyInUnit(payload.getExternalId(),unit.getId())) {
+        if (staffGraphRepository.staffAlreadyInUnit(payload.getExternalId(), unit.getId())) {
             throw new DuplicateDataException("Staff already exist in organization");
         }
         setBasicDetailsOfUser(user, payload);
@@ -865,8 +866,8 @@ public class StaffService extends UserBaseService {
         }
         Employment employment;
         if (employmentAlreadyExist) {
-            employment = (Optional.ofNullable(organization).isPresent())?
-                    employmentGraphRepository.findEmployment(organization.getId(), staff.getId()):
+            employment = (Optional.ofNullable(organization).isPresent()) ?
+                    employmentGraphRepository.findEmployment(organization.getId(), staff.getId()) :
                     employmentGraphRepository.findEmployment(unit.getId(), staff.getId());
         } else {
             employment = new Employment();
@@ -957,7 +958,7 @@ public class StaffService extends UserBaseService {
 
         List<Staff> staffList = new ArrayList<>();
 
-        try(InputStream stream = multipartFile.getInputStream()) {
+        try (InputStream stream = multipartFile.getInputStream()) {
             //Get the workbook instance for XLS file
             XSSFWorkbook workbook = new XSSFWorkbook(stream);
             //Get first sheet from the workbook
@@ -1124,7 +1125,7 @@ public class StaffService extends UserBaseService {
      */
     public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId, String date) {
 
-        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
+        Staff staff = staffGraphRepository.getStaffByUnitId(unitId, staffId);
         if (staff == null) {
             throw new InternalError("Staff not found");
         }
@@ -1217,7 +1218,7 @@ public class StaffService extends UserBaseService {
 
     public List<StaffPersonalDetailDTO> getAllStaffByUnitId(long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId);
-        if (unit == null) {
+        if (!Optional.ofNullable(unit).isPresent()) {
             throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
         }
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(unitId);
@@ -1226,19 +1227,21 @@ public class StaffService extends UserBaseService {
 
     public List<StaffPersonalDetailDTO> getStaffInfoById(long staffId, long unitId) {
         List<StaffPersonalDetailDTO> staffPersonalDetailList = staffGraphRepository.getStaffInfoById(unitId, staffId);
-        if (staffPersonalDetailList == null) {
+        if (!Optional.ofNullable(staffPersonalDetailList).isPresent()) {
             throw new DataNotFoundByIdException("Staff not found with provided Staff ID: " + staffId + " and Unit ID: " + unitId);
         }
         return staffPersonalDetailList;
 
     }
 
-    public boolean verifyStaffBelongsToUnit(long staffId, long unitId) {
-        Staff staff = staffGraphRepository.getStaffByOrganizationId(unitId, staffId);
-        if (staff == null) {
-            return false;
+    public Long verifyStaffBelongsToUnit(long staffId, long id, String type) {
+        Long unitId = -1L;
+        unitId = organizationService.getOrganization(id, type);
+        Staff staff = staffGraphRepository.getStaffByUnitId(unitId, staffId);
+        if (!Optional.ofNullable(staff).isPresent()) {
+            unitId = -1L;
         }
-        return true;
+        return unitId;
     }
 
 }

@@ -8,7 +8,6 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.integration.Visitour;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -181,8 +180,38 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public static WorkingTimeAgreement copyProperties(WorkingTimeAgreement source, WorkingTimeAgreement target,Long id){
+    public static WorkingTimeAgreement copyProperties(WorkingTimeAgreement source, WorkingTimeAgreement target){
         BeanUtils.copyProperties(source,target);
         return target;
+    }
+
+    public WorkingTimeAgreement() {
+    }
+
+    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, Country country, List<WTABaseRuleTemplate> ruleTemplates, WorkingTimeAgreement wta, Long startDateMillis, Long endDateMillis, Long expiryDate, boolean isEnabled) {
+        this.name = name;
+        this.description = description;
+        this.expertise = expertise;
+        this.organizationType = organizationType;
+        this.organizationSubType = organizationSubType;
+        this.country = country;
+        this.ruleTemplates = ruleTemplates;
+        this.wta = wta;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.expiryDate = expiryDate;
+        this.isEnabled = isEnabled;
+    }
+
+    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<WTABaseRuleTemplate> ruleTemplates, Long startDateMillis, Long endDateMillis, Long expiryDate) {
+        this.name = name;
+        this.description = description;
+        this.expertise = expertise;
+        this.organizationType = organizationType;
+        this.organizationSubType = organizationSubType;
+        this.ruleTemplates = ruleTemplates;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.expiryDate = expiryDate;
     }
 }

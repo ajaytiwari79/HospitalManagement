@@ -15,6 +15,7 @@ public class ClientMinimumDTO {
     private String firstName;
     private String lastName;
     private String cprnumber;
+    private String name;
     private Boolean hasSameAddress;
 
     public ClientMinimumDTO(String firstName, String lastName, String cprNumber) {
@@ -61,6 +62,10 @@ public class ClientMinimumDTO {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getName() {
+        return this.firstName+" "+this.lastName;
     }
 
     public ClientMinimumDTO() {

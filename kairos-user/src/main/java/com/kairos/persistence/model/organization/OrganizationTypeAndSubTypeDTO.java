@@ -8,7 +8,7 @@ import java.util.List;
 public class OrganizationTypeAndSubTypeDTO {
     private List<Long> organizationTypes;
     private List<Long> organizationSubTypes;
-
+    private Long unitId;
     public List<Long> getOrganizationTypes() {
         return organizationTypes;
     }
@@ -23,5 +23,13 @@ public class OrganizationTypeAndSubTypeDTO {
 
     public void setOrganizationSubTypes(List<Long> organizationSubTypes) {
         this.organizationSubTypes = organizationSubTypes;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 }

@@ -160,6 +160,9 @@ public class RelationshipConstants {
     public final static String REGION = "REGION";
     public final static String KAIROS_STATUS = "KAIROS_STATUS";
     public final static String TYPE_OF_HOUSING = "TYPE_OF_HOUSING";
+    public final static String CLIENT_CONTACT_PERSON_RELATION_TYPE = "CLIENT_CONTACT_PERSON_RELATION_TYPE";
+    public final static String CLIENT_CONTACT_PERSON_STAFF = "CLIENT_CONTACT_PERSON_STAFF";
+    public final static String CLIENT_CONTACT_PERSON_SERVICE = "CLIENT_CONTACT_PERSON_SERVICE";
 
     // RULE Template
     public final static String HAS_RULE_TEMPLATE="HAS_RULE_TEMPLATE";

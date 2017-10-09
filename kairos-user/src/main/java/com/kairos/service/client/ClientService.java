@@ -10,6 +10,9 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
@@ -18,6 +21,7 @@ import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.user.staff.StaffClientData;
+import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
@@ -29,9 +33,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.response.dto.web.ClientStaffInfoDTO;
-import com.kairos.response.dto.web.EscalateTaskWrapper;
-import com.kairos.response.dto.web.EscalatedTasksWrapper;
+import com.kairos.response.dto.web.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.integration.IntegrationService;
@@ -463,7 +465,7 @@ public class ClientService extends UserBaseService {
     }
 
 
-    public List<Map<String, Object>> getOrganizationHierarchy(Long clientId) {
+    public List<Map<String, Object>> getOrganizationsByClient(Long clientId) {
         logger.debug("Creating:");
         List<Organization> list = clientGraphRepository.getClientOrganizationIdList(clientId);
         List<Map<String, Object>> mapList = new ArrayList<>();
@@ -515,7 +517,7 @@ public class ClientService extends UserBaseService {
 
     public Map<String, Object> getUnitData(Long clientId, long unitId) {
         Map<String, Object> response = new HashMap<>();
-        response.put("units", getOrganizationHierarchy(clientId));
+        response.put("units", getOrganizationsByClient(clientId));
         return response;
     }
     //TODO not used
@@ -663,7 +665,7 @@ public class ClientService extends UserBaseService {
             visitourIds.add((long) visitourId.get("visitourId"));
         }
 
-        return (visitourIds.size() > 0 ? visitourIds : Collections.EMPTY_LIST);
+        return visitourIds;
     }
 
     public List<Long> getForbiddenStaffVisitourIds(Long id) {
@@ -677,7 +679,7 @@ public class ClientService extends UserBaseService {
             visitourIds.add((long) visitourId.get("visitourId"));
         }
 
-        return (visitourIds.size() > 0 ? visitourIds : Collections.EMPTY_LIST);
+        return visitourIds;
     }
 
 
@@ -841,10 +843,13 @@ public class ClientService extends UserBaseService {
 
             Optional<TaskTypeAggregateResult> taskTypeAggregateResult = results.stream().filter(citizenTaskType -> citizenTaskType.getId() == client.getId()).findFirst();
             HashMap<String, Object> citizen = new HashMap<>();
+            HashMap<String, Object> clientMap = new HashMap<>();
             citizen.put("id", client.getId());
             citizen.put("name", client.getName());
             citizen.put("gender", client.getGender());
             citizen.put("age", client.getAge());
+            citizen.put("localAreaTag", client.getLocalAreaTag());
+            citizen.put("address", client.getAddress());
             citizen.put("profilePic", (client.getProfilePic() == null) ? null :
                     envConfig.getServerHost() + FORWARD_SLASH + client.getProfilePic());
             citizen.put("taskTypes", (taskTypeAggregateResult.isPresent()) ? taskTypeAggregateResult.get().getTaskTypeIds() : Collections.emptyList());
@@ -853,10 +858,8 @@ public class ClientService extends UserBaseService {
                 staffData.put((Long) staff.get("id"), staff.get("type"));
             });
             citizen.put("staff", staffData);
-            //  Map<String , String> clientDemandsHoursTasksData = taskDemandService.countCitizenTaskDemandsHoursAndTasks(client.getId(), unitId);
-            citizen.put("noOfVisitationHours", 0);
-            citizen.put("noOfVisitationTasks", 0);
-            citizenStaffList.add(citizen);
+            clientMap.put("Client", citizen);
+            citizenStaffList.add(clientMap);
         });
 
         //meta data preparation
@@ -874,10 +877,11 @@ public class ClientService extends UserBaseService {
 
         long endTime = System.currentTimeMillis();
         logger.info("Time taken by ClientService>>getAssignedStaffOfCitizen " + (endTime - startTime) + "  ms");
+        Map<String, Object> clientInfo = taskDemandRestClient.getOrganizationClientsInfo(unitId, citizenStaffList);
         HashMap<String, Object> response = new HashMap<>();
         response.put("staffList", staffAdditionalInfoQueryResults);
-        response.put("clientList", citizenStaffList);
         response.put("organization", orgData);
+        response.putAll(clientInfo);
         return response;
 
 
@@ -891,7 +895,6 @@ public class ClientService extends UserBaseService {
      */
     public Map<String, Object> getOrganizationClientsWithPlanning(Long organizationId) {
         Map<String, Object> response = new HashMap<>();
-        List<Object> clientList = new ArrayList<>();
 
         logger.debug("Finding citizen with Id: " + organizationId);
         List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH);
@@ -1367,6 +1370,111 @@ public class ClientService extends UserBaseService {
 
         }
         return false;
+    }
+
+    public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId){
+        List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllStaffDetailByUnitId(unitId);
+        List<ClientMinimumDTO> clientMinimumDTOs =  getPeopleInHousehold(clientId);
+        List<Long> houseHoldIds = clientGraphRepository.getPeopleInHouseholdIdList(clientId);
+        houseHoldIds.add(clientId);
+List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refactorContactPersonList(clientId, clientGraphRepository.getClientContactPersonDataList(clientId));
+        ContactPersonTabDataDTO contactPersonTabDataDTO = new ContactPersonTabDataDTO();
+        contactPersonTabDataDTO.setOrganizationServices(organizationServices);
+        contactPersonTabDataDTO.setStaffPersonalDetailDTOS(staffPersonalDetailDTOS);
+        contactPersonTabDataDTO.setPeopleHouseHolds(clientMinimumDTOs);
+        contactPersonTabDataDTO.setContactPersonDataList(clientContactPersonQueryResults);
+        return contactPersonTabDataDTO;
+
+    }
+
+    public ClientContactPersonStructuredData saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO){
+        ClientContactPersonStructuredData clientContactPersonStructuredData = new ClientContactPersonStructuredData();
+        try{
+
+            clientContactPersonStructuredData.setHouseHolds(contactPersonDTO.getHouseHoldMembers());
+            clientContactPersonStructuredData.setPrimaryStaffId(contactPersonDTO.getPrimaryStaffId());
+            clientContactPersonStructuredData.setSecondaryStaffId(contactPersonDTO.getSecondaryStaffId1());
+            clientContactPersonStructuredData.setSecondaryTwoStaffId(contactPersonDTO.getSecondaryStaffId2());
+            clientContactPersonStructuredData.setSecondaryThreeStaffId(contactPersonDTO.getSecondaryStaffId3());
+            clientContactPersonStructuredData.setServiceId(contactPersonDTO.getServiceTypeId());
+            if(Optional.ofNullable(contactPersonDTO.getPrimaryStaffId()).isPresent()){
+                saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getPrimaryStaffId(), ClientContactPersonRelationship.ContactPersonRelationType.PRIMARY, contactPersonDTO.getHouseHoldMembers());
+            }
+            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId1()).isPresent()) {
+                saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId1(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_ONE, contactPersonDTO.getHouseHoldMembers());
+            }
+            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()) {
+                saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId2(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_TWO, contactPersonDTO.getHouseHoldMembers());
+            }
+            if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId3()).isPresent()){
+                saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId3(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_THREE, contactPersonDTO.getHouseHoldMembers());
+            }
+
+        }catch (Exception exception){
+            logger.error("Error occurs while save contact person for client : "+clientId, exception);
+            clientContactPersonStructuredData = null;
+        }
+
+        return clientContactPersonStructuredData;
+
+    }
+
+    public void saveContactPersonWithGivenRelation(Long clientId, Long serviceId, Long staffId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, List<Long> households){
+        ClientContactPerson clientContactPerson = clientGraphRepository.getClientContactPerson(clientId, contactPersonRelationType, serviceId);
+        OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
+        Staff staff = staffGraphRepository.findOne(staffId);
+        households.add(clientId);
+        if(Optional.ofNullable(clientContactPerson).isPresent()){
+            clientGraphRepository.removeClientContactPersonRelationship(households, contactPersonRelationType, serviceId);
+        }
+       if(!Optional.ofNullable(clientContactPerson).isPresent()) clientContactPerson  = new ClientContactPerson();
+        clientContactPerson.setOrganizationService(organizationService);
+        clientContactPerson.setStaff(staff);
+
+        for(Client client : clientGraphRepository.findAll(households) ){
+            ClientContactPersonRelationship clientContactPersonRelationship = new ClientContactPersonRelationship();
+            clientContactPersonRelationship.setClient(client);
+            clientContactPersonRelationship.setClientContactPerson(clientContactPerson);
+            clientContactPersonRelationship.setContactPersonRelationType(contactPersonRelationType);
+            save(clientContactPersonRelationship);
+        }
+
+
+
+
+
+
+
+    }
+
+    public List<ClientContactPersonStructuredData> refactorContactPersonList(Long clientId, List<ClientContactPersonQueryResultByService> clientContactPersonQueryResultByServices){
+
+List<ClientContactPersonStructuredData> clientContactPersonStructuredDataList = new ArrayList<>();
+        for(ClientContactPersonQueryResultByService clientContactPersonQueryResultByService : clientContactPersonQueryResultByServices){
+            ClientContactPersonStructuredData clientContactPersonStructuredData = new ClientContactPersonStructuredData();
+            clientContactPersonStructuredData.setServiceId(clientContactPersonQueryResultByService.getServiceId());
+            logger.info("clientContactPersonQueryResultByService.getServiceId()------> "+clientContactPersonQueryResultByService.getServiceId());
+            List<Long> houseHolds = new ArrayList();
+            logger.info("clientContactPersonQueryResultByService.getClientContactPersonQueryResults()----> "+clientContactPersonQueryResultByService.getClientContactPersonQueryResults().size());
+            for(Map<String, Object> clientContactPersonQueryResult : clientContactPersonQueryResultByService.getClientContactPersonQueryResults()){
+                if(Optional.ofNullable(clientContactPersonQueryResult.get("primaryStaffId")).isPresent()) clientContactPersonStructuredData.setPrimaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("primaryStaffId").toString()));
+                if(Optional.ofNullable(clientContactPersonQueryResult.get("secondaryStaffId")).isPresent()) clientContactPersonStructuredData.setSecondaryStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryStaffId").toString()));
+                if(Optional.ofNullable(clientContactPersonQueryResult.get("secondaryTwoStaffId")).isPresent()) clientContactPersonStructuredData.setSecondaryTwoStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryTwoStaffId").toString()));
+                if(Optional.ofNullable(clientContactPersonQueryResult.get("secondaryThreeStaffId")).isPresent()) clientContactPersonStructuredData.setSecondaryThreeStaffId(Long.valueOf(clientContactPersonQueryResult.get("secondaryThreeStaffId").toString()));
+                if(Optional.ofNullable(clientContactPersonQueryResult.get("houseHold")).isPresent()) {
+                    Long houseHoldId = Long.valueOf(clientContactPersonQueryResult.get("houseHold").toString());
+                    if(!houseHoldId.equals(clientId) && !houseHolds.contains(houseHoldId))
+                    houseHolds.add(houseHoldId);
+                }
+
+            }
+
+            clientContactPersonStructuredData.setHouseHolds(houseHolds);
+            clientContactPersonStructuredDataList.add(clientContactPersonStructuredData);
+        }
+        return clientContactPersonStructuredDataList;
+
     }
 
 }
