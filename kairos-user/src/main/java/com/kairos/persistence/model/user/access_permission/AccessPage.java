@@ -5,6 +5,7 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_PAGE;
@@ -17,6 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_P
 @NodeEntity
 public class AccessPage extends UserBaseEntity {
 
+    @NotNull(message = "error.name.notnull")
     private String name;
     private boolean isModule;
     private String moduleId;

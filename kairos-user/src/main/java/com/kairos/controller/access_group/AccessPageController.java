@@ -7,6 +7,7 @@ import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -30,14 +32,12 @@ public class AccessPageController {
     private AccessPageService accessPageService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Map<String,Object>> createAccessPage(@RequestBody AccessPage accessPage){
-
+    public ResponseEntity<Map<String,Object>> createAccessPage(@Valid @RequestBody AccessPage accessPage){
         return ResponseHandler.generateResponse(HttpStatus.CREATED,true,accessPageService.createAccessPage(accessPage));
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getAllAccessPage(@RequestBody AccessPage accessPage){
-
         return ResponseHandler.generateResponse(HttpStatus.CREATED,true,accessPageService.getAllAccessPage());
     }
 
@@ -52,6 +52,4 @@ public class AccessPageController {
         accessPageService.setPermissionToAccessPage();
         return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
     }
-
-
 }

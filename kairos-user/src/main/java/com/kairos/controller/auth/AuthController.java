@@ -2,6 +2,7 @@ package com.kairos.controller.auth;
 
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.auth.User;
+import com.kairos.response.dto.web.FirstTimePasswordUpdateDTO;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
 import com.kairos.util.response.ResponseHandler;
@@ -20,6 +21,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -157,20 +159,8 @@ public class AuthController {
 
     /* @PreAuthorize("@customPermissionEvaluator.isAuthorized(#organizationId,#tabId,#httpServletRequest)")*/
     @RequestMapping(value = "/user/password", method = RequestMethod.PUT)
-    ResponseEntity<Map<String,Object>> updatePassword(@RequestBody Map<String,Object> passwordDetails){
-
-        if(passwordDetails.get("password1")!=null && passwordDetails.get("password2")!=null && passwordDetails.get("email")!=null){
-
-            String password1 = passwordDetails.get("password1").toString().trim();
-            String password2 = passwordDetails.get("password2").toString().trim();
-            String email     = passwordDetails.get("email").toString().trim();
-
-            if( !password1.isEmpty() && password1.equals(password2) ){
-                return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updatePassword(email,password1));
-            }
-        }
-        logger.debug("Data in request body is either null or empty");
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Data in request body is either null or empty");
+    ResponseEntity<Map<String,Object>> updatePassword(@Valid @RequestBody FirstTimePasswordUpdateDTO firstTimePasswordUpdateDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updatePassword(firstTimePasswordUpdateDTO));
     }
 
     @RequestMapping(value = "/user/organizations", method = RequestMethod.GET)

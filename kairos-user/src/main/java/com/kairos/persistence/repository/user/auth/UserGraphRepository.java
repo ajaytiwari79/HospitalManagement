@@ -23,7 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface UserGraphRepository extends GraphRepository<User> {
 
 
-    User findByUserName(String userName);
+    User findByUserNameIgnoreCase(String userName);
 
     User findOne(Long id);
 
@@ -71,4 +71,7 @@ public interface UserGraphRepository extends GraphRepository<User> {
             "Match (emp:Employment)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(unitEmp:UnitEmployment)-[:"+PROVIDED_BY+"]->(org:Organization) with collect(org.isKairosHub) as hubList\n" +
             "return true in hubList")
     Boolean isHubMember(Long userId);
+
+    @Query("Match (staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(staff)={0} return user")
+    User getUserByStaffId(Long staffId);
 }

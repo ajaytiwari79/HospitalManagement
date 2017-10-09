@@ -6,12 +6,14 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
+import com.kairos.persistence.model.user.access_permission.AccessPageCustomId;
 import com.kairos.persistence.model.user.access_permission.Tab;
 import com.kairos.persistence.model.user.staff.AccessPermission;
 import com.kairos.persistence.model.user.staff.EmploymentAccessPageRelation;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageCustomIdRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
@@ -27,10 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
@@ -60,11 +59,13 @@ public class AccessPageService extends UserBaseService {
     private AccessGroupRepository accessGroupRepository;
     @Inject
     private TreeStructureService treeStructureService;
+    @Inject
+    private AccessPageCustomIdRepository accessPageCustomIdRepository;
 
     public AccessPage createAccessPage(@RequestBody AccessPage accessPage){
-
-        save(accessPage);
-        List<AccessPermission> accessPermissions = accessPermissionGraphRepository.findAll();
+        accessPage.setModuleId(getTabId(accessPage.isModule()));
+        //save(accessPage);
+       /* List<AccessPermission> accessPermissions = accessPermissionGraphRepository.findAll();
         List<EmploymentAccessPageRelation> employmentAccessPageRelations = new ArrayList<>();
         for (AccessPermission accessPermission : accessPermissions) {
             EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
@@ -74,7 +75,7 @@ public class AccessPageService extends UserBaseService {
             employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
             employmentAccessPageRelations.add(employmentAccessPageRelation);
         }
-        employmentPageGraphRepository.save(employmentAccessPageRelations);
+        employmentPageGraphRepository.save(employmentAccessPageRelations);*/
         return accessPage;
     }
 
@@ -260,5 +261,39 @@ public class AccessPageService extends UserBaseService {
             workPlaces.add(workPlace);
         }
         return workPlaces;
+    }
+
+    private synchronized String getTabId(Boolean isModule){
+
+        AccessPageCustomId accessPageCustomId = accessPageCustomIdRepository.findFirst();
+        if(!Optional.ofNullable(accessPageCustomId).isPresent()){
+            logger.error("AccessPageCustomId collection is not present");
+            throw new InternalError("AccessPageCustomId collection is not present");
+        }
+        String content[];
+        String tabId = null;
+        if(isModule){
+            content = accessPageCustomId.getModuleId().split("_");
+            if(content.length>0){
+                int id = Integer.parseInt(content[1]);
+                id+=1;
+                tabId = "module_" + id;
+                accessPageCustomId.setModuleId(tabId);
+            }
+        } else {
+            content = accessPageCustomId.getTabId().split("_");
+            if(content.length>0){
+                int id = Integer.parseInt(content[1]);
+                id+=1;
+                tabId = "tab_" + id;
+                accessPageCustomId.setTabId(tabId);
+            }
+        }
+        if(!Optional.ofNullable(tabId).isPresent()){
+            throw new InternalError("tab id is not present");
+        }
+        save(accessPageCustomId);
+        System.out.println("id -->" + tabId);
+        return tabId;
     }
 }

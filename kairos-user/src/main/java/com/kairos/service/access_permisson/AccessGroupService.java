@@ -127,16 +127,9 @@ public class AccessGroupService extends UserBaseService {
         return accessGroupList;
     }
 
-    public List<Map<String, Object>> getAccessGroups(long organizationId) {
+    public List<AccessGroup> getAccessGroups(long organizationId) {
 
-        List<Map<String, Object>> list = new ArrayList<>();
-        for (AccessGroup accessGroup : accessGroupRepository.getAccessGroups(organizationId)) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", accessGroup.getId());
-            map.put("name", accessGroup.getName());
-            list.add(map);
-        }
-        return list;
+       return accessGroupRepository.getAccessGroups(organizationId);
     }
 
     public boolean assignAccessGroupToStaff(List<String> accessGroupIds, long staffId) {

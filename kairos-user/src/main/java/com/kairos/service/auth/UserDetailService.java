@@ -37,7 +37,7 @@ public class UserDetailService {
      * @throws UsernameNotFoundException
      */
     public User loadUserByUsername(String userName , String password) throws UsernameNotFoundException {
-        User user=  userRepository.findByUserName(userName);
+        User user=  userRepository.findByUserNameIgnoreCase(userName);
          if (user == null) {
               logger.info("User is null");
                return null;
