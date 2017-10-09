@@ -560,5 +560,13 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.verifyStaffBelongsToUnit(staffId, unitId,type));
     }
 
+    @RequestMapping(value = "/current_user/{userId}", method = RequestMethod.GET)
+    @ApiOperation("fetch staff from given userId ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffByUser(@PathVariable long userId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByUserId(userId));
+    }
+
+
 
 }
