@@ -1442,8 +1442,8 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
        }else{
            clientContactPerson.setOrganizationService(organizationService);
            clientContactPerson.setStaff(staff);
+           save(clientContactPerson);
        }
-
 
 
         households.remove(clientId);
