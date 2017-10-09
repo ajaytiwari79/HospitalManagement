@@ -16,6 +16,7 @@ import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredD
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
+import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -1374,7 +1375,7 @@ public class ClientService extends UserBaseService {
 
     public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId){
         List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllStaffDetailByUnitId(unitId);
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllMainEmploymentStaffDetailByUnitId(unitId, Position.EmploymentType.FULL_TIME);
         List<ClientMinimumDTO> clientMinimumDTOs =  getPeopleInHousehold(clientId);
         List<Long> houseHoldIds = clientGraphRepository.getPeopleInHouseholdIdList(clientId);
         houseHoldIds.add(clientId);
