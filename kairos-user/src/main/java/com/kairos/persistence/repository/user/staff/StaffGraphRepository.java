@@ -5,6 +5,7 @@ import com.kairos.persistence.model.organization.StaffRelationship;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientStaffRelation;
 import com.kairos.persistence.model.user.client.ContactDetail;
+import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.PartialLeave;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -299,6 +300,12 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
             "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments)\n" +
             "return  id(staff) as id, staff.firstName as firstName,staff.lastName as lastName")
     List<StaffPersonalDetailDTO> getAllStaffDetailByUnitId(long unitId);
+
+    @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments ,organization\n" +
+            "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments)\n" +
+            "match (unitEmployments)-[:HAS_POSITION]->(p:Position{employmentType:{1}})\n" +
+            "return  id(staff) as id, staff.firstName as firstName,staff.lastName as lastName")
+    List<StaffPersonalDetailDTO> getAllMainEmploymentStaffDetailByUnitId(long unitId, Position.EmploymentType employmentType);
 
 
 }
