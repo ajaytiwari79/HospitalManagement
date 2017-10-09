@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
@@ -36,8 +37,8 @@ public class WtaRuleTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaRuleTemplateService.getRuleTemplate(countryId));
     }
 
-    @RequestMapping(value = "/rule_templates/{templateType}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @RequestBody WTARuleTemplateDTO templateDTO) {
+    @RequestMapping(value = "/rule_templates/{templateType}", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @Valid @RequestBody WTARuleTemplateDTO templateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaRuleTemplateService.updateRuleTemplate(countryId,templateType, templateDTO));
     }
 

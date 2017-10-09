@@ -1,5 +1,8 @@
 package com.kairos.response.dto.web;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -7,8 +10,11 @@ import java.util.List;
  */
 public class WTARuleTemplateDTO {
 
+    @NotEmpty(message = "error.WTARuleTemplateDTO.name.notEmpty") @NotNull(message = "error.WTARuleTemplateDTO.name.notnull")
     private String name;
+    @NotEmpty(message = "error.WTARuleTemplateDTO.templateType.notEmpty") @NotNull(message = "error.WTARuleTemplateDTO.templateType.notnull")
     private String templateType;
+    @NotEmpty(message = "error.WTARuleTemplateDTO.category.notEmpty")
     private String category;
     private long timeLimit;//1,2,5
     private List<String> balanceType;//1,2,5

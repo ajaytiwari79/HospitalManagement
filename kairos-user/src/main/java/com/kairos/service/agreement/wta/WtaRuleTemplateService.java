@@ -186,26 +186,14 @@ public class WtaRuleTemplateService extends UserBaseService {
 
     public WTARuleTemplateQueryResponse updateRuleTemplate(long countryId, String templateType, WTARuleTemplateDTO templateDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
+        if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country");
         }
 
         WTABaseRuleTemplate oldTemplate = getTemplateByType(countryId, templateType);
-        if (oldTemplate == null) {
-            throw new DataNotFoundByIdException("Invalid TemplateType");
+        if (!Optional.ofNullable(oldTemplate).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid TemplateType "+ templateType);
         }
-
-        wtaRuleTemplateGraphRepository.deleteCategoryFromTemplate(oldTemplate.getId());
-
-        RuleTemplateCategory templateCategory = ruleTemplateCategoryRepository.findByName(countryId, templateDTO.getCategory());
-
-        if (templateCategory == null) {
-            templateCategory = new RuleTemplateCategory(templateDTO.getCategory(), "", false);
-            country.getRuleTemplateCategories().add(templateCategory);
-            save(country);
-            ruleTemplateCategoryRepository.findByName(countryId, templateDTO.getCategory());
-        }
-
         switch (templateType) {
 
             case TEMPLATE1:
@@ -216,6 +204,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 maximumShiftLengthWTATemplate.setBalanceType(templateDTO.getBalanceType());
                 maximumShiftLengthWTATemplate.setCheckAgainstTimeRules(templateDTO.isCheckAgainstTimeRules());
                 oldTemplate = save(maximumShiftLengthWTATemplate);
+
                 break;
 
             case TEMPLATE2:
@@ -307,8 +296,6 @@ public class WtaRuleTemplateService extends UserBaseService {
                 break;
             case TEMPLATE11:
                 MaximumAverageScheduledTimeWTATemplate maximumAverageScheduledTimeWTATemplate = (MaximumAverageScheduledTimeWTATemplate) getTemplateByType(countryId, templateType);
-
-
                 maximumAverageScheduledTimeWTATemplate.setDescription(templateDTO.getDescription());
                 maximumAverageScheduledTimeWTATemplate.setUseShiftTimes(templateDTO.isUseShiftTimes());
                 maximumAverageScheduledTimeWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
@@ -413,6 +400,17 @@ public class WtaRuleTemplateService extends UserBaseService {
         }
 
         oldTemplate.setActive(templateDTO.isActive());
+
+        wtaRuleTemplateGraphRepository.deleteCategoryFromTemplate(oldTemplate.getId());
+
+        RuleTemplateCategory templateCategory =null;
+        if(templateDTO.getCategory()==""){
+            templateCategory =   ruleTemplateCategoryRepository.findByName(countryId, "NONE");
+        }else {
+            templateCategory =   ruleTemplateCategoryRepository.findByName(countryId, templateDTO.getCategory());
+        }
+        if(!Optional.ofNullable(templateCategory).isPresent())
+            throw new InvalidRequestException("Incorrect category "+templateDTO.getCategory());
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = templateCategory.getWtaBaseRuleTemplates();
         wtaBaseRuleTemplates.add(oldTemplate);
         templateCategory.setWtaBaseRuleTemplates(wtaBaseRuleTemplates);
