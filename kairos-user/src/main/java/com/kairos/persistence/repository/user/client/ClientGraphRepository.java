@@ -305,7 +305,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "MATCH (clientContactPerson)-[r2:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(organizationService:OrganizationService) where id(organizationService)={2} delete r1,r2 \n")
      void removeClientContactPersonRelations(List<Long> clientIds, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, Long serviceId);
 
-    @Query("Match (client:Client)-[r:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client)={0} with r \n" +
+    @Query("Match (client:Client)-[r:"+CLIENT_CONTACT_PERSON_RELATION_TYPE+"{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client) in {0} with r \n" +
             "MATCH (clientContactPerson)-[:"+CLIENT_CONTACT_PERSON_SERVICE+"]->(organizationService:OrganizationService) where id(organizationService)={2}  delete r")
     void removeClientContactPersonRelationship(List<Long> clientIds, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, Long serviceId);
 
