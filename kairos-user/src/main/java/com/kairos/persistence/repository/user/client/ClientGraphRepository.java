@@ -326,5 +326,8 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "return id(os) as serviceId,collect({primaryStaffId:case when r.contactPersonRelationType='PRIMARY' then id(staff) else null end,secondaryStaffId:case when r.contactPersonRelationType='SECONDARY_ONE' then id(staff) else null end,secondaryTwoStaffId:case when r.contactPersonRelationType='SECONDARY_TWO' then id(staff) else null end,secondaryThreeStaffId:case when r.contactPersonRelationType='SECONDARY_THREE' then id(staff) else null end,houseHold:id(ps)}) as clientContactPersonQueryResults")
     List<ClientContactPersonQueryResultByService> getClientContactPersonDataList(Long clientId);
 
+    @Query("MATCH (clientContactPerson:ClientContactPerson)-[r:"+CLIENT_CONTACT_PERSON_STAFF+"]->(staff:Staff) where id(clientContactPerson)={0}  delete r")
+    void removeClientContactPersonStaffRelation(Long clientContactPersonId);
+
 
 }
