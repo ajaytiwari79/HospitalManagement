@@ -16,6 +16,7 @@ public class ClientHomeAddressQueryResult {
     private ContactAddress homeAddress;
     private ZipCode zipCode;
     private Municipality municipality;
+    private Long localAreaTagId;
 
     public Municipality getMunicipality() {
         return municipality;
@@ -49,5 +50,13 @@ public class ClientHomeAddressQueryResult {
 
     public void setCitizen(Client citizen) {
         this.citizen = citizen;
+    }
+
+    public Long getLocalAreaTagId() {
+        return localAreaTagId;
+    }
+
+    public void setLocalAreaTagId(Long localAreaTagId) {
+        this.localAreaTagId = localAreaTagId;
     }
 }
