@@ -70,7 +70,7 @@ public class OrganizationMetadataService extends UserBaseService {
             LocalAreaTag areaTag = new LocalAreaTag();
             areaTag.setName(localAreaTag.getName());
             areaTag.setPaths(localAreaTag.getPaths());
-           // areaTag.setColor(localAreaTag.getColor());
+            areaTag.setColor(localAreaTag.getColor());
             organizationMetadataRepository.save(areaTag);
             localAreaTagList.add(areaTag);
             organization.setLocalAreaTags(localAreaTagList);
@@ -87,7 +87,7 @@ public class OrganizationMetadataService extends UserBaseService {
         LocalAreaTag existingLocalAreaTag = organizationMetadataRepository.findOne(localAreaTag.getId());
         existingLocalAreaTag.setPaths(localAreaTag.getPaths());
         existingLocalAreaTag.setName(localAreaTag.getName());
-       // localAreaTag1.setColor(localAreaTag.getColor());
+        existingLocalAreaTag.setColor(localAreaTag.getColor());
 
 
         List<ClientHomeAddressQueryResult> clientHomeAddressQueryResults = clientGraphRepository.getClientsAndHomeAddressByUnitId(unitId);
@@ -96,6 +96,7 @@ public class OrganizationMetadataService extends UserBaseService {
             if(clientHomeAddressQueryResult != null){
                 boolean isVerified = isCoordinateInsidePolygon(existingLocalAreaTag.getPaths(), clientHomeAddressQueryResult.getHomeAddress().getLatitude(),
                         clientHomeAddressQueryResult.getHomeAddress().getLongitude());
+                //TODO Yasir replace findone query from loop
                 Client citizen = clientGraphRepository.findOne(clientHomeAddressQueryResult.getCitizen().getId());
                 if(isVerified){
                     //Client citizen = clientHomeAddressQueryResult.getCitizen();
