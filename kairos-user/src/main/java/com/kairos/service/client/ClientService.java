@@ -1405,20 +1405,14 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
             if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId1()).isPresent()) {
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId1(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_ONE, contactPersonDTO.getHouseHoldMembers());
-            }else{
-                removeClientContactPerson(clientId, contactPersonDTO.getServiceTypeId() , ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_ONE, contactPersonDTO.getHouseHoldMembers());
             }
 
             if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId2()).isPresent()) {
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId2(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_TWO, contactPersonDTO.getHouseHoldMembers());
-            }else{
-                removeClientContactPerson(clientId, contactPersonDTO.getServiceTypeId() , ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_TWO, contactPersonDTO.getHouseHoldMembers());
             }
 
             if(Optional.ofNullable(contactPersonDTO.getSecondaryStaffId3()).isPresent()){
                 saveContactPersonWithGivenRelation(clientId, contactPersonDTO.getServiceTypeId(), contactPersonDTO.getSecondaryStaffId3(), ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_THREE, contactPersonDTO.getHouseHoldMembers());
-            }else{
-                removeClientContactPerson(clientId, contactPersonDTO.getServiceTypeId() , ClientContactPersonRelationship.ContactPersonRelationType.SECONDARY_THREE, contactPersonDTO.getHouseHoldMembers());
             }
 
         }catch (Exception exception){
