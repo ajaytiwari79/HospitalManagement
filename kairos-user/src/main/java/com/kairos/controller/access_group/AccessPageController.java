@@ -1,6 +1,7 @@
 package com.kairos.controller.access_group;
 
 import com.kairos.persistence.model.user.access_permission.AccessPage;
+import com.kairos.persistence.model.user.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.user.access_permission.Tab;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.util.response.ResponseHandler;
@@ -9,22 +10,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_V1;
 
 /**
  * Created by prabjot on 3/1/17.
  */
-@RequestMapping(API_ORGANIZATION_UNIT_URL + "/page")
-@Api(value = API_ORGANIZATION_UNIT_URL)
+@RequestMapping(API_V1+ "/tab")
+@Api(value = API_V1)
 @RestController
 public class AccessPageController {
 
@@ -32,8 +31,14 @@ public class AccessPageController {
     private AccessPageService accessPageService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Map<String,Object>> createAccessPage(@Valid @RequestBody AccessPage accessPage){
-        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,accessPageService.createAccessPage(accessPage));
+    public ResponseEntity<Map<String,Object>> createAccessPage(@Valid @RequestBody AccessPageDTO accessPageDTO){
+        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,accessPageService.createAccessPage(accessPageDTO));
+    }
+
+    @RequestMapping(method = RequestMethod.PUT,value = "/{tabId}")
+    public ResponseEntity<Map<String,Object>> createAccessPage(@PathVariable Long tabId,
+                                                               @Valid @RequestBody AccessPageDTO accessPageDTO){
+        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,accessPageService.updateAccessPage(tabId,accessPageDTO));
     }
 
     @RequestMapping(method = RequestMethod.GET)

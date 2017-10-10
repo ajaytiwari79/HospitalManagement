@@ -1,13 +1,11 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.access_permission.AccessPage;
-import com.kairos.persistence.model.user.access_permission.AccessPageCustomId;
-import com.kairos.persistence.model.user.access_permission.Tab;
+import com.kairos.persistence.model.user.access_permission.*;
 import com.kairos.persistence.model.user.staff.AccessPermission;
 import com.kairos.persistence.model.user.staff.EmploymentAccessPageRelation;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -62,21 +60,33 @@ public class AccessPageService extends UserBaseService {
     @Inject
     private AccessPageCustomIdRepository accessPageCustomIdRepository;
 
-    public AccessPage createAccessPage(@RequestBody AccessPage accessPage){
-        accessPage.setModuleId(getTabId(accessPage.isModule()));
-        //save(accessPage);
-       /* List<AccessPermission> accessPermissions = accessPermissionGraphRepository.findAll();
-        List<EmploymentAccessPageRelation> employmentAccessPageRelations = new ArrayList<>();
-        for (AccessPermission accessPermission : accessPermissions) {
-            EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
-            employmentAccessPageRelation.setRead(true);
-            employmentAccessPageRelation.setWrite(true);
-            employmentAccessPageRelation.setCreationDate(new DateTime().getMillis());
-            employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
-            employmentAccessPageRelations.add(employmentAccessPageRelation);
+    public AccessPage createAccessPage(AccessPageDTO accessPageDTO){
+        AccessPage accessPage = new AccessPage(accessPageDTO.getName(),accessPageDTO.isModule(),
+                getTabId(accessPageDTO.isModule()));
+        if(Optional.ofNullable(accessPageDTO.getParentTabId()).isPresent()){
+            AccessPage parentTab = accessPageRepository.findOne(accessPageDTO.getParentTabId());
+            if(!Optional.ofNullable(parentTab).isPresent()){
+                logger.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
+                throw new DataNotFoundByIdException("Parent access page not found::id " + accessPageDTO.getParentTabId());
+            }
+            List<AccessPage> childTabs = parentTab.getSubPages();
+            childTabs.add(accessPage);
+            parentTab.setSubPages(childTabs);
+            save(parentTab);
+        } else {
+            save(accessPage);
         }
-        employmentPageGraphRepository.save(employmentAccessPageRelations);*/
         return accessPage;
+    }
+
+    public AccessPage updateAccessPage(Long accessPageId,AccessPageDTO accessPageDTO){
+        AccessPage accessPage = (Optional.ofNullable(accessPageId).isPresent())?accessPageRepository.findOne(accessPageId):
+                null;
+        if(!Optional.ofNullable(accessPage).isPresent()){
+            throw new DataNotFoundByIdException("Tab not found: id " + accessPageId);
+        }
+        accessPage.setName(accessPageDTO.getName());
+        return save(accessPage);
     }
 
     public List<AccessPage> getAllAccessPage(){

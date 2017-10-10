@@ -40,7 +40,12 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
             "where id(parent)=id(ps.p) with r2,ps,accessGroup\n" +
             "optional match (child:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(accessGroup)\n" +
             "where id(child)=id(ps.c) with r,r2,ps,accessGroup\n" +
-            "return {name:ps.p.name,id:id(ps.p),selected:case when r2.isEnabled then true else false end,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),selected:case when r.isEnabled then true else false end})} as data")
+            "return {name:ps.p.name,id:id(ps.p),selected:case when r2.isEnabled then true else false end,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),selected:case when r.isEnabled then true else false end})} as data\n" +
+            "UNION\n" +
+            "Match (accessPage:AccessPage{isModule:true}) where not (accessPage)-[:"+SUB_PAGE+"]->() with accessPage\n" +
+            "match (accessGroup:AccessGroup) where id(accessGroup)={0} with accessGroup,accessPage\n" +
+            "optional match (accessPage:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(accessGroup)\n" +
+            "return {name:accessPage.name,id:id(accessPage),selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
     List<Map<String,Object>> getAccessPageHierarchy(long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup),(accessPermission:AccessPermission) where id(accessPermission)={0} AND id(accessGroup)={1}\n" +
