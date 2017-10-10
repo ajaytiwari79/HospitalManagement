@@ -2,6 +2,7 @@ package com.kairos.controller.access_group;
 
 import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.access_permission.AccessPageDTO;
+import com.kairos.persistence.model.user.access_permission.AccessPageStatusDTO;
 import com.kairos.persistence.model.user.access_permission.Tab;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.util.response.ResponseHandler;
@@ -17,12 +18,13 @@ import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
+import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.API_V1;
 
 /**
  * Created by prabjot on 3/1/17.
  */
-@RequestMapping(API_V1+ "/tab")
+@RequestMapping(API_ORGANIZATION_URL+ "/tab")
 @Api(value = API_V1)
 @RestController
 public class AccessPageController {
@@ -35,16 +37,28 @@ public class AccessPageController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED,true,accessPageService.createAccessPage(accessPageDTO));
     }
 
-    @RequestMapping(method = RequestMethod.PUT,value = "/{tabId}")
+    @RequestMapping(value = "/{tabId}",method = RequestMethod.PUT)
     public ResponseEntity<Map<String,Object>> createAccessPage(@PathVariable Long tabId,
                                                                @Valid @RequestBody AccessPageDTO accessPageDTO){
-        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,accessPageService.updateAccessPage(tabId,accessPageDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateAccessPage(tabId,accessPageDTO));
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<Map<String,Object>> getAllAccessPage(@RequestBody AccessPage accessPage){
-        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,accessPageService.getAllAccessPage());
+    public ResponseEntity<Map<String,Object>> getMainTabs(){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getMainTabs());
     }
+
+    @RequestMapping(value = "/{tabId}/tabs",method = RequestMethod.GET)
+    public ResponseEntity<Map<String,Object>> getChildTabs(@PathVariable Long tabId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getChildTabs(tabId));
+    }
+
+    @RequestMapping(value = "/{tabId}/status",method = RequestMethod.PUT)
+    public ResponseEntity<Map<String,Object>> updateStatusOfTab(@PathVariable Long tabId,
+                                                                @Valid @RequestBody AccessPageStatusDTO accessPageStatusDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateStatus(accessPageStatusDTO.getStatus(),tabId));
+    }
+
 
     @RequestMapping(value = "/xml" ,method = RequestMethod.POST,consumes = {MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<Map<String,Object>> parseXml(@RequestBody Tab tab){

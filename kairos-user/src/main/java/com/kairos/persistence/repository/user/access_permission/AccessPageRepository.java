@@ -101,4 +101,12 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
             "return module.name as name,id(module) as id,module.moduleId as moduleId,true as read,true as write,module.isModule as isModule,collect({name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:true,write:true,isModule:subPage.isModule}) as children")
     List<AccessPageQueryResult> getTabsPermissionForHubMember();
 
+    @Query("Match (accessPage:AccessPage{isModule:true}) return accessPage")
+    List<AccessPage> getMainTabs();
+
+    @Query("Match (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) where id(accessPage)={0} return subPage")
+    List<AccessPage> getChildTabs(Long tabId);
+
 }
+
+

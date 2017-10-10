@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.access_permission;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -16,6 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_P
 /**
  * Created by arvind on 24/10/16.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class AccessPage extends UserBaseEntity {

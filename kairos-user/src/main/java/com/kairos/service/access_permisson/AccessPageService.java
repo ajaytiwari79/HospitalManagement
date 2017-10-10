@@ -89,8 +89,21 @@ public class AccessPageService extends UserBaseService {
         return save(accessPage);
     }
 
-    public List<AccessPage> getAllAccessPage(){
-        return accessPageRepository.findAll();
+    public List<AccessPage> getMainTabs(){
+        return accessPageRepository.getMainTabs();
+    }
+
+    public List<AccessPage> getChildTabs(Long tabId){
+        return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.getChildTabs(tabId):Collections.emptyList();
+    }
+
+    public AccessPage updateStatus(boolean status,Long tabId){
+        AccessPage accessPage = (Optional.ofNullable(tabId).isPresent())?accessPageRepository.findOne(tabId):null;
+        if(!Optional.ofNullable(accessPage).isPresent()){
+            throw new DataNotFoundByIdException("Incorrect tab id " + tabId);
+        }
+        accessPage.setActive(status);
+        return save(accessPage);
     }
 
     public void createAccessPageByXml(Tab tab){

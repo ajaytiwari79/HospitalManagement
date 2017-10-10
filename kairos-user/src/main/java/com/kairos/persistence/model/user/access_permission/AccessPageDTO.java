@@ -1,10 +1,13 @@
 package com.kairos.persistence.model.user.access_permission;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by prabjot on 10/10/17.
  */
 public class AccessPageDTO {
 
+    @NotNull(message = "error.name.notnull")
     private String name;
     private boolean module;
     private Long parentTabId;
