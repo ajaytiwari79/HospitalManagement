@@ -179,7 +179,7 @@ public class Organization extends UserBaseEntity {
     private int dayShiftTimeDeduction = 4; //in percentage
 
     private int nightShiftTimeDeduction = 7; //in percentage
-
+    private boolean phaseGenerated=true;
 
     @Relationship(type = HAS_POSITION_NAME)
     private List<PositionName> positionNameList = new ArrayList<>();
@@ -712,5 +712,13 @@ public class Organization extends UserBaseEntity {
 
     public void setPositionNameList(List<PositionName> positionNameList) {
         this.positionNameList = positionNameList;
+    }
+
+    public boolean isPhaseGenerated() {
+        return phaseGenerated;
+    }
+
+    public void setPhaseGenerated(boolean phaseGenerated) {
+        this.phaseGenerated = phaseGenerated;
     }
 }

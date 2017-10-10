@@ -814,7 +814,7 @@ public class StaffService extends UserBaseService {
         user.setLastName(staffCreationDTO.getLastName());
         String defaultPassword = user.getFirstName().trim() + "@kairos";
         user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
-        if (Optional.ofNullable(staffCreationDTO.getCprNumber()).isPresent()) {
+        if (!StringUtils.isBlank(staffCreationDTO.getCprNumber())) {
             user.setAge(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1)));
         }
     }

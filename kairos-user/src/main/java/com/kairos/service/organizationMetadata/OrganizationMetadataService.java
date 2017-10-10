@@ -16,10 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 
@@ -73,7 +70,7 @@ public class OrganizationMetadataService extends UserBaseService {
             LocalAreaTag areaTag = new LocalAreaTag();
             areaTag.setName(localAreaTag.getName());
             areaTag.setPaths(localAreaTag.getPaths());
-           // areaTag.setColor(localAreaTag.getColor());
+            areaTag.setColor(localAreaTag.getColor());
             organizationMetadataRepository.save(areaTag);
             localAreaTagList.add(areaTag);
             organization.setLocalAreaTags(localAreaTagList);
@@ -90,7 +87,7 @@ public class OrganizationMetadataService extends UserBaseService {
         LocalAreaTag existingLocalAreaTag = organizationMetadataRepository.findOne(localAreaTag.getId());
         existingLocalAreaTag.setPaths(localAreaTag.getPaths());
         existingLocalAreaTag.setName(localAreaTag.getName());
-       // localAreaTag1.setColor(localAreaTag.getColor());
+        existingLocalAreaTag.setColor(localAreaTag.getColor());
 
 
         List<ClientHomeAddressQueryResult> clientHomeAddressQueryResults = clientGraphRepository.getClientsAndHomeAddressByUnitId(unitId);
@@ -99,10 +96,17 @@ public class OrganizationMetadataService extends UserBaseService {
             if(clientHomeAddressQueryResult != null){
                 boolean isVerified = isCoordinateInsidePolygon(existingLocalAreaTag.getPaths(), clientHomeAddressQueryResult.getHomeAddress().getLatitude(),
                         clientHomeAddressQueryResult.getHomeAddress().getLongitude());
+                //TODO Yasir replace findone query from loop
+                Client citizen = clientGraphRepository.findOne(clientHomeAddressQueryResult.getCitizen().getId());
                 if(isVerified){
-                    Client citizen = clientHomeAddressQueryResult.getCitizen();
+                    //Client citizen = clientHomeAddressQueryResult.getCitizen();
                     citizen.setLocalAreaTag(existingLocalAreaTag);
                     citizenList.add(citizen);
+                }else if (Optional.ofNullable(clientHomeAddressQueryResult.getLocalAreaTagId()).isPresent()) {
+                    if(existingLocalAreaTag.getId().longValue() == clientHomeAddressQueryResult.getLocalAreaTagId().longValue()){
+                        citizen.setLocalAreaTag(null);
+                        citizenList.add(citizen);
+                    }
                 }
             }
         }
