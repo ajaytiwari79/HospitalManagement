@@ -25,6 +25,7 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.FileUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -293,6 +294,14 @@ public class ClientExtendedService extends UserBaseService {
         clientGraphRepository.save(nextToKin);
         return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + FORWARD_SLASH,
                 nextToKinDTO.getRelationTypeId(),nextToKinDTO);
+    }
+
+    public NextToKinQueryResult getNextToKinByCprNumber(String cprNumber){
+        if(StringUtils.isEmpty(cprNumber) || cprNumber.length()<10){
+            logger.error("Cpr number is incorrect " + cprNumber);
+        }
+        return clientGraphRepository.getNextToKinByCprNumber(cprNumber,envConfig.getServerHost() + FORWARD_SLASH);
+
     }
 
     public Map<String, Object> setTransportationDetails(Client client) {

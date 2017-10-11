@@ -130,6 +130,13 @@ public class ClientController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO,clientId));
     }
 
+    // NextToKin
+    @ApiOperation("get next to kin by CPR")
+    @RequestMapping(value = "/nextToKin/cpr_number", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getNextToKinByCprNumber(@RequestBody Map<String,String> cprInfo) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.getNextToKinByCprNumber(cprInfo.get("cprNumber")));
+    }
+
 
     // Client Profile Picture
     @RequestMapping(value = "/{clientId}/next_to_Kin/image", method = RequestMethod.POST)
@@ -566,7 +573,7 @@ public class ClientController {
     @ApiOperation("get required data for task creation")
     private ResponseEntity<Map<String, Object>> generateIndividualTask(@PathVariable Long  citizenId
             , @PathVariable Long  unitId, OAuth2Authentication authentication){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 clientService.getPrerequisitesForTaskCreation(authentication.getUserAuthentication().getPrincipal().toString(),unitId,citizenId));
     }
 
