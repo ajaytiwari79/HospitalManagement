@@ -116,7 +116,7 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
     AccessPage updateAccessTab(Long id, String name);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n\n" +
-            "Optional Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages set pages.active=false return distinct true")
+            "Optional Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages set pages.active={1} return distinct true")
     Boolean updateStatusOfAccessTabs(Long tabId,Boolean active);
 
 }
