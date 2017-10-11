@@ -35,7 +35,7 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
     @Query("Match (n:UnitEmployment)-[:"+HAS_ACCESS_PERMISSION+"]->(accessPermission:AccessPermission)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(p:AccessPage) where id(n)={0} AND id(p)={1} SET r.isRead={2} return r")
     void modifyAccessPagePermission(long unitEmploymentId, long accessPageId, boolean value);
 
-    @Query("MATCH path=(accessPage:AccessPage)-[:"+SUB_PAGE+"*]->() WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with ps\n" +
+    @Query("MATCH path=(accessPage:AccessPage{active:true})-[:"+SUB_PAGE+"*]->(subPage:AccessPage{active:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with ps\n" +
             "match (accessGroup:AccessGroup) where id(accessGroup)={0} with accessGroup,ps\n" +
             "optional match (parent:AccessPage)<-[r2:"+HAS_ACCESS_OF_TABS+"]-(accessGroup)\n" +
             "where id(parent)=id(ps.p) with r2,ps,accessGroup\n" +
@@ -43,7 +43,7 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
             "where id(child)=id(ps.c) with r,r2,ps,accessGroup\n" +
             "return {name:ps.p.name,id:id(ps.p),selected:case when r2.isEnabled then true else false end,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),selected:case when r.isEnabled then true else false end})} as data\n" +
             "UNION\n" +
-            "Match (accessPage:AccessPage{isModule:true}) where not (accessPage)-[:"+SUB_PAGE+"]->() with accessPage\n" +
+            "Match (accessPage:AccessPage{isModule:true,active:true}) where not (accessPage)-[:"+SUB_PAGE+"]->() with accessPage\n" +
             "match (accessGroup:AccessGroup) where id(accessGroup)={0} with accessGroup,accessPage\n" +
             "optional match (accessPage:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(accessGroup)\n" +
             "return {name:accessPage.name,id:id(accessPage),selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
@@ -115,7 +115,8 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
     @Query("Match (accessPage:AccessPage) where id(accessPage)={0} set accessPage.name={1} return accessPage")
     AccessPage updateAccessTab(Long id, String name);
 
-    @Query("Match (n:AccessPage)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) where id(n)={0} with n+[subPage] as coll unwind coll as pages with distinct pages set pages.active={1} return distinct true")
+    @Query("Match (n:AccessPage) where id(n)={0} with n\n" +
+            "Optional Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages set pages.active=false return distinct true")
     Boolean updateStatusOfAccessTabs(Long tabId,Boolean active);
 
 }
