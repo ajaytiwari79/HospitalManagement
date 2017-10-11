@@ -17,6 +17,8 @@ public class AccessPageQueryResult {
     private boolean isModule;
     private boolean isRead;
     private boolean isWrite;
+    private boolean active;
+
 
     public String getModuleId() {
         return moduleId;
@@ -85,6 +87,14 @@ public class AccessPageQueryResult {
 
     public void setModule(boolean module) {
         isModule = module;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     @Override

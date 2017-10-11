@@ -56,7 +56,7 @@ public class AccessPageController {
     @RequestMapping(value = "/{tabId}/status",method = RequestMethod.PUT)
     public ResponseEntity<Map<String,Object>> updateStatusOfTab(@PathVariable Long tabId,
                                                                 @Valid @RequestBody AccessPageStatusDTO accessPageStatusDTO){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateStatus(accessPageStatusDTO.getStatus(),tabId));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateStatus(accessPageStatusDTO.getActive(),tabId));
     }
 
 

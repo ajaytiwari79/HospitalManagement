@@ -80,30 +80,24 @@ public class AccessPageService extends UserBaseService {
     }
 
     public AccessPage updateAccessPage(Long accessPageId,AccessPageDTO accessPageDTO){
-        AccessPage accessPage = (Optional.ofNullable(accessPageId).isPresent())?accessPageRepository.findOne(accessPageId):
-                null;
+        AccessPage accessPage = (Optional.ofNullable(accessPageId).isPresent())?accessPageRepository.
+                updateAccessTab(accessPageId,accessPageDTO.getName()): null;
         if(!Optional.ofNullable(accessPage).isPresent()){
             throw new DataNotFoundByIdException("Tab not found: id " + accessPageId);
         }
-        accessPage.setName(accessPageDTO.getName());
-        return save(accessPage);
+        return accessPage;
     }
 
-    public List<AccessPage> getMainTabs(){
+    public List<AccessPageDTO> getMainTabs(){
         return accessPageRepository.getMainTabs();
     }
 
-    public List<AccessPage> getChildTabs(Long tabId){
+    public List<AccessPageDTO> getChildTabs(Long tabId){
         return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.getChildTabs(tabId):Collections.emptyList();
     }
 
-    public AccessPage updateStatus(boolean status,Long tabId){
-        AccessPage accessPage = (Optional.ofNullable(tabId).isPresent())?accessPageRepository.findOne(tabId):null;
-        if(!Optional.ofNullable(accessPage).isPresent()){
-            throw new DataNotFoundByIdException("Incorrect tab id " + tabId);
-        }
-        accessPage.setActive(status);
-        return save(accessPage);
+    public Boolean updateStatus(boolean active,Long tabId){
+        return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
     }
 
     public void createAccessPageByXml(Tab tab){

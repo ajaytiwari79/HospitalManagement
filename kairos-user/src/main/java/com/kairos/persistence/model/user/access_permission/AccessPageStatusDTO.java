@@ -8,13 +8,13 @@ import javax.validation.constraints.NotNull;
 public class AccessPageStatusDTO {
 
     @NotNull(message = "status can not be null")
-    private Boolean status;
+    private Boolean active;
 
-    public Boolean getStatus() {
-        return status;
+    public Boolean getActive() {
+        return active;
     }
 
-    public void setStatus(Boolean status) {
-        this.status = status;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }
