@@ -1,17 +1,17 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.access_permission.AccessPage;
-import com.kairos.persistence.model.user.access_permission.Tab;
+import com.kairos.persistence.model.user.access_permission.*;
 import com.kairos.persistence.model.user.staff.AccessPermission;
 import com.kairos.persistence.model.user.staff.EmploymentAccessPageRelation;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageCustomIdRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
@@ -60,26 +57,47 @@ public class AccessPageService extends UserBaseService {
     private AccessGroupRepository accessGroupRepository;
     @Inject
     private TreeStructureService treeStructureService;
+    @Inject
+    private AccessPageCustomIdRepository accessPageCustomIdRepository;
 
-    public AccessPage createAccessPage(@RequestBody AccessPage accessPage){
-
-        save(accessPage);
-        List<AccessPermission> accessPermissions = accessPermissionGraphRepository.findAll();
-        List<EmploymentAccessPageRelation> employmentAccessPageRelations = new ArrayList<>();
-        for (AccessPermission accessPermission : accessPermissions) {
-            EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);
-            employmentAccessPageRelation.setRead(true);
-            employmentAccessPageRelation.setWrite(true);
-            employmentAccessPageRelation.setCreationDate(new DateTime().getMillis());
-            employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
-            employmentAccessPageRelations.add(employmentAccessPageRelation);
+    public AccessPage createAccessPage(AccessPageDTO accessPageDTO){
+        AccessPage accessPage = new AccessPage(accessPageDTO.getName(),accessPageDTO.isModule(),
+                getTabId(accessPageDTO.isModule()));
+        if(Optional.ofNullable(accessPageDTO.getParentTabId()).isPresent()){
+            AccessPage parentTab = accessPageRepository.findOne(accessPageDTO.getParentTabId());
+            if(!Optional.ofNullable(parentTab).isPresent()){
+                logger.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
+                throw new DataNotFoundByIdException("Parent access page not found::id " + accessPageDTO.getParentTabId());
+            }
+            List<AccessPage> childTabs = parentTab.getSubPages();
+            childTabs.add(accessPage);
+            parentTab.setSubPages(childTabs);
+            save(parentTab);
+        } else {
+            save(accessPage);
         }
-        employmentPageGraphRepository.save(employmentAccessPageRelations);
         return accessPage;
     }
 
-    public List<AccessPage> getAllAccessPage(){
-        return accessPageRepository.findAll();
+    public AccessPage updateAccessPage(Long accessPageId,AccessPageDTO accessPageDTO){
+        AccessPage accessPage = (Optional.ofNullable(accessPageId).isPresent())?accessPageRepository.
+                updateAccessTab(accessPageId,accessPageDTO.getName()): null;
+        if(!Optional.ofNullable(accessPage).isPresent()){
+            throw new DataNotFoundByIdException("Tab not found: id " + accessPageId);
+        }
+        return accessPage;
+    }
+
+    public List<AccessPageDTO> getMainTabs(){
+        return accessPageRepository.getMainTabs();
+    }
+
+    public List<AccessPageDTO> getChildTabs(Long tabId){
+        return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.getChildTabs(tabId):Collections.emptyList();
+    }
+
+    public Boolean updateStatus(boolean active,Long tabId){
+        return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
     }
 
     public void createAccessPageByXml(Tab tab){
@@ -260,5 +278,39 @@ public class AccessPageService extends UserBaseService {
             workPlaces.add(workPlace);
         }
         return workPlaces;
+    }
+
+    private synchronized String getTabId(Boolean isModule){
+
+        AccessPageCustomId accessPageCustomId = accessPageCustomIdRepository.findFirst();
+        if(!Optional.ofNullable(accessPageCustomId).isPresent()){
+            logger.error("AccessPageCustomId collection is not present");
+            throw new InternalError("AccessPageCustomId collection is not present");
+        }
+        String content[];
+        String tabId = null;
+        if(isModule){
+            content = accessPageCustomId.getModuleId().split("_");
+            if(content.length>0){
+                int id = Integer.parseInt(content[1]);
+                id+=1;
+                tabId = "module_" + id;
+                accessPageCustomId.setModuleId(tabId);
+            }
+        } else {
+            content = accessPageCustomId.getTabId().split("_");
+            if(content.length>0){
+                int id = Integer.parseInt(content[1]);
+                id+=1;
+                tabId = "tab_" + id;
+                accessPageCustomId.setTabId(tabId);
+            }
+        }
+        if(!Optional.ofNullable(tabId).isPresent()){
+            throw new InternalError("tab id is not present");
+        }
+        save(accessPageCustomId);
+        System.out.println("id -->" + tabId);
+        return tabId;
     }
 }
