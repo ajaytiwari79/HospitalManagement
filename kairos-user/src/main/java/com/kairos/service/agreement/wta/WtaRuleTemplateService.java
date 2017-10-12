@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.user.agreement.wta.templates.*;
+import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.TemplateCategoryRelationGraphRepository;
