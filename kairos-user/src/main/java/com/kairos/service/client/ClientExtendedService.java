@@ -103,6 +103,12 @@ public class ClientExtendedService extends UserBaseService {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
+
+        if(clientGraphRepository.citizenInNextToKinList(clientId,nextToKinDTO.getCprNumber())){
+            logger.error("Next to kin already exist with CPR number " + nextToKinDTO.getCprNumber());
+            throw new DuplicateDataException("Next to kin already exist with CPR number");
+        }
+
         Long homeAddressId = null;
         Client nextToKin = validateCPRNumber(nextToKinDTO.getCprNumber());
         ContactDetail contactDetail = null;

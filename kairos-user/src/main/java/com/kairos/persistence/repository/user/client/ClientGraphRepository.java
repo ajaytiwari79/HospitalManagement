@@ -248,6 +248,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             ",latitude:homeAddress.latitude,municipalities:result} else null end as homeAddress")
     NextToKinQueryResult getNextToKinByCprNumber(String cprNumber,String imageUrl);
 
+    @Query("Match (c:Client)-[r:NEXT_TO_KIN]->(nextToKin:Client{cprNumber:{1}}) where id(c)={0} return count(r)>0")
+    Boolean citizenInNextToKinList(Long clientId,String cprNumber);
+
     @Query("Match (client:Client) where id(client)={0} with client\n" +
             "Match (houseHoldPeople:Client) where id(houseHoldPeople)={1} with client,houseHoldPeople\n" +
             "Merge (client)-[r:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(houseHoldPeople)\n" +
