@@ -418,6 +418,7 @@ public class WtaRuleTemplateService extends UserBaseService {
         return wtaRuleTemplateGraphRepository.getRuleTemplateAndCategoryById(oldTemplate.getId());
     }
 
+
     private WTABaseRuleTemplate getTemplateByType(Long countryId, String templateType) {
         return countryGraphRepository.getTemplateByType(countryId, templateType);
     }
@@ -466,6 +467,9 @@ public class WtaRuleTemplateService extends UserBaseService {
         });
 
         return wtaBaseRuleTemplateDTOS;
+    }
+    public  WTARuleTemplateQueryResponse getRuleTemplateById(Long ruleTemplateId){
+        return wtaRuleTemplateGraphRepository.getRuleTemplateAndCategoryById(ruleTemplateId);
     }
 
 }
