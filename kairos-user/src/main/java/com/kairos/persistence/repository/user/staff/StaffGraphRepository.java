@@ -309,7 +309,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments ,organization\n" +
             "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments)\n" +
             "match (unitEmployments)-[:HAS_POSITION]->(p:Position{employmentType:{1}})\n" +
-            "return  id(staff) as id, staff.firstName as firstName,staff.lastName as lastName")
+            "return distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName")
     List<StaffPersonalDetailDTO> getAllMainEmploymentStaffDetailByUnitId(long unitId, Position.EmploymentType employmentType);
 
 

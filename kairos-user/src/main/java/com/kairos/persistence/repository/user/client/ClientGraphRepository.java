@@ -246,7 +246,8 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     void createHouseHoldRelationship(long clientId,long houseHoldPeopleId,long creationDate,long lastModificationDate);
 
     @Query("MATCH (citizen:Client{citizenDead:false})-[:GET_SERVICE_FROM]->(o:Organization)  where id(o)= {0} with citizen\n"+
-            "MATCH (citizen)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) WHERE homeAddress IS NOT NULL return citizen, homeAddress")
+            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,citizen\n"+
+            "MATCH (citizen)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) WHERE homeAddress IS NOT NULL return citizen, homeAddress, id(lat) as localAreaTagId")
     List<ClientHomeAddressQueryResult> getClientsAndHomeAddressByUnitId(long unitId);
 
     @Query("MATCH (c:Client{citizenDead:false})-[r:"+HAS_LOCAL_AREA_TAG+"]-(lat:LocalAreaTag) where id(lat)= {0} return c")
@@ -320,7 +321,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
     @Query("Match (client:Client)-[r:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson:ClientContactPerson) where id(client)={0} with clientContactPerson,r\n" +
             "OPTIONAL MATCH (client)-[:PEOPLE_IN_HOUSEHOLD_LIST]-(ps:Client) with ps,clientContactPerson,r\n" +
-            "Match (ps)-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson)  with ps,clientContactPerson,r\n" +
+            "OPTIONAL Match (ps)-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson)  with ps,clientContactPerson,r\n" +
             "Match (staff:Staff)<-[:CLIENT_CONTACT_PERSON_STAFF]-(clientContactPerson)-[:CLIENT_CONTACT_PERSON_SERVICE]->(os:OrganizationService) with os,clientContactPerson as cp,r,staff,ps\n" +
             "return id(os) as serviceId,collect({primaryStaffId:case when r.contactPersonRelationType='PRIMARY' then id(staff) else null end,secondaryStaffId:case when r.contactPersonRelationType='SECONDARY_ONE' then id(staff) else null end,secondaryTwoStaffId:case when r.contactPersonRelationType='SECONDARY_TWO' then id(staff) else null end,secondaryThreeStaffId:case when r.contactPersonRelationType='SECONDARY_THREE' then id(staff) else null end,houseHold:id(ps)}) as clientContactPersonQueryResults")
     List<ClientContactPersonQueryResultByService> getClientContactPersonDataList(Long clientId);
