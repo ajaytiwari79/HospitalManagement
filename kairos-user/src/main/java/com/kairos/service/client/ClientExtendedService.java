@@ -103,8 +103,8 @@ public class ClientExtendedService extends UserBaseService {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
-        Client nextToKin = validateCPRNumber(nextToKinDTO.getCprNumber());
         Long homeAddressId = null;
+        Client nextToKin = validateCPRNumber(nextToKinDTO.getCprNumber());
         ContactDetail contactDetail = null;
         if(!Optional.ofNullable(nextToKin).isPresent()){
             nextToKin = new Client();
