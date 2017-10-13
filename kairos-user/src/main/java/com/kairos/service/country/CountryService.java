@@ -370,13 +370,13 @@ public class CountryService extends UserBaseService {
         return true;
     }
 
-    public Vehicle addVehicle(long countryId, Vehicle vehicle){
-        Country country = countryGraphRepository.findOne(countryId);
-        if(country == null){
-            logger.debug("Finding country by id::" + countryId);
+    public Vehicle addVehicle(Long countryId, Vehicle vehicle){
+        Country country = (Optional.ofNullable(countryId).isPresent())?countryGraphRepository.findOne(countryId):
+                null;
+        if(Optional.ofNullable(country).isPresent()){
+            logger.error("Finding country by id::" + countryId);
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
-
         country.addResources(vehicle);
         countryGraphRepository.save(country);
         return vehicle;
