@@ -1006,9 +1006,10 @@ public class OrganizationService extends UserBaseService {
      * @return
      */
     public OrganizationSkillAndOrganizationTypesDTO getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(Long unitId){
-         Map<String, Object> availableSkills=skillService.getAllAvailableSkills(unitId,"organization");
+        Map<String,Object> skills=new HashMap<>();
+        skills.put("skill",skillService.getSkillsOfOrganization(unitId));
         OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO=this.getOrganizationTypeAndSubTypes(unitId);
-        return new OrganizationSkillAndOrganizationTypesDTO(organizationTypeAndSubTypeDTO,availableSkills);
+        return new OrganizationSkillAndOrganizationTypesDTO(organizationTypeAndSubTypeDTO,skillService.getSkillsOfOrganization(unitId));
     }
 
     public List<Vehicle> getVehicleList(long unitId){

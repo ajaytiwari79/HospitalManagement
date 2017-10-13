@@ -2,19 +2,20 @@ package com.kairos.client.dto;
 
 import com.kairos.persistence.model.organization.OrganizationTypeAndSubTypeDTO;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class OrganizationSkillAndOrganizationTypesDTO {
 private OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO;
-private Map<String, Object> availableSkills=new HashMap<>();
+private List<Map<String,Object>> availableSkills=new ArrayList<>();
 
     public OrganizationSkillAndOrganizationTypesDTO() {
         //default constructor
     }
 
     public OrganizationSkillAndOrganizationTypesDTO(OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO,
-         Map<String, Object> availableSkills) {
+                                                    List<Map<String,Object>> availableSkills) {
         this.organizationTypeAndSubTypeDTO = organizationTypeAndSubTypeDTO;
         this.availableSkills = availableSkills;
     }
@@ -27,11 +28,12 @@ private Map<String, Object> availableSkills=new HashMap<>();
         this.organizationTypeAndSubTypeDTO = organizationTypeAndSubTypeDTO;
     }
 
-    public Map<String, Object> getAvailableSkills() {
+    public List<Map<String, Object>> getAvailableSkills() {
         return availableSkills;
     }
 
-    public void setAvailableSkills(Map<String, Object> availableSkills) {
+
+    public void setAvailableSkills(List<Map<String, Object>> availableSkills) {
         this.availableSkills = availableSkills;
     }
 }

@@ -1030,7 +1030,7 @@ public class CountryController {
 
 
 
-    @RequestMapping(value = COUNTRY_URL + "/dayType", method = RequestMethod.GET)
+    @RequestMapping(value = COUNTRY_URL + "/dayTypebydate", method = RequestMethod.GET)
     @ApiOperation("get dayType in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> getDayTypee(@PathVariable Long countryId,@RequestParam("date")Date date){
