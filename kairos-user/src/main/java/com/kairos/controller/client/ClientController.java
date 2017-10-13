@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.*;
 
@@ -119,15 +120,23 @@ public class ClientController {
     // NextToKin
     @ApiOperation("create NextToKin")
     @RequestMapping(value = "/{clientId}/nextToKin", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> createNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable Long unitId, @PathVariable Long clientId) {
+    ResponseEntity<Map<String, Object>> createNextToKin(@Valid @RequestBody NextToKinDTO nextToKinDTO, @PathVariable Long unitId, @PathVariable Long clientId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.saveNextToKin(unitId,clientId,nextToKinDTO));
     }
 
     // NextToKin
     @ApiOperation("update NextToKin")
     @RequestMapping(value = "/{clientId}/nextToKin/{nextToKinId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long nextToKinId, @PathVariable long clientId) {
+    ResponseEntity<Map<String, Object>> updateNextToKin(@Valid @RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId,
+                                                        @PathVariable long nextToKinId, @PathVariable long clientId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO,clientId));
+    }
+
+    // NextToKin
+    @ApiOperation("get next to kin by CPR")
+    @RequestMapping(value = "/nextToKin/cpr_number", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getNextToKinByCprNumber(@RequestBody Map<String,String> cprInfo) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.getNextToKinByCprNumber(cprInfo.get("cprNumber")));
     }
 
 
@@ -566,7 +575,7 @@ public class ClientController {
     @ApiOperation("get required data for task creation")
     private ResponseEntity<Map<String, Object>> generateIndividualTask(@PathVariable Long  citizenId
             , @PathVariable Long  unitId, OAuth2Authentication authentication){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 clientService.getPrerequisitesForTaskCreation(authentication.getUserAuthentication().getPrincipal().toString(),unitId,citizenId));
     }
 
