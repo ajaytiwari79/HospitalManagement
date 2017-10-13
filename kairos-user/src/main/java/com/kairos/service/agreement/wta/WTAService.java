@@ -68,7 +68,7 @@ public class WTAService extends UserBaseService {
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country id " + countryId);
         }
-       // checkUniquenessOfData(countryId, wtaDTO);
+        checkUniquenessOfData(countryId, wtaDTO);
         List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList=new ArrayList<WTAWithCategoryDTO>();
         WorkingTimeAgreement wta = prepareWta(countryId, wtaDTO,wtaRuleTemplateQueryResponseArrayList);
 
@@ -78,11 +78,6 @@ public class WTAService extends UserBaseService {
         HashMap hs = new HashMap();
         hs.put("id", wta.getId());
         hs.put("name", wta.getName());
-//        wta.getRuleTemplates().forEach(ruleTemplate->{
-//            WTAWithCategoryDTO wtaWithCategoryDTO= new WTAWithCategoryDTO();
-//            BeanUtils.copyProperties(ruleTemplate,wtaWithCategoryDTO);
-//            ruleTemplates.add(wtaWithCategoryDTO);
-//        });
         hs.put("ruleTemplates",wtaRuleTemplateQueryResponseArrayList);
         return hs;
     }
@@ -122,7 +117,6 @@ public class WTAService extends UserBaseService {
         wta.setOrganizationSubType(organizationSubType);
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<WTABaseRuleTemplate>();
 
-        // wtaBaseRuleTemplates = setRuleTemplates(countryId, wta, wtaDTO);
         copyRuleTemplates(countryId, wtaDTO, wtaBaseRuleTemplates, wtaRuleTemplateQueryResponseArrayList);
 
         wta.setRuleTemplates(wtaBaseRuleTemplates);
@@ -180,7 +174,7 @@ public class WTAService extends UserBaseService {
         return;
     }
 
-    public boolean updateWta(long countryId, long wtaId, WtaDTO wta) {
+    public HashMap updateWta(long countryId, long wtaId, WtaDTO wta) {
         WorkingTimeAgreement oldWta = wtaRepository.findOne(wtaId);
         if (!Optional.ofNullable(oldWta).isPresent()) {
             throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
@@ -191,8 +185,11 @@ public class WTAService extends UserBaseService {
         prepareWta(countryId, oldWta, wta,wtaRuleTemplateQueryResponseArrayList);
 
         save(oldWta);
-
-        return true;
+        HashMap response=new HashMap();
+        response.put("id",oldWta.getId());
+        response.put("name",oldWta.getName());
+        response.put("ruleTemplates",wtaRuleTemplateQueryResponseArrayList);
+        return response;
     }
 
     private void prepareWta(long countryId, WorkingTimeAgreement oldWta, WtaDTO wtaDTO,List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList) {
