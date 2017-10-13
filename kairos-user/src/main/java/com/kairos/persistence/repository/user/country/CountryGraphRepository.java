@@ -178,7 +178,7 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
     Vehicle getResources(long countryId, long resourcesId);
 
     @Query("MATCH (country:Country)-[:"+HAS_RESOURCES+"]->(resources:Vehicle{enabled:true}) where id(country)={0} return resources")
-    List<Vehicle> getResourcesByCountry(long countryId);
+    List<Vehicle> getResourcesByCountry(Long countryId);
 
 
 
