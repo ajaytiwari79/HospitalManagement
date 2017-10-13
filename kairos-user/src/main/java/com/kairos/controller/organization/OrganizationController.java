@@ -970,9 +970,9 @@ public class OrganizationController {
     @RequestMapping(value = UNIT_URL+"/organizationTypeAndSubTypes", method = RequestMethod.GET)
     @ApiOperation("get All organization types and  and Sub org by unitId")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getorganizationTypeAndSubTypes( @PathVariable long unitId) {
+    public ResponseEntity<Map<String, Object>> getorganizationTypeAndSubTypes( @RequestParam("type") String type,@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.getOrganizationTypeAndSubTypes(unitId));
+                organizationService.getOrganizationTypeAndSubTypes(unitId,type));
     }
 
     @RequestMapping(value = "/unit/{unitId}/saveKMDExternal", method = RequestMethod.POST)

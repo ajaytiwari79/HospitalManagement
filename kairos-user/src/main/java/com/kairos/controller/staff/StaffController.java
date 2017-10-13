@@ -4,6 +4,7 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.skill.SkillService;
@@ -17,13 +18,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
@@ -95,18 +96,9 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/password", method = RequestMethod.PUT)
     @ApiOperation("update password")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable long staffId, @RequestBody Map<String, Object> passwordDetails) {
+    public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable long staffId, @Valid @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
 
-        if (passwordDetails.get("oldPassword") != null && passwordDetails.get("newPassword") != null && passwordDetails.get("confirmPassword") != null) {
-            String oldPassword = passwordDetails.get("oldPassword").toString().trim();
-            String newPassword = passwordDetails.get("newPassword").toString().trim();
-            String confirmPassword = passwordDetails.get("confirmPassword").toString().trim();
-
-            if (!newPassword.isEmpty() && newPassword.equals(confirmPassword) && staffService.updatePassword(staffId, oldPassword, newPassword)) {
-                return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
-            }
-        }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Data in request body is either null or empty");
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updatePassword(staffId, passwordUpdateDTO));
     }
 
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
@@ -384,9 +376,11 @@ public class StaffController {
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     @ApiOperation("Upload XLSX file ")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> batchCreateStaff(@PathVariable long unitId, @RequestParam("file") MultipartFile multipartFile) throws ParseException {
+    public ResponseEntity<Map<String, Object>> batchCreateStaff(@PathVariable long unitId,
+                                                                @RequestParam("file") MultipartFile multipartFile,
+                                                                @RequestParam("accessGroupId") Long accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffService.batchAddStaffToDatabase(unitId, multipartFile));
+                staffService.batchAddStaffToDatabase(unitId, multipartFile,accessGroupId));
     }
 
     @RequestMapping(value = "/{staffId}/access_permissions", method = RequestMethod.GET)
@@ -467,7 +461,7 @@ public class StaffController {
 
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable long unitId, @Validated @RequestBody StaffCreationPOJOData staffCreationPOJOData) throws ParseException {
+    public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationPOJOData staffCreationPOJOData) throws ParseException {
         Staff staff = staffService.createStaffFromWeb(unitId, staffCreationPOJOData);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staff);
     }
@@ -557,8 +551,8 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> verifyStaffBelongsToUnit(@PathVariable long unitId, @PathVariable long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.verifyStaffBelongsToUnit(staffId, unitId));
+    public ResponseEntity<Map<String, Object>> verifyStaffBelongsToUnit(@RequestParam("type") String type,@PathVariable long unitId, @PathVariable long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.verifyStaffBelongsToUnit(staffId, unitId,type));
     }
 
 

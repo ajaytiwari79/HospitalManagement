@@ -6,6 +6,7 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.staff.StaffClientData;
+import com.kairos.response.dto.web.ContactPersonDTO;
 import com.kairos.service.client.ClientAddressService;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientExtendedService;
@@ -97,7 +98,7 @@ public class ClientController {
     @ApiOperation("Get General Information for a Client")
     @RequestMapping(value = "/{clientId}/general", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getClientGeneralInformation(@PathVariable long clientId, @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.retrieveGeneralDetails(clientId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.retrieveCompleteDetails(clientId, unitId));
     }
 
 
@@ -582,6 +583,18 @@ public class ClientController {
                clientService.getClientIds(unitId));
     }
 
+    /**
+     * this method will be called from  task micro service in planner service
+     * @param unitIds
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/client_ids_by_unitIds")
+    @ApiOperation("get required data for task creation")
+    private ResponseEntity<Map<String,Object>> getCitizenIdsByUnitIds(@RequestBody List<Long> unitIds){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                clientService.getCitizenIdsByUnitIds(unitIds));
+    }
+
 
 
     @ApiOperation(value = "Get Organization Clients with min details")
@@ -679,6 +692,21 @@ public class ClientController {
                                                                    @PathVariable String cprNumber, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.findByCPRNumber(clientId,unitId,cprNumber));
     }
+
+    //Prefer Staff
+    @ApiOperation("Fetch Client Contact Person")
+    @RequestMapping(value = "/{clientId}/staff/contact-person", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getContactPerson(@PathVariable long unitId, @PathVariable long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getDetailsForContactPersonTab(unitId, clientId));
+    }
+
+    //Prefer Staff
+    @ApiOperation("Save Client Contact Person")
+    @RequestMapping(value = "/{clientId}/staff/contact-person", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> saveContactPerson(@PathVariable long clientId, @RequestBody ContactPersonDTO contactPersonDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.saveContactPerson(clientId, contactPersonDTO));
+    }
+
 
 
 

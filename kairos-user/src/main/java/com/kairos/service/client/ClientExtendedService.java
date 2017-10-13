@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.*;
 
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.IMAGES_PATH;
 
 
@@ -141,7 +142,7 @@ public class ClientExtendedService extends UserBaseService {
         if(!gettingServicesFromOrganization(nextToKin.getId(),unitId)){
             assignOrganizationToNextToKin(nextToKin, unitId);
         }
-        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator,
+        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + FORWARD_SLASH,
                 nextToKinDTO.getRelationTypeId(),nextToKinDTO);
     }
 
@@ -244,7 +245,7 @@ public class ClientExtendedService extends UserBaseService {
 
     private void saveCitizenRelation(Long relationTypeId, Long unitId, Client nextToKin, Long clientId) {
 
-        Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         Client client = clientGraphRepository.findOne(clientId);
         if (Optional.ofNullable(relationTypeId).isPresent()) {
             RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);
@@ -290,7 +291,7 @@ public class ClientExtendedService extends UserBaseService {
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, clientId);
         logger.debug("Preparing response");
         clientGraphRepository.save(nextToKin);
-        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator,
+        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + FORWARD_SLASH,
                 nextToKinDTO.getRelationTypeId(),nextToKinDTO);
     }
 
@@ -585,7 +586,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         accessToLocation.setAccessPhotoURL(fileName);
         accessToLocationGraphRepository.save(accessToLocation);
-        return envConfig.getServerHost() + File.separator + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
     }
 
     public void removeAccessToLocationImage(long accessToLocationId) {
@@ -601,7 +602,7 @@ public class ClientExtendedService extends UserBaseService {
         String fileName = writeFile(multipartFile);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + File.separator + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + fileName);
         return imageurls;
     }
 
@@ -627,7 +628,7 @@ public class ClientExtendedService extends UserBaseService {
         clientGraphRepository.save(nextToKin);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + File.separator + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + fileName);
         return imageurls;
     }
 
@@ -648,7 +649,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         client.setProfilePic(fileName);
         clientGraphRepository.save(client);
-        return envConfig.getServerHost() + File.separator + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
     }
 
 

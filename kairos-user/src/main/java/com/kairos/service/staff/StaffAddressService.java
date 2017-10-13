@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
@@ -209,7 +210,7 @@ public class StaffAddressService extends UserBaseService {
     }
 
     public Map<String, Object> getAddress(long unitId, long staffId, String type) {
-        Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
 
         Staff staff = staffGraphRepository.findOne(staffId, 2);
@@ -251,7 +252,7 @@ public class StaffAddressService extends UserBaseService {
 
     public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization){
         ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
-        if(organizationAddress != null){
+        if(Optional.ofNullable(organizationAddress).isPresent()){
             ContactAddress contactAddress = new ContactAddress();
             contactAddress.setCity(organizationAddress.getCity());
             contactAddress.setStreet1(organizationAddress.getStreet1());

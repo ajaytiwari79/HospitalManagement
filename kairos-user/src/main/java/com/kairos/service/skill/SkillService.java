@@ -26,12 +26,9 @@ import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
-import com.kairos.util.response.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -235,9 +232,9 @@ public class SkillService extends UserBaseService {
         response.putAll(taskTypeList);
 
         response.put("teamList", teamService.getAllTeamsInOrganization(unitId));
-        response.put("civilianStatus", citizenStatusService.getCitizenStatusByCountryIdAnotherFormat(countryGraphRepository.getCountryOfUnit(unitId)));
+        response.put("civilianStatus", citizenStatusService.getCitizenStatusByCountryIdAnotherFormat(countryGraphRepository.getCountryIdByUnitId(unitId)));
 
-        List<Map<String, Object>> staff = staffGraphRepository.getStaffWithBasicInfo(unitId, unitId,envConfig.getServerHost() + File.separator);
+        List<Map<String, Object>> staff = staffGraphRepository.getStaffWithBasicInfo(unitId, unitId,envConfig.getServerHost() + FORWARD_SLASH);
 
         List<Map<String, Object>> staffList = new ArrayList<>();
         for (Map<String, Object> map : staff) {
@@ -250,7 +247,7 @@ public class SkillService extends UserBaseService {
         }
         response.put("staffList", staffList);
         response.put("localAreaTags", localAreaTagsList);
-        response.put("serviceTypes", organizationServiceRepository.findAll(serviceIds));
+        response.put("serviceTypes", organizationServiceRepository.getOrganizationServiceByOrgId(unitId));
 
         return response;
 
@@ -467,7 +464,7 @@ public class SkillService extends UserBaseService {
             skills = organizationGraphRepository.getAssignedSkillsOfStaffByOrganization(id, staffIds);
 
         } else if (TEAM.equalsIgnoreCase(type)) {
-            List<Map<String, Object>> staffList = staffGraphRepository.getStaffByTeamId(id,envConfig.getServerHost() + File.separator);
+            List<Map<String, Object>> staffList = staffGraphRepository.getStaffByTeamId(id,envConfig.getServerHost() + FORWARD_SLASH);
             List<Long> staffIds = new ArrayList<>(staffList.size());
             for (Map<String, Object> map : staffList) {
                 response.add((Map<String, Object>) map.get("data"));

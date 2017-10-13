@@ -35,6 +35,7 @@ public class AppConstants {
     public static final String KMD_CARE_CITIZEN_URL = "/api/v1/kmdNexus/citizen/preferences/";
     public static final String API_KMD_CARE_CITIZEN_GRANTS = "/api/v1/kmdNexus/citizen/grants";
     public static final String API_KMD_CARE_CITIZEN_RELATIVE_DATA = "/api/v1/kmdNexus/citizen/nextToKin";
+    public static final String FORWARD_SLASH = "/";
 
     public static final String API_KMD_CARE_STAFF_SHIFTS = "/api/v1/kmdNexus/citizen/unit/{unitId}/getShifts/{filterId}";
     public static final String API_KMD_CARE_TIME_SLOTS = "/api/v1/kmdNexus/citizen/unit/{unitId}/getTimeSlots";
@@ -255,15 +256,6 @@ public class AppConstants {
     public static final String SUCCESS = "success";
 
 
-    public static final String REQUEST_PHASE_NAME = "REQUEST";
-    public static final String REQUEST_PHASE_DESCRIPTION = "REQUEST PHASE";
-    public static final String PUZZLE_PHASE_NAME = "PUZZLE";
-    public static final String PUZZLE_PHASE_DESCRIPTION = "PUZZLE PHASE";
-    public static final String CONSTRUCTION_PHASE_NAME = "CONSTRUCTION";
-    public static final String CONSTRUCTION_PHASE_DESCRIPTION = "CONSTRUCTION PHASE";
-    public static final String FINAL_PHASE_NAME = "FINAL";
-    public static final String FINAL_PHASE_DESCRIPTION = "FINAL PHASE";
-    public static final Long DURATION_IN_WEEK=4L;
 
 
 

@@ -160,13 +160,15 @@ public class RelationshipConstants {
     public final static String REGION = "REGION";
     public final static String KAIROS_STATUS = "KAIROS_STATUS";
     public final static String TYPE_OF_HOUSING = "TYPE_OF_HOUSING";
+    public final static String CLIENT_CONTACT_PERSON_RELATION_TYPE = "CLIENT_CONTACT_PERSON_RELATION_TYPE";
+    public final static String CLIENT_CONTACT_PERSON_STAFF = "CLIENT_CONTACT_PERSON_STAFF";
+    public final static String CLIENT_CONTACT_PERSON_SERVICE = "CLIENT_CONTACT_PERSON_SERVICE";
 
     // RULE Template
     public final static String HAS_RULE_TEMPLATE="HAS_RULE_TEMPLATE";
     public final static String HAS_RULE_TEMPLATE_CATEGORY="HAS_RULE_TEMPLATE_CATEGORY";
     public final static String HAS_RULE_TEMPLATES = "HAS_RULE_TEMPLATES";
     public final static String HAS_LEVEL = "HAS_LEVEL";
-    public final static String PHASE_BELONGS_TO="PHASE_BELONGS_TO";
     public final static String HAS_RELATION_TYPES="HAS_RELATION_TYPES";
     public final static String RELATION_TYPE="RELATION_TYPE";
     public final static String RELATION_WITH_NEXT_TO_KIN="RELATION_WITH_NEXT_TO_KIN";

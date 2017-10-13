@@ -73,7 +73,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/v2/api-docs");
         web.ignoring().antMatchers("/api/v1/organization/{organizationId}/ids");
         web.ignoring().antMatchers("/api/v1/organization/{organizationId}/unit/{unitId}/WithoutAuth");
-        web.ignoring().antMatchers("/api/v1/allOrganizationIds");
+        web.ignoring().antMatchers("/api/v1/organizationwithoutphases");
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN_GRANTS);
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN);
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN_RELATIVE_DATA);
@@ -81,6 +81,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(API_TIME_CARE_SHIFTS);
         web.ignoring().antMatchers(API_TIME_SLOTS_NAME);
         web.ignoring().antMatchers(API_KMD_CARE_TIME_SLOTS);
+        web.ignoring().antMatchers("/api/v1/organization/{organizationId}/unit/{unitId}/client/client_ids_by_unitIds");
 
 
         web.ignoring().antMatchers("/api/v1/login");

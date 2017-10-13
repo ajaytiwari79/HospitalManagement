@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,8 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 @Service
 public class UserOauth2Service implements UserDetailsService {
     private final Logger logger = LoggerFactory.getLogger(UserOauth2Service.class);
@@ -29,7 +27,7 @@ public class UserOauth2Service implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-         User user=  userGraphRepository.findByUserName(username);
+         User user=  userGraphRepository.findByUserNameIgnoreCase(username.toLowerCase());
          user.setHubMember(userService.isHubMember(user.getId()));
          Optional<User> loggedUser=Optional.ofNullable(user);
          String otpString=HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");

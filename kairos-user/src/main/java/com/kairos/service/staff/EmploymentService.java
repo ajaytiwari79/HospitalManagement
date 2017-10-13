@@ -37,6 +37,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.util.*;
 
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 
@@ -108,7 +109,7 @@ public class EmploymentService extends UserBaseService {
         map.put("sendNotificationBy", staff.getSendNotificationBy());
         map.put("copyKariosMailToLogin", staff.isCopyKariosMailToLogin());
         map.put("email", staff.getEmail());
-        map.put("profilePic", envConfig.getServerHost() + File.separator + staff.getProfilePic());
+        map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + staff.getProfilePic());
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
         map.put("timeCareExternalId",staff.getExternalId());
@@ -329,7 +330,7 @@ public class EmploymentService extends UserBaseService {
      * @param unitId
      * @return
      */
-    private boolean syncStaffInVisitour(Staff staff,long unitId, Map<String, String> flsCredentials){
+    public boolean syncStaffInVisitour(Staff staff,long unitId, Map<String, String> flsCredentials){
         logger.info("Syncing staff in fls");
         ContactDetail staffContactDetail = staffGraphRepository.getContactDetail(staff.getId());
 
