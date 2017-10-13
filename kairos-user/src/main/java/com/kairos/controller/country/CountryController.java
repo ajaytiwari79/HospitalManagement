@@ -10,6 +10,7 @@ import com.kairos.persistence.model.user.expertise.ExpertiseSkillDTO;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.persistence.model.user.payment_type.PaymentType;
+import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.service.country.*;

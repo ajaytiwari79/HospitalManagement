@@ -252,7 +252,7 @@ public class Organization extends UserBaseEntity {
     }
 
     public List<Resource> getResourceList() {
-        return resourceList;
+        return java.util.Optional.ofNullable(resourceList).orElse(new ArrayList<>());
     }
 
     public void setResourceList(List<Resource> resourceList) {
@@ -721,4 +721,12 @@ public class Organization extends UserBaseEntity {
     public void setPhaseGenerated(boolean phaseGenerated) {
         this.phaseGenerated = phaseGenerated;
     }
+
+    public void addResource(Resource resource){
+        List<Resource> resourceList = this.getResourceList();
+        resourceList.add(resource);
+        this.resourceList = resourceList;
+    }
+
+
 }

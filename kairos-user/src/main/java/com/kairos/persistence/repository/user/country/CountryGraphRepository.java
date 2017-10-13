@@ -5,7 +5,7 @@ import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemp
 import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.RelationType;
-import com.kairos.persistence.model.user.country.Vehicle;
+import com.kairos.persistence.model.user.resources.Vehicle;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
