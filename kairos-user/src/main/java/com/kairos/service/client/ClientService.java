@@ -4,6 +4,7 @@ import com.kairos.client.*;
 import com.kairos.client.dto.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
@@ -602,7 +603,13 @@ public class ClientService extends UserBaseService {
         }
         Client houseHold = saveDetailsOfHouseHold(minimumDTO);
         saveAddressOfHouseHold(client, houseHold);
-        if (!Optional.ofNullable(houseHold.getId()).isPresent()) {
+        if (Optional.ofNullable(houseHold.getId()).isPresent()) {
+            if(houseHold.getId().equals(clientId)){
+                logger.error("You can't enter yourself in your house hold list : houseHoldId " + houseHold.getId() + " citizen id" + clientId);
+                throw new DataNotMatchedException("Add another next to kin");
+            }
+
+        } else {
             addHouseHoldInOrganization(houseHold, unitId);
         }
         save(houseHold);
