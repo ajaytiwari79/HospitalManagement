@@ -238,6 +238,19 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             ",latitude:homeAddress.latitude,municipalities:result} as homeAddress")
     List<NextToKinQueryResult> getNextToKinDetail(long clientId,String imageUrl);
 
+    @Query("Match (nextToKin:Client{cprNumber:{0}}) with nextToKin\n" +
+            "optional Match (nextToKin)-[:CIVILIAN_STATUS]->(citizenStatus:CitizenStatus) with nextToKin,citizenStatus\n" +
+            "optional Match (nextToKin)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail,nextToKin,citizenStatus\n" +
+            "optional Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "optional Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "optional Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
+            "return id(nextToKin) as id, nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,case when homeAddress is not null then {municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
+            ",latitude:homeAddress.latitude,municipalities:result} else null end as homeAddress")
+    NextToKinQueryResult getNextToKinByCprNumber(String cprNumber,String imageUrl);
+
+    @Query("Match (c:Client)-[r:NEXT_TO_KIN]->(nextToKin:Client{cprNumber:{1}}) where id(c)={0} return count(r)>0")
+    Boolean citizenInNextToKinList(Long clientId,String cprNumber);
+
     @Query("Match (client:Client) where id(client)={0} with client\n" +
             "Match (houseHoldPeople:Client) where id(houseHoldPeople)={1} with client,houseHoldPeople\n" +
             "Merge (client)-[r:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(houseHoldPeople)\n" +

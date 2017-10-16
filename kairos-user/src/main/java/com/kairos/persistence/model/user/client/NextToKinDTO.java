@@ -7,18 +7,24 @@ import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by oodles on 24/1/17.
  */
 @QueryResult
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NextToKinDTO {
+
     private String nickName;
+    @NotNull(message = "First name can't be empty")
     private String firstName;
+    @NotNull(message = "Last name can't be empty")
     private String lastName;
     private AddressDTO homeAddress;
     private ContactDetail contactDetail;
     private String profilePic;
+    @NotNull(message = "CPR number can't be empty")
     private String cprNumber;
     private String  privateEmail;
     private boolean isVerifiedByGoogleMap;
