@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.user.agreement.wta.templates;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -12,13 +11,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WTAWithCategoryDTO {
-    @JsonIgnore
-    private RuleTemplateCategory ruleTemplateCategoryObj;
-
-
-    private String ruleTemplateCategoryId;
-
-    private String ruleTemplateCategory;
+    private RuleTemplateCategory ruleTemplateCategory;
     private Long id;
     private String name;
     private String templateType;
@@ -330,29 +323,12 @@ public class WTAWithCategoryDTO {
         this.activityCode = activityCode;
     }
 
-    public RuleTemplateCategory getRuleTemplateCategoryObj() {
-        return ruleTemplateCategoryObj;
+    public RuleTemplateCategory getRuleTemplateCategory() {
+        return ruleTemplateCategory;
     }
 
-    public void setRuleTemplateCategoryObj(RuleTemplateCategory ruleTemplateCategoryObj) {
-        this.ruleTemplateCategoryObj = ruleTemplateCategoryObj;
-    }
-
-
-    public String getRuleTemplateCategory() {
-        return this.ruleTemplateCategoryObj.getName().toString();
-    }
-
-    public void setRuleTemplateCategory(String ruleTemplateCategory) {
+    public void setRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
         this.ruleTemplateCategory = ruleTemplateCategory;
-    }
-
-    public String getRuleTemplateCategoryId() {
-        return this.ruleTemplateCategoryObj.getId().toString();
-    }
-
-    public void setRuleTemplateCategoryId(String ruleTemplateCategoryId) {
-        this.ruleTemplateCategoryId = ruleTemplateCategoryId;
     }
 
     public Long getIntervalLength() {

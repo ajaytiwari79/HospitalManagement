@@ -191,11 +191,11 @@ public class WtaRuleTemplateService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Country");
         }
 
-        WTABaseRuleTemplate oldTemplate = getTemplateByType(countryId, templateType);
+        WTABaseRuleTemplate oldTemplate = wtaRuleTemplateGraphRepository.findOne(templateDTO.getId());
         if (!Optional.ofNullable(oldTemplate).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid TemplateType "+ templateType);
+            throw new DataNotFoundByIdException("Invalid TemplateType id "+ templateDTO.getId());
         }
-        switch (templateType) {
+        switch (oldTemplate.getTemplateType()) {
 
             case TEMPLATE1:
                 MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = (MaximumShiftLengthWTATemplate) getTemplateByType(countryId, templateType);
@@ -346,6 +346,7 @@ public class WtaRuleTemplateService extends UserBaseService {
             case TEMPLATE15:
                 MinimumDailyRestingTimeWTATemplate minimumDailyRestingTimeWTATemplate = (MinimumDailyRestingTimeWTATemplate) getTemplateByType(countryId, templateType);
                 minimumDailyRestingTimeWTATemplate.setActive(templateDTO.isActive());
+                minimumDailyRestingTimeWTATemplate.setId(oldTemplate.getId());
                 minimumDailyRestingTimeWTATemplate.setDescription(templateDTO.getDescription());
                 minimumDailyRestingTimeWTATemplate.setContinuousDayRestHours(templateDTO.getContinuousDayRestHours());
                 oldTemplate = save(minimumDailyRestingTimeWTATemplate);
