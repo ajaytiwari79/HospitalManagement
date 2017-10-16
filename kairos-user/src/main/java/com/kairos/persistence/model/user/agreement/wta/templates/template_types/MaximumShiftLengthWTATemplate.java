@@ -26,7 +26,6 @@ public class MaximumShiftLengthWTATemplate extends WTABaseRuleTemplate {
         this.timeLimit = timeLimit;
         this.balanceType = balanceType;
         this.checkAgainstTimeRules = checkAgainstTimeRules;
-
         this.name=name;
         this.templateType=templateType;
         this.isActive=isActive;
@@ -60,4 +59,5 @@ public class MaximumShiftLengthWTATemplate extends WTABaseRuleTemplate {
     public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
     }
+
 }
