@@ -522,9 +522,10 @@ public class OrganizationController {
     @RequestMapping(value = "unit/{unitId}/resources", method = RequestMethod.GET)
     @ApiOperation("Get Organization Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationResources(@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationResources(@PathVariable Long unitId,
+                                                                        @RequestParam("startDate") String date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                resourceService.getUnitResources(unitId));
+                resourceService.getUnitResources(unitId,date));
     }
 
     @RequestMapping(value = "unit/{unitId}/resources/type", method = RequestMethod.GET)
@@ -535,7 +536,7 @@ public class OrganizationController {
                 resourceService.getUnitResourcesTypes(unitId));
     }
 
-    @RequestMapping(value = "unit/{unitId}/resources", method = RequestMethod.PUT)
+    @RequestMapping(value = "unit/{unitId}/resources", method = RequestMethod.POST)
     @ApiOperation("Update Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateOrganizationResources(@PathVariable Long unitId,

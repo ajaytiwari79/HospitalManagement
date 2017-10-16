@@ -1,33 +1,106 @@
 package com.kairos.persistence.model.user.resources;
 
-import java.util.List;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
+import org.springframework.data.neo4j.annotation.QueryResult;
+
+import javax.validation.constraints.NotNull;
+import java.time.LocalTime;
 
 /**
- * Created by prabjot on 13/10/17.
+ * Created by prabjot on 16/10/17.
  */
+@QueryResult
 public class ResourceWrapper {
+    private String registrationNumber;
+    private String number;
+    private String modelDescription;
+    private float costPerKM;
+    private FuelType fuelType;
+    private Long startDate;
+    private Long endDate;
+    @Convert(Neo4jTimeConvertor.class)
+    private LocalTime timeFrom;
+    @Convert(Neo4jTimeConvertor.class)
+    private LocalTime timeTo;
+    private Long vehicleTypeId;
 
-    private List<Vehicle> vehicleTypeList;
-    private List<FuelType> fuelTypeList;
-
-    public List<Vehicle> getVehicleTypeList() {
-        return vehicleTypeList;
+    public String getRegistrationNumber() {
+        return registrationNumber;
     }
 
-    public void setVehicleTypeList(List<Vehicle> vehicleTypeList) {
-        this.vehicleTypeList = vehicleTypeList;
+    public void setRegistrationNumber(String registrationNumber) {
+        this.registrationNumber = registrationNumber;
     }
 
-    public List<FuelType> getFuelTypeList() {
-        return fuelTypeList;
+    public String getNumber() {
+        return number;
     }
 
-    public void setFuelTypeList(List<FuelType> fuelTypeList) {
-        this.fuelTypeList = fuelTypeList;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
-    public ResourceWrapper(List<Vehicle> vehicleTypeList, List<FuelType> fuelTypeList) {
-        this.vehicleTypeList = vehicleTypeList;
-        this.fuelTypeList = fuelTypeList;
+    public String getModelDescription() {
+        return modelDescription;
+    }
+
+    public void setModelDescription(String modelDescription) {
+        this.modelDescription = modelDescription;
+    }
+
+    public float getCostPerKM() {
+        return costPerKM;
+    }
+
+    public void setCostPerKM(float costPerKM) {
+        this.costPerKM = costPerKM;
+    }
+
+    public FuelType getFuelType() {
+        return fuelType;
+    }
+
+    public void setFuelType(FuelType fuelType) {
+        this.fuelType = fuelType;
+    }
+
+    public Long getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Long startDate) {
+        this.startDate = startDate;
+    }
+
+    public Long getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Long endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalTime getTimeFrom() {
+        return timeFrom;
+    }
+
+    public void setTimeFrom(LocalTime timeFrom) {
+        this.timeFrom = timeFrom;
+    }
+
+    public LocalTime getTimeTo() {
+        return timeTo;
+    }
+
+    public void setTimeTo(LocalTime timeTo) {
+        this.timeTo = timeTo;
+    }
+
+    public Long getVehicleTypeId() {
+        return vehicleTypeId;
+    }
+
+    public void setVehicleTypeId(Long vehicleTypeId) {
+        this.vehicleTypeId = vehicleTypeId;
     }
 }

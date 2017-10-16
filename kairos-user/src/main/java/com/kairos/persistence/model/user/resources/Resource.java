@@ -6,11 +6,9 @@ import com.kairos.persistence.model.constants.RelationshipConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.List;
 
 /**
@@ -31,13 +29,10 @@ public class Resource extends UserBaseEntity {
     private boolean deleted ;
     private Long startDate;
     private Long endDate;
-    private Integer startHour;
-    private Integer startMin;
-    private Integer startSecond;
-    private Integer endHour;
-    private Integer endMin;
-    private Integer endSecond;
-
+    @Convert(Neo4jTimeConvertor.class)
+    private LocalTime timeFrom;
+    @Convert(Neo4jTimeConvertor.class)
+    private LocalTime timeTo;
     public Resource(Vehicle vehicleType, String registrationNumber, String number, String modelDescription, float costPerKM) {
         this.vehicleType = vehicleType;
         this.registrationNumber = registrationNumber;
@@ -118,39 +113,6 @@ public class Resource extends UserBaseEntity {
         return fuelType;
     }
 
-
-    public Integer getStartMin() {
-        return startMin;
-    }
-
-    public void setStartMin(Integer startMin) {
-        this.startMin = startMin;
-    }
-
-    public Integer getStartSecond() {
-        return startSecond;
-    }
-
-    public void setStartSecond(Integer startSecond) {
-        this.startSecond = startSecond;
-    }
-
-    public Integer getEndMin() {
-        return endMin;
-    }
-
-    public void setEndMin(Integer endMin) {
-        this.endMin = endMin;
-    }
-
-    public Integer getEndSecond() {
-        return endSecond;
-    }
-
-    public void setEndSecond(Integer endSecond) {
-        this.endSecond = endSecond;
-    }
-
     public Vehicle getVehicleType() {
         return vehicleType;
     }
@@ -175,20 +137,20 @@ public class Resource extends UserBaseEntity {
         this.endDate = endDate;
     }
 
-    public Integer getStartHour() {
-        return startHour;
+    public LocalTime getTimeFrom() {
+        return timeFrom;
     }
 
-    public void setStartHour(Integer startHour) {
-        this.startHour = startHour;
+    public void setTimeFrom(LocalTime timeFrom) {
+        this.timeFrom = timeFrom;
     }
 
-    public Integer getEndHour() {
-        return endHour;
+    public LocalTime getTimeTo() {
+        return timeTo;
     }
 
-    public void setEndHour(Integer endHour) {
-        this.endHour = endHour;
+    public void setTimeTo(LocalTime timeTo) {
+        this.timeTo = timeTo;
     }
 
     public void setAvailability(ResourceDTO resourceDTO){
@@ -203,16 +165,12 @@ public class Resource extends UserBaseEntity {
         if(!StringUtils.isBlank(resourceDTO.getTimeFrom())){
             instant = Instant.parse(resourceDTO.getTimeFrom());
             LocalDateTime startTime = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
-            this.startHour = startTime.getHour();
-            this.startMin = startTime.getMinute();
-            this.startSecond = startTime.getSecond();
+            this.timeFrom = LocalTime.of(startTime.getHour(),startTime.getSecond());
         }
-        if(StringUtils.isBlank(resourceDTO.getTimeTo())){
+        if(!StringUtils.isBlank(resourceDTO.getTimeTo())){
             instant = Instant.parse(resourceDTO.getTimeTo());
             LocalDateTime endTime = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
-            this.endHour = endTime.getHour();
-            this.endMin = endTime.getMinute();
-            this.endSecond = endTime.getSecond();
+            this.timeTo = LocalTime.of(endTime.getHour(),endTime.getSecond());
         }
     }
 }

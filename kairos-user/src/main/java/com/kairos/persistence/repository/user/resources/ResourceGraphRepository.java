@@ -5,6 +5,8 @@ package com.kairos.persistence.repository.user.resources;
  */
 
 import com.kairos.persistence.model.user.resources.Resource;
+import com.kairos.persistence.model.user.resources.ResourceDTO;
+import com.kairos.persistence.model.user.resources.ResourceWrapper;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -51,4 +53,9 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
 
     @Query("MATCH(o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource)  where id(o)={0} AND r.deleted=false  return r")
     List<Resource> getByUnitId(Long organizationId);
+
+    @Query("MATCH (o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource) where r.startDate>={0} and r.endDate<={1} and id(o)={2}\n" +
+            "Match (r)-[:VEHICLE_TYPE]->(vehicle:Vehicle)\n" +
+            "return r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType,r.startDate as startDate,r.endDate as endDate,r.timeFrom as timeFrom,r.timeTo as timeTo,id(vehicle) as vehicleTypeId")
+    List<ResourceWrapper> getResources(Long startDate, Long endDate, Long organizationId);
 }

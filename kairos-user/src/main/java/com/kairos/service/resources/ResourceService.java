@@ -3,7 +3,6 @@ package com.kairos.service.resources;
 /**
  * Created by oodles on 17/10/16.
  */
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.resources.Vehicle;
@@ -20,9 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-
-import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**
  * Calls ResourceGraphRepository to perform CRUD operation on Resources.
@@ -111,24 +109,23 @@ public class ResourceService extends UserBaseService {
 
     }
 
-    public List<Object> getUnitResources(Long unitId) {
-        List<Map<String, Object>> mapList = getAllResourcesByOrgId(unitId);
-        List<Object> objectList = new ArrayList<>();
-        if (!mapList.isEmpty()) {
-            for (Map<String, Object> map : mapList) {
-                Object o = map.get("resourceList");
-                objectList.add(o);
-            }
-            return objectList;
-        }
-        return null;
+    public List<ResourceWrapper> getUnitResources(Long unitId,String date) {
+        Instant instant = Instant.parse(date);
+        LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+        LocalDateTime firstDayOfMonth = startDate.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDateTime lastDayOfMonth = startDate.with(TemporalAdjusters.lastDayOfMonth());
+
+        List<ResourceWrapper> resources = resourceGraphRepository.getResources(firstDayOfMonth.atZone(
+                ZoneId.systemDefault()).toInstant().toEpochMilli(),lastDayOfMonth.atZone(
+                ZoneId.systemDefault()).toInstant().toEpochMilli(),unitId);
+      return resources;
     }
 
 
-    public ResourceWrapper getUnitResourcesTypes(Long unitId) {
+    public ResourceTypeWrapper getUnitResourcesTypes(Long unitId) {
         Long countryId = organizationGraphRepository.getCountryId(unitId);
         List<Vehicle> vehicleTypes = countryService.getVehicleList(countryId);
-        ResourceWrapper resourceWrapper = new ResourceWrapper(vehicleTypes,Arrays.asList(FuelType.values()));
+        ResourceTypeWrapper resourceWrapper = new ResourceTypeWrapper(vehicleTypes,Arrays.asList(FuelType.values()));
         return resourceWrapper;
     }
 
