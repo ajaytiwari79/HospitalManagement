@@ -18,5 +18,8 @@ public interface PositionNameGraphRepository extends GraphRepository<PositionNam
     @Query("MATCH (o:Organization)-[:"+HAS_POSITION_NAME+"]->(pn:PositionName{ isEnabled:true }) WHERE id(o)={0} AND pn.name=~ {1} return pn ")
     PositionName checkDuplicatePositionName(long orgId, String positionName);
 
+    @Query("MATCH (o:Organization)-[:"+HAS_POSITION_NAME+"]->(pn:PositionName{ isEnabled:true }) WHERE id(o)={0} AND id(pn)= {1} return pn ")
+    PositionName getPositionNameByUnitIdAndId(long orgId, long positionNameId);
+
 
 }

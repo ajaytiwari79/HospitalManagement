@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -59,5 +60,9 @@ public class WTABaseRuleTemplate extends UserBaseEntity{
         this.description = description;
     }
 
+    public static WTABaseRuleTemplate copyProperties(WTABaseRuleTemplate source, WTABaseRuleTemplate target){
+        BeanUtils.copyProperties(source,target);
+        return target;
+    }
 
 }

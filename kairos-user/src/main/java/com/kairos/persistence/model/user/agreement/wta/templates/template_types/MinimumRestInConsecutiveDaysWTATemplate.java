@@ -1,7 +1,8 @@
-package com.kairos.persistence.model.user.agreement.wta.templates;
+package com.kairos.persistence.model.user.agreement.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
