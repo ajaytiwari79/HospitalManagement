@@ -174,7 +174,7 @@ public class RelationshipConstants {
     public final static String RELATION_WITH_NEXT_TO_KIN="RELATION_WITH_NEXT_TO_KIN";
     public final static String HAS_RELATION_OF="HAS_RELATION_OF";
     public final static String HAS_RESOURCES="HAS_RESOURCES";
-
+    public final static  String BELONGS_TO_STAFF="BELONGS_TO_STAFF";
     /**
      * Default constructor
      */

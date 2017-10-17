@@ -36,7 +36,6 @@ public class WTARuleTemplateQueryResponse {
     private Boolean useShiftTimes;
     private Long maximumAvgTime;
     private Double maximumVetoPercentage;
-
     private Long numberShiftsPerPeriod;
     private Long numberOfWeeks;
     private String fromDayOfWeek;

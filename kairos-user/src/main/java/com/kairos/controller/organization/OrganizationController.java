@@ -27,6 +27,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -35,13 +36,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 
 /**
@@ -1008,12 +1005,36 @@ public class OrganizationController {
                 organizationService.getTimeSlotPercentageDeduction(unitId));
     }
 
+    /**
+     * @auther anil maurya
+     * use this endpoint from activity micro service via rest client
+     * @param unitId
+     * @return
+     */
+    @ApiOperation(value = "Get skills and organizationTypes of organization")
+    @RequestMapping(value = "/unit/{unitId}/skill/orgTypes", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(unitId));
+    }
+
     @RequestMapping(value = "/vehicleList", method = RequestMethod.GET)
     @ApiOperation("Get Vehicle list of unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> getVehicleList(@PathVariable Long organizationId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getVehicleList(organizationId));
+
     }
+
+    @RequestMapping(value =UNIT_URL+"/dayTypebydate", method = RequestMethod.GET)
+    @ApiOperation("get dayType in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getDayType(@PathVariable Long unitId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)Date date){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(unitId,date));
+
+    }
+
 
 }
 

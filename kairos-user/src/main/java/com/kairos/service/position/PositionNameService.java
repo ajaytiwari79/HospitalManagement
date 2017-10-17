@@ -9,6 +9,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.position.PositionNameGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.GroupService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +39,10 @@ public class PositionNameService extends UserBaseService {
     private GroupService groupService;
     @Inject
     private TeamService teamService;
+    @Inject private OrganizationService organizationService;
 
-    public PositionName createPositionName(Long unitId, PositionName positionName) {
+    public PositionName createPositionName(Long id, PositionName positionName, String type) {
+        Long unitId=organizationService.getOrganization(id,type);
         PositionName position = null;
         String name = "(?i)" + positionName.getName();
         //check if duplicate
@@ -67,8 +70,8 @@ public class PositionNameService extends UserBaseService {
     }
 
 
-    public PositionName updatePositionName(Long unitId, Long positionNameId, PositionName positionName) {
-
+    public PositionName updatePositionName(Long id, Long positionNameId, PositionName positionName, String type) {
+        Long unitId=organizationService.getOrganization(id,type);
         PositionName oldPositionName = positionNameGraphRepository.findOne(positionNameId);
 
         if (oldPositionName == null) {
@@ -98,7 +101,8 @@ public class PositionNameService extends UserBaseService {
     }
 
 
-    public boolean deletePositionName(Long unitId, Long positionId) {
+    public boolean deletePositionName(Long id, Long positionId, String type) {
+        Long unitId=organizationService.getOrganization(id,type);
         PositionName position = positionNameGraphRepository.findOne(positionId);
         if (position == null) {
             throw new DataNotFoundByIdException("position_name  not found " + positionId);
@@ -122,7 +126,9 @@ public class PositionNameService extends UserBaseService {
         return positionNameGraphRepository.findOne(positionId);
     }
 
-
+    public PositionName getPositionNameByUnitIdAndId(Long unitId, long  positionNameId){
+        return  positionNameGraphRepository.getPositionNameByUnitIdAndId(unitId,positionNameId);
+    }
     public List<PositionName> getAllPositionName(Long id, String type) {
         Long unitId;
         Organization organization = null;
