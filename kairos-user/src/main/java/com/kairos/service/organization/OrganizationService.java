@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.kairos.client.PhaseRestClient;
+import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.organization.*;
@@ -10,6 +11,7 @@ import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -35,8 +37,10 @@ import com.kairos.service.client.ClientOrganizationRelationService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
+import com.kairos.service.country.DayTypeService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
+import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
@@ -151,6 +155,10 @@ public class OrganizationService extends UserBaseService {
 
     @Inject
     AbsenceTypesRepository absenceTypesRepository;
+    @Inject
+    private SkillService skillService;
+    @Autowired
+    DayTypeService dayTypeService;
 
 
     public Organization getOrganizationById(long id) {
@@ -1039,6 +1047,22 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.updateOrganizationWithoutPhases(organizationIds);
     }
 
+
+    /**
+     * @auther anil maurya
+     * @param unitId
+     * @return
+     */
+    public OrganizationSkillAndOrganizationTypesDTO getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(Long unitId){
+        OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO=this.getOrganizationTypeAndSubTypes(unitId,"organization");
+        return new OrganizationSkillAndOrganizationTypesDTO(organizationTypeAndSubTypeDTO,skillService.getSkillsOfOrganization(unitId));
+    }
+
+
+    public DayType getDayType(Long unitID, Date date){
+        Long countryId = organizationGraphRepository.getCountryId(unitID);
+       return  dayTypeService.getDayTypeByDate(countryId,date);
+    }
 
 }
 
