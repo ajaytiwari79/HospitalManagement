@@ -39,6 +39,8 @@ public class DayType  extends UserBaseEntity {
 
     private boolean isEnabled = true;
 
+    private boolean allowTimeSettings = false;
+
     public String getColorCode() {
         return colorCode;
     }
@@ -93,6 +95,14 @@ public class DayType  extends UserBaseEntity {
 
     public void setValidDays(List<Day> validDays) {
         this.validDays = validDays;
+    }
+
+    public boolean isAllowTimeSettings() {
+        return allowTimeSettings;
+    }
+
+    public void setAllowTimeSettings(boolean allowTimeSettings) {
+        this.allowTimeSettings = allowTimeSettings;
     }
 
     // Constructor
