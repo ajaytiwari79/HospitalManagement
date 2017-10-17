@@ -606,7 +606,7 @@ public class ClientService extends UserBaseService {
         if (Optional.ofNullable(houseHold.getId()).isPresent()) {
             if(houseHold.getId().equals(clientId)){
                 logger.error("You can't enter yourself in your house hold list : houseHoldId " + houseHold.getId() + " citizen id" + clientId);
-                throw new DataNotMatchedException("Add another next to kin");
+                throw new DataNotMatchedException("Add another house hold");
             }
 
         } else {
