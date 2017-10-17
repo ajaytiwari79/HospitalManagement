@@ -23,7 +23,7 @@ public class ResourceWrapper {
     private LocalTime timeFrom;
     @Convert(Neo4jTimeConvertor.class)
     private LocalTime timeTo;
-    private Long vehicleTypeId;
+    private Vehicle vehicleType;
 
     public Long getId() {
         return id;
@@ -105,11 +105,11 @@ public class ResourceWrapper {
         this.timeTo = timeTo;
     }
 
-    public Long getVehicleTypeId() {
-        return vehicleTypeId;
+    public Vehicle getVehicleType() {
+        return vehicleType;
     }
 
-    public void setVehicleTypeId(Long vehicleTypeId) {
-        this.vehicleTypeId = vehicleTypeId;
+    public void setVehicleType(Vehicle vehicleType) {
+        this.vehicleType = vehicleType;
     }
 }
