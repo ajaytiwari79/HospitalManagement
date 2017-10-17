@@ -1,19 +1,25 @@
 package com.kairos.persistence.model.user.resources;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.constants.RelationshipConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 
+import java.time.*;
 import java.util.List;
 
 /**
  * Created by arvind on 6/10/16.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class Resource extends UserBaseEntity {
 
 
-    private VehicleType name;
+    private Vehicle vehicleType;
     private String registrationNumber;
     private String number;
     private String modelDescription;
@@ -21,25 +27,26 @@ public class Resource extends UserBaseEntity {
     private FuelType fuelType;
     private boolean enabled ;
     private boolean deleted ;
+    private Long startDate;
+    private Long endDate;
+    @Convert(Neo4jTimeConvertor.class)
+    private LocalTime timeFrom;
+    @Convert(Neo4jTimeConvertor.class)
+    private LocalTime timeTo;
+    public Resource(Vehicle vehicleType, String registrationNumber, String number, String modelDescription, float costPerKM) {
+        this.vehicleType = vehicleType;
+        this.registrationNumber = registrationNumber;
+        this.number = number;
+        this.modelDescription = modelDescription;
+        this.costPerKM = costPerKM;
+    }
 
-    @Relationship(type = RelationshipConstants.RESOURCE_NOT_AVAILABLE_ON, direction = "OUTGOING")
+    @Relationship(type = RelationshipConstants.RESOURCE_NOT_AVAILABLE_ON)
     private List<ResourceUnAvailability> resourceAvailabilities;
 
     public Resource() {
     }
 
-    public Resource(VehicleType name, String registrationNumber, String number, String modelDescription, float costPerKM, String fuelType) {
-        this.name = name;
-        this.registrationNumber = registrationNumber;
-        this.number = number;
-        this.modelDescription = modelDescription;
-        this.costPerKM = costPerKM;
-        this.fuelType = FuelType.getByValue(fuelType);
-    }
-
-    public void setName(VehicleType name) {
-        this.name = name;
-    }
 
     public void setRegistrationNumber(String registrationNumber) {
         this.registrationNumber = registrationNumber;
@@ -85,9 +92,6 @@ public class Resource extends UserBaseEntity {
         this.deleted = deleted;
     }
 
-    public VehicleType getName() {
-        return name;
-    }
 
     public String getRegistrationNumber() {
         return registrationNumber;
@@ -109,13 +113,65 @@ public class Resource extends UserBaseEntity {
         return fuelType;
     }
 
-    public Resource(VehicleType name, String number,float costPerKM, FuelType fuelType,List<ResourceUnAvailability> resourceAvailabilities) {
-        this.name = name;
-        this.number = number;
-        this.costPerKM = costPerKM;
-        this.fuelType = fuelType;
-        this.resourceAvailabilities=resourceAvailabilities;
+    public Vehicle getVehicleType() {
+        return vehicleType;
+    }
 
+    public void setVehicleType(Vehicle vehicleType) {
+        this.vehicleType = vehicleType;
+    }
+
+    public Long getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Long startDate) {
+        this.startDate = startDate;
+    }
+
+    public Long getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Long endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalTime getTimeFrom() {
+        return timeFrom;
+    }
+
+    public void setTimeFrom(LocalTime timeFrom) {
+        this.timeFrom = timeFrom;
+    }
+
+    public LocalTime getTimeTo() {
+        return timeTo;
+    }
+
+    public void setTimeTo(LocalTime timeTo) {
+        this.timeTo = timeTo;
+    }
+
+    public void setAvailability(ResourceDTO resourceDTO){
+        Instant instant = Instant.parse(resourceDTO.getStartDate());
+        LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+        this.startDate = startDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        if(!StringUtils.isBlank(resourceDTO.getEndDate())){
+            instant = Instant.parse(resourceDTO.getEndDate());
+            LocalDateTime endDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+            this.endDate = endDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        }
+        if(!StringUtils.isBlank(resourceDTO.getTimeFrom())){
+            instant = Instant.parse(resourceDTO.getTimeFrom());
+            LocalDateTime startTime = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+            this.timeFrom = LocalTime.of(startTime.getHour(),startTime.getSecond());
+        }
+        if(!StringUtils.isBlank(resourceDTO.getTimeTo())){
+            instant = Instant.parse(resourceDTO.getTimeTo());
+            LocalDateTime endTime = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+            this.timeTo = LocalTime.of(endTime.getHour(),endTime.getSecond());
+        }
     }
 }
 
