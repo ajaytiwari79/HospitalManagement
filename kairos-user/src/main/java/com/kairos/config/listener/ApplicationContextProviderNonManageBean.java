@@ -15,12 +15,12 @@ public class ApplicationContextProviderNonManageBean  implements ApplicationCont
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationContextProviderNonManageBean.class);
 
     private static ApplicationContext context;
+
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
         ApplicationContextProviderNonManageBean.context=context;
 
     }
-
     public static ApplicationContext  getApplicationContext(){
         return context;
     }
