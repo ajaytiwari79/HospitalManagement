@@ -999,7 +999,8 @@ public class ClientService extends UserBaseService {
      */
     public Map<String, Object> getStaffAndCitizenHouseholds(Long citizenId, Long staffId) {
         Map<String, Object> staffAndCitizenHouseholdsInfo = new HashMap<>();
-        staffAndCitizenHouseholdsInfo.put("lastModifiedBy", staffGraphRepository.findOne(staffId).getFirstName());
+        Staff staff = (Optional.ofNullable(staffId).isPresent())?staffGraphRepository.findOne(staffId):null;
+        staffAndCitizenHouseholdsInfo.put("lastModifiedBy",(Optional.ofNullable(staff).isPresent())?staff.getFirstName():"anonymous user");
         staffAndCitizenHouseholdsInfo.put("citizenHouseholds", getPeopleInHousehold(citizenId));
         return staffAndCitizenHouseholdsInfo;
     }
