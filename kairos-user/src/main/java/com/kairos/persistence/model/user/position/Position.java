@@ -5,6 +5,7 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.staff.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -29,6 +30,9 @@ public class Position extends UserBaseEntity {
 
     @Relationship(type = HAS_POSITION_NAME)
     private PositionName positionName;
+
+    @Relationship(type = BELONGS_TO_STAFF,direction = "INCOMING")
+    private Staff staff;
 
     private boolean isEnabled = true;
     private Long startDate;
@@ -167,5 +171,30 @@ public class Position extends UserBaseEntity {
 
     public void setEmploymentType(EmploymentType employmentType) {
         this.employmentType = employmentType;
+    }
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
+    }
+
+    public Position(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionName positionName, Staff staff, boolean isEnabled, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
+        this.expertise = expertise;
+        this.cta = cta;
+        this.wta = wta;
+        this.positionName = positionName;
+        this.staff = staff;
+        this.isEnabled = isEnabled;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.hourlyWages = hourlyWages;
+        this.employmentType = employmentType;
+        this.salary = salary;
     }
 }

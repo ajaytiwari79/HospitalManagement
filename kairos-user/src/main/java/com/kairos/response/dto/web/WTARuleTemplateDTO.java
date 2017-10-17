@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class WTARuleTemplateDTO {
 
+    private Long id;
     @NotEmpty(message = "error.WTARuleTemplateDTO.name.notEmpty") @NotNull(message = "error.WTARuleTemplateDTO.name.notnull")
     private String name;
     @NotEmpty(message = "error.WTARuleTemplateDTO.templateType.notEmpty") @NotNull(message = "error.WTARuleTemplateDTO.templateType.notnull")
@@ -318,5 +319,17 @@ public class WTARuleTemplateDTO {
 
     public void setActivityCode(String activityCode) {
         this.activityCode = activityCode;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public boolean isProportional() {
+        return proportional;
     }
 }

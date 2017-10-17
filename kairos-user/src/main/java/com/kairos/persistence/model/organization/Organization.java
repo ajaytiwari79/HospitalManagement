@@ -160,6 +160,11 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = HAS_LEVEL)
     private Level level;
 
+    @Relationship(type = HAS_POSITION_NAME)
+    private List<PositionName> positionNameList = new ArrayList<>();
+
+    @Relationship(type = HAS_WTA)
+    private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
     public Level getLevel() {
         return level;
     }
@@ -181,11 +186,6 @@ public class Organization extends UserBaseEntity {
     private int nightShiftTimeDeduction = 7; //in percentage
     private boolean phaseGenerated=true;
 
-    @Relationship(type = HAS_POSITION_NAME)
-    private List<PositionName> positionNameList = new ArrayList<>();
-
-    @Relationship(type = HAS_WTA)
-    private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
 
     public Organization(String name, List<Group> groupList, List<Organization> children) {
         this.name = name;
