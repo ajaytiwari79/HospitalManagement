@@ -11,6 +11,7 @@ import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -36,6 +37,7 @@ import com.kairos.service.client.ClientOrganizationRelationService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
+import com.kairos.service.country.DayTypeService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
@@ -155,6 +157,8 @@ public class OrganizationService extends UserBaseService {
     AbsenceTypesRepository absenceTypesRepository;
     @Inject
     private SkillService skillService;
+    @Autowired
+    DayTypeService dayTypeService;
 
 
     public Organization getOrganizationById(long id) {
@@ -1054,6 +1058,11 @@ public class OrganizationService extends UserBaseService {
         return new OrganizationSkillAndOrganizationTypesDTO(organizationTypeAndSubTypeDTO,skillService.getSkillsOfOrganization(unitId));
     }
 
+
+    public DayType getDayType(Long unitID, Date date){
+        Long countryId = organizationGraphRepository.getCountryId(unitID);
+       return  dayTypeService.getDayTypeByDate(countryId,date)
+    }
 
 }
 
