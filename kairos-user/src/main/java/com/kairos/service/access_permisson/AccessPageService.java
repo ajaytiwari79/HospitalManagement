@@ -261,4 +261,8 @@ public class AccessPageService extends UserBaseService {
         }
         return workPlaces;
     }
+
+    public AccessPage findByModuleId(String moduleId){
+       return accessPageRepository.findByModuleId(moduleId);
+    }
 }

@@ -8,6 +8,7 @@ import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
+import com.kairos.response.dto.web.ClientFilterDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.service.client.ClientBatchService;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.ws.rs.QueryParam;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1013,6 +1015,14 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> getVehicleList(@PathVariable Long organizationId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getVehicleList(organizationId));
+    }
+
+    @ApiOperation(value = "Get Organization Clients with filters")
+    @RequestMapping(value = "/unit/{unitId}/client/filters", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationClientsWithFilters(@PathVariable Long unitId, @RequestBody ClientFilterDTO clientFilterDTO, @RequestParam("start") String start) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start));
     }
 
 }

@@ -12,6 +12,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
@@ -94,8 +95,6 @@ public class StaffService extends UserBaseService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
-    private PasswordEncoder passwordEncoder;
-    @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
@@ -171,7 +170,7 @@ public class StaffService extends UserBaseService {
             throw new DataNotFoundByIdException("User not found belongs to this staff id " + staffId);
         }
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
-        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+        if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
             save(user);
@@ -1243,5 +1242,45 @@ public class StaffService extends UserBaseService {
         }
         return unitId;
     }
+
+    public StaffFilterDTO addStaffFavouriteFilters(Long staffId, StaffFilterDTO staffFilterDTO){
+        StaffFavouriteFilters alreadyExistFilter = staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, staffFilterDTO.getModuleId());
+        if(Optional.ofNullable(alreadyExistFilter).isPresent()){
+            throw new DuplicateDataException("StaffFavouriteFilters already exist !");
+        }
+        StaffFavouriteFilters staffFavouriteFilters =  new StaffFavouriteFilters();
+
+        Staff staff = staffGraphRepository.findOne(staffId);
+        AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
+        staffFavouriteFilters.setAccessPage(accessPage);
+        staffFavouriteFilters.setFilterJson(staffFilterDTO.getFilterJson());
+        staff.addFavouriteFilters(staffFavouriteFilters);
+        staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
+        staffFilterDTO.setModuleId(accessPage.getModuleId());
+        return staffFilterDTO;
+
+
+    }
+
+    public StaffFilterDTO updateStaffFavouriteFilters(Long staffId, StaffFilterDTO staffFilterDTO){
+        StaffFavouriteFilters staffFavouriteFilters = staffGraphRepository.getStaffFavouriteFiltersById(staffId, staffFilterDTO.getId());
+        if(!Optional.ofNullable(staffFavouriteFilters).isPresent()){
+            throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFilterDTO.getId());
+        }
+        AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
+        staffFavouriteFilters.setAccessPage(accessPage);
+        staffFavouriteFilters.setFilterJson(staffFilterDTO.getFilterJson());
+        save(staffFavouriteFilters);
+        staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
+        staffFilterDTO.setModuleId(accessPage.getModuleId());
+        return staffFilterDTO;
+
+    }
+
+    public StaffFavouriteFilters getStaffFavouriteFilters(Long staffId, StaffFilterDTO staffFilterDTO){
+        return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, staffFilterDTO.getModuleId());
+    }
+
+
 
 }

@@ -3,6 +3,7 @@ package com.kairos.client;
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.TaskTypeAggregateResult;
+import com.kairos.response.dto.web.ClientFilterDTO;
 import com.kairos.util.userContext.UserContext;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -131,6 +132,8 @@ public class TaskDemandRestClient {
 
     }
 
+
+
     /**
      * @auther anil maurya
      * map endpoind on task demand controller in task micro service
@@ -197,6 +200,39 @@ public class TaskDemandRestClient {
     }
 
 
+
+    /**
+     *  @auther anil maurya
+     *
+     *  map in task demand controller
+     * @param organizationId
+     * @return
+     */
+    public List<TaskTypeAggregateResult> getCitizensByFilters(Long organizationId, ClientFilterDTO clientFilterDTO){
+
+        try {
+            HttpEntity<ClientFilterDTO> request = new HttpEntity<>(clientFilterDTO);
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>>> restExchange =
+                    restTemplate.exchange("http://zuulservice/kairos/activity/api/v1/task_demand/organization/{organizationId}/getCitizensByTaskTypeIds",
+                            HttpMethod.
+                                    POST,request, typeReference,organizationId);
+
+            RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+
+    }
 
     private final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){

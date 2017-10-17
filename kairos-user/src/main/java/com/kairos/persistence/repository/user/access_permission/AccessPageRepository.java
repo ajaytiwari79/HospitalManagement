@@ -96,4 +96,6 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
             "return module.name as name,id(module) as id,module.moduleId as moduleId,true as read,true as write,module.isModule as isModule,collect({name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:true,write:true,isModule:subPage.isModule}) as children")
     List<AccessPageQueryResult> getTabsPermissionForHubMember();
 
+    AccessPage findByModuleId(String moduleId);
+
 }

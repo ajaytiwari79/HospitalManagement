@@ -175,6 +175,10 @@ public class RelationshipConstants {
     public final static String HAS_RELATION_OF="HAS_RELATION_OF";
     public final static String HAS_RESOURCES="HAS_RESOURCES";
 
+    public final static String FILTER_BY_PAGE = "FILTER_BY_PAGE";
+
+    public final static String HAS_FAVOURITE_FILTERS = "HAS_FAVOURITE_FILTERS";
+
     /**
      * Default constructor
      */
