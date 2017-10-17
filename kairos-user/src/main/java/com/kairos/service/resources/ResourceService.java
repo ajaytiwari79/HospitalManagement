@@ -143,7 +143,7 @@ public class ResourceService extends UserBaseService {
             throw new DataNotFoundByIdException("Vehicle type not found");
         }
         Resource resource = new Resource(vehicle,resourceDTO.getRegistrationNumber(),resourceDTO.getNumber(),
-                resourceDTO.getModelDescription(),resourceDTO.getCostPerKM());
+                resourceDTO.getModelDescription(),resourceDTO.getCostPerKM(),resourceDTO.getFuelType());
         resource.setAvailability(resourceDTO);
         organization.addResource(resource);
         save(organization);

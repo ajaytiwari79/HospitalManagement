@@ -11,6 +11,7 @@ import java.time.LocalTime;
  */
 @QueryResult
 public class ResourceWrapper {
+    private Long id;
     private String registrationNumber;
     private String number;
     private String modelDescription;
@@ -23,6 +24,14 @@ public class ResourceWrapper {
     @Convert(Neo4jTimeConvertor.class)
     private LocalTime timeTo;
     private Long vehicleTypeId;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getRegistrationNumber() {
         return registrationNumber;

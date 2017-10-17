@@ -56,6 +56,6 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
 
     @Query("MATCH (o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource) where r.startDate>={0} and r.endDate<={1} and id(o)={2}\n" +
             "Match (r)-[:VEHICLE_TYPE]->(vehicle:Vehicle)\n" +
-            "return r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType,r.startDate as startDate,r.endDate as endDate,r.timeFrom as timeFrom,r.timeTo as timeTo,id(vehicle) as vehicleTypeId")
+            "return id(r) as id,r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType,r.startDate as startDate,r.endDate as endDate,r.timeFrom as timeFrom,r.timeTo as timeTo,id(vehicle) as vehicleTypeId")
     List<ResourceWrapper> getResources(Long startDate, Long endDate, Long organizationId);
 }
