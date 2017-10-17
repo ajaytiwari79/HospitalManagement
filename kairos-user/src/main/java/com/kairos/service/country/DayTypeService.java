@@ -2,6 +2,7 @@ package com.kairos.service.country;
 
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.CountryHolidayCalender;
+import com.kairos.persistence.model.user.country.Day;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
@@ -81,6 +82,7 @@ public class DayTypeService extends UserBaseService {
      */
     public DayType getDayTypeByDate(Long countryId,Date date){
         Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
@@ -90,7 +92,7 @@ public class DayTypeService extends UserBaseService {
         calendar.set(Calendar.SECOND, 59);
         Date endDate=calendar.getTime();
         Optional<CountryHolidayCalender> countryHolidayCalender=countryHolidayCalenderGraphRepository.
-                findByIdAndHolidayDateBetween(countryId,startDate.getTime(),endDate.getTime());
+                findByIdAndHolidayDateBetween(startDate.getTime(),endDate.getTime(),countryId);
 
         if(countryHolidayCalender.isPresent()){
           return countryHolidayCalender.get().getDayType();
@@ -99,8 +101,10 @@ public class DayTypeService extends UserBaseService {
             LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
             LocalDate localDate = localDateTime.toLocalDate();
             String day=localDate.getDayOfWeek().name();
-            DayType dayType=dayTypeGraphRepository.findByName(getDanishNameByDay(day));
-            return dayType;
+            Day dayEnum=Day.valueOf(day);
+            //as per requirement one day may belong to many dayTypes return any day type
+            List<DayType> dayTypes=dayTypeGraphRepository.findByValidDays(dayEnum);
+            return dayTypes.isEmpty()?null:dayTypes.get(0);
         }
 
     }

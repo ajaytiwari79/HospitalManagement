@@ -23,7 +23,8 @@ public interface CountryHolidayCalenderGraphRepository extends GraphRepository<C
 
     @Query("MATCH (c:Country)-[:HAS_HOLIDAY]->(ch:CountryHolidayCalender)  WHERE ch.googleCalId={0} AND  id(c)={1} return ch ")
     CountryHolidayCalender getExistingHoliday(String id, Long countryId);
-    Optional<CountryHolidayCalender> findByIdAndHolidayDateBetween(Long countryId, Long startDateTime, Long endDateTime);
+    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]->(ch:CountryHolidayCalender{isEnable:true})  WHERE ch.holidayDate>={0} AND ch.holidayDate<={1}AND  id(c)={2} return ch ")
+    Optional<CountryHolidayCalender> findByIdAndHolidayDateBetween(Long startDateTime, Long endDateTime,Long countryId);
 
 
 }

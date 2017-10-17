@@ -26,6 +26,7 @@ import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -1033,8 +1034,9 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/dayTypebydate", method = RequestMethod.GET)
     @ApiOperation("get dayType in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> getDayTypee(@PathVariable Long countryId,@RequestParam("date")Date date){
+    public ResponseEntity<Map<String,Object>> getDayTypee(@PathVariable Long countryId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)Date  date){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypeByDate(countryId,date));
+
     }
 
 }
