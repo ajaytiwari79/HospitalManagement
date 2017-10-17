@@ -22,7 +22,7 @@ public class RuleTemplateWithCategoryDTO {
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
-    private Boolean isActive;
+    private Boolean active;
     private String description;
     private Long creationDate;
     private Long lastModificationDate;
@@ -132,11 +132,11 @@ public class RuleTemplateWithCategoryDTO {
     }
 
     public Boolean getActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(Boolean active) {
-        isActive = active;
+        this.active = active;
     }
 
     public String getDescription() {
