@@ -617,7 +617,7 @@ public class ClientExtendedService extends UserBaseService {
         String fileName = writeFile(multipartFile);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+fileName);
         return imageurls;
     }
 
@@ -643,7 +643,7 @@ public class ClientExtendedService extends UserBaseService {
         clientGraphRepository.save(nextToKin);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ fileName);
         return imageurls;
     }
 
@@ -664,7 +664,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         client.setProfilePic(fileName);
         clientGraphRepository.save(client);
-        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ fileName;
     }
 
 

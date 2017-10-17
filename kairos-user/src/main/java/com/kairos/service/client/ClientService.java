@@ -335,7 +335,7 @@ public class ClientService extends UserBaseService {
 
             // Profile Picture
             String image = (String) data.get("profilePic");
-            String imageUrl = envConfig.getServerHost() + FORWARD_SLASH + image;
+            String imageUrl = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + image;
             data.put("profilePic", imageUrl);
 
 
@@ -361,8 +361,7 @@ public class ClientService extends UserBaseService {
             Map<String, Object> clientGeneralDetails = currentClient.retrieveClientGeneralDetails();
 
             // Client Profile Picture
-            String url = envConfig.getServerHost() + FORWARD_SLASH;
-
+            String url = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath();
             clientGeneralDetails.put("profilePic", url + (String) clientGeneralDetails.get("profilePic"));
             clientGeneralDetails.put("civilianStatus", clientGraphRepository.findCitizenCivilianStatus(clientId));
 
@@ -852,7 +851,7 @@ public class ClientService extends UserBaseService {
             citizen.put("localAreaTag", client.getLocalAreaTag());
             citizen.put("address", client.getAddress());
             citizen.put("profilePic", (client.getProfilePic() == null) ? null :
-                    envConfig.getServerHost() + FORWARD_SLASH + client.getProfilePic());
+                    envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + client.getProfilePic());
             citizen.put("taskTypes", (taskTypeAggregateResult.isPresent()) ? taskTypeAggregateResult.get().getTaskTypeIds() : Collections.emptyList());
             Map<Long, Object> staffData = new HashMap<>();
             client.getStaff().forEach(staff -> {
@@ -1021,7 +1020,7 @@ public class ClientService extends UserBaseService {
         citizenDetails.put("id", citizen.getId());
         citizenDetails.put("name", citizen.getFirstName() + " " + citizen.getLastName());
         citizenDetails.put("age", citizen.getAge());
-        citizenDetails.put("profilePic", citizen.getProfilePic() != null ? envConfig.getServerHost() + FORWARD_SLASH + citizen.getProfilePic() : "");
+        citizenDetails.put("profilePic", citizen.getProfilePic() != null ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + citizen.getProfilePic() : "");
         citizenDetails.put("phone", citizen.getContactDetail() != null ? citizen.getContactDetail().retreiveContactNumbers() : "");
         citizenDetails.put("address", citizen.getHomeAddress());
         citizenDetails.put("cprNumber", citizen.getCprNumber());
