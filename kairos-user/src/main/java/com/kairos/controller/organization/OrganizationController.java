@@ -7,6 +7,7 @@ import com.kairos.persistence.model.user.client.ClientStaffDTO;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.skill.Skill;
+import com.kairos.persistence.model.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.response.dto.web.ClientFilterDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
@@ -1043,6 +1044,30 @@ public class OrganizationController {
     public ResponseEntity<Map<String,Object>> getDayType(@PathVariable Long unitId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)Date date){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(unitId,date));
 
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/addStaffFavouriteFilters", method = RequestMethod.POST)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addStaffFavouriteFilters( @RequestBody StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.addStaffFavouriteFilters( staffFilterDTO));
+    }
+
+
+
+    @RequestMapping(value = "/unit/{unitId}/updateStaffFavouriteFilters", method = RequestMethod.POST)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateStaffFavouriteFilters( @RequestBody  StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updateStaffFavouriteFilters(staffFilterDTO));
+    }
+
+
+    @RequestMapping(value = "/unit/{unitId}/getStaffFavouriteFilters/${moduleId}", method = RequestMethod.GET)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffFavouriteFilters( @PathVariable  String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffFavouriteFilters(moduleId));
     }
 
 
