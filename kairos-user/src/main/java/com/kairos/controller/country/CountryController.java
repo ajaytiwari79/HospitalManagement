@@ -1,5 +1,6 @@
 package com.kairos.controller.country;
 
+import com.kairos.persistence.model.dto.TimeTypeDTO;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrgTypeExpertiseDTO;
 import com.kairos.persistence.model.organization.OrganizationType;
@@ -102,7 +103,7 @@ public class CountryController {
     private IntegrationConfigurationService integrationConfigurationService;
     @Inject
     private ExpertiseService expertiseService;
-
+    @Inject private  TimeTypeService timeTypeService;
 
     // Country
     @RequestMapping(value = "/country", method = RequestMethod.POST)
@@ -1026,6 +1027,14 @@ public class CountryController {
     public ResponseEntity<Map<String,Object>> updateVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId,  @RequestBody Vehicle vehicle){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateVehicle(countryId, vehicleId, vehicle));
     }
+
+    @ApiOperation(value = "Add timeType by countryId")
+    @RequestMapping(value = COUNTRY_URL + "/timeType", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addTimeType(@PathVariable long countryId, @Validated @RequestBody TimeTypeDTO timeType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.addTimeType(timeType, countryId));
+    }
+
 
 
 }
