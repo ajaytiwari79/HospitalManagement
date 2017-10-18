@@ -1,6 +1,6 @@
 package com.kairos.util;
 
-import com.kairos.persistence.model.common.SpringApplicationContext;
+import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.MutablePropertyValues;
@@ -110,8 +110,10 @@ public class BeanFactoryUtil {
      * @return DefaultListableBeanFactory
      */
     public static DefaultListableBeanFactory getDefaultListableBeanFactory() {
-        final DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) ((ConfigurableApplicationContext) SpringApplicationContext
-                .get()).getBeanFactory();
+        final DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) ((ConfigurableApplicationContext)
+                ApplicationContextProviderNonManageBean.getApplicationContext()
+
+        ).getBeanFactory();
 
         return beanFactory;
     }

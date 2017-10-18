@@ -27,7 +27,6 @@ public class PositionName extends UserBaseEntity {
     private boolean isEnabled = true;
 
 
-
     public PositionName() {
     }
 

@@ -25,6 +25,7 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.FileUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -102,8 +103,14 @@ public class ClientExtendedService extends UserBaseService {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
-        Client nextToKin = validateCPRNumber(nextToKinDTO.getCprNumber());
+
+        if(clientGraphRepository.citizenInNextToKinList(clientId,nextToKinDTO.getCprNumber())){
+            logger.error("Next to kin already exist with CPR number " + nextToKinDTO.getCprNumber());
+            throw new DuplicateDataException("Next to kin already exist with CPR number");
+        }
+
         Long homeAddressId = null;
+        Client nextToKin = validateCPRNumber(nextToKinDTO.getCprNumber());
         ContactDetail contactDetail = null;
         if(!Optional.ofNullable(nextToKin).isPresent()){
             nextToKin = new Client();
@@ -293,6 +300,14 @@ public class ClientExtendedService extends UserBaseService {
         clientGraphRepository.save(nextToKin);
         return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + FORWARD_SLASH,
                 nextToKinDTO.getRelationTypeId(),nextToKinDTO);
+    }
+
+    public NextToKinQueryResult getNextToKinByCprNumber(String cprNumber){
+        if(StringUtils.isEmpty(cprNumber) || cprNumber.length()<10){
+            logger.error("Cpr number is incorrect " + cprNumber);
+        }
+        return clientGraphRepository.getNextToKinByCprNumber(cprNumber,envConfig.getServerHost() + FORWARD_SLASH);
+
     }
 
     public Map<String, Object> setTransportationDetails(Client client) {
@@ -586,7 +601,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         accessToLocation.setAccessPhotoURL(fileName);
         accessToLocationGraphRepository.save(accessToLocation);
-        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + fileName;
     }
 
     public void removeAccessToLocationImage(long accessToLocationId) {
@@ -602,7 +617,7 @@ public class ClientExtendedService extends UserBaseService {
         String fileName = writeFile(multipartFile);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+fileName);
         return imageurls;
     }
 
@@ -628,7 +643,7 @@ public class ClientExtendedService extends UserBaseService {
         clientGraphRepository.save(nextToKin);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ fileName);
         return imageurls;
     }
 
@@ -649,7 +664,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         client.setProfilePic(fileName);
         clientGraphRepository.save(client);
-        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ fileName;
     }
 
 

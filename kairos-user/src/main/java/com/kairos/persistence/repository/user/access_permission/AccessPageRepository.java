@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.access_permission;
 
 import com.kairos.persistence.model.user.access_permission.AccessPage;
+import com.kairos.persistence.model.user.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
@@ -34,13 +35,18 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
     @Query("Match (n:UnitEmployment)-[:"+HAS_ACCESS_PERMISSION+"]->(accessPermission:AccessPermission)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(p:AccessPage) where id(n)={0} AND id(p)={1} SET r.isRead={2} return r")
     void modifyAccessPagePermission(long unitEmploymentId, long accessPageId, boolean value);
 
-    @Query("MATCH path=(accessPage:AccessPage)-[:"+SUB_PAGE+"*]->() WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with ps\n" +
+    @Query("MATCH path=(accessPage:AccessPage{active:true})-[:"+SUB_PAGE+"*]->(subPage:AccessPage{active:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with ps\n" +
             "match (accessGroup:AccessGroup) where id(accessGroup)={0} with accessGroup,ps\n" +
             "optional match (parent:AccessPage)<-[r2:"+HAS_ACCESS_OF_TABS+"]-(accessGroup)\n" +
             "where id(parent)=id(ps.p) with r2,ps,accessGroup\n" +
             "optional match (child:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(accessGroup)\n" +
             "where id(child)=id(ps.c) with r,r2,ps,accessGroup\n" +
-            "return {name:ps.p.name,id:id(ps.p),selected:case when r2.isEnabled then true else false end,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),selected:case when r.isEnabled then true else false end})} as data")
+            "return {name:ps.p.name,id:id(ps.p),selected:case when r2.isEnabled then true else false end,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),selected:case when r.isEnabled then true else false end})} as data\n" +
+            "UNION\n" +
+            "Match (accessPage:AccessPage{isModule:true,active:true}) where not (accessPage)-[:"+SUB_PAGE+"]->() with accessPage\n" +
+            "match (accessGroup:AccessGroup) where id(accessGroup)={0} with accessGroup,accessPage\n" +
+            "optional match (accessPage:AccessPage)<-[r:"+HAS_ACCESS_OF_TABS+"]-(accessGroup)\n" +
+            "return {name:accessPage.name,id:id(accessPage),selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
     List<Map<String,Object>> getAccessPageHierarchy(long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup),(accessPermission:AccessPermission) where id(accessPermission)={0} AND id(accessGroup)={1}\n" +
@@ -77,7 +83,7 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
             "Match (unitEmp)-[:"+HAS_ACCESS_PERMISSION+"{isEnabled:true}]->(ap:AccessPermission) with ap,org\n" +
             "MATCH (ap)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,ap,org\n"+
             "Match (ap)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(accessPage:AccessPage{isModule:true})<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup)\n" +
-            "return id(accessPage) as id,accessPage.name as name,r.isRead as read,r.isWrite as write,accessPage.moduleId as moduleId")
+            "return id(accessPage) as id,accessPage.name as name,r.isRead as read,r.isWrite as write,accessPage.moduleId as moduleId,accessPage.active as active")
     List<AccessPageQueryResult> getPermissionOfMainModule(long orgId, long userId);
 
     @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
@@ -88,14 +94,33 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
             "Match (accessPermission)-[modulePermission:HAS_ACCESS_PAGE_PERMISSION]->(module:AccessPage{isModule:true})<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with module,accessPermission,modulePermission\n" +
             "Match (accessPage)-[:SUB_PAGE*]->(subPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPermission,modulePermission,subPage,module\n"+
             "Match (subPage:AccessPage)<-[subPagePermission:HAS_ACCESS_PAGE_PERMISSION]-(accessPermission) with module,subPage,modulePermission,subPagePermission\n" +
-            "return module.name as name,id(module) as id,module.moduleId as moduleId,modulePermission.isRead as read,modulePermission.isWrite as write,module.isModule as isModule,collect({name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:subPagePermission.isRead,write:subPagePermission.isWrite,isModule:subPage.isModule}) as children")
+            "return module.name as name,id(module) as id,module.moduleId as moduleId,modulePermission.isRead as read,modulePermission.isWrite as write,module.isModule as isModule,module.active as active,collect({name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:subPagePermission.isRead,write:subPagePermission.isWrite,isModule:subPage.isModule,active:subPage.active}) as children")
     List<AccessPageQueryResult> getTabPermissionForUnit(long unitId, long userId);
 
     @Query("Match (accessPage:AccessPage{isModule:true}) with accessPage as module\n" +
             "Match (module)-[:SUB_PAGE*]->(subPage:AccessPage) with module,subPage\n" +
-            "return module.name as name,id(module) as id,module.moduleId as moduleId,true as read,true as write,module.isModule as isModule,collect({name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:true,write:true,isModule:subPage.isModule}) as children")
+            "return module.name as name,id(module) as id,module.moduleId as moduleId,true as read,true as write,module.isModule as isModule," +
+            "module.active as active,collect({name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:true,write:true," +
+            "isModule:subPage.isModule,active:subPage.active}) as children")
     List<AccessPageQueryResult> getTabsPermissionForHubMember();
 
     AccessPage findByModuleId(String moduleId);
 
+    @Query("Match (accessPage:AccessPage{isModule:true}) return id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId," +
+            "accessPage.active as active")
+    List<AccessPageDTO> getMainTabs();
+
+    @Query("Match (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) where id(accessPage)={0} return id(subPage) as id," +
+            "subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,id(accessPage) as parentTabId")
+    List<AccessPageDTO> getChildTabs(Long tabId);
+
+    @Query("Match (accessPage:AccessPage) where id(accessPage)={0} set accessPage.name={1} return accessPage")
+    AccessPage updateAccessTab(Long id, String name);
+
+    @Query("Match (n:AccessPage) where id(n)={0} with n\n" +
+            "Optional Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages set pages.active={1} return distinct true")
+    Boolean updateStatusOfAccessTabs(Long tabId,Boolean active);
+
 }
+
+

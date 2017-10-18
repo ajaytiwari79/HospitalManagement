@@ -402,6 +402,7 @@ public class UserService extends UserBaseService {
             response.put("read", mainModule.isRead());
             response.put("write", mainModule.isWrite());
             response.put("moduleId",mainModule.getModuleId());
+            response.put("active",mainModule.isActive());
             List<Map<String, Object>> unitPermissionList = new ArrayList<>();
             for (Map<String, Object> unitPermission : list) {
                 Map<String, Object> unitPermissionForModule = new HashMap<>();
