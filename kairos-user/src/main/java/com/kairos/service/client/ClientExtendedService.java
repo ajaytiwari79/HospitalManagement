@@ -601,7 +601,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         accessToLocation.setAccessPhotoURL(fileName);
         accessToLocationGraphRepository.save(accessToLocation);
-        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + fileName;
     }
 
     public void removeAccessToLocationImage(long accessToLocationId) {
