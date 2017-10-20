@@ -20,6 +20,7 @@ buildscript {
 
 plugins {
 	id "org.sonarqube" version "2.2.1"
+    id 'net.researchgate.release' version '2.4.0'
 }
 
 apply plugin: 'java'
@@ -139,4 +140,30 @@ sonarqube {
         //f1601d358fe3614c11dd5c9ceb3b9402e648fa08
         property "sonar.host.url","http://dev.kairosplanning.com:9000"
     }
+}
+
+//gradle release plugin
+release {
+    failOnCommitNeeded = true
+    failOnPublishNeeded = true
+    failOnSnapshotDependencies = true
+    failOnUnversionedFiles = true
+    failOnUpdateNeeded = true
+    revertOnFail = true
+    preCommitText = ''
+    preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
+    tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
+    newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
+    tagTemplate = '${version}'
+    versionPropertyFile = 'gradle.properties'
+    versionProperties = []
+    buildTasks = ['build']
+    git {
+        requireBranch = 'development'
+        pushToRemote = 'origin'
+        pushToBranchPrefix = ''
+        commitVersionFileOnly = false
+    }
+
+
 }
