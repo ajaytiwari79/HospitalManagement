@@ -6,6 +6,7 @@ buildscript {
 		neo4jBoltDriverVersion = '2.1.1'
 		neo4jOgmVersion="2.1.1"
         projectVersion="0.0.1"
+        version="0.0.1"
 	}
 	repositories {
 		mavenCentral()
