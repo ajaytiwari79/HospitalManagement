@@ -159,7 +159,7 @@ release {
     versionProperties = []
     buildTasks = ['build']
     git {
-        requireBranch = 'development'
+        requireBranch = 'release-plugin'
         pushToRemote = 'origin'
         pushToBranchPrefix = ''
         commitVersionFileOnly = false
