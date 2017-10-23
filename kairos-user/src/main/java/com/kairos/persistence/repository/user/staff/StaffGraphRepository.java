@@ -324,5 +324,15 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     @Query("MATCH (u:User)-[:BELONGS_TO]-(s:Staff) where id(u)={0} return s ")
     Staff getStaffByUserId(Long id);
 
+    @Query( "MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment) where id(organization)={0} with employment\n" +
+            "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment)-[:PROVIDED_BY]->(unit:Organization) where id(unit)={1} AND ( staff.firstName=~{2} OR staff.firstName=~{2} OR staff.userName=~{2} ) with unitEmployment, staff\n" +
+            "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, unitEmployment, staff\n" +
+            "OPTIONAL Match (staff)-[:"+ENGINEER_TYPE+"]->(engineerType:EngineerType) with engineerType, staff, user\n" +
+            "OPTIONAL MATCH (staff)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail)  WHERE cd.privatePhone STARTS WITH {4}  with contactDetail,  engineerType, staff, user\n" +
+            "return {id:id(staff), name:staff.firstName+\" \" +staff.lastName, firstName:staff.firstName,lastName:staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,visitourId:staff.visitourId, age:user.age, gender:user.gender, profilePic: {2} + staff.profilePic, engineerType:id(engineerType)} as data order by data.firstName ASC SKIP {6} LIMIT 20")
+    List<Map<String,Object>> getStaffBasicInfoWithFilters(long organizationId, long unitId, String imageUrl);
+
+
+
 
 }
