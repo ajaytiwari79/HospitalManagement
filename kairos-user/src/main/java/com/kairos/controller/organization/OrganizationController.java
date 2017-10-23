@@ -550,7 +550,7 @@ public class OrganizationController {
                                                                              @Valid @RequestBody ResourceDTO resourceDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 resourceService.updateResource(resourceDTO, resourceId));
-        
+
     }
 
     /**
