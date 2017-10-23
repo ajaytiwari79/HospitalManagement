@@ -43,7 +43,7 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
             "AND ch.isEnabled = true WITH  ch as ch  " +
             "OPTIONAL MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
             "return {text: ch.holidayTitle,isEnabled :ch.isEnabled  ,holidayDate: ch.holidayDate, description:ch.description,startTime:ch.startTime,id:id(ch),endTime:ch.endTime, " +
-            "dayType:dt.name, colorCode:dt.colorCode," +
+            "dayType:dt.name, allowTimeSettings:dt.allowTimeSettings, colorCode:dt.colorCode," +
             "dayTypeId:id(dt)} as result order by  ch.holidayDate asc ")
     List<Map<String,Object>> getCountryAllHolidays(Long countryId);
 

@@ -131,6 +131,7 @@ public class CountryHolidayCalender extends UserBaseEntity {
         map.put("id", this.id);
         map.put("endTime", this.endTime);
         map.put("dayType", this.dayType.getName());
+        map.put("allowTimeSettings", this.dayType.isAllowTimeSettings());
         map.put("dayTypeId", this.dayType.getId());
         map.put("colorCode", this.dayType.getColorCode());
         return map;

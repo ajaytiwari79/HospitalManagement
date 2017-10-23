@@ -148,7 +148,7 @@ public class StaffService extends UserBaseService {
         FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
         save(staff);
-        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + fileName;
 
     }
 
@@ -270,7 +270,7 @@ public class StaffService extends UserBaseService {
         Map<String, Object> map = new HashMap<>();
         map.put("firstName", staff.getFirstName());
         map.put("lastName", staff.getLastName());
-        map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + staff.getProfilePic());
+        map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ staff.getProfilePic());
         map.put("familyName", staff.getFamilyName());
         map.put("active", staff.isActive());
         map.put("signature", staff.getSignature());
@@ -325,12 +325,12 @@ public class StaffService extends UserBaseService {
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
         } else if (GROUP.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByGroupId(id, envConfig.getServerHost() + FORWARD_SLASH);
+            staff = staffGraphRepository.getStaffByGroupId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             Organization organization = organizationGraphRepository.getOrganizationByGroupId(id).getOrganization();
             countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
             roles = accessGroupService.getAccessGroups(organization.getId());
         } else if (TEAM.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH);
+            staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             Organization organization = organizationGraphRepository.getOrganizationByTeamId(id);
             roles = accessGroupService.getAccessGroups(organization.getId());
             countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
@@ -362,9 +362,9 @@ public class StaffService extends UserBaseService {
         }
 
         if (parent == null) {
-            return staffGraphRepository.getStaffWithBasicInfo(unit.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH);
+            return staffGraphRepository.getStaffWithBasicInfo(unit.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         } else {
-            return staffGraphRepository.getStaffInfoForFilters(parent.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH);
+            return staffGraphRepository.getStaffInfoForFilters(parent.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         }
     }
 
