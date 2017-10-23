@@ -141,8 +141,8 @@ public class ClientExtendedService extends UserBaseService {
         }
         saveCivilianStatus(nextToKinDTO,nextToKin);
         nextToKin.setHomeAddress(homeAddress);
-        save(nextToKin);
-        saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, client.getId());
+        clientGraphRepository.save(nextToKin);
+   //     saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, client.getId());
         if(!hasAlreadyNextToKin(clientId,nextToKin.getId())){
             createNextToKinRelationship(client, nextToKin);
         }
@@ -154,7 +154,7 @@ public class ClientExtendedService extends UserBaseService {
     }
 
     private Client validateCPRNumber(String cprNumber){
-        Client client = clientGraphRepository.findByCPRNumber(cprNumber.trim());
+        Client client = clientGraphRepository.findByCprNumber(cprNumber.trim());
         if(Optional.ofNullable(client).isPresent() && client.isCitizenDead()){
             throw new DuplicateDataException("You can't enter the CPR of dead citizen " + cprNumber);
         }

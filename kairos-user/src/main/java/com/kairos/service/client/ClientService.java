@@ -11,7 +11,6 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.user.client.*;
@@ -51,7 +50,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
@@ -164,7 +162,7 @@ public class ClientService extends UserBaseService {
             }
 
 
-            Client client = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
+            Client client = clientGraphRepository.findByCprNumber(clientMinimumDTO.getCprnumber());
             if (Optional.ofNullable(client).isPresent() && client.isCitizenDead()) {
                 throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
             }
@@ -220,7 +218,7 @@ public class ClientService extends UserBaseService {
     public boolean checkCitizenCPRConstraint(Client client) {
         logger.debug("Checking CRP Constraints...");
         boolean cprExists = true;
-        if (client.getCprNumber() != null && clientGraphRepository.findByCPRNumber(client.getCprNumber()) != null) {
+        if (client.getCprNumber() != null && clientGraphRepository.findByCprNumber(client.getCprNumber()) != null) {
             logger.debug("CPR number matched !");
             //return false;
             cprExists = false;
@@ -620,7 +618,7 @@ public class ClientService extends UserBaseService {
 
     private Client saveDetailsOfHouseHold(ClientMinimumDTO clientMinimumDTO) {
 
-        Client houseHoldPeople = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
+        Client houseHoldPeople = clientGraphRepository.findByCprNumber(clientMinimumDTO.getCprnumber());
         if (Optional.ofNullable(houseHoldPeople).isPresent()) {
             if (houseHoldPeople.isCitizenDead()) {
                 throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
@@ -1291,7 +1289,7 @@ public class ClientService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect client id " + clientId);
         }
 
-        Client houseHoldPerson = clientGraphRepository.findByCPRNumber(cprNumber);
+        Client houseHoldPerson = clientGraphRepository.findByCprNumber(cprNumber);
         if (Optional.ofNullable(houseHoldPerson).isPresent()) {
             if (houseHoldPerson.isCitizenDead()) {
                 throw new DataNotFoundByIdException("You can't enter CPR number of dead citizen");

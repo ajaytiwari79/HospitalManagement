@@ -1,5 +1,6 @@
 package com.kairos.controller.organization;
 
+import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.TeamDTO;
@@ -536,10 +537,30 @@ public class OrganizationController {
     @RequestMapping(value = "unit/{unitId}/resources", method = RequestMethod.POST)
     @ApiOperation("Update Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateOrganizationResources(@PathVariable Long unitId,
+    public ResponseEntity<Map<String, Object>> createResourceForOrganization(@PathVariable Long unitId,
                                                                            @Valid @RequestBody ResourceDTO resourceDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 resourceService.addResource(resourceDTO, unitId));
+    }
+
+    @RequestMapping(value = "unit/{unitId}/resource/{resourceId}", method = RequestMethod.PUT)
+    @ApiOperation("Update Resource of a Unit")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateResource(@PathVariable Long resourceId,
+                                                                             @Valid @RequestBody ResourceDTO resourceDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                resourceService.updateResource(resourceDTO, resourceId));
+    }
+
+    /**
+     * Mark disabled to a resource by given id
+     *
+     * @param resourceId
+     */
+    @RequestMapping(value = "/unit/{unitId}/resource/{resourceId}", method = RequestMethod.DELETE)
+    @ApiOperation("Delete a resource by resourceId")
+    ResponseEntity<Map<String, Object>> deleteResourceById(@PathVariable Long resourceId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, resourceService.deleteResource(resourceId));
     }
 
 

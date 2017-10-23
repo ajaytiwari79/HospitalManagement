@@ -133,8 +133,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     List<Team> findForbidTeam(Long id);
 
     @Depth(value = 1)
-    @Query("MATCH (c:Client) where c.cprNumber={0}  return c")
-    Client findByCPRNumber(String cprNumber);
+    Client findByCprNumber(String cprNumber);
 
     @Query("MATCH (t:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(s:Staff)-[:BELONGS_TO]->(u:User) where id(t)={0} \n" +
             "             with s AS staff , u as user\n" +
