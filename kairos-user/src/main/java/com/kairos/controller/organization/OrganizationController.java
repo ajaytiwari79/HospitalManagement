@@ -5,7 +5,7 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.user.client.ClientStaffDTO;
 import com.kairos.persistence.model.user.department.Department;
-import com.kairos.persistence.model.user.resources.Resource;
+import com.kairos.persistence.model.user.resources.ResourceDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.*;
 
@@ -518,25 +519,27 @@ public class OrganizationController {
     @RequestMapping(value = "unit/{unitId}/resources", method = RequestMethod.GET)
     @ApiOperation("Get Organization Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationResources(@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationResources(@PathVariable Long unitId,
+                                                                        @RequestParam("startDate") String date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                resourceService.getUnitResources(unitId));
+                resourceService.getUnitResources(unitId,date));
     }
 
     @RequestMapping(value = "unit/{unitId}/resources/type", method = RequestMethod.GET)
     @ApiOperation("Get Organization Resource Type Array")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationResourcesTypes() {
+    public ResponseEntity<Map<String, Object>> getOrganizationResourcesTypes(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                resourceService.getUnitResourcesTypes());
+                resourceService.getUnitResourcesTypes(unitId));
     }
 
-    @RequestMapping(value = "unit/{unitId}/resources", method = RequestMethod.PUT)
+    @RequestMapping(value = "unit/{unitId}/resources", method = RequestMethod.POST)
     @ApiOperation("Update Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateOrganizationResources(@PathVariable Long unitId, @RequestBody Resource resource) {
+    public ResponseEntity<Map<String, Object>> updateOrganizationResources(@PathVariable Long unitId,
+                                                                           @Valid @RequestBody ResourceDTO resourceDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                resourceService.setUnitResource(resource, unitId));
+                resourceService.addResource(resourceDTO, unitId));
     }
 
 

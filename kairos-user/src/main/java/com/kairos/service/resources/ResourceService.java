@@ -3,17 +3,23 @@ package com.kairos.service.resources;
 /**
  * Created by oodles on 17/10/16.
  */
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.resources.FuelType;
-import com.kairos.persistence.model.user.resources.Resource;
-import com.kairos.persistence.model.user.resources.VehicleType;
+import com.kairos.persistence.model.user.resources.Vehicle;
+import com.kairos.persistence.model.user.resources.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
+import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.country.CountryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 /**
@@ -23,10 +29,16 @@ import java.util.*;
 @Transactional
 public class ResourceService extends UserBaseService {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Inject
     ResourceGraphRepository resourceGraphRepository;
     @Inject
     OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    CountryService countryService;
+    @Inject
+    VehicleGraphRepository vehicleGraphRepository;
 
 
     /**
@@ -97,56 +109,45 @@ public class ResourceService extends UserBaseService {
 
     }
 
-    public List<Object> getUnitResources(Long unitId) {
-        List<Map<String, Object>> mapList = getAllResourcesByOrgId(unitId);
-        List<Object> objectList = new ArrayList<>();
-        if (!mapList.isEmpty()) {
-            for (Map<String, Object> map : mapList) {
-                Object o = map.get("resourceList");
-                objectList.add(o);
-            }
-            return objectList;
-        }
-        return null;
+    public List<ResourceWrapper> getUnitResources(Long unitId,String date) {
+        Instant instant = Instant.parse(date);
+        LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+        LocalDateTime firstDayOfMonth = startDate.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDateTime lastDayOfMonth = startDate.with(TemporalAdjusters.lastDayOfMonth());
+
+        List<ResourceWrapper> resources = resourceGraphRepository.getResources(firstDayOfMonth.atZone(
+                ZoneId.systemDefault()).toInstant().toEpochMilli(),lastDayOfMonth.atZone(
+                ZoneId.systemDefault()).toInstant().toEpochMilli(),unitId);
+      return resources;
     }
 
 
-    public Map<String, Object> getUnitResourcesTypes() {
-        Map<String, Object> data = new HashMap<>();
-        List<String> typeList = new ArrayList<>();
-        List<String> fuelList = new ArrayList<>();
-        for (VehicleType type : VehicleType.values()) {
-            String value = String.valueOf(VehicleType.valueOf(type.name()));
-            typeList.add(value);
-        }
-        for (FuelType type : FuelType.values()) {
-            String value = String.valueOf(FuelType.valueOf(type.name()));
-            fuelList.add(value);
-        }
-
-        data.put("typeList", typeList);
-        data.put("fuelList", fuelList);
-
-        return data;
+    public ResourceTypeWrapper getUnitResourcesTypes(Long unitId) {
+        Long countryId = organizationGraphRepository.getCountryId(unitId);
+        List<Vehicle> vehicleTypes = countryService.getVehicleList(countryId);
+        ResourceTypeWrapper resourceWrapper = new ResourceTypeWrapper(vehicleTypes,Arrays.asList(FuelType.values()));
+        return resourceWrapper;
     }
 
 
-    public Resource setUnitResource(Resource resource, Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization != null) {
-            if (organization.getResourceList() != null) {
-                List<Resource> resourceList = organization.getResourceList();
-                resourceList.add(resource);
-                organizationGraphRepository.save(organization);
-                return resourceGraphRepository.save(resource);
-            } else {
-                organization.setResourceList(Arrays.asList(resource));
-                organizationGraphRepository.save(organization);
-                return resourceGraphRepository.save(resource);
-            }
-
+    public Resource addResource(ResourceDTO resourceDTO, Long unitId) {
+        Organization organization = (Optional.ofNullable(unitId).isPresent())?organizationGraphRepository.findOne(unitId):null;
+        if(!Optional.ofNullable(organization).isPresent()){
+            logger.error("Incorrect unit id " + unitId);
+            throw new DataNotFoundByIdException("Incorrect unit id ");
         }
-        return null;
+
+        Vehicle vehicle = vehicleGraphRepository.findOne(resourceDTO.getVehicleTypeId());
+        if(!Optional.ofNullable(vehicle).isPresent()){
+            logger.error("Vehicle type not found " + resourceDTO.getVehicleTypeId());
+            throw new DataNotFoundByIdException("Vehicle type not found");
+        }
+        Resource resource = new Resource(vehicle,resourceDTO.getRegistrationNumber(),resourceDTO.getNumber(),
+                resourceDTO.getModelDescription(),resourceDTO.getCostPerKM());
+        resource.setAvailability(resourceDTO);
+        organization.addResource(resource);
+        save(organization);
+        return resource;
     }
 
 
