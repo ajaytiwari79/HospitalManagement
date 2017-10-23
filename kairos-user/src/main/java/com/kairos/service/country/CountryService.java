@@ -372,7 +372,7 @@ public class CountryService extends UserBaseService {
     public Vehicle addVehicle(Long countryId, Vehicle vehicle) {
         Country country = (Optional.ofNullable(countryId).isPresent()) ? countryGraphRepository.findOne(countryId) :
                 null;
-        if (Optional.ofNullable(country).isPresent()) {
+        if (!Optional.ofNullable(country).isPresent()) {
             logger.error("Finding country by id::" + countryId);
             throw new DataNotFoundByIdException("Incorrect country id");
         }

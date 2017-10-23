@@ -33,12 +33,14 @@ public class Resource extends UserBaseEntity {
     private LocalTime timeFrom;
     @Convert(Neo4jTimeConvertor.class)
     private LocalTime timeTo;
-    public Resource(Vehicle vehicleType, String registrationNumber, String number, String modelDescription, float costPerKM) {
+    public Resource(Vehicle vehicleType, String registrationNumber, String number, String modelDescription,
+                    float costPerKM,FuelType fuelType) {
         this.vehicleType = vehicleType;
         this.registrationNumber = registrationNumber;
         this.number = number;
         this.modelDescription = modelDescription;
         this.costPerKM = costPerKM;
+        this.fuelType = fuelType;
     }
 
     @Relationship(type = RelationshipConstants.RESOURCE_NOT_AVAILABLE_ON)

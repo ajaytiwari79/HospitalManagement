@@ -1,11 +1,17 @@
 package com.kairos.client;
 
 import com.kairos.UserServiceApplication;
-import org.junit.Ignore;
+import com.kairos.persistence.model.user.client.ClientMinimumDTO;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -17,15 +23,25 @@ public class HouseHoldTest {
 
     @Value("${server.host.http.url}")
     private String url ;
+    @Autowired
+    TestRestTemplate restTemplate;
 
+
+    /**
+     * this test checks, client can't add himself in his house hold list
+     */
     @Test
-    @Ignore
-    public void addHouseHold(){
-        String baseUrl=getBaseUrl(1L,1L);
-
+    public void validateCitizenAsHouseHold(){
+        String baseUrl=getBaseUrl(71L,5753L);
+        ClientMinimumDTO clientMinimumDTO = new ClientMinimumDTO("Aage","Bag","2503681059");
+        HttpEntity<ClientMinimumDTO> entity = new HttpEntity<>(clientMinimumDTO);
+        ResponseEntity<ClientMinimumDTO> response = restTemplate.exchange(
+                baseUrl+"/client/571/household",
+                HttpMethod.POST, entity, ClientMinimumDTO.class);
+       Assert.assertEquals(409,response.getStatusCodeValue());
     }
 
-    public   final String getBaseUrl(Long organizationId,Long unitId){
+    public final String getBaseUrl(Long organizationId,Long unitId){
         if(organizationId!=null &&unitId!=null ){
             String baseUrl=new StringBuilder(url+"/api/v1/organization/").append(organizationId)
                     .append("/unit/").append(unitId).toString();                    ;
