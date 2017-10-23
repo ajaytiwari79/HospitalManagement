@@ -1046,7 +1046,7 @@ public class OrganizationController {
 
     }
 
-    @RequestMapping(value = "/unit/{unitId}/addStaffFavouriteFilters", method = RequestMethod.POST)
+    @RequestMapping(value = "/addStaffFavouriteFilters", method = RequestMethod.POST)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addStaffFavouriteFilters( @RequestBody StaffFilterDTO staffFilterDTO) {
@@ -1055,7 +1055,7 @@ public class OrganizationController {
 
 
 
-    @RequestMapping(value = "/unit/{unitId}/updateStaffFavouriteFilters", method = RequestMethod.POST)
+    @RequestMapping(value = "/updateStaffFavouriteFilters", method = RequestMethod.POST)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateStaffFavouriteFilters( @RequestBody  StaffFilterDTO staffFilterDTO) {
@@ -1063,7 +1063,7 @@ public class OrganizationController {
     }
 
 
-    @RequestMapping(value = "/unit/{unitId}/getStaffFavouriteFilters/${moduleId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getStaffFavouriteFilters/{moduleId}", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffFavouriteFilters( @PathVariable  String moduleId) {

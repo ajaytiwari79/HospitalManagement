@@ -22,6 +22,16 @@ public class StaffFavouriteFilters extends UserBaseEntity {
 
     private String filterJson;
 
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public AccessPage getAccessPage() {
         return accessPage;
     }

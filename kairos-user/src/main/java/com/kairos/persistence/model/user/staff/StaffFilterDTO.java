@@ -12,6 +12,7 @@ public class StaffFilterDTO {
    private String moduleId;
    private String filterJson;
     private long id;
+    private String name;
 
     public long getId() {
         return id;
@@ -31,6 +32,14 @@ public class StaffFilterDTO {
 
     public String getFilterJson() {
         return filterJson;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setFilterJson(String filterJson) {
