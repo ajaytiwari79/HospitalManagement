@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by oodles on 9/1/17.
@@ -108,7 +110,7 @@ public class DayTypeService extends UserBaseService {
             String day=localDate.getDayOfWeek().name();
             Day dayEnum=Day.valueOf(day);
             //as per requirement one day may belong to many dayTypes return any day type
-            List<DayType> dayTypes=dayTypeGraphRepository.findByValidDays(dayEnum);
+            List<DayType> dayTypes=dayTypeGraphRepository.findByValidDays(Stream.of(dayEnum).collect(Collectors.toList()));
             return dayTypes.isEmpty()?null:dayTypes.get(0);
         }
 
