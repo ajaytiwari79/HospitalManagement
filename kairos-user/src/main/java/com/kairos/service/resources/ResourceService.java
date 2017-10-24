@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -124,9 +125,9 @@ public class ResourceService extends UserBaseService {
     public List<ResourceWrapper> getUnitResources(Long unitId, String date) {
         Instant instant = Instant.parse(date);
         LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
-        LocalDateTime firstDayOfMonth = startDate.with(TemporalAdjusters.firstDayOfMonth());
-        LocalDateTime lastDayOfMonth = startDate.with(TemporalAdjusters.lastDayOfMonth());
-
+        LocalDateTime firstDayOfMonth = startDate.with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).
+                withSecond(0).withNano(0);
+        LocalDateTime lastDayOfMonth = startDate.with(TemporalAdjusters.lastDayOfMonth()).withHour(11).withMinute(59);
         List<ResourceWrapper> resources = resourceGraphRepository.getResources(firstDayOfMonth.atZone(
                 ZoneId.systemDefault()).toInstant().toEpochMilli(), lastDayOfMonth.atZone(
                 ZoneId.systemDefault()).toInstant().toEpochMilli(), unitId);
@@ -142,7 +143,7 @@ public class ResourceService extends UserBaseService {
     }
 
 
-    public Resource addResource(ResourceDTO resourceDTO, Long unitId) {
+    public Resource addResource(ResourceDTO resourceDTO, Long unitId) throws ParseException {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
@@ -162,7 +163,7 @@ public class ResourceService extends UserBaseService {
         return resource;
     }
 
-    public Resource updateResource(ResourceDTO resourceDTO, Long resourceId) {
+    public Resource updateResource(ResourceDTO resourceDTO, Long resourceId) throws ParseException {
         Resource resource = (Optional.ofNullable(resourceId).isPresent()) ? resourceGraphRepository.findOne(resourceId) : null;
         if (!Optional.ofNullable(resource).isPresent()) {
             logger.error("Incorrect resource id" + resourceId);

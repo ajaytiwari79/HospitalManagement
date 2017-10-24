@@ -1,9 +1,12 @@
 package com.kairos.persistence.model.user.resources;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
@@ -19,10 +22,8 @@ public class ResourceWrapper {
     private FuelType fuelType;
     private Long startDate;
     private Long endDate;
-    @Convert(Neo4jTimeConvertor.class)
-    private LocalTime timeFrom;
-    @Convert(Neo4jTimeConvertor.class)
-    private LocalTime timeTo;
+    private Long timeFrom;
+    private Long timeTo;
     private Vehicle vehicleType;
 
     public Long getId() {
@@ -89,19 +90,19 @@ public class ResourceWrapper {
         this.endDate = endDate;
     }
 
-    public LocalTime getTimeFrom() {
+    public Long getTimeFrom() {
         return timeFrom;
     }
 
-    public void setTimeFrom(LocalTime timeFrom) {
+    public void setTimeFrom(Long timeFrom) {
         this.timeFrom = timeFrom;
     }
 
-    public LocalTime getTimeTo() {
+    public Long getTimeTo() {
         return timeTo;
     }
 
-    public void setTimeTo(LocalTime timeTo) {
+    public void setTimeTo(Long timeTo) {
         this.timeTo = timeTo;
     }
 
