@@ -1528,14 +1528,14 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
         logger.debug("Finding citizen with Id: " + organizationId);
         List<Map<String, Object>> mapList = new ArrayList<>();
         logger.info("citizenIds----------> " + citizenIds.size());
-        logger.info("clientFilterDTO----------> " + clientFilterDTO);
-        if(citizenIds.isEmpty()){
+
+        if(citizenIds.isEmpty() && clientFilterDTO.getServicesTypes().isEmpty() && clientFilterDTO.getTimeSlots().isEmpty() && clientFilterDTO.getTaskTypes().isEmpty() && !clientFilterDTO.isNewDemands()){
             mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDeadWithFilterParameters(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(), Integer.valueOf(skip));
 
         }else{
             mapList = organizationGraphRepository.getClientsWithFilterParameters(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(),Integer.valueOf(skip), citizenIds);
         }
-        logger.debug("CitizenList Size: " + mapList.size());
+        logger.info("CitizenList Size: " + mapList.size());
 
         Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )
