@@ -228,6 +228,7 @@ public class StaffAddressService extends UserBaseService {
             address = organization.getContactAddress();
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(unitId);
+            countryId = teamGraphRepository.getCountryByTeamId(unitId);
             address = team.getContactAddress();
         } else {
             throw new InternalError("type can not be null");
