@@ -538,7 +538,7 @@ public class OrganizationController {
     @ApiOperation("Update Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createResourceForOrganization(@PathVariable Long unitId,
-                                                                           @Valid @RequestBody ResourceDTO resourceDTO) {
+                                                                           @Valid @RequestBody ResourceDTO resourceDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 resourceService.addResource(resourceDTO, unitId));
     }
@@ -547,7 +547,7 @@ public class OrganizationController {
     @ApiOperation("Update Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateResource(@PathVariable Long resourceId,
-                                                                             @Valid @RequestBody ResourceDTO resourceDTO) {
+                                                                             @Valid @RequestBody ResourceDTO resourceDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 resourceService.updateResource(resourceDTO, resourceId));
 
