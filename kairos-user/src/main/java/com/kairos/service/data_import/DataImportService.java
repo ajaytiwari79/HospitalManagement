@@ -850,7 +850,7 @@ public class DataImportService {
                         if(cprNumber.length() == 9){
                             cprNumber = "0" + cprNumber;
                         }
-                        Client client = clientGraphRepository.findByCPRNumber(cprNumber);
+                        Client client = clientGraphRepository.findByCprNumber(cprNumber);
                         if(client != null){
                             for(String taskTypeId : taskTypeIds){
                                 TaskDemand taskDemand = taskDemandMongoRepository.findByCitizenIdAndTaskTypeId(client.getId(),new BigInteger(taskTypeId));
@@ -1092,7 +1092,7 @@ public class DataImportService {
             if(cprNumber.length() == 9){
                 cprNumber = "0" + cprNumber;
             }
-            Client client = clientGraphRepository.findByCPRNumber(cprNumber);
+            Client client = clientGraphRepository.findByCprNumber(cprNumber);
             if(client != null){
                 for(String taskTypeId : taskTypeIds){
                     TaskDemand taskDemand = taskDemandMongoRepository.findByCitizenIdAndTaskTypeId(client.getId(),new BigInteger(taskTypeId));

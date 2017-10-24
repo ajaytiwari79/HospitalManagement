@@ -632,7 +632,7 @@ public class BootDataService {
 
     private void createOodlesResource() {
         van = new Resource();
-        van.setName(VehicleType.CAR);
+        //van.setName(VehicleType.CAR);
         van.setCostPerKM(20);
         van.setFuelType(FuelType.DIESEL);
         van.setEnabled(true);
@@ -644,7 +644,7 @@ public class BootDataService {
 
 
         ambulance = new Resource();
-        ambulance.setName(VehicleType.AMBULANCE);
+    //    ambulance.setName(VehicleType.AMBULANCE);
         ambulance.setCostPerKM(50);
         ambulance.setFuelType(FuelType.PETROL);
         ambulance.setEnabled(true);
@@ -656,7 +656,7 @@ public class BootDataService {
 
 
         bicycle = new Resource();
-        bicycle.setName(VehicleType.BICYCLE);
+       // bicycle.setName(VehicleType.BICYCLE);
         bicycle.setCostPerKM(1);
         bicycle.setFuelType(FuelType.ELECTRIC);
         bicycle.setEnabled(true);

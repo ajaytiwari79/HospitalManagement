@@ -24,6 +24,8 @@ public class StaffFavouriteFilters extends UserBaseEntity {
 
     private String name;
 
+    private boolean enabled = true;
+
     public String getName() {
         return name;
     }
@@ -46,5 +48,13 @@ public class StaffFavouriteFilters extends UserBaseEntity {
 
     public void setFilterJson(String filterJson) {
         this.filterJson = filterJson;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -1258,10 +1258,13 @@ public class StaffService extends UserBaseService {
         staffFavouriteFilters.setAccessPage(accessPage);
         staffFavouriteFilters.setFilterJson(staffFilterDTO.getFilterJson());
         staffFavouriteFilters.setName(staffFilterDTO.getName());
+        save(staffFavouriteFilters);
         staff.addFavouriteFilters(staffFavouriteFilters);
+        save(staff);
         staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
         staffFilterDTO.setModuleId(accessPage.getModuleId());
         staffFilterDTO.setName(staffFavouriteFilters.getName());
+        staffFilterDTO.setId(staffFavouriteFilters.getId());
         return staffFilterDTO;
 
 
@@ -1274,14 +1277,29 @@ public class StaffService extends UserBaseService {
         if(!Optional.ofNullable(staffFavouriteFilters).isPresent()){
             throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFilterDTO.getId());
         }
-        AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
-        staffFavouriteFilters.setAccessPage(accessPage);
+        /*AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
+        staffFavouriteFilters.setAccessPage(accessPage);*/
         staffFavouriteFilters.setFilterJson(staffFilterDTO.getFilterJson());
         staffFavouriteFilters.setName(staffFilterDTO.getName());
+        staffFavouriteFilters.setEnabled(true);
         save(staffFavouriteFilters);
         staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
-        staffFilterDTO.setModuleId(accessPage.getModuleId());
+       // staffFilterDTO.setModuleId(accessPage.getModuleId());
         return staffFilterDTO;
+
+    }
+
+    public boolean removeStaffFavouriteFilters( Long staffFavouriteFilterId){
+        Long userId = UserContext.getUserDetails().getId();
+        Staff staff = staffGraphRepository.getStaffByUserId(userId);
+        StaffFavouriteFilters staffFavouriteFilters = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
+        if(!Optional.ofNullable(staffFavouriteFilters).isPresent()){
+            throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFavouriteFilterId);
+        }
+
+        staffFavouriteFilters.setEnabled(false);
+        save(staffFavouriteFilters);
+        return true;
 
     }
 

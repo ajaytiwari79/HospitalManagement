@@ -45,5 +45,11 @@ public class StaffFilterDTO {
     public void setFilterJson(String filterJson) {
         this.filterJson = filterJson;
     }
+
+    public StaffFilterDTO(String moduleId, String filterJson, String name) {
+        this.moduleId = moduleId;
+        this.filterJson = filterJson;
+        this.name = name;
+    }
 }
 
