@@ -141,7 +141,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         saveCivilianStatus(nextToKinDTO,nextToKin);
         nextToKin.setHomeAddress(homeAddress);
-        save(nextToKin);
+        clientGraphRepository.save(nextToKin);
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, client.getId());
         if(!hasAlreadyNextToKin(clientId,nextToKin.getId())){
             createNextToKinRelationship(client, nextToKin);
@@ -154,7 +154,7 @@ public class ClientExtendedService extends UserBaseService {
     }
 
     private Client validateCPRNumber(String cprNumber){
-        Client client = clientGraphRepository.findByCPRNumber(cprNumber.trim());
+        Client client = clientGraphRepository.findByCprNumber(cprNumber.trim());
         if(Optional.ofNullable(client).isPresent() && client.isCitizenDead()){
             throw new DuplicateDataException("You can't enter the CPR of dead citizen " + cprNumber);
         }
@@ -601,7 +601,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         accessToLocation.setAccessPhotoURL(fileName);
         accessToLocationGraphRepository.save(accessToLocation);
-        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + fileName;
     }
 
     public void removeAccessToLocationImage(long accessToLocationId) {
@@ -617,7 +617,7 @@ public class ClientExtendedService extends UserBaseService {
         String fileName = writeFile(multipartFile);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+fileName);
         return imageurls;
     }
 
@@ -643,7 +643,7 @@ public class ClientExtendedService extends UserBaseService {
         clientGraphRepository.save(nextToKin);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ fileName);
         return imageurls;
     }
 
@@ -664,7 +664,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         client.setProfilePic(fileName);
         clientGraphRepository.save(client);
-        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ fileName;
     }
 
 

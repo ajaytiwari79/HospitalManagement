@@ -4,13 +4,13 @@ import com.kairos.client.*;
 import com.kairos.client.dto.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.user.client.*;
@@ -50,7 +50,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
@@ -163,7 +162,7 @@ public class ClientService extends UserBaseService {
             }
 
 
-            Client client = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
+            Client client = clientGraphRepository.findByCprNumber(clientMinimumDTO.getCprnumber());
             if (Optional.ofNullable(client).isPresent() && client.isCitizenDead()) {
                 throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
             }
@@ -219,7 +218,7 @@ public class ClientService extends UserBaseService {
     public boolean checkCitizenCPRConstraint(Client client) {
         logger.debug("Checking CRP Constraints...");
         boolean cprExists = true;
-        if (client.getCprNumber() != null && clientGraphRepository.findByCPRNumber(client.getCprNumber()) != null) {
+        if (client.getCprNumber() != null && clientGraphRepository.findByCprNumber(client.getCprNumber()) != null) {
             logger.debug("CPR number matched !");
             //return false;
             cprExists = false;
@@ -335,7 +334,7 @@ public class ClientService extends UserBaseService {
 
             // Profile Picture
             String image = (String) data.get("profilePic");
-            String imageUrl = envConfig.getServerHost() + FORWARD_SLASH + image;
+            String imageUrl = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + image;
             data.put("profilePic", imageUrl);
 
 
@@ -361,8 +360,7 @@ public class ClientService extends UserBaseService {
             Map<String, Object> clientGeneralDetails = currentClient.retrieveClientGeneralDetails();
 
             // Client Profile Picture
-            String url = envConfig.getServerHost() + FORWARD_SLASH;
-
+            String url = envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath();
             clientGeneralDetails.put("profilePic", url + (String) clientGeneralDetails.get("profilePic"));
             clientGeneralDetails.put("civilianStatus", clientGraphRepository.findCitizenCivilianStatus(clientId));
 
@@ -395,7 +393,7 @@ public class ClientService extends UserBaseService {
             }
 
             // NextToKin
-            List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId, envConfig.getServerHost() + FORWARD_SLASH);
+            List<NextToKinQueryResult> nextToKinDetails = clientGraphRepository.getNextToKinDetail(clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             response.put("nextToKin", nextToKinDetails);
             // Social Media Details
             Map<String, Object> socialMediaDetails = getSocialMediaDetails(clientId);
@@ -561,7 +559,7 @@ public class ClientService extends UserBaseService {
     }
 
     public List<Object> getAllUsers(Long teamID, Long clientId) {
-        List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + FORWARD_SLASH);
+        List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         List<Object> response = new ArrayList<>();
 
         if (data == null) {
@@ -602,7 +600,13 @@ public class ClientService extends UserBaseService {
         }
         Client houseHold = saveDetailsOfHouseHold(minimumDTO);
         saveAddressOfHouseHold(client, houseHold);
-        if (!Optional.ofNullable(houseHold.getId()).isPresent()) {
+        if (Optional.ofNullable(houseHold.getId()).isPresent()) {
+            if(houseHold.getId().equals(clientId)){
+                logger.error("You can't enter yourself in your house hold list : houseHoldId " + houseHold.getId() + " citizen id" + clientId);
+                throw new DataNotMatchedException("Add another house hold");
+            }
+
+        } else {
             addHouseHoldInOrganization(houseHold, unitId);
         }
         save(houseHold);
@@ -613,7 +617,7 @@ public class ClientService extends UserBaseService {
 
     private Client saveDetailsOfHouseHold(ClientMinimumDTO clientMinimumDTO) {
 
-        Client houseHoldPeople = clientGraphRepository.findByCPRNumber(clientMinimumDTO.getCprnumber());
+        Client houseHoldPeople = clientGraphRepository.findByCprNumber(clientMinimumDTO.getCprnumber());
         if (Optional.ofNullable(houseHoldPeople).isPresent()) {
             if (houseHoldPeople.isCitizenDead()) {
                 throw new DuplicateDataException("You can't enter the CPR of dead citizen " + clientMinimumDTO.getCprnumber());
@@ -852,7 +856,7 @@ public class ClientService extends UserBaseService {
             citizen.put("localAreaTag", client.getLocalAreaTag());
             citizen.put("address", client.getAddress());
             citizen.put("profilePic", (client.getProfilePic() == null) ? null :
-                    envConfig.getServerHost() + FORWARD_SLASH + client.getProfilePic());
+                    envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + client.getProfilePic());
             citizen.put("taskTypes", (taskTypeAggregateResult.isPresent()) ? taskTypeAggregateResult.get().getTaskTypeIds() : Collections.emptyList());
             Map<Long, Object> staffData = new HashMap<>();
             client.getStaff().forEach(staff -> {
@@ -898,7 +902,7 @@ public class ClientService extends UserBaseService {
         Map<String, Object> response = new HashMap<>();
 
         logger.debug("Finding citizen with Id: " + organizationId);
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         logger.debug("CitizenList Size: " + mapList.size());
 
         Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
@@ -919,7 +923,7 @@ public class ClientService extends UserBaseService {
     public Map<String, Object> getOrganizationClients(Long organizationId) {
 
         Map<String, Object> clientData = new HashMap<String, Object>();
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
 
         if (mapList.isEmpty()) {
             return null;
@@ -971,7 +975,7 @@ public class ClientService extends UserBaseService {
      * @auther anil maurya
      */
     public List<Map<String, Object>> getOrganizationClientsExcludeDead(Long organizationId) {
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         return mapList;
     }
 
@@ -1021,7 +1025,7 @@ public class ClientService extends UserBaseService {
         citizenDetails.put("id", citizen.getId());
         citizenDetails.put("name", citizen.getFirstName() + " " + citizen.getLastName());
         citizenDetails.put("age", citizen.getAge());
-        citizenDetails.put("profilePic", citizen.getProfilePic() != null ? envConfig.getServerHost() + FORWARD_SLASH + citizen.getProfilePic() : "");
+        citizenDetails.put("profilePic", citizen.getProfilePic() != null ? envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + citizen.getProfilePic() : "");
         citizenDetails.put("phone", citizen.getContactDetail() != null ? citizen.getContactDetail().retreiveContactNumbers() : "");
         citizenDetails.put("address", citizen.getHomeAddress());
         citizenDetails.put("cprNumber", citizen.getCprNumber());
@@ -1222,7 +1226,7 @@ public class ClientService extends UserBaseService {
     public OrganizationClientWrapper getOrgnizationClients(Long organizationId, OAuth2Authentication auth2Authentication) {
 
         logger.debug("Finding citizen with Id: " + organizationId);
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH);
+        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         logger.debug("CitizenList Size: " + mapList.size());
 
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(auth2Authentication.getUserAuthentication().getPrincipal().toString()).getId());
@@ -1284,7 +1288,7 @@ public class ClientService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect client id " + clientId);
         }
 
-        Client houseHoldPerson = clientGraphRepository.findByCPRNumber(cprNumber);
+        Client houseHoldPerson = clientGraphRepository.findByCprNumber(cprNumber);
         if (Optional.ofNullable(houseHoldPerson).isPresent()) {
             if (houseHoldPerson.isCitizenDead()) {
                 throw new DataNotFoundByIdException("You can't enter CPR number of dead citizen");

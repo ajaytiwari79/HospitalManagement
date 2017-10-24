@@ -9,6 +9,8 @@ import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGrap
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.FormatUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,8 @@ public class DayTypeService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private CountryHolidayCalenderGraphRepository countryHolidayCalenderGraphRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public Map<String, Object> createDayType(DayType dayType, long countryId){
         Country country = countryGraphRepository.findOne(countryId);
@@ -61,6 +65,7 @@ public class DayTypeService extends UserBaseService {
             currentDayType.setCode(dayType.getCode());
             currentDayType.setColorCode(dayType.getColorCode());
             currentDayType.setDescription(dayType.getDescription());
+            currentDayType.setAllowTimeSettings(dayType.isAllowTimeSettings());
             save(currentDayType);
             return currentDayType.retrieveDetails();
         }

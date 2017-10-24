@@ -221,7 +221,7 @@ public class ClientBatchService {
 
 
                 // Check if Client already exist in database with CPR number
-                client = clientGraphRepository.findByCPRNumber(cpr);
+                client = clientGraphRepository.findByCprNumber(cpr);
                 if (client == null) {
                     client = new Client();
                     client.setFirstName(firstName);
