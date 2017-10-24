@@ -139,8 +139,9 @@ public class ClientExtendedService extends UserBaseService {
         if (!Optional.ofNullable(homeAddress).isPresent()) {
             return null;
         }
-        saveCivilianStatus(nextToKinDTO,nextToKin);
         nextToKin.setHomeAddress(homeAddress);
+        CitizenStatus citizenStatus = saveCivilianStatus(nextToKinDTO,nextToKin);
+        nextToKin.setCivilianStatus(citizenStatus);
         clientGraphRepository.save(nextToKin);
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, client.getId());
         if(!hasAlreadyNextToKin(clientId,nextToKin.getId())){
@@ -232,7 +233,7 @@ public class ClientExtendedService extends UserBaseService {
         return contactAddressToSave;
     }
 
-    private void saveCivilianStatus(NextToKinDTO nextToKinDTO, Client nextToKin) {
+    private CitizenStatus saveCivilianStatus(NextToKinDTO nextToKinDTO, Client nextToKin) {
 
         if (Optional.ofNullable(nextToKinDTO.getCivilianStatusId()).isPresent()) {
             CitizenStatus citizenStatus = citizenStatusGraphRepository.findOne(nextToKinDTO.getCivilianStatusId());
@@ -240,10 +241,7 @@ public class ClientExtendedService extends UserBaseService {
                 logger.debug("Finding civilian status using id " + nextToKinDTO.getCivilianStatusId());
                 throw new DataNotFoundByIdException("Incorrect id of civilian status " + citizenStatus);
             }
-            if(Optional.ofNullable(nextToKin.getId()).isPresent()){
-                clientGraphRepository.deleteCivilianStatus(nextToKin.getId());
-            }
-            nextToKin.setCivilianStatus(citizenStatus);
+            return citizenStatus;
         } else {
             throw new DataNotFoundByIdException("Civilian status can't be empty");
         }
@@ -294,7 +292,8 @@ public class ClientExtendedService extends UserBaseService {
         }
         nextToKin.saveContactDetail(nextToKinDTO,contactDetail);
         nextToKin.setContactDetail(contactDetail);
-        saveCivilianStatus(nextToKinDTO,nextToKin);
+        CitizenStatus citizenStatus = saveCivilianStatus(nextToKinDTO,nextToKin);
+        nextToKin.setCivilianStatus(citizenStatus);
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, clientId);
         logger.debug("Preparing response");
         clientGraphRepository.save(nextToKin);

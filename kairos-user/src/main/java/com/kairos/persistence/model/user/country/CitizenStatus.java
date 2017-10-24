@@ -86,6 +86,7 @@ public class CitizenStatus extends UserBaseEntity {
                 ", description='" + description + '\'' +
                 ", country=" + country +
                 ", isEnabled=" + isEnabled +
+                ", id=" + super.getId() +
                 '}';
     }
 }
