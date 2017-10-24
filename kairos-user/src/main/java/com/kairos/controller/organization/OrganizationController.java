@@ -1102,6 +1102,15 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffFavouriteFilters(moduleId));
     }
 
+    // DayType
+    @ApiOperation(value = "Get DayType by unitID")
+    @RequestMapping(value = UNIT_URL + "/dayType", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayTypeByOrganization(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getAllDayTypeofOrganization(unitId));
+    }
+
+
 
 }
 
