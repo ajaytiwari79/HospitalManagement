@@ -918,7 +918,7 @@ public class OrganizationController {
      * @return OrganizationDTO
      */
     @ApiOperation("get getOrganization By TeamId ")
-    @RequestMapping(value = "/unit/{unitId}/getOrganizationByTeamId/{teamId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getOrganizationByTeamId/{teamId}", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getOrganizationByTeamId(@PathVariable long teamId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationByTeamId(teamId));
     }
