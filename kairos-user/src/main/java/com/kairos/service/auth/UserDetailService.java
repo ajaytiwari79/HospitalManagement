@@ -3,6 +3,7 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class UserDetailService {
     private UserGraphRepository userRepository;
 
     @Inject
+    @Lazy
     private PasswordEncoder passwordEncoder;
 
     /**

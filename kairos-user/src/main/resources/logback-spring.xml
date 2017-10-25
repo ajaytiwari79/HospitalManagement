@@ -39,7 +39,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="production">
+    <springProfile name="production,qa">
         <appender name="ROLLING-FILE"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
             <encoder>
