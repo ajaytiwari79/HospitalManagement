@@ -313,4 +313,16 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     List<StaffPersonalDetailDTO> getAllMainEmploymentStaffDetailByUnitId(long unitId, Position.EmploymentType employmentType);
 
 
+    @Query("MATCH (staff:Staff)-[:"+HAS_FAVOURITE_FILTERS+"]->(staffFavouriteFilters:StaffFavouriteFilters{enabled:true}) where id(staff)={0} with staffFavouriteFilters\n"+
+            "MATCH (staffFavouriteFilters)-[:"+FILTER_BY_PAGE+"]->(accessPage:AccessPage) where accessPage.moduleId={1} return staffFavouriteFilters\n" )
+    List<StaffFavouriteFilters> getStaffFavouriteFiltersByStaffAndView(Long staffId, String moduleId);
+
+    @Query("MATCH (staff:Staff)-[:"+HAS_FAVOURITE_FILTERS+"]->(staffFavouriteFilters:StaffFavouriteFilters) where id(staff)={0} AND id(staffFavouriteFilters)={1} return staffFavouriteFilters" )
+    StaffFavouriteFilters getStaffFavouriteFiltersById(Long staffId, Long staffFavouriteFiltersId);
+
+
+    @Query("MATCH (u:User)-[:BELONGS_TO]-(s:Staff) where id(u)={0} return s ")
+    Staff getStaffByUserId(Long id);
+
+
 }

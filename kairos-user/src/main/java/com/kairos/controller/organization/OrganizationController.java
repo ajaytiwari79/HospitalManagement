@@ -8,7 +8,9 @@ import com.kairos.persistence.model.user.client.ClientStaffDTO;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.resources.ResourceDTO;
 import com.kairos.persistence.model.user.skill.Skill;
+import com.kairos.persistence.model.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
+import com.kairos.response.dto.web.ClientFilterDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.service.client.ClientBatchService;
@@ -36,7 +38,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.ws.rs.QueryParam;
 import javax.validation.Valid;
+
 import java.text.ParseException;
 import java.util.*;
 
@@ -1052,12 +1056,50 @@ public class OrganizationController {
 
     }
 
+    @ApiOperation(value = "Get Organization Clients with filters")
+    @RequestMapping(value = "/unit/{unitId}/client/filters", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationClientsWithFilters(@PathVariable Long unitId, @RequestBody ClientFilterDTO clientFilterDTO, @RequestParam("start") String start) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start));
+    }
+
     @RequestMapping(value =UNIT_URL+"/dayTypebydate", method = RequestMethod.GET)
     @ApiOperation("get dayType in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> getDayType(@PathVariable Long unitId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)Date date){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(unitId,date));
 
+    }
+
+    @RequestMapping(value = "/addStaffFavouriteFilters", method = RequestMethod.POST)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addStaffFavouriteFilters( @RequestBody StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.addStaffFavouriteFilters( staffFilterDTO));
+    }
+
+
+
+    @RequestMapping(value = "/updateStaffFavouriteFilters", method = RequestMethod.POST)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateStaffFavouriteFilters( @RequestBody  StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updateStaffFavouriteFilters(staffFilterDTO));
+    }
+
+    @RequestMapping(value = "/removeStaffFavouriteFilters/{staffFavouriteFilterId}", method = RequestMethod.DELETE)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> removeStaffFavouriteFilters( @PathVariable  Long staffFavouriteFilterId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.removeStaffFavouriteFilters(staffFavouriteFilterId));
+    }
+
+    @RequestMapping(value = "/getStaffFavouriteFilters/{moduleId}", method = RequestMethod.GET)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffFavouriteFilters( @PathVariable  String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffFavouriteFilters(moduleId));
     }
 
     // DayType
