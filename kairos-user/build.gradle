@@ -14,12 +14,12 @@ buildscript {
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 		classpath 'org.springframework:springloaded:1.2.7.RELEASE'
-		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.2.1"
+		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
 	}
 }
 
 plugins {
-	id "org.sonarqube" version "2.2.1"
+	id "org.sonarqube" version "2.5"
 }
 
 apply plugin: 'java'
