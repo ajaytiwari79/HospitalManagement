@@ -175,6 +175,7 @@ public class RelationshipConstants {
     public final static String HAS_RELATION_OF="HAS_RELATION_OF";
     public final static String HAS_RESOURCES="HAS_RESOURCES";
     public final static  String BELONGS_TO_STAFF="BELONGS_TO_STAFF";
+    public final static String UNAVAILABLE_ON = "UNAVAILABLE_ON";
     /**
      * Default constructor
      */

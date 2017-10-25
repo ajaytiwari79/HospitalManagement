@@ -54,9 +54,8 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
     @Query("MATCH(o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource)  where id(o)={0} AND r.deleted=false  return r")
     List<Resource> getByUnitId(Long organizationId);
 
-    @Query("MATCH (o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource{deleted:false}) " +
-            "where (id(o)={2}) AND ((r.startDate>={0} and r.startDate<={1}) OR (r.endDate>={0} AND r.endDate<={1}))\n" +
-            "Match (r)-[:VEHICLE_TYPE]->(vehicle:Vehicle)\n" +
-            "return id(r) as id,r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType,r.startDate as startDate,r.endDate as endDate,r.timeFrom as timeFrom,r.timeTo as timeTo,vehicle as vehicleType")
-    List<ResourceWrapper> getResources(Long startDate, Long endDate, Long organizationId);
+    @Query("MATCH (o:Organization)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle) where id(o)={0}\n" +
+            "Match (r)-[:UNAVAILABLE_ON{month:{1},year:{2}}]->(ru:ResourceUnAvailability)\n" +
+            "return id(r) as id,r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType,vehicle as vehicleType,collect(ru) as resourceUnAvailabilities")
+    List<ResourceWrapper> getResources(Long organizationId,Integer month,Integer year);
 }

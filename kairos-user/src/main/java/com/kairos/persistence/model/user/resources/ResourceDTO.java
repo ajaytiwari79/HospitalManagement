@@ -15,12 +15,6 @@ public class ResourceDTO {
     private String modelDescription;
     private float costPerKM;
     private FuelType fuelType;
-    @NotNull(message = "start date can't be empty")
-    private String startDate;
-    private String endDate;
-    private String timeFrom;
-    private String timeTo;
-    @NotNull(message = "Vehicle type can't be empty")
     private Long vehicleTypeId;
 
     public Long getVehicleTypeId() {
@@ -31,37 +25,7 @@ public class ResourceDTO {
         this.vehicleTypeId = vehicleTypeId;
     }
 
-    public String getStartDate() {
-        return startDate;
-    }
 
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-
-    public String getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getTimeFrom() {
-        return timeFrom;
-    }
-
-    public void setTimeFrom(String timeFrom) {
-        this.timeFrom = timeFrom;
-    }
-
-    public String getTimeTo() {
-        return timeTo;
-    }
-
-    public void setTimeTo(String timeTo) {
-        this.timeTo = timeTo;
-    }
 
     public String getRegistrationNumber() {
         return registrationNumber;
@@ -110,11 +74,6 @@ public class ResourceDTO {
                 ", number='" + number + '\'' +
                 ", modelDescription='" + modelDescription + '\'' +
                 ", costPerKM=" + costPerKM +
-                ", fuelType=" + fuelType +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", timeFrom=" + timeFrom +
-                ", timeTo=" + timeTo +
                 ", vehicleTypeId=" + vehicleTypeId +
                 '}';
     }

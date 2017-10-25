@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * Created by prabjot on 16/10/17.
@@ -20,11 +21,8 @@ public class ResourceWrapper {
     private String modelDescription;
     private float costPerKM;
     private FuelType fuelType;
-    private Long startDate;
-    private Long endDate;
-    private Long timeFrom;
-    private Long timeTo;
     private Vehicle vehicleType;
+    private List<ResourceUnAvailability> resourceUnAvailabilities;
 
     public Long getId() {
         return id;
@@ -74,43 +72,19 @@ public class ResourceWrapper {
         this.fuelType = fuelType;
     }
 
-    public Long getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
-    }
-
-    public Long getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
-    }
-
-    public Long getTimeFrom() {
-        return timeFrom;
-    }
-
-    public void setTimeFrom(Long timeFrom) {
-        this.timeFrom = timeFrom;
-    }
-
-    public Long getTimeTo() {
-        return timeTo;
-    }
-
-    public void setTimeTo(Long timeTo) {
-        this.timeTo = timeTo;
-    }
-
     public Vehicle getVehicleType() {
         return vehicleType;
     }
 
     public void setVehicleType(Vehicle vehicleType) {
         this.vehicleType = vehicleType;
+    }
+
+    public List<ResourceUnAvailability> getResourceUnAvailabilities() {
+        return resourceUnAvailabilities;
+    }
+
+    public void setResourceUnAvailabilities(List<ResourceUnAvailability> resourceUnAvailabilities) {
+        this.resourceUnAvailabilities = resourceUnAvailabilities;
     }
 }

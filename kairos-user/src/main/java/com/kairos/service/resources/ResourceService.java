@@ -9,9 +9,11 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.resources.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
+import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRelationshipRepository;
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**
  * Calls ResourceGraphRepository to perform CRUD operation on Resources.
@@ -46,6 +47,8 @@ public class ResourceService extends UserBaseService {
     CountryService countryService;
     @Inject
     VehicleGraphRepository vehicleGraphRepository;
+    @Inject
+    ResourceUnavailabilityRelationshipRepository unavailabilityRelationshipRepository;
 
 
     /**
@@ -125,12 +128,7 @@ public class ResourceService extends UserBaseService {
     public List<ResourceWrapper> getUnitResources(Long unitId, String date) {
         Instant instant = Instant.parse(date);
         LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
-        LocalDateTime firstDayOfMonth = startDate.with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).
-                withSecond(0).withNano(0);
-        LocalDateTime lastDayOfMonth = startDate.with(TemporalAdjusters.lastDayOfMonth()).withHour(11).withMinute(59);
-        List<ResourceWrapper> resources = resourceGraphRepository.getResources(firstDayOfMonth.atZone(
-                ZoneId.systemDefault()).toInstant().toEpochMilli(), lastDayOfMonth.atZone(
-                ZoneId.systemDefault()).toInstant().toEpochMilli(), unitId);
+        List<ResourceWrapper> resources = resourceGraphRepository.getResources(unitId,startDate.getMonth().getValue(),startDate.getYear());
         return resources;
     }
 
@@ -157,7 +155,6 @@ public class ResourceService extends UserBaseService {
         }
         Resource resource = new Resource(vehicle, resourceDTO.getRegistrationNumber(), resourceDTO.getNumber(),
                 resourceDTO.getModelDescription(), resourceDTO.getCostPerKM(), resourceDTO.getFuelType());
-        resource.setAvailability(resourceDTO);
         organization.addResource(resource);
         save(organization);
         return resource;
@@ -175,8 +172,34 @@ public class ResourceService extends UserBaseService {
             throw new DataNotFoundByIdException("Vehicle type not found");
         }
         resource.setVehicleType(vehicle);
-        resource.setAvailability(resourceDTO);
         return resourceGraphRepository.save(resource);
+    }
+
+    public Resource setResourceUnavailability(ResourceUnavailabilityDTO unavailabilityDTO,Long resourceId){
+        Resource resource = resourceGraphRepository.findOne(resourceId);
+        if(resource == null){
+            logger.error("Resource not found by id " + resource);
+            throw new DataNotFoundByIdException("Resource not found");
+        }
+        List<ResourceUnavailabilityRelationship> resourceUnavailabilityRelationships = new ArrayList<>
+                (unavailabilityDTO.getUnavailabilityDates().size());
+
+
+        for(String unavailabilityDate : unavailabilityDTO.getUnavailabilityDates()){
+            ResourceUnAvailability resourceUnAvailability = new ResourceUnAvailability().
+                    setUnavailability(unavailabilityDTO,unavailabilityDate);
+            try {
+                LocalDateTime startDateIncludeTime = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDate,
+                        MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
+                ResourceUnavailabilityRelationship resourceUnavailabilityRelationship = new ResourceUnavailabilityRelationship(resource,
+                        resourceUnAvailability,startDateIncludeTime.getMonth().getValue(),startDateIncludeTime.getYear());
+                resourceUnavailabilityRelationships.add(resourceUnavailabilityRelationship);
+            } catch (ParseException e){
+                throw new InternalError("Incorrect resource date ");
+            }
+        }
+        unavailabilityRelationshipRepository.save(resourceUnavailabilityRelationships);
+        return null;
     }
 
 

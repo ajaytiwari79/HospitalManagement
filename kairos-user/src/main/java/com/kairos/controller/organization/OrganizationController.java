@@ -7,6 +7,7 @@ import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.user.client.ClientStaffDTO;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.resources.ResourceDTO;
+import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
@@ -542,6 +543,17 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 resourceService.addResource(resourceDTO, unitId));
     }
+
+    @RequestMapping(value = "unit/{unitId}/resource/{resourceId}/unavailability", method = RequestMethod.POST)
+    @ApiOperation("set resource unavailability")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> setResourceUnavailability(@PathVariable Long resourceId,
+                                                                             @Valid @RequestBody ResourceUnavailabilityDTO unavailabilityDTO) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                resourceService.setResourceUnavailability(unavailabilityDTO, resourceId));
+    }
+
+
 
     @RequestMapping(value = "unit/{unitId}/resource/{resourceId}", method = RequestMethod.PUT)
     @ApiOperation("Update Resource of a Unit")

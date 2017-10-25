@@ -630,47 +630,6 @@ public class BootDataService {
         createUnitEmploymentForCountryLevel();
     }
 
-    private void createOodlesResource() {
-        van = new Resource();
-        //van.setName(VehicleType.CAR);
-        van.setCostPerKM(20);
-        van.setFuelType(FuelType.DIESEL);
-        van.setEnabled(true);
-        van.setModelDescription("Van with capacity of 4 people");
-        van.setModelDescription("STR BS-IV");
-        van.setResourceAvailabilities(Arrays.asList(new ResourceUnAvailability(1482172200000L, 1483036200000L),
-                new ResourceUnAvailability(1483986600000L, 1484850600000L)));
-        van = resourceGraphRepository.save(van);
-
-
-        ambulance = new Resource();
-    //    ambulance.setName(VehicleType.AMBULANCE);
-        ambulance.setCostPerKM(50);
-        ambulance.setFuelType(FuelType.PETROL);
-        ambulance.setEnabled(true);
-        ambulance.setModelDescription("Medical Ambulance for Emergency situations");
-        ambulance.setModelDescription("STR BS-V");
-        ambulance.setResourceAvailabilities(Arrays.asList(new ResourceUnAvailability(1482172200000L, 1483036200000L),
-                new ResourceUnAvailability(1483986600000L, 1484850600000L)));
-        ambulance = resourceGraphRepository.save(ambulance);
-
-
-        bicycle = new Resource();
-       // bicycle.setName(VehicleType.BICYCLE);
-        bicycle.setCostPerKM(1);
-        bicycle.setFuelType(FuelType.ELECTRIC);
-        bicycle.setEnabled(true);
-        bicycle.setModelDescription("Electric bicycle for nearby situations");
-        bicycle.setModelDescription("BMX");
-        bicycle.setResourceAvailabilities(Arrays.asList(new ResourceUnAvailability(1482172200000L, 1483036200000L),
-                new ResourceUnAvailability(1483986600000L, 1484850600000L)));
-        bicycle = resourceGraphRepository.save(bicycle);
-
-        oodlesCityLevel.setResourceList(Arrays.asList(ambulance, van, bicycle));
-        organizationGraphRepository.save(oodlesCityLevel);
-
-    }
-
     private void createUser() {
 
       /*  michal = new User();
