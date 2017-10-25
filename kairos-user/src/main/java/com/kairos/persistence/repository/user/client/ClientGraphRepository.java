@@ -132,7 +132,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("MATCH (c:Client)-[r:"+SERVED_BY_TEAM+"]->(t:Team) WHERE id(c)={0} AND r.type='FORBIDDEN'   RETURN t")
     List<Team> findForbidTeam(Long id);
 
-    @Depth(value = 1)
+
     Client findByCprNumber(String cprNumber);
 
     @Query("MATCH (t:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(s:Staff)-[:BELONGS_TO]->(u:User) where id(t)={0} \n" +
@@ -243,7 +243,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "optional Match (nextToKin)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) with homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "optional Match (municipality:Municipality)<-[:MUNICIPALITY]-(homeAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
             "optional Match (municipality)-[:PROVINCE]->(province:Province)-[:REGION]->(region:Region)-[:BELONGS_TO]->(country:Country) with collect({id:id(municipality),name:municipality.name,province:{name:province.name,id:id(province),region:{id:id(region),name:region.name,country:{id:id(country),name:country.name}}}}) as result, municipality, zipCode, homeAddress,contactDetail,nextToKin,citizenStatus\n" +
-            "return id(nextToKin) as id, nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,nextToKin.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,case when homeAddress is not null then {municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
+            "return id(nextToKin) as id, nextToKin.age as age,nextToKin.firstName as firstName,nextToKin.lastName as lastName,nextToKin.nickName as nickName,{1}+ nextToKin.profilePic as profilePic,nextToKin.gender as gender,nextToKin.cprNumber as cprNumber,id(citizenStatus) as civilianStatusId,contactDetail as contactDetail,case when homeAddress is not null then {municipalityId:id(municipality),zipCodeId:id(zipCode),street1:homeAddress.street1,floorNumber:homeAddress.floorNumber,houseNumber:homeAddress.houseNumber,city:homeAddress.city,longitude:homeAddress.longitude\n" +
             ",latitude:homeAddress.latitude,municipalities:result} else null end as homeAddress")
     NextToKinQueryResult getNextToKinByCprNumber(String cprNumber,String imageUrl);
 

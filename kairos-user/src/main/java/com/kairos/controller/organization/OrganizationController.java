@@ -542,7 +542,7 @@ public class OrganizationController {
     @ApiOperation("Update Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createResourceForOrganization(@PathVariable Long unitId,
-                                                                           @Valid @RequestBody ResourceDTO resourceDTO) {
+                                                                           @Valid @RequestBody ResourceDTO resourceDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 resourceService.addResource(resourceDTO, unitId));
     }
@@ -551,7 +551,7 @@ public class OrganizationController {
     @ApiOperation("Update Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateResource(@PathVariable Long resourceId,
-                                                                             @Valid @RequestBody ResourceDTO resourceDTO) {
+                                                                             @Valid @RequestBody ResourceDTO resourceDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 resourceService.updateResource(resourceDTO, resourceId));
 
@@ -922,7 +922,7 @@ public class OrganizationController {
      * @return OrganizationDTO
      */
     @ApiOperation("get getOrganization By TeamId ")
-    @RequestMapping(value = "/unit/{unitId}/getOrganizationByTeamId/{teamId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getOrganizationByTeamId/{teamId}", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getOrganizationByTeamId(@PathVariable long teamId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationByTeamId(teamId));
     }

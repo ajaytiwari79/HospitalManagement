@@ -144,4 +144,8 @@ public interface TeamGraphRepository extends GraphRepository<Team>{
             "return {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:collect({id:id(skill),name:skill.name,description:skill.description,isSelected:case when r is null then false else true end,isEdited:true,staff:staff.staff})} as data")
     List<Map<String, Object>> getAssignedSkillsOfStaffByTeam(long unitId, List<Long> staffId);
 
+    @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team) where id(team)={0} with organization  Match (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:MUNICIPALITY]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
+            "Match (region)-[:"+BELONGS_TO+"]->(country:Country) return id(country)")
+    Long getCountryByTeamId(Long teamId);
+
 }
