@@ -512,4 +512,26 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, " +
             "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client ORDER BY c.firstName ASC SKIP {6} LIMIT 20 ")
     List<Map<String, Object>> getClientsWithFilterParameters(Long organizationId, String serverImageUrl,String filterByName, String filterByCPR, String filterByPhone, String filterByCivilianStatus, Integer skip, List<Long> citizenIds);
+
+    @Query("MATCH (c:Client{citizenDead:false})-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {0} AND id(c) in {7} AND ( c.firstName=~{2} OR c.lastName=~{2} ) AND c.cprNumber STARTS WITH {3} with c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {4} with cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) WHERE cs.name=~{5} with cs,cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) in {8} with lat,cs,cd,ca,c,r\n" +
+            "return {name:c.firstName+\" \" +c.lastName,id:id(c), age:c.age, emailId:c.email, profilePic: {1} + c.profilePic, gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, joiningDate:r.joinDate,city:ca.city," +
+            "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, " +
+            "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client ORDER BY c.firstName ASC SKIP {6} LIMIT 20 ")
+    List<Map<String, Object>> getClientsWithFilterParametersAndLatLng(Long organizationId, String serverImageUrl,String filterByName, String filterByCPR, String filterByPhone, String filterByCivilianStatus, Integer skip, List<Long> citizenIds, List<Long> latLngIds);
+
+    @Query("MATCH (c:Client{citizenDead:false})-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {0} AND ( c.firstName=~{2} OR c.lastName=~{2} ) AND c.cprNumber STARTS WITH {3} with c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {4} with cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) WHERE cs.name=~{5} with cs,cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) in {7} with lat,cs,cd,ca,c,r\n" +
+            "return {name:c.firstName+\" \" +c.lastName,id:id(c), age:c.age, emailId:c.email, profilePic: {1} + c.profilePic, gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, joiningDate:r.joinDate,city:ca.city," +
+            "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, " +
+            "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client ORDER BY c.firstName ASC SKIP {6} LIMIT 20 ")
+    List<Map<String, Object>> getClientsOfOrganizationExcludeDeadWithFilterParametersAndLatLng(Long organizationId, String serverImageUrl,String filterByName, String filterByCPR, String filterByPhone, String filterByCivilianStatus, Integer skip, List<Long> latLngIds);
+
+
 }

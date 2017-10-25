@@ -3,6 +3,7 @@ package com.kairos.client;
 import com.kairos.client.dto.OrgTaskTypeAggregateResult;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.TaskTypeAggregateResult;
+import com.kairos.response.dto.web.ClientExceptionTypesDTO;
 import com.kairos.response.dto.web.ClientFilterDTO;
 import com.kairos.util.userContext.UserContext;
 import org.json.JSONObject;
@@ -219,6 +220,38 @@ public class TaskDemandRestClient {
                                     POST,request, typeReference,organizationId);
 
             RestTemplateResponseEnvelope<List<TaskTypeAggregateResult>> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+
+    }
+
+    /**
+     *  @auther anil maurya
+     *
+     *  map in task demand controller
+     * @param organizationId
+     * @return
+     */
+    public List<ClientExceptionTypesDTO> getCitizensExceptionTypes(Long organizationId){
+
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ClientExceptionTypesDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ClientExceptionTypesDTO>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<ClientExceptionTypesDTO>>> restExchange =
+                    restTemplate.exchange("http://zuulservice/kairos/activity/api/v1/task_demand/organization/{organizationId}/getCitizensExceptionTypes",
+                            HttpMethod.
+                                    POST,null, typeReference,organizationId);
+
+            RestTemplateResponseEnvelope<List<ClientExceptionTypesDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
 

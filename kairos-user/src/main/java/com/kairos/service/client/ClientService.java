@@ -1530,10 +1530,17 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
         logger.info("citizenIds----------> " + citizenIds.size());
 
         if(citizenIds.isEmpty() && clientFilterDTO.getServicesTypes().isEmpty() && clientFilterDTO.getTimeSlots().isEmpty() && clientFilterDTO.getTaskTypes().isEmpty() && !clientFilterDTO.isNewDemands()){
-            mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDeadWithFilterParameters(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(), Integer.valueOf(skip));
+           if(clientFilterDTO.getLocalAreaTags().isEmpty())
+                mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDeadWithFilterParameters(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(), Integer.valueOf(skip));
+           else
+               mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDeadWithFilterParametersAndLatLng(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(), Integer.valueOf(skip), clientFilterDTO.getLocalAreaTags());
 
         }else{
-            mapList = organizationGraphRepository.getClientsWithFilterParameters(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(),Integer.valueOf(skip), citizenIds);
+            if(clientFilterDTO.getLocalAreaTags().isEmpty())
+                mapList = organizationGraphRepository.getClientsWithFilterParameters(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(),Integer.valueOf(skip), citizenIds);
+            else
+                mapList = organizationGraphRepository.getClientsWithFilterParametersAndLatLng(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(),Integer.valueOf(skip), citizenIds, clientFilterDTO.getLocalAreaTags());
+
         }
         logger.info("CitizenList Size: " + mapList.size());
 
