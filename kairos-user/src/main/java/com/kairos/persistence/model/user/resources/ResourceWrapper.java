@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.user.resources;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -8,10 +11,13 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * Created by prabjot on 16/10/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
 public class ResourceWrapper {
     private Long id;
@@ -20,11 +26,10 @@ public class ResourceWrapper {
     private String modelDescription;
     private float costPerKM;
     private FuelType fuelType;
-    private Long startDate;
-    private Long endDate;
-    private Long timeFrom;
-    private Long timeTo;
     private Vehicle vehicleType;
+    private Long creationDate;
+    private Long decommissionDate;
+    private List<ResourceUnAvailability> resourceUnAvailabilities;
 
     public Long getId() {
         return id;
@@ -74,43 +79,35 @@ public class ResourceWrapper {
         this.fuelType = fuelType;
     }
 
-    public Long getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
-    }
-
-    public Long getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
-    }
-
-    public Long getTimeFrom() {
-        return timeFrom;
-    }
-
-    public void setTimeFrom(Long timeFrom) {
-        this.timeFrom = timeFrom;
-    }
-
-    public Long getTimeTo() {
-        return timeTo;
-    }
-
-    public void setTimeTo(Long timeTo) {
-        this.timeTo = timeTo;
-    }
-
     public Vehicle getVehicleType() {
         return vehicleType;
     }
 
     public void setVehicleType(Vehicle vehicleType) {
         this.vehicleType = vehicleType;
+    }
+
+    public List<ResourceUnAvailability> getResourceUnAvailabilities() {
+        return resourceUnAvailabilities;
+    }
+
+    public void setResourceUnAvailabilities(List<ResourceUnAvailability> resourceUnAvailabilities) {
+        this.resourceUnAvailabilities = resourceUnAvailabilities;
+    }
+
+    public Long getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Long creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Long getDecommissionDate() {
+        return decommissionDate;
+    }
+
+    public void setDecommissionDate(Long decommissionDate) {
+        this.decommissionDate = decommissionDate;
     }
 }

@@ -5,13 +5,17 @@ package com.kairos.service.resources;
  */
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.resources.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
+import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRelationshipRepository;
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
+import com.kairos.util.DateUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,15 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.text.ParseException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.temporal.TemporalAdjusters;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.*;
+import java.util.*;
+
+import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**
  * Calls ResourceGraphRepository to perform CRUD operation on Resources.
@@ -46,6 +45,8 @@ public class ResourceService extends UserBaseService {
     CountryService countryService;
     @Inject
     VehicleGraphRepository vehicleGraphRepository;
+    @Inject
+    ResourceUnavailabilityRelationshipRepository unavailabilityRelationshipRepository;
 
 
     /**
@@ -115,25 +116,23 @@ public class ResourceService extends UserBaseService {
      */
     public boolean deleteResource(Long resourceId) {
         Resource resource = resourceGraphRepository.findOne(resourceId);
-        if(Optional.ofNullable(resource).isPresent()){
+        if (Optional.ofNullable(resource).isPresent()) {
             resource.setDeleted(true);
             return resourceGraphRepository.save(resource) != null;
         }
         throw new DataNotFoundByIdException("Resource not found by id");
     }
 
-    public List<ResourceWrapper> getUnitResources(Long unitId, String date) {
-        Instant instant = Instant.parse(date);
-        LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
-        LocalDateTime firstDayOfMonth = startDate.with(TemporalAdjusters.firstDayOfMonth()).withHour(0).withMinute(0).
-                withSecond(0).withNano(0);
-        LocalDateTime lastDayOfMonth = startDate.with(TemporalAdjusters.lastDayOfMonth()).withHour(11).withMinute(59);
-        List<ResourceWrapper> resources = resourceGraphRepository.getResources(firstDayOfMonth.atZone(
-                ZoneId.systemDefault()).toInstant().toEpochMilli(), lastDayOfMonth.atZone(
-                ZoneId.systemDefault()).toInstant().toEpochMilli(), unitId);
-        return resources;
+    public List<ResourceWrapper> getUnitResources(Long unitId) {
+        return resourceGraphRepository.getResources(unitId);
     }
 
+    public List<ResourceWrapper> getOrganizationResourcesWithUnAvailability(Long unitId, String date) {
+        Instant instant = Instant.parse(date);
+        LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+        List<ResourceWrapper> resources = resourceGraphRepository.getResourcesWithUnAvailability(unitId, startDate.getMonth().getValue(), startDate.getYear());
+        return resources;
+    }
 
     public ResourceTypeWrapper getUnitResourcesTypes(Long unitId) {
         Long countryId = organizationGraphRepository.getCountryId(unitId);
@@ -149,6 +148,10 @@ public class ResourceService extends UserBaseService {
             logger.error("Incorrect unit id " + unitId);
             throw new DataNotFoundByIdException("Incorrect unit id ");
         }
+        Resource dbResourceObject = resourceGraphRepository.getResourceByRegistrationNumberAndUnit(unitId,resourceDTO.getRegistrationNumber());
+        if(!Optional.ofNullable(dbResourceObject).isPresent()){
+            throw new DuplicateDataException("Resource already exist with register number " + resourceDTO.getRegistrationNumber());
+        }
 
         Vehicle vehicle = vehicleGraphRepository.findOne(resourceDTO.getVehicleTypeId());
         if (!Optional.ofNullable(vehicle).isPresent()) {
@@ -157,7 +160,13 @@ public class ResourceService extends UserBaseService {
         }
         Resource resource = new Resource(vehicle, resourceDTO.getRegistrationNumber(), resourceDTO.getNumber(),
                 resourceDTO.getModelDescription(), resourceDTO.getCostPerKM(), resourceDTO.getFuelType());
-        resource.setAvailability(resourceDTO);
+        if(!StringUtils.isBlank(resourceDTO.getDecommissionDate())){
+            LocalDateTime decommissionDate = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(resourceDTO.getDecommissionDate(),
+                    MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault()).
+                    withHour(0).withMinute(0).withSecond(0).withNano(0);
+            resource.setDecommissionDate(decommissionDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        }
+        resource.setCreationDate(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         organization.addResource(resource);
         save(organization);
         return resource;
@@ -175,8 +184,77 @@ public class ResourceService extends UserBaseService {
             throw new DataNotFoundByIdException("Vehicle type not found");
         }
         resource.setVehicleType(vehicle);
-        resource.setAvailability(resourceDTO);
         return resourceGraphRepository.save(resource);
+    }
+
+    public List<ResourceUnAvailability> setResourceUnavailability(ResourceUnavailabilityDTO unavailabilityDTO, Long resourceId) {
+        Resource resource = resourceGraphRepository.findOne(resourceId);
+        if (!Optional.ofNullable(resource).isPresent()) {
+            logger.error("Resource not found by id " + resource);
+            throw new DataNotFoundByIdException("Resource not found");
+        }
+        List<ResourceUnavailabilityRelationship> resourceUnavailabilityRelationships = new ArrayList<>
+                (unavailabilityDTO.getUnavailabilityDates().size());
+
+        List<ResourceUnAvailability> resourceUnAvailabilities = new ArrayList<>();
+        for (String unavailabilityDate : unavailabilityDTO.getUnavailabilityDates()) {
+            ResourceUnAvailability resourceUnAvailability = new ResourceUnAvailability(unavailabilityDTO.isFullDay()).
+                    setUnavailability(unavailabilityDTO, unavailabilityDate);
+            try {
+                LocalDateTime startDateIncludeTime = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDate,
+                        MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
+                ResourceUnavailabilityRelationship resourceUnavailabilityRelationship = new ResourceUnavailabilityRelationship(resource,
+                        resourceUnAvailability, startDateIncludeTime.getMonth().getValue(), startDateIncludeTime.getYear());
+                resourceUnavailabilityRelationships.add(resourceUnavailabilityRelationship);
+                resourceUnAvailabilities.add(resourceUnAvailability);
+            } catch (ParseException e) {
+                throw new InternalError("Incorrect resource date ");
+            }
+        }
+        unavailabilityRelationshipRepository.save(resourceUnavailabilityRelationships);
+        return resourceUnAvailabilities;
+    }
+
+    public ResourceUnAvailability updateResourceUnavailability(ResourceUnavailabilityDTO unavailabilityDTO, Long unAvailabilityId,
+                                                                  Long resourceId) throws ParseException {
+        ResourceUnAvailability resourceUnAvailability = resourceGraphRepository.getResourceUnavailabilityById(resourceId,unAvailabilityId);
+        if(!Optional.ofNullable(resourceUnAvailability).isPresent()){
+            logger.error("Incorrect id of Resource unavailability " + unAvailabilityId);
+            throw new DataNotFoundByIdException("Resource unavailability not found ");
+        }
+        if(unavailabilityDTO.isFullDay()){
+            resourceUnAvailability.setFullDay(unavailabilityDTO.isFullDay());
+            resourceUnAvailability.setStartTime(null);
+            resourceUnAvailability.setEndTime(null);
+        } else {
+            if(!unavailabilityDTO.isFullDay() && !StringUtils.isBlank(unavailabilityDTO.getStartTime())){
+                LocalDateTime timeFrom = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDTO.getStartTime(),
+                        MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
+                resourceUnAvailability.setStartTime(timeFrom.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+            }
+
+            if(!unavailabilityDTO.isFullDay() && !StringUtils.isBlank(unavailabilityDTO.getEndTime())){
+                LocalDateTime timeTo = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDTO.getEndTime(),
+                        MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
+                resourceUnAvailability.setEndTime(timeTo.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+            }
+        }
+        return save(resourceUnAvailability);
+    }
+
+    public void deleteUnavailability(Long resourceId, Long unavailableDateId) {
+        resourceGraphRepository.deleteResourceUnavailability(resourceId, unavailableDateId);
+    }
+
+    public List<ResourceUnAvailability> getResourceUnAvailability(Long resourceId,String date){
+        Resource resource = resourceGraphRepository.findOne(resourceId);
+        if(!Optional.ofNullable(resource).isPresent()){
+            logger.error("Resource not found by id " + resource);
+            throw new DataNotFoundByIdException("Resource not found");
+        }
+        Instant instant = Instant.parse(date);
+        LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+        return resourceGraphRepository.getResourceUnavailability(resourceId,startDate.getMonth().getValue(),startDate.getYear());
     }
 
 

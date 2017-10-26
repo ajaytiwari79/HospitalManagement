@@ -13,15 +13,26 @@ public class ResourceDTO {
     private String number;
     @NotNull(message = "error.description.notnull")
     private String modelDescription;
+    @NotNull(message = "Cost per km can not be null")
     private float costPerKM;
+    @NotNull(message = "Fuel type can not be null")
     private FuelType fuelType;
-    @NotNull(message = "start date can't be empty")
-    private String startDate;
-    private String endDate;
-    private String timeFrom;
-    private String timeTo;
-    @NotNull(message = "Vehicle type can't be empty")
     private Long vehicleTypeId;
+    private String decommissionDate;
+
+    public ResourceDTO() {
+        //default constructor
+    }
+
+    public ResourceDTO(String registrationNumber, String number, String modelDescription, float costPerKM,
+                       FuelType fuelType, Long vehicleTypeId) {
+        this.registrationNumber = registrationNumber;
+        this.number = number;
+        this.modelDescription = modelDescription;
+        this.costPerKM = costPerKM;
+        this.fuelType = fuelType;
+        this.vehicleTypeId = vehicleTypeId;
+    }
 
     public Long getVehicleTypeId() {
         return vehicleTypeId;
@@ -31,37 +42,7 @@ public class ResourceDTO {
         this.vehicleTypeId = vehicleTypeId;
     }
 
-    public String getStartDate() {
-        return startDate;
-    }
 
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-
-    public String getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getTimeFrom() {
-        return timeFrom;
-    }
-
-    public void setTimeFrom(String timeFrom) {
-        this.timeFrom = timeFrom;
-    }
-
-    public String getTimeTo() {
-        return timeTo;
-    }
-
-    public void setTimeTo(String timeTo) {
-        this.timeTo = timeTo;
-    }
 
     public String getRegistrationNumber() {
         return registrationNumber;
@@ -103,6 +84,14 @@ public class ResourceDTO {
         this.fuelType = fuelType;
     }
 
+    public String getDecommissionDate() {
+        return decommissionDate;
+    }
+
+    public void setDecommissionDate(String decommissionDate) {
+        this.decommissionDate = decommissionDate;
+    }
+
     @Override
     public String toString() {
         return "ResourceDTO{" +
@@ -110,11 +99,6 @@ public class ResourceDTO {
                 ", number='" + number + '\'' +
                 ", modelDescription='" + modelDescription + '\'' +
                 ", costPerKM=" + costPerKM +
-                ", fuelType=" + fuelType +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", timeFrom=" + timeFrom +
-                ", timeTo=" + timeTo +
                 ", vehicleTypeId=" + vehicleTypeId +
                 '}';
     }
