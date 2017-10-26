@@ -53,6 +53,7 @@ import javax.inject.Inject;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.KAIROS;
@@ -902,13 +903,13 @@ public class ClientService extends UserBaseService {
         Map<String, Object> response = new HashMap<>();
 
         logger.debug("Finding citizen with Id: " + organizationId);
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        logger.debug("CitizenList Size: " + mapList.size());
+     //   List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+     //   logger.debug("CitizenList Size: " + mapList.size());
 
-        Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
+     //   Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )
-        Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), organizationId, mapList);
-        response.putAll(responseFromTask);
+    //    Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), organizationId, mapList);
+       // response.putAll(responseFromTask);
 
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
 
@@ -1509,6 +1510,47 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
             households.remove(clientId);
         }
 
+    }
+
+    /**
+     * @param organizationId
+     * @return
+     * @auther Anil maurya
+     */
+    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip) {
+        Map<String, Object> response = new HashMap<>();
+        List<Long> citizenIds = new ArrayList<>();
+        if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()){
+            List<TaskTypeAggregateResult> taskTypeAggregateResults = taskDemandRestClient.getCitizensByFilters(organizationId, clientFilterDTO);
+        logger.info("taskTypeAggregateResults----------> " + taskTypeAggregateResults.size());
+        citizenIds.addAll(taskTypeAggregateResults.stream().map(taskTypeAggregateResult -> taskTypeAggregateResult.getId()).collect(Collectors.toList()));
+    }
+        logger.debug("Finding citizen with Id: " + organizationId);
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        logger.info("citizenIds----------> " + citizenIds.size());
+
+        if(citizenIds.isEmpty() && clientFilterDTO.getServicesTypes().isEmpty() && clientFilterDTO.getTimeSlots().isEmpty() && clientFilterDTO.getTaskTypes().isEmpty() && !clientFilterDTO.isNewDemands()){
+           if(clientFilterDTO.getLocalAreaTags().isEmpty())
+                mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDeadWithFilterParameters(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(), Integer.valueOf(skip));
+           else
+               mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDeadWithFilterParametersAndLatLng(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(), Integer.valueOf(skip), clientFilterDTO.getLocalAreaTags());
+
+        }else{
+            if(clientFilterDTO.getLocalAreaTags().isEmpty())
+                mapList = organizationGraphRepository.getClientsWithFilterParameters(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(),Integer.valueOf(skip), citizenIds);
+            else
+                mapList = organizationGraphRepository.getClientsWithFilterParametersAndLatLng(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(),Integer.valueOf(skip), citizenIds, clientFilterDTO.getLocalAreaTags());
+
+        }
+        logger.info("CitizenList Size: " + mapList.size());
+
+        Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
+        //anil maurya move some business logic in task demand service (task micro service )
+        Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), organizationId, mapList);
+        response.putAll(responseFromTask);
+
+
+        return response;
     }
 
 }

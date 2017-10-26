@@ -280,6 +280,10 @@ public class AccessPageService extends UserBaseService {
         return workPlaces;
     }
 
+    public AccessPage findByModuleId(String moduleId) {
+        return accessPageRepository.findByModuleId(moduleId);
+
+    }
     private synchronized String getTabId(Boolean isModule){
 
         AccessPageCustomId accessPageCustomId = accessPageCustomIdRepository.findFirst();

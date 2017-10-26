@@ -104,6 +104,8 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
             "isModule:subPage.isModule,active:subPage.active}) as children")
     List<AccessPageQueryResult> getTabsPermissionForHubMember();
 
+    AccessPage findByModuleId(String moduleId);
+
     @Query("Match (accessPage:AccessPage{isModule:true}) return id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId," +
             "accessPage.active as active")
     List<AccessPageDTO> getMainTabs();
