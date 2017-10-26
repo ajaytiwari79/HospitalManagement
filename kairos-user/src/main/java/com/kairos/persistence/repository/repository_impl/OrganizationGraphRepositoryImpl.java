@@ -49,16 +49,16 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }else{
             query += "MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {phoneNumber} with cd,ca,c,r\n";
         }
-        if(clientFilterDTO.getClientStatus().equals("(?i).*")){
+        if(clientFilterDTO.getClientStatus() == null){
             query +=  "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) with cs,cd,ca,c,r\n";
         }else{
-            query +=  "MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) WHERE cs.name=~{civilianStatus} with cs,cd,ca,c,r\n";
+            query +=  "MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) WHERE id(cs) = {civilianStatus} with cs,cd,ca,c,r\n";
         }
         if(clientFilterDTO.getLocalAreaTags().isEmpty()){
             query +=   "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,cs,cd,ca,c,r\n";
         }
         else{
-            query +=   "MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) in {latLngs} with lat,cs,cd,ca,c,r\n";
+            query +=   "MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) WHERE id(lat) in {latLngs} with lat,cs,cd,ca,c,r\n";
         }
         query += "return {name:c.firstName+\" \" +c.lastName,id:id(c), age:c.age, emailId:c.email, profilePic: {imagePath} + c.profilePic, gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, joiningDate:r.joinDate,city:ca.city,";
         query += "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, ";

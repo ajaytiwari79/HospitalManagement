@@ -13,7 +13,7 @@ public class ClientFilterDTO {
    private String name;
     private String cprNumber;
     private String phoneNumber;
-    private String clientStatus;
+    private Integer clientStatus;
     private List<String> taskTypes;
     private List<Long> servicesTypes;
     private List<Long> localAreaTags;
@@ -36,11 +36,11 @@ public class ClientFilterDTO {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getClientStatus() {
-        return "(?i)"+clientStatus+".*";
+    public Integer getClientStatus() {
+        return clientStatus;
     }
 
-    public void setClientStatus(String clientStatus) {
+    public void setClientStatus(Integer clientStatus) {
         this.clientStatus = clientStatus;
     }
 
