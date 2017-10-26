@@ -10,6 +10,7 @@ public class ResourceUnavailabilityDTO {
     private List<String> unavailabilityDates;
     private String startTime;
     private String endTime;
+    private boolean fullDay;
 
     public List<String> getUnavailabilityDates() {
         return unavailabilityDates;
@@ -33,5 +34,13 @@ public class ResourceUnavailabilityDTO {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public boolean isFullDay() {
+        return fullDay;
+    }
+
+    public void setFullDay(boolean fullDay) {
+        this.fullDay = fullDay;
     }
 }

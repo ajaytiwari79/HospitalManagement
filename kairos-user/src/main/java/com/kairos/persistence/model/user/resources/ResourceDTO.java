@@ -16,6 +16,7 @@ public class ResourceDTO {
     private float costPerKM;
     private FuelType fuelType;
     private Long vehicleTypeId;
+    private String decommissionDate;
 
     public Long getVehicleTypeId() {
         return vehicleTypeId;
@@ -65,6 +66,14 @@ public class ResourceDTO {
 
     public void setFuelType(FuelType fuelType) {
         this.fuelType = fuelType;
+    }
+
+    public String getDecommissionDate() {
+        return decommissionDate;
+    }
+
+    public void setDecommissionDate(String decommissionDate) {
+        this.decommissionDate = decommissionDate;
     }
 
     @Override

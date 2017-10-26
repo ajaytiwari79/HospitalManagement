@@ -24,6 +24,7 @@ public class Resource extends UserBaseEntity {
     private FuelType fuelType;
     private boolean enabled ;
     private boolean deleted ;
+    private Long decommissionDate;
 
     public Resource(Vehicle vehicleType, String registrationNumber, String number, String modelDescription,
                     float costPerKM,FuelType fuelType) {
@@ -115,6 +116,13 @@ public class Resource extends UserBaseEntity {
         this.vehicleType = vehicleType;
     }
 
+    public Long getDecommissionDate() {
+        return decommissionDate;
+    }
+
+    public void setDecommissionDate(Long decommissionDate) {
+        this.decommissionDate = decommissionDate;
+    }
 }
 
 

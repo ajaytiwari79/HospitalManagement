@@ -21,6 +21,11 @@ public class ResourceUnAvailability extends UserBaseEntity {
     private Long date;
     private Long startTime;
     private Long endTime;
+    private boolean fullDay;
+
+    public ResourceUnAvailability(boolean fullDay) {
+        this.fullDay = fullDay;
+    }
 
     public Long getDate() {
         return date;
@@ -46,19 +51,27 @@ public class ResourceUnAvailability extends UserBaseEntity {
         this.endTime = endTime;
     }
 
-    public ResourceUnAvailability setUnavailability(ResourceUnavailabilityDTO unavailabilityDTO,String unavailabilityDate)  {
+    public boolean isFullDay() {
+        return fullDay;
+    }
+
+    public void setFullDay(boolean fullDay) {
+        this.fullDay = fullDay;
+    }
+
+    public ResourceUnAvailability setUnavailability(ResourceUnavailabilityDTO unavailabilityDTO, String unavailabilityDate)  {
         try{
             LocalDateTime startDateIncludeTime = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDate,
                     MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
             this.date = startDateIncludeTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-            if(!StringUtils.isBlank(unavailabilityDTO.getStartTime())){
+            if(!unavailabilityDTO.isFullDay() && !StringUtils.isBlank(unavailabilityDTO.getStartTime())){
                 LocalDateTime timeFrom = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDTO.getStartTime(),
                         MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
                 this.startTime = timeFrom.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
             }
 
-            if(!StringUtils.isBlank(unavailabilityDTO.getEndTime())){
+            if(!unavailabilityDTO.isFullDay() && !StringUtils.isBlank(unavailabilityDTO.getEndTime())){
                 LocalDateTime timeTo = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(unavailabilityDTO.getEndTime(),
                         MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault());
                 this.endTime = timeTo.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();

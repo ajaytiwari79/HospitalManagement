@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.user.resources;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -13,6 +16,8 @@ import java.util.List;
 /**
  * Created by prabjot on 16/10/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
 public class ResourceWrapper {
     private Long id;
@@ -22,6 +27,8 @@ public class ResourceWrapper {
     private float costPerKM;
     private FuelType fuelType;
     private Vehicle vehicleType;
+    private Long creationDate;
+    private Long decommissionDate;
     private List<ResourceUnAvailability> resourceUnAvailabilities;
 
     public Long getId() {
@@ -86,5 +93,21 @@ public class ResourceWrapper {
 
     public void setResourceUnAvailabilities(List<ResourceUnAvailability> resourceUnAvailabilities) {
         this.resourceUnAvailabilities = resourceUnAvailabilities;
+    }
+
+    public Long getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Long creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Long getDecommissionDate() {
+        return decommissionDate;
+    }
+
+    public void setDecommissionDate(Long decommissionDate) {
+        this.decommissionDate = decommissionDate;
     }
 }
