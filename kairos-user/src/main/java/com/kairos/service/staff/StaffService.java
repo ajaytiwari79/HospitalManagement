@@ -1244,4 +1244,13 @@ public class StaffService extends UserBaseService {
         return unitId;
     }
 
+    /**
+     * This method return Staff from given user id
+     * @param userId
+     * @return
+     */
+    public Staff getStaffByUserId(Long userId){
+        return staffGraphRepository.getByUser(userId);
+    }
+
 }

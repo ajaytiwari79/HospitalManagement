@@ -119,6 +119,7 @@ public class DayType  extends UserBaseEntity {
         map.put("colorCode",this.colorCode);
         map.put("lastModificationDate",this.getLastModificationDate());
         map.put("creationDate",this.getCreationDate());
+        map.put("allowTimeSettings",this.isAllowTimeSettings());
         return map;
     }
 }

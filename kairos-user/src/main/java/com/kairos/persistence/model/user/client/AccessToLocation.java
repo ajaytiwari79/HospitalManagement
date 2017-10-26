@@ -1,11 +1,13 @@
 package com.kairos.persistence.model.user.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * Created by oodles on 25/10/16.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class AccessToLocation extends UserBaseEntity {
     // Lock & Emergency Information
