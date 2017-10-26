@@ -161,7 +161,7 @@ release {
     versionProperties = []
     buildTasks = ['bootRepackage']
     git {
-        requireBranch = 'release-plugin'
+        requireBranch = 'master'
         pushToRemote = 'origin'
         pushToBranchPrefix = ''
         commitVersionFileOnly = false
