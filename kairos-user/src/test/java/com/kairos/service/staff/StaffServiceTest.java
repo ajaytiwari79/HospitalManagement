@@ -1,6 +1,7 @@
 package com.kairos.service.staff;
 
 import com.kairos.UserServiceApplication;
+import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.persistence.model.user.staff.StaffFilterDTO;
 import org.junit.Assert;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import javax.inject.Inject;
 
 import static org.junit.Assert.*;
 
@@ -29,8 +32,9 @@ public class StaffServiceTest {
     @Autowired
     TestRestTemplate restTemplate;
 
+
     @Test
-    public void addStaffFavouriteFilters() throws Exception {
+    public long addStaffFavouriteFilters() throws Exception {
         String baseUrl=getBaseUrl(71L,null);
         StaffFilterDTO staffFilterDTO = new StaffFilterDTO("tab_21"," {\"name\":\"el\",\"cprNumber\":\"\",\"phoneNumber\":\"\",\"taskTypes\":[],\"servicesTypes\":[],\"localAreaTags\":[],\"newDemands\":false,\"timeSlots\":[]}","my filter");
         HttpEntity<StaffFilterDTO> entity = new HttpEntity<>(staffFilterDTO);
@@ -38,13 +42,15 @@ public class StaffServiceTest {
                 baseUrl+"/addStaffFavouriteFilters",
                 HttpMethod.POST, entity, StaffFilterDTO.class);
         Assert.assertNotNull(response.getBody().getId());
+        return response.getBody().getId();
 
     }
 
     @Test
     public void updateStaffFavouriteFilters() throws Exception {
+        Long filterId = addStaffFavouriteFilters();
         String baseUrl=getBaseUrl(71L,null);
-        StaffFilterDTO staffFilterDTO = new StaffFilterDTO(""," {\"name\":\"el\",\"cprNumber\":\"\",\"phoneNumber\":\"\",\"taskTypes\":[],\"servicesTypes\":[],\"localAreaTags\":[],\"newDemands\":false,\"timeSlots\":[]}","my filter 2");
+        StaffFilterDTO staffFilterDTO = new StaffFilterDTO(""," {\"name\":\"el\",\"cprNumber\":\"\",\"phoneNumber\":\"\",\"taskTypes\":[],\"servicesTypes\":[],\"localAreaTags\":[],\"newDemands\":false,\"timeSlots\":[]}","my filter 2", 2);
         HttpEntity<StaffFilterDTO> entity = new HttpEntity<>(staffFilterDTO);
         ResponseEntity<StaffFilterDTO> response = restTemplate.exchange(
                 baseUrl+"/updateStaffFavouriteFilters",
