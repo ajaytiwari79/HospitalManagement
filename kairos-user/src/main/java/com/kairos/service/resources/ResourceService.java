@@ -5,6 +5,7 @@ package com.kairos.service.resources;
  */
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.resources.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -122,11 +123,8 @@ public class ResourceService extends UserBaseService {
         throw new DataNotFoundByIdException("Resource not found by id");
     }
 
-    public List<ResourceWrapper> getUnitResources(Long unitId, String date) {
-        Instant instant = Instant.parse(date);
-        LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
-        List<ResourceWrapper> resources = resourceGraphRepository.getResources(unitId, startDate.getMonth().getValue(), startDate.getYear());
-        return resources;
+    public List<ResourceWrapper> getUnitResources(Long unitId) {
+        return resourceGraphRepository.getResources(unitId);
     }
 
     public List<ResourceWrapper> getOrganizationResourcesWithUnAvailability(Long unitId, String date) {
@@ -149,6 +147,10 @@ public class ResourceService extends UserBaseService {
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
             throw new DataNotFoundByIdException("Incorrect unit id ");
+        }
+        Resource dbResourceObject = resourceGraphRepository.getResourceByRegistrationNumberAndUnit(unitId,resourceDTO.getRegistrationNumber());
+        if(!Optional.ofNullable(dbResourceObject).isPresent()){
+            throw new DuplicateDataException("Resource already exist with register number " + resourceDTO.getRegistrationNumber());
         }
 
         Vehicle vehicle = vehicleGraphRepository.findOne(resourceDTO.getVehicleTypeId());

@@ -23,6 +23,10 @@ public class ResourceUnAvailability extends UserBaseEntity {
     private Long endTime;
     private boolean fullDay;
 
+    public ResourceUnAvailability() {
+        //default constructor
+    }
+
     public ResourceUnAvailability(boolean fullDay) {
         this.fullDay = fullDay;
     }

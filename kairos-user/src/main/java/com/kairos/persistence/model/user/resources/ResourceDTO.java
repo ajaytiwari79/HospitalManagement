@@ -13,10 +13,26 @@ public class ResourceDTO {
     private String number;
     @NotNull(message = "error.description.notnull")
     private String modelDescription;
+    @NotNull(message = "Cost per km can not be null")
     private float costPerKM;
+    @NotNull(message = "Fuel type can not be null")
     private FuelType fuelType;
     private Long vehicleTypeId;
     private String decommissionDate;
+
+    public ResourceDTO() {
+        //default constructor
+    }
+
+    public ResourceDTO(String registrationNumber, String number, String modelDescription, float costPerKM,
+                       FuelType fuelType, Long vehicleTypeId) {
+        this.registrationNumber = registrationNumber;
+        this.number = number;
+        this.modelDescription = modelDescription;
+        this.costPerKM = costPerKM;
+        this.fuelType = fuelType;
+        this.vehicleTypeId = vehicleTypeId;
+    }
 
     public Long getVehicleTypeId() {
         return vehicleTypeId;

@@ -61,7 +61,7 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
     @Query("MATCH (o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle) where id(o)={0}\n" +
             "return id(r) as id,r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType," +
             "vehicle as vehicleType,r.creationDate as creationDate,r.decommissionDate as decommissionDate")
-    List<ResourceWrapper> getResources(Long organizationId,Integer month,Integer year);
+    List<ResourceWrapper> getResources(Long organizationId);
 
     @Query("MATCH (o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle) where id(o)={0}\n" +
             "Match (r)-[:"+UNAVAILABLE_ON+"{month:{1},year:{2}}]->(ru:ResourceUnAvailability)\n" +
@@ -79,4 +79,7 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
     @Query("Match (resource:Resource)-[:"+UNAVAILABLE_ON+"]->(resourceUnAvailability:ResourceUnAvailability) where id(resource)={0} and id(resourceUnAvailability)={1}\n" +
             "return resourceUnAvailability")
     ResourceUnAvailability getResourceUnavailabilityById(Long resourceId, Long unavailabilityId);
+
+    @Query("MATCH(o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource)  where id(o)={0} AND r.registrationNumber={1} return r")
+    Resource getResourceByRegistrationNumberAndUnit(Long organizationId,String registrationNumber);
 }

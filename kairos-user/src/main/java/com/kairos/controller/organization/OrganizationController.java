@@ -525,10 +525,9 @@ public class OrganizationController {
     @RequestMapping(value = "/unit/{unitId}/resources", method = RequestMethod.GET)
     @ApiOperation("Get Organization Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationResources(@PathVariable Long unitId,
-                                                                        @RequestParam("startDate") String date) {
+    public ResponseEntity<Map<String, Object>> getOrganizationResources(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                resourceService.getUnitResources(unitId,date));
+                resourceService.getUnitResources(unitId));
     }
 
     @RequestMapping(value = "/unit/{unitId}/resources_with_unavailability", method = RequestMethod.GET)
