@@ -107,7 +107,7 @@ public class TaskDemandRestClient {
      * @return
      */
 
-    public Map<String,Object> getOrganizationClientsWithPlanning(Long staffId, Long organizationId, List<Map<String, Object>> mapList){
+    public Map<String,Object> getOrganizationClientsWithPlanning(Long staffId, Long organizationId, List<Map> mapList){
 
         try {
             HttpEntity<List> request = new HttpEntity<>(mapList);

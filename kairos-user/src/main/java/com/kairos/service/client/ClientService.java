@@ -24,6 +24,7 @@ import com.kairos.persistence.model.user.staff.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.user.staff.StaffClientData;
 import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.repository_impl.OrganizationGraphRepositoryImpl;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
@@ -43,8 +44,11 @@ import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +58,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.KAIROS;
@@ -128,7 +133,10 @@ public class ClientService extends UserBaseService {
     TaskDemandRestClient taskDemandRestClient;
     @Autowired
     TableConfigRestClient tableConfigRestClient;
-
+    @Inject
+    Session session;
+    @Inject
+    OrganizationGraphRepositoryImpl organizationGraphRepositoryImpl;
     public Client createCitizen(Client client) {
 
         Client createClient = null;
@@ -1522,14 +1530,12 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
         List<Long> citizenIds = new ArrayList<>();
         if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()){
             List<TaskTypeAggregateResult> taskTypeAggregateResults = taskDemandRestClient.getCitizensByFilters(organizationId, clientFilterDTO);
-        logger.info("taskTypeAggregateResults----------> " + taskTypeAggregateResults.size());
         citizenIds.addAll(taskTypeAggregateResults.stream().map(taskTypeAggregateResult -> taskTypeAggregateResult.getId()).collect(Collectors.toList()));
     }
         logger.debug("Finding citizen with Id: " + organizationId);
-        List<Map<String, Object>> mapList = new ArrayList<>();
-        logger.info("citizenIds----------> " + citizenIds.size());
+        List<Map> mapList = new ArrayList<>();
 
-        if(citizenIds.isEmpty() && clientFilterDTO.getServicesTypes().isEmpty() && clientFilterDTO.getTimeSlots().isEmpty() && clientFilterDTO.getTaskTypes().isEmpty() && !clientFilterDTO.isNewDemands()){
+       /* if(citizenIds.isEmpty() && clientFilterDTO.getServicesTypes().isEmpty() && clientFilterDTO.getTimeSlots().isEmpty() && clientFilterDTO.getTaskTypes().isEmpty() && !clientFilterDTO.isNewDemands()){
            if(clientFilterDTO.getLocalAreaTags().isEmpty())
                 mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDeadWithFilterParameters(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(), Integer.valueOf(skip));
            else
@@ -1541,8 +1547,11 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
             else
                 mapList = organizationGraphRepository.getClientsWithFilterParametersAndLatLng(organizationId, envConfig.getServerHost() + FORWARD_SLASH, clientFilterDTO.getName(), clientFilterDTO.getCprNumber(), clientFilterDTO.getPhoneNumber(), clientFilterDTO.getClientStatus(),Integer.valueOf(skip), citizenIds, clientFilterDTO.getLocalAreaTags());
 
-        }
-        logger.info("CitizenList Size: " + mapList.size());
+        }*/
+
+        String imagePath = envConfig.getServerHost() + FORWARD_SLASH;
+
+      mapList.addAll( organizationGraphRepositoryImpl.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip));
 
         Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )
