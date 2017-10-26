@@ -46,17 +46,6 @@ public class StaffServiceTest {
 
     }
 
-    @Test
-    public void updateStaffFavouriteFilters() throws Exception {
-        Long filterId = addStaffFavouriteFilters();
-        String baseUrl=getBaseUrl(71L,null);
-        StaffFilterDTO staffFilterDTO = new StaffFilterDTO(""," {\"name\":\"el\",\"cprNumber\":\"\",\"phoneNumber\":\"\",\"taskTypes\":[],\"servicesTypes\":[],\"localAreaTags\":[],\"newDemands\":false,\"timeSlots\":[]}","my filter 2", 2);
-        HttpEntity<StaffFilterDTO> entity = new HttpEntity<>(staffFilterDTO);
-        ResponseEntity<StaffFilterDTO> response = restTemplate.exchange(
-                baseUrl+"/updateStaffFavouriteFilters",
-                HttpMethod.POST, entity, StaffFilterDTO.class);
-        Assert.assertEquals("my filter 2",response.getBody().getName());
-    }
 
     public final String getBaseUrl(Long organizationId,Long unitId){
         if(organizationId!=null &&unitId!=null ){

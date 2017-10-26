@@ -6,6 +6,7 @@ buildscript {
 		neo4jBoltDriverVersion = '2.1.1'
 		neo4jOgmVersion="2.1.1"
         projectVersion="0.0.1"
+        version="0.0.1"
 	}
 	repositories {
 		mavenCentral()
@@ -19,7 +20,9 @@ buildscript {
 }
 
 plugins {
+    id 'net.researchgate.release' version '2.4.0'
 	id "org.sonarqube" version "2.5"
+
 }
 
 apply plugin: 'java'
@@ -139,4 +142,30 @@ sonarqube {
         //f1601d358fe3614c11dd5c9ceb3b9402e648fa08
         property "sonar.host.url","http://dev.kairosplanning.com:9000"
     }
+}
+
+//gradle release plugin
+release {
+    failOnCommitNeeded = true
+    failOnPublishNeeded = true
+    failOnSnapshotDependencies = true
+    failOnUnversionedFiles = true
+    failOnUpdateNeeded = true
+    revertOnFail = true
+    preCommitText = ''
+    preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
+    tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
+    newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
+    tagTemplate = '${version}'
+    versionPropertyFile = 'app-version.properties'
+    versionProperties = []
+    buildTasks = ['bootRepackage']
+    git {
+        requireBranch = 'master'
+        pushToRemote = 'origin'
+        pushToBranchPrefix = ''
+        commitVersionFileOnly = false
+    }
+
+
 }

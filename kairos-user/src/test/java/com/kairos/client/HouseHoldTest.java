@@ -32,7 +32,7 @@ public class HouseHoldTest {
      */
     @Test
     public void validateCitizenAsHouseHold(){
-        String baseUrl=getBaseUrl(71L,5753L);
+        String baseUrl=getBaseUrl(71L,145L);
         ClientMinimumDTO clientMinimumDTO = new ClientMinimumDTO("Aage","Bag","2503681059");
         HttpEntity<ClientMinimumDTO> entity = new HttpEntity<>(clientMinimumDTO);
         ResponseEntity<ClientMinimumDTO> response = restTemplate.exchange(
