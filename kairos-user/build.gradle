@@ -159,9 +159,9 @@ release {
     tagTemplate = '${version}'
     versionPropertyFile = 'app-version.properties'
     versionProperties = []
-    buildTasks = ['bootRepackage']
+    buildTasks = ['test','bootRepackage']
     git {
-        requireBranch = 'master'
+        requireBranch = 'release/0.0.2'
         pushToRemote = 'origin'
         pushToBranchPrefix = ''
         commitVersionFileOnly = false
