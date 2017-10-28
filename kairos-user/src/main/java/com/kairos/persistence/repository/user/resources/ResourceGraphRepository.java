@@ -80,6 +80,6 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
             "return resourceUnAvailability")
     ResourceUnAvailability getResourceUnavailabilityById(Long resourceId, Long unavailabilityId);
 
-    @Query("MATCH(o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource)  where id(o)={0} AND r.registrationNumber={1} return r")
+    @Query("MATCH(o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})  where id(o)={0} AND r.registrationNumber={1} return r")
     Resource getResourceByRegistrationNumberAndUnit(Long organizationId,String registrationNumber);
 }
