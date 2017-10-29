@@ -60,13 +60,13 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
 
     @Query("MATCH (o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle) where id(o)={0}\n" +
             "return id(r) as id,r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType," +
-            "vehicle as vehicleType,r.creationDate as creationDate,r.decommissionDate as decommissionDate")
+            "vehicle as vehicleType,r.creationDate as creationDate,r.decommissionDate as decommissionDate,case when r.decommissionDate is null then false else true end as isDecommision")
     List<ResourceWrapper> getResources(Long organizationId);
 
     @Query("MATCH (o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle) where id(o)={0}\n" +
-            "Match (r)-[:"+UNAVAILABLE_ON+"{month:{1},year:{2}}]->(ru:ResourceUnAvailability)\n" +
+            "Optional Match (r)-[:"+UNAVAILABLE_ON+"{month:{1},year:{2}}]->(ru:ResourceUnAvailability)\n" +
             "return id(r) as id,r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType," +
-            "vehicle as vehicleType,r.creationDate as creationDate,r.decommissionDate as decommissionDate,collect(ru) as resourceUnAvailabilities")
+            "vehicle as vehicleType,r.creationDate as creationDate,r.decommissionDate as decommissionDate,case when r.decommissionDate is null then false else true end as isDecommision,collect(ru) as resourceUnAvailabilities")
     List<ResourceWrapper> getResourcesWithUnAvailability(Long organizationId,Integer month,Integer year);
 
     @Query("Match (resource:Resource)-[r:"+UNAVAILABLE_ON+"]->(ru:ResourceUnAvailability) where id(resource)={0} AND id(ru)={1} delete r,ru")

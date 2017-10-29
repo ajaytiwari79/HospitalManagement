@@ -1,13 +1,11 @@
 package com.kairos.persistence.model.user.resources;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -19,7 +17,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-public class ResourceWrapper {
+public class ResourceWrapper implements Serializable {
     private Long id;
     private String registrationNumber;
     private String number;
@@ -29,6 +27,7 @@ public class ResourceWrapper {
     private Vehicle vehicleType;
     private Long creationDate;
     private Long decommissionDate;
+    private boolean isDecommision;
     private List<ResourceUnAvailability> resourceUnAvailabilities;
 
     public Long getId() {
@@ -109,5 +108,14 @@ public class ResourceWrapper {
 
     public void setDecommissionDate(Long decommissionDate) {
         this.decommissionDate = decommissionDate;
+    }
+
+    @JsonProperty(value = "isDecommision")
+    public boolean isDecommision() {
+        return isDecommision;
+    }
+
+    public void setDecommision(boolean decommision) {
+        isDecommision = decommision;
     }
 }
