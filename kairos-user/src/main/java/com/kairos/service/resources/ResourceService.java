@@ -117,6 +117,7 @@ public class ResourceService extends UserBaseService {
     public boolean deleteResource(Long resourceId) {
         Resource resource = resourceGraphRepository.findOne(resourceId);
         if (Optional.ofNullable(resource).isPresent()) {
+            resource.setDeleted(true);
             return resourceGraphRepository.save(resource) != null;
         }
         throw new DataNotFoundByIdException("Resource not found by id");
