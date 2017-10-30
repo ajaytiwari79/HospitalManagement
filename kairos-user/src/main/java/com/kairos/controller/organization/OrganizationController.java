@@ -1,6 +1,5 @@
 package com.kairos.controller.organization;
 
-import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.TeamDTO;
@@ -40,7 +39,8 @@ import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.*;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 
 /**
@@ -1068,6 +1068,13 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getAllDayTypeofOrganization(unitId));
     }
 
+
+    @ApiOperation(value = "Get DayType by unitID")
+    @RequestMapping(value ="/units", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnitsByOrganizationID(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getUnitsByOrganizationIs(organizationId));
+    }
 
 
 }
