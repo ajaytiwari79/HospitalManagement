@@ -80,6 +80,7 @@ public class TimeTypeDTO extends UserBaseEntity {
         this.negativeDayBalancePresent = negativeDayBalancePresent;
     }
 
+
     public TimeTypeDTO() {
         //default
     }

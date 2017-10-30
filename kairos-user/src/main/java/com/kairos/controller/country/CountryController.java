@@ -1008,7 +1008,7 @@ public class CountryController {
     @ApiOperation("Add vehicle in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
 
-    public ResponseEntity<Map<String,Object>> addVehicle(@PathVariable Long countryId, @Valid @RequestBody Vehicle vehicle){
+    public ResponseEntity<Map<String, Object>> addVehicle(@PathVariable Long countryId, @Valid @RequestBody Vehicle vehicle) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addVehicle(countryId, vehicle));
     }
 
@@ -1030,7 +1030,7 @@ public class CountryController {
     @ApiOperation("Update vehicle in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
 
-    public ResponseEntity<Map<String,Object>> updateVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId,  @Valid @RequestBody Vehicle vehicle){
+    public ResponseEntity<Map<String, Object>> updateVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId, @Valid @RequestBody Vehicle vehicle) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateVehicle(countryId, vehicleId, vehicle));
     }
 
@@ -1042,7 +1042,6 @@ public class CountryController {
     }
 
 
-
     // timeType
     @ApiOperation(value = "Get timeType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/timeType", method = RequestMethod.GET)
@@ -1050,4 +1049,22 @@ public class CountryController {
     public ResponseEntity<Map<String, Object>> getAllTimeTypes(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.getAllTimeTypes(countryId));
     }
+
+    // timeType
+    @ApiOperation(value = "delete a  timeType by Id")
+    @RequestMapping(value = COUNTRY_URL + "/timeType/{timeTypeId}", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteTimeType(@PathVariable long timeTypeId) {
+        timeTypeService.deleteTimeType(timeTypeId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @ApiOperation(value = "Update timeType")
+    @RequestMapping(value = COUNTRY_URL + "/timeType", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateTimeType(@PathVariable long countryId, @Validated @RequestBody TimeTypeDTO timeType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updateTimeType(timeType,countryId));
+    }
+
 }
+

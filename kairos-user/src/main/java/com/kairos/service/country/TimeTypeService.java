@@ -46,7 +46,31 @@ public class TimeTypeService extends UserBaseService {
             logger.error("Country not found by Id while creating TimeType" + countryId);
             throw new DataNotFoundByIdException("Invalid Country");
         }
-        return  timeTypeGraphRepository.findAllByCountryIdAndEnabled(countryId,true);
+        return  timeTypeGraphRepository.findAllByCountryId(countryId);
+    }
+    public void deleteTimeType(long timeTypeId){
+        TimeType timeType = timeTypeGraphRepository.findOne(timeTypeId);
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            logger.error("TimeType does not exist" + timeTypeId);
+            throw new DataNotFoundByIdException("Invalid timeType");
+        }
+        timeType.setEnabled(false);
+        save(timeType);
+    }
+
+    public TimeTypeDTO updateTimeType(TimeTypeDTO timeTypeDTO, long countryId){
+        TimeType timeType = timeTypeGraphRepository.findOne(timeTypeDTO.getId());
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            logger.error("TimeType does not exist" + timeTypeDTO.getId());
+            throw new DataNotFoundByIdException("Invalid timeType");
+        }
+        timeType.setType(timeTypeDTO.getType());
+        timeType.setName(timeTypeDTO.getName());
+        timeType.setIncludeInTimeBank(timeTypeDTO.isIncludeInTimeBank());
+        timeType.setNegativeDayBalancePresent(timeTypeDTO.getNegativeDayBalancePresent());
+        timeType.setOnCallTime(timeTypeDTO.getOnCallTime());
+        save(timeType);
+        return timeTypeDTO;
     }
 
 
