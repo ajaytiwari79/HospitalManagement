@@ -3,13 +3,20 @@ package com.kairos.persistence.model.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.country.TimeType;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.neo4j.annotation.QueryResult;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by vipul on 17/10/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@QueryResult
 public class TimeTypeDTO extends UserBaseEntity {
+    @NotEmpty(message = "error.TimeType.name.notEmpty")    @NotNull(message = "error.TimeType.name.notnull")
     private String name;
+    @NotEmpty(message = "error.TimeType.type.notEmpty")     @NotNull(message = "error.TimeType.type.notnull")
     private String type;
     private boolean includeInTimeBank = true;
     private Long countryId;
@@ -73,13 +80,24 @@ public class TimeTypeDTO extends UserBaseEntity {
         this.negativeDayBalancePresent = negativeDayBalancePresent;
     }
 
-
+    public TimeTypeDTO() {
+        //default
+    }
 
     public TimeTypeDTO(String name, String type, boolean includeInTimeBank, Long countryId, boolean enabled, Boolean negativeDayBalancePresent, Boolean onCallTime) {
         this.name = name;
         this.type = type;
         this.includeInTimeBank = includeInTimeBank;
         this.countryId = countryId;
+        this.enabled = enabled;
+        this.negativeDayBalancePresent = negativeDayBalancePresent;
+        this.onCallTime = onCallTime;
+    }
+
+    public TimeTypeDTO(String name, String type, boolean includeInTimeBank, boolean enabled, Boolean negativeDayBalancePresent, Boolean onCallTime) {
+        this.name = name;
+        this.type = type;
+        this.includeInTimeBank = includeInTimeBank;
         this.enabled = enabled;
         this.negativeDayBalancePresent = negativeDayBalancePresent;
         this.onCallTime = onCallTime;

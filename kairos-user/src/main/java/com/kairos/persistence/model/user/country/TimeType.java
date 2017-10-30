@@ -5,11 +5,8 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-
-import javax.validation.constraints.NotNull;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
@@ -19,18 +16,18 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeType extends UserBaseEntity {
-    @NotEmpty(message = "error.TimeType.name.notEmpty")
-    @NotNull(message = "error.TimeType.name.notnull")
+
     private String name;
-    @NotEmpty(message = "error.TimeType.type.notEmpty")
-    @NotNull(message = "error.TimeType.type.notnull")
     private String type;
     private boolean includeInTimeBank = true;
-    @Relationship(type = BELONGS_TO)
+    @Relationship(type = BELONGS_TO , direction=Relationship.OUTGOING)
     private Country country;
     private boolean enabled = true;
     private Boolean negativeDayBalancePresent;
     private Boolean onCallTime;
+
+    public TimeType() {
+    }
 
     public TimeType(String name, String type, boolean includeInTimeBank, Country country, boolean enabled, Boolean negativeDayBalancePresent, Boolean onCallTime) {
         this.name = name;
