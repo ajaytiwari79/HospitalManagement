@@ -96,7 +96,7 @@ public class ResourceController {
      * @param resourceId
      * @return resource
      */
-    @ApiOperation("Update a resource by resourceId")
+    /*@ApiOperation("Update a resource by resourceId")
     @RequestMapping(value = "/{resourceId}", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> getResourceById(@RequestBody Resource resource, @PathVariable Long resourceId) {
         if (resourceService.getResourceById(resourceId) != null) {
@@ -105,24 +105,8 @@ public class ResourceController {
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
 
-    }
+    }*/
 
-    /**
-     * Mark disabled to a resource by given id
-     *
-     * @param resourceId
-     */
-    @RequestMapping(value = "/{resourceId}", method = RequestMethod.DELETE)
-    @ApiOperation("Delete a resource by resourceId")
-    ResponseEntity<Map<String, Object>> deleteResourceById(@PathVariable Long resourceId) {
-        if (resourceId != null) {
-            if (resourceService.getResourceById(resourceId) != null) {
-                resourceService.safeDeleteResource(resourceId);
-                return ResponseHandler.generateResponse(HttpStatus.OK, true, AppConstants.SUCCESS);
-            }
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
-        }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
-    }
+
 
 }

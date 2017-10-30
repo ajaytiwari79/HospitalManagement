@@ -11,6 +11,7 @@ import com.kairos.persistence.model.user.expertise.ExpertiseSkillDTO;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.persistence.model.user.payment_type.PaymentType;
+import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.service.country.*;
@@ -34,6 +35,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1005,7 +1007,8 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/vehicle", method = RequestMethod.POST)
     @ApiOperation("Add vehicle in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addVehicle(@PathVariable Long countryId, @RequestBody Vehicle vehicle) {
+
+    public ResponseEntity<Map<String,Object>> addVehicle(@PathVariable Long countryId, @Valid @RequestBody Vehicle vehicle){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.addVehicle(countryId, vehicle));
     }
 
@@ -1026,7 +1029,8 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/vehicle/{vehicleId}", method = RequestMethod.PUT)
     @ApiOperation("Update vehicle in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId, @RequestBody Vehicle vehicle) {
+
+    public ResponseEntity<Map<String,Object>> updateVehicle(@PathVariable Long countryId, @PathVariable Long vehicleId,  @Valid @RequestBody Vehicle vehicle){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateVehicle(countryId, vehicleId, vehicle));
     }
 

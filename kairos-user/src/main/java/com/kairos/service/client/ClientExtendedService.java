@@ -139,9 +139,10 @@ public class ClientExtendedService extends UserBaseService {
         if (!Optional.ofNullable(homeAddress).isPresent()) {
             return null;
         }
-        saveCivilianStatus(nextToKinDTO,nextToKin);
         nextToKin.setHomeAddress(homeAddress);
-        save(nextToKin);
+        CitizenStatus citizenStatus = saveCivilianStatus(nextToKinDTO,nextToKin);
+        nextToKin.setCivilianStatus(citizenStatus);
+        clientGraphRepository.save(nextToKin);
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, client.getId());
         if(!hasAlreadyNextToKin(clientId,nextToKin.getId())){
             createNextToKinRelationship(client, nextToKin);
@@ -154,7 +155,7 @@ public class ClientExtendedService extends UserBaseService {
     }
 
     private Client validateCPRNumber(String cprNumber){
-        Client client = clientGraphRepository.findByCPRNumber(cprNumber.trim());
+        Client client = clientGraphRepository.findByCprNumber(cprNumber.trim());
         if(Optional.ofNullable(client).isPresent() && client.isCitizenDead()){
             throw new DuplicateDataException("You can't enter the CPR of dead citizen " + cprNumber);
         }
@@ -232,7 +233,7 @@ public class ClientExtendedService extends UserBaseService {
         return contactAddressToSave;
     }
 
-    private void saveCivilianStatus(NextToKinDTO nextToKinDTO, Client nextToKin) {
+    private CitizenStatus saveCivilianStatus(NextToKinDTO nextToKinDTO, Client nextToKin) {
 
         if (Optional.ofNullable(nextToKinDTO.getCivilianStatusId()).isPresent()) {
             CitizenStatus citizenStatus = citizenStatusGraphRepository.findOne(nextToKinDTO.getCivilianStatusId());
@@ -240,10 +241,7 @@ public class ClientExtendedService extends UserBaseService {
                 logger.debug("Finding civilian status using id " + nextToKinDTO.getCivilianStatusId());
                 throw new DataNotFoundByIdException("Incorrect id of civilian status " + citizenStatus);
             }
-            if(Optional.ofNullable(nextToKin.getId()).isPresent()){
-                clientGraphRepository.deleteCivilianStatus(nextToKin.getId());
-            }
-            nextToKin.setCivilianStatus(citizenStatus);
+            return citizenStatus;
         } else {
             throw new DataNotFoundByIdException("Civilian status can't be empty");
         }
@@ -294,7 +292,8 @@ public class ClientExtendedService extends UserBaseService {
         }
         nextToKin.saveContactDetail(nextToKinDTO,contactDetail);
         nextToKin.setContactDetail(contactDetail);
-        saveCivilianStatus(nextToKinDTO,nextToKin);
+        CitizenStatus citizenStatus = saveCivilianStatus(nextToKinDTO,nextToKin);
+        nextToKin.setCivilianStatus(citizenStatus);
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, clientId);
         logger.debug("Preparing response");
         clientGraphRepository.save(nextToKin);
@@ -601,7 +600,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         accessToLocation.setAccessPhotoURL(fileName);
         accessToLocationGraphRepository.save(accessToLocation);
-        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + fileName;
     }
 
     public void removeAccessToLocationImage(long accessToLocationId) {
@@ -617,7 +616,7 @@ public class ClientExtendedService extends UserBaseService {
         String fileName = writeFile(multipartFile);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+fileName);
         return imageurls;
     }
 
@@ -643,7 +642,7 @@ public class ClientExtendedService extends UserBaseService {
         clientGraphRepository.save(nextToKin);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ fileName);
         return imageurls;
     }
 
@@ -664,7 +663,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         client.setProfilePic(fileName);
         clientGraphRepository.save(client);
-        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ fileName;
     }
 
 

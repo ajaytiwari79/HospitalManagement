@@ -1,6 +1,7 @@
 package com.kairos.service.skill;
 
 import com.kairos.client.SkillServiceTemplateClient;
+import com.kairos.client.TaskDemandRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
@@ -24,6 +25,7 @@ import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.TeamService;
+import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
 import org.slf4j.Logger;
@@ -84,6 +86,10 @@ public class SkillService extends UserBaseService {
     private EnvConfig envConfig;
     @Autowired
     SkillServiceTemplateClient skillServiceTemplateClient;
+    @Inject
+    private TimeSlotService timeSlotService;
+    @Inject
+    private TaskDemandRestClient taskDemandRestClient;
 
 
     public Map<String, Object> createSkill(Skill skill, long skillCategoryId) {
@@ -233,6 +239,11 @@ public class SkillService extends UserBaseService {
 
         response.put("teamList", teamService.getAllTeamsInOrganization(unitId));
         response.put("civilianStatus", citizenStatusService.getCitizenStatusByCountryIdAnotherFormat(countryGraphRepository.getCountryIdByUnitId(unitId)));
+        Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(unitId);
+
+        if (timeSlotData != null) {
+            response.put("timeSlotList", timeSlotData);
+        }
 
         List<Map<String, Object>> staff = staffGraphRepository.getStaffWithBasicInfo(unitId, unitId,envConfig.getServerHost() + FORWARD_SLASH);
 
@@ -248,6 +259,7 @@ public class SkillService extends UserBaseService {
         response.put("staffList", staffList);
         response.put("localAreaTags", localAreaTagsList);
         response.put("serviceTypes", organizationServiceRepository.getOrganizationServiceByOrgId(unitId));
+        response.put("exceptionTypes", taskDemandRestClient.getCitizensExceptionTypes(unitId));
 
         return response;
 
@@ -464,7 +476,7 @@ public class SkillService extends UserBaseService {
             skills = organizationGraphRepository.getAssignedSkillsOfStaffByOrganization(id, staffIds);
 
         } else if (TEAM.equalsIgnoreCase(type)) {
-            List<Map<String, Object>> staffList = staffGraphRepository.getStaffByTeamId(id,envConfig.getServerHost() + FORWARD_SLASH);
+            List<Map<String, Object>> staffList = staffGraphRepository.getStaffByTeamId(id,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             List<Long> staffIds = new ArrayList<>(staffList.size());
             for (Map<String, Object> map : staffList) {
                 response.add((Map<String, Object>) map.get("data"));

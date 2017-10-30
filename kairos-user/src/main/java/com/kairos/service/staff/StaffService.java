@@ -12,6 +12,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
@@ -47,6 +48,7 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.FileUtil;
+import com.kairos.util.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -93,8 +95,6 @@ public class StaffService extends UserBaseService {
     private LanguageGraphRepository languageGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
-    @Inject
-    private PasswordEncoder passwordEncoder;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
@@ -148,7 +148,7 @@ public class StaffService extends UserBaseService {
         FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
         save(staff);
-        return envConfig.getServerHost() + FORWARD_SLASH + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + fileName;
 
     }
 
@@ -171,7 +171,7 @@ public class StaffService extends UserBaseService {
             throw new DataNotFoundByIdException("User not found belongs to this staff id " + staffId);
         }
         CharSequence oldPassword = CharBuffer.wrap(passwordUpdateDTO.getOldPassword());
-        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+        if (new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
             CharSequence newPassword = CharBuffer.wrap(passwordUpdateDTO.getNewPassword());
             user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
             save(user);
@@ -270,7 +270,7 @@ public class StaffService extends UserBaseService {
         Map<String, Object> map = new HashMap<>();
         map.put("firstName", staff.getFirstName());
         map.put("lastName", staff.getLastName());
-        map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + staff.getProfilePic());
+        map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ staff.getProfilePic());
         map.put("familyName", staff.getFamilyName());
         map.put("active", staff.isActive());
         map.put("signature", staff.getSignature());
@@ -325,12 +325,12 @@ public class StaffService extends UserBaseService {
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
         } else if (GROUP.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByGroupId(id, envConfig.getServerHost() + FORWARD_SLASH);
+            staff = staffGraphRepository.getStaffByGroupId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             Organization organization = organizationGraphRepository.getOrganizationByGroupId(id).getOrganization();
             countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
             roles = accessGroupService.getAccessGroups(organization.getId());
         } else if (TEAM.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH);
+            staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             Organization organization = organizationGraphRepository.getOrganizationByTeamId(id);
             roles = accessGroupService.getAccessGroups(organization.getId());
             countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
@@ -362,9 +362,9 @@ public class StaffService extends UserBaseService {
         }
 
         if (parent == null) {
-            return staffGraphRepository.getStaffWithBasicInfo(unit.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH);
+            return staffGraphRepository.getStaffWithBasicInfo(unit.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         } else {
-            return staffGraphRepository.getStaffInfoForFilters(parent.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH);
+            return staffGraphRepository.getStaffInfoForFilters(parent.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         }
     }
 
@@ -1242,6 +1242,82 @@ public class StaffService extends UserBaseService {
             unitId = -1L;
         }
         return unitId;
+    }
+
+    public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO){
+        /*StaffFavouriteFilters alreadyExistFilter = staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, staffFilterDTO.getModuleId());
+        if(Optional.ofNullable(alreadyExistFilter).isPresent()){
+            throw new DuplicateDataException("StaffFavouriteFilters already exist !");
+        }*/
+
+
+        StaffFavouriteFilters staffFavouriteFilters =  new StaffFavouriteFilters();
+        Long userId = UserContext.getUserDetails().getId();
+        Staff staff = staffGraphRepository.getStaffByUserId(userId);
+        AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
+        staffFavouriteFilters.setAccessPage(accessPage);
+        staffFavouriteFilters.setFilterJson(staffFilterDTO.getFilterJson());
+        staffFavouriteFilters.setName(staffFilterDTO.getName());
+        save(staffFavouriteFilters);
+        staff.addFavouriteFilters(staffFavouriteFilters);
+        save(staff);
+        staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
+        staffFilterDTO.setModuleId(accessPage.getModuleId());
+        staffFilterDTO.setName(staffFavouriteFilters.getName());
+        staffFilterDTO.setId(staffFavouriteFilters.getId());
+        return staffFilterDTO;
+
+
+    }
+
+    public StaffFilterDTO updateStaffFavouriteFilters( StaffFilterDTO staffFilterDTO){
+        Long userId = UserContext.getUserDetails().getId();
+        Staff staff = staffGraphRepository.getStaffByUserId(userId);
+        StaffFavouriteFilters staffFavouriteFilters = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFilterDTO.getId());
+        if(!Optional.ofNullable(staffFavouriteFilters).isPresent()){
+            throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFilterDTO.getId());
+        }
+        /*AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
+        staffFavouriteFilters.setAccessPage(accessPage);*/
+        staffFavouriteFilters.setFilterJson(staffFilterDTO.getFilterJson());
+        staffFavouriteFilters.setName(staffFilterDTO.getName());
+        staffFavouriteFilters.setEnabled(true);
+        save(staffFavouriteFilters);
+        staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
+       // staffFilterDTO.setModuleId(accessPage.getModuleId());
+        return staffFilterDTO;
+
+    }
+
+    public boolean removeStaffFavouriteFilters( Long staffFavouriteFilterId){
+        Long userId = UserContext.getUserDetails().getId();
+        Staff staff = staffGraphRepository.getStaffByUserId(userId);
+        StaffFavouriteFilters staffFavouriteFilters = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
+        if(!Optional.ofNullable(staffFavouriteFilters).isPresent()){
+            throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFavouriteFilterId);
+        }
+
+        staffFavouriteFilters.setEnabled(false);
+        save(staffFavouriteFilters);
+        return true;
+
+    }
+
+    public List<StaffFavouriteFilters> getStaffFavouriteFilters(String moduleId){
+        Long userId = UserContext.getUserDetails().getId();
+        Staff staff = staffGraphRepository.getStaffByUserId(userId);
+        return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staff.getId(), moduleId);
+    }
+
+
+
+    /**
+     * This method return Staff from given user id
+     * @param userId
+     * @return
+     */
+    public Staff getStaffByUserId(Long userId){
+        return staffGraphRepository.getByUser(userId);
     }
 
 }

@@ -14,6 +14,7 @@ import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -1062,6 +1063,12 @@ public class OrganizationService extends UserBaseService {
     public DayType getDayType(Long unitID, Date date){
         Long countryId = organizationGraphRepository.getCountryId(unitID);
        return  dayTypeService.getDayTypeByDate(countryId,date);
+    }
+
+    public List<Map<String,Object>> getAllDayTypeofOrganization(Long unitID){
+        Long countryId = organizationGraphRepository.getCountryId(unitID);
+        return  dayTypeService.getAllDayTypeByCountryId(countryId);
+
     }
 
 }

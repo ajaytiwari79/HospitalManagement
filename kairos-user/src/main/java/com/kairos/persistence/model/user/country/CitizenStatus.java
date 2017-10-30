@@ -79,4 +79,14 @@ public class CitizenStatus extends UserBaseEntity {
 
     }
 
+    @Override
+    public String toString() {
+        return "CitizenStatus{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", country=" + country +
+                ", isEnabled=" + isEnabled +
+                ", id=" + super.getId() +
+                '}';
+    }
 }
