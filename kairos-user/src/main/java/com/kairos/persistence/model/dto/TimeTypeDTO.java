@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.country.TimeType;
@@ -20,6 +21,7 @@ public class TimeTypeDTO extends UserBaseEntity {
     private String type;
     private boolean includeInTimeBank = true;
     private Long countryId;
+    @JsonIgnore
     private boolean enabled = true;
     private Boolean negativeDayBalancePresent;
     private Boolean onCallTime;

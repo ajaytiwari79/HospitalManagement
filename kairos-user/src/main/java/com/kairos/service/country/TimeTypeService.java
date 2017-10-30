@@ -2,6 +2,7 @@ package com.kairos.service.country;
 
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.dto.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.TimeType;
@@ -33,8 +34,12 @@ public class TimeTypeService extends UserBaseService {
             logger.error("Country not found by Id while creating TimeType" + countryId);
             throw new DataNotFoundByIdException("Invalid Country");
         }
-        //int countExisting=timeTypeGraphRepository
-        TimeType timeType = timeTypeDTO.buildTimeType();
+        TimeType timeType=timeTypeGraphRepository.findByNameAndTypeIgnoreCase("(?i)"+timeTypeDTO.getName(),"(?i)"+timeTypeDTO.getType());
+        if (Optional.ofNullable(timeType).isPresent()) {
+            logger.error("Country has already a TimeType with name " + timeTypeDTO.getName()+" and type "+timeTypeDTO.getType());
+            throw new DuplicateDataException("Country has already a TimeType with name and type");
+        }
+        timeType = timeTypeDTO.buildTimeType();
         timeType.setCountry(country);
         save(timeType);
         timeTypeDTO.setId(timeType.getId());
