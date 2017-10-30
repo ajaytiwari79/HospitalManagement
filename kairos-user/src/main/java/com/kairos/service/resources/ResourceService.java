@@ -149,7 +149,8 @@ public class ResourceService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect unit id ");
         }
         Resource dbResourceObject = resourceGraphRepository.getResourceByRegistrationNumberAndUnit(unitId,resourceDTO.getRegistrationNumber());
-        if(!Optional.ofNullable(dbResourceObject).isPresent()){
+
+        if(Optional.ofNullable(dbResourceObject).isPresent()){
             throw new DuplicateDataException("Resource already exist with register number " + resourceDTO.getRegistrationNumber());
         }
 
