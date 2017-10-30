@@ -36,9 +36,6 @@ public class Resource extends UserBaseEntity {
         this.fuelType = fuelType;
     }
 
-    @Relationship(type = RelationshipConstants.RESOURCE_NOT_AVAILABLE_ON)
-    private List<ResourceUnAvailability> resourceAvailabilities;
-
     public Resource() {
     }
 
@@ -63,13 +60,6 @@ public class Resource extends UserBaseEntity {
         this.fuelType = fuelType;
     }
 
-    public List<ResourceUnAvailability> getResourceAvailabilities() {
-        return resourceAvailabilities;
-    }
-
-    public void setResourceAvailabilities(List<ResourceUnAvailability> resourceAvailabilities) {
-        this.resourceAvailabilities = resourceAvailabilities;
-    }
 
     public boolean isEnabled() {
         return enabled;
