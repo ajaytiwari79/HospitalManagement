@@ -23,16 +23,10 @@ public class TimeTypeDTO extends UserBaseEntity {
     private Long countryId;
     @JsonIgnore
     private boolean enabled = true;
-    private Boolean negativeDayBalancePresent;
-    private Boolean onCallTime;
+    private boolean negativeDayBalancePresent;
+    private boolean onCallTime;
 
-    public Boolean getOnCallTime() {
-        return onCallTime;
-    }
 
-    public void setOnCallTime(Boolean onCallTime) {
-        this.onCallTime = onCallTime;
-    }
 
     public String getName() {
         return name;
@@ -74,14 +68,21 @@ public class TimeTypeDTO extends UserBaseEntity {
         this.enabled = enabled;
     }
 
-    public Boolean getNegativeDayBalancePresent() {
+    public boolean isNegativeDayBalancePresent() {
         return negativeDayBalancePresent;
     }
 
-    public void setNegativeDayBalancePresent(Boolean negativeDayBalancePresent) {
+    public void setNegativeDayBalancePresent(boolean negativeDayBalancePresent) {
         this.negativeDayBalancePresent = negativeDayBalancePresent;
     }
 
+    public boolean isOnCallTime() {
+        return onCallTime;
+    }
+
+    public void setOnCallTime(boolean onCallTime) {
+        this.onCallTime = onCallTime;
+    }
 
     public TimeTypeDTO() {
         //default

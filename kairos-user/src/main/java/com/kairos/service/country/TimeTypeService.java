@@ -28,7 +28,7 @@ public class TimeTypeService extends UserBaseService {
     @Inject
     private TimeTypeGraphRepository timeTypeGraphRepository;
 
-    public TimeTypeDTO addTimeType(TimeTypeDTO timeTypeDTO, long countryId) {
+    public TimeTypeDTO addTimeType(TimeTypeDTO timeTypeDTO, Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             logger.error("Country not found by Id while creating TimeType" + countryId);
@@ -63,7 +63,7 @@ public class TimeTypeService extends UserBaseService {
         save(timeType);
     }
 
-    public TimeTypeDTO updateTimeType(TimeTypeDTO timeTypeDTO, long countryId){
+    public TimeTypeDTO updateTimeType(TimeTypeDTO timeTypeDTO, Long countryId){
         TimeType timeType = timeTypeGraphRepository.findOne(timeTypeDTO.getId());
         if (!Optional.ofNullable(timeType).isPresent()) {
             logger.error("TimeType does not exist" + timeTypeDTO.getId());
@@ -77,8 +77,8 @@ public class TimeTypeService extends UserBaseService {
         timeType.setType(timeTypeDTO.getType());
         timeType.setName(timeTypeDTO.getName());
         timeType.setIncludeInTimeBank(timeTypeDTO.isIncludeInTimeBank());
-        timeType.setNegativeDayBalancePresent(timeTypeDTO.getNegativeDayBalancePresent());
-        timeType.setOnCallTime(timeTypeDTO.getOnCallTime());
+        timeType.setNegativeDayBalancePresent(timeTypeDTO.isNegativeDayBalancePresent());
+        timeType.setOnCallTime(timeTypeDTO.isOnCallTime());
         save(timeType);
         return timeTypeDTO;
     }

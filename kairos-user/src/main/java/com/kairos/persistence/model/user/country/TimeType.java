@@ -23,13 +23,13 @@ public class TimeType extends UserBaseEntity {
     @Relationship(type = BELONGS_TO , direction=Relationship.OUTGOING)
     private Country country;
     private boolean enabled = true;
-    private Boolean negativeDayBalancePresent;
-    private Boolean onCallTime;
+    private boolean negativeDayBalancePresent;
+    private boolean onCallTime;
 
     public TimeType() {
     }
 
-    public TimeType(String name, String type, boolean includeInTimeBank, Country country, boolean enabled, Boolean negativeDayBalancePresent, Boolean onCallTime) {
+    public TimeType(String name, String type, boolean includeInTimeBank, Country country, boolean enabled, boolean negativeDayBalancePresent, boolean onCallTime) {
         this.name = name;
         this.type = type;
         this.includeInTimeBank = includeInTimeBank;
@@ -39,7 +39,7 @@ public class TimeType extends UserBaseEntity {
         this.onCallTime = onCallTime;
     }
 
-    public TimeType(String name, String type, boolean includeInTimeBank, boolean enabled, Boolean negativeDayBalancePresent, Boolean onCallTime) {
+    public TimeType(String name, String type, boolean includeInTimeBank, boolean enabled, boolean negativeDayBalancePresent, boolean onCallTime) {
         this.name = name;
         this.type = type;
         this.includeInTimeBank = includeInTimeBank;
@@ -88,22 +88,21 @@ public class TimeType extends UserBaseEntity {
         this.enabled = enabled;
     }
 
-    public Boolean getNegativeDayBalancePresent() {
+    public boolean isNegativeDayBalancePresent() {
         return negativeDayBalancePresent;
     }
 
-    public void setNegativeDayBalancePresent(Boolean negativeDayBalancePresent) {
+    public void setNegativeDayBalancePresent(boolean negativeDayBalancePresent) {
         this.negativeDayBalancePresent = negativeDayBalancePresent;
     }
 
-    public Boolean getOnCallTime() {
+    public boolean isOnCallTime() {
         return onCallTime;
     }
 
-    public void setOnCallTime(Boolean onCallTime) {
+    public void setOnCallTime(boolean onCallTime) {
         this.onCallTime = onCallTime;
     }
-
 
     @Override
     public int hashCode() {
