@@ -1043,6 +1043,26 @@ public class OrganizationService extends UserBaseService {
         return organization.getId();
     }
 
+    public Organization getOrganizationDetail(Long id, String type) {
+        Organization organization = null;
+        switch (type.toLowerCase()) {
+            case ORGANIZATION:
+                organization = organizationGraphRepository.findOne(id);
+                break;
+            case GROUP:
+                organization = groupService.getUnitByGroupId(id);
+                break;
+            case TEAM:
+                organization = teamService.getOrganizationByTeamId(id);
+                break;
+            default:
+                throw new UnsupportedOperationException("Type is not valid");
+        }
+        if (!Optional.ofNullable(organization).isPresent()) {
+            throw new DataNotFoundByIdException("Organization not found-" + id);
+        }
+        return organization;
+    }
     public  void updateOrganizationWithoutPhases( List<Long> organizationIds){
 
         organizationGraphRepository.updateOrganizationWithoutPhases(organizationIds);
