@@ -87,7 +87,7 @@ public class DayTypeService extends UserBaseService {
      * @param
      * @return
      */
-    public DayType getDayTypeByDate(Long countryId,Date date){
+    public List<DayType> getDayTypeByDate(Long countryId,Date date){
         Calendar calendar=Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -102,16 +102,18 @@ public class DayTypeService extends UserBaseService {
                 findByIdAndHolidayDateBetween(startDate.getTime(),endDate.getTime(),countryId);
 
         if(countryHolidayCalender.isPresent()){
-          return countryHolidayCalender.get().getDayType();
+            List<DayType> dayTypes=new ArrayList<>();
+            dayTypes.add( countryHolidayCalender.get().getDayType()) ;
+          return  dayTypes;
+
         }else{
             Instant instant = Instant.ofEpochMilli(date.getTime());
             LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
             LocalDate localDate = localDateTime.toLocalDate();
             String day=localDate.getDayOfWeek().name();
             Day dayEnum=Day.valueOf(day);
-            //as per requirement one day may belong to many dayTypes return any day type
-            List<DayType> dayTypes=dayTypeGraphRepository.findByValidDays(Stream.of(dayEnum).collect(Collectors.toList()));
-            return dayTypes.isEmpty()?null:dayTypes.get(0);
+            List<DayType> dayTypes=dayTypeGraphRepository.findByValidDaysContains(Stream.of(dayEnum.toString()).collect(Collectors.toList()));
+            return dayTypes.isEmpty()?Collections.EMPTY_LIST:dayTypes;
         }
 
     }
