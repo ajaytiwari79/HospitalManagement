@@ -437,7 +437,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
 
 
     @Query("match (n:Organization) where id(n)={0} with n \n" +
-            "match (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true}) \n" +
+            "match (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true})  where org.isKairosHub =false \n" +
             "match (org)-[:" + HAS_POSITION_NAME + "]->(p:PositionName {isEnabled:true}) return p")
     List<PositionName> getPositionNamesOfParentOrganization(Long organizationId);
 
