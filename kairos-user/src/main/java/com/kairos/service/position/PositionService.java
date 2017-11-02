@@ -1,6 +1,7 @@
 package com.kairos.service.position;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.position.PositionName;
@@ -16,12 +17,14 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
 import com.kairos.response.dto.web.PositionDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -48,27 +51,32 @@ public class PositionService extends UserBaseService {
     private CollectiveTimeAgreementGraphRepository costTimeAgreementGraphRepository;
     @Inject
     private StaffService staffService;
+    @Inject
+    private OrganizationService organizationService;
+    @Inject private  PositionNameService positionNameService;
 
-    public Position createPosition(long unitEmploymentId, PositionDTO positionDTO) {
-        Position position = preparePosition(positionDTO);
-
+    public Position createPosition( Long id,long unitEmploymentId, PositionDTO positionDTO, String type) {
         UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
-
-        if (unitEmployment == null) {
-            throw new DataNotFoundByIdException("Invalid UnitEmployment id");
+        if (!Optional.ofNullable(unitEmployment).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid UnitEmployment id"+unitEmploymentId);
         }
+        Organization organization=organizationService.getOrganizationDetail(id,type);
+        if (!organization.isParentOrganization()){
+             organization  =  organizationService.getParentOfOrganization(organization.getId());
+
+        }
+        Position position = preparePosition(positionDTO,organization);
         List<Position> positions = unitEmployment.getPositions();
+
         positions.add(position);
+
         unitEmployment.setPositions(positions);
         save(unitEmployment);
-
-
-
         return position;
     }
 
 
-    public Position     updatePosition(long positionId, PositionDTO positionDTO) {
+    public Position updatePosition(long positionId, PositionDTO positionDTO) {
 
         //Position position=preparePosition(positionDTO);
         Position oldPosition = positionGraphRepository.findOne(positionId);
@@ -120,26 +128,26 @@ public class PositionService extends UserBaseService {
         UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
 
         if (unitEmployment == null) {
-            throw new DataNotFoundByIdException("Invalid UnitEmployment id");
+            throw new DataNotFoundByIdException("Invalid UnitEmployment id"+unitEmploymentId);
         }
         return positionGraphRepository.findAllPositions(unitEmploymentId);
 
     }
 
-    private Position preparePosition(PositionDTO positionDTO) {
+    private Position preparePosition(PositionDTO positionDTO,Organization organization) {
         Position position = new Position();
 
         //String name, String description, Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta
 
         Expertise expertise = expertiseGraphRepository.findOne(positionDTO.getExpertiseId());
-        /*if (expertise == null) {
-            throw new DataNotFoundByIdException("Invalid Expertize");
-        }*/
+        if (!Optional.ofNullable(expertise).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid Expertize"+positionDTO.getExpertiseId());
+        }
         position.setExpertise(expertise);
 
-        PositionName positionName = positionNameGraphRepository.findOne(positionDTO.getPositionNameId());
-        if (positionName == null) {
-            throw new DataNotFoundByIdException("Invalid PositionName");
+        PositionName positionName = positionNameService.getPositionNameByUnitIdAndId(organization.getId(),positionDTO.getPositionNameId());
+        if (!Optional.ofNullable(positionName).isPresent()) {
+            throw new DataNotFoundByIdException("position Name does not exist in unit "+positionDTO.getPositionNameId());
         }
         position.setPositionName(positionName);
 
@@ -155,6 +163,11 @@ public class PositionService extends UserBaseService {
         }
         position.setWta(wta);*/
 
+        Staff staff = staffGraphRepository.findOne(positionDTO.getStaffId());
+        if (!Optional.ofNullable(staff).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid Staff Id"+positionDTO.getStaffId());
+        }
+        position.setStaff(staff);
         position.setStartDate(positionDTO.getStartDate());
         position.setEndDate(positionDTO.getEndDate());
 
@@ -167,13 +180,13 @@ public class PositionService extends UserBaseService {
 
         return position;
     }
-
+//!Optional.ofNullable().isPresent()
     private void preparePosition(Position oldPosition, PositionDTO positionDTO) {
 
         if (oldPosition.getExpertise().getId() != positionDTO.getExpertiseId()) {
             Expertise expertise = expertiseGraphRepository.findOne(positionDTO.getExpertiseId());
-            if (expertise == null) {
-                throw new NullPointerException("Expertize Cannot be null");
+            if ( !Optional.ofNullable(expertise).isPresent()) {
+                throw new DataNotFoundByIdException("Expertize Cannot be null"+positionDTO.getExpertiseId());
             }
             oldPosition.setExpertise(expertise);
 
@@ -182,8 +195,8 @@ public class PositionService extends UserBaseService {
 
         if (oldPosition.getPositionName().getId() != positionDTO.getPositionNameId()) {
             PositionName positionName = positionNameGraphRepository.findOne(positionDTO.getPositionNameId());
-            if (positionName == null) {
-                throw new NullPointerException("PositionName Cannot be null");
+            if (!Optional.ofNullable(positionName).isPresent()) {
+                throw new DataNotFoundByIdException("PositionName Cannot be null"+positionDTO.getPositionNameId());
             }
             oldPosition.setPositionName(positionName);
         }
@@ -219,13 +232,16 @@ public class PositionService extends UserBaseService {
      * @auth vipul
      * used to get all positions of organization n buy organization and staff Id
      * */
-    public List<PositionQueryResult> getAllPositionByStaff(long unitId, long staffId) {
+    public List<PositionQueryResult> getAllPositionByStaff(long id, long unitEmploymentId,long staffId,String type) {
+
+        Long unitId =organizationService.getOrganization(id,type);
+
         Staff staff = staffGraphRepository.findOne(staffId);
-        if (staff == null) {
-            throw new DataNotFoundByIdException("Invalid Staff Id");
+        if (!Optional.ofNullable(staff).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid Staff Id"+staffId);
         }
 
-        return positionGraphRepository.getAllPositionByStaff(unitId, staffId);
+        return positionGraphRepository.getAllPositionByStaff(unitId, unitEmploymentId,staffId);
     }
 
 }

@@ -72,7 +72,7 @@ public class LanguageService extends UserBaseService {
 
     public List<Map<String, Object>> getUnitAvailableLanguages(long unitId) {
 
-        Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
         if (countryId != null) {
 

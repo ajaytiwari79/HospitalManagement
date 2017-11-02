@@ -100,6 +100,7 @@ public class RelationshipConstants {
     public final static String ORGANIZATION_HAS_RESOURCE = "ORGANIZATION_HAS_RESOURCE";
     public final static String ORGANIZATION_HAS_DEPARTMENT ="ORGANIZATION_HAS_DEPARTMENT";
     public final static String ORGANIZATION_SUB_SERVICE ="ORGANIZATION_SUB_SERVICE";
+    public final static String LINK_WITH_EXTERNAL_SERVICE ="LINK_WITH_EXTERNAL_SERVICE";
 
 
     public static final String RESOURCE_NOT_AVAILABLE_ON="RESOURCE_NOT_AVAILABLE_ON";
@@ -159,19 +160,27 @@ public class RelationshipConstants {
     public final static String REGION = "REGION";
     public final static String KAIROS_STATUS = "KAIROS_STATUS";
     public final static String TYPE_OF_HOUSING = "TYPE_OF_HOUSING";
+    public final static String CLIENT_CONTACT_PERSON_RELATION_TYPE = "CLIENT_CONTACT_PERSON_RELATION_TYPE";
+    public final static String CLIENT_CONTACT_PERSON_STAFF = "CLIENT_CONTACT_PERSON_STAFF";
+    public final static String CLIENT_CONTACT_PERSON_SERVICE = "CLIENT_CONTACT_PERSON_SERVICE";
 
     // RULE Template
     public final static String HAS_RULE_TEMPLATE="HAS_RULE_TEMPLATE";
     public final static String HAS_RULE_TEMPLATE_CATEGORY="HAS_RULE_TEMPLATE_CATEGORY";
     public final static String HAS_RULE_TEMPLATES = "HAS_RULE_TEMPLATES";
     public final static String HAS_LEVEL = "HAS_LEVEL";
-    public final static String PHASE_BELONGS_TO="PHASE_BELONGS_TO";
     public final static String HAS_RELATION_TYPES="HAS_RELATION_TYPES";
     public final static String RELATION_TYPE="RELATION_TYPE";
     public final static String RELATION_WITH_NEXT_TO_KIN="RELATION_WITH_NEXT_TO_KIN";
     public final static String HAS_RELATION_OF="HAS_RELATION_OF";
     public final static String HAS_RESOURCES="HAS_RESOURCES";
 
+    public final static String FILTER_BY_PAGE = "FILTER_BY_PAGE";
+
+    public final static String HAS_FAVOURITE_FILTERS = "HAS_FAVOURITE_FILTERS";
+
+    public final static  String BELONGS_TO_STAFF="BELONGS_TO_STAFF";
+    public final static String UNAVAILABLE_ON = "UNAVAILABLE_ON";
     /**
      * Default constructor
      */

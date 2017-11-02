@@ -1,30 +1,38 @@
 package com.kairos.response.dto.web;
 
 import com.kairos.persistence.model.user.position.Position;
+import org.hibernate.validator.constraints.Range;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by pawanmandhan on 27/7/17.
  */
 public class PositionDTO {
 
-
+    @NotNull(message = "Position Name  is required for position") @Range(min = 0,message = "Position Name is required for position")
     private Long positionNameId;
+    @NotNull(message = "expertise is required for position")
+    @Range(min = 0,message = "expertise is required for position")
     private Long expertiseId;
+
     private Long startDate;
     private Long endDate;
     private int totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
-
     private float salary;
     private Position.EmploymentType employmentType;
-    //private Long staffId;
+
+    @NotNull(message = "staffId is missing")
+    @Range(min = 0, message = "staffId is missing")
+    private Long staffId;
     // private Long expiryDate;
 
 
     public PositionDTO() {
-
+        //default cons
     }
 
 
@@ -46,6 +54,20 @@ public class PositionDTO {
         this.startDate = startDate;
         this.endDate = endDate;
         this.employmentType=employmentType;
+    }
+
+    public PositionDTO(Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Position.EmploymentType employmentType, Long staffId) {
+        this.positionNameId = positionNameId;
+        this.expertiseId = expertiseId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.hourlyWages = hourlyWages;
+        this.salary = salary;
+        this.employmentType = employmentType;
+        this.staffId = staffId;
     }
 
     public int getWorkingDaysInWeek() {
@@ -127,5 +149,13 @@ public class PositionDTO {
 
     public void setEmploymentType(Position.EmploymentType employmentType) {
         this.employmentType = employmentType;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 }

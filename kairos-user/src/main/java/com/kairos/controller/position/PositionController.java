@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -32,13 +33,14 @@ public class PositionController {
     @ApiOperation(value = "Create a New Position")
   //  http://dev.kairosplanning.com/api/v1/organization/71/unit/71/unitEmployment/82/position?moduleId=tab_23&type=Organization
     @PostMapping(value = "/unitEmployment/{unitEmploymentId}/position")
-    public ResponseEntity<Map<String, Object>> createPosition(@PathVariable Long unitEmploymentId, @RequestBody PositionDTO position) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionService.createPosition(unitEmploymentId,position));
+    public ResponseEntity<Map<String, Object>> createPosition(@PathVariable Long organizationId,@PathVariable Long unitId,@PathVariable Long unitEmploymentId,
+                                                              @RequestParam("type") String type,@RequestBody @Valid  PositionDTO position) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionService.createPosition(unitId,unitEmploymentId,position,type));
     }
 
     @ApiOperation(value = "Update Position")
     @PutMapping(value = "/position/{positionId}")
-    public ResponseEntity<Map<String, Object>> updatePosition(@PathVariable Long positionId,@RequestBody PositionDTO position) {
+    public ResponseEntity<Map<String, Object>> updatePosition(@PathVariable Long positionId,@RequestBody @Valid  PositionDTO position) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionService.updatePosition(positionId,position));
     }
 
@@ -63,9 +65,9 @@ public class PositionController {
     * used to get all positions of organization n buy organization and staff Id
     * */
     @ApiOperation(value = "Get all positions by organization and staff")
-    @RequestMapping(value="/staff/{staffId}/position")
-    ResponseEntity<Map<String, Object>> getAllPositionByStaff(@PathVariable Long unitId,@PathVariable Long staffId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,positionService.getAllPositionByStaff(unitId,staffId));
+    @RequestMapping(value="/unitEmployment/{unitEmploymentId}/staff/{staffId}/position")
+    ResponseEntity<Map<String, Object>> getAllPositionByStaff(@PathVariable Long unitId,@RequestParam("type") String type,@PathVariable Long unitEmploymentId,@PathVariable Long staffId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,positionService.getAllPositionByStaff(unitId,unitEmploymentId,staffId,type));
     }
 
 

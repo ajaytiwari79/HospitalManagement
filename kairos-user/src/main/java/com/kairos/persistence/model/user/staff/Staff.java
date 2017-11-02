@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.auth.User;
@@ -11,8 +12,7 @@ import com.kairos.persistence.model.user.language.Language;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -20,6 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 /**
  * Created by prabjot on 24/10/16.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 public class Staff extends UserBaseEntity {
@@ -85,6 +86,10 @@ public class Staff extends UserBaseEntity {
     private Float costHourOvertime;
     private Integer capacity;
     private Long kmdExternalId;
+
+    @Relationship(type = HAS_FAVOURITE_FILTERS)
+    private List<StaffFavouriteFilters> staffFavouriteFiltersList;
+
 
 
     public Staff(String firstName) {
@@ -470,6 +475,12 @@ public class Staff extends UserBaseEntity {
 
     public void setKmdExternalId(Long kmdExternalId) {
         this.kmdExternalId = kmdExternalId;
+    }
+
+    public void addFavouriteFilters(StaffFavouriteFilters staffFavouriteFilters){
+        List<StaffFavouriteFilters> staffFavouriteFiltersList = Optional.ofNullable(this.staffFavouriteFiltersList).orElse(new ArrayList<>());
+        staffFavouriteFiltersList.add(staffFavouriteFilters);
+        this.staffFavouriteFiltersList = staffFavouriteFiltersList;
     }
 
     @Override

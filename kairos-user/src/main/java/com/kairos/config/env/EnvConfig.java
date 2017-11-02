@@ -39,6 +39,9 @@ public class EnvConfig {
     @Value("${webservice.googleCalendarApiUrl}")
     private String googleCalendarAPIV3Url;
 
+    @Value("${webservice.imagesPath}")
+    private String imagesPath;
+
     public String getGoogleCalendarAPIV3Url(String vCardId){
 
         return googleCalendarAPIV3Url.replace("{countryVCard}" ,vCardId);
@@ -83,5 +86,13 @@ public class EnvConfig {
 
     public void setFlsPackageName(String flsPackageName) {
         this.flsPackageName = flsPackageName;
+    }
+
+    public String getImagesPath() {
+        return imagesPath;
+    }
+
+    public void setImagesPath(String imagesPath) {
+        this.imagesPath = imagesPath;
     }
 }

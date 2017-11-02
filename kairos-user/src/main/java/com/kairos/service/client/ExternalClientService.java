@@ -269,7 +269,7 @@ public class ExternalClientService extends UserBaseService {
             client.setFirstName(patientWrapper.getFirstName());
             client.setLastName(patientWrapper.getLastName());
             client.setCprNumber(cprNumber);
-            CitizenStatus citizenStatus = citizenStatusGraphRepository.findByDescription(countryGraphRepository.getCountryOfUnit(unitId), patientWrapper.getMaritalStatus());
+            CitizenStatus citizenStatus = citizenStatusGraphRepository.findByDescription(countryGraphRepository.getCountryIdByUnitId(unitId), patientWrapper.getMaritalStatus());
 
             if (citizenStatus != null) {
                 client.setCivilianStatus(citizenStatusGraphRepository.findOne(citizenStatus.getId()));

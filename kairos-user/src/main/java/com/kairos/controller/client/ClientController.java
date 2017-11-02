@@ -6,6 +6,7 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.staff.StaffClientData;
+import com.kairos.response.dto.web.ContactPersonDTO;
 import com.kairos.service.client.ClientAddressService;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientExtendedService;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.*;
 
@@ -97,7 +99,7 @@ public class ClientController {
     @ApiOperation("Get General Information for a Client")
     @RequestMapping(value = "/{clientId}/general", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getClientGeneralInformation(@PathVariable long clientId, @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.retrieveGeneralDetails(clientId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.retrieveCompleteDetails(clientId, unitId));
     }
 
 
@@ -118,15 +120,23 @@ public class ClientController {
     // NextToKin
     @ApiOperation("create NextToKin")
     @RequestMapping(value = "/{clientId}/nextToKin", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> createNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable Long unitId, @PathVariable Long clientId) {
+    ResponseEntity<Map<String, Object>> createNextToKin(@Valid @RequestBody NextToKinDTO nextToKinDTO, @PathVariable Long unitId, @PathVariable Long clientId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.saveNextToKin(unitId,clientId,nextToKinDTO));
     }
 
     // NextToKin
     @ApiOperation("update NextToKin")
     @RequestMapping(value = "/{clientId}/nextToKin/{nextToKinId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateNextToKin(@RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId, @PathVariable long nextToKinId, @PathVariable long clientId) {
+    ResponseEntity<Map<String, Object>> updateNextToKin(@Valid @RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId,
+                                                        @PathVariable long nextToKinId, @PathVariable long clientId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO,clientId));
+    }
+
+    // NextToKin
+    @ApiOperation("get next to kin by CPR")
+    @RequestMapping(value = "/nextToKin/cpr_number", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getNextToKinByCprNumber(@RequestBody Map<String,String> cprInfo) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.getNextToKinByCprNumber(cprInfo.get("cprNumber")));
     }
 
 
@@ -565,7 +575,7 @@ public class ClientController {
     @ApiOperation("get required data for task creation")
     private ResponseEntity<Map<String, Object>> generateIndividualTask(@PathVariable Long  citizenId
             , @PathVariable Long  unitId, OAuth2Authentication authentication){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                    return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 clientService.getPrerequisitesForTaskCreation(authentication.getUserAuthentication().getPrincipal().toString(),unitId,citizenId));
     }
 
@@ -580,6 +590,18 @@ public class ClientController {
     private ResponseEntity<Map<String,Object>> getClientIdsOfUnit(@PathVariable long unitId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                clientService.getClientIds(unitId));
+    }
+
+    /**
+     * this method will be called from  task micro service in planner service
+     * @param unitIds
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/client_ids_by_unitIds")
+    @ApiOperation("get required data for task creation")
+    private ResponseEntity<Map<String,Object>> getCitizenIdsByUnitIds(@RequestBody List<Long> unitIds){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                clientService.getCitizenIdsByUnitIds(unitIds));
     }
 
 
@@ -679,6 +701,21 @@ public class ClientController {
                                                                    @PathVariable String cprNumber, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,clientService.findByCPRNumber(clientId,unitId,cprNumber));
     }
+
+    //Prefer Staff
+    @ApiOperation("Fetch Client Contact Person")
+    @RequestMapping(value = "/{clientId}/staff/contact-person", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getContactPerson(@PathVariable long unitId, @PathVariable long clientId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getDetailsForContactPersonTab(unitId, clientId));
+    }
+
+    //Prefer Staff
+    @ApiOperation("Save Client Contact Person")
+    @RequestMapping(value = "/{clientId}/staff/contact-person", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> saveContactPerson(@PathVariable long clientId, @RequestBody ContactPersonDTO contactPersonDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.saveContactPerson(clientId, contactPersonDTO));
+    }
+
 
 
 

@@ -125,5 +125,9 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     }
 
+    public void setRuleTemplatecategoryWithRuleTemplate( Long templateCategoryId,Long ruleTemplateId ){
+        ruleTemplateCategoryGraphRepository.setRuleTemplateCategoryWithRuleTemplate(templateCategoryId,ruleTemplateId);
+
+    }
 
 }

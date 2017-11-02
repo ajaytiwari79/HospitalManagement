@@ -5,9 +5,12 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.user.client.ClientStaffDTO;
 import com.kairos.persistence.model.user.department.Department;
-import com.kairos.persistence.model.user.resources.Resource;
+import com.kairos.persistence.model.user.resources.ResourceDTO;
+import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
+import com.kairos.persistence.model.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
+import com.kairos.response.dto.web.ClientFilterDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.service.client.ClientBatchService;
@@ -27,6 +30,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -34,11 +38,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
+
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
@@ -115,6 +118,7 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationById(unitId));
     }
+
     //TODO
     /**
      * Return Organization with given id and return if found.
@@ -128,7 +132,6 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationById(unitId));
     }
-
     /**
      * Create new organization in db and return created organization
      *
@@ -518,7 +521,7 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationHierarchyService.getChildUnits(organizationId, userId, moduleId));
     }
 
-    @RequestMapping(value = "unit/{unitId}/resources", method = RequestMethod.GET)
+    @RequestMapping(value = "/unit/{unitId}/resources", method = RequestMethod.GET)
     @ApiOperation("Get Organization Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationResources(@PathVariable Long unitId) {
@@ -526,20 +529,88 @@ public class OrganizationController {
                 resourceService.getUnitResources(unitId));
     }
 
-    @RequestMapping(value = "unit/{unitId}/resources/type", method = RequestMethod.GET)
-    @ApiOperation("Get Organization Resource Type Array")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationResourcesTypes() {
+    @RequestMapping(value = "/unit/{unitId}/resources_with_unavailability", method = RequestMethod.GET)
+    @ApiOperation("Get Organization Resource of a Unit")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationResourcesWithUnAvailability(@PathVariable Long unitId,
+                                                                        @RequestParam("startDate") String date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                resourceService.getUnitResourcesTypes());
+                resourceService.getOrganizationResourcesWithUnAvailability(unitId,date));
     }
 
-    @RequestMapping(value = "unit/{unitId}/resources", method = RequestMethod.PUT)
+
+    @RequestMapping(value = "/unit/{unitId}/resources/type", method = RequestMethod.GET)
+    @ApiOperation("Get Organization Resource Type Array")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationResourcesTypes(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                resourceService.getUnitResourcesTypes(unitId));
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/resources", method = RequestMethod.POST)
     @ApiOperation("Update Resource of a Unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateOrganizationResources(@PathVariable Long unitId, @RequestBody Resource resource) {
+    public ResponseEntity<Map<String, Object>> createResourceForOrganization(@PathVariable Long unitId,
+                                                                           @Valid @RequestBody ResourceDTO resourceDTO) throws ParseException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                resourceService.setUnitResource(resource, unitId));
+                resourceService.addResource(resourceDTO, unitId));
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/resource/{resourceId}/unavailability", method = RequestMethod.POST)
+    @ApiOperation("set resource unavailability")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> setResourceUnavailability(@PathVariable Long resourceId,
+                                                                             @Valid @RequestBody ResourceUnavailabilityDTO unavailabilityDTO) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                resourceService.setResourceUnavailability(unavailabilityDTO, resourceId));
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/resource/{resourceId}/unavailability/{unavailabilityId}", method = RequestMethod.PUT)
+    @ApiOperation("get resource unavailability")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getResourceUnavailability(@PathVariable Long resourceId,
+                                                                         @PathVariable Long unavailabilityId,
+                                                                         @Valid @RequestBody ResourceUnavailabilityDTO unavailabilityDTO) throws ParseException {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,resourceService.
+                updateResourceUnavailability(unavailabilityDTO,unavailabilityId,resourceId));
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/resource/{resourceId}/unavailability/{unavailableDateId}", method = RequestMethod.DELETE)
+    @ApiOperation("delete resource unavailability")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteResourceUnavailability(@PathVariable Long resourceId,@PathVariable Long unavailableDateId) {
+        resourceService.deleteUnavailability(resourceId,unavailableDateId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/resource/{resourceId}/unavailability", method = RequestMethod.GET)
+    @ApiOperation("get resource unavailability")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getResourceUnavailability(@PathVariable Long resourceId,@RequestParam("startDate") String date) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, resourceService.getResourceUnAvailability(resourceId,date));
+    }
+
+
+    @RequestMapping(value = "/unit/{unitId}/resource/{resourceId}", method = RequestMethod.PUT)
+    @ApiOperation("Update Resource of a Unit")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateResource(@PathVariable Long resourceId,
+                                                                             @Valid @RequestBody ResourceDTO resourceDTO) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                resourceService.updateResource(resourceDTO, resourceId));
+
+    }
+
+    /**
+     * Mark disabled to a resource by given id
+     *
+     * @param resourceId
+     */
+    @RequestMapping(value = "/unit/{unitId}/resource/{resourceId}", method = RequestMethod.DELETE)
+    @ApiOperation("Delete a resource by resourceId")
+    ResponseEntity<Map<String, Object>> deleteResourceById(@PathVariable Long resourceId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, resourceService.deleteResource(resourceId));
     }
 
 
@@ -832,8 +903,8 @@ public class OrganizationController {
      */
     @ApiOperation("get time slot info by unit id and timeslot name")
     @RequestMapping(value = "/unit/{unitId}/time_slot_name", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotName(@PathVariable long unitId, @RequestBody String timeSlotName) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotName(unitId, timeSlotName));
+    ResponseEntity<Map<String, Object>> getTimeSlotByUnitIdAndTimeSlotName(@PathVariable long unitId, @RequestBody Long timeSlotExternalId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByUnitIdAndTimeSlotExternalId(unitId, timeSlotExternalId));
     }
 
 
@@ -896,7 +967,7 @@ public class OrganizationController {
      * @return OrganizationDTO
      */
     @ApiOperation("get getOrganization By TeamId ")
-    @RequestMapping(value = "/unit/{unitId}/getOrganizationByTeamId/{teamId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getOrganizationByTeamId/{teamId}", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getOrganizationByTeamId(@PathVariable long teamId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationByTeamId(teamId));
     }
@@ -970,9 +1041,9 @@ public class OrganizationController {
     @RequestMapping(value = UNIT_URL+"/organizationTypeAndSubTypes", method = RequestMethod.GET)
     @ApiOperation("get All organization types and  and Sub org by unitId")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getorganizationTypeAndSubTypes( @PathVariable long unitId) {
+    public ResponseEntity<Map<String, Object>> getorganizationTypeAndSubTypes( @RequestParam("type") String type,@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                organizationService.getOrganizationTypeAndSubTypes(unitId));
+                organizationService.getOrganizationTypeAndSubTypes(unitId,type));
     }
 
     @RequestMapping(value = "/unit/{unitId}/saveKMDExternal", method = RequestMethod.POST)
@@ -1008,13 +1079,89 @@ public class OrganizationController {
                 organizationService.getTimeSlotPercentageDeduction(unitId));
     }
 
+    /**
+     * @auther anil maurya
+     * use this endpoint from activity micro service via rest client
+     * @param unitId
+     * @return
+     */
+    @ApiOperation(value = "Get skills and organizationTypes of organization")
+    @RequestMapping(value = "/unit/{unitId}/skill/orgTypes", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(unitId));
+    }
+
     @RequestMapping(value = "/vehicleList", method = RequestMethod.GET)
     @ApiOperation("Get Vehicle list of unit")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String,Object>> getVehicleList(@PathVariable Long organizationId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getVehicleList(organizationId));
+
     }
 
+    @ApiOperation(value = "Get Organization Clients with filters")
+    @RequestMapping(value = "/unit/{unitId}/client/filters", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationClientsWithFilters(@PathVariable Long unitId, @RequestBody ClientFilterDTO clientFilterDTO, @RequestParam("start") String start) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start));
+    }
+
+    @RequestMapping(value =UNIT_URL+"/dayTypebydate", method = RequestMethod.GET)
+    @ApiOperation("get dayType in country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getDayType(@PathVariable Long unitId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)Date date){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(unitId,date));
+
+    }
+
+    @RequestMapping(value = "/addStaffFavouriteFilters", method = RequestMethod.POST)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addStaffFavouriteFilters( @RequestBody StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.addStaffFavouriteFilters( staffFilterDTO));
+    }
+
+
+
+    @RequestMapping(value = "/updateStaffFavouriteFilters", method = RequestMethod.POST)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateStaffFavouriteFilters( @RequestBody  StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updateStaffFavouriteFilters(staffFilterDTO));
+    }
+
+    @RequestMapping(value = "/removeStaffFavouriteFilters/{staffFavouriteFilterId}", method = RequestMethod.DELETE)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> removeStaffFavouriteFilters( @PathVariable  Long staffFavouriteFilterId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.removeStaffFavouriteFilters(staffFavouriteFilterId));
+    }
+
+    @RequestMapping(value = "/getStaffFavouriteFilters/{moduleId}", method = RequestMethod.GET)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffFavouriteFilters( @PathVariable  String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffFavouriteFilters(moduleId));
+    }
+
+    // DayType
+    @ApiOperation(value = "Get DayType by unitID")
+    @RequestMapping(value = UNIT_URL + "/dayType", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDayTypeByOrganization(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getAllDayTypeofOrganization(unitId));
+    }
+
+
+    @ApiOperation(value = "Get DayType by unitID")
+    @RequestMapping(value ="/units", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnitsByOrganizationID(@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getUnitsByOrganizationIs(organizationId));
+    }
 
 
 }

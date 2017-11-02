@@ -160,6 +160,11 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = HAS_LEVEL)
     private Level level;
 
+    @Relationship(type = HAS_POSITION_NAME)
+    private List<PositionName> positionNameList = new ArrayList<>();
+
+    @Relationship(type = HAS_WTA)
+    private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
     public Level getLevel() {
         return level;
     }
@@ -179,13 +184,8 @@ public class Organization extends UserBaseEntity {
     private int dayShiftTimeDeduction = 4; //in percentage
 
     private int nightShiftTimeDeduction = 7; //in percentage
+    private boolean phaseGenerated=true;
 
-
-    @Relationship(type = HAS_POSITION_NAME)
-    private List<PositionName> positionNameList = new ArrayList<>();
-
-    @Relationship(type = HAS_WTA)
-    private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
 
     public Organization(String name, List<Group> groupList, List<Organization> children) {
         this.name = name;
@@ -252,7 +252,7 @@ public class Organization extends UserBaseEntity {
     }
 
     public List<Resource> getResourceList() {
-        return resourceList;
+        return java.util.Optional.ofNullable(resourceList).orElse(new ArrayList<>());
     }
 
     public void setResourceList(List<Resource> resourceList) {
@@ -713,4 +713,20 @@ public class Organization extends UserBaseEntity {
     public void setPositionNameList(List<PositionName> positionNameList) {
         this.positionNameList = positionNameList;
     }
+
+    public boolean isPhaseGenerated() {
+        return phaseGenerated;
+    }
+
+    public void setPhaseGenerated(boolean phaseGenerated) {
+        this.phaseGenerated = phaseGenerated;
+    }
+
+    public void addResource(Resource resource){
+        List<Resource> resourceList = this.getResourceList();
+        resourceList.add(resource);
+        this.resourceList = resourceList;
+    }
+
+
 }

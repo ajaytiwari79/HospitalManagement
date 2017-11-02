@@ -29,11 +29,10 @@ public class SkillServiceTemplateClient {
     /**
      * endpoint map in taskType controller in task micro service
      * @param serviceIds
-     * @param orgId
+     * @param organizationId
      * @return
      */
-    public  Map<String, Object> getTaskTypeList(List<Long> serviceIds, long orgId) {
-        final String baseUrl = getBaseUrl(false);
+    public  Map<String, Object> getTaskTypeList(List<Long> serviceIds, long organizationId) {
 
         try {
 
@@ -44,8 +43,8 @@ public class SkillServiceTemplateClient {
 
             logger.debug("typeReference "+typeReference);
             ResponseEntity<RestTemplateResponseEnvelope<Object>> restExchange =
-                    restTemplate.exchange(baseUrl + "/task_types/getAllAvlSkill",
-                            HttpMethod.POST, request, typeReference, orgId);
+                    restTemplate.exchange("http://zuulservice/kairos/activity/api/v1/organization/{organizationId}/task_types/getAllAvlSkill",
+                            HttpMethod.POST, request, typeReference, organizationId);
 
             logger.info("restExchange.getBody() "+ restExchange.getBody());
 

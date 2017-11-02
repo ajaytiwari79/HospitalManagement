@@ -8,8 +8,6 @@ import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position.PositionName;
-import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
-import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -58,31 +56,31 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
 
     // Skill
     @Query("Match (organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) where id(organization)={0} with subType,organization\n" +
-            "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization\n" +
-            "Match (organization)-[r:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,r\n" +
-            "MATCH (skill)-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with\n" +
+            "Match (subType)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]->(expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization\n" +
+            "Match (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) with skill,r\n" +
+            "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with\n" +
             " {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true})} as availableSkills\n" +
             " return {availableSkills:collect(availableSkills)} as data\n" +
             " UNION\n" +
             " Match (unit:Organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) where id(unit)={1} with subType,unit\n" +
-            " Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,unit\n" +
-            " Match (unit)-[r:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,unit,r\n" +
-            " Match (skill)-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:collect({id:id(skill),name:skill.name,visitourId:r.visitourId,description:skill.description,isEdited:true})} as selectedSkills\n" +
+            " Match (subType)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]->(expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,unit\n" +
+            " Match (unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) with skill,unit,r\n" +
+            " Match (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:collect({id:id(skill),name:skill.name,visitourId:r.visitourId,description:skill.description,isEdited:true})} as selectedSkills\n" +
             " return {selectedSkills:collect(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsOfChildOrganization(long organizationId, long unitId);
 
     @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
-            "Match (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with subType,organization\n" +
-            "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill) with skill,organization\n" +
-            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with distinct skill,skillCategory,organization\n" +
-            "optional Match (organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill) with\n" +
+            "Match (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with subType,organization\n" +
+            "Match (subType)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]->(expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) with skill,organization\n" +
+            "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with distinct skill,skillCategory,organization\n" +
+            "optional Match (organization)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) with\n" +
             "{id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true})} as availableSkills\n" +
             "return {availableSkills:collect(availableSkills)} as data\n" +
             "UNION\n" +
-            "Match (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) where id(organization)={0} with subType,organization\n" +
-            "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill) with distinct skill,organization\n" +
-            "Match (organization)-[r:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,r\n" +
-            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with\n" +
+            "Match (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) where id(organization)={0} with subType,organization\n" +
+            "Match (subType)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]->(expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) with distinct skill,organization\n" +
+            "Match (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) with skill,r\n" +
+            "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with\n" +
             "{id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true})} as selectedSkills\n" +
             "return {selectedSkills:collect(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsOfParentOrganization(long unitId);
@@ -150,13 +148,13 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "} as serviceList")
     List<Map<String, Object>> getTeamAllSelectedSubServices(Long teamId);
 
-    @Query("MATCH (c:Client)-[:GET_SERVICE_FROM]->(o:Organization)  where id(o)= {0} with c\n"+
+    @Query("MATCH (c:Client)-[:GET_SERVICE_FROM]->(o:Organization)  where id(o)= {0} with c\n" +
             "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c\n" +
             "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail, ca, c\n" +
             "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(civilianStatus:CitizenStatus) with civilianStatus, contactDetail, ca, c\n" +
-            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,  civilianStatus, contactDetail, ca, c\n"+
+            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,  civilianStatus, contactDetail, ca, c\n" +
             "return {name:c.firstName+\" \" +c.lastName,id:id(c) , gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, phoneNumber:contactDetail.mobilePhone, clientStatus:id(civilianStatus), " +
-            "lat:ca.latitude, lng:ca.longitude, profilePic: {1} + c.profilePic, age:c.age, " +
+            "address:ca.houseNumber+\" \" +ca.street1, lat:ca.latitude, lng:ca.longitude, profilePic: {1} + c.profilePic, age:c.age, " +
             "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client  ORDER BY c.firstName")
     List<Map<String, Object>> getClientsOfOrganization(Long organizationId, String imageUrl);
 
@@ -170,8 +168,8 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,cs,cd,ca,c,r\n" +
             "return {name:c.firstName+\" \" +c.lastName,id:id(c), age:c.age, emailId:c.email, profilePic: {1} + c.profilePic, gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, joiningDate:r.joinDate,city:ca.city," +
             "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, " +
-            "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client  ORDER BY c.firstName")
-    List<Map<String,Object>> getClientsOfOrganizationExcludeDead(Long organizationId, String serverImageUrl);
+            "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client ORDER BY c.firstName")
+    List<Map<String, Object>> getClientsOfOrganizationExcludeDead(Long organizationId, String serverImageUrl);
 
 
     @Query("MATCH (c:Client{citizenDead:false}) WHERE id(c) IN {0} return {name:c.firstName+\" \" +c.lastName,id:id(c) , gender:c.gender, cprNumber:c.cprNumber  , citizenDead:c.citizenDead }  as Client  ORDER BY c.firstName")
@@ -218,21 +216,21 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("MATCH (o:Organization {isEnable:true})-[:HAS_SETTING]-(os:OrganizationSetting) where id(o)={0} WITH os as setting MATCH (setting)-[:OPENING_HOUR]-(oh:OpeningHours) return oh order by oh.index")
     List<OpeningHours> getOpeningHours(Long organizationId);
 
-    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[:"+BELONGS_TO+"]->(c:Country)  where id(c)={0} with org\n" +
-            "Match (org)-[:"+TYPE_OF+"]->(ot:OrganizationType) with collect(id(ot)) as organizationTypeIds,org\n" +
-            "optional match (org)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with  collect(id(subType)) as organizationSubTypeIds,organizationTypeIds,org\n" +
-            "MATCH (org)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode\n" +
-            "OPTIONAL MATCH (contactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) with municipality,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode\n" +
-            "MATCH (org)-[:"+BUSINESS_TYPE+"]-(businessType:BusinessType) with collect(id(businessType)) as businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality\n" +
-            "optional MATCH (org)-[:"+HAS_LEVEL+"]-(level:Level{isEnabled:true}) with level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality\n"+
+    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[:" + BELONGS_TO + "]->(c:Country)  where id(c)={0} with org\n" +
+            "Match (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) with collect(id(ot)) as organizationTypeIds,org\n" +
+            "optional match (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with  collect(id(subType)) as organizationSubTypeIds,organizationTypeIds,org\n" +
+            "MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode\n" +
+            "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) with municipality,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode\n" +
+            "MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) with collect(id(businessType)) as businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality\n" +
+            "optional MATCH (org)-[:" + HAS_LEVEL + "]-(level:Level{isEnabled:true}) with level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality\n" +
             "return collect({id:id(org),levelId:id(level),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,homeAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCode:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,municipalityId:id(municipality)}}) as organizations")
     OrganizationQueryResult getParentOrganizationOfRegion(long countryId);
 
     @Query("Match (country:Country) where id(country)={0} with country\n" +
-            "MATCH (bt:BusinessType{isEnabled:true})-[:"+BELONGS_TO+"]->(country) with collect(bt) as bt,country\n" +
-            "optional Match (country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) with collect(level) as level,bt,country\n" +
-            "MATCH (ot:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(country) WITH ot,bt,level\n" +
-            "OPTIONAL MATCH (ot)-[:"+HAS_SUB_TYPE+"]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else  collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot)} as orgTypes,bt,level\n" +
+            "MATCH (bt:BusinessType{isEnabled:true})-[:" + BELONGS_TO + "]->(country) with collect(bt) as bt,country\n" +
+            "optional Match (country)-[:" + HAS_LEVEL + "]->(level:Level{isEnabled:true}) with collect(level) as level,bt,country\n" +
+            "MATCH (ot:OrganizationType{isEnable:true})-[:" + BELONGS_TO + "]->(country) WITH ot,bt,level\n" +
+            "OPTIONAL MATCH (ot)-[:" + HAS_SUB_TYPE + "]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else  collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot)} as orgTypes,bt,level\n" +
             "return collect(orgTypes) as organizationTypes,bt as businessTypes,level as levels")
     OrganizationCreationData getOrganizationCreationData(long countryId);
 
@@ -314,43 +312,43 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     List<Map<String, Object>> getGeneralTabMetaData(long countryId);
 
     @Query("Match (n:Organization) where id(n)={0}\n" +
-            "Match (n)-[:"+TYPE_OF+"]->(orgType:OrganizationType) with collect(distinct id(orgType)) as orgId,n\n" +
-            "optional match (n)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with collect(distinct id(subType)) as subTypeId,orgId,n\n" +
-            "optional match (n)-[:"+BUSINESS_TYPE+"]->(businessType:BusinessType) with subTypeId,orgId,n,collect(distinct id(businessType)) as businessTypeId\n" +
-            "match (n)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) with subTypeId,orgId,n,businessTypeId,municipality\n" +
-            "optional match (n)-[:"+INDUSTRY_TYPE+"]->(industryType:IndustryType) with orgId,subTypeId,businessTypeId,industryType,n,municipality\n" +
-            "optional match  (n)-[:"+EMPLOYEE_LIMIT+"]->(employeeLimit:EmployeeLimit) with orgId,subTypeId,businessTypeId,employeeLimit,n,municipality,industryType\n" +
-            "optional match (n)-[:"+VAT_TYPE+"]->(vatType:VatType) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,n,municipality,industryType\n" +
-            "optional match (n)-[:"+CONTRACT_TYPE+"]->(contractType:ContractType) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,n,municipality,industryType,contractType\n" +
-            "optional match (n)-[:"+KAIROS_STATUS+"]->(kairosStatus:KairosStatus) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,kairosStatus,n,municipality,industryType,contractType\n" +
-            "optional match (n)-[:"+OWNERSHIP_TYPE+"]->(ownershipType:OwnershipType) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,kairosStatus,ownershipType,n,municipality,industryType,contractType\n" +
+            "Match (n)-[:" + TYPE_OF + "]->(orgType:OrganizationType) with collect(distinct id(orgType)) as orgId,n\n" +
+            "optional match (n)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with collect(distinct id(subType)) as subTypeId,orgId,n\n" +
+            "optional match (n)-[:" + BUSINESS_TYPE + "]->(businessType:BusinessType) with subTypeId,orgId,n,collect(distinct id(businessType)) as businessTypeId\n" +
+            "match (n)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) with subTypeId,orgId,n,businessTypeId,municipality\n" +
+            "optional match (n)-[:" + INDUSTRY_TYPE + "]->(industryType:IndustryType) with orgId,subTypeId,businessTypeId,industryType,n,municipality\n" +
+            "optional match  (n)-[:" + EMPLOYEE_LIMIT + "]->(employeeLimit:EmployeeLimit) with orgId,subTypeId,businessTypeId,employeeLimit,n,municipality,industryType\n" +
+            "optional match (n)-[:" + VAT_TYPE + "]->(vatType:VatType) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,n,municipality,industryType\n" +
+            "optional match (n)-[:" + CONTRACT_TYPE + "]->(contractType:ContractType) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,n,municipality,industryType,contractType\n" +
+            "optional match (n)-[:" + KAIROS_STATUS + "]->(kairosStatus:KairosStatus) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,kairosStatus,n,municipality,industryType,contractType\n" +
+            "optional match (n)-[:" + OWNERSHIP_TYPE + "]->(ownershipType:OwnershipType) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,kairosStatus,ownershipType,n,municipality,industryType,contractType\n" +
             "return {name:n.name,shortName:n.shortName,eanNumber:n.eanNumber,costCenterCode:n.costCenterCode,costCenterName:n.costCenterName,industryTypeId:id(industryType),businessTypeId:businessTypeId,websiteUrl:n.webSiteUrl,employeeLimitId:id(employeeLimit),description:n.description,vatTypeId:id(vatType),ownershipTypeId:id(ownershipType),organizationTypeId:orgId,organizationSubTypeId:subTypeId,cvrNumber:n.cvrNumber,pNumber:n.pNumber,contractTypeId:id(contractType),isKairosHub:n.isKairosHub,clientSince:n.clientSince,kairosStatusId:id(kairosStatus),municipalityId:id(municipality),externalId:n.externalId,percentageWorkDeduction:n.endTimeDeduction,kmdExternalId:n.kmdExternalId, dayShiftTimeDeduction:n.dayShiftTimeDeduction, nightShiftTimeDeduction:n.nightShiftTimeDeduction} as data")
-    Map<String,Object> getGeneralTabInfo(long organizationId);
+    Map<String, Object> getGeneralTabInfo(long organizationId);
 
     @Query("MATCH (c:Client)-[:GET_SERVICE_FROM]->(o:Organization) where id(c)={0} return { name:o.name , id: id(o), description: o.description } as result")
     List<Map<String, Object>> getClientServingOrganizations(Client client);
 
 
-    @Query("Match(parentOrg:Organization) where id(parentOrg)= {0} with parentOrg Match(parentOrg)-[:"+HAS_SUB_ORGANIZATION+"]->(childOrg:Organization) return childOrg")
+    @Query("Match(parentOrg:Organization) where id(parentOrg)= {0} with parentOrg Match(parentOrg)-[:" + HAS_SUB_ORGANIZATION + "]->(childOrg:Organization) return childOrg")
     List<Organization> getChildOrganizations(long parentOrganization);
 
     @Query("Match (organization:Organization),(unit:Organization) where id(organization)={0} AND id(unit)={1} \n" +
             "Match (unit)-[:SUB_TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) with organizationType,unit,organization \n" +
             "MATCH (organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService{isEnabled:true})<-[r:PROVIDE_SERVICE{isEnabled:true}]-(organization) with distinct os,r \n" +
-            "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate, referenceId:os.referenceId}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description, referenceId:organizationService.referenceId} as availableServices return {availableServices:collect(availableServices)} as data \n" +
+            "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as availableServices return {availableServices:collect(availableServices)} as data \n" +
             "UNION \n" +
             "Match (organization:Organization),(unit:Organization) where id(unit)={1} and id(organization)={0}\n" +
             "Match (unit)-[:SUB_TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) with organizationType,unit,organization\n" +
             "MATCH (organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService{isEnabled:true})<-[:PROVIDE_SERVICE{isEnabled:true}]-(organization) with distinct os,unit\n" +
             "Match (unit)-[r:PROVIDE_SERVICE{isEnabled:true}]->(os) with distinct os,r,unit\n" +
-            "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate, referenceId:os.referenceId}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description, referenceId:organizationService.referenceId} as selectedServices return {selectedServices:collect(selectedServices)} as data")
+            "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as selectedServices return {selectedServices:collect(selectedServices)} as data")
     List<Map<String, Object>> getServicesForUnit(long organizationId, long unitId);
 
-    @Query("Match (organization:Organization) where id(organization)={0} with organization Match (organization)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) with organizationType,organization MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true}) with os,organization match (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) with {children: case when os is NULL then [] else collect(distinct {id:id(os),name:os.name,description:os.description, referenceId:os.referenceId}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description, referenceId:organizationService.referenceId} as availableServices return {availableServices:collect(availableServices)} as data\n" +
+    @Query("Match (organization:Organization) where id(organization)={0} with organization Match (organization)-[:" + SUB_TYPE_OF + "]->(organizationType:OrganizationType{isEnable:true}) with organizationType,organization MATCH (organizationType)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]-(os:OrganizationService{isEnabled:true}) with os,organization match (organizationService:OrganizationService{isEnabled:true})-[:" + ORGANIZATION_SUB_SERVICE + "]->(os) with {children: case when os is NULL then [] else collect(distinct {id:id(os),name:os.name,description:os.description}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as availableServices return {availableServices:collect(availableServices)} as data\n" +
             "UNION\n" +
-            "Match (organization:Organization) where id(organization)={0} with organization Match (organization)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) with organizationType,organization \n" +
-            "MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true}) with distinct os,organization \n" +
-            "Match (organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os) with os, r match (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate, referenceId:os.referenceId}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description, referenceId:organizationService.referenceId} as selectedServices return {selectedServices:collect(selectedServices)} as data")
+            "Match (organization:Organization) where id(organization)={0} with organization Match (organization)-[:" + SUB_TYPE_OF + "]->(organizationType:OrganizationType{isEnable:true}) with organizationType,organization \n" +
+            "MATCH (organizationType)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]-(os:OrganizationService{isEnabled:true}) with distinct os,organization \n" +
+            "Match (organization)-[r:" + PROVIDE_SERVICE + "{isEnabled:true}]->(os) with os, r match (organizationService:OrganizationService{isEnabled:true})-[:" + ORGANIZATION_SUB_SERVICE + "]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as selectedServices return {selectedServices:collect(selectedServices)} as data")
     List<Map<String, Object>> getServicesForParent(long organizationId);
 
     @Query("Match (unit:Organization),(skill:Skill) where id (unit)={0} AND id(skill) IN {1} create (unit)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{2},lastModificationDate:{3},isEnabled:true}]->(skill) return skill")
@@ -365,11 +363,11 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("Match (o:Organization)-[r:" + ORGANISATION_HAS_SKILL + "]->(os:Skill) where id(o)={0} AND id(os)={1} return count(r) as countOfRel")
     int isSkillAlreadyExist(long unitId, long serviceId);
 
-    @Query("Match (organization:Organization) where id(organization)={0} with organization Match (organization)-[:"+HAS_BILLING_ADDRESS+"]->(billingAddress:ContactAddress) with billingAddress \n" +
-            "optional match (billingAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) with zipCode,billingAddress\n" +
-            "optional match (billingAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) with municipality,zipCode,billingAddress\n" +
-            "optional match (billingAddress)-[:"+PAYMENT_TYPE+"]->(paymentType:PaymentType) with paymentType,zipCode,billingAddress,municipality \n" +
-            "OPTIONAL MATCH (billingAddress)-[:"+CURRENCY+"]->(currency:Currency) with currency,paymentType,zipCode,billingAddress,municipality\n" +
+    @Query("Match (organization:Organization) where id(organization)={0} with organization Match (organization)-[:" + HAS_BILLING_ADDRESS + "]->(billingAddress:ContactAddress) with billingAddress \n" +
+            "optional match (billingAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) with zipCode,billingAddress\n" +
+            "optional match (billingAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) with municipality,zipCode,billingAddress\n" +
+            "optional match (billingAddress)-[:" + PAYMENT_TYPE + "]->(paymentType:PaymentType) with paymentType,zipCode,billingAddress,municipality \n" +
+            "OPTIONAL MATCH (billingAddress)-[:" + CURRENCY + "]->(currency:Currency) with currency,paymentType,zipCode,billingAddress,municipality\n" +
             "return {id:id(billingAddress),houseNumber:billingAddress.houseNumber,floorNumber:billingAddress.floorNumber,street1:billingAddress.street1,zipCodeId:id(zipCode),city:billingAddress.city,municipalityId:id(municipality),regionName:billingAddress.regionName,province:billingAddress.province,country:billingAddress.country,latitude:billingAddress.latitude,longitude:billingAddress.longitude,paymentTypeId:id(paymentType),currencyId:id(currency),streetUrl:billingAddress.streetUrl,billingPerson:billingAddress.contactPersonForBillingAddress} as data")
     Map<String, Object> getBillingAddress(long unitId);
 
@@ -380,9 +378,9 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team) where id(team)={0} return organization")
     Organization getOrganizationByTeamId(long groupId);
 
-    @Query("Match (organization:Organization) where id(organization)={0} with organization Match (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress) with contactAddress \n" +
-            "Match (contactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) with zipCode,contactAddress \n" +
-            "optional Match (contactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) with municipality,zipCode,contactAddress\n" +
+    @Query("Match (organization:Organization) where id(organization)={0} with organization Match (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) with contactAddress \n" +
+            "Match (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) with zipCode,contactAddress \n" +
+            "optional Match (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) with municipality,zipCode,contactAddress\n" +
             "return municipality as municipality,contactAddress as contactAddress,zipCode as zipCode")
     OrganizationContactAddress getContactAddressOfOrg(long unitId);
 
@@ -401,13 +399,14 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     void assignDefaultSkillsToOrg(long orgId, long creationDate, long lastModificationDate);
 
     @Query("Match (n:Organization) where id(n)={0}\n" +
-            "Match (n)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with subType,n\n" +
-            "Match (subType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]->(organizationService:OrganizationService) with organizationService,n\n" +
-            "create unique (n)-[:"+PROVIDE_SERVICE+"{isEnabled:true,creationDate:{1},lastModificationDate:{2}}]->(organizationService) ")
+            "Match (n)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with subType,n\n" +
+            "Match (subType)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(organizationService:OrganizationService) with organizationService,n\n" +
+            "create unique (n)-[:" + PROVIDE_SERVICE + "{isEnabled:true,creationDate:{1},lastModificationDate:{2}}]->(organizationService) ")
     void assignDefaultServicesToOrg(long orgId, long creationDate, long lastModificationDate);
 
     /**
      * this provides tree structure of skills
+     *
      * @param unitId
      * @return
      */
@@ -419,18 +418,18 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             " return {id:id(skillCategory),name:skillCategory.name,skills:collect({skillId:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true})} as data")*/
     @Query("Match (unit:Organization)-[:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) where id(unit)={0} with skill,unit\n" +
             "Match (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with  skill,skillCategory\n" +
-            "return {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,skills:collect({id:id(skill),name:skill.name,visitourId:skill.visitourId,description:skill.description,isEdited:true})} as data")
-    List<Map<String,Object>> getSkillsOfOrganization(long unitId);
+            "return {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,skills:collect(distinct {id:id(skill),name:skill.name,visitourId:skill.visitourId,description:skill.description,isEdited:true})} as data")
+    List<Map<String, Object>> getSkillsOfOrganization(long unitId);
 
     Organization findByKmdExternalId(String kmdExternalId);
 
     @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
-            "optional match (org)-[:"+HAS_SUB_ORGANIZATION+"*]->(unit:Organization) with org+[unit] as coll\n" +
+            "optional match (org)-[:" + HAS_SUB_ORGANIZATION + "*]->(unit:Organization) with org+[unit] as coll\n" +
             "unwind coll as units with distinct units\n" +
             "return units")
     List<Organization> getUnitsWithBasicInfo(long organizationId);
 
-    @Query("MATCH (org:Organization)-[r:"+HAS_SUB_ORGANIZATION+"]->(unit:Organization) where id(org)={0} AND id(unit)={1} return count(r)")
+    @Query("MATCH (org:Organization)-[r:" + HAS_SUB_ORGANIZATION + "]->(unit:Organization) where id(org)={0} AND id(unit)={1} return count(r)")
     Integer checkParentChildRelation(Long organizationId, Long unitId);
 
     @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
@@ -438,7 +437,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
 
 
     @Query("match (n:Organization) where id(n)={0} with n \n" +
-            "match (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true}) \n" +
+            "match (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true})  where org.isKairosHub =false \n" +
             "match (org)-[:" + HAS_POSITION_NAME + "]->(p:PositionName {isEnabled:true}) return p")
     List<PositionName> getPositionNamesOfParentOrganization(Long organizationId);
 
@@ -447,9 +446,11 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
 
     @Query(" Match (organization:Organization) where id(organization)={0} with organization\n" +
             "Match (organization)-[r:PROVIDE_SERVICE]->(os) where os.imported=true with distinct os,r\n" +
-            "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) " +
+            "Match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os)  with r,os,organizationService\n" +
+            "Optional MATCH (organizationService)<-[:" + LINK_WITH_EXTERNAL_SERVICE + "]-(ms:OrganizationService)  with r,ms,os,organizationService \n" +
+            "Optional MATCH (os)<-[:" + LINK_WITH_EXTERNAL_SERVICE + "]-(mss:OrganizationService)  with r,mss,ms,os,organizationService \n" +
             "with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description," +
-            "isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as selectedServices return {selectedServices:collect(selectedServices)} as data")
+            "isEnabled:r.isEnabled,created:r.creationDate,referenceId:id(mss)}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description,referenceId:id(ms)} as selectedServices return {selectedServices:collect(selectedServices)} as data")
     List<Map<String, Object>> getImportedServicesForUnit(long organizationId);
 
 //    @Query("Match (country:Country) where id(country)={0} with country\n" +
@@ -460,32 +461,77 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
 //            "return collect(orgTypes) as organizationTypes,bt as businessTypes,level as levels")
 //    OrganizationCreationData getOrganizationCreationData(long countryId);countryId
 
-    @Query("Match (org:Organization)-[:"+HAS_LEVEL+"]->(level:Level) where id(org)={0} return level")
+    @Query("Match (org:Organization)-[:" + HAS_LEVEL + "]->(level:Level) where id(org)={0} return level")
     Level getLevelOfOrganization(long organizationId);
 
     @Query("match (org:OrganizationType{isEnable:true}) where id(org) in {0} \n" +
             "return count(org) as matched ")
     Long findAllOrgCountMatchedByIds(List<Long> Ids);
 
-    @Query("Match (org:Organization) WHERE NOT ((org)<-[:"+PHASE_BELONGS_TO+"]-(:Phase{disabled:false}))\n" +
-            "return  org")
-    List<Organization> getAllOrganizationIdsWithoutPhases();
 
     @Query("MATCH (o:Organization) return id(o)")
     List<Long> findAllOrganizationIds();
 
     @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
-            "Match (organization)-[:"+TYPE_OF+"]->(organizationType:OrganizationType) with organizationType,organization\n" +
-            "optional match (organizationType)-[:"+HAS_SUB_TYPE+"]->(subType:OrganizationType)<-[:"+SUB_TYPE_OF+"]-(organization) with subType,organizationType,organization\n" +
+            "Match (organization)-[:" + TYPE_OF + "]->(organizationType:OrganizationType) with organizationType,organization\n" +
+            "optional match (organizationType)-[:" + HAS_SUB_TYPE + "]->(subType:OrganizationType)<-[:" + SUB_TYPE_OF + "]-(organization) with subType,organizationType,organization\n" +
             "return collect(id(organizationType)) as organizationTypes, collect(id(subType)) as organizationSubTypes")
     OrganizationTypeAndSubTypeDTO getorganizationTypeAndSubTypes(Long unitId);
 
     @Query("MATCH (c:Client{imported:true})-[r:GET_SERVICE_FROM]->(o:Organization) where id(o)= {0}  case when c is NULL then false else true ")
     Boolean isOrganizationHasExternalReference(Long organizationId);
 
-    @Query("MATCH (country:Country)<-[:"+COUNTRY+"]-(o:Organization) where id(o)={0}  return id(country) ")
+    @Query("MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0}  return id(country) ")
     Long getCountryId(Long organizationId);
 
-    @Query("MATCH (n:Organization) RETURN Id(n)")
-    List<Long> allOrganizationIds();
+    @Query("match(organization:Organization) where not exists (organization.phaseGenerated) OR organization.phaseGenerated=false\n" +
+            "return id(organization)")
+    List<Long> getAllOrganizationWithoutPhases();
+
+    @Query("match(organization:Organization) where Id(organization) IN {0}\n" +
+            "set organization.phaseGenerated=true")
+    void updateOrganizationWithoutPhases( List<Long> organizationIds);
+
+
+    @Query("MATCH (c:Client{citizenDead:false})-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {0} AND ( c.firstName=~{2} OR c.lastName=~{2} ) AND c.cprNumber STARTS WITH {3} with c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {4} with cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) WHERE cs.name=~{5} with cs,cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag)  with lat,cs,cd,ca,c,r\n" +
+            "return {name:c.firstName+\" \" +c.lastName,id:id(c), age:c.age, emailId:c.email, profilePic: {1} + c.profilePic, gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, joiningDate:r.joinDate,city:ca.city," +
+            "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, " +
+            "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client ORDER BY c.firstName ASC SKIP {6} LIMIT 20 ")
+    List<Map<String, Object>> getClientsOfOrganizationExcludeDeadWithFilterParameters(Long organizationId, String serverImageUrl,String filterByName, String filterByCPR, String filterByPhone, String filterByCivilianStatus, Integer skip);
+
+    @Query("MATCH (c:Client{citizenDead:false})-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {0} AND id(c) in {7} AND ( c.firstName=~{2} OR c.lastName=~{2} ) AND c.cprNumber STARTS WITH {3} with c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {4} with cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) WHERE cs.name=~{5} with cs,cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,cs,cd,ca,c,r\n" +
+            "return {name:c.firstName+\" \" +c.lastName,id:id(c), age:c.age, emailId:c.email, profilePic: {1} + c.profilePic, gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, joiningDate:r.joinDate,city:ca.city," +
+            "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, " +
+            "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client ORDER BY c.firstName ASC SKIP {6} LIMIT 20 ")
+    List<Map<String, Object>> getClientsWithFilterParameters(Long organizationId, String serverImageUrl,String filterByName, String filterByCPR, String filterByPhone, String filterByCivilianStatus, Integer skip, List<Long> citizenIds);
+
+    @Query("MATCH (c:Client{citizenDead:false})-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {0} AND id(c) in {7} AND ( c.firstName=~{2} OR c.lastName=~{2} ) AND c.cprNumber STARTS WITH {3} with c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {4} with cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) WHERE cs.name=~{5} with cs,cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) in {8} with lat,cs,cd,ca,c,r\n" +
+            "return {name:c.firstName+\" \" +c.lastName,id:id(c), age:c.age, emailId:c.email, profilePic: {1} + c.profilePic, gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, joiningDate:r.joinDate,city:ca.city," +
+            "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, " +
+            "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client ORDER BY c.firstName ASC SKIP {6} LIMIT 20 ")
+    List<Map<String, Object>> getClientsWithFilterParametersAndLatLng(Long organizationId, String serverImageUrl,String filterByName, String filterByCPR, String filterByPhone, String filterByCivilianStatus, Integer skip, List<Long> citizenIds, List<Long> latLngIds);
+
+    @Query("MATCH (c:Client{citizenDead:false})-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {0} AND ( c.firstName=~{2} OR c.lastName=~{2} ) AND c.cprNumber STARTS WITH {3} with c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) WHERE cd.privatePhone STARTS WITH {4} with cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) WHERE cs.name=~{5} with cs,cd,ca,c,r\n" +
+            "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) in {7} with lat,cs,cd,ca,c,r\n" +
+            "return {name:c.firstName+\" \" +c.lastName,id:id(c), age:c.age, emailId:c.email, profilePic: {1} + c.profilePic, gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, joiningDate:r.joinDate,city:ca.city," +
+            "address:ca.houseNumber+\" \" +ca.street1, phoneNumber:cd.privatePhone, workNumber:cd.workPhone, clientStatus:id(cs), lat:ca.latitude, lng:ca.longitude, " +
+            "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client ORDER BY c.firstName ASC SKIP {6} LIMIT 20 ")
+    List<Map<String, Object>> getClientsOfOrganizationExcludeDeadWithFilterParametersAndLatLng(Long organizationId, String serverImageUrl,String filterByName, String filterByCPR, String filterByPhone, String filterByCivilianStatus, Integer skip, List<Long> latLngIds);
+
+
 }

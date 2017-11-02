@@ -1,4 +1,5 @@
 package com.kairos.service.organization;
+
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.group.Group;
@@ -31,12 +32,14 @@ public class GroupService extends UserBaseService {
 
     @Inject
     private SkillGraphRepository skillGraphRepository;
+
     /**
      * Get List of Group of an Organization
+     *
      * @param organizationId
      * @return
      */
-    public List<Map<String,Object>> getGroups(Long organizationId) {
+    public List<Map<String, Object>> getGroups(Long organizationId) {
         return organizationGraphRepository.getGroups(organizationId);
     }
 
@@ -46,8 +49,8 @@ public class GroupService extends UserBaseService {
     }
 
     public QueryResult createGroup(Group group, long unitId) {
-        Organization currentOrganization  = organizationGraphRepository.findOne(unitId);
-        if(currentOrganization == null){
+        Organization currentOrganization = organizationGraphRepository.findOne(unitId);
+        if (currentOrganization == null) {
             return null;
         }
         currentOrganization.getGroupList().add(group);
@@ -61,19 +64,17 @@ public class GroupService extends UserBaseService {
     }
 
     public List<Map<String, Object>> getGroupAvailableService(Long groupId) {
-        return  organizationGraphRepository.getGroupOrganizationServices(groupId);
+        return organizationGraphRepository.getGroupOrganizationServices(groupId);
     }
 
     public List<Map<String, Object>> getGroupSelectedService(Long groupId) {
-        return  organizationGraphRepository.getGroupAllSelectedServices(groupId);
+        return organizationGraphRepository.getGroupAllSelectedServices(groupId);
     }
 
-    public List<com.kairos.persistence.model.organization.OrganizationService>  addGroupSelectedService(Long groupId, Long[] service) {
-        return groupGraphRepository.addSelectedService(groupId,service);
+    public List<com.kairos.persistence.model.organization.OrganizationService> addGroupSelectedService(Long groupId, Long[] service) {
+        return groupGraphRepository.addSelectedService(groupId, service);
 
     }
-
-
 
 
     public List<Map<String, Object>> getGroupAvailableSkills(Long groupId) {
@@ -85,7 +86,7 @@ public class GroupService extends UserBaseService {
     }
 
     public List<Skill> addGroupSelectedSkills(Long groupId, Long[] skill) {
-        return groupGraphRepository.saveSkill(groupId,skill);
+        return groupGraphRepository.saveSkill(groupId, skill);
     }
 
     public Group updateGroupGeneralDetails(long groupId, Group group) {
@@ -98,6 +99,10 @@ public class GroupService extends UserBaseService {
         objectToUpdate.setDescription(group.getDescription());
         groupGraphRepository.save(group);
         return group;
+    }
+
+    public Organization getUnitByGroupId(Long groupId) {
+        return groupGraphRepository.getUnitByGroupId(groupId);
     }
 
 

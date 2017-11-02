@@ -25,6 +25,7 @@ import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.FileUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.*;
 
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.IMAGES_PATH;
 
 
@@ -101,8 +103,14 @@ public class ClientExtendedService extends UserBaseService {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
-        Client nextToKin = validateCPRNumber(nextToKinDTO.getCprNumber());
+
+        if(clientGraphRepository.citizenInNextToKinList(clientId,nextToKinDTO.getCprNumber())){
+            logger.error("Next to kin already exist with CPR number " + nextToKinDTO.getCprNumber());
+            throw new DuplicateDataException("Next to kin already exist with CPR number");
+        }
+
         Long homeAddressId = null;
+        Client nextToKin = validateCPRNumber(nextToKinDTO.getCprNumber());
         ContactDetail contactDetail = null;
         if(!Optional.ofNullable(nextToKin).isPresent()){
             nextToKin = new Client();
@@ -131,9 +139,10 @@ public class ClientExtendedService extends UserBaseService {
         if (!Optional.ofNullable(homeAddress).isPresent()) {
             return null;
         }
-        saveCivilianStatus(nextToKinDTO,nextToKin);
         nextToKin.setHomeAddress(homeAddress);
-        save(nextToKin);
+        CitizenStatus citizenStatus = saveCivilianStatus(nextToKinDTO,nextToKin);
+        nextToKin.setCivilianStatus(citizenStatus);
+        clientGraphRepository.save(nextToKin);
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, client.getId());
         if(!hasAlreadyNextToKin(clientId,nextToKin.getId())){
             createNextToKinRelationship(client, nextToKin);
@@ -141,12 +150,12 @@ public class ClientExtendedService extends UserBaseService {
         if(!gettingServicesFromOrganization(nextToKin.getId(),unitId)){
             assignOrganizationToNextToKin(nextToKin, unitId);
         }
-        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator,
+        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + FORWARD_SLASH,
                 nextToKinDTO.getRelationTypeId(),nextToKinDTO);
     }
 
     private Client validateCPRNumber(String cprNumber){
-        Client client = clientGraphRepository.findByCPRNumber(cprNumber.trim());
+        Client client = clientGraphRepository.findByCprNumber(cprNumber.trim());
         if(Optional.ofNullable(client).isPresent() && client.isCitizenDead()){
             throw new DuplicateDataException("You can't enter the CPR of dead citizen " + cprNumber);
         }
@@ -224,7 +233,7 @@ public class ClientExtendedService extends UserBaseService {
         return contactAddressToSave;
     }
 
-    private void saveCivilianStatus(NextToKinDTO nextToKinDTO, Client nextToKin) {
+    private CitizenStatus saveCivilianStatus(NextToKinDTO nextToKinDTO, Client nextToKin) {
 
         if (Optional.ofNullable(nextToKinDTO.getCivilianStatusId()).isPresent()) {
             CitizenStatus citizenStatus = citizenStatusGraphRepository.findOne(nextToKinDTO.getCivilianStatusId());
@@ -232,10 +241,7 @@ public class ClientExtendedService extends UserBaseService {
                 logger.debug("Finding civilian status using id " + nextToKinDTO.getCivilianStatusId());
                 throw new DataNotFoundByIdException("Incorrect id of civilian status " + citizenStatus);
             }
-            if(Optional.ofNullable(nextToKin.getId()).isPresent()){
-                clientGraphRepository.deleteCivilianStatus(nextToKin.getId());
-            }
-            nextToKin.setCivilianStatus(citizenStatus);
+            return citizenStatus;
         } else {
             throw new DataNotFoundByIdException("Civilian status can't be empty");
         }
@@ -244,7 +250,7 @@ public class ClientExtendedService extends UserBaseService {
 
     private void saveCitizenRelation(Long relationTypeId, Long unitId, Client nextToKin, Long clientId) {
 
-        Long countryId = countryGraphRepository.getCountryOfUnit(unitId);
+        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         Client client = clientGraphRepository.findOne(clientId);
         if (Optional.ofNullable(relationTypeId).isPresent()) {
             RelationType relationType = countryGraphRepository.getRelationType(countryId, relationTypeId);
@@ -286,12 +292,21 @@ public class ClientExtendedService extends UserBaseService {
         }
         nextToKin.saveContactDetail(nextToKinDTO,contactDetail);
         nextToKin.setContactDetail(contactDetail);
-        saveCivilianStatus(nextToKinDTO,nextToKin);
+        CitizenStatus citizenStatus = saveCivilianStatus(nextToKinDTO,nextToKin);
+        nextToKin.setCivilianStatus(citizenStatus);
         saveCitizenRelation(nextToKinDTO.getRelationTypeId(), unitId, nextToKin, clientId);
         logger.debug("Preparing response");
         clientGraphRepository.save(nextToKin);
-        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + File.separator,
+        return new NextToKinDTO().buildResponse(nextToKin,envConfig.getServerHost() + FORWARD_SLASH,
                 nextToKinDTO.getRelationTypeId(),nextToKinDTO);
+    }
+
+    public NextToKinQueryResult getNextToKinByCprNumber(String cprNumber){
+        if(StringUtils.isEmpty(cprNumber) || cprNumber.length()<10){
+            logger.error("Cpr number is incorrect " + cprNumber);
+        }
+        return clientGraphRepository.getNextToKinByCprNumber(cprNumber,envConfig.getServerHost() + FORWARD_SLASH);
+
     }
 
     public Map<String, Object> setTransportationDetails(Client client) {
@@ -585,7 +600,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         accessToLocation.setAccessPhotoURL(fileName);
         accessToLocationGraphRepository.save(accessToLocation);
-        return envConfig.getServerHost() + File.separator + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + fileName;
     }
 
     public void removeAccessToLocationImage(long accessToLocationId) {
@@ -601,7 +616,7 @@ public class ClientExtendedService extends UserBaseService {
         String fileName = writeFile(multipartFile);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + File.separator + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+fileName);
         return imageurls;
     }
 
@@ -627,7 +642,7 @@ public class ClientExtendedService extends UserBaseService {
         clientGraphRepository.save(nextToKin);
         HashMap<String,String> imageurls = new HashMap<>();
         imageurls.put("profilePic",fileName);
-        imageurls.put("profilePicUrl",envConfig.getServerHost() + File.separator + fileName);
+        imageurls.put("profilePicUrl",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ fileName);
         return imageurls;
     }
 
@@ -648,7 +663,7 @@ public class ClientExtendedService extends UserBaseService {
         }
         client.setProfilePic(fileName);
         clientGraphRepository.save(client);
-        return envConfig.getServerHost() + File.separator + fileName;
+        return envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ fileName;
     }
 
 

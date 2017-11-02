@@ -7,7 +7,9 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
@@ -33,8 +35,11 @@ public class DayType  extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
     private Country country;
+    private List<Day> validDays=new ArrayList<>();
 
     private boolean isEnabled = true;
+
+    private boolean allowTimeSettings = false;
 
     public String getColorCode() {
         return colorCode;
@@ -84,6 +89,22 @@ public class DayType  extends UserBaseEntity {
         this.description = description;
     }
 
+    public List<Day> getValidDays() {
+        return validDays;
+    }
+
+    public void setValidDays(List<Day> validDays) {
+        this.validDays = validDays;
+    }
+
+    public boolean isAllowTimeSettings() {
+        return allowTimeSettings;
+    }
+
+    public void setAllowTimeSettings(boolean allowTimeSettings) {
+        this.allowTimeSettings = allowTimeSettings;
+    }
+
     // Constructor
     public DayType() {
     }
@@ -98,6 +119,7 @@ public class DayType  extends UserBaseEntity {
         map.put("colorCode",this.colorCode);
         map.put("lastModificationDate",this.getLastModificationDate());
         map.put("creationDate",this.getCreationDate());
+        map.put("allowTimeSettings",this.isAllowTimeSettings());
         return map;
     }
 }
