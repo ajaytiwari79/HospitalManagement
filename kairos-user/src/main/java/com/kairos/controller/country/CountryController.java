@@ -1038,7 +1038,7 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/timeType", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addTimeType(@PathVariable Long countryId, @Validated @RequestBody TimeTypeDTO timeType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.addTimeType(timeType, countryId));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, timeTypeService.addTimeType(timeType, countryId));
     }
 
 
