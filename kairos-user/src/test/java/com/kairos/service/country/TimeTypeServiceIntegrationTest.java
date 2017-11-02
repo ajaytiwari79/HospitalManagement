@@ -3,7 +3,6 @@ package com.kairos.service.country;
 import com.kairos.UserServiceApplication;
 import com.kairos.persistence.model.dto.TimeTypeDTO;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Date;
+
 /**
  * Created by vipul on 1/11/17.
  */
@@ -29,7 +30,8 @@ public class TimeTypeServiceIntegrationTest {
     @Autowired
     TestRestTemplate restTemplate;
 
-
+    Long createdId ;
+    String name="ABC"+ new Date().toString();
 
     @Test
     public void addTimeType() throws Exception {
@@ -37,12 +39,14 @@ public class TimeTypeServiceIntegrationTest {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/timeType/");
 
         String expectedUrl="http://localhost:8095/kairos/user/api/v1/organization/71/country/53/timeType";
-        TimeTypeDTO timeTypeDTO =new TimeTypeDTO("pdsa1","PRESENCE DAY",false,false,false ,false);
+        TimeTypeDTO timeTypeDTO =new TimeTypeDTO(name,"PRESENCE DAY",false,false,false ,false);
         HttpEntity<TimeTypeDTO> entity = new HttpEntity<>(timeTypeDTO);
         ResponseEntity<TimeTypeDTO> response = restTemplate.exchange(
                 baseUrl+"/timeType",
                 HttpMethod.POST, entity, TimeTypeDTO.class);
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.CONFLICT.equals(response.getStatusCode()));
+        createdId=response.getBody().getId();
+        System.out.println(createdId+"CREATED ID ");
       //  Assert.assertEquals(expectedUrl, builder.toUriString());
     }
 
@@ -55,22 +59,32 @@ public class TimeTypeServiceIntegrationTest {
                 HttpMethod.GET, null, String.class);
         Assert.assertEquals(HttpStatus.OK,response.getStatusCode());
     }
-    // Please update the ID if required
     @Test
 
     public void deleteTimeType() throws Exception {
         String baseUrl=getBaseUrl(71L,53L);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/timeType/"+7750);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/timeType/"+7671);
         ResponseEntity<String> response = restTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.DELETE, null, String.class);
         Assert.assertEquals(HttpStatus.OK,response.getStatusCode());
 
     }
-    @Ignore
+
     @Test
     public void updateTimeType() throws Exception {
+        String baseUrl=getBaseUrl(71L,53L);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/timeType/"+7671);
 
+         name="ABC"+ new Date().toString();
+        TimeTypeDTO timeTypeDTO =new TimeTypeDTO(name,"PRESENCE DAY",false,false,false ,false);
+        HttpEntity<TimeTypeDTO> entity = new HttpEntity<>(timeTypeDTO);
+        ResponseEntity<TimeTypeDTO> response = restTemplate.exchange(
+                baseUrl+"/timeType"+7671,
+                HttpMethod.PUT, entity, TimeTypeDTO.class);
+        System.out.println(response);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+        Assert.assertEquals(name,response.getBody().getName());
     }
     public final String getBaseUrl(Long organizationId,Long countryId){
         if(organizationId!=null &&countryId!=null ){
