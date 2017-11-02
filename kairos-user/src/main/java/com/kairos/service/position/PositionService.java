@@ -1,6 +1,7 @@
 package com.kairos.service.position;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.position.PositionName;
@@ -59,8 +60,12 @@ public class PositionService extends UserBaseService {
         if (!Optional.ofNullable(unitEmployment).isPresent()) {
             throw new DataNotFoundByIdException("Invalid UnitEmployment id"+unitEmploymentId);
         }
-        Long unitId=organizationService.getOrganization(id,type);
-        Position position = preparePosition(positionDTO,unitId);
+        Organization organization=organizationService.getOrganizationDetail(id,type);
+        if (!organization.isParentOrganization()){
+             organization  =  organizationService.getParentOfOrganization(organization.getId());
+
+        }
+        Position position = preparePosition(positionDTO,organization);
         List<Position> positions = unitEmployment.getPositions();
 
         positions.add(position);
@@ -129,7 +134,7 @@ public class PositionService extends UserBaseService {
 
     }
 
-    private Position preparePosition(PositionDTO positionDTO,Long unitId) {
+    private Position preparePosition(PositionDTO positionDTO,Organization organization) {
         Position position = new Position();
 
         //String name, String description, Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta
@@ -140,9 +145,9 @@ public class PositionService extends UserBaseService {
         }
         position.setExpertise(expertise);
 
-        PositionName positionName = positionNameService.getPositionNameByUnitIdAndId(unitId,positionDTO.getPositionNameId());
+        PositionName positionName = positionNameService.getPositionNameByUnitIdAndId(organization.getId(),positionDTO.getPositionNameId());
         if (!Optional.ofNullable(positionName).isPresent()) {
-            throw new DataNotFoundByIdException("position Name does not exist in unit"+positionDTO.getPositionNameId());
+            throw new DataNotFoundByIdException("position Name does not exist in unit "+positionDTO.getPositionNameId());
         }
         position.setPositionName(positionName);
 
