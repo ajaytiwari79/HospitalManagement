@@ -35,18 +35,18 @@ public class RuleTemplateCategoryService extends UserBaseService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * used to save a new Rue template in a country
+     * used to save a new Rule template in a country
      * Created by vipul on 2/8/17.
-     * params countryId and rulecategory via name and desc
+     * params countryId and rule template category via name and desc
      */
 
-    public RuleTemplateCategory createRuleTemplate(long countryId, RuleTemplateCategory ruleTemplateCategory) {
+    public RuleTemplateCategory createRuleTemplateCategory(long countryId, RuleTemplateCategory ruleTemplateCategory) {
 
         String name = "(?i)" + ruleTemplateCategory.getName();
         int ruleFound = countryGraphRepository.checkDuplicateRuleTemplate(countryId, name);
 
         if (ruleFound != 0) {
-            throw new DuplicateDataException("Can't create duplicate rule template in same country");
+            throw new DuplicateDataException("Can't create duplicate rule template category in same country "+name);
         }
 
 
@@ -67,7 +67,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     }
 
-    public List<RuleTemplateCategory> getRulesTemplate(long countryId) {
+    public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId) {
         Country country = countryService.getCountryById(countryId);
         if (country == null) {
             throw new DataNotFoundByIdException("Country does not exist");
