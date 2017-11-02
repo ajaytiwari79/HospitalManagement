@@ -257,6 +257,16 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "ON MATCH SET r.lastModificationDate={3} return true")
     void createHouseHoldRelationship(long clientId,long houseHoldPeopleId,long creationDate,long lastModificationDate);
 
+    @Query("Match (client:Client) where id(client)={0}\n" +
+            "Match (client)-[:"+HAS_HOME_ADDRESS+"]->(clientHomeAddress:ContactAddress)-[:ZIP_CODE]->(clientZipCode:ZipCode)\n" +
+            "Match (clientHomeAddress)-[:MUNICIPALITY]->(clientMunicipality:Municipality)\n" +
+            "Match (client)-[r:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(n:Client)\n" +
+            "Match (n)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode)\n" +
+            "Match (homeAddress)-[:MUNICIPALITY]->(Municipality:Municipality)\n" +
+            "where zipCode.zipCode=clientZipCode.zipCode AND homeAddress.street1=~clientHomeAddress.street1 AND homeAddress.houseNumber=clientHomeAddress.houseNumber\n" +
+            "delete r")
+    void deleteHouseHoldWhoseAddressNotSame(Long clientId);
+
     @Query("MATCH (citizen:Client{citizenDead:false})-[:GET_SERVICE_FROM]->(o:Organization)  where id(o)= {0} with citizen\n"+
             "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,citizen\n"+
             "MATCH (citizen)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) WHERE homeAddress IS NOT NULL return citizen, homeAddress, id(lat) as localAreaTagId")
@@ -295,8 +305,6 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "Match (citizen)-[r:NEXT_TO_KIN]->(nextToKin) return count(r)>0")
     Boolean hasAlreadyNextToKin(Long clientId,Long nextToKinId);
 
-    @Query("MATCH (client:Client)-[r:"+CIVILIAN_STATUS+"]->(citizenStatus:CitizenStatus) where id(client)={0} delete r")
-    void deleteCivilianStatus(Long clientId);
 
     @Query("MATCH (c:Client{citizenDead:false})-[r:"+GET_SERVICE_FROM+"]-(o:Organization) where id(o)in {0} with id(c) as citizenId, id(o) as organizationId\n" +
             "return citizenId, organizationId")

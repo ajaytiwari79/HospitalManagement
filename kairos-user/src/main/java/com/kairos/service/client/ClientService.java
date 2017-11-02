@@ -608,6 +608,9 @@ public class ClientService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
         Client houseHold = saveDetailsOfHouseHold(minimumDTO);
+        if(Optional.ofNullable(houseHold.getId()).isPresent()){
+            clientGraphRepository.deleteHouseHoldWhoseAddressNotSame(houseHold.getId());
+        }
         saveAddressOfHouseHold(client, houseHold);
         if (Optional.ofNullable(houseHold.getId()).isPresent()) {
             if(houseHold.getId().equals(clientId)){
@@ -663,6 +666,7 @@ public class ClientService extends UserBaseService {
             houseHold.setHomeAddress(client.getHomeAddress());
         }
     }
+
 
 
     public List<ClientMinimumDTO> getPeopleInHousehold(long clientId) {
