@@ -75,13 +75,11 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
     List<Map<String, Object>> getAllWTAWithOrganization(long countryId);
 
     @Query("match(c:Country) where id(c)={0}\n" +
-            "match(c)<-[:" + BELONGS_TO_ORG_TYPE + "]-(or:OrganizationType)\n" +
-            " match(w:WorkingTimeAgreement) where id(w)={1}\n" +
-            " match(or)-[:" + HAS_SUB_TYPE + "]->(ora:OrganizationType)\n" +
-            " match(w)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(ora)\n" +
-            "with or,ora,w\n" +
-            "with or,ora,{WTA:CASE WHEN w IS NOT NULL THEN collect({id:id(w),name:w.name}) ELSE [] END} as oraRes\n" +
-            "WITH {name: or.name,id:id(or), children: CASE WHEN ora IS NOT NULL THEN collect({id:id(ora),name:ora.name,wtaa:oraRes}) ELSE [] END} as orga\n" +
+            "match(wta:WorkingTimeAgreement) where id(wta)={1}\n" +
+            "match(wta)-[:"+BELONGS_TO_ORG_TYPE+"]-(or:OrganizationType)\n" +
+            "match(wta)-[:"+BELONGS_TO_ORG_SUB_TYPE+"]->(org:OrganizationType)\n" +
+            "with or ,org ,{WTA:CASE WHEN wta IS NOT NULL THEN collect({id:id(wta),name:wta.name}) ELSE [] END} as oraRes\n" +
+            "WITH {name: or.name,id:id(or), children: CASE WHEN org IS NOT NULL THEN collect({id:id(org),name:org.name,wta:oraRes}) ELSE [] END} as orga \n" +
             "RETURN orga as result")
     List<Map<String, Object>> getAllWTAWithWTAId(long countryId, long wtaId);
 

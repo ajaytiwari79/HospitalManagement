@@ -106,7 +106,6 @@ public class DayTypeService extends UserBaseService {
             List<DayType> dayTypes=new ArrayList<>();
             dayTypes.add( countryHolidayCalender.get().getDayType()) ;
           return  dayTypes;
-          
         }else{
             Instant instant = Instant.ofEpochMilli(date.getTime());
             LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());

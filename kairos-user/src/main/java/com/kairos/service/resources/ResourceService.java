@@ -185,6 +185,17 @@ public class ResourceService extends UserBaseService {
             throw new DataNotFoundByIdException("Vehicle type not found");
         }
         resource.setVehicleType(vehicle);
+        resource.setNumber(resourceDTO.getNumber());
+        resource.setRegistrationNumber(resourceDTO.getRegistrationNumber());
+        resource.setModelDescription(resourceDTO.getModelDescription());
+        resource.setCostPerKM(resourceDTO.getCostPerKM());
+        resource.setFuelType(resourceDTO.getFuelType());
+        if(!StringUtils.isBlank(resourceDTO.getDecommissionDate())){
+            LocalDateTime decommissionDate = LocalDateTime.ofInstant(DateUtil.convertToOnlyDate(resourceDTO.getDecommissionDate(),
+                    MONGODB_QUERY_DATE_FORMAT).toInstant(), ZoneId.systemDefault()).
+                    withHour(0).withMinute(0).withSecond(0).withNano(0);
+            resource.setDecommissionDate(decommissionDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        }
         return resourceGraphRepository.save(resource);
     }
 

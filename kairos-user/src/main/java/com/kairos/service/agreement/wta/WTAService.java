@@ -310,7 +310,6 @@ public class WTAService extends UserBaseService {
             save(newWtaObject);
         } else {
             wta.setEnabled(false);
-
             save(wta);
         }
         return checked;
