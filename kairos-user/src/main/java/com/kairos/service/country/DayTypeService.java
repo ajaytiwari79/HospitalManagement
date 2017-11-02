@@ -66,6 +66,7 @@ public class DayTypeService extends UserBaseService {
             currentDayType.setColorCode(dayType.getColorCode());
             currentDayType.setDescription(dayType.getDescription());
             currentDayType.setAllowTimeSettings(dayType.isAllowTimeSettings());
+            currentDayType.setValidDays(dayType.getValidDays());
             save(currentDayType);
             return currentDayType.retrieveDetails();
         }

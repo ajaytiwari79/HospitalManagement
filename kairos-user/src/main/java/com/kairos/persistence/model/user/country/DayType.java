@@ -120,6 +120,7 @@ public class DayType  extends UserBaseEntity {
         map.put("lastModificationDate",this.getLastModificationDate());
         map.put("creationDate",this.getCreationDate());
         map.put("allowTimeSettings",this.isAllowTimeSettings());
+        map.put("validDays",this.getValidDays());
         return map;
     }
 }
