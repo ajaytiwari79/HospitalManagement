@@ -69,7 +69,7 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
             "vehicle as vehicleType,r.creationDate as creationDate,r.decommissionDate as decommissionDate,case when r.decommissionDate is null then false else true end as isDecommision,collect(ru) as resourceUnAvailabilities")
     List<ResourceWrapper> getResourcesWithUnAvailability(Long organizationId,Integer month,Integer year);
 
-    @Query("Match (resource:Resource)-[r:"+UNAVAILABLE_ON+"]->(ru:ResourceUnAvailability) where id(resource)={0} AND id(ru)={1} delete r,ru")
+    @Query("Match (resource:Resource)-[r:"+UNAVAILABLE_ON+"]->(ru:ResourceUnAvailability) where id(resource)={0} AND id(ru)={1} detach delete ru")
     void deleteResourceUnavailability(Long resourceId,Long unavailableDateId);
 
     @Query("Match (resource:Resource)-[:"+UNAVAILABLE_ON+"{month:{1},year:{2}}]->(resourceUnAvailability:ResourceUnAvailability) where id(resource)={0}\n" +

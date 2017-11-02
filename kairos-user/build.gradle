@@ -161,7 +161,7 @@ release {
     versionProperties = []
     buildTasks = ['test','bootRepackage']
     git {
-        requireBranch = 'release/0.0.2'
+        requireBranch = 'master'
         pushToRemote = 'origin'
         pushToBranchPrefix = ''
         commitVersionFileOnly = false
