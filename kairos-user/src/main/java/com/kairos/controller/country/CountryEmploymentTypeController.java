@@ -47,8 +47,8 @@ public class CountryEmploymentTypeController {
     @RequestMapping(value = COUNTRY_URL + "/employment_type/{employmentTypeId}", method = RequestMethod.DELETE)
     @ApiOperation("Delete employment type of country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteEmploymentType(@PathVariable long countryId, @PathVariable long levelId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryEmploymentTypeService.deleteEmploymentType(countryId, levelId));
+    public ResponseEntity<Map<String, Object>> deleteEmploymentType(@PathVariable long countryId, @PathVariable long employmentTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryEmploymentTypeService.deleteEmploymentType(countryId, employmentTypeId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type", method = RequestMethod.GET)
