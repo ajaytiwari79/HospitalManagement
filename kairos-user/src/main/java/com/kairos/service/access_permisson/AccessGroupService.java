@@ -284,6 +284,9 @@ public class AccessGroupService extends UserBaseService {
         } else {
             accessGroupRepository.setPermissionForTab(parent.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
         }
+    }
+
+    private void assignPermissionOnNewUnit(Long organizationId,Long unitId){
 
     }
 

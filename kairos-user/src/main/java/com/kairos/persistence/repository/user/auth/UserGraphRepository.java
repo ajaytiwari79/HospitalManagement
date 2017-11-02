@@ -64,13 +64,8 @@ public interface UserGraphRepository extends GraphRepository<User> {
             "Match (unitEmp)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission) with accessPermission,units\n" +
             "MATCH (accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,accessPermission,units\n" +
             "Match (accessPermission)-[modulePermission:HAS_ACCESS_PAGE_PERMISSION]->(accessPage:AccessPage) with accessPage,accessPermission,modulePermission,units\n" +
-            "return id(accessPage) as id,accessPage.moduleId as tabId,modulePermission.isRead as read,modulePermission.isWrite as write,accessPage.isModule as isModule,id(units) as unitId")
+            "return id(accessPage) as id,accessPage.moduleId as tabId,modulePermission.isRead as read,modulePermission.isWrite as write,id(units) as unitId")
     Set<TabPermission> getAccessPermissionsOfUser(Long userId);
-
-    @Query("Match (emp:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with emp\n" +
-            "Match (emp:Employment)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(unitEmp:UnitEmployment)-[:"+PROVIDED_BY+"]->(org:Organization) with collect(org.isKairosHub) as hubList\n" +
-            "return true in hubList")
-    Boolean isHubMember(Long userId);
 
     @Query("Match (staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(staff)={0} return user")
     User getUserByStaffId(Long staffId);

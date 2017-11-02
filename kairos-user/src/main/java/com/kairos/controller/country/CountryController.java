@@ -333,11 +333,14 @@ public class CountryController {
     @ApiOperation(value = "Add a Parent Organization")
     @RequestMapping(value = COUNTRY_URL + "/parent_organization", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable long countryId, @RequestBody ParentOrganizationDTO organization) {
+    public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long organizationId,
+                                                                        @PathVariable long countryId,
+                                                                        @RequestBody ParentOrganizationDTO organization) {
         if (organization == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.createParentOrganization(organization, countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.
+                createParentOrganization(organization, countryId,organizationId));
     }
 
     @ApiOperation(value = "Update Parent Organization")
