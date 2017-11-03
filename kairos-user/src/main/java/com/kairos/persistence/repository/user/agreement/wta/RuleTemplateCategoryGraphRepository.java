@@ -39,10 +39,10 @@ public interface RuleTemplateCategoryGraphRepository extends GraphRepository<Rul
     @Query("MATCH (n:RuleTemplateCategory)-[:"+HAS_RULE_TEMPLATES+"]->(w:WTABaseRuleTemplate)<-[:"+HAS_RULE_TEMPLATE+"]-(c:Country) where n.name={0} AND Id(c)={1} return Id(w)")
     List<Long> findAllExistingRuleTemplateAddedToThiscategory(String ruleTemplateCategoryName, long countryId);
 
-    @Query("MATCH (n:RuleTemplateCategory)\n" +
-            "match(he:RuleTemplateCategory) where he.name={1} \n" +
-            "Match(w:WTABaseRuleTemplate)<-[r:HAS_RULE_TEMPLATES]-(n)  where Id(w) IN {0}\n" +
+    @Query("MATCH (allRTC:RuleTemplateCategory)\n" +
+            "match(newRTC:RuleTemplateCategory) where newRTC.name={1} \n" +
+            "Match(WBRT:WTABaseRuleTemplate)<-[r:HAS_RULE_TEMPLATES]-(allRTC)  where Id(WBRT) IN {0}\n" +
             "delete r\n" +
-            "create(w)<-[:HAS_RULE_TEMPLATES]-(he)")
+            "create(WBRT)<-[:HAS_RULE_TEMPLATES]-(newRTC)")
     void updateCategoryOfRuleTemplate(List<Long> wtaBaseRuleTemplateId,String ruleTemplateCategoryName);
 }

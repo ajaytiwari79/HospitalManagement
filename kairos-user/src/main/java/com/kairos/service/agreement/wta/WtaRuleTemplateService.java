@@ -18,6 +18,7 @@ import com.kairos.response.dto.web.WTARuleTemplateDTO;
 import com.kairos.response.dto.web.WtaRuleTemplateDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.ArrayUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -415,7 +416,7 @@ public class WtaRuleTemplateService extends UserBaseService {
         wtaRuleTemplateGraphRepository.deleteCategoryFromTemplate(oldTemplate.getId());
 
         RuleTemplateCategory templateCategory = null;
-        if (templateDTO.getCategory() == "") {
+        if (StringUtils.isEmpty(templateDTO.getCategory())) {
             templateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE");
         } else {
             templateCategory = ruleTemplateCategoryRepository.findByName(countryId, templateDTO.getCategory());
