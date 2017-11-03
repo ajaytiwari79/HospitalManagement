@@ -260,7 +260,7 @@ public class WTAService extends UserBaseService {
         return wtaRepository.getAllWTAByCountryId(countryId);
     }
 
-    public List<WorkingTimeAgreementQueryResult> getAllWTAByOrganizationSubType(long organizationSubTypeId) {
+    public List<WTAWithCountryAndOrganizationTypeDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId) {
         return wtaRepository.getAllWTAByOrganizationSubType(organizationSubTypeId);
     }
 
