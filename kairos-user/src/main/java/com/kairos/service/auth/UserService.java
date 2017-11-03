@@ -533,18 +533,12 @@ public class UserService extends UserBaseService {
             } else if (stringTabPermissionEntry.getValue().isRead()) {
                 permission = unitId + "_" + stringTabPermissionEntry.getValue().getTabId() +
                         "_" + "r";
+            } else{
+                permission = unitId + "_" + stringTabPermissionEntry.getValue().getTabId();
             }
             return new SimpleGrantedAuthority(permission);
         }).collect(Collectors.toList());
         return permissionList;
-    }
-
-    public boolean isHubMember(Long userId){
-        Boolean hubMember = userGraphRepository.isHubMember(userId);
-        if(hubMember instanceof Boolean){
-            return hubMember;
-        }
-        return false;
     }
 
 }

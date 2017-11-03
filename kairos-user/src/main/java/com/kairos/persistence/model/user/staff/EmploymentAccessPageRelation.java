@@ -27,6 +27,13 @@ public class EmploymentAccessPageRelation extends UserBaseEntity {
         this.accessPage = accessPage;
     }
 
+    public EmploymentAccessPageRelation(AccessPermission accessPermission, AccessPage accessPage, boolean isRead, boolean isWrite) {
+        this.accessPermission = accessPermission;
+        this.accessPage = accessPage;
+        this.isRead = isRead;
+        this.isWrite = isWrite;
+    }
+
     public void setRead(boolean read) {
         isRead = read;
     }

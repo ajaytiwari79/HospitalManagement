@@ -7,6 +7,7 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT_EMPLOYMENTS;
@@ -46,7 +47,7 @@ public class Employment extends UserBaseEntity {
     }
 
     public List<UnitEmployment> getUnitEmployments() {
-        return unitEmployments;
+        return Optional.ofNullable(unitEmployments).orElse(new ArrayList<>());
     }
 
     public void setUnitEmployments(List<UnitEmployment> unitEmployments) {

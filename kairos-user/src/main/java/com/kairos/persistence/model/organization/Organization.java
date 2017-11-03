@@ -398,7 +398,7 @@ public class Organization extends UserBaseEntity {
     }
 
     public List<Employment> getEmployments() {
-        return employments;
+        return java.util.Optional.ofNullable(employments).orElse(new ArrayList<>());
     }
 
     public void setEmployments(List<Employment> employments) {
