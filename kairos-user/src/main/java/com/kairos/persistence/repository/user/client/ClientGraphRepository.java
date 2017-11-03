@@ -258,14 +258,14 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     void createHouseHoldRelationship(long clientId,long houseHoldPeopleId,long creationDate,long lastModificationDate);
 
     @Query("Match (client:Client) where id(client)={0}\n" +
-            "Match (client)-[:"+HAS_HOME_ADDRESS+"]->(clientHomeAddress:ContactAddress)-[:ZIP_CODE]->(clientZipCode:ZipCode)\n" +
+            "Match (client)-[:HAS_HOME_ADDRESS]->(clientHomeAddress:ContactAddress)-[:ZIP_CODE]->(clientZipCode:ZipCode)\n" +
             "Match (clientHomeAddress)-[:MUNICIPALITY]->(clientMunicipality:Municipality)\n" +
-            "Match (client)-[r:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(n:Client)\n" +
-            "Match (n)-[:"+HAS_HOME_ADDRESS+"]->(homeAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode)\n" +
+            "Match (houseHold:Client)-[r:PEOPLE_IN_HOUSEHOLD_LIST]-(n:Client) where id(houseHold)={1}\n" +
+            "Match (houseHold)-[houseHoldHomeAddressRel:HAS_HOME_ADDRESS]->(houseHoldAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode)\n" +
             "Match (homeAddress)-[:MUNICIPALITY]->(Municipality:Municipality)\n" +
-            "where zipCode.zipCode=clientZipCode.zipCode AND homeAddress.street1=~clientHomeAddress.street1 AND homeAddress.houseNumber=clientHomeAddress.houseNumber\n" +
-            "delete r")
-    void deleteHouseHoldWhoseAddressNotSame(Long clientId);
+            "where not (zipCode.zipCode=clientZipCode.zipCode AND  houseHoldAddress.street1=~clientHomeAddress.street1 AND houseHoldAddress.houseNumber=clientHomeAddress.houseNumber)\n" +
+            "delete houseHoldHomeAddressRel,r")
+    void deleteHouseHoldWhoseAddressNotSame(Long clientId,Long houseHoldId);
 
     @Query("MATCH (citizen:Client{citizenDead:false})-[:GET_SERVICE_FROM]->(o:Organization)  where id(o)= {0} with citizen\n"+
             "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,citizen\n"+

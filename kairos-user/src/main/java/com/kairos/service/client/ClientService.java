@@ -609,7 +609,7 @@ public class ClientService extends UserBaseService {
         }
         Client houseHold = saveDetailsOfHouseHold(minimumDTO);
         if(Optional.ofNullable(houseHold.getId()).isPresent()){
-            clientGraphRepository.deleteHouseHoldWhoseAddressNotSame(houseHold.getId());
+            clientGraphRepository.deleteHouseHoldWhoseAddressNotSame(client.getId(),houseHold.getId());
         }
         saveAddressOfHouseHold(client, houseHold);
         if (Optional.ofNullable(houseHold.getId()).isPresent()) {
