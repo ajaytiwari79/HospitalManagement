@@ -1,9 +1,7 @@
 package com.kairos.controller.country;
 
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.ParentOrganizationDTO;
 import com.kairos.persistence.model.user.country.EmploymentType;
-import com.kairos.service.country.CountryEmploymentTypeService;
+import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,33 +26,33 @@ import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 public class CountryEmploymentTypeController {
 
     @Inject
-    private CountryEmploymentTypeService countryEmploymentTypeService;
+    private EmploymentTypeService employmentTypeService;
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type", method = RequestMethod.POST)
     @ApiOperation("Add employment type in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addEmploymentType(@PathVariable long countryId, @Valid @RequestBody EmploymentType employmentType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryEmploymentTypeService.addEmploymentType(countryId, employmentType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.addEmploymentType(countryId, employmentType));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type/{employmentTypeId}", method = RequestMethod.PUT)
     @ApiOperation("Update employment type in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateEmploymentType(@PathVariable long countryId, @PathVariable long employmentTypeId, @RequestBody EmploymentType employmentType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryEmploymentTypeService.updateEmploymentType(countryId, employmentTypeId, employmentType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.updateEmploymentType(countryId, employmentTypeId, employmentType));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type/{employmentTypeId}", method = RequestMethod.DELETE)
     @ApiOperation("Delete employment type of country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteEmploymentType(@PathVariable long countryId, @PathVariable long employmentTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryEmploymentTypeService.deleteEmploymentType(countryId, employmentTypeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.deleteEmploymentType(countryId, employmentTypeId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type", method = RequestMethod.GET)
     @ApiOperation("get employment type of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmploymentTypeList (@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryEmploymentTypeService.getEmploymentTypeList(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getEmploymentTypeList(countryId, false));
     }
 }

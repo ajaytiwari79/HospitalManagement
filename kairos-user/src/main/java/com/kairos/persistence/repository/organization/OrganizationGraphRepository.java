@@ -533,5 +533,10 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client ORDER BY c.firstName ASC SKIP {6} LIMIT 20 ")
     List<Map<String, Object>> getClientsOfOrganizationExcludeDeadWithFilterParametersAndLatLng(Long organizationId, String serverImageUrl,String filterByName, String filterByCPR, String filterByPhone, String filterByCivilianStatus, Integer skip, List<Long> latLngIds);
 
+    @Query("MATCH (n:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType)\n"+
+            "WHERE id(n)={0} AND et.deleted={1}\n" +
+            "return et.name as name, et.description as description ORDER BY et.name ASC")
+    List<Map<String, Object>> getEmploymentTypeByOrganization(Long organizationId,Boolean isDeleted);
+
 
 }

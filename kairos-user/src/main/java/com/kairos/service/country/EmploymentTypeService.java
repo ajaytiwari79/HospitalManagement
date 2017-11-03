@@ -5,6 +5,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.RelationType;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
@@ -13,16 +14,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prerna on 2/11/17.
  */
 @Service
 @Transactional
-public class CountryEmploymentTypeService extends UserBaseService {
+public class EmploymentTypeService extends UserBaseService {
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
+
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
 
     public EmploymentType addEmploymentType(Long countryId, EmploymentType employmentType) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -58,8 +63,12 @@ public class CountryEmploymentTypeService extends UserBaseService {
         return true;
     }
 
-    public List<EmploymentType> getEmploymentTypeList(long countryId) {
-        return countryGraphRepository.getEmploymentTypeByCountry(countryId, false);
+    public List<EmploymentType> getEmploymentTypeList(long countryId, boolean isDeleted) {
+        return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
+    }
+
+    public List<Map<String, Object>> getEmploymentTypeOfOrganization(long organizationId, boolean isDeleted){
+        return organizationGraphRepository.getEmploymentTypeByOrganization(organizationId,isDeleted);
     }
 
 }
