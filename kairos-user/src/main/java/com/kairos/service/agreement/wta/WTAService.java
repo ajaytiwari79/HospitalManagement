@@ -160,10 +160,6 @@ public class WTAService extends UserBaseService {
     }
 
 
-    private WTABaseRuleTemplate getTemplateByType(Long countryId, String templateType) {
-        return countryRepository.getTemplateByType(countryId, templateType);
-    }
-
     private void checkUniquenessOfDataExcludingCurrent(long countryId, long wtaId, WtaDTO wtaDTO) {
         WorkingTimeAgreement wta =
                 wtaRepository.checkUniquenessOfDataExcludingCurrent(wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId(), countryId, wtaId);
