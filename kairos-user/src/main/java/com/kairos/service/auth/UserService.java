@@ -376,7 +376,8 @@ public class UserService extends UserBaseService {
 
         long loggedinUserId = UserContext.getUserDetails().getId();
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
-        List<AccessPageQueryResult> mainModulePermissions = accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
+        List<AccessPageQueryResult> mainModulePermissions = (organization.isKairosHub())?accessPageRepository.getPermissionOfMainModuleForHubMembers():
+                accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
         List<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> unitPermissionMap;

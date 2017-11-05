@@ -87,6 +87,10 @@ public interface AccessPageRepository extends GraphRepository<AccessPage> {
             "return id(accessPage) as id,accessPage.name as name,r.isRead as read,r.isWrite as write,accessPage.moduleId as moduleId,accessPage.active as active")
     List<AccessPageQueryResult> getPermissionOfMainModule(long orgId, long userId);
 
+    @Query("Match (accessPage:AccessPage{isModule:true})\n" +
+            "return id(accessPage) as id,accessPage.name as name,true as read,true as write,accessPage.moduleId as moduleId,accessPage.active as active")
+    List<AccessPageQueryResult> getPermissionOfMainModuleForHubMembers();
+
     @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
             "MATCH (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with org,emp\n" +
             "MATCH (emp)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmp:UnitEmployment)-[:PROVIDED_BY]->(org) with unitEmp,org\n" +
