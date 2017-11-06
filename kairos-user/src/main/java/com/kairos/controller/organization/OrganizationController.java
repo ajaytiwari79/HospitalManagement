@@ -1006,7 +1006,6 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>>
     verifyOrganizationExpertise(@RequestBody OrganizationMappingActivityTypeDTO organizationMappingActivityTypeDTO) {
-        logger.info("inside the controller------------------");
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.verifyOrganizationExpertise(organizationMappingActivityTypeDTO));
     }

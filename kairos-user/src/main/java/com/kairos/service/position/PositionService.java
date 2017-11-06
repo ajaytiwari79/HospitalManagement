@@ -69,7 +69,6 @@ public class PositionService extends UserBaseService {
         List<Position> positions = unitEmployment.getPositions();
 
         positions.add(position);
-
         unitEmployment.setPositions(positions);
         save(unitEmployment);
         return position;
