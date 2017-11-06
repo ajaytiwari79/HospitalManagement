@@ -9,7 +9,6 @@ public class ResourceDTO {
 
     @NotNull(message = "Registration number can't be empty")
     private String registrationNumber;
-    @NotNull(message = "error.Resource.registrationNumber.notnull")
     private String number;
     @NotNull(message = "error.description.notnull")
     private String modelDescription;

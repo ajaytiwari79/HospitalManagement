@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import javax.ws.rs.QueryParam;
 import javax.validation.Valid;
 
 import java.text.ParseException;
@@ -1007,7 +1006,6 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>>
     verifyOrganizationExpertise(@RequestBody OrganizationMappingActivityTypeDTO organizationMappingActivityTypeDTO) {
-        logger.info("inside the controller------------------");
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.verifyOrganizationExpertise(organizationMappingActivityTypeDTO));
     }

@@ -33,14 +33,14 @@ public class RuleTemplateCategoryController {
     ResponseEntity<Map<String, Object>> createRuleTemplate(@PathVariable long countryId, @RequestBody @Valid RuleTemplateCategory ruleTemplateCategory) {
 
         if (ruleTemplateCategory != null) {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.createRuleTemplate(countryId, ruleTemplateCategory));
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.createRuleTemplateCategory(countryId, ruleTemplateCategory));
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
     }
 
     @RequestMapping(value = "/template_category", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getRulesTemplate(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplate(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplateCategory(countryId));
     }
 
     @RequestMapping(value = "/template_category/{templateCategoryId}", method = RequestMethod.DELETE)

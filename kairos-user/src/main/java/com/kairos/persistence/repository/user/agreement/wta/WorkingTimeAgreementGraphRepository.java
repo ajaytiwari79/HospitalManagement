@@ -27,7 +27,7 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
     @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where id(o)={0}\n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true})\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCategory:RuleTemplateCategory) with wta,o,expertise,ruleTemp,ruleTemplatecategory\n" +
-            "with wta,expertise,collect({active:ruleTemp.isActive,fromDayOfWeek:ruleTemp.fromDayOfWeek,minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts,shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional,toTime:ruleTemp.toTime,toDayOfWeek:ruleTemp.toDayOfWeek,continuousDayRestHours:ruleTemp.continuousDayRestHours,name:ruleTemp.name,id:Id(ruleTemp),minimumRest:ruleTemp.minimumRest,timeLimit:ruleTemp.timeLimit,balanceType:ruleTemp.balanceType,templateType:ruleTemp.templateType,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description, numberShiftsPerPeriod:ruleTemp.numberShiftsPerPeriod,numberOfWeeks:ruleTemp.numberOfWeeks,maximumVetoPercentage:ruleTemp.maximumVetoPercentage,maximumAvgTime:ruleTemp.maximumAvgTime,useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,interval:ruleTemp.interval,intervalUnit:ruleTemp.intervalUnit,validationStartDateMillis:ruleTemp.validationStartDateMillis,daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules,ruleTemplateCategory:ruleTemplateCategory.name,ruleTemplateCategoryId:Id(ruleTemplateCategory)}) as ruleTemplates\n" +
+            "with wta,expertise, CASE  WHEN ruleTemp IS NOT NULL THEN collect({active:ruleTemp.isActive,fromDayOfWeek:ruleTemp.fromDayOfWeek,minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts,shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional,toTime:ruleTemp.toTime,toDayOfWeek:ruleTemp.toDayOfWeek,continuousDayRestHours:ruleTemp.continuousDayRestHours,name:ruleTemp.name,id:Id(ruleTemp),minimumRest:ruleTemp.minimumRest,timeLimit:ruleTemp.timeLimit,balanceType:ruleTemp.balanceType,templateType:ruleTemp.templateType,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description, numberShiftsPerPeriod:ruleTemp.numberShiftsPerPeriod,numberOfWeeks:ruleTemp.numberOfWeeks,maximumVetoPercentage:ruleTemp.maximumVetoPercentage,maximumAvgTime:ruleTemp.maximumAvgTime,useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,intervalLength:ruleTemp.intervalLength,intervalUnit:ruleTemp.intervalUnit,validationStartDateMillis:ruleTemp.validationStartDateMillis,daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules,ruleTemplateCategory:ruleTemplateCategory.name,ruleTemplateCategoryId:Id(ruleTemplateCategory)}) else [] END as ruleTemplates\n" +
             "RETURN ruleTemplates as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
             "expertise as expertise,wta.creationDate as creationDate, wta.endDateMillis as endDateMillis,wta.name as name,id(wta) as id"
     )
@@ -39,16 +39,16 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orgSubType:OrganizationType) \n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(ruleTempCatg:RuleTemplateCategory)\n" +
             "return wta.isEnabled as isEnabled," +
-            "wta.startDateMillis as startDateMillis,collect({active:ruleTemp.isActive,fromDayOfWeek:ruleTemp.fromDayOfWeek,minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts," +
+            "wta.startDateMillis as startDateMillis,CASE  WHEN ruleTemp IS NOT NULL THEN collect({active:ruleTemp.isActive,fromDayOfWeek:ruleTemp.fromDayOfWeek,minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts," +
             " fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts,shiftsLimit:ruleTemp.shiftsLimit," +
             "shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional," +
             "toTime:ruleTemp.toTime,toDayOfWeek:ruleTemp.toDayOfWeek,continuousDayRestHours:ruleTemp.continuousDayRestHours,name:ruleTemp.name,id:Id(ruleTemp)," +
             "minimumRest:ruleTemp.minimumRest,timeLimit:ruleTemp.timeLimit,balanceType:ruleTemp.balanceType,templateType:ruleTemp.templateType,nightsWorked:ruleTemp.nightsWorked," +
             "description:ruleTemp.description, numberShiftsPerPeriod:ruleTemp.numberShiftsPerPeriod,numberOfWeeks:ruleTemp.numberOfWeeks,maximumVetoPercentage:ruleTemp.maximumVetoPercentage," +
-            "maximumAvgTime:ruleTemp.maximumAvgTime,useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,interval:ruleTemp.interval," +
+            "maximumAvgTime:ruleTemp.maximumAvgTime,useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,intervalLength:ruleTemp.intervalLength," +
             "intervalUnit:ruleTemp.intervalUnit,validationStartDateMillis:ruleTemp.validationStartDateMillis,daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked," +
             "description:ruleTemp.description,ruleTemplateCategory:{name:ruleTempCatg.name,id:Id(ruleTempCatg)}," +
-            "checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules,ruleTemplateCategoryId:id(ruleTempCatg)}) as ruleTemplates," +
+            "checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules,ruleTemplateCategoryId:id(ruleTempCatg)}) else [] END as ruleTemplates," +
             "wta.endDateMillis as endDateMillis,orgType as organizationTypes,orgSubType as organizationSubTypes,expertise as expertise," +
             "wta.expiryDate as expiryDate," +
             "wta.description as description," +
@@ -58,11 +58,18 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
 
     @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(o:OrganizationType) where id(o)={0} \n" +
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
-            "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCategory:RuleTemplateCategory)\n" +
-            "RETURN collect({active:ruleTemp.isActive,isActive:ruleTemp.isActive,fromDayOfWeek:ruleTemp.fromDayOfWeek,minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts,shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional,toTime:ruleTemp.toTime,toDayOfWeek:ruleTemp.toDayOfWeek,continuousDayRestHours:ruleTemp.continuousDayRestHours,name:ruleTemp.name,id:Id(ruleTemp),minimumRest:ruleTemp.minimumRest,timeLimit:ruleTemp.timeLimit,balanceType:ruleTemp.balanceType,templateType:ruleTemp.templateType,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description, numberShiftsPerPeriod:ruleTemp.numberShiftsPerPeriod,numberOfWeeks:ruleTemp.numberOfWeeks,maximumVetoPercentage:ruleTemp.maximumVetoPercentage,maximumAvgTime:ruleTemp.maximumAvgTime,useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,interval:ruleTemp.interval,intervalUnit:ruleTemp.intervalUnit,validationStartDateMillis:ruleTemp.validationStartDateMillis,daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules,ruleTemplateCategory:ruleTemplateCategory.name,ruleTemplateCategoryId:Id(ruleTemplateCategory)}) as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
+            "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
+            "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({active:ruleTemp.isActive,isActive:ruleTemp.isActive,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
+            "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
+            "shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional," +
+            "toTime:ruleTemp.toTime,toDayOfWeek:ruleTemp.toDayOfWeek,continuousDayRestHours:ruleTemp.continuousDayRestHours,name:ruleTemp.name,id:Id(ruleTemp),minimumRest:ruleTemp.minimumRest," +
+            "timeLimit:ruleTemp.timeLimit,balanceType:ruleTemp.balanceType,templateType:ruleTemp.templateType,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description," +
+            " numberShiftsPerPeriod:ruleTemp.numberShiftsPerPeriod,numberOfWeeks:ruleTemp.numberOfWeeks,maximumVetoPercentage:ruleTemp.maximumVetoPercentage,maximumAvgTime:ruleTemp.maximumAvgTime," +
+            "useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,intervalLength:ruleTemp.intervalLength,intervalUnit:ruleTemp.intervalUnit,validationStartDateMillis:ruleTemp.validationStartDateMillis," +
+            "daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
             "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id"
     )
-    List<WorkingTimeAgreementQueryResult> getAllWTAByOrganizationSubType(long organizationSubTypeId);
+    List<WTAWithCountryAndOrganizationTypeDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId);
 
     @Query("match(c:Country) where id(c)={0}\n" +
             "match(c)<-[:" + BELONGS_TO + "]-(or:OrganizationType)\n" +
@@ -75,13 +82,11 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
     List<Map<String, Object>> getAllWTAWithOrganization(long countryId);
 
     @Query("match(c:Country) where id(c)={0}\n" +
-            "match(c)<-[:" + BELONGS_TO_ORG_TYPE + "]-(or:OrganizationType)\n" +
-            " match(w:WorkingTimeAgreement) where id(w)={1}\n" +
-            " match(or)-[:" + HAS_SUB_TYPE + "]->(ora:OrganizationType)\n" +
-            " match(w)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(ora)\n" +
-            "with or,ora,w\n" +
-            "with or,ora,{WTA:CASE WHEN w IS NOT NULL THEN collect({id:id(w),name:w.name}) ELSE [] END} as oraRes\n" +
-            "WITH {name: or.name,id:id(or), children: CASE WHEN ora IS NOT NULL THEN collect({id:id(ora),name:ora.name,wtaa:oraRes}) ELSE [] END} as orga\n" +
+            "match(wta:WorkingTimeAgreement) where id(wta)={1}\n" +
+            "match(wta)-[:"+BELONGS_TO_ORG_TYPE+"]-(or:OrganizationType)\n" +
+            "match(wta)-[:"+BELONGS_TO_ORG_SUB_TYPE+"]->(org:OrganizationType)\n" +
+            "with or ,org ,{WTA:CASE WHEN wta IS NOT NULL THEN collect({id:id(wta),name:wta.name}) ELSE [] END} as oraRes\n" +
+            "WITH {name: or.name,id:id(or), children: CASE WHEN org IS NOT NULL THEN collect({id:id(org),name:org.name,wta:oraRes}) ELSE [] END} as orga \n" +
             "RETURN orga as result")
     List<Map<String, Object>> getAllWTAWithWTAId(long countryId, long wtaId);
 

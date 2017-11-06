@@ -3,6 +3,7 @@ package com.kairos.service.auth;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.auth.UserPrincipal;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.util.HttpRequestHolder;
 import com.kairos.util.OptionalUtility;
 import org.slf4j.Logger;
@@ -24,11 +25,13 @@ public class UserOauth2Service implements UserDetailsService {
     private UserGraphRepository userGraphRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private AccessPageService accessPageService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
          User user=  userGraphRepository.findByUserNameIgnoreCase(username.toLowerCase());
-         user.setHubMember(userService.isHubMember(user.getId()));
+         user.setHubMember(accessPageService.isHubMember(user.getId()));
          Optional<User> loggedUser=Optional.ofNullable(user);
          String otpString=HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
          Optional<Integer>optInt=OptionalUtility.stringToInt(otpString);
