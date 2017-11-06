@@ -1,17 +1,21 @@
 package com.kairos.service.position;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.position.PositionName;
 import com.kairos.persistence.model.user.position.PositionQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.UnitEmployment;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
+import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.position.PositionGraphRepository;
 import com.kairos.persistence.repository.user.position.PositionNameGraphRepository;
+import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
 import com.kairos.response.dto.web.PositionDTO;
@@ -34,6 +38,8 @@ import java.util.Optional;
 @Service
 public class PositionService extends UserBaseService {
 
+    private final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
+
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -49,7 +55,11 @@ public class PositionService extends UserBaseService {
     @Inject
     private CollectiveTimeAgreementGraphRepository costTimeAgreementGraphRepository;
     @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
+    @Inject
     private StaffService staffService;
+    @Inject
+    private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
     private OrganizationService organizationService;
     @Inject private  PositionNameService positionNameService;
@@ -60,7 +70,7 @@ public class PositionService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid UnitEmployment id"+unitEmploymentId);
         }
         Long unitId=organizationService.getOrganization(id,type);
-        Position position = preparePosition(positionDTO,unitId);
+        Position position = preparePosition(positionDTO,unitId, id);
         List<Position> positions = unitEmployment.getPositions();
 
         positions.add(position);
@@ -129,7 +139,7 @@ public class PositionService extends UserBaseService {
 
     }
 
-    private Position preparePosition(PositionDTO positionDTO,Long unitId) {
+    private Position preparePosition(PositionDTO positionDTO,Long unitId, Long orgId) {
         Position position = new Position();
 
         //String name, String description, Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta
@@ -139,6 +149,16 @@ public class PositionService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Expertize"+positionDTO.getExpertiseId());
         }
         position.setExpertise(expertise);
+
+        logger.debug("EMPLOYMENT TYPE ID ==================== : "+positionDTO.getEmploymentTypeId());
+        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(orgId, positionDTO.getEmploymentTypeId(), false);
+        if(employmentType == null){
+            throw new DataNotFoundByIdException("NULL OBJECT");
+        }
+        if (!Optional.ofNullable(employmentType).isPresent()) {
+            throw new DataNotFoundByIdException("Employment Type does not exist in unit "+employmentType.getId()+ " AND "+positionDTO.getEmploymentTypeId());
+        }
+        position.setEmploymentType(employmentType);
 
         PositionName positionName = positionNameService.getPositionNameByUnitIdAndId(unitId,positionDTO.getPositionNameId());
         if (!Optional.ofNullable(positionName).isPresent()) {
@@ -171,7 +191,6 @@ public class PositionService extends UserBaseService {
         position.setHourlyWages(positionDTO.getHourlyWages());
         position.setSalary(positionDTO.getSalary());
         position.setWorkingDaysInWeek(positionDTO.getWorkingDaysInWeek());
-        position.setEmploymentType(positionDTO.getEmploymentType());
 
         return position;
     }
@@ -194,6 +213,14 @@ public class PositionService extends UserBaseService {
                 throw new DataNotFoundByIdException("PositionName Cannot be null"+positionDTO.getPositionNameId());
             }
             oldPosition.setPositionName(positionName);
+        }
+
+        if (oldPosition.getEmploymentType().getId() != positionDTO.getEmploymentTypeId()) {
+            EmploymentType employmentType = employmentTypeGraphRepository.findOne(positionDTO.getEmploymentTypeId());
+            if (!Optional.ofNullable(employmentType).isPresent()) {
+                throw new DataNotFoundByIdException("employmentType Cannot be null"+positionDTO.getEmploymentTypeId());
+            }
+            oldPosition.setEmploymentType(employmentType);
         }
 
         /*if (oldPosition.getCta() != null && (oldPosition.getCta().getId() != positionDTO.getCtaId())) {
@@ -219,7 +246,6 @@ public class PositionService extends UserBaseService {
         oldPosition.setAvgDailyWorkingHours(positionDTO.getAvgDailyWorkingHours());
         oldPosition.setHourlyWages(positionDTO.getHourlyWages());
         oldPosition.setSalary(positionDTO.getSalary());
-        oldPosition.setEmploymentType(positionDTO.getEmploymentType());
 
     }
 

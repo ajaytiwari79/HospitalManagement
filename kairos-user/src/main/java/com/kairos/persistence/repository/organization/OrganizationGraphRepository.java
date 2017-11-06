@@ -6,6 +6,7 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
+import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position.PositionName;
 import org.springframework.data.neo4j.annotation.Query;
@@ -535,8 +536,13 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
 
     @Query("MATCH (n:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType)\n"+
             "WHERE id(n)={0} AND et.deleted={1}\n" +
-            "return et.name as name, et.description as description ORDER BY et.name ASC")
+            "return id(et) as id, et.name as name, et.description as description ORDER BY et.name ASC")
     List<Map<String, Object>> getEmploymentTypeByOrganization(Long organizationId,Boolean isDeleted);
 
+    @Query("MATCH (n:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType)\n"+
+            "WHERE id(n)={0} AND id(et)={1} AND et.deleted={2}\n" +
+            "return et ORDER BY et.name ASC")
+//    id(et) as id, et.name as name, et.description as description
+    EmploymentType getEmploymentTypeByOrganizationAndEmploymentId(Long organizationId, Long employmentId, Boolean isDeleted);
 
 }

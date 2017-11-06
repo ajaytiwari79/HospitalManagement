@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
+import org.slf4j.Logger;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -29,13 +30,14 @@ public class PositionController {
     @Inject
     private PositionService positionService;
 
+    private final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
 
     @ApiOperation(value = "Create a New Position")
   //  http://dev.kairosplanning.com/api/v1/organization/71/unit/71/unitEmployment/82/position?moduleId=tab_23&type=Organization
     @PostMapping(value = "/unitEmployment/{unitEmploymentId}/position")
     public ResponseEntity<Map<String, Object>> createPosition(@PathVariable Long organizationId,@PathVariable Long unitId,@PathVariable Long unitEmploymentId,
                                                               @RequestParam("type") String type,@RequestBody @Valid  PositionDTO position) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionService.createPosition(unitId,unitEmploymentId,position,type));
+       return ResponseHandler.generateResponse(HttpStatus.OK, true, positionService.createPosition(unitId,unitEmploymentId,position,type));
     }
 
     @ApiOperation(value = "Update Position")
@@ -62,7 +64,7 @@ public class PositionController {
     }
     /*
     * @auth vipul
-    * used to get all positions of organization n buy organization and staff Id
+    * used to get all positions of organization n by organization and staff Id
     * */
     @ApiOperation(value = "Get all positions by organization and staff")
     @RequestMapping(value="/unitEmployment/{unitEmploymentId}/staff/{staffId}/position")

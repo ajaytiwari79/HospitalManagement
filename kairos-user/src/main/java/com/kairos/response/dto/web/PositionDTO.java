@@ -23,7 +23,8 @@ public class PositionDTO {
     private int workingDaysInWeek;
     private float hourlyWages;
     private float salary;
-    private Position.EmploymentType employmentType;
+    private Long employmentTypeId;
+//    private Position.EmploymentType employmentType;
 
     @NotNull(message = "staffId is missing")
     @Range(min = 0, message = "staffId is missing")
@@ -44,7 +45,7 @@ public class PositionDTO {
 
 
     public PositionDTO(String name, String description, Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours,
-                       float avgDailyWorkingHours, float hourlyWages, float salary, Position.EmploymentType employmentType) {
+                       float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
         this.salary=salary;
         this.avgDailyWorkingHours =avgDailyWorkingHours;
         this.totalWeeklyHours=totalWeeklyHours;
@@ -53,10 +54,10 @@ public class PositionDTO {
         this.expertiseId = expertiseId;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.employmentType=employmentType;
+        this.employmentTypeId=employmentTypeId;
     }
 
-    public PositionDTO(Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Position.EmploymentType employmentType, Long staffId) {
+    public PositionDTO(Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
         this.positionNameId = positionNameId;
         this.expertiseId = expertiseId;
         this.startDate = startDate;
@@ -66,7 +67,7 @@ public class PositionDTO {
         this.workingDaysInWeek = workingDaysInWeek;
         this.hourlyWages = hourlyWages;
         this.salary = salary;
-        this.employmentType = employmentType;
+        this.employmentTypeId = employmentTypeId;
         this.staffId = staffId;
     }
 
@@ -143,12 +144,20 @@ public class PositionDTO {
         this.salary = salary;
     }
 
-    public Position.EmploymentType getEmploymentType() {
+    /*public Position.EmploymentType getEmploymentType() {
         return employmentType;
     }
 
     public void setEmploymentType(Position.EmploymentType employmentType) {
         this.employmentType = employmentType;
+    }*/
+
+    public long getEmploymentTypeId() {
+        return employmentTypeId;
+    }
+
+    public void setEmploymentTypeId(long employmentTypeId) {
+        this.employmentTypeId = employmentTypeId;
     }
 
     public Long getStaffId() {

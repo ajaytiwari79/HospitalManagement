@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.staff.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -34,6 +35,9 @@ public class Position extends UserBaseEntity {
     @Relationship(type = BELONGS_TO_STAFF,direction = "INCOMING")
     private Staff staff;
 
+    @Relationship(type = HAS_EMPLOYMENT_TYPE)
+    private EmploymentType employmentType;
+
     private boolean isEnabled = true;
     private Long startDate;
     private Long endDate;
@@ -41,11 +45,11 @@ public class Position extends UserBaseEntity {
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
-    public enum EmploymentType{
+    /*public enum EmploymentType{
         FULL_TIME,PART_TIME
     };
 
-    private EmploymentType employmentType;
+    private EmploymentType employmentType;*/
     private float salary;
 
     public Position() {

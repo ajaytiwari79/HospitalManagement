@@ -178,8 +178,8 @@ public class StaffController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmployments(@PathVariable long staffId, @PathVariable long unitId, @RequestParam("type") String type) {
         Map<String, Object> responseData = new HashMap<String, Object>(2);
-        responseData.put("staffEmployments", employmentService.getEmployments(staffId, unitId, type));
-        responseData.put("employments", employmentTypeService.getEmploymentTypeOfOrganization(unitId, false) );
+        responseData.put("employments", employmentService.getEmployments(staffId, unitId, type));
+        responseData.put("employmentTypes", employmentTypeService.getEmploymentTypeOfOrganization(unitId, false) );
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responseData);
     }
 
