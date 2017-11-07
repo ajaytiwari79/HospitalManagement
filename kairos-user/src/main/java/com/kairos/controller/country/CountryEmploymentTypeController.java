@@ -32,7 +32,7 @@ public class CountryEmploymentTypeController {
     @ApiOperation("Add employment type in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addEmploymentType(@PathVariable long countryId, @Valid @RequestBody EmploymentType employmentType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.addEmploymentType(countryId, employmentType));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, employmentTypeService.addEmploymentType(countryId, employmentType));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/employment_type/{employmentTypeId}", method = RequestMethod.PUT)
