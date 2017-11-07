@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 @NodeEntity
 public class EmploymentType extends UserBaseEntity {
 
-    @NotEmpty(message = "error.EmploymentType.name.notEmpty") @NotNull(message = "error.EmploymentType.name.notnull")
+    @NotEmpty(message = "error.EmploymentType.name.notEmptyOrNotNull") @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull")
     private String name;
     private String description;
     private boolean deleted = false;
@@ -37,7 +37,6 @@ public class EmploymentType extends UserBaseEntity {
     public void setDescription(String description) {
         this.description = description;
     }
-
     public boolean isDeleted() {
         return deleted;
     }
