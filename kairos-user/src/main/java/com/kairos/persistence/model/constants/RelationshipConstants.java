@@ -34,7 +34,7 @@ public class RelationshipConstants {
     public final static String PAYMENT_TYPE = "PAYMENT_TYPE";
     public final static String CURRENCY = "CURRENCY";
     public final static String ORGANIZATION_HAS_OFFICE_RESOURCE ="ORGANIZATION_HAS_OFFICE_RESOURCE";
-
+    public final static String HAS_EMPLOYMENT_TYPE = "HAS_EMPLOYMENT_TYPE";
 
     public final static String HAS_POSITION_NAME ="HAS_POSITION_NAME";
     public final static String HAS_POSITION ="HAS_POSITION";

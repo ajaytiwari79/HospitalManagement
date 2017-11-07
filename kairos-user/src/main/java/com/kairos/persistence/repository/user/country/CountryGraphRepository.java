@@ -3,6 +3,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.RelationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import org.springframework.data.neo4j.annotation.Query;
@@ -176,8 +177,11 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
     @Query("MATCH (country:Country)-[:"+HAS_RESOURCES+"]->(resources:Vehicle{enabled:true}) where id(country)={0} return resources")
     List<Vehicle> getResourcesByCountry(Long countryId);
 
+    @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND id(employmentType)={1} return employmentType")
+    EmploymentType getEmploymentTypeByCountryAndEmploymentType(long countryId, long employmentTypeId);
 
-
+    @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} return employmentType")
+    List<EmploymentType> getEmploymentTypeByCountry(long countryId, Boolean isDeleted);
 
 
 
