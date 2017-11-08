@@ -341,9 +341,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
     @Query("Match (client:Client)-[r:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson:ClientContactPerson) where id(client)={0} with clientContactPerson,r,client\n" +
             "OPTIONAL MATCH (client)-[:PEOPLE_IN_HOUSEHOLD_LIST]-(ps:Client) with ps,clientContactPerson,r\n" +
-            "Match (ps)-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson)  with ps,clientContactPerson,r\n" +
-            "Match (staff:Staff)<-[:CLIENT_CONTACT_PERSON_STAFF]-(clientContactPerson)-[:CLIENT_CONTACT_PERSON_SERVICE]->(os:OrganizationService) with os,clientContactPerson as cp,r,staff,ps\n" +
-            "return id(os) as serviceId,collect({primaryStaffId:case when r.contactPersonRelationType='PRIMARY' then id(staff) else null end,secondaryStaffId:case when r.contactPersonRelationType='SECONDARY_ONE' then id(staff) else null end,secondaryTwoStaffId:case when r.contactPersonRelationType='SECONDARY_TWO' then id(staff) else null end,secondaryThreeStaffId:case when r.contactPersonRelationType='SECONDARY_THREE' then id(staff) else null end,houseHold:id(ps)}) as clientContactPersonQueryResults")
+            "optional Match (ps)-[houseHoldRel:CLIENT_CONTACT_PERSON_RELATION_TYPE]->(clientContactPerson)  with clientContactPerson,r,ps,houseHoldRel\n" +
+            "Match (staff:Staff)<-[:CLIENT_CONTACT_PERSON_STAFF]-(clientContactPerson)-[:CLIENT_CONTACT_PERSON_SERVICE]->(os:OrganizationService) with os,clientContactPerson as cp,r,staff,ps,houseHoldRel\n" +
+            "return id(os) as serviceId,collect({primaryStaffId:case when r.contactPersonRelationType='PRIMARY' then id(staff) else null end,secondaryStaffId:case when r.contactPersonRelationType='SECONDARY_ONE' then id(staff) else null end,secondaryTwoStaffId:case when r.contactPersonRelationType='SECONDARY_TWO' then id(staff) else null end,secondaryThreeStaffId:case when r.contactPersonRelationType='SECONDARY_THREE' then id(staff) else null end,houseHold:case when houseHoldRel is null then null else id(ps) end}) as clientContactPersonQueryResults")
     List<ClientContactPersonQueryResultByService> getClientContactPersonDataList(Long clientId);
 
     @Query("MATCH (clientContactPerson:ClientContactPerson)-[r:"+CLIENT_CONTACT_PERSON_STAFF+"]->(staff:Staff) where id(clientContactPerson)={0}  delete r")
