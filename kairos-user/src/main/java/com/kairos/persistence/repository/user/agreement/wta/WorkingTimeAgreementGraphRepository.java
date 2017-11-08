@@ -83,8 +83,8 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
 
     @Query("match(c:Country) where id(c)={0}\n" +
             "match(wta:WorkingTimeAgreement) where id(wta)={1}\n" +
-            "match(wta)-[:"+BELONGS_TO_ORG_TYPE+"]-(or:OrganizationType)\n" +
-            "match(wta)-[:"+BELONGS_TO_ORG_SUB_TYPE+"]->(org:OrganizationType)\n" +
+            "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]-(or:OrganizationType)\n" +
+            "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(org:OrganizationType)\n" +
             "with or ,org ,{WTA:CASE WHEN wta IS NOT NULL THEN collect({id:id(wta),name:wta.name}) ELSE [] END} as oraRes\n" +
             "WITH {name: or.name,id:id(or), children: CASE WHEN org IS NOT NULL THEN collect({id:id(org),name:org.name,wta:oraRes}) ELSE [] END} as orga \n" +
             "RETURN orga as result")
@@ -109,4 +109,23 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
             "with linkedExpertiseIds, collect (id(allExp)) as allExpertiseIds\n" +
             "return linkedExpertiseIds,allExpertiseIds")
     ExpertiseIdListDTO getAvailableAndFreeExpertise(long countryId, long organizationSubTypeId);
+
+
+    @Query(" match (country:Country) <-[:" + BELONGS_TO + "]-(wta:WorkingTimeAgreement{isEnabled:true})-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) where Id(expertise)={0} AND  Id(country)={1} \n" +
+            "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
+            "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({active:ruleTemp.isActive,isActive:ruleTemp.isActive,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
+            "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
+            "shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional," +
+            "toTime:ruleTemp.toTime,toDayOfWeek:ruleTemp.toDayOfWeek,continuousDayRestHours:ruleTemp.continuousDayRestHours,name:ruleTemp.name,id:Id(ruleTemp),minimumRest:ruleTemp.minimumRest," +
+            "timeLimit:ruleTemp.timeLimit,balanceType:ruleTemp.balanceType,templateType:ruleTemp.templateType,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description," +
+            " numberShiftsPerPeriod:ruleTemp.numberShiftsPerPeriod,numberOfWeeks:ruleTemp.numberOfWeeks,maximumVetoPercentage:ruleTemp.maximumVetoPercentage,maximumAvgTime:ruleTemp.maximumAvgTime," +
+            "useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,intervalLength:ruleTemp.intervalLength,intervalUnit:ruleTemp.intervalUnit,validationStartDateMillis:ruleTemp.validationStartDateMillis," +
+            "daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
+            "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id"
+    )
+    WTAWithCountryAndOrganizationTypeDTO getWTAByExpertiseAndCountry(Long expertiseId, Long countryId);
+
+
+    @Query("match (country:Country) <-[:" + BELONGS_TO + "]-(wta:WorkingTimeAgreement{isEnabled:true})-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) where Id(expertise)={0} AND  Id(country)={1} return wta")
+    WorkingTimeAgreement findByExpertiseId(Long expertiseId, Long countryId);
 }

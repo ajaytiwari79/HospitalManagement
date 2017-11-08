@@ -19,7 +19,8 @@ public interface PositionGraphRepository extends GraphRepository<Position> {
             "match (p)-[:"+HAS_POSITION_NAME+"]->(pn:PositionName)\n" +
             "match (p)-[:"+HAS_EMPLOYMENT_TYPE+"]->(et:EmploymentType)\n" +
             "match (p)-[:"+HAS_EXPERTISE_IN+"]->(e:Expertise)\n" +
-            "return e as expertise," +
+            "match (p)-[:"+HAS_WTA+"]->(wta:WorkingTimeAgreement)\n" +
+            "return e as expertise,wta as workingTimeAgreement," +
             "pn as positionName," +
             "p.totalWeeklyHours as totalWeeklyHours," +
             "p.startDate as startDate,"+
