@@ -49,9 +49,11 @@ import org.joda.time.DateTime;
 import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.template.Neo4jOperations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.inject.Inject;
 import java.text.ParseException;
@@ -1440,7 +1442,6 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
         }
 
         return clientContactPersonStructuredData;
-
     }
 
     public void saveContactPersonWithGivenRelation(Long clientId, Long serviceId, Long staffId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, List<Long> households){
@@ -1565,6 +1566,19 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
 
         return response;
+    }
+
+    public ClientContactPersonStructuredData updateContactPerson(Long clientId,ContactPersonDTO contactPersonDTO){
+        Client client = clientGraphRepository.findOne(clientId);
+        if(!Optional.ofNullable(client).isPresent()){
+            throw new DataNotFoundByIdException("Client is not found with client id " + clientId);
+        }
+        deleteContactPersonForService(contactPersonDTO.getServiceTypeId(),clientId);
+        return saveContactPerson(clientId,contactPersonDTO);
+    }
+
+    private void deleteContactPersonForService(Long organizationServiceId,Long clientId){
+        clientGraphRepository.deleteContactPersonForService(organizationServiceId,clientId);
     }
 
 }
