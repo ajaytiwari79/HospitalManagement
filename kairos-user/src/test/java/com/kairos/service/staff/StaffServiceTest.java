@@ -34,7 +34,7 @@ public class StaffServiceTest {
 
 
     @Test
-    public long addStaffFavouriteFilters() throws Exception {
+    public void addStaffFavouriteFilters() throws Exception {
         String baseUrl=getBaseUrl(71L,null);
         StaffFilterDTO staffFilterDTO = new StaffFilterDTO("tab_21"," {\"name\":\"el\",\"cprNumber\":\"\",\"phoneNumber\":\"\",\"taskTypes\":[],\"servicesTypes\":[],\"localAreaTags\":[],\"newDemands\":false,\"timeSlots\":[]}","my filter");
         HttpEntity<StaffFilterDTO> entity = new HttpEntity<>(staffFilterDTO);
@@ -42,8 +42,6 @@ public class StaffServiceTest {
                 baseUrl+"/addStaffFavouriteFilters",
                 HttpMethod.POST, entity, StaffFilterDTO.class);
         Assert.assertNotNull(response.getBody().getId());
-        return response.getBody().getId();
-
     }
 
 
