@@ -1,27 +1,23 @@
-package com.kairos.persistence.model.user.country;
+package com.kairos.persistence.model.user.country.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.country.EmploymentType;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.neo4j.ogm.annotation.NodeEntity;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 
 /**
- * Created by prerna on 2/11/17.
+ * Created by prerna on 7/11/17.
  */
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NodeEntity
-public class EmploymentType extends UserBaseEntity {
-
-    @NotEmpty(message = "error.EmploymentType.name.notEmptyOrNotNull") @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull")
+@QueryResult
+public class EmploymentTypeDTO extends UserBaseEntity {
+    @NotEmpty(message = "error.EmploymentType.name.notEmptyOrNotNull")    @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull")
     private String name;
     private String description;
-    private boolean allowedForContactPerson;
-    private boolean deleted = false;
+    private boolean allowedForContactPerson = false;
 
     public String getName() {
         return name;
@@ -47,11 +43,11 @@ public class EmploymentType extends UserBaseEntity {
         this.allowedForContactPerson = allowedForContactPerson;
     }
 
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public EmploymentType generateEmploymentTypeFromEmploymentTypeDTO() {
+        EmploymentType employmentType = new EmploymentType();
+        employmentType.setName(this.getName());
+        employmentType.setDescription(this.getDescription());
+        employmentType.setAllowedForContactPerson(this.isAllowedForContactPerson());
+        return employmentType;
     }
 }

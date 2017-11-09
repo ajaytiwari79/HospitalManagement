@@ -310,8 +310,15 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     List<StaffPersonalDetailDTO> getAllStaffDetailByUnitId(long unitId);
 
     @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments ,organization\n" +
+
+            "MATCH (o:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE id(o)=71 with et\n" +
+            "OPTIONAL MATCH (o)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) with \n" +
+            "collect(CASE WHEN r IS NULL AND  et.allowedForContactPerson =true THEN  {id:id(et),allowedForContactPerson:et.allowedForContactPerson} \n" +
+            "ELSE {id:id(et),allowedForContactPerson:r.allowedForContactPerson} END) as employmentTypeSettings with filter\n" +
+            "(x IN employmentTypeSettings WHERE x.allowedForContactPerson=true) as filteredEmploymentType return extract(n IN filteredEmploymentType| n.id) AS extractedEmploymentTypeId \n"+
+
             "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments)\n" +
-//            "match (unitEmployments)-[:HAS_POSITION]->(p:Position{employmentType:{1}})\n" +
+            "match (unitEmployments)-[:HAS_POSITION]->(p:Position)-[:"+HAS_EMPLOYMENT_TYPE+"]->(et:EmploymentType) WHERE id(et) IN extractedEmploymentTypeId\n" +
             "return distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName")
     List<StaffPersonalDetailDTO> getAllMainEmploymentStaffDetailByUnitId(long unitId);
 
