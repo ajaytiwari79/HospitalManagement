@@ -1,8 +1,5 @@
 package com.kairos.persistence.repository.organization;
-import com.kairos.persistence.model.organization.OrgTypeExpertiseQueryResult;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
@@ -12,8 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_TYPE_HAS_SERVICES;
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORG_TYPE_HAS_EXPERTISE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -28,7 +24,8 @@ public interface OrganizationTypeGraphRepository extends GraphRepository<Organiz
     @Query("MATCH (organizationType:OrganizationType) where id(organizationType) in {0} return organizationType")
     List<OrganizationType> findByIdIn(List<Long> ids);
 
-    @Query("MATCH (ot:OrganizationType{isEnable:true})-[:BELONGS_TO]->(c:Country) WHERE id(c)= {0} return ot")
+    @Query("MATCH (ot:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(c:Country) WHERE id(c)= {0}\n" +
+            "Optional Match (ot)-[:"+HAS_LEVEL+"]->(level:Level{deleted:false}) return ot.name as name,id(ot) as id,collect(level) as levels")
     List<OrganizationType> getOrganizationTypeByCountryId(Long countryId);
 
     OrganizationType findByName(OrganizationType.OrganizationTypeEnum name);

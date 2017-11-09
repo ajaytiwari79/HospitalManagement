@@ -2,9 +2,11 @@ package com.kairos.service.country;
 
 import com.google.gson.JsonObject;
 import com.kairos.UserServiceApplication;
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
+import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,6 +44,29 @@ public class OrganizationTypeIntegrationTest {
                 baseUrl+"/country/53/organization_type",
                 HttpMethod.POST, entity, String.class);
         Assert.assertEquals(true,response.getBody().contains(organizationTypeDTO.getName()));
+    }
+
+    @Test
+    public void updateOrganizationType(){
+        String baseUrl=getBaseUrl(71L,null);
+        Level level = new Level("Regional");
+        level.setId(10980L  );
+        UpdateOrganizationTypeDTO updateOrganizationTypeDTO = new UpdateOrganizationTypeDTO("test2",Arrays.asList(level),Arrays.asList());
+        HttpEntity<UpdateOrganizationTypeDTO> entity = new HttpEntity<>(updateOrganizationTypeDTO);
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl+"/country/53/organization_type/10981",
+                HttpMethod.PUT, entity, String.class);
+        Assert.assertEquals(true,response.getBody().contains(updateOrganizationTypeDTO.getName()));
+    }
+
+    @Test
+    public void getOrgTypesByCountryId(){
+        String baseUrl=getBaseUrl(71L,null);
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl+"/country/53/organization_type",
+                HttpMethod.GET, null, String.class);
+        System.out.println(response.getBody());
+        Assert.assertNotNull(response.getBody());
     }
 
     public final String getBaseUrl(Long organizationId,Long unitId){

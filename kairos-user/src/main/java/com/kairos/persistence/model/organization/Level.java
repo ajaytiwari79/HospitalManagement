@@ -14,6 +14,8 @@ public class Level extends UserBaseEntity {
     private String name;
     private String description;
     private boolean isEnabled = true;
+    private boolean deleted;
+
 
     public Level() {
         //default constructor
@@ -45,5 +47,13 @@ public class Level extends UserBaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
