@@ -327,7 +327,7 @@ public class WTAService extends UserBaseService {
 
     }
 
-    private WTABaseRuleTemplate createCopyOfPrevious(WTARuleTemplateQueryResponse wtaBaseRuleTemplate) {
+    protected WTABaseRuleTemplate createCopyOfPrevious(WTARuleTemplateQueryResponse wtaBaseRuleTemplate) {
         WTABaseRuleTemplate wtaBaseRuleTemplateCopy = null;
         switch (wtaBaseRuleTemplate.getTemplateType()) {
             case TEMPLATE1:
