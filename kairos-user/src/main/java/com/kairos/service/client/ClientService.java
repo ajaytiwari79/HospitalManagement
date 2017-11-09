@@ -49,9 +49,11 @@ import org.joda.time.DateTime;
 import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.template.Neo4jOperations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.inject.Inject;
 import java.text.ParseException;
@@ -608,6 +610,9 @@ public class ClientService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect client " + clientId);
         }
         Client houseHold = saveDetailsOfHouseHold(minimumDTO);
+        if(Optional.ofNullable(houseHold.getId()).isPresent()){
+            clientGraphRepository.deleteHouseHoldWhoseAddressNotSame(client.getId(),houseHold.getId());
+        }
         saveAddressOfHouseHold(client, houseHold);
         if (Optional.ofNullable(houseHold.getId()).isPresent()) {
             if(houseHold.getId().equals(clientId)){
@@ -663,6 +668,7 @@ public class ClientService extends UserBaseService {
             houseHold.setHomeAddress(client.getHomeAddress());
         }
     }
+
 
 
     public List<ClientMinimumDTO> getPeopleInHousehold(long clientId) {
@@ -1389,7 +1395,8 @@ public class ClientService extends UserBaseService {
 
     public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId){
         List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllMainEmploymentStaffDetailByUnitId(unitId, Position.EmploymentType.FULL_TIME);
+        // TODO Fetch list of staff according to employment type ( According to dynamic value of employmnet type )
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllMainEmploymentStaffDetailByUnitId(unitId);
         List<ClientMinimumDTO> clientMinimumDTOs =  getPeopleInHousehold(clientId);
         List<Long> houseHoldIds = clientGraphRepository.getPeopleInHouseholdIdList(clientId);
         houseHoldIds.add(clientId);
@@ -1435,7 +1442,6 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
         }
 
         return clientContactPersonStructuredData;
-
     }
 
     public void saveContactPersonWithGivenRelation(Long clientId, Long serviceId, Long staffId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, List<Long> households){
@@ -1560,6 +1566,19 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
 
         return response;
+    }
+
+    public ClientContactPersonStructuredData updateContactPerson(Long clientId,ContactPersonDTO contactPersonDTO){
+        Client client = clientGraphRepository.findOne(clientId);
+        if(!Optional.ofNullable(client).isPresent()){
+            throw new DataNotFoundByIdException("Client is not found with client id " + clientId);
+        }
+        deleteContactPersonForService(contactPersonDTO.getServiceTypeId(),clientId);
+        return saveContactPerson(clientId,contactPersonDTO);
+    }
+
+    private void deleteContactPersonForService(Long organizationServiceId,Long clientId){
+        clientGraphRepository.deleteContactPersonForService(organizationServiceId,clientId);
     }
 
 }

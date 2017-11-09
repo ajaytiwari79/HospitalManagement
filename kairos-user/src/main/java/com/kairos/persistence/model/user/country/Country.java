@@ -72,6 +72,9 @@ public class Country extends UserBaseEntity {
     @Relationship(type = HAS_RESOURCES)
     private List<Vehicle> resources;
 
+    @Relationship(type = HAS_EMPLOYMENT_TYPE)
+    private List<EmploymentType> employmentTypeList;
+
     public Country() {
     }
 
@@ -149,6 +152,20 @@ public class Country extends UserBaseEntity {
 
     public void setOrganizationServices(List<OrganizationService> organizationServices) {
         this.organizationServices = organizationServices;
+    }
+
+    public void setEmploymentTypeList(List<EmploymentType> employmentTypeList) {
+        this.employmentTypeList = employmentTypeList;
+    }
+
+    public void addEmploymentType(EmploymentType employmentType){
+        List<EmploymentType> employmentTypeList = Optional.ofNullable(this.employmentTypeList).orElse(new ArrayList<>());
+        employmentTypeList.add(employmentType);
+        this.employmentTypeList = employmentTypeList;
+    }
+
+    public List<EmploymentType> getEmploymentTypeList() {
+        return employmentTypeList;
     }
 
     public List<RuleTemplateCategory> getRuleTemplateCategories() {

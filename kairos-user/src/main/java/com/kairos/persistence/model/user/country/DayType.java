@@ -23,7 +23,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 public class DayType  extends UserBaseEntity {
     @NotEmpty(message = "error.DayType.name.notEmpty") @NotNull(message = "error.DayType.name.notnull")
     private String name;
-
     @NotNull
     int code;
 
@@ -120,6 +119,7 @@ public class DayType  extends UserBaseEntity {
         map.put("lastModificationDate",this.getLastModificationDate());
         map.put("creationDate",this.getCreationDate());
         map.put("allowTimeSettings",this.isAllowTimeSettings());
+        map.put("validDays",this.getValidDays());
         return map;
     }
 }

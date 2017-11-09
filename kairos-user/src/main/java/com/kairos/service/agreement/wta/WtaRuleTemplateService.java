@@ -4,7 +4,10 @@ package com.kairos.service.agreement.wta;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.persistence.model.user.agreement.wta.templates.*;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplateDTO;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
@@ -14,7 +17,8 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.WTARuleTemplateDTO;
 import com.kairos.response.dto.web.WtaRuleTemplateDTO;
 import com.kairos.service.UserBaseService;
-import org.apache.commons.collections.map.HashedMap;
+import com.kairos.util.ArrayUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -57,7 +61,7 @@ public class WtaRuleTemplateService extends UserBaseService {
 
 
         RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("NONE");
-        ruleTemplateCategoryService.createRuleTemplate(countryId, ruleTemplateCategory);
+        ruleTemplateCategoryService.createRuleTemplateCategory(countryId, ruleTemplateCategory);
         ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE");
         String MONTHS = "MONTHS";
         String TUESDAY = "TUESDAY";
@@ -166,7 +170,7 @@ public class WtaRuleTemplateService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Country");
         }
 
-        List<RuleTemplateCategory> categoryList =  ruleTemplateCategoryRepository.getAllRulesOfCountry(countryId);
+        List<RuleTemplateCategory> categoryList = ruleTemplateCategoryRepository.getAllRulesOfCountry(countryId);
 
         if (categoryList == null) {
             throw new DataNotFoundByIdException("Category List is null");
@@ -193,12 +197,12 @@ public class WtaRuleTemplateService extends UserBaseService {
 
         WTABaseRuleTemplate oldTemplate = wtaRuleTemplateGraphRepository.findOne(templateDTO.getId());
         if (!Optional.ofNullable(oldTemplate).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid TemplateType id "+ templateDTO.getId());
+            throw new DataNotFoundByIdException("Invalid TemplateType id " + templateDTO.getId());
         }
         switch (oldTemplate.getTemplateType()) {
 
             case TEMPLATE1:
-                MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = (MaximumShiftLengthWTATemplate) getTemplateByType(countryId, templateType);
+                MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = (MaximumShiftLengthWTATemplate) oldTemplate;//oldTemplate;
 
                 maximumShiftLengthWTATemplate.setDescription(templateDTO.getDescription());
                 maximumShiftLengthWTATemplate.setTimeLimit(templateDTO.getTimeLimit());
@@ -210,7 +214,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 break;
 
             case TEMPLATE2:
-                MinimumShiftLengthWTATemplate minimumShiftLengthWTATemplate = (MinimumShiftLengthWTATemplate) getTemplateByType(countryId, templateType);
+                MinimumShiftLengthWTATemplate minimumShiftLengthWTATemplate = (MinimumShiftLengthWTATemplate) oldTemplate;
                 minimumShiftLengthWTATemplate.setDescription(templateDTO.getDescription());
                 minimumShiftLengthWTATemplate.setTimeLimit(templateDTO.getTimeLimit());
                 minimumShiftLengthWTATemplate.setBalanceType(templateDTO.getBalanceType());
@@ -220,7 +224,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 break;
 
             case TEMPLATE3:
-                MaximumConsecutiveWorkingDaysWTATemplate maximumConsecutiveWorkingDaysWTATemplate = (MaximumConsecutiveWorkingDaysWTATemplate) getTemplateByType(countryId, templateType);
+                MaximumConsecutiveWorkingDaysWTATemplate maximumConsecutiveWorkingDaysWTATemplate = (MaximumConsecutiveWorkingDaysWTATemplate) oldTemplate;
                 maximumConsecutiveWorkingDaysWTATemplate.setActive(templateDTO.isActive());
 
                 maximumConsecutiveWorkingDaysWTATemplate.setDescription(templateDTO.getDescription());
@@ -231,7 +235,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 break;
 
             case TEMPLATE4:
-                MinimumRestInConsecutiveDaysWTATemplate minimumRestInConsecutiveDaysWTATemplate = (MinimumRestInConsecutiveDaysWTATemplate) getTemplateByType(countryId, templateType);
+                MinimumRestInConsecutiveDaysWTATemplate minimumRestInConsecutiveDaysWTATemplate = (MinimumRestInConsecutiveDaysWTATemplate) oldTemplate;
                 minimumRestInConsecutiveDaysWTATemplate.setActive(templateDTO.isActive());
                 minimumRestInConsecutiveDaysWTATemplate.setDescription(templateDTO.getDescription());
                 minimumRestInConsecutiveDaysWTATemplate.setMinimumRest(templateDTO.getMinimumRest());
@@ -241,7 +245,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 break;
 
             case TEMPLATE5:
-                MaximumNightShiftLengthWTATemplate maximumNightShiftLengthWTATemplate = (MaximumNightShiftLengthWTATemplate) getTemplateByType(countryId, templateType);
+                MaximumNightShiftLengthWTATemplate maximumNightShiftLengthWTATemplate = (MaximumNightShiftLengthWTATemplate) oldTemplate;
                 maximumNightShiftLengthWTATemplate.setDescription(templateDTO.getDescription());
                 maximumNightShiftLengthWTATemplate.setTimeLimit(templateDTO.getTimeLimit());
                 maximumNightShiftLengthWTATemplate.setBalanceType(templateDTO.getBalanceType());
@@ -251,7 +255,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 break;
 
             case TEMPLATE6:
-                MinimumConsecutiveNightsWTATemplate minimumConsecutiveNightsWTATemplate = (MinimumConsecutiveNightsWTATemplate) getTemplateByType(countryId, templateType);
+                MinimumConsecutiveNightsWTATemplate minimumConsecutiveNightsWTATemplate = (MinimumConsecutiveNightsWTATemplate) oldTemplate;
                 minimumConsecutiveNightsWTATemplate.setActive(templateDTO.isActive());
                 minimumConsecutiveNightsWTATemplate.setDescription(templateDTO.getDescription());
                 minimumConsecutiveNightsWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
@@ -259,7 +263,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 break;
 
             case TEMPLATE7:
-                MaximumConsecutiveWorkingNightsWTATemplate maximumConsecutiveWorkingNights = (MaximumConsecutiveWorkingNightsWTATemplate) getTemplateByType(countryId, templateType);
+                MaximumConsecutiveWorkingNightsWTATemplate maximumConsecutiveWorkingNights = (MaximumConsecutiveWorkingNightsWTATemplate) oldTemplate;//oldTemplate;
                 maximumConsecutiveWorkingNights.setActive(templateDTO.isActive());
                 maximumConsecutiveWorkingNights.setDescription(templateDTO.getDescription());
                 maximumConsecutiveWorkingNights.setNightsWorked(templateDTO.getNightsWorked());
@@ -268,7 +272,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(maximumConsecutiveWorkingNights);
                 break;
             case TEMPLATE8:
-                MinimumRestConsecutiveNightsWTATemplate minimumRestConsecutiveNightsWTATemplate = (MinimumRestConsecutiveNightsWTATemplate) getTemplateByType(countryId, templateType);
+                MinimumRestConsecutiveNightsWTATemplate minimumRestConsecutiveNightsWTATemplate = (MinimumRestConsecutiveNightsWTATemplate) oldTemplate;
                 minimumRestConsecutiveNightsWTATemplate.setActive(templateDTO.isActive());
                 minimumRestConsecutiveNightsWTATemplate.setDescription(templateDTO.getDescription());
                 minimumRestConsecutiveNightsWTATemplate.setNightsWorked(templateDTO.getNightsWorked());
@@ -277,7 +281,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(minimumRestConsecutiveNightsWTATemplate);
                 break;
             case TEMPLATE9:
-                MaximumNumberOfNightsWTATemplate maximumNumberOfNightsWTATemplate = (MaximumNumberOfNightsWTATemplate) getTemplateByType(countryId, templateType);
+                MaximumNumberOfNightsWTATemplate maximumNumberOfNightsWTATemplate = (MaximumNumberOfNightsWTATemplate) oldTemplate;
                 maximumNumberOfNightsWTATemplate.setActive(templateDTO.isActive());
                 maximumNumberOfNightsWTATemplate.setDescription(templateDTO.getDescription());
                 maximumNumberOfNightsWTATemplate.setNightsWorked(templateDTO.getNightsWorked());
@@ -288,7 +292,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(maximumNumberOfNightsWTATemplate);
                 break;
             case TEMPLATE10:
-                MaximumDaysOffInPeriodWTATemplate maximumDaysOffInPeriodWTATemplate = (MaximumDaysOffInPeriodWTATemplate) getTemplateByType(countryId, templateType);
+                MaximumDaysOffInPeriodWTATemplate maximumDaysOffInPeriodWTATemplate = (MaximumDaysOffInPeriodWTATemplate) oldTemplate;
                 maximumDaysOffInPeriodWTATemplate.setActive(templateDTO.isActive());
 
                 maximumDaysOffInPeriodWTATemplate.setDescription(templateDTO.getDescription());
@@ -300,7 +304,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(maximumDaysOffInPeriodWTATemplate);
                 break;
             case TEMPLATE11:
-                MaximumAverageScheduledTimeWTATemplate maximumAverageScheduledTimeWTATemplate = (MaximumAverageScheduledTimeWTATemplate) getTemplateByType(countryId, templateType);
+                MaximumAverageScheduledTimeWTATemplate maximumAverageScheduledTimeWTATemplate = (MaximumAverageScheduledTimeWTATemplate) oldTemplate;
                 maximumAverageScheduledTimeWTATemplate.setDescription(templateDTO.getDescription());
                 maximumAverageScheduledTimeWTATemplate.setUseShiftTimes(templateDTO.isUseShiftTimes());
                 maximumAverageScheduledTimeWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
@@ -314,14 +318,14 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(maximumAverageScheduledTimeWTATemplate);
                 break;
             case TEMPLATE12:
-                MaximumVetoPerPeriodWTATemplate maximumVetoPerPeriodWTATemplate = (MaximumVetoPerPeriodWTATemplate) getTemplateByType(countryId, templateType);
+                MaximumVetoPerPeriodWTATemplate maximumVetoPerPeriodWTATemplate = (MaximumVetoPerPeriodWTATemplate) oldTemplate;
                 maximumVetoPerPeriodWTATemplate.setActive(templateDTO.isActive());
                 maximumVetoPerPeriodWTATemplate.setDescription(templateDTO.getDescription());
                 maximumVetoPerPeriodWTATemplate.setMaximumVetoPercentage(templateDTO.getMaximumVetoPercentage());
                 oldTemplate = save(maximumVetoPerPeriodWTATemplate);
                 break;
             case TEMPLATE13:
-                NumberOfWeekendShiftInPeriodWTATemplate numberOfWeekendShiftInPeriodWTATemplate = (NumberOfWeekendShiftInPeriodWTATemplate) getTemplateByType(countryId, templateType);
+                NumberOfWeekendShiftInPeriodWTATemplate numberOfWeekendShiftInPeriodWTATemplate = (NumberOfWeekendShiftInPeriodWTATemplate) oldTemplate;
                 numberOfWeekendShiftInPeriodWTATemplate.setActive(templateDTO.isActive());
                 numberOfWeekendShiftInPeriodWTATemplate.setDescription(templateDTO.getDescription());
                 numberOfWeekendShiftInPeriodWTATemplate.setNumberShiftsPerPeriod(templateDTO.getNumberShiftsPerPeriod());
@@ -334,7 +338,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(numberOfWeekendShiftInPeriodWTATemplate);
                 break;
             case TEMPLATE14:
-                CareDayCheckWTATemplate careDayCheckWTATemplate = (CareDayCheckWTATemplate) getTemplateByType(countryId, templateType);
+                CareDayCheckWTATemplate careDayCheckWTATemplate = (CareDayCheckWTATemplate) oldTemplate;
                 careDayCheckWTATemplate.setActive(templateDTO.isActive());
                 careDayCheckWTATemplate.setDescription(templateDTO.getDescription());
                 careDayCheckWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
@@ -344,7 +348,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(careDayCheckWTATemplate);
                 break;
             case TEMPLATE15:
-                MinimumDailyRestingTimeWTATemplate minimumDailyRestingTimeWTATemplate = (MinimumDailyRestingTimeWTATemplate) getTemplateByType(countryId, templateType);
+                MinimumDailyRestingTimeWTATemplate minimumDailyRestingTimeWTATemplate = (MinimumDailyRestingTimeWTATemplate) oldTemplate;
                 minimumDailyRestingTimeWTATemplate.setActive(templateDTO.isActive());
                 minimumDailyRestingTimeWTATemplate.setId(oldTemplate.getId());
                 minimumDailyRestingTimeWTATemplate.setDescription(templateDTO.getDescription());
@@ -352,7 +356,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(minimumDailyRestingTimeWTATemplate);
                 break;
             case TEMPLATE16:
-                MinimumDurationBetweenShiftWTATemplate minimumDurationBetweenShiftWTATemplate = (MinimumDurationBetweenShiftWTATemplate) getTemplateByType(countryId, templateType);
+                MinimumDurationBetweenShiftWTATemplate minimumDurationBetweenShiftWTATemplate = (MinimumDurationBetweenShiftWTATemplate) oldTemplate;
                 minimumDurationBetweenShiftWTATemplate.setDescription(templateDTO.getDescription());
                 minimumDurationBetweenShiftWTATemplate.setActive(templateDTO.isActive());
 
@@ -361,14 +365,14 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(minimumDurationBetweenShiftWTATemplate);
                 break;
             case TEMPLATE17:
-                MinimumWeeklyRestPeriodWTATemplate minimumWeeklyRestPeriodWTATemplate = (MinimumWeeklyRestPeriodWTATemplate) getTemplateByType(countryId, templateType);
+                MinimumWeeklyRestPeriodWTATemplate minimumWeeklyRestPeriodWTATemplate = (MinimumWeeklyRestPeriodWTATemplate) oldTemplate;
                 minimumWeeklyRestPeriodWTATemplate.setActive(templateDTO.isActive());
                 minimumWeeklyRestPeriodWTATemplate.setDescription(templateDTO.getDescription());
                 minimumWeeklyRestPeriodWTATemplate.setContinuousWeekRest(templateDTO.getContinuousWeekRest());
                 oldTemplate = save(minimumWeeklyRestPeriodWTATemplate);
                 break;
             case TEMPLATE18:
-                ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = (ShortestAndAverageDailyRestWTATemplate) getTemplateByType(countryId, templateType);
+                ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = (ShortestAndAverageDailyRestWTATemplate) oldTemplate;
                 shortestAndAverageDailyRestWTATemplate.setActive(templateDTO.isActive());
                 shortestAndAverageDailyRestWTATemplate.setDescription(templateDTO.getDescription());
                 shortestAndAverageDailyRestWTATemplate.setBalanceType(templateDTO.getBalanceType());
@@ -381,7 +385,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(shortestAndAverageDailyRestWTATemplate);
                 break;
             case TEMPLATE19:
-                MaximumShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = (MaximumShiftsInIntervalWTATemplate) getTemplateByType(countryId, templateType);
+                MaximumShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = (MaximumShiftsInIntervalWTATemplate) oldTemplate;
                 maximumShiftsInIntervalWTATemplate.setActive(templateDTO.isActive());
                 maximumShiftsInIntervalWTATemplate.setDescription(templateDTO.getDescription());
                 maximumShiftsInIntervalWTATemplate.setBalanceType(templateDTO.getBalanceType());
@@ -393,7 +397,7 @@ public class WtaRuleTemplateService extends UserBaseService {
                 oldTemplate = save(maximumShiftsInIntervalWTATemplate);
                 break;
             case TEMPLATE20:
-                MaximumSeniorDaysInYearWTATemplate maximumSeniorDaysInYearWTATemplate = (MaximumSeniorDaysInYearWTATemplate) getTemplateByType(countryId, templateType);
+                MaximumSeniorDaysInYearWTATemplate maximumSeniorDaysInYearWTATemplate = (MaximumSeniorDaysInYearWTATemplate) oldTemplate;
                 maximumSeniorDaysInYearWTATemplate.setActive(templateDTO.isActive());
                 maximumSeniorDaysInYearWTATemplate.setDescription(templateDTO.getDescription());
                 maximumSeniorDaysInYearWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
@@ -411,14 +415,14 @@ public class WtaRuleTemplateService extends UserBaseService {
 
         wtaRuleTemplateGraphRepository.deleteCategoryFromTemplate(oldTemplate.getId());
 
-        RuleTemplateCategory templateCategory =null;
-        if(templateDTO.getCategory()==""){
-            templateCategory =   ruleTemplateCategoryRepository.findByName(countryId, "NONE");
-        }else {
-            templateCategory =   ruleTemplateCategoryRepository.findByName(countryId, templateDTO.getCategory());
+        RuleTemplateCategory templateCategory = null;
+        if (StringUtils.isEmpty(templateDTO.getCategory())) {
+            templateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE");
+        } else {
+            templateCategory = ruleTemplateCategoryRepository.findByName(countryId, templateDTO.getCategory());
         }
-        if(!Optional.ofNullable(templateCategory).isPresent())
-            throw new InvalidRequestException("Incorrect category "+templateDTO.getCategory());
+        if (!Optional.ofNullable(templateCategory).isPresent())
+            throw new InvalidRequestException("Incorrect category " + templateDTO.getCategory());
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = templateCategory.getWtaBaseRuleTemplates();
         wtaBaseRuleTemplates.add(oldTemplate);
         templateCategory.setWtaBaseRuleTemplates(wtaBaseRuleTemplates);
@@ -427,40 +431,40 @@ public class WtaRuleTemplateService extends UserBaseService {
     }
 
 
-    private WTABaseRuleTemplate getTemplateByType(Long countryId, String templateType) {
-        return countryGraphRepository.getTemplateByType(countryId, templateType);
-    }
 
+    /*
+    *
+    * This method will change the category of rule Template when we change the rule template all existing rule templates wil set to none
+     * and new rule temp wll be setted to  this new rule template category
+    * */
     public Map<String, Object> updateRuleTemplateCategory(WtaRuleTemplateDTO wtaRuleTemplateDTO, long countryId) {
-
-
-        if(wtaRuleTemplateDTO.getCategoryName()==null || wtaRuleTemplateDTO.getCategoryName().isEmpty()){
-            throw new InvalidRequestException("category name cant be null or empty!!");
-        }
-
-        wtaRuleTemplateGraphRepository.deleteOldCategories(wtaRuleTemplateDTO.getRuleTemplateIds());
-
+        // This Method will get all the previous
+        Map<String, Object> response = new HashMap();
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaRuleTemplateGraphRepository.getWtaBaseRuleTemplateByIds(wtaRuleTemplateDTO.getRuleTemplateIds());
-
-        RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, wtaRuleTemplateDTO.getCategoryName());
-        Map<String, Object> response = new HashedMap();
-        if (ruleTemplateCategory == null) {
-            ruleTemplateCategory = new RuleTemplateCategory(wtaRuleTemplateDTO.getCategoryName());
+        RuleTemplateCategory previousRuleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "(?i)" + wtaRuleTemplateDTO.getCategoryName());
+        if (!Optional.ofNullable(previousRuleTemplateCategory).isPresent()) {  // Rule Template Category does not exist So creating  a new one and adding in country
+            previousRuleTemplateCategory = new RuleTemplateCategory(wtaRuleTemplateDTO.getCategoryName());
             Country country = countryGraphRepository.findOne(countryId);
-            if (country == null) {
-                throw new InternalError("country is null");
-            }
             List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
-            ruleTemplateCategories.add(ruleTemplateCategory);
+            ruleTemplateCategories.add(previousRuleTemplateCategory);
             country.setRuleTemplateCategories(ruleTemplateCategories);
             countryGraphRepository.save(country);
-            response.put("category", ruleTemplateCategory);
+            // Break Previous Relation
+            wtaRuleTemplateGraphRepository.deleteOldCategories(wtaRuleTemplateDTO.getRuleTemplateIds());
+            previousRuleTemplateCategory.setWtaBaseRuleTemplates(wtaBaseRuleTemplates);
+            save(previousRuleTemplateCategory);
+            response.put("category", previousRuleTemplateCategory);
+            response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, previousRuleTemplateCategory));
+
+        } else {
+            List<Long> previousBaseRuleTemplates = ruleTemplateCategoryRepository.findAllExistingRuleTemplateAddedToThiscategory(wtaRuleTemplateDTO.getCategoryName(), countryId);
+            List<Long> newRuleTemplates = wtaRuleTemplateDTO.getRuleTemplateIds();
+            List<Long> ruleTemplateIdsNeedToAddInCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(previousBaseRuleTemplates, newRuleTemplates);
+            List<Long> ruleTemplateIdsNeedToRemoveFromCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(newRuleTemplates, previousBaseRuleTemplates);
+            ruleTemplateCategoryRepository.updateCategoryOfRuleTemplate(ruleTemplateIdsNeedToAddInCategory, wtaRuleTemplateDTO.getCategoryName());
+            ruleTemplateCategoryRepository.updateCategoryOfRuleTemplate(ruleTemplateIdsNeedToRemoveFromCategory, "NONE");
+            response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, previousRuleTemplateCategory));
         }
-        List<WTABaseRuleTemplate> baseRuleTemplates = ruleTemplateCategory.getWtaBaseRuleTemplates();
-        baseRuleTemplates.addAll(wtaBaseRuleTemplates);
-        ruleTemplateCategory.setWtaBaseRuleTemplates(baseRuleTemplates);
-        save(ruleTemplateCategory);
-        response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, ruleTemplateCategory));
         return response;
     }
 
@@ -476,7 +480,8 @@ public class WtaRuleTemplateService extends UserBaseService {
 
         return wtaBaseRuleTemplateDTOS;
     }
-    public  WTARuleTemplateQueryResponse getRuleTemplateById(Long ruleTemplateId){
+
+    public WTARuleTemplateQueryResponse getRuleTemplateById(Long ruleTemplateId) {
         return wtaRuleTemplateGraphRepository.getRuleTemplateAndCategoryById(ruleTemplateId);
     }
 

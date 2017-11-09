@@ -13,7 +13,7 @@ public enum Day {
 
     @JsonValue
     public String toJson() {
-        return name().toLowerCase();
+        return name();
     }
 
     public static <T extends Enum<T>> T getEnumFromString(Class<T> enumClass, String value) {

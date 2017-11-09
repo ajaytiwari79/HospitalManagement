@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.position;
 
+import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -17,11 +18,8 @@ public class PositionQueryResult {
     private int totalWeeklyHours;
     private float avgDailyWorkingHours;
     private float hourlyWages;
-    public enum EmploymentType{
-        FULL_TIME,PART_TIME
-    };
     private long id;
-    private Position.EmploymentType employmentType;
+    private EmploymentType employmentType;
     private float salary;
 
     private PositionName positionName;
@@ -91,11 +89,11 @@ public class PositionQueryResult {
         this.hourlyWages = hourlyWages;
     }
 
-    public Position.EmploymentType getEmploymentType() {
+    public EmploymentType getEmploymentType() {
         return employmentType;
     }
 
-    public void setEmploymentType(Position.EmploymentType employmentType) {
+    public void setEmploymentType(EmploymentType employmentType) {
         this.employmentType = employmentType;
     }
 

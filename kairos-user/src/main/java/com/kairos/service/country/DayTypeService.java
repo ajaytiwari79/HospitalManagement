@@ -66,6 +66,7 @@ public class DayTypeService extends UserBaseService {
             currentDayType.setColorCode(dayType.getColorCode());
             currentDayType.setDescription(dayType.getDescription());
             currentDayType.setAllowTimeSettings(dayType.isAllowTimeSettings());
+            currentDayType.setValidDays(dayType.getValidDays());
             save(currentDayType);
             return currentDayType.retrieveDetails();
         }
@@ -105,7 +106,6 @@ public class DayTypeService extends UserBaseService {
             List<DayType> dayTypes=new ArrayList<>();
             dayTypes.add( countryHolidayCalender.get().getDayType()) ;
           return  dayTypes;
-
         }else{
             Instant instant = Instant.ofEpochMilli(date.getTime());
             LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());

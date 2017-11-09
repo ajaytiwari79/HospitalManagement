@@ -119,8 +119,8 @@ public class WTAController {
 
     @ApiOperation(value = "link unlink wta with org Type")
     @PutMapping(value = COUNTRY_URL + "/organization_type/{organizationSubTypeId}/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> setWtaWithOrganizationType(@PathVariable long wtaId, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setWtaWithOrganizationType(wtaId, organizationSubTypeId, checked));
+    public ResponseEntity<Map<String, Object>> setWtaWithOrganizationType(@PathVariable long countryId,@PathVariable long wtaId, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setWtaWithOrganizationType(countryId,wtaId, organizationSubTypeId, checked));
     }
 
 }

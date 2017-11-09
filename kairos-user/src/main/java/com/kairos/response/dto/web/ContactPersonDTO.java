@@ -1,5 +1,6 @@
 package com.kairos.response.dto.web;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -7,12 +8,22 @@ import java.util.List;
  */
 public class ContactPersonDTO {
 
+    @NotNull(message = "Serviceid can't be null")
     private Long serviceTypeId;
     private Long  primaryStaffId;
     private Long secondaryStaffId1;
     private Long  secondaryStaffId2;
     private Long secondaryStaffId3;
     private List<Long> houseHoldMembers;
+
+    public ContactPersonDTO(){//default constructor
+        }
+
+    public ContactPersonDTO(Long serviceTypeId, Long primaryStaffId, List<Long> houseHoldMembers) {
+        this.serviceTypeId = serviceTypeId;
+        this.primaryStaffId = primaryStaffId;
+        this.houseHoldMembers = houseHoldMembers;
+    }
 
     public Long getServiceTypeId() {
         return serviceTypeId;
