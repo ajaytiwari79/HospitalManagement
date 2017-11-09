@@ -716,6 +716,13 @@ public class ClientController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.saveContactPerson(clientId, contactPersonDTO));
     }
 
+    //Prefer Staff
+    @ApiOperation("Update contact person")
+    @RequestMapping(value = "/{clientId}/staff/contact-person",method = RequestMethod.PUT)
+    ResponseEntity<Map<String,Object>> updateContactPerson(@PathVariable Long clientId,@Valid @RequestBody ContactPersonDTO contactPersonDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.updateContactPerson(clientId,contactPersonDTO));
+    }
+
 
 
 
