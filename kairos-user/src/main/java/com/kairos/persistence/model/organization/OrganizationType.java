@@ -31,7 +31,7 @@ public class OrganizationType extends UserBaseEntity {
     @NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull")
     private String name;
 
-//    @NotEmpty(message = "error.OrganizationType.description.notEmpty") @NotNull(message = "error.OrganizationType.description.notnull")
+    //    @NotEmpty(message = "error.OrganizationType.description.notEmpty") @NotNull(message = "error.OrganizationType.description.notnull")
     private String description;
 
 
@@ -44,6 +44,13 @@ public class OrganizationType extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Country country;
 
+    private List<Level> levels;
+
+    public OrganizationType(String name, Country country, List<Level> levels) {
+        this.name = name;
+        this.country = country;
+        this.levels = levels;
+    }
 
     public boolean isEnable() {
         return isEnable;
@@ -101,6 +108,14 @@ public class OrganizationType extends UserBaseEntity {
     public OrganizationType(String name, List<OrganizationService> organizationServiceList) {
         this.name = name;
         this.organizationServiceList = organizationServiceList;
+    }
+
+    public List<Level> getLevels() {
+        return levels;
+    }
+
+    public void setLevels(List<Level> levels) {
+        this.levels = levels;
     }
 
     public OrganizationType(){}

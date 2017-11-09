@@ -15,6 +15,14 @@ public class Level extends UserBaseEntity {
     private String description;
     private boolean isEnabled = true;
 
+    public Level() {
+        //default constructor
+    }
+
+    public Level(String name) {
+        this.name = name;
+    }
+
     public boolean isEnabled() {
         return isEnabled;
     }
