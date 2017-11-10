@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -29,7 +30,7 @@ public class PresenceTypeService extends UserBaseService {
     private PresenceTypeRepository presenceTypeRepository;
 
     public PresenceTypeDTO addPresenceType(PresenceTypeDTO presenceTypeDTO, Long countryId) {
-        logger.info(presenceTypeDTO.toString());
+
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             logger.error("Country not found by Id while creating Presence type in country" + countryId);
@@ -46,6 +47,43 @@ public class PresenceTypeService extends UserBaseService {
         save(presenceType);
         presenceTypeDTO.setId(presenceType.getId());
         logger.info(presenceType.toString());
+        return presenceTypeDTO;
+    }
+
+    public List<PresenceTypeDTO> getAllPresenceTypeByCountry(Long countryId) {
+        Country country = countryGraphRepository.findOne(countryId);
+        if (!Optional.ofNullable(country).isPresent()) {
+            logger.error("Country not found by Id while creating Presence type in country" + countryId);
+            throw new DataNotFoundByIdException("Invalid Country");
+        }
+        return presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
+    }
+
+    public boolean deletePresenceTypeById(Long presenceTypeId) {
+        PresenceType presenceType = presenceTypeRepository.findOne(presenceTypeId);
+        if (!Optional.ofNullable(presenceType).isPresent()) {
+            logger.error("Presence type not found by Id removing" + presenceTypeId);
+            throw new DataNotFoundByIdException("Presence type not found");
+        }
+        presenceType.setDeleted(true);
+        save(presenceType);
+        return true;
+    }
+
+    public PresenceTypeDTO updatePresenceType(Long countryId, Long presenceTypeId, PresenceTypeDTO presenceTypeDTO) {
+        boolean unique = presenceTypeRepository.findByNameAndDeletedAndCountryIdExcludingCurrent(countryId, presenceTypeId, "(?i)" + presenceTypeDTO.getName(), false);
+        if (unique) {
+            throw new DataNotFoundByIdException("A Presence type Already exist by the new name" + presenceTypeDTO.getName());
+        }
+        logger.info(unique + "I need to");
+        PresenceType presenceType = presenceTypeRepository.findOne(presenceTypeId);
+        if (!Optional.ofNullable(presenceType).isPresent()) {
+            logger.error("Presence type not found by Id removing" + presenceTypeId);
+            throw new DataNotFoundByIdException("Presence type not found");
+        }
+
+        presenceType.setName(presenceTypeDTO.getName());
+        save(presenceType);
         return presenceTypeDTO;
     }
 

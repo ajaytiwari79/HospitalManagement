@@ -1,6 +1,7 @@
 package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.dto.timeType.PresenceTypeDTO;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -33,16 +35,54 @@ public class PresenceTypeServiceIntegrationTest {
     Long createdId;
 
     @Test
-    public void AddPresenceType() throws Exception {
+    public void test1_AddPresenceType() throws Exception {
+        System.out.println(new Date() + "first");
+        String baseUrl = getBaseUrl(71L, 53L);
+        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PRESENCE TYPE" + new Date().getTime());
+        HttpEntity<PresenceTypeDTO> requestBodyData = new HttpEntity<>(presenceTypeDTO);
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<PresenceTypeDTO>> response = restTemplate.exchange(
+                baseUrl + "/presenceType",
+                HttpMethod.POST, requestBodyData, typeReference);
+        Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()));
+        createdId = response.getBody().getData().getId();
+    }
+
+    @Test
+    public void test2_getAllPresenceTypeByCountry() throws Exception {
+        System.out.println(new Date() + "test2_getAllPresenceTypeByCountry");
+        String baseUrl = getBaseUrl(71L, 53L);
+        ResponseEntity<PresenceTypeDTO> response = restTemplate.exchange(
+                baseUrl + "/presenceType",
+                HttpMethod.GET, null, PresenceTypeDTO.class);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void test4_DeletePresenceTypeById() throws Exception {
+        System.out.println(new Date() + "test4_DeletePresenceTypeById");
+        String baseUrl = getBaseUrl(71L, 53L);
+        ResponseEntity<PresenceTypeDTO> response = restTemplate.exchange(
+                baseUrl + "/presenceType/" + createdId,
+                HttpMethod.DELETE, null, PresenceTypeDTO.class);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void test3_updatePresenceType() throws Exception {
+        System.out.println(new Date() + "test3_updatePresenceType");
         String baseUrl = getBaseUrl(71L, 53L);
         PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PRESENCE TYPE" + new Date().getTime());
         HttpEntity<PresenceTypeDTO> requestBodyData = new HttpEntity<>(presenceTypeDTO);
         ResponseEntity<PresenceTypeDTO> response = restTemplate.exchange(
-                baseUrl + "/presenceType",
-                HttpMethod.POST, requestBodyData, PresenceTypeDTO.class);
-        Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()));
+                baseUrl + "/presenceType/" + createdId,
+                HttpMethod.PUT, requestBodyData, PresenceTypeDTO.class);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdId = response.getBody().getId();
-        System.out.println(createdId + "CREATED ID ");
     }
 
     public final String getBaseUrl(Long organizationId, Long countryId) {
