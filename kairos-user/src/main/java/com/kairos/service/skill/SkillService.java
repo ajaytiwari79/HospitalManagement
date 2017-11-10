@@ -19,6 +19,7 @@ import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
@@ -323,7 +324,7 @@ public class SkillService extends UserBaseService {
      * @param visitourId
      * @return
      */
-    public boolean updateVisitourIdOfSkill(long unitId, long skillId, String visitourId,String type) {
+   /* public boolean updateVisitourIdOfSkill(long unitId, long skillId, String visitourId,String type) {
 
         if(ORGANIZATION.equalsIgnoreCase(type)){
             return skillGraphRepository.updateVisitourIdOfSkillInOrganization(unitId, skillId, visitourId);
@@ -332,8 +333,18 @@ public class SkillService extends UserBaseService {
         } else {
             throw new InternalError("Type incorrect");
         }
-    }
+    }*/
 
+    public boolean updateSkillOfOrganization(long unitId, long skillId, String type, OrganizationSkillDTO organizationSkillDTO) {
+
+        if(ORGANIZATION.equalsIgnoreCase(type)){
+            return skillGraphRepository.updateSkillOfOrganization(unitId, skillId, organizationSkillDTO.getVisitourId(), organizationSkillDTO.getCustomName());
+        } else if(TEAM.equalsIgnoreCase(type)) {
+            return skillGraphRepository.updateVisitourIdOfSkillInTeam(unitId,skillId,organizationSkillDTO.getVisitourId());
+        } else {
+            throw new InternalError("Type incorrect");
+        }
+    }
 
     public boolean requestForCreateNewSkill(long unitId, Skill skill) {
         Organization organization = organizationGraphRepository.findOne(unitId);
