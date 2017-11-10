@@ -3,7 +3,7 @@ package com.kairos.service.country;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.dto.timeType.TimeTypeDTO;
+import com.kairos.response.dto.web.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.TimeType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

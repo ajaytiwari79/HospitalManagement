@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.persistence.model.dto.timeType.PresenceTypeDTO;
+import com.kairos.response.dto.web.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.user.country.PresenceType;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
@@ -18,7 +18,7 @@ public interface PresenceTypeRepository extends GraphRepository<PresenceType> {
     @Query("match(presenceType:PresenceType)-[:" + BELONGS_TO + "]-> (country:Country) where Id(country)={2} AND presenceType.name =~ {0} AND presenceType.deleted={1} return presenceType")
     PresenceType findByNameAndDeletedAndCountryId(String name, boolean deleted, Long countryId);
 
-    @Query("match(presenceType:PresenceType)-[:" + BELONGS_TO + "]-> (country:Country) where Id(country)={0} AND presenceType.deleted={1} return presenceType")
+    @Query("match(presenceType:PresenceType)-[:" + BELONGS_TO + "]-> (country:Country) where Id(country)={0} AND presenceType.deleted={1} return id(presenceType) as id,presenceType.name as name")
     List<PresenceTypeDTO> getAllPresenceTypeByCountryId(Long countryId, boolean deleted);
 
     @Query("match(presenceType:PresenceType)-[:" + BELONGS_TO + "]-> (country:Country) where Id(country)={0} AND presenceType.deleted={3} AND Id(presenceType) <> {1} AND presenceType.name =~ {2} \n"+

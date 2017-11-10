@@ -1,7 +1,8 @@
-package com.kairos.persistence.model.dto.timeType;
+package com.kairos.response.dto.web.timetype;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -13,11 +14,11 @@ import javax.validation.constraints.NotNull;
 @QueryResult
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PresenceTypeDTO {
+public class PresenceTypeDTO extends UserBaseEntity {
     @NotEmpty(message = "error.PresenceTypeDTO.name.notEmpty")
     @NotNull(message = "error.PresenceTypeDTO.name.notnull")
     private String name;
-    private Long Id;
+    private Long id;
 
     public String getName() {
         return name;
@@ -36,18 +37,18 @@ public class PresenceTypeDTO {
     }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        this.id = id;
     }
 
     @Override
     public String toString() {
         return "PresenceTypeDTO{" +
                 "name='" + name + '\'' +
-                ", Id=" + Id +
+                ", id=" + id +
                 '}';
     }
 

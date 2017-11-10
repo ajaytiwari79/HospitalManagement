@@ -1,7 +1,7 @@
 package com.kairos.controller.country;
 
-import com.kairos.persistence.model.dto.timeType.PresenceTypeDTO;
-import com.kairos.persistence.model.dto.timeType.TimeTypeDTO;
+import com.kairos.response.dto.web.timetype.PresenceTypeDTO;
+import com.kairos.response.dto.web.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrgTypeExpertiseDTO;
 import com.kairos.persistence.model.organization.OrganizationType;

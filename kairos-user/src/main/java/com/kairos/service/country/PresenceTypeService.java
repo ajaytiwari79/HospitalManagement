@@ -2,7 +2,7 @@ package com.kairos.service.country;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.dto.timeType.PresenceTypeDTO;
+import com.kairos.response.dto.web.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.PresenceType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -56,7 +56,11 @@ public class PresenceTypeService extends UserBaseService {
             logger.error("Country not found by Id while creating Presence type in country" + countryId);
             throw new DataNotFoundByIdException("Invalid Country");
         }
-        return presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
+        List<PresenceTypeDTO> presenceTypeDTOList =
+        presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
+        System.out.println(presenceTypeDTOList.toString());
+
+        return presenceTypeDTOList;
     }
 
     public boolean deletePresenceTypeById(Long presenceTypeId) {
