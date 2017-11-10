@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.dto;
+package com.kairos.persistence.model.dto.timeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -22,7 +22,7 @@ public class TimeTypeDTO extends UserBaseEntity {
     private boolean includeInTimeBank = true;
     private Long countryId;
     @JsonIgnore
-    private boolean enabled = true;
+    private boolean deleted ;
     private boolean negativeDayBalancePresent;
     private boolean onCallTime;
 
@@ -60,12 +60,12 @@ public class TimeTypeDTO extends UserBaseEntity {
         this.countryId = countryId;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public boolean isNegativeDayBalancePresent() {
@@ -88,27 +88,27 @@ public class TimeTypeDTO extends UserBaseEntity {
         //default
     }
 
-    public TimeTypeDTO(String name, String type, boolean includeInTimeBank, Long countryId, boolean enabled, Boolean negativeDayBalancePresent, Boolean onCallTime) {
+    public TimeTypeDTO(String name, String type, boolean includeInTimeBank, Long countryId, boolean deleted, Boolean negativeDayBalancePresent, Boolean onCallTime) {
         this.name = name;
         this.type = type;
         this.includeInTimeBank = includeInTimeBank;
         this.countryId = countryId;
-        this.enabled = enabled;
+        this.deleted = deleted;
         this.negativeDayBalancePresent = negativeDayBalancePresent;
         this.onCallTime = onCallTime;
     }
 
-    public TimeTypeDTO(String name, String type, boolean includeInTimeBank, boolean enabled, Boolean negativeDayBalancePresent, Boolean onCallTime) {
+    public TimeTypeDTO(String name, String type, boolean includeInTimeBank, boolean deleted, Boolean negativeDayBalancePresent, Boolean onCallTime) {
         this.name = name;
         this.type = type;
         this.includeInTimeBank = includeInTimeBank;
-        this.enabled = enabled;
+        this.deleted = deleted;
         this.negativeDayBalancePresent = negativeDayBalancePresent;
         this.onCallTime = onCallTime;
     }
 
     public TimeType buildTimeType() {
-        TimeType timeType = new TimeType(this.name, this.type, this.includeInTimeBank, this.enabled, this.negativeDayBalancePresent, this.onCallTime);
+        TimeType timeType = new TimeType(this.name, this.type, this.includeInTimeBank, this.deleted, this.negativeDayBalancePresent, this.onCallTime);
         return timeType;
     }
 

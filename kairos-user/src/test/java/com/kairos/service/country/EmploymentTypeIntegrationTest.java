@@ -1,10 +1,8 @@
 package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.persistence.model.dto.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,8 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Date;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by prerna on 7/11/17.

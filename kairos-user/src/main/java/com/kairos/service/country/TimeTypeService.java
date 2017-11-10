@@ -3,7 +3,7 @@ package com.kairos.service.country;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.dto.TimeTypeDTO;
+import com.kairos.persistence.model.dto.timeType.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.TimeType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -12,6 +12,7 @@ import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Optional;
  * Created by vipul on 17/10/17.
  */
 @Service
+@Transactional
 public class TimeTypeService extends UserBaseService {
     private Logger logger = LoggerFactory.getLogger(TimeTypeService.class);
     @Inject
@@ -59,7 +61,7 @@ public class TimeTypeService extends UserBaseService {
             logger.error("TimeType does not exist" + timeTypeId);
             throw new DataNotFoundByIdException("Invalid timeType");
         }
-        timeType.setEnabled(false);
+        timeType.setDeleted(false);
         save(timeType);
     }
 
