@@ -103,4 +103,7 @@ public interface OrganizationTypeGraphRepository extends GraphRepository<Organiz
             "optional match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType)<-[:SUB_TYPE_OF]-(organization) with subType,organizationType,organization\n" +
             "return id(subType)")
     List<Long> getOrganizationSubTypeIdsByUnitId(long unitId);
+
+    @Query("Match (ot:OrganizationType{isEnable:true})-[:"+HAS_LEVEL+"]->(level:Level{deleted:false}) where id(ot)={0} AND id(level)={1} return level")
+    Level getLevel(Long organizationTypeId,Long levelId);
 }
