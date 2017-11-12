@@ -221,7 +221,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = new Date().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        phaseRestClient.createDefaultPhases(organization.getId());
+        //phaseRestClient.createDefaultPhases(organization.getId());
         HashMap<String,Object> orgResponse = new HashMap<>();
         orgResponse.put("orgData",organizationResponse(organization, orgDetails));
         orgResponse.put("permissions",accessPageService.getPermissionOfUserInUnit(organizationId,organization,UserContext.getUserDetails().getId()));
@@ -325,6 +325,7 @@ public class OrganizationService extends UserBaseService {
         // Verify Address here
         AddressDTO addressDTO = orgDetails.getHomeAddress();
         ZipCode zipCode;
+        addressDTO.setVerifiedByGoogleMap(true);
         if (addressDTO.isVerifiedByGoogleMap()) {
             contactAddress.setLongitude(addressDTO.getLongitude());
             contactAddress.setLatitude(addressDTO.getLatitude());
@@ -357,7 +358,8 @@ public class OrganizationService extends UserBaseService {
         }
         logger.info("Geography Data: " + geographyData);
 
-        Level level = countryGraphRepository.getLevel(countryId, orgDetails.getLevelId());
+
+        Level level = organizationTypeGraphRepository.getLevel(orgDetails.getTypeId().get(0),orgDetails.getLevelId());
         if (level == null) {
             throw new InternalError("Level can't be null");
         }

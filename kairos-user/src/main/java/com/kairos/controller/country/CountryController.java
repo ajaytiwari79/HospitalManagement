@@ -14,6 +14,8 @@ import com.kairos.persistence.model.user.payment_type.PaymentType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
+import com.kairos.response.dto.web.OrganizationTypeDTO;
+import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.service.country.*;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.language.LanguageLevelService;
@@ -165,24 +167,23 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/organization_type", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrgTypesByCountryId(@PathVariable Long countryId) {
-        List<Map<String, Object>> response = organizationTypeService.getOrgTypesByCountryId(countryId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrgTypesByCountryId(countryId));
     }
 
     @ApiOperation(value = "Add Organization Types")
     @RequestMapping(value = COUNTRY_URL + "/organization_type", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addOrgTypesByCountryId(@PathVariable Long countryId, @Validated @RequestBody OrganizationType data) {
-        Map<String, Object> response = organizationTypeService.createOrganizationTypeForCountry(countryId, data);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+    public ResponseEntity<Map<String, Object>> addOrgTypesByCountryId(@PathVariable Long countryId,
+                                                                      @Validated @RequestBody OrganizationTypeDTO organizationTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.createOrganizationTypeForCountry(countryId, organizationTypeDTO));
     }
 
     @ApiOperation(value = "Update Organization Types")
-    @RequestMapping(value = COUNTRY_URL + "/organization_type", method = RequestMethod.PUT)
+    @RequestMapping(value = COUNTRY_URL + "/organization_type/{organizationTypeId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateOrganizationType(@Validated @RequestBody OrganizationType data) {
-        Map<String, Object> response = organizationTypeService.updateOrganizationType(data);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+    public ResponseEntity<Map<String, Object>> updateOrganizationType(@PathVariable Long organizationTypeId,
+                                                                      @Validated @RequestBody UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateOrganizationType(organizationTypeId,updateOrganizationTypeDTO));
     }
 
     @ApiOperation(value = "Delete Organization Types")

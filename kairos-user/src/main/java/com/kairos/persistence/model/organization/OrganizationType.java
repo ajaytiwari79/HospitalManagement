@@ -7,21 +7,19 @@ import com.kairos.persistence.model.user.country.Country;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SUB_TYPE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_TYPE_HAS_SERVICES;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
  * Created by oodles on 14/9/16.
  */
 
+@QueryResult
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -31,7 +29,7 @@ public class OrganizationType extends UserBaseEntity {
     @NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull")
     private String name;
 
-//    @NotEmpty(message = "error.OrganizationType.description.notEmpty") @NotNull(message = "error.OrganizationType.description.notnull")
+    //    @NotEmpty(message = "error.OrganizationType.description.notEmpty") @NotNull(message = "error.OrganizationType.description.notnull")
     private String description;
 
 
@@ -44,6 +42,14 @@ public class OrganizationType extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Country country;
 
+    @Relationship(type = HAS_LEVEL)
+    private List<Level> levels;
+
+    public OrganizationType(String name, Country country, List<Level> levels) {
+        this.name = name;
+        this.country = country;
+        this.levels = levels;
+    }
 
     public boolean isEnable() {
         return isEnable;
@@ -103,6 +109,14 @@ public class OrganizationType extends UserBaseEntity {
         this.organizationServiceList = organizationServiceList;
     }
 
+    public List<Level> getLevels() {
+        return Optional.ofNullable(levels).orElse(new ArrayList<>());
+    }
+
+    public void setLevels(List<Level> levels) {
+        this.levels = levels;
+    }
+
     public OrganizationType(){}
 
     public enum OrganizationTypeEnum {
@@ -133,5 +147,7 @@ public class OrganizationType extends UserBaseEntity {
         map.put("creationDate",this.getCreationDate());
         return map;
     }
+
+
 
 }

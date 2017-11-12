@@ -6,6 +6,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.enums.CitizenHealthStatus;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -56,6 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.inject.Inject;
+import javax.swing.text.html.Option;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
@@ -64,6 +66,8 @@ import java.util.stream.StreamSupport;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.KAIROS;
+import static com.kairos.persistence.model.enums.CitizenHealthStatus.DECEASED;
+import static com.kairos.persistence.model.enums.CitizenHealthStatus.TERMINATED;
 import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**
@@ -709,16 +713,25 @@ public class ClientService extends UserBaseService {
      * @auther anil maurya
      */
     public boolean markClientAsDead(Long clientId, String deathDate) throws ParseException {
-        Client client = clientGraphRepository.findOne(clientId);
-        if (client == null) {
+        Client citizen = clientGraphRepository.findOne(clientId);
+        if (!Optional.ofNullable(citizen).isPresent()) {
             throw new DataNotFoundByIdException("Incorrect client id ::" + clientId);
         }
         Date deathDateInDateFormat = DateUtil.convertToOnlyDate(deathDate, MONGODB_QUERY_DATE_FORMAT);
-        client.setCitizenDead(true);
-        client.setDeathDate(deathDateInDateFormat.getTime());
-        clientGraphRepository.save(client);
-        //return plannerService.deleteTasksForCitizen(clientId);
-        return plannerRestClient.deleteTaskForCitizen(clientId);
+        switch (citizen.getHealthStatus()){
+            case ALIVE:
+                citizen.setHealthStatus(DECEASED);
+                citizen.setDeceasedDate(deathDateInDateFormat.getTime());
+                plannerRestClient.deleteTaskForCitizen(clientId,DECEASED,deathDate);
+                break;
+            case DECEASED:
+                citizen.setHealthStatus(TERMINATED);
+                citizen.setTerminatedDate(deathDateInDateFormat.getTime());
+                plannerRestClient.deleteTaskForCitizen(clientId,TERMINATED,deathDate);
+                break;
+        }
+        clientGraphRepository.save(citizen);
+        return true;
 
     }
 

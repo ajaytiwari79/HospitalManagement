@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.client;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.enums.CitizenHealthStatus;
 import com.kairos.persistence.model.enums.ClientEnum;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.user.auth.User;
@@ -17,6 +18,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.enums.CitizenHealthStatus.ALIVE;
 
 
 /**
@@ -119,14 +121,25 @@ public class Client extends User {
 
     private String visitourTeamId;
 
-    private long deathDate;
+    private long deceasedDate;
+    private long terminatedDate;
 
-    public long getDeathDate() {
-        return deathDate;
+    private CitizenHealthStatus healthStatus  = ALIVE;
+
+    public long getDeceasedDate() {
+        return deceasedDate;
     }
 
-    public void setDeathDate(long deathDate) {
-        this.deathDate = deathDate;
+    public void setDeceasedDate(long deceasedDate) {
+        this.deceasedDate = deceasedDate;
+    }
+
+    public long getTerminatedDate() {
+        return terminatedDate;
+    }
+
+    public void setTerminatedDate(long terminatedDate) {
+        this.terminatedDate = terminatedDate;
     }
 
     @Relationship(type = HAS_ALLERGY)
@@ -710,6 +723,14 @@ public class Client extends User {
         this.kmdNexusExternalId = kmdNexusExternalId;
     }
 
+    public CitizenHealthStatus getHealthStatus() {
+        return healthStatus;
+    }
+
+    public void setHealthStatus(CitizenHealthStatus healthStatus) {
+        this.healthStatus = healthStatus;
+    }
+
     // General Tab Constructor
     public Map<String, Object> retrieveClientGeneralDetails() {
         Map<String, Object> map = new HashMap<>();
@@ -735,7 +756,7 @@ public class Client extends User {
 
         map.put("peopleInHousehold", this.peopleInHousehold);
         map.put("livesAlone", this.livesAlone);
-        map.put("deathDate", DateConverter.getDate(this.deathDate));
+        map.put("deathDate", DateConverter.getDate(this.deceasedDate));
         return map;
     }
 
@@ -954,5 +975,6 @@ public class Client extends User {
         }
         return contactDetail;
     }
+
 }
 
