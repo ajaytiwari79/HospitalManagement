@@ -757,6 +757,8 @@ public class Client extends User {
         map.put("peopleInHousehold", this.peopleInHousehold);
         map.put("livesAlone", this.livesAlone);
         map.put("deathDate", DateConverter.getDate(this.deceasedDate));
+        map.put("deceasedDate",DateConverter.getDate(this.deceasedDate));
+        map.put("terminatedDate",DateConverter.getDate(this.terminatedDate));
         return map;
     }
 
