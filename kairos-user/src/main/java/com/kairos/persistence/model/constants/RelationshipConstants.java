@@ -9,6 +9,9 @@ import java.net.UnknownHostException;
 
 public class RelationshipConstants {
 
+    // Country
+    public final static String COUNTRY_HAS_TAG = "COUNTRY_HAS_TAG";
+
     // Organization
     public final static String COUNTRY = "BELONGS_TO";
     public final static String HAS_GROUP = "HAS_GROUP";
@@ -35,6 +38,7 @@ public class RelationshipConstants {
     public final static String CURRENCY = "CURRENCY";
     public final static String ORGANIZATION_HAS_OFFICE_RESOURCE ="ORGANIZATION_HAS_OFFICE_RESOURCE";
     public final static String HAS_EMPLOYMENT_TYPE = "HAS_EMPLOYMENT_TYPE";
+    public final static String ORGANIZATION_HAS_TAG = "ORGANIZATION_HAS_TAG";
 
     public final static String HAS_POSITION_NAME ="HAS_POSITION_NAME";
     public final static String HAS_POSITION ="HAS_POSITION";
