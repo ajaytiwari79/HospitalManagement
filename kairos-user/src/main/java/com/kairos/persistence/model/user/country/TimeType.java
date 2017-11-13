@@ -22,28 +22,28 @@ public class TimeType extends UserBaseEntity {
     private boolean includeInTimeBank = true;
     @Relationship(type = BELONGS_TO , direction=Relationship.OUTGOING)
     private Country country;
-    private boolean enabled = true;
+    private boolean deleted;
     private boolean negativeDayBalancePresent;
     private boolean onCallTime;
 
     public TimeType() {
     }
 
-    public TimeType(String name, String type, boolean includeInTimeBank, Country country, boolean enabled, boolean negativeDayBalancePresent, boolean onCallTime) {
+    public TimeType(String name, String type, boolean includeInTimeBank, Country country, boolean deleted, boolean negativeDayBalancePresent, boolean onCallTime) {
         this.name = name;
         this.type = type;
         this.includeInTimeBank = includeInTimeBank;
         this.country = country;
-        this.enabled = enabled;
+        this.deleted = deleted;
         this.negativeDayBalancePresent = negativeDayBalancePresent;
         this.onCallTime = onCallTime;
     }
 
-    public TimeType(String name, String type, boolean includeInTimeBank, boolean enabled, boolean negativeDayBalancePresent, boolean onCallTime) {
+    public TimeType(String name, String type, boolean includeInTimeBank, boolean deleted, boolean negativeDayBalancePresent, boolean onCallTime) {
         this.name = name;
         this.type = type;
         this.includeInTimeBank = includeInTimeBank;
-        this.enabled = enabled;
+        this.deleted = deleted;
         this.negativeDayBalancePresent = negativeDayBalancePresent;
         this.onCallTime = onCallTime;
     }
@@ -80,12 +80,12 @@ public class TimeType extends UserBaseEntity {
         this.country = country;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public boolean isNegativeDayBalancePresent() {

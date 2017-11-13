@@ -1,7 +1,7 @@
 package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.persistence.model.dto.TimeTypeDTO;
+import com.kairos.response.dto.web.timetype.TimeTypeDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
