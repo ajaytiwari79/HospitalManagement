@@ -24,6 +24,12 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
             "return wta")
     WorkingTimeAgreement getWta(Long wtaId);
 
+    @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={1} AND wta.name =~{0} return wta")
+    WorkingTimeAgreement getWtaByName(String wtaName,Long countryId);
+
+    @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={1} AND wta.name =~{0} AND id(wta) <> {2} return wta")
+    WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName,Long countryId,Long wtaId);
+
     @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where id(o)={0}\n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true})\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCategory:RuleTemplateCategory) with wta,o,expertise,ruleTemp,ruleTemplatecategory\n" +

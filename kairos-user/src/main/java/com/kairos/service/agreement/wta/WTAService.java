@@ -1,6 +1,7 @@
 package com.kairos.service.agreement.wta;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
@@ -68,9 +69,14 @@ public class WTAService extends UserBaseService {
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country id " + countryId);
         }
-        checkUniquenessOfData(countryId, wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId());
+        //TODO  API functionality has been changed for now KP-958
+        //  checkUniquenessOfData(countryId, wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId());
+        WorkingTimeAgreement wta = wtaRepository.getWtaByName("(?i)" + wtaDTO.getName(), countryId);
+        if (Optional.ofNullable(wta).isPresent()) {
+            throw new DuplicateDataException("Duplicate WTA name" + wtaDTO.getName());
+        }
         List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTAWithCategoryDTO>();
-        WorkingTimeAgreement wta = prepareWta(countryId, wtaDTO, wtaRuleTemplateQueryResponseArrayList);
+        wta = prepareWta(countryId, wtaDTO, wtaRuleTemplateQueryResponseArrayList);
 
         wta.setCountry(country);
         save(wta);
@@ -121,10 +127,10 @@ public class WTAService extends UserBaseService {
 
         wta.setRuleTemplates(wtaBaseRuleTemplates);
 
+        Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? new Date().getTime() : wtaDTO.getStartDateMillis();
+        wta.setStartDateMillis(dateInMillies);
 
-        if (wtaDTO.getStartDateMillis() == 0) {
-            wta.setStartDateMillis(new Date().getTime());
-        } else wta.setStartDateMillis(wtaDTO.getStartDateMillis());
+
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
             if (wtaDTO.getStartDateMillis() > wtaDTO.getEndDateMillis()) {
                 throw new InvalidRequestException("End Date must not be greater than start date");
@@ -175,7 +181,13 @@ public class WTAService extends UserBaseService {
         if (!Optional.ofNullable(oldWta).isPresent()) {
             throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
         }
-        checkUniquenessOfDataExcludingCurrent(countryId, wtaId, wta);
+        // TODO may be again changed in future.
+        //checkUniquenessOfDataExcludingCurrent(countryId, wtaId, wta);
+        WorkingTimeAgreement workingTimeAgreement = wtaRepository.getWtaByNameExcludingCurrent("(?i)" + wta.getName(), countryId, wtaId);
+        if (Optional.ofNullable(workingTimeAgreement).isPresent()) {
+            throw new DuplicateDataException("Duplicate WTA name " + wta.getName());
+        }
+
         List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTAWithCategoryDTO>();
 
         prepareWta(countryId, oldWta, wta, wtaRuleTemplateQueryResponseArrayList);
