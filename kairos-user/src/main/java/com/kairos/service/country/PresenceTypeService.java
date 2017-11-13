@@ -3,6 +3,7 @@ package com.kairos.service.country;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
+import com.kairos.persistence.model.timetype.PresenceTypeWithTimeTypeDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.PresenceType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -28,6 +29,8 @@ public class PresenceTypeService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private PresenceTypeRepository presenceTypeRepository;
+    @Inject
+    private TimeTypeService timeTypeService;
 
     public PresenceTypeDTO addPresenceType(PresenceTypeDTO presenceTypeDTO, Long countryId) {
 
@@ -57,7 +60,7 @@ public class PresenceTypeService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Country");
         }
         List<PresenceTypeDTO> presenceTypeDTOList =
-        presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
+                presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
         return presenceTypeDTOList;
     }
 
@@ -77,7 +80,6 @@ public class PresenceTypeService extends UserBaseService {
         if (unique) {
             throw new DataNotFoundByIdException("A Presence type Already exist by the new name" + presenceTypeDTO.getName());
         }
-        logger.info(unique + "I need to");
         PresenceType presenceType = presenceTypeRepository.findOne(presenceTypeId);
         if (!Optional.ofNullable(presenceType).isPresent()) {
             logger.error("Presence type not found by Id removing" + presenceTypeId);
@@ -89,5 +91,16 @@ public class PresenceTypeService extends UserBaseService {
         return presenceTypeDTO;
     }
 
+    public PresenceTypeWithTimeTypeDTO getAllPresenceTypeAndTimeTypesByCountry(Long countryId) {
+        Country country = countryGraphRepository.findOne(countryId);
+        if (!Optional.ofNullable(country).isPresent()) {
+            logger.error("Country not found by Id while creating Presence type  and Time type in country" + countryId);
+            throw new DataNotFoundByIdException("Invalid Country");
+        }
+        PresenceTypeWithTimeTypeDTO presenceTypeWithTimeTypes = new PresenceTypeWithTimeTypeDTO();
+        presenceTypeWithTimeTypes.setPresenceTypes(presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false));
+        presenceTypeWithTimeTypes.setTimeTypes(timeTypeService.getAllTimeTypes(countryId));
+        return presenceTypeWithTimeTypes;
+    }
 
 }

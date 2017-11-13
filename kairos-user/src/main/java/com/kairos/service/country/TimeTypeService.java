@@ -61,7 +61,7 @@ public class TimeTypeService extends UserBaseService {
             logger.error("TimeType does not exist" + timeTypeId);
             throw new DataNotFoundByIdException("Invalid timeType");
         }
-        timeType.setDeleted(false);
+        timeType.setDeleted(true);
         save(timeType);
     }
 
