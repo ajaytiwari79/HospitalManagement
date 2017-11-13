@@ -2,7 +2,7 @@ package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.response.dto.web.timetype.PresenceTypeDTO;
+import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

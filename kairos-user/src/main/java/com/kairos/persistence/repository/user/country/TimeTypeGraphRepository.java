@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.response.dto.web.timetype.TimeTypeDTO;
+import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.TimeType;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;

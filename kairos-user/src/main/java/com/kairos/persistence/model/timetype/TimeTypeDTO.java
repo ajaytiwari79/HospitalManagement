@@ -1,4 +1,4 @@
-package com.kairos.response.dto.web.timetype;
+package com.kairos.persistence.model.timetype;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
