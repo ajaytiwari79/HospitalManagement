@@ -300,7 +300,7 @@ public class OrganizationService extends UserBaseService {
             workingTimeAgreementObj.setEndDateMillis(obj.getEndDateMillis());
             workingTimeAgreementObj.setExpiryDate(obj.getExpiryDate());
             workingTimeAgreementObj.setExpertise(obj.getExpertise());
-            workingTimeAgreementObj.setEnabled(true);
+            workingTimeAgreementObj.setDeleted(true);
             workingTimeAgreementObj.setRuleTemplates(obj.getRuleTemplates());
             workingTimeAgreementObj.setStartDateMillis(obj.getStartDateMillis());
             workingTimeAgreementObj.setWta(obj.getWta());

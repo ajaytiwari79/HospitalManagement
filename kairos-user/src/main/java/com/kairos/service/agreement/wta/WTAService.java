@@ -254,9 +254,8 @@ public class WTAService extends UserBaseService {
         if (!Optional.ofNullable(wta).isPresent()) {
             throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
         }
-        wta.setEnabled(false);
+        wta.setDeleted(true);
         save(wta);
-
         return true;
     }
 
@@ -332,7 +331,7 @@ public class WTAService extends UserBaseService {
             map.put("wta", newWtaObject);
             map.put("ruleTemplate", wtaRuleTemplateQueryResponseArrayList);
         } else {
-            wta.setEnabled(false);
+            wta.setDeleted(false);
             save(wta);
         }
         return map;
