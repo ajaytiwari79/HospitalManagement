@@ -32,11 +32,11 @@ public class PresenceTypeServiceIntegrationTest {
     private String url;
     @Autowired
     TestRestTemplate restTemplate;
-    Long createdId;
+    static Long createdId;
+    static Long createdIdForDelete;
 
     @Test
     public void test1_AddPresenceType() throws Exception {
-        System.out.println(new Date() + "first");
         String baseUrl = getBaseUrl(71L, 53L);
         PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PRESENCE TYPE" + new Date().getTime());
         HttpEntity<PresenceTypeDTO> requestBodyData = new HttpEntity<>(presenceTypeDTO);
@@ -49,12 +49,11 @@ public class PresenceTypeServiceIntegrationTest {
                 baseUrl + "/presenceType",
                 HttpMethod.POST, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()));
-        createdId = response.getBody().getData().getId();
+        createdIdForDelete= createdId = response.getBody().getData().getId();
     }
 
     @Test
     public void test2_getAllPresenceTypeByCountry() throws Exception {
-        System.out.println(new Date() + "test2_getAllPresenceTypeByCountry");
         String baseUrl = getBaseUrl(71L, 53L);
         ResponseEntity<PresenceTypeDTO> response = restTemplate.exchange(
                 baseUrl + "/presenceType",
@@ -64,17 +63,15 @@ public class PresenceTypeServiceIntegrationTest {
 
     @Test
     public void test4_DeletePresenceTypeById() throws Exception {
-        System.out.println(new Date() + "test4_DeletePresenceTypeById");
         String baseUrl = getBaseUrl(71L, 53L);
         ResponseEntity<PresenceTypeDTO> response = restTemplate.exchange(
-                baseUrl + "/presenceType/" + createdId,
+                baseUrl + "/presenceType/" + createdIdForDelete,
                 HttpMethod.DELETE, null, PresenceTypeDTO.class);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 
     @Test
     public void test3_updatePresenceType() throws Exception {
-        System.out.println(new Date() + "test3_updatePresenceType");
         String baseUrl = getBaseUrl(71L, 53L);
         PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PRESENCE TYPE" + new Date().getTime());
         HttpEntity<PresenceTypeDTO> requestBodyData = new HttpEntity<>(presenceTypeDTO);
