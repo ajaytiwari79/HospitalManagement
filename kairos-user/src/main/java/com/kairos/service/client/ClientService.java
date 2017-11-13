@@ -1570,7 +1570,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
         String imagePath = envConfig.getServerHost() + FORWARD_SLASH;
 
-      mapList.addAll( organizationGraphRepositoryImpl.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip));
+      mapList.addAll( organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip));
 
         Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )
