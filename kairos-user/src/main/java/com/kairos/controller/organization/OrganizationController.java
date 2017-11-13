@@ -1103,9 +1103,10 @@ public class OrganizationController {
     @ApiOperation(value = "Get Organization Clients with filters")
     @RequestMapping(value = "/unit/{unitId}/client/filters", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationClientsWithFilters(@PathVariable Long unitId, @RequestBody ClientFilterDTO clientFilterDTO, @RequestParam("start") String start) {
+    public ResponseEntity<Map<String, Object>> getOrganizationClientsWithFilters(@PathVariable Long unitId, @RequestBody ClientFilterDTO clientFilterDTO,
+                                                                                 @RequestParam("start") String start,@RequestParam("moduleId") String moduleId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start));
+                clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start,moduleId));
     }
 
     @RequestMapping(value =UNIT_URL+"/dayTypebydate", method = RequestMethod.GET)

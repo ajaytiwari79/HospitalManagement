@@ -1544,7 +1544,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
      * @return
      * @auther Anil maurya
      */
-    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip) {
+    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip,String moduleId) {
         Map<String, Object> response = new HashMap<>();
         List<Long> citizenIds = new ArrayList<>();
         if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()){
@@ -1570,7 +1570,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
         String imagePath = envConfig.getServerHost() + FORWARD_SLASH;
 
-      mapList.addAll( organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip));
+      mapList.addAll( organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip,moduleId));
 
         Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )
