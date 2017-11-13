@@ -3,6 +3,7 @@ package com.kairos.service.country;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
+import com.kairos.persistence.model.timetype.PresenceTypeWithTimeTypeDTO;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -58,6 +59,14 @@ public class PresenceTypeServiceIntegrationTest {
         ResponseEntity<PresenceTypeDTO> response = restTemplate.exchange(
                 baseUrl + "/presenceType",
                 HttpMethod.GET, null, PresenceTypeDTO.class);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+    @Test
+    public void test5_getAllPresenceTypeAndTimeTypesByCountry() throws Exception {
+        String baseUrl = getBaseUrl(71L, 53L);
+        ResponseEntity<PresenceTypeWithTimeTypeDTO> response = restTemplate.exchange(
+                baseUrl + "/presenceTypeWithTimeType",
+                HttpMethod.GET, null, PresenceTypeWithTimeTypeDTO.class);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 

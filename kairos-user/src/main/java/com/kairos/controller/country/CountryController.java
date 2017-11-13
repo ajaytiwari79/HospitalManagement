@@ -1086,8 +1086,6 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeByCountry(countryId));
     }
 
-
-    // timeType
     @ApiOperation(value = "delete a presenceType by Id")
     @RequestMapping(value = COUNTRY_URL + "/presenceType/{presenceTypeId}", method = RequestMethod.DELETE)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -1103,6 +1101,13 @@ public class CountryController {
                                                                   @PathVariable Long presenceTypeId,
                                                                   @Validated @RequestBody PresenceTypeDTO presenceTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.updatePresenceType(countryId, presenceTypeId, presenceTypeDTO));
+    }
+
+    @ApiOperation(value = "Get all presenceType with timeType by countryId")
+    @RequestMapping(value = COUNTRY_URL + "/presenceTypeWithTimeType", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByCountry(countryId)) ;
     }
 
 }
