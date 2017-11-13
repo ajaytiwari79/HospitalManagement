@@ -6,6 +6,8 @@ package com.kairos.client.dto.organization;
 public class OrganizationEmploymentTypeDTO {
     private long employmentTypeId;
     private boolean allowedForContactPerson;
+    private boolean allowedForShiftPlan;
+    private boolean allowedForFlexPool;
 
     public long getEmploymentTypeId() {
         return employmentTypeId;
@@ -21,5 +23,21 @@ public class OrganizationEmploymentTypeDTO {
 
     public void setAllowedForContactPerson(boolean allowedForContactPerson) {
         this.allowedForContactPerson = allowedForContactPerson;
+    }
+
+    public boolean isAllowedForShiftPlan() {
+        return allowedForShiftPlan;
+    }
+
+    public void setAllowedForShiftPlan(boolean allowedForShiftPlan) {
+        this.allowedForShiftPlan = allowedForShiftPlan;
+    }
+
+    public boolean isAllowedForFlexPool() {
+        return allowedForFlexPool;
+    }
+
+    public void setAllowedForFlexPool(boolean allowedForFlexPool) {
+        this.allowedForFlexPool = allowedForFlexPool;
     }
 }

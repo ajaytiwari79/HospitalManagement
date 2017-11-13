@@ -26,18 +26,22 @@ public interface EmploymentTypeGraphRepository extends GraphRepository<Employmen
 
         @Query("Match (o:Organization),(et:EmploymentType) where id(o) = {0} AND id(et) = {1}\n" +
                 "MERGE (o)-[r:"+EMPLOYMENT_TYPE_SETTINGS+"]->(et)\n" +
-                "ON CREATE SET r.allowedForContactPerson = {2},r.creationDate = {3},r.lastModificationDate = {4}\n" +
-                "ON MATCH SET r.allowedForContactPerson = {2},r.lastModificationDate = {4} return true")
-        Boolean setEmploymentTypeSettingsForOrganization(Long organizationId, Long employmentTypeId, Boolean allowedForContactPerson, long creationDate, long lastModificationDate);
+                "ON CREATE SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.creationDate = {5},r.lastModificationDate = {4}\n" +
+                "ON MATCH SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.lastModificationDate = {6} return true")
+        Boolean setEmploymentTypeSettingsForOrganization(Long organizationId, Long employmentTypeId,
+                                                         Boolean allowedForContactPerson,
+                                                         boolean allowedForShiftPlan,
+                                                         boolean allowedForFlexPool, long creationDate, long lastModificationDate);
 
         @Query("MATCH (o:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE id(o)={0} AND et.deleted={1} with et\n" +
                 "OPTIONAL MATCH (o)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) with \n" +
                 "CASE WHEN r IS NULL THEN \n" +
                 "collect({employmentType:{id:id(et),name:et.name,description:et.description},\n" +
-                "allowedForContactPerson:o.allowedForContactPerson}) \n" +
+                "allowedForContactPerson:o.allowedForContactPerson, allowedForShiftPlan:et.allowedForShiftPlan, allowedForFlexPool:et.allowedForFlexPool}) \n" +
                 "ELSE\n" +
                 "collect({employmentType:{id:id(et),name:et.name,description:et.description},\n" +
-                "allowedForContactPerson:et.allowedForContactPerson}) END as employmentTypeSettings return employmentTypeSettings")
+                "allowedForContactPerson:et.allowedForContactPerson, allowedForShiftPlan:et.allowedForShiftPlan, allowedForFlexPool:et.allowedForFlexPool})\n"+
+                "END as employmentTypeSettings return employmentTypeSettings")
         List<HashMap<String, Object>> getEmploymentTypeSettingsForOrganization(long organizationId, boolean isDeleted);
 
         @Query("MATCH (n:Organization) - [r:"+BELONGS_TO+"] -> (c:Country)-[r1:"+HAS_EMPLOYMENT_TYPE+"]-> (et:EmploymentType)\n" +

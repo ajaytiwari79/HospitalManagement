@@ -68,6 +68,8 @@ public class EmploymentTypeService extends UserBaseService {
         employmentTypeToUpdate.setName(employmentTypeDTO.getName());
         employmentTypeToUpdate.setDescription(employmentTypeDTO.getDescription());
         employmentTypeToUpdate.setAllowedForContactPerson(employmentTypeDTO.isAllowedForContactPerson());
+        employmentTypeToUpdate.setAllowedForShiftPlan(employmentTypeDTO.isAllowedForShiftPlan());
+        employmentTypeToUpdate.setAllowedForFlexPool(employmentTypeDTO.isAllowedForFlexPool());
         return save(employmentTypeToUpdate);
     }
 
@@ -100,7 +102,9 @@ public class EmploymentTypeService extends UserBaseService {
 
         Boolean settingUpdated = employmentTypeGraphRepository.setEmploymentTypeSettingsForOrganization(organizationId,
                 organizationEmploymentTypeDTO.getEmploymentTypeId(),
-                organizationEmploymentTypeDTO.isAllowedForContactPerson(), new Date().getTime(),new Date().getTime());
+                organizationEmploymentTypeDTO.isAllowedForContactPerson(),
+                organizationEmploymentTypeDTO.isAllowedForShiftPlan(),
+                organizationEmploymentTypeDTO.isAllowedForFlexPool(),new Date().getTime(),new Date().getTime());
         if(settingUpdated){
             return organizationEmploymentTypeDTO;
         } else {
