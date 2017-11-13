@@ -331,7 +331,7 @@ public class WTAService extends UserBaseService {
             map.put("wta", newWtaObject);
             map.put("ruleTemplate", wtaRuleTemplateQueryResponseArrayList);
         } else {
-            wta.setDeleted(false);
+            wta.setDeleted(true);
             save(wta);
         }
         return map;
