@@ -12,6 +12,7 @@ public class TagQueryResult {
     private long id;
     private String name;
     private String masterDataType;
+    private boolean countryTag;
 
     public long getId() {
         return id;
@@ -35,5 +36,13 @@ public class TagQueryResult {
 
     public void setMasterDataType(String masterDataType) {
         this.masterDataType = masterDataType;
+    }
+
+    public boolean isCountryTag() {
+        return countryTag;
+    }
+
+    public void setCountryTag(boolean countryTag) {
+        this.countryTag = countryTag;
     }
 }

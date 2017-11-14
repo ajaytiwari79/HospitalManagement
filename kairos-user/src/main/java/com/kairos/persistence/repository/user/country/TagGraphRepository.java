@@ -3,14 +3,12 @@ package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.country.tag.TagQueryResult;
-import com.kairos.persistence.model.user.skill.Skill;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -31,9 +29,14 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
     Tag addCountryTag(String name, Long countryId, String masterDataType, long creationDate, long lastModificationDate);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(country)={0} AND tag.deleted= {1}\n" +
-            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType")
-    List<TagQueryResult> getListOfCountryTags(Long countryId , boolean deleted);
+            "WHERE id(country)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
+            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType, true as countryTag")
+    List<TagQueryResult> getListOfCountryTags(Long countryId , boolean deleted, String searchTextRegex);
+
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE id(country)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND r.masterDataType ={3}\n" +
+            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType, true as countryTag")
+    List<TagQueryResult> getListOfCountryTagsByMasterDataType(Long countryId , boolean deleted, String searchTextRegex, String masterDataType);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
             "WHERE id(country)={0} AND tag.deleted= {1} AND e.masterDataType={2}\n" +
@@ -41,23 +44,23 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
     List<TagQueryResult> getListOfCountryTagsByMasterDataType(Long countryId , boolean deleted, String masterDataType);
 
     @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(org)={0} AND tag.deleted= {1} AND tag.name={2}\n" +
-            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType, false as isCountryTag\n" +
+            "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
+            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType, false as countryTag\n" +
             "UNION\n" +
             "MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0} AND o.showCountryTags=true\n" +
-            "OPTIONAL Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(country)={0} AND tag.deleted= {1} AND tag.name={2}\n" +
-            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType, true as isCountryTag\n")
+            "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE id(country)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
+            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType, true as countryTag\n")
     List<TagQueryResult>  getListOfOrganizationTags(Long orgId , boolean deleted, String searchTextRegex);
 
     @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(org)={0} AND tag.deleted= {1} AND tag.name={2} AND r.masterDataType ={3}\n" +
-            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType, false as isCountryTag\n" +
+            "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND r.masterDataType ={3}\n" +
+            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType, false as countryTag\n" +
             "UNION\n" +
             "MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0} AND o.showCountryTags=true\n" +
-            "OPTIONAL Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(country)={0} AND tag.deleted= {1} AND tag.name={2} AND r.masterDataType ={3}\n" +
-            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType, true as isCountryTag\n")
+            "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE id(country)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND r.masterDataType ={3}\n" +
+            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType, true as countryTag\n")
     List<TagQueryResult>  getListOfOrganizationTagsByMasterDataType(Long orgId , boolean deleted, String searchTextRegex, String masterDataType);
 
 

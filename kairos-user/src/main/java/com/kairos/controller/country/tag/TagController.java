@@ -52,7 +52,9 @@ public class TagController {
     @ApiOperation(value = "Get list of Organization Tag")
     @RequestMapping(value = UNIT_URL + "/tag", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationTag(@PathVariable long unitId, @RequestParam("filterText") String filterText,  @RequestParam("masterDataType") MasterDataTypeEnum masterDataType) {
+    public ResponseEntity<Map<String, Object>> getOrganizationTag(@PathVariable long unitId,
+                                                                  @RequestParam(value = "filterText",required = false) String filterText,
+                                                                  @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfOrganizationTags(unitId, filterText, masterDataType));
     }
 
@@ -85,8 +87,10 @@ public class TagController {
     @ApiOperation(value = "Get list of Country Tag")
     @RequestMapping(value = COUNTRY_URL + "/tag", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getCountryTag(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfCountryTags(countryId));
+    public ResponseEntity<Map<String, Object>> getCountryTag(@PathVariable long countryId,
+                                                             @RequestParam(value = "filterText",required = false) String filterText,
+                                                             @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfCountryTags(countryId, filterText, masterDataType));
     }
 
     @ApiOperation(value = "Delete Country Tag")

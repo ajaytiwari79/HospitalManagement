@@ -83,13 +83,24 @@ public class TagService extends UserBaseService {
         return tagGraphRepository.updateCountryTag(tagId, countryId, tagDTO.getName(), new Date().getTime());
     }
 
-    public HashMap<String,Object> getListOfCountryTags(Long countryId){
+    public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
+
+        if(filterText == null){
+            filterText = "";
+        }
+//        String filterTextRegex = "~'.*"+filterText+".*'";
+
         HashMap<String,Object> tagsData = new HashMap<>();
-        tagsData.put("tags",tagGraphRepository.getListOfCountryTags(countryId, false));
+        if(masterDataType == null){
+            tagsData.put("tags",tagGraphRepository.getListOfCountryTags(countryId, false, filterText));
+        } else {
+            tagsData.put("tags",tagGraphRepository.getListOfCountryTagsByMasterDataType (countryId, false, filterText,  masterDataType.toString()));
+        }
+
         return tagsData;
     }
 
@@ -173,12 +184,12 @@ public class TagService extends UserBaseService {
         if(filterText == null){
             filterText = "";
         }
-        String filterTextRegex = "~'.*"+filterText+".*";
+//        String filterTextRegex = "~'.*"+filterText+".*'";
         HashMap<String,Object> tagsData = new HashMap<>();
         if(masterDataType == null){
-            tagsData.put("tags",tagGraphRepository.getListOfOrganizationTags(organizationId, false, ""));
+            tagsData.put("tags",tagGraphRepository.getListOfOrganizationTags(organizationId, false, filterText));
         } else {
-            tagsData.put("tags",tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, "",  masterDataType.toString()));
+            tagsData.put("tags",tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, filterText,  masterDataType.toString()));
         }
 
         return tagsData;
