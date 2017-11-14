@@ -17,7 +17,6 @@ public class WtaDTO {
     private long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
-
     public String getName() {
         return name;
     }

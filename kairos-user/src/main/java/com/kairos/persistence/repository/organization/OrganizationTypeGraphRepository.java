@@ -84,7 +84,7 @@ public interface OrganizationTypeGraphRepository extends GraphRepository<Organiz
     OrgTypeExpertiseQueryResult getExpertiseOfOrganizationType(long countryId, long orgTypeId);
 
     @Query("match(o:OrganizationType) where  id(o) in {0} \n" +
-            "match(workingTimeAgreement:WorkingTimeAgreement)-[:BELONGS_TO]->(o)\n" +
+            "match(workingTimeAgreement:WorkingTimeAgreement{deleted:false})-[:BELONGS_TO]->(o)\n" +
             "return workingTimeAgreement")
     List<WorkingTimeAgreement> getAllWTAByOrganiationType(List<Long> organizationTypeIds);
 

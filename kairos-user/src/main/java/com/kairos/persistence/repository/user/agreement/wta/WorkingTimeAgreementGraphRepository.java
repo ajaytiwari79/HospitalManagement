@@ -19,10 +19,16 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface WorkingTimeAgreementGraphRepository extends GraphRepository<WorkingTimeAgreement> {
 
-    @Query("MATCH (wta:WorkingTimeAgreement {isEnabled:true}) where id(wta)={0} \n" +
+    @Query("MATCH (wta:WorkingTimeAgreement {deleted:false}) where id(wta)={0} \n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true})\n" +
             "return wta")
     WorkingTimeAgreement getWta(Long wtaId);
+
+    @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={1} AND wta.name =~{0} return wta")
+    WorkingTimeAgreement getWtaByName(String wtaName, Long countryId);
+
+    @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={1} AND wta.name =~{0} AND id(wta) <> {2} return wta")
+    WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, Long wtaId);
 
     @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where id(o)={0}\n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true})\n" +
@@ -33,7 +39,7 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
     )
     List<WorkingTimeAgreementQueryResult> getAllWTAByOrganizationId(long organizationId);
 
-    @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={0} \n" +
+    @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={0} \n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true}) \n" +
             "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]->(orgType:OrganizationType)\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orgSubType:OrganizationType) \n" +
@@ -56,7 +62,7 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
             "id(wta) as id")
     List<WTAWithCountryAndOrganizationTypeDTO> getAllWTAByCountryId(long countryId);
 
-    @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(o:OrganizationType) where id(o)={0} \n" +
+    @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(o:OrganizationType) where id(o)={0} \n" +
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({active:ruleTemp.isActive,isActive:ruleTemp.isActive,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
@@ -74,7 +80,7 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
     @Query("match(c:Country) where id(c)={0}\n" +
             "match(c)<-[:" + BELONGS_TO + "]-(or:OrganizationType)\n" +
             "optional match(or)-[:" + HAS_SUB_TYPE + "]->(ora:OrganizationType)\n" +
-            "optional match(w:WorkingTimeAgreement)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(ora)\n" +
+            "optional match(w:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(ora)\n" +
             "with or,ora,w\n" +
             "with or,ora,{WTA:CASE WHEN w IS NOT NULL THEN collect({id:id(w),name:w.name}) ELSE [] END} as oraRes\n" +
             "WITH {name: or.name,id:id(or), children: CASE WHEN ora IS NOT NULL THEN collect({id:id(ora),name:ora.name,wtaa:oraRes}) ELSE [] END} as orga\n" +
@@ -82,29 +88,29 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
     List<Map<String, Object>> getAllWTAWithOrganization(long countryId);
 
     @Query("match(c:Country) where id(c)={0}\n" +
-            "match(wta:WorkingTimeAgreement) where id(wta)={1}\n" +
-            "match(wta)-[:"+BELONGS_TO_ORG_TYPE+"]-(or:OrganizationType)\n" +
-            "match(wta)-[:"+BELONGS_TO_ORG_SUB_TYPE+"]->(org:OrganizationType)\n" +
+            "match(wta:WorkingTimeAgreement{deleted:false}) where id(wta)={1}\n" +
+            "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]-(or:OrganizationType)\n" +
+            "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(org:OrganizationType)\n" +
             "with or ,org ,{WTA:CASE WHEN wta IS NOT NULL THEN collect({id:id(wta),name:wta.name}) ELSE [] END} as oraRes\n" +
             "WITH {name: or.name,id:id(or), children: CASE WHEN org IS NOT NULL THEN collect({id:id(org),name:org.name,wta:oraRes}) ELSE [] END} as orga \n" +
             "RETURN orga as result")
     List<Map<String, Object>> getAllWTAWithWTAId(long countryId, long wtaId);
 
-    @Query("match (wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={3}\n" +
+    @Query("match (wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={3}\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where Id(o)={1}\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orSubType:OrganizationType) where Id(orSubType)={0}\n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(exp:Expertise{isEnabled:true}) where Id(exp)={2}\n" +
             "return wta")
     WorkingTimeAgreement checkUniquenessOfData(long orgSubTypeId, long orgTypeId, long expertiseId, long countryId);
 
-    @Query("match (wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={3} AND Id(wta) <> {4}\n" +
+    @Query("match (wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={3} AND Id(wta) <> {4}\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where Id(o)={1}\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orSubType:OrganizationType) where Id(orSubType)={0}\n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(exp:Expertise{isEnabled:true}) where Id(exp)={2}\n" +
             "return wta")
     WorkingTimeAgreement checkUniquenessOfDataExcludingCurrent(long orgSubTypeId, long orgTypeId, long expertiseId, long countryId, long wtaId);
 
-    @Query("match (linkedEx:Expertise{isEnabled:true})<-[:" + HAS_EXPERTISE_IN + "]-(wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(o:OrganizationType) where id(o)={1}\n" +
+    @Query("match (linkedEx:Expertise{deleted:false})<-[:" + HAS_EXPERTISE_IN + "]-(wta:WorkingTimeAgreement{isEnabled:true})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(o:OrganizationType) where id(o)={1}\n" +
             "with collect (id(linkedEx)) as linkedExpertiseIds match(allExp:Expertise{isEnabled:true})-[:" + BELONGS_TO + "]->(c:Country) where Id(c)={0} \n" +
             "with linkedExpertiseIds, collect (id(allExp)) as allExpertiseIds\n" +
             "return linkedExpertiseIds,allExpertiseIds")
