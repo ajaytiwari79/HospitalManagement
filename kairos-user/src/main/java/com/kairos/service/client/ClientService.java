@@ -48,6 +48,7 @@ import com.kairos.util.userContext.UserContext;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.neo4j.ogm.session.Session;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.http.ResponseEntity;
@@ -1094,26 +1095,42 @@ public class ClientService extends UserBaseService {
      * @auther aniil maurya
      * this method is call from exception service from task micro service
      */
-    public ClientTemporaryAddress changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId, Long clientId) {
+    public List<ClientTemporaryAddressDTO> changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId, Long clientId) {
 
-        Client client = clientGraphRepository.findOne(clientId);
-        ClientTemporaryAddress clientTemporaryAddress = null;
+        List<Long> citizenIds = clientExceptionDto.getHouseHoldMembers();
+        citizenIds.add(clientId);
+        List<Client> citizens = clientGraphRepository.findByIdIn(citizenIds);
+        List<ClientTemporaryAddressDTO> clientTemporaryAddressDTOS = null;
         if (clientExceptionDto.getTempAddress() != null) {
-            clientTemporaryAddress = updateClientTemporaryAddress(clientExceptionDto, unitId, client);
+            clientTemporaryAddressDTOS = updateClientTemporaryAddress(clientExceptionDto, unitId, clientId,citizens);
         }
         if (clientExceptionDto.getTemporaryAddress() != null) {
-            clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
+            ClientTemporaryAddress clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
             if (clientTemporaryAddress == null) {
                 throw new InternalError("Address not found");
             }
-
+            clientTemporaryAddressDTOS = new ArrayList<>();
+            for(Client citizen : citizens) {
+                List<ClientTemporaryAddress> clientTemporaryAddresses = citizen.getTemporaryAddress();
+                ClientTemporaryAddressDTO clientTemporaryAddressDTO = new ClientTemporaryAddressDTO(citizen.getId());
+                if (citizen.getId() == clientId) {
+                    clientTemporaryAddresses.add(clientTemporaryAddress);
+                    clientTemporaryAddressDTO.setClientTemporaryAddress(clientTemporaryAddress);
+                } else {
+                    ClientTemporaryAddress addressForHouseHold = ClientTemporaryAddress.getInstance();
+                    BeanUtils.copyProperties(clientTemporaryAddress, addressForHouseHold);
+                    clientTemporaryAddresses.add(addressForHouseHold);
+                    clientTemporaryAddressDTO.setClientTemporaryAddress(addressForHouseHold);
+                }
+                clientTemporaryAddressDTOS.add(clientTemporaryAddressDTO);
+            }
         }
-
-        return clientTemporaryAddress;
+        return Optional.ofNullable(clientTemporaryAddressDTOS).orElse(new ArrayList<>());
     }
 
 
-    private ClientTemporaryAddress updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, long unitId, Client client) {
+    private List<ClientTemporaryAddressDTO> updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, long unitId,
+                                                                         Long clientId,List<Client> citizens) {
 
         AddressDTO addressDTO = clientExceptionDto.getTempAddress();
         ZipCode zipCode;
@@ -1161,11 +1178,24 @@ public class ClientService extends UserBaseService {
         clientTemporaryAddress.setCity(zipCode.getName());
         clientTemporaryAddress.setZipCode(zipCode);
         clientTemporaryAddress.setCity(zipCode.getName());
-        List<ClientTemporaryAddress> temporaryAddressList = client.getTemporaryAddress();
-        temporaryAddressList.add(clientTemporaryAddress);
-        client.setTemporaryAddress(temporaryAddressList);
-        clientGraphRepository.save(client);
-        return clientTemporaryAddress;
+
+        List<ClientTemporaryAddressDTO> clientTemporaryAddressDTOS = new ArrayList<>();
+        citizens.forEach(citizen->{
+            List<ClientTemporaryAddress> clientTemporaryAddresses = citizen.getTemporaryAddress();
+            ClientTemporaryAddressDTO clientTemporaryAddressDTO = new ClientTemporaryAddressDTO(citizen.getId());
+            if(citizen.getId() == clientId){
+                clientTemporaryAddresses.add(clientTemporaryAddress);
+                clientTemporaryAddressDTO.setClientTemporaryAddress(clientTemporaryAddress);
+            } else {
+                ClientTemporaryAddress addressForHouseHold = ClientTemporaryAddress.getInstance();
+                BeanUtils.copyProperties(clientTemporaryAddress,addressForHouseHold);
+                clientTemporaryAddresses.add(addressForHouseHold);
+                clientTemporaryAddressDTO.setClientTemporaryAddress(addressForHouseHold);
+            }
+            citizen.setTemporaryAddress(clientTemporaryAddresses);
+        });
+        clientGraphRepository.save(citizens);
+        return clientTemporaryAddressDTOS;
     }
 
 

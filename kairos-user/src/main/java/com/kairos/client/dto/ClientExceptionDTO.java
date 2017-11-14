@@ -25,6 +25,7 @@ public class ClientExceptionDTO {
 
     private boolean updateTaskDuration;
     private boolean updateTaskPriority;
+    private List<Long> houseHoldMembers;
 
     public boolean isUpdateTaskPriority() {
         return updateTaskPriority;
@@ -181,6 +182,14 @@ public class ClientExceptionDTO {
 
     public void setToTime(String toTime) {
         this.toTime = toTime;
+    }
+
+    public List<Long> getHouseHoldMembers() {
+        return houseHoldMembers;
+    }
+
+    public void setHouseHoldMembers(List<Long> houseHoldMembers) {
+        this.houseHoldMembers = houseHoldMembers;
     }
 
     @Override
