@@ -36,8 +36,6 @@ public class StaffServiceTest {
                 baseUrl+"/addStaffFavouriteFilters",
                 HttpMethod.POST, entity, StaffFilterDTO.class);
         Assert.assertNotNull(response.getBody().getId());
-      //  return response.getBody().getId();
-
     }
 
 
