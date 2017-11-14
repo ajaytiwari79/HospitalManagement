@@ -315,7 +315,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
             "OPTIONAL MATCH (o)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) with \n" +
             "collect(CASE WHEN r IS NULL AND  et.allowedForContactPerson =true THEN  {id:id(et),allowedForContactPerson:et.allowedForContactPerson} \n" +
             "ELSE {id:id(et),allowedForContactPerson:r.allowedForContactPerson} END) as employmentTypeSettings with filter\n" +
-            "(x IN employmentTypeSettings WHERE x.allowedForContactPerson=true) as filteredEmploymentType return extract(n IN filteredEmploymentType| n.id) AS extractedEmploymentTypeId \n"+
+            "(x IN employmentTypeSettings WHERE x.allowedForContactPerson=true) as filteredEmploymentType with extract(n IN filteredEmploymentType| n.id) AS extractedEmploymentTypeId \n"+
 
             "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments)\n" +
             "match (unitEmployments)-[:HAS_POSITION]->(p:Position)-[:"+HAS_EMPLOYMENT_TYPE+"]->(et:EmploymentType) WHERE id(et) IN extractedEmploymentTypeId\n" +

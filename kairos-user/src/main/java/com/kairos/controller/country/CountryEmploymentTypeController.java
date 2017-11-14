@@ -59,30 +59,18 @@ public class CountryEmploymentTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getEmploymentTypeList(countryId, false));
     }
 
-   /* @RequestMapping(value = "/employment_type", method = RequestMethod.GET)
-    @ApiOperation("get employment type of country")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getEmploymentTypeList (@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getEmploymentTypeList(countryId, false));
-    }*/
-
-    @RequestMapping(value = UNIT_URL+"/employment_type_settings", method = RequestMethod.PUT)
+    @RequestMapping(value = UNIT_URL+"/employment_type/{employmentTypeId}", method = RequestMethod.PUT)
     @ApiOperation("Add relationship for organization and employment type for settings")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addEmploymentTypeSettingsForOrganization(@PathVariable long unitId, @Valid @RequestBody OrganizationEmploymentTypeDTO orgEmploymentTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.setEmploymentTypeSettingsOfOrganization(unitId, orgEmploymentTypeDTO));
+    public ResponseEntity<Map<String, Object>> addEmploymentTypeSettingsForOrganization(@PathVariable long unitId, @PathVariable long employmentTypeId, @Valid @RequestBody OrganizationEmploymentTypeDTO orgEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.setEmploymentTypeSettingsOfOrganization(unitId, employmentTypeId, orgEmploymentTypeDTO));
     }
 
-    @RequestMapping(value = UNIT_URL+"/employment_type_settings", method = RequestMethod.GET)
+    @RequestMapping(value = UNIT_URL+"/employment_type", method = RequestMethod.GET)
     @ApiOperation("Add relationship for organization and employment type for settings")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmploymentTypeSettinggsForOrganization(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, employmentTypeService.getEmploymentTypeSettingsOfOrganization(unitId));
     }
-    /*@RequestMapping(value = UNIT_URL+"/employment_type_settings", method = RequestMethod.PUT)
-    @ApiOperation("Add relationship for organization and employment type for settings")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addEmploymentTypeForOrganization(@PathVariable long unitId, @Valid @RequestBody OrganizationEmploymentTypeDTO orgEmploymentTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, employmentTypeService.addEmploymentTypeSettingsForUnit(unitId, orgEmploymentTypeDTO));
-    }*/
+
 }

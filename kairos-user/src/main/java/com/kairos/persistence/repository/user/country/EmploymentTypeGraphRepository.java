@@ -1,4 +1,5 @@
 package com.kairos.persistence.repository.user.country;
+import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -35,14 +36,12 @@ public interface EmploymentTypeGraphRepository extends GraphRepository<Employmen
 
         @Query("MATCH (o:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE id(o)={0} AND et.deleted={1} with et\n" +
                 "OPTIONAL MATCH (o)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) with \n" +
-                "CASE WHEN r IS NULL THEN \n" +
-                "collect({employmentType:{id:id(et),name:et.name,description:et.description},\n" +
-                "allowedForContactPerson:o.allowedForContactPerson, allowedForShiftPlan:et.allowedForShiftPlan, allowedForFlexPool:et.allowedForFlexPool}) \n" +
-                "ELSE\n" +
-                "collect({employmentType:{id:id(et),name:et.name,description:et.description},\n" +
-                "allowedForContactPerson:et.allowedForContactPerson, allowedForShiftPlan:et.allowedForShiftPlan, allowedForFlexPool:et.allowedForFlexPool})\n"+
-                "END as employmentTypeSettings return employmentTypeSettings")
-        List<HashMap<String, Object>> getEmploymentTypeSettingsForOrganization(long organizationId, boolean isDeleted);
+                "o,et,r \n" +
+                "return id(et) as id, et.name as name, et.description as description,\n" +
+                "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +
+                "CASE WHEN r IS null THEN et.allowedForShiftPlan ELSE r.allowedForShiftPlan  END AS allowedForShiftPlan,\n" +
+                "CASE WHEN r IS null THEN et.allowedForFlexPool ELSE r.allowedForFlexPool  END AS allowedForFlexPool")
+        List<EmploymentTypeDTO> getEmploymentTypeSettingsForOrganization(long organizationId, boolean isDeleted);
 
         @Query("MATCH (n:Organization) - [r:"+BELONGS_TO+"] -> (c:Country)-[r1:"+HAS_EMPLOYMENT_TYPE+"]-> (et:EmploymentType)\n" +
                 "WHERE id(n)={0} AND id(et)={1} AND et.deleted={2} return count(et) > 0 as etExists")

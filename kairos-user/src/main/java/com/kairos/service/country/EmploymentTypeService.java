@@ -4,6 +4,7 @@ import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationEmploymentTypeRelationship;
 import com.kairos.persistence.model.organization.OrganizationTimeSlotRelationship;
 import com.kairos.persistence.model.user.country.Country;
@@ -60,6 +61,10 @@ public class EmploymentTypeService extends UserBaseService {
     }
 
     public EmploymentType updateEmploymentType(long countryId, long employmentTypeId, EmploymentTypeDTO employmentTypeDTO) {
+        Country country = countryGraphRepository.findOne(countryId,0);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
         EmploymentType employmentTypeToUpdate = countryGraphRepository.getEmploymentTypeByCountryAndEmploymentType(countryId, employmentTypeId);
         if (employmentTypeToUpdate == null) {
 //            logger.debug("Finding Employment Type by id::" + levelId);
@@ -86,35 +91,53 @@ public class EmploymentTypeService extends UserBaseService {
     }
 
     public List<EmploymentType> getEmploymentTypeList(long countryId, boolean isDeleted) {
+        Country country = countryGraphRepository.findOne(countryId,0);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
         return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
     }
 
-    public List<Map<String, Object>> getEmploymentTypeOfOrganization(long organizationId, boolean isDeleted){
-        return organizationGraphRepository.getEmploymentTypeByOrganization(organizationId,isDeleted);
+    public List<Map<String, Object>> getEmploymentTypeOfOrganization(long unitId, boolean isDeleted){
+        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId,0) : null;
+        if (!Optional.ofNullable(organization).isPresent()) {
+            logger.error("Incorrect unit id " + unitId);
+            throw new DataNotFoundByIdException("Incorrect unit id ");
+        }
+        return organizationGraphRepository.getEmploymentTypeByOrganization(unitId,isDeleted);
     }
 
-    public OrganizationEmploymentTypeDTO setEmploymentTypeSettingsOfOrganization(Long organizationId, OrganizationEmploymentTypeDTO organizationEmploymentTypeDTO) {
-        boolean employmentTypeExistInOrganization = employmentTypeGraphRepository.isEmploymentTypeExistInOrganization(organizationId, organizationEmploymentTypeDTO.getEmploymentTypeId(), false);
-        if( ! employmentTypeExistInOrganization ) {
-            logger.error("Employment Type does not exist in organization" + organizationEmploymentTypeDTO.getEmploymentTypeId());
-            throw new DataNotFoundByIdException("Invalid Employment Type");
+    public OrganizationEmploymentTypeDTO setEmploymentTypeSettingsOfOrganization(Long unitId, Long employmentTypeId, OrganizationEmploymentTypeDTO organizationEmploymentTypeDTO) {
+        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId,0) : null;
+        if (!Optional.ofNullable(organization).isPresent()) {
+            logger.error("Incorrect unit id " + unitId);
+            throw new DataNotFoundByIdException("Incorrect unit id ");
+        }
+        EmploymentType employmentType = employmentTypeGraphRepository.findOne(employmentTypeId,0);
+//        boolean employmentTypeExistInOrganization = employmentTypeGraphRepository.isEmploymentTypeExistInOrganization(unitId, organizationEmploymentTypeDTO.getEmploymentTypeId(), false);
+        if( employmentType == null) {
+            throw new DataNotFoundByIdException("Invalid Employment Type Id : "+employmentTypeId);
         }
 
-        Boolean settingUpdated = employmentTypeGraphRepository.setEmploymentTypeSettingsForOrganization(organizationId,
-                organizationEmploymentTypeDTO.getEmploymentTypeId(),
+        Boolean settingUpdated = employmentTypeGraphRepository.setEmploymentTypeSettingsForOrganization(unitId,employmentTypeId,
                 organizationEmploymentTypeDTO.isAllowedForContactPerson(),
                 organizationEmploymentTypeDTO.isAllowedForShiftPlan(),
                 organizationEmploymentTypeDTO.isAllowedForFlexPool(),new Date().getTime(),new Date().getTime());
         if(settingUpdated){
             return organizationEmploymentTypeDTO;
         } else {
-            logger.error("Employment type settings could not be updated in organization " +organizationId);
+            logger.error("Employment type settings could not be updated in organization " +unitId);
             throw new InternalError("Employment type settings could not be updated");
         }
     }
 
-    public List<HashMap<String, Object>> getEmploymentTypeSettingsOfOrganization(Long organizationId) {
-        return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(organizationId, false);
+    public List<EmploymentTypeDTO> getEmploymentTypeSettingsOfOrganization(Long unitId) {
+        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId,0) : null;
+        if (!Optional.ofNullable(organization).isPresent()) {
+            logger.error("Incorrect unit id " + unitId);
+            throw new DataNotFoundByIdException("Incorrect unit id ");
+        }
+        return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(unitId, false);
     }
 
 }

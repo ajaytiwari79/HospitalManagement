@@ -24,6 +24,8 @@ public class OrganizationEmploymentTypeRelationship extends UserBaseEntity {
     private EmploymentType employmentType;
 
     private boolean allowedForContactPerson;
+    private boolean allowedForShiftPlan;
+    private boolean allowedForFlexPool;
 
     public Organization getOrganization() {
         return organization;
@@ -47,5 +49,21 @@ public class OrganizationEmploymentTypeRelationship extends UserBaseEntity {
 
     public void setAllowedForContactPerson(boolean allowedForContactPerson) {
         this.allowedForContactPerson = allowedForContactPerson;
+    }
+
+    public boolean isAllowedForShiftPlan() {
+        return allowedForShiftPlan;
+    }
+
+    public void setAllowedForShiftPlan(boolean allowedForShiftPlan) {
+        this.allowedForShiftPlan = allowedForShiftPlan;
+    }
+
+    public boolean isAllowedForFlexPool() {
+        return allowedForFlexPool;
+    }
+
+    public void setAllowedForFlexPool(boolean allowedForFlexPool) {
+        this.allowedForFlexPool = allowedForFlexPool;
     }
 }
