@@ -22,8 +22,10 @@ public class Tag extends UserBaseEntity {
     @NotEmpty(message = "error.Tag.name.notEmptyOrNotNull") @NotNull(message = "error.Tag.name.notEmptyOrNotNull")
     private String name;
 
-    boolean deleted;
+    private boolean deleted;
 
+    public Tag(){}
+    
     public String getName() {
         return name;
     }
@@ -38,5 +40,9 @@ public class Tag extends UserBaseEntity {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Tag(String name){
+        this.setName(name);
     }
 }

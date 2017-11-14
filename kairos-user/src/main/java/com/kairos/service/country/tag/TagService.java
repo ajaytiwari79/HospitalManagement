@@ -1,25 +1,35 @@
 package com.kairos.service.country.tag;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.tag.CountryTagRelationship;
+import com.kairos.persistence.model.user.country.tag.OrganizationTagRelationship;
 import com.kairos.persistence.model.user.country.tag.Tag;
+import com.kairos.persistence.model.user.country.tag.TagQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryTagRelationshipGraphRepository;
+import com.kairos.persistence.repository.user.country.OrganizationTagRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by prerna on 10/11/17.
  */
+@Service
+@Transactional
 public class TagService extends UserBaseService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -30,30 +40,65 @@ public class TagService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
 
     @Inject
+    private CountryTagRelationshipGraphRepository countryTagRelationshipGraphRepository;
+
+    @Inject
+    OrganizationTagRelationshipGraphRepository organizationTagRelationshipGraphRepository;
+
+    @Inject
     private OrganizationGraphRepository organizationGraphRepository;
 
-    public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
+    public TagDTO addCountryTag(Long countryId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
-        return tagGraphRepository.addCountryTag(tagDTO.getName(), countryId, tagDTO.getMasterDataType(), new Date().getTime(), new Date().getTime() );
+        logger.info("tagDTO : "+tagDTO.getMasterDataType());
+        if( tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false) ){
+            throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
+        }
+        CountryTagRelationship countryTagRelationship = new CountryTagRelationship();
+        countryTagRelationship.setCountry(country);
+        countryTagRelationship.setTag(new Tag(tagDTO.getName()));
+        countryTagRelationship.setMasterDataType(tagDTO.getMasterDataType());
+        countryTagRelationship.setCreationDate(new Date().getTime());
+        countryTagRelationship.setLastModificationDate(new Date().getTime());
+        countryTagRelationshipGraphRepository.save(countryTagRelationship);
+
+        tagDTO.setId(countryTagRelationship.getTag().getId());
+        return tagDTO;
     }
 
-    public Tag updateCountryTag(Long countryId, TagDTO tagDTO, Long tagId) {
+    public HashMap<String,Object>  updateCountryTag(Long countryId, Long tagId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+        if(! tagGraphRepository.isCountryTagExistsWithDataType(tagId, countryId, tagDTO.getMasterDataType().toString(), false) ){
+            throw new DuplicateDataException("Tag does not exist with id " +tagId );
+        }
+        if( tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false) ){
+            throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
         }
         return tagGraphRepository.updateCountryTag(tagId, countryId, tagDTO.getName(), new Date().getTime());
     }
 
-    public boolean deleteCountryTag(Long countryId, Long tagId, MasterDataTypeEnum masterDataTypeEnum){
+    public HashMap<String,Object> getListOfCountryTags(Long countryId){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
-        Tag tag = tagGraphRepository.getCountryTag(countryId, tagId, masterDataTypeEnum, false);
+        HashMap<String,Object> tagsData = new HashMap<>();
+        tagsData.put("tags",tagGraphRepository.getListOfCountryTags(countryId, false));
+        return tagsData;
+    }
+
+    public boolean deleteCountryTag(Long countryId, Long tagId){
+        Country country = countryGraphRepository.findOne(countryId,0);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+        Tag tag = tagGraphRepository.getCountryTag(countryId, tagId, false);
         if( tag == null) {
             throw new DataNotFoundByIdException("Incorrect tag id " + tagId);
         }
@@ -62,26 +107,81 @@ public class TagService extends UserBaseService {
         return true;
     }
 
-    public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO) {
+    /*public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO) {
         return tagGraphRepository.addOrganizationTag(tagDTO.getName(), organizationId, tagDTO.getMasterDataType(), new Date().getTime(), new Date().getTime() );
-    }
+    }*/
 
-    public Tag updateOrganizationTag(Long organizationId, TagDTO tagDTO, Long tagId) {
+
+    public TagDTO addOrganizationTag(Long organizationId, TagDTO tagDTO) {
+        Organization organization = organizationGraphRepository.findOne(organizationId, 0);
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
+        }
+        logger.info("tagDTO : "+tagDTO.getMasterDataType());
+        if( tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false) ){
+            throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
+        }
+        OrganizationTagRelationship organizationTagRelationship = new OrganizationTagRelationship();
+        organizationTagRelationship.setOrganization(organization);
+        organizationTagRelationship.setTag(new Tag(tagDTO.getName()));
+        organizationTagRelationship.setMasterDataType(tagDTO.getMasterDataType());
+        organizationTagRelationship.setCreationDate(new Date().getTime());
+        organizationTagRelationship.setLastModificationDate(new Date().getTime());
+        organizationTagRelationshipGraphRepository.save(organizationTagRelationship);
+
+        tagDTO.setId(organizationTagRelationship.getTag().getId());
+        return tagDTO;
+    }
+    /*public Tag updateOrganizationTag(Long organizationId, TagDTO tagDTO, Long tagId) {
+        return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), new Date().getTime());
+    }*/
+
+
+    public HashMap<String,Object>  updateOrganizationTag(Long organizationId, Long tagId, TagDTO tagDTO) {
+        Organization organization = organizationGraphRepository.findOne(organizationId, 0);
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
+        }
+        if(! tagGraphRepository.isOrganizationTagExistsWithDataType(tagId, organizationId, tagDTO.getMasterDataType().toString(), false) ){
+            throw new DuplicateDataException("Tag does not exist with id " +tagId );
+        }
+        if( tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false) ){
+            throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
+        }
         return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), new Date().getTime());
     }
 
-    public boolean deleteOrganizationTag(Long orgId, Long tagId, MasterDataTypeEnum masterDataTypeEnum){
+    public boolean deleteOrganizationTag(Long orgId, Long tagId){
         Organization organization = organizationGraphRepository.findOne(orgId, 0);
         if (organization == null) {
             throw new DataNotFoundByIdException("Incorrect Unit Id " + orgId);
         }
-        Tag tag = tagGraphRepository.getOrganizationTag(tagId, orgId, masterDataTypeEnum, false);
+        Tag tag = tagGraphRepository.getOrganizationTag(tagId, orgId, false);
         if( tag == null) {
             throw new DataNotFoundByIdException("Incorrect tag id " + tagId);
         }
         tag.setDeleted(true);
         save(tag);
         return true;
+    }
+
+    public HashMap<String, Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType){
+        Organization organization = organizationGraphRepository.findOne(organizationId, 0);
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
+        }
+        if(filterText == null){
+            filterText = "";
+        }
+        String filterTextRegex = "~'.*"+filterText+".*";
+        HashMap<String,Object> tagsData = new HashMap<>();
+        if(masterDataType == null){
+            tagsData.put("tags",tagGraphRepository.getListOfOrganizationTags(organizationId, false, ""));
+        } else {
+            tagsData.put("tags",tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, "",  masterDataType.toString()));
+        }
+
+        return tagsData;
     }
 
     public boolean updateShowCountryTagSettingOfOrganization(Long organizationId, boolean showCountryTags) {
@@ -94,9 +194,5 @@ public class TagService extends UserBaseService {
         return showCountryTags;
     }
 
-
-
-
-//    public
 }
 

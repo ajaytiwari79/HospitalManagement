@@ -4,6 +4,7 @@ package com.kairos.persistence.model.user.country.tag;
  * Created by prerna on 10/11/17.
  */
 
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.tag.Tag;
@@ -16,7 +17,7 @@ import org.neo4j.ogm.annotation.typeconversion.EnumString;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_HAS_TAG;
 
 @RelationshipEntity(type = ORGANIZATION_HAS_TAG)
-public class OrganizationTagRelationship {
+public class OrganizationTagRelationship extends UserBaseEntity {
 
     @StartNode
     private Organization organization;
@@ -27,6 +28,8 @@ public class OrganizationTagRelationship {
     @EnumString(MasterDataTypeEnum.class)
     private MasterDataTypeEnum masterDataType;
 
+
+    public OrganizationTagRelationship(){}
     public Organization getOrganization() {
         return organization;
     }

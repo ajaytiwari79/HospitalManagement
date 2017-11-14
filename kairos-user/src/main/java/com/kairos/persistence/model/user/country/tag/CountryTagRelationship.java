@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.country.tag;
 
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
@@ -15,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.COUNT
  * Created by prerna on 10/11/17.
  */
 @RelationshipEntity(type = COUNTRY_HAS_TAG)
-public class CountryTagRelationship {
+public class CountryTagRelationship extends UserBaseEntity {
 
     @StartNode
     private Country country;
@@ -26,6 +27,7 @@ public class CountryTagRelationship {
     @EnumString(MasterDataTypeEnum.class)
     private MasterDataTypeEnum masterDataType;
 
+    public CountryTagRelationship(){}
     public Country getCountry() {
         return country;
     }
