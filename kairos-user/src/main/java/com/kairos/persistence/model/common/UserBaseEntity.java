@@ -15,6 +15,7 @@ public class UserBaseEntity {
     private Long creationDate;
     private Long lastModificationDate;
 
+
     public void setId(Long id) {
         this.id = id;
     }

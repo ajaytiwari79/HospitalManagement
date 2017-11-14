@@ -1,12 +1,12 @@
 package com.kairos.service.organization;
 
-import com.kairos.persistence.model.organization.OrgTypeExpertiseQueryResult;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.response.dto.web.OrganizationTypeDTO;
+import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by oodles on 18/10/16.
@@ -30,33 +31,22 @@ public class OrganizationTypeService extends UserBaseService {
     @Inject
     CountryGraphRepository countryGraphRepository;
 
-    public List<Map<String, Object>> getOrgTypesByCountryId(Long countryId) {
+    public List<OrganizationType> getOrgTypesByCountryId(Long countryId) {
 
-        List<Map<String, Object>> list = new ArrayList<>();
-        for (OrganizationType organizationType : organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId)) {
-            Map<String, Object> map = new HashMap();
-            map.put("id", organizationType.getId());
-            map.put("name", organizationType.getName());
-            map.put("description", organizationType.getDescription());
-            list.add(map);
-        }
-        return list;
+        return organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId);
     }
 
-    public Map<String, Object> createOrganizationTypeForCountry(Long countryId, OrganizationType data) {
+    public OrganizationType createOrganizationTypeForCountry(Long countryId, OrganizationTypeDTO organizationTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        if (country != null) {
-            if (data.getName() != null) {
-                OrganizationType organizationType = new OrganizationType();
-                organizationType.setName(data.getName());
-                organizationType.setDescription(data.getDescription());
-                organizationType.setCountry(country);
-                save(organizationType);
-                return  organizationType.retrieveDetails();
-            }
+        if(!Optional.ofNullable(country).isPresent()){
+            throw new DataNotFoundByIdException("Invalid country id " + countryId);
         }
-        return null;
+        List<Level> levels = organizationTypeDTO.getLevels().stream().map(level->new Level(level)).collect(Collectors.toList());
+        OrganizationType organizationType = new OrganizationType(organizationTypeDTO.getName(),country,levels);
+        return prepareResponse(save(organizationType));
     }
+
+
 
     public OrganizationType getOrganizationTypeById(Long organizationTypeId) {
         return organizationTypeGraphRepository.findOne(organizationTypeId);
@@ -83,18 +73,29 @@ public class OrganizationTypeService extends UserBaseService {
 
     }
 
-    public Map<String, Object> updateOrganizationType(OrganizationType organizationType) {
-        if (organizationType.getName() != null && organizationType.getId() != null) {
-            OrganizationType currentType = organizationTypeGraphRepository.findOne(organizationType.getId());
-            if (currentType != null) {
-                currentType.setName(organizationType.getName());
-                currentType.setDescription(organizationType.getDescription());
-                save(currentType);
-                return currentType.retrieveDetails();
-            }
-            return null;
+    public OrganizationType updateOrganizationType(Long organizationTypeId,UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
+        OrganizationType orgTypeToUpdate = organizationTypeGraphRepository.findOne(organizationTypeId);
+        if(!Optional.ofNullable(orgTypeToUpdate).isPresent()){
+            throw new DataNotFoundByIdException("Invalid organization type id " + organizationTypeId);
         }
-        return null;
+        orgTypeToUpdate.getLevels().forEach(level -> {
+            Optional<Level> result = updateOrganizationTypeDTO.getLevelsToUpdate().stream().filter(levelInList->levelInList.getId().equals(level.getId())).findFirst();
+            if(result.isPresent()){
+                level.setName(result.get().getName());
+            } else if(updateOrganizationTypeDTO.getLevelsToDelete().contains(level.getId())) {
+                level.setDeleted(true);
+            }
+        });
+        orgTypeToUpdate.setName(updateOrganizationTypeDTO.getName());
+        return prepareResponse(save(orgTypeToUpdate));
+    }
+
+    private OrganizationType prepareResponse(OrganizationType organizationType){
+        OrganizationType response = new OrganizationType();
+        response.setId(organizationType.getId());
+        response.setName(organizationType.getName());
+        response.setLevels(organizationType.getLevels());
+        return response;
     }
 
     public Map<String, Object> addOrganizationTypeSubType(OrganizationType organizationType, Long organizationTypeId) {
