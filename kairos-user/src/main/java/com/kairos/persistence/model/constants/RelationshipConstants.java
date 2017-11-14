@@ -11,6 +11,7 @@ public class RelationshipConstants {
 
     // Country
     public final static String COUNTRY_HAS_TAG = "COUNTRY_HAS_TAG";
+    public final static String HAS_TAG = "HAS_TAG";
 
     // Organization
     public final static String COUNTRY = "BELONGS_TO";

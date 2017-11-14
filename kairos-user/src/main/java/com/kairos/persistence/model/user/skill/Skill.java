@@ -1,17 +1,20 @@
 package com.kairos.persistence.model.user.skill;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.country.tag.Tag;
+import com.kairos.response.dto.web.skill.SkillDTO;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.APPROVED_BY;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CATEGORY;
-import static com.kairos.persistence.model.constants.RelationshipConstants.REQUESTED_BY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -41,12 +44,20 @@ public class Skill extends UserBaseEntity {
     @Relationship(type = APPROVED_BY)
     User approvedBy;
 
+    @Relationship(type = HAS_TAG)
+    private List<Tag> tags = new ArrayList<>();
+
     public Skill(String name, SkillCategory skillCategory) {
         this.name = name;
         this.skillCategory = skillCategory;
     }
 
     public Skill() {
+    }
+
+    public Skill(SkillDTO skillDTO){
+        this.name = skillDTO.getName();
+        this.description = skillDTO.getDescription();
     }
 
     public String getShortName() {
@@ -141,6 +152,13 @@ public class Skill extends UserBaseEntity {
         this.approvedBy = approvedBy;
     }
 
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 
     public enum SkillStatus {
         PENDING, APPROVED, REJECTED;

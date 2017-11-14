@@ -205,5 +205,20 @@ public class TagService extends UserBaseService {
         return showCountryTags;
     }
 
+    public List<Tag> getTagsByIds(List<Long> tagsId){
+        if (tagsId != null && tagsId.size() > 0) {
+            return tagGraphRepository.getTagsById(tagsId, false);
+        } else {
+            return new ArrayList<Tag>();
+        }
+    }
+
+    public List<Tag> getTagsByIdsAndMasterDataType(List<Long> tagsId, MasterDataTypeEnum masterDataType){
+        if (tagsId != null && tagsId.size() > 0) {
+            return tagGraphRepository.getTagsById(tagsId, masterDataType.toString(), false);
+        } else {
+            return new ArrayList<Tag>();
+        }
+    }
 }
 

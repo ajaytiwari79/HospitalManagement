@@ -2,6 +2,7 @@ package com.kairos.service.agreement.wta;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
@@ -23,6 +24,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.WtaDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.expertise.ExpertiseService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -62,6 +64,8 @@ public class WTAService extends UserBaseService {
     private WtaRuleTemplateService wtaRuleTemplateService;
     @Inject
     private RuleTemplateCategoryService ruleTemplateCategoryService;
+    @Inject
+    private TagService tagService;
 
     public HashMap createWta(long countryId, WtaDTO wtaDTO) {
         Country country = countryRepository.findOne(countryId);
@@ -71,7 +75,8 @@ public class WTAService extends UserBaseService {
         checkUniquenessOfData(countryId, wtaDTO.getOrganizationSubType(), wtaDTO.getOrganizationType(), wtaDTO.getExpertiseId());
         List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTAWithCategoryDTO>();
         WorkingTimeAgreement wta = prepareWta(countryId, wtaDTO, wtaRuleTemplateQueryResponseArrayList);
-
+        // Link tags to WTA
+        wta.setTags(tagService.getTagsByIdsAndMasterDataType(wtaDTO.getTagsId(), MasterDataTypeEnum.WTA));
         wta.setCountry(country);
         save(wta);
 
@@ -230,6 +235,7 @@ public class WTAService extends UserBaseService {
             }
             oldWta.setEndDateMillis(wtaDTO.getEndDateMillis());
         }
+        oldWta.setTags(tagService.getTagsByIdsAndMasterDataType(wtaDTO.getTagsId(), MasterDataTypeEnum.WTA));
         save(oldWta);
     }
 

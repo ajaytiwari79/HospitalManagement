@@ -3,15 +3,19 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TAG;
 
 
 /**
@@ -32,6 +36,9 @@ public class Expertise extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
     Country country;
+
+    @Relationship(type = HAS_TAG)
+    private List<Tag> tags = new ArrayList<>();
 
     public String getDescription() {
         return description;
@@ -64,6 +71,14 @@ public class Expertise extends UserBaseEntity {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     public Expertise(){}

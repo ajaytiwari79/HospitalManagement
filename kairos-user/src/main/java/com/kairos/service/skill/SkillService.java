@@ -4,6 +4,7 @@ import com.kairos.client.SkillServiceTemplateClient;
 import com.kairos.client.TaskDemandRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.country.Country;
@@ -15,12 +16,15 @@ import com.kairos.persistence.repository.organization.OrganizationMetadataReposi
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.mail.MailService;
@@ -90,18 +94,22 @@ public class SkillService extends UserBaseService {
     private TimeSlotService timeSlotService;
     @Inject
     private TaskDemandRestClient taskDemandRestClient;
+    @Inject
+    private TagService tagService;
 
 
-    public Map<String, Object> createSkill(Skill skill, long skillCategoryId) {
+    public Map<String, Object> createSkill(SkillDTO skillDTO, long skillCategoryId) {
         SkillCategory skillCategory = skillCategoryGraphRepository.findOne(skillCategoryId);
         if (skillCategory == null) {
             return null;
         }
-        String name = "(?i)" + skill.getName();
+        String name = "(?i)" + skillDTO.getName();
         logger.info("Added regex to Name: " + name);
         if (skillGraphRepository.checkDuplicateSkill(skillCategoryId, name).isEmpty()) {
             logger.info("Creating unique skill");
+            Skill skill = new Skill(skillDTO);
             skill.setSkillCategory(skillCategory);
+            skill.setTags(tagService.getTagsByIdsAndMasterDataType(skillDTO.getTagsId(), MasterDataTypeEnum.SKILL));
             skillGraphRepository.save(skill);
             Map<String, Object> response = skill.retrieveDetails();
             return response;
@@ -127,7 +135,7 @@ public class SkillService extends UserBaseService {
     }
 
 
-    public Map<String, Object> updateSkill(long countryId, Skill data) {
+    public Map<String, Object> updateSkill(long countryId, SkillDTO data) {
         if (data != null) {
             Skill skill = skillGraphRepository.findOne(data.getId());
 
@@ -135,6 +143,7 @@ public class SkillService extends UserBaseService {
                 skill.setName(data.getName());
                 skill.setDescription(data.getDescription());
                 skill.setShortName(data.getShortName());
+                skill.setTags(tagService.getTagsByIdsAndMasterDataType(data.getTagsId(), MasterDataTypeEnum.SKILL));
                 return skillGraphRepository.save(skill).retrieveDetails();
             }
 

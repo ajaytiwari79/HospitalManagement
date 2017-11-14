@@ -126,7 +126,17 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
     //collect({id:tag.id, masterDataType:r.masterDataType, name:tag.name}) as data
     List<Tag> getListOfCountryTagsByDataType(Long countryId, MasterDataTypeEnum masterDataType, boolean deleted);
 
+    @Query("MATCH (tag:Tag) WHERE id(tag) IN {0} AND tag.deleted={1}")
+    List<Tag> getTagsById(List<Long> tagIds, boolean deleted);
 
+    @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE id(tag) IN {0} AND tag.deleted= {2} AND r.masterDataType ={1}\n" +
+            "return id(tag) as id\n" +
+            "UNION\n" +
+            "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
+            "WHERE id(tag) IN {0} AND tag.deleted= {2} AND r.masterDataType ={1}\n" +
+            "return id(tag) as id\n")
+    List<Tag> getTagsById(List<Long> tagIds, String masterDataType, boolean deleted);
 
 }
 

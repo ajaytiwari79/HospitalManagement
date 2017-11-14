@@ -108,4 +108,14 @@ public class TagController {
     public ResponseEntity<Map<String, Object>> updateCountryTag(@Validated @RequestBody ShowCountryTagSetting showCountryTagSetting, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateShowCountryTagSettingOfOrganization(unitId, showCountryTagSetting.isShowCountryTags()));
     }
+
+    // TO get tags of skill
+    /*@ApiOperation(value = "Get list of Tag")
+    @RequestMapping(value = COUNTRY_URL + "/tag", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryTag(@PathVariable long countryId,
+                                                             @RequestParam(value = "filterText",required = false) String filterText,
+                                                             @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfCountryTags(countryId, filterText, masterDataType));
+    }*/
 }
