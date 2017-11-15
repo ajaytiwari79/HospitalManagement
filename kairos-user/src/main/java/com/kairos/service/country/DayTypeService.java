@@ -49,12 +49,12 @@ public class DayTypeService extends UserBaseService {
         return null;
     }
 
-    public List<Map<String,Object>> getAllDayTypeByCountryId(long countryId){
-        List<Map<String,Object>>  data = dayTypeGraphRepository.findByCountryId(countryId);
-        if (data!=null){
+    public List<DayType> getAllDayTypeByCountryId(long countryId){
+        List<DayType>  data = dayTypeGraphRepository.findByCountryId(countryId);
+        /*if (data!=null){
          return FormatUtil.formatNeoResponse(data);
-        }
-        return  null;
+        }*/
+        return  data;
     }
 
     public Map<String, Object> updateDayType(DayType dayType){
