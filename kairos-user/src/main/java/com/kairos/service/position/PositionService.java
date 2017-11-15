@@ -203,7 +203,6 @@ public class PositionService extends UserBaseService {
         WorkingTimeAgreement wta = new WorkingTimeAgreement();
         wta.setName(wtaWithRuleTemplateDTO.getName());
         wta.setDescription(wtaWithRuleTemplateDTO.getDescription());
-        wta.setEnabled(true);
         wta.setEndDateMillis(wtaWithRuleTemplateDTO.getEndDateMillis());
         wta.setStartDateMillis(wtaWithRuleTemplateDTO.getStartDateMillis());
         wtaWithRuleTemplateDTO.getRuleTemplates();
