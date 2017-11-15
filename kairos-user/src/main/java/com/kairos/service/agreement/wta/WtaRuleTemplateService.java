@@ -294,7 +294,6 @@ public class WtaRuleTemplateService extends UserBaseService {
             case TEMPLATE10:
                 MaximumDaysOffInPeriodWTATemplate maximumDaysOffInPeriodWTATemplate = (MaximumDaysOffInPeriodWTATemplate) oldTemplate;
                 maximumDaysOffInPeriodWTATemplate.setActive(templateDTO.isActive());
-
                 maximumDaysOffInPeriodWTATemplate.setDescription(templateDTO.getDescription());
                 maximumDaysOffInPeriodWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
                 maximumDaysOffInPeriodWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());

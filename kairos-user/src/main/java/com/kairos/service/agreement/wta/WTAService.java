@@ -142,7 +142,7 @@ public class WTAService extends UserBaseService {
         return wta;
     }
 
-    private void copyRuleTemplates(WtaDTO wtaDTO, List<WTABaseRuleTemplate> wtaBaseRuleTemplates, List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList) {
+    public void copyRuleTemplates(WtaDTO wtaDTO, List<WTABaseRuleTemplate> wtaBaseRuleTemplates, List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList) {
 
         if (wtaDTO.getRuleTemplates() != null || !wtaDTO.getRuleTemplates().isEmpty()) {
             for (long ruleTemplateId : wtaDTO.getRuleTemplates()) {
@@ -338,7 +338,7 @@ public class WTAService extends UserBaseService {
 
     }
 
-    private WTABaseRuleTemplate createCopyOfPrevious(WTARuleTemplateQueryResponse wtaBaseRuleTemplate) {
+    protected WTABaseRuleTemplate createCopyOfPrevious(WTARuleTemplateQueryResponse wtaBaseRuleTemplate) {
         WTABaseRuleTemplate wtaBaseRuleTemplateCopy = null;
         switch (wtaBaseRuleTemplate.getTemplateType()) {
             case TEMPLATE1:
