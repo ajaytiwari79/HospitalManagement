@@ -227,12 +227,12 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "return collect({id:id(org),levelId:id(level),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,homeAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCode:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,municipalityId:id(municipality)}}) as organizations")
     OrganizationQueryResult getParentOrganizationOfRegion(long countryId);
 
-    @Query("Match (country:Country) where id(country)={0} with country\n" +
-            "MATCH (bt:BusinessType{isEnabled:true})-[:" + BELONGS_TO + "]->(country) with collect(bt) as bt,country\n" +
-            "optional Match (country)-[:" + HAS_LEVEL + "]->(level:Level{isEnabled:true}) with collect(level) as level,bt,country\n" +
-            "MATCH (ot:OrganizationType{isEnable:true})-[:" + BELONGS_TO + "]->(country) WITH ot,bt,level\n" +
-            "OPTIONAL MATCH (ot)-[:" + HAS_SUB_TYPE + "]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else  collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot)} as orgTypes,bt,level\n" +
-            "return collect(orgTypes) as organizationTypes,bt as businessTypes,level as levels")
+    @Query("Match (country:Country) where id(country)=53 with country\n" +
+            "MATCH (bt:BusinessType{isEnabled:true})-[:BELONGS_TO]->(country) with collect(bt) as bt,country\n" +
+            "MATCH (ot:OrganizationType{isEnable:true})-[:BELONGS_TO]->(country) WITH ot,bt\n" +
+            "Optional Match (ot)-[:HAS_LEVEL]->(level:Level{deleted:false}) with ot,bt,collect(level) as levels\n" +
+            "OPTIONAL MATCH (ot)-[:HAS_SUB_TYPE]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else  collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot),levels:levels} as orgTypes,bt\n" +
+            "return collect(orgTypes) as organizationTypes,bt as businessTypes")
     OrganizationCreationData getOrganizationCreationData(long countryId);
 
 
