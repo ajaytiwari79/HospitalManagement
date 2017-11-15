@@ -1095,46 +1095,28 @@ public class ClientService extends UserBaseService {
      * @auther aniil maurya
      * this method is call from exception service from task micro service
      */
-    public List<ClientTemporaryAddressDTO> changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId, Long clientId) {
-
+    public ClientTemporaryAddress changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId, Long clientId) {
         List<Long> citizenIds = clientExceptionDto.getHouseHoldMembers();
         citizenIds.add(clientId);
         List<Client> citizens = clientGraphRepository.findByIdIn(citizenIds);
-        List<ClientTemporaryAddressDTO> clientTemporaryAddressDTOS = null;
+        ClientTemporaryAddress clientTemporaryAddress = null;
         if (clientExceptionDto.getTempAddress() != null) {
-            clientTemporaryAddressDTOS = updateClientTemporaryAddress(clientExceptionDto, unitId, clientId,citizens);
+            clientTemporaryAddress = updateClientTemporaryAddress(clientExceptionDto, unitId);
         }
         if (clientExceptionDto.getTemporaryAddress() != null) {
-            ClientTemporaryAddress clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
-            if (clientTemporaryAddress == null) {
-                throw new InternalError("Address not found");
-            }
-            clientTemporaryAddressDTOS = new ArrayList<>();
-            for(Client citizen : citizens) {
-                List<ClientTemporaryAddress> clientTemporaryAddresses = citizen.getTemporaryAddress();
-                ClientTemporaryAddressDTO clientTemporaryAddressDTO = new ClientTemporaryAddressDTO(citizen.getId());
-                if (citizen.getId() == clientId) {
-                    clientTemporaryAddresses.add(clientTemporaryAddress);
-                    clientTemporaryAddressDTO.setClientTemporaryAddress(clientTemporaryAddress);
-                } else {
-                    ClientTemporaryAddress addressForHouseHold = ClientTemporaryAddress.getInstance();
-                    BeanUtils.copyProperties(clientTemporaryAddress, addressForHouseHold);
-                    clientTemporaryAddresses.add(addressForHouseHold);
-                    clientTemporaryAddressDTO.setClientTemporaryAddress(addressForHouseHold);
-                }
-                clientTemporaryAddressDTOS.add(clientTemporaryAddressDTO);
-            }
+            clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
         }
-        return Optional.ofNullable(clientTemporaryAddressDTOS).orElse(new ArrayList<>());
+        for(Client citizen : citizens ){
+            citizen.getTemporaryAddress().add(clientTemporaryAddress);
+        }
+        clientGraphRepository.save(citizens);
+        return clientTemporaryAddress;
     }
 
 
-    private List<ClientTemporaryAddressDTO> updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, long unitId,
-                                                                         Long clientId,List<Client> citizens) {
-
+    private ClientTemporaryAddress updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, long unitId) {
         AddressDTO addressDTO = clientExceptionDto.getTempAddress();
         ZipCode zipCode;
-
         ClientTemporaryAddress clientTemporaryAddress = ClientTemporaryAddress.getInstance();
         if (addressDTO.isVerifiedByGoogleMap()) {
             clientTemporaryAddress.setLongitude(addressDTO.getLongitude());
@@ -1178,24 +1160,7 @@ public class ClientService extends UserBaseService {
         clientTemporaryAddress.setCity(zipCode.getName());
         clientTemporaryAddress.setZipCode(zipCode);
         clientTemporaryAddress.setCity(zipCode.getName());
-
-        List<ClientTemporaryAddressDTO> clientTemporaryAddressDTOS = new ArrayList<>();
-        citizens.forEach(citizen->{
-            List<ClientTemporaryAddress> clientTemporaryAddresses = citizen.getTemporaryAddress();
-            ClientTemporaryAddressDTO clientTemporaryAddressDTO = new ClientTemporaryAddressDTO(citizen.getId());
-            if(citizen.getId() == clientId){
-                clientTemporaryAddresses.add(clientTemporaryAddress);
-                clientTemporaryAddressDTO.setClientTemporaryAddress(clientTemporaryAddress);
-            } else {
-                ClientTemporaryAddress addressForHouseHold = ClientTemporaryAddress.getInstance();
-                BeanUtils.copyProperties(clientTemporaryAddress,addressForHouseHold);
-                clientTemporaryAddresses.add(addressForHouseHold);
-                clientTemporaryAddressDTO.setClientTemporaryAddress(addressForHouseHold);
-            }
-            citizen.setTemporaryAddress(clientTemporaryAddresses);
-        });
-        clientGraphRepository.save(citizens);
-        return clientTemporaryAddressDTOS;
+        return clientTemporaryAddress;
     }
 
 

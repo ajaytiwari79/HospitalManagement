@@ -2,7 +2,9 @@ package com.kairos.client.dto;
 
 import com.kairos.persistence.model.organization.AddressDTO;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by oodles on 14/2/17.
@@ -185,7 +187,7 @@ public class ClientExceptionDTO {
     }
 
     public List<Long> getHouseHoldMembers() {
-        return houseHoldMembers;
+        return Optional.ofNullable(houseHoldMembers).orElse(new ArrayList<>());
     }
 
     public void setHouseHoldMembers(List<Long> houseHoldMembers) {
