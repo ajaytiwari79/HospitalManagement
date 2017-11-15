@@ -345,7 +345,7 @@ public class CountryController {
         if (organization == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, organizationService.
                 createParentOrganization(organization, countryId, organizationId));
     }
 
