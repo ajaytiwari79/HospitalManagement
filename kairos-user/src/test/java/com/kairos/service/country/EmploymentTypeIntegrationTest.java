@@ -49,10 +49,12 @@ public class EmploymentTypeIntegrationTest {
         ResponseEntity<EmploymentTypeDTO> response = restTemplate.exchange(
                 baseUrl+"/employment_type",
                 HttpMethod.POST, entity, EmploymentTypeDTO.class);
+        System.out.println("response.getStatusCode() : "+response.getStatusCode());
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.CONFLICT.equals(response.getStatusCode()));
     }
 
     @Test
+    @Ignore
     public void updateEmploymentType() throws Exception {
         String baseUrl=getBaseUrl(71L,53L, null);
         String name="Test Employment Type "+ new Date().toString();
@@ -68,16 +70,17 @@ public class EmploymentTypeIntegrationTest {
 
         HttpEntity<EmploymentTypeDTO> entity = new HttpEntity<>(employmentTypeDTO);
         ResponseEntity<EmploymentTypeDTO> response = restTemplate.exchange(
-                baseUrl+"/employment_type/"+10656,
+                baseUrl+"/employment_type/"+10651,
                 HttpMethod.PUT, entity, EmploymentTypeDTO.class);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
 //        Assert.assertEquals(name,response.getBody().getName());
     }
 
     @Test
+    @Ignore
     public void deleteEmploymentType() throws Exception {
         String baseUrl=getBaseUrl(71L,53L, null);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/employment_type/"+10656);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/employment_type/"+10651);
         ResponseEntity<String> response = restTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.DELETE, null, String.class);
@@ -85,6 +88,7 @@ public class EmploymentTypeIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void getEmploymentTypeList() throws Exception {
         String baseUrl=getBaseUrl(71L,53L, null);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/employment_type/");
@@ -95,6 +99,7 @@ public class EmploymentTypeIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void addEmploymentTypeSettingsForOrganization() throws Exception {
         String baseUrl=getBaseUrl(71L,null, 145L);
         EmploymentTypeDTO employmentTypeDTO =new EmploymentTypeDTO();
@@ -104,13 +109,14 @@ public class EmploymentTypeIntegrationTest {
 
         HttpEntity<EmploymentTypeDTO> entity = new HttpEntity<>(employmentTypeDTO);
         ResponseEntity<EmploymentTypeDTO> response = restTemplate.exchange(
-                baseUrl+"/employment_type/"+10656,
+                baseUrl+"/employment_type/"+10651,
                 HttpMethod.PUT, entity, EmploymentTypeDTO.class);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 
     @Test
-    public void getEmploymentTypeSettinggsForOrganization() throws Exception {
+    @Ignore
+    public void getEmploymentTypeSettingsForOrganization() throws Exception {
         String baseUrl=getBaseUrl(71L,null, 145L);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/employment_type");
         ResponseEntity<String> response = restTemplate.exchange(

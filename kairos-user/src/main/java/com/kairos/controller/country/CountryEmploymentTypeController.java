@@ -70,7 +70,7 @@ public class CountryEmploymentTypeController {
     @ApiOperation("Add relationship for organization and employment type for settings")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmploymentTypeSettinggsForOrganization(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, employmentTypeService.getEmploymentTypeSettingsOfOrganization(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getEmploymentTypeSettingsOfOrganization(unitId));
     }
 
 }
