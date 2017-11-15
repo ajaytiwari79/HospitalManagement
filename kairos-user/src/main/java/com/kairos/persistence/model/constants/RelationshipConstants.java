@@ -38,6 +38,7 @@ public class RelationshipConstants {
 
     public final static String HAS_POSITION_NAME ="HAS_POSITION_NAME";
     public final static String HAS_POSITION ="HAS_POSITION";
+    public final static String EMPLOYMENT_TYPE_SETTINGS= "EMPLOYMENT_TYPE_SETTINGS";
 
 
     // Group

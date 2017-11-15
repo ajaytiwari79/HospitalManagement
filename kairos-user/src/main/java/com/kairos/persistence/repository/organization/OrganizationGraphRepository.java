@@ -536,7 +536,8 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
 
     @Query("MATCH (n:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType)\n"+
             "WHERE id(n)={0} AND et.deleted={1}\n" +
-            "return id(et) as id, et.name as name, et.description as description ORDER BY et.name ASC")
+            "return id(et) as id, et.name as name, et.description as description, \n"+
+            "et.allowedForContactPerson as allowedForContactPerson, et.allowedForShiftPlan as allowedForShiftPlan, et.allowedForFlexPool as allowedForFlexPool ORDER BY et.name ASC")
     List<Map<String, Object>> getEmploymentTypeByOrganization(Long organizationId,Boolean isDeleted);
 
     @Query("MATCH (n:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType)\n"+
