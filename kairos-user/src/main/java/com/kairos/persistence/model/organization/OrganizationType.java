@@ -19,7 +19,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by oodles on 14/9/16.
  */
 
-@QueryResult
+
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -148,6 +148,12 @@ public class OrganizationType extends UserBaseEntity {
         return map;
     }
 
-
+    @Override
+    public String toString() {
+        return "OrganizationType{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 
 }

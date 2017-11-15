@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -36,7 +37,7 @@ public class OrganizationServiceTest {
     public void createOrganization(){
 
         ParentOrganizationDTO parentOrganizationDTO = new ParentOrganizationDTO(Arrays.asList(94L),"Junit",
-                true,"Junit",10980L,Arrays.asList(10981L),Arrays.asList(10980L));
+                true,"My pharmacy",10980L,Arrays.asList(10981L),Arrays.asList(0L));
         parentOrganizationDTO.setVerifiedByGoogleMap(true);
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setStreet1("Frederiksberg");
@@ -54,6 +55,7 @@ public class OrganizationServiceTest {
                 baseUrl+"/country/53/parent_organization",
                 HttpMethod.POST, entity, String.class);
         System.out.println(response.getBody());
+        Assert.assertEquals(HttpStatus.CREATED,response.getStatusCode());
         Assert.assertNotNull(response.getBody());
 
     }

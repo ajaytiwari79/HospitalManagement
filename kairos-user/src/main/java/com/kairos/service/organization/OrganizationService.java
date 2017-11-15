@@ -221,7 +221,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = new Date().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        //phaseRestClient.createDefaultPhases(organization.getId());
+        phaseRestClient.createDefaultPhases(organization.getId());
         HashMap<String,Object> orgResponse = new HashMap<>();
         orgResponse.put("orgData",organizationResponse(organization, orgDetails));
         orgResponse.put("permissions",accessPageService.getPermissionOfUserInUnit(organizationId,organization,UserContext.getUserDetails().getId()));
@@ -259,6 +259,7 @@ public class OrganizationService extends UserBaseService {
         response.put("subTypeId", parentOrganizationDTO.getSubTypeId());
         response.put("externalId", organization.getExternalId());
         response.put("homeAddress", filterContactAddressInfo(organization.getContactAddress()));
+        response.put("levelId",organization.getLevel().getId());
         return response;
     }
 
@@ -730,6 +731,7 @@ public class OrganizationService extends UserBaseService {
 
         response.put("organizationTypes", organizationTypesForUnit);
         response.put("businessTypes", businessTypes);
+        response.put("level",organization.getLevel());
         return response;
     }
 
