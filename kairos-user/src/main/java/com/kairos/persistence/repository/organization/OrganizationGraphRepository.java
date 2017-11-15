@@ -230,7 +230,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
     @Query("Match (country:Country) where id(country)=53 with country\n" +
             "MATCH (bt:BusinessType{isEnabled:true})-[:BELONGS_TO]->(country) with collect(bt) as bt,country\n" +
             "MATCH (ot:OrganizationType{isEnable:true})-[:BELONGS_TO]->(country) WITH ot,bt\n" +
-            "Optional Match (ot)-[:HAS_LEVEL]->(level:Level{deleted:false}) with ot,bt,collect(level) as levels\n" +
+            "Optional Match (ot)-[:HAS_LEVEL]->(level:Level{deleted:false}) with ot,bt,collect({id:id(level),name:level.name}) as levels\n" +
             "OPTIONAL MATCH (ot)-[:HAS_SUB_TYPE]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else  collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot),levels:levels} as orgTypes,bt\n" +
             "return collect(orgTypes) as organizationTypes,bt as businessTypes")
     OrganizationCreationData getOrganizationCreationData(long countryId);
