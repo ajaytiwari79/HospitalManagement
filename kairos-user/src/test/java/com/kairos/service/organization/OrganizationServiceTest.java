@@ -54,9 +54,7 @@ public class OrganizationServiceTest {
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl+"/country/53/parent_organization",
                 HttpMethod.POST, entity, String.class);
-        System.out.println(response.getBody());
         Assert.assertEquals(HttpStatus.CREATED,response.getStatusCode());
-        Assert.assertNotNull(response.getBody());
 
     }
 
