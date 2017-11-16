@@ -14,6 +14,7 @@ import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
@@ -1188,9 +1189,12 @@ public class ClientService extends UserBaseService {
 
         List<Long> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(), taskDemandWrapper.getEndDate().getTime());
 
+        List<CountryHolidayCalendarQueryResult> countryHolidayCalenderList = countryGraphRepository.getCountryHolidayCalendarBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(), taskDemandWrapper.getEndDate().getTime());
+
         TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(client,
                 forbiddenStaff, preferredStaff, taskAddress).timeSlotMap(timeSlotMap).countryId(countryId)
                 .publicHolidayList(publicHolidayList).build();
+        taskDemandVisitWrapper.setCountryHolidayCalenderList(countryHolidayCalenderList);
 
         return taskDemandVisitWrapper;
 
