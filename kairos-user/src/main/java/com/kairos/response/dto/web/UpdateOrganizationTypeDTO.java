@@ -4,7 +4,9 @@ import com.kairos.persistence.model.organization.Level;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by prabjot on 9/11/17.
@@ -37,7 +39,7 @@ public class UpdateOrganizationTypeDTO {
     }
 
     public List<Level> getLevelsToUpdate() {
-        return levelsToUpdate;
+        return Optional.ofNullable(levelsToUpdate).orElse(new ArrayList<>());
     }
 
     public void setLevelsToUpdate(List<Level> levelsToUpdate) {
@@ -45,7 +47,7 @@ public class UpdateOrganizationTypeDTO {
     }
 
     public List<Long> getLevelsToDelete() {
-        return levelsToDelete;
+        return Optional.ofNullable(levelsToDelete).orElse(new ArrayList<>());
     }
 
     public void setLevelsToDelete(List<Long> levelsToDelete) {

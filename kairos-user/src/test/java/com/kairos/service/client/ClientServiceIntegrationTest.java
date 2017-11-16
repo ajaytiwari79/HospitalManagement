@@ -59,6 +59,17 @@ public class ClientServiceIntegrationTest {
         Assert.assertNotNull(response.getBody());
     }
 
+    @Test
+    public void markClientAsDead(){
+        String baseUrl=getBaseUrl(71L,145L);
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl+"/client/10952/dead?deathDate=2017-11-11T07:03:44.155Z",
+                HttpMethod.DELETE, null, String.class);
+        System.out.println("response is " + response);
+        Assert.assertEquals(200,response.getStatusCodeValue());
+        Assert.assertNotNull(response.getBody());
+    }
+
 
 
     public final String getBaseUrl(Long organizationId,Long unitId){
