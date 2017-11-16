@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.neo4j.ogm.annotation.GraphId;
 
 /**
- * Contains common fields of an entitiy
+ * Contains common fields of an entity
  *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)

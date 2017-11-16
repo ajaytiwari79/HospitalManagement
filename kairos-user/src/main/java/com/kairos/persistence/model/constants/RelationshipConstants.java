@@ -111,6 +111,7 @@ public class RelationshipConstants {
     public static final String BELONGS_TO_ORG_TYPE="BELONGS_TO_ORG_TYPE";
 
     public static final String HAS_CTA = "HAS_CTA";
+    public static final String HAS_CTA_PARENT = "HAS_CTA_PARENT";
     public static final String HAS_WTA = "HAS_WTA";
 
 

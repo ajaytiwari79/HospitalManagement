@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.country.Country;
@@ -8,20 +7,17 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
-/**
- * Created by pawanmandhan on 26/7/17.
- */
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 public class CostTimeAgreement extends UserBaseEntity {
 
-    @NotEmpty(message = "error.cta.name.notempty") @NotNull(message = "error.cta.name.notnull")
+    @NotEmpty(message = "error.parent.name.notempty") @NotNull(message = "error.parent.name.notnull")
     private String name;
 
     private String description;
@@ -35,9 +31,8 @@ public class CostTimeAgreement extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Country country;
 
-    @Relationship(type = HAS_CTA)
-    private CostTimeAgreement cta;
-
+    @Relationship(type = HAS_CTA_PARENT)
+    private CostTimeAgreement parent;
     private Long startDate;
     private Long endDate;
     private Long expiryDate;
@@ -83,12 +78,15 @@ public class CostTimeAgreement extends UserBaseEntity {
         this.country = country;
     }
 
-    public CostTimeAgreement getCta() {
-        return cta;
+    public CostTimeAgreement getParent() {
+        return parent;
     }
 
-    public void setCta(CostTimeAgreement cta) {
-        this.cta = cta;
+    public void setParent(CostTimeAgreement parent) {
+        this.parent = parent;
+    }
+    public boolean hasParent(){
+        return true;
     }
 
     public Long getStartDate() {

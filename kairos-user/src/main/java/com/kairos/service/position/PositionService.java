@@ -174,7 +174,7 @@ public class PositionService extends UserBaseService {
          if (cta == null) {
             throw new DataNotFoundByIdException("Invalid CTA");
         }
-        position.setCta(cta);<String, Object>
+        position.setParent(cta);<String, Object>
 
         */
 
