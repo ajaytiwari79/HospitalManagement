@@ -646,7 +646,8 @@ public class ClientController {
     @RequestMapping(value = "/{clientId}/updateClientTempAddress", method = RequestMethod.POST)
     @ApiOperation("updateClientTempAddress")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> changeLocationUpdateClientAddress(@RequestBody ClientExceptionDTO clientExceptionDto,@PathVariable Long unitId, @PathVariable Long clientId) {
+    public ResponseEntity<Map<String, Object>> changeLocationUpdateClientAddress(@RequestBody ClientExceptionDTO clientExceptionDto,
+                                                                                 @PathVariable Long unitId, @PathVariable Long clientId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.changeLocationUpdateClientAddress(clientExceptionDto, unitId, clientId));
 
     }

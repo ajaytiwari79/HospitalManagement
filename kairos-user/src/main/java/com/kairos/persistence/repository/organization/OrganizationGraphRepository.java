@@ -23,7 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Interface for CRUD operation on Organization
  */
 @Repository
-public interface OrganizationGraphRepository extends GraphRepository<Organization> {
+public interface OrganizationGraphRepository extends GraphRepository<Organization>,CustomOrganizationGraphRepository {
 
     @Query("MATCH (o:Organization) return {name:o.name, id:id(o)} as organization")
     List<Map<String, Object>> findAllOrganizations();
@@ -154,7 +154,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) with contactDetail, ca, c\n" +
             "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(civilianStatus:CitizenStatus) with civilianStatus, contactDetail, ca, c\n" +
             "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,  civilianStatus, contactDetail, ca, c\n" +
-            "return {name:c.firstName+\" \" +c.lastName,id:id(c) , gender:c.gender, cprNumber:c.cprNumber , citizenDead:c.citizenDead, phoneNumber:contactDetail.mobilePhone, clientStatus:id(civilianStatus), " +
+            "return {name:c.firstName+\" \" +c.lastName,id:id(c) , gender:c.gender, cprNumber:c.cprNumber , healthStatus:c.healthStatus,citizenDead:c.citizenDead, phoneNumber:contactDetail.mobilePhone, clientStatus:id(civilianStatus), " +
             "address:ca.houseNumber+\" \" +ca.street1, lat:ca.latitude, lng:ca.longitude, profilePic: {1} + c.profilePic, age:c.age, " +
             "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client  ORDER BY c.firstName")
     List<Map<String, Object>> getClientsOfOrganization(Long organizationId, String imageUrl);
@@ -227,7 +227,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "return collect({id:id(org),levelId:id(level),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,homeAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCode:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,municipalityId:id(municipality)}}) as organizations")
     OrganizationQueryResult getParentOrganizationOfRegion(long countryId);
 
-    @Query("Match (country:Country) where id(country)=53 with country\n" +
+    @Query("Match (country:Country) where id(country)={0} with country\n" +
             "MATCH (bt:BusinessType{isEnabled:true})-[:BELONGS_TO]->(country) with collect(bt) as bt,country\n" +
             "MATCH (ot:OrganizationType{isEnable:true})-[:BELONGS_TO]->(country) WITH ot,bt\n" +
             "Optional Match (ot)-[:HAS_LEVEL]->(level:Level{deleted:false}) with ot,bt,collect({id:id(level),name:level.name}) as levels\n" +
@@ -256,7 +256,7 @@ public interface OrganizationGraphRepository extends GraphRepository<Organizatio
             "MATCH path=(org)-[:HAS_SUB_ORGANIZATION]->() WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps return {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data")
     List<Map<String, Object>> getSubOrgHierarchy(long organizationId);
 
-    @Query("MATCH (c:Client{citizenDead:false})-[r:GET_SERVICE_FROM]-(o:Organization) where id(o)= {0}  with c,r\n" +
+    @Query("MATCH (c:Client{healthStatus:'ALIVE'})-[r:GET_SERVICE_FROM]-(o:Organization) where id(o)= {0}  with c,r\n" +
             "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus)  with cs,c,r\n" +
             "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r,cs\n" +
             "OPTIONAL MATCH (ca)-[:ZIP_CODE]->(zipCode:ZipCode) with ca,c,r,zipCode,cs \n" +

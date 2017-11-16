@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_INTEGRATION_URL;
@@ -90,9 +91,17 @@ public class IntegrationController {
 
     @ApiOperation("fetch FLS_Credentials ")
     @RequestMapping(value = "/unit/{citizenUnitId}/flsCred",method = RequestMethod.GET)
-    ResponseEntity<Map<String, Object>> getFLS_Credentials(@PathVariable Long citizenUnitId)  {
+    ResponseEntity<Map<String, Object>> getFLSCredentials(@PathVariable Long citizenUnitId)  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationService.getFLS_Credentials(citizenUnitId));
+
+    }
+
+    @ApiOperation("fetch FLS_Credentials ")
+    @RequestMapping(value = "/units/flsCred",method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getFLSCredentials(@RequestBody List<Long> unitIds)  {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationService.getFLSCredentials(unitIds));
 
     }
 }
