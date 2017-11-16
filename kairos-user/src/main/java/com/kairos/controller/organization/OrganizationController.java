@@ -13,6 +13,7 @@ import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
 import com.kairos.response.dto.web.ClientFilterDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
+import com.kairos.response.dto.web.organization.OrganizationServiceDTO;
 import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
@@ -27,6 +28,7 @@ import com.kairos.service.tpa_services.IntegrationConfigurationService;
 import com.kairos.util.response.ResponseHandler;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
+import com.sun.org.apache.regexp.internal.RE;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -273,19 +275,8 @@ public class OrganizationController {
                 skillService.addNewSkill(unitId, skillId, isSelected, type, visitourId));
     }
 
-    /*@ApiOperation(value = "update visitour id of skill for an organization")
-    @RequestMapping(value = "/unit/{unitId}/skill/{skillId}/visitour_details", method = RequestMethod.PUT)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateVisitourIdOfSkill(@PathVariable long unitId, @PathVariable long skillId, @RequestParam("type") String type, @RequestBody Map<String, Object> data) {
-
-        if (data.get("visitourId") != null && data.get("visitourId") != "") {
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.updateVisitourIdOfSkill(unitId, skillId, (String) data.get("visitourId"), type));
-        }
-        throw new InternalError("Visitour id can not be null or empty");
-    }*/
-
     @ApiOperation(value = "update skill(visitour, custom Name) for an organization")
-    @RequestMapping(value = "/unit/{unitId}/skill/{skillId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/unit/{unitId}/skill/{skillId}/visitour_details", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateSkillOfOrganization(@PathVariable long unitId, @PathVariable long skillId, @RequestParam("type") String type, @Valid @RequestBody OrganizationSkillDTO organizationSkillDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.updateSkillOfOrganization(unitId, skillId, type, organizationSkillDTO));
@@ -1170,6 +1161,17 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getUnitsByOrganizationIs(organizationId));
     }
 
+    @ApiOperation(value = "Add custom name for Organization Service")
+    @RequestMapping(value = "/unit/{unitId}/organization_service/{serviceId}", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Object>> updateCustomNameOfService (@PathVariable Long unitId, @PathVariable Long serviceId, @RequestBody OrganizationServiceDTO organizationServiceDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfService(serviceId, unitId, organizationServiceDTO.getCustomName()));
+    }
+
+    @ApiOperation(value = "Add custom name for Organization Sub Service")
+    @RequestMapping(value = "/unit/{unitId}/organization_sub_service/{serviceId}", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Object>> updateCustomNameOfSubService (@PathVariable Long unitId, @PathVariable Long serviceId, @RequestBody OrganizationServiceDTO organizationServiceDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfSubService(serviceId, unitId, organizationServiceDTO.getCustomName()));
+    }
 
 }
 
