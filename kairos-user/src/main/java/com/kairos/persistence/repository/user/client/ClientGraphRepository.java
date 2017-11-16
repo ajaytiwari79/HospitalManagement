@@ -357,6 +357,6 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     void deleteContactPersonForService(Long organizationId,Long clientId);
 
     @Query("Match (n:ClientContactPerson)-[:CLIENT_CONTACT_PERSON_STAFF]->(s:Staff) where id(s)={0}\n" +
-            "Match (n)<-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]-(client:Client) return id(client) as id,client.firstName as firstName,clien.lastName as lastName")
+            "Match (n)<-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]-(client:Client) return id(client) as id,client.firstName as firstName,client.lastName as lastName")
     List<ClientMinimumDTO> getCitizenListForThisContactPerson(Long staffId);
 }
