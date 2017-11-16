@@ -72,10 +72,10 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     Staff editStaffWorkPlaces(long staffId, List<Long> staffIds);
 
     @Query("Match (unit:Organization),(staff:Staff) where id(staff)={0} AND id(unit)={1} with staff,unit\n" +
-            "Match (unit)-["+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with skill,staff\n" +
-            "OPTIONAL MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill{isEnabled:true}) with skill,r\n" +
-            "Match (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with skill,skillCategory,r\n" +
-            "return {children:collect({id:id(skill),name:skill.name,isSelected:r.isEnabled}),id:id(skillCategory),name:skillCategory.name} as data")
+            "Match (unit)-[orgSkillRelation:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with skill,staff, orgSkillRelation\n" +
+            "OPTIONAL MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill{isEnabled:true}) with skill,r,orgSkillRelation\n" +
+            "Match (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with skill,skillCategory,r,orgSkillRelation\n" +
+            "return {children:collect({id:id(skill),name:orgSkillRelation.customName,isSelected:r.isEnabled}),id:id(skillCategory),name:skillCategory.name} as data")
     List<Map<String,Object>> getSkills(long staffId, long unitId);
 
     @Query("Match (staff:Staff),(skill:Skill) where id(staff)={0} AND id(skill) IN {1} match (staff)-[r:STAFF_HAS_SKILLS]->(skill) set r.isEnabled=false,r.lastModificationDate={2} return r")

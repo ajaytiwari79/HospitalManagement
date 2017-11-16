@@ -19,6 +19,7 @@ public class OrganizationServiceRelationship extends UserBaseEntity {
     @EndNode
     private OrganizationService organizationService;
     private boolean isEnabled=true;
+    private String customName;
 
     public void setOrganization(Organization organization) {
         this.organization = organization;
@@ -50,5 +51,13 @@ public class OrganizationServiceRelationship extends UserBaseEntity {
     }
 
     public OrganizationServiceRelationship() {
+    }
+
+    public String getCustomName() {
+        return customName;
+    }
+
+    public void setCustomName(String customName) {
+        this.customName = customName;
     }
 }
