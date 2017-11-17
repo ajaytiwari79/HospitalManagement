@@ -5,15 +5,9 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.EmploymentType;
-import com.kairos.persistence.model.user.country.tag.CountryTagRelationship;
-import com.kairos.persistence.model.user.country.tag.OrganizationTagRelationship;
 import com.kairos.persistence.model.user.country.tag.Tag;
-import com.kairos.persistence.model.user.country.tag.TagQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryTagRelationshipGraphRepository;
-import com.kairos.persistence.repository.user.country.OrganizationTagRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
@@ -40,15 +34,9 @@ public class TagService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
 
     @Inject
-    private CountryTagRelationshipGraphRepository countryTagRelationshipGraphRepository;
-
-    @Inject
-    OrganizationTagRelationshipGraphRepository organizationTagRelationshipGraphRepository;
-
-    @Inject
     private OrganizationGraphRepository organizationGraphRepository;
 
-    public TagDTO addCountryTag(Long countryId, TagDTO tagDTO) {
+    public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
@@ -57,19 +45,21 @@ public class TagService extends UserBaseService {
         if( tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false) ){
             throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
         }
+        return tagGraphRepository.createCountryTag(countryId,tagDTO.getName(), tagDTO.getMasterDataType().toString());
+        /*country.setTags();
         CountryTagRelationship countryTagRelationship = new CountryTagRelationship();
         countryTagRelationship.setCountry(country);
-        countryTagRelationship.setTag(new Tag(tagDTO.getName()));
+        countryTagRelationship.setTag(new Tag(tagDTO, true));
         countryTagRelationship.setMasterDataType(tagDTO.getMasterDataType());
         countryTagRelationship.setCreationDate(new Date().getTime());
         countryTagRelationship.setLastModificationDate(new Date().getTime());
         countryTagRelationshipGraphRepository.save(countryTagRelationship);
 
         tagDTO.setId(countryTagRelationship.getTag().getId());
-        return tagDTO;
+        return tagDTO;*/
     }
 
-    public HashMap<String,Object>  updateCountryTag(Long countryId, Long tagId, TagDTO tagDTO) {
+    public Tag  updateCountryTag(Long countryId, Long tagId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
@@ -144,7 +134,7 @@ public class TagService extends UserBaseService {
     }*/
 
 
-    public TagDTO addOrganizationTag(Long organizationId, TagDTO tagDTO) {
+    public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 0);
         if (organization == null) {
             throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
@@ -153,7 +143,8 @@ public class TagService extends UserBaseService {
         if( tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false) ){
             throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
         }
-        OrganizationTagRelationship organizationTagRelationship = new OrganizationTagRelationship();
+        return tagGraphRepository.createOrganizationTag(organizationId,tagDTO.getName(), tagDTO.getMasterDataType().toString());
+        /*OrganizationTagRelationship organizationTagRelationship = new OrganizationTagRelationship();
         organizationTagRelationship.setOrganization(organization);
         organizationTagRelationship.setTag(new Tag(tagDTO.getName()));
         organizationTagRelationship.setMasterDataType(tagDTO.getMasterDataType());
@@ -162,14 +153,14 @@ public class TagService extends UserBaseService {
         organizationTagRelationshipGraphRepository.save(organizationTagRelationship);
 
         tagDTO.setId(organizationTagRelationship.getTag().getId());
-        return tagDTO;
+        return tagDTO;*/
     }
     /*public Tag updateOrganizationTag(Long organizationId, TagDTO tagDTO, Long tagId) {
         return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), new Date().getTime());
     }*/
 
 
-    public HashMap<String,Object>  updateOrganizationTag(Long organizationId, Long tagId, TagDTO tagDTO) {
+    public Tag  updateOrganizationTag(Long organizationId, Long tagId, TagDTO tagDTO) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 0);
         if (organization == null) {
             throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
@@ -234,10 +225,10 @@ public class TagService extends UserBaseService {
         }
     }
 
-    public List<Tag> getTagsByIdsAndMasterDataType(List<Long> tagsId, MasterDataTypeEnum masterDataType){
+    public List<Tag> getCountryTagsByIdsAndMasterDataType(List<Long> tagsId, MasterDataTypeEnum masterDataType){
         logger.info("tagsId : "+tagsId);
         if (tagsId != null && tagsId.size() > 0) {
-            List<Tag> tags = tagGraphRepository.getTagsById(tagsId, masterDataType.toString(), false);
+            List<Tag> tags = tagGraphRepository.getCountryTagsById(tagsId, masterDataType.toString(), false);
             logger.info("tags : "+tags);
             return tags;
         } else {

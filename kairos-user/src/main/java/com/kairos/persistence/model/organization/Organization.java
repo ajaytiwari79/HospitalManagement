@@ -12,6 +12,7 @@ import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
 import com.kairos.persistence.model.user.position.PositionName;
@@ -125,6 +126,8 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = ORGANIZATION_HAS_OFFICE_RESOURCE)
     private List<OfficeResources> officeResourcesList;
 
+    @Relationship(type = ORGANIZATION_HAS_TAG)
+    private List<Tag> tags;
 
     @Relationship(type = HAS_EMPLOYMENTS)
     private List<Employment> employments = new ArrayList<>();
@@ -447,6 +450,13 @@ public class Organization extends UserBaseEntity {
         this.officeResourcesList = officeResourcesList;
     }
 
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 
     public Map<String, Object> retrieveOrganizationUnitDetails() {
         Map<String, Object> map = new HashMap<>();

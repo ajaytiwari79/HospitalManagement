@@ -111,7 +111,7 @@ public class SkillService extends UserBaseService {
             logger.info("DROOOOOOOOOOOOOOO : "+skillDTO.getTagsId());
             Skill skill = new Skill(skillDTO);
             skill.setSkillCategory(skillCategory);
-            List<Tag> tags = tagService.getTagsByIdsAndMasterDataType(skillDTO.getTagsId(), MasterDataTypeEnum.SKILL);
+            List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(skillDTO.getTagsId(), MasterDataTypeEnum.SKILL);
             logger.info("t>>>>>>>>ags : "+tags);
             skill.setTags(tags);
             skillGraphRepository.save(skill);
@@ -147,7 +147,7 @@ public class SkillService extends UserBaseService {
                 skill.setName(data.getName());
                 skill.setDescription(data.getDescription());
                 skill.setShortName(data.getShortName());
-                skill.setTags(tagService.getTagsByIdsAndMasterDataType(data.getTagsId(), MasterDataTypeEnum.SKILL));
+                skill.setTags(tagService.getCountryTagsByIdsAndMasterDataType(data.getTagsId(), MasterDataTypeEnum.SKILL));
                 return skillGraphRepository.save(skill).retrieveDetails();
             }
 

@@ -8,6 +8,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -58,6 +59,8 @@ public class Country extends UserBaseEntity {
     @Relationship(type = HAS_RULE_TEMPLATE)
     private List <WTABaseRuleTemplate> WTABaseRuleTemplate;
 
+    @Relationship(type = COUNTRY_HAS_TAG)
+    private List<Tag> tags;
 
     @JsonIgnore
     @Relationship(type = HAS_ORGANIZATION_SERVICES)
@@ -220,5 +223,13 @@ public class Country extends UserBaseEntity {
 
     public void setRelationTypes(List<RelationType> relationTypes) {
         this.relationTypes = relationTypes;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }

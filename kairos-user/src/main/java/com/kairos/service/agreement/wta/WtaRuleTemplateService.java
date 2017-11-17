@@ -457,7 +457,7 @@ public class WtaRuleTemplateService extends UserBaseService {
             wtaRuleTemplateGraphRepository.deleteOldCategories(wtaRuleTemplateDTO.getRuleTemplateIds());
             previousRuleTemplateCategory.setWtaBaseRuleTemplates(wtaBaseRuleTemplates);
             // Save Tags in Rule Template Category
-            previousRuleTemplateCategory.setTags(tagService.getTagsByIdsAndMasterDataType(wtaRuleTemplateDTO.getTagIds(), MasterDataTypeEnum.RULE_TEMPLATE_CATEGORY));
+            previousRuleTemplateCategory.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaRuleTemplateDTO.getTagIds(), MasterDataTypeEnum.RULE_TEMPLATE_CATEGORY));
             save(previousRuleTemplateCategory);
             response.put("category", previousRuleTemplateCategory);
             response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, previousRuleTemplateCategory));
@@ -470,7 +470,7 @@ public class WtaRuleTemplateService extends UserBaseService {
             ruleTemplateCategoryRepository.updateCategoryOfRuleTemplate(ruleTemplateIdsNeedToAddInCategory, wtaRuleTemplateDTO.getCategoryName());
             ruleTemplateCategoryRepository.updateCategoryOfRuleTemplate(ruleTemplateIdsNeedToRemoveFromCategory, "NONE");
             // Save Tags in Rule Template Category
-            previousRuleTemplateCategory.setTags(tagService.getTagsByIdsAndMasterDataType(wtaRuleTemplateDTO.getTagIds(),MasterDataTypeEnum.RULE_TEMPLATE_CATEGORY));
+            previousRuleTemplateCategory.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaRuleTemplateDTO.getTagIds(),MasterDataTypeEnum.RULE_TEMPLATE_CATEGORY));
             save(previousRuleTemplateCategory);
             response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, previousRuleTemplateCategory));
         }

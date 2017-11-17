@@ -47,7 +47,7 @@ public class ExpertiseService extends UserBaseService {
         }
         Expertise expertise = new Expertise();
         expertise.setCountry(country);
-        expertise.setTags(tagService.getTagsByIdsAndMasterDataType(expertiseDTO.getTagsId(), MasterDataTypeEnum.EXPERTISE));
+        expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTagsId(), MasterDataTypeEnum.EXPERTISE));
         save(expertise);
         return expertise.retrieveDetails();
     }
@@ -64,7 +64,7 @@ public class ExpertiseService extends UserBaseService {
         }
         currentExpertise.setName(expertiseDTO.getName());
         currentExpertise.setDescription(expertiseDTO.getDescription());
-        currentExpertise.setTags(tagService.getTagsByIdsAndMasterDataType(expertiseDTO.getTagsId(), MasterDataTypeEnum.EXPERTISE));
+        currentExpertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTagsId(), MasterDataTypeEnum.EXPERTISE));
         save(currentExpertise);
         return currentExpertise.retrieveDetails();
     }

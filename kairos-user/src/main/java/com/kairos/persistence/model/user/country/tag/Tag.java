@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
+import com.kairos.response.dto.web.tag.TagDTO;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
@@ -22,7 +23,13 @@ public class Tag extends UserBaseEntity {
     @NotEmpty(message = "error.Tag.name.notEmptyOrNotNull") @NotNull(message = "error.Tag.name.notEmptyOrNotNull")
     private String name;
 
+    @Property(name = "masterDataType")
+    @EnumString(MasterDataTypeEnum.class)
+    private MasterDataTypeEnum masterDataType;
+
     private boolean deleted;
+
+    private boolean countryTag;
 
     public Tag(){}
     
@@ -42,7 +49,25 @@ public class Tag extends UserBaseEntity {
         this.deleted = deleted;
     }
 
-    public Tag(String name){
-        this.setName(name);
+    public boolean isCountryTag() {
+        return countryTag;
+    }
+
+    public void setCountryTag(boolean countryTag) {
+        this.countryTag = countryTag;
+    }
+
+    public Tag(TagDTO tagDTO, boolean countryTag){
+        this.setName(tagDTO.getName());
+        this.setMasterDataType(tagDTO.getMasterDataType());
+        this.setCountryTag(countryTag);
+    }
+
+    public MasterDataTypeEnum getMasterDataType() {
+        return masterDataType;
+    }
+
+    public void setMasterDataType(MasterDataTypeEnum masterDataType) {
+        this.masterDataType = masterDataType;
     }
 }
