@@ -8,6 +8,7 @@ import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -107,9 +108,12 @@ public class SkillService extends UserBaseService {
         logger.info("Added regex to Name: " + name);
         if (skillGraphRepository.checkDuplicateSkill(skillCategoryId, name).isEmpty()) {
             logger.info("Creating unique skill");
+            logger.info("DROOOOOOOOOOOOOOO : "+skillDTO.getTagsId());
             Skill skill = new Skill(skillDTO);
             skill.setSkillCategory(skillCategory);
-            skill.setTags(tagService.getTagsByIdsAndMasterDataType(skillDTO.getTagsId(), MasterDataTypeEnum.SKILL));
+            List<Tag> tags = tagService.getTagsByIdsAndMasterDataType(skillDTO.getTagsId(), MasterDataTypeEnum.SKILL);
+            logger.info("t>>>>>>>>ags : "+tags);
+            skill.setTags(tags);
             skillGraphRepository.save(skill);
             Map<String, Object> response = skill.retrieveDetails();
             return response;

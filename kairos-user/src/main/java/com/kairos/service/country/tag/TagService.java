@@ -104,6 +104,27 @@ public class TagService extends UserBaseService {
         return tagsData;
     }
 
+    /*public HashMap<String,Object> getTagsOfSkill(Long countryId, Long skillId, String filterText){
+        Country country = countryGraphRepository.findOne(countryId,0);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+
+        if(filterText == null){
+            filterText = "";
+        }
+//        String filterTextRegex = "~'.*"+filterText+".*'";
+
+        HashMap<String,Object> tagsData = new HashMap<>();
+        if(masterDataType == null){
+            tagsData.put("tags",tagGraphRepository.getListOfCountryTags(countryId, false, filterText));
+        } else {
+            tagsData.put("tags",tagGraphRepository.getListOfCountryTagsByMasterDataType (countryId, false, filterText,  masterDataType.toString()));
+        }
+
+        return tagsData;
+    }*/
+
     public boolean deleteCountryTag(Long countryId, Long tagId){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
@@ -214,11 +235,18 @@ public class TagService extends UserBaseService {
     }
 
     public List<Tag> getTagsByIdsAndMasterDataType(List<Long> tagsId, MasterDataTypeEnum masterDataType){
+        logger.info("tagsId : "+tagsId);
         if (tagsId != null && tagsId.size() > 0) {
-            return tagGraphRepository.getTagsById(tagsId, masterDataType.toString(), false);
+            List<Tag> tags = tagGraphRepository.getTagsById(tagsId, masterDataType.toString(), false);
+            logger.info("tags : "+tags);
+            return tags;
         } else {
             return new ArrayList<Tag>();
         }
     }
+
+    /*public List<TagQueryResult> getTagsOfSkill(long skillId, String filterText){
+
+    }*/
 }
 

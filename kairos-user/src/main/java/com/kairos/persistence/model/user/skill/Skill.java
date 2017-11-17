@@ -58,6 +58,7 @@ public class Skill extends UserBaseEntity {
     public Skill(SkillDTO skillDTO){
         this.name = skillDTO.getName();
         this.description = skillDTO.getDescription();
+        this.shortName = skillDTO.getShortName();
     }
 
     public String getShortName() {

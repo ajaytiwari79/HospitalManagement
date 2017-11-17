@@ -131,13 +131,15 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
 
     @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag)\n" +
             "WHERE id(tag) IN {0} AND tag.deleted= {2} AND r.masterDataType ={1}\n" +
-            "return id(tag) as id\n" +
+            "return tag\n" +
             "UNION\n" +
             "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
             "WHERE id(tag) IN {0} AND tag.deleted= {2} AND r.masterDataType ={1}\n" +
-            "return id(tag) as id\n")
+            "return tag\n")
     List<Tag> getTagsById(List<Long> tagIds, String masterDataType, boolean deleted);
 
+    @Query("")
+    List<TagQueryResult> getListOfSkillTags();
 }
 
 

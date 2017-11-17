@@ -35,41 +35,6 @@ public class TagController {
     @Inject
     TagService tagService;
 
-    @ApiOperation(value = "Create a New Tag in Organization")
-    @RequestMapping(value = UNIT_URL + "/tag", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addOrganizationTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,tagService.addOrganizationTag(unitId,tagDTO));
-    }
-
-    @ApiOperation(value = "Update a Organization Tag")
-    @RequestMapping(value = UNIT_URL + "/tag/{tagId}", method = RequestMethod.PUT)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateOrganizationTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long unitId, @PathVariable long tagId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateOrganizationTag(unitId, tagId, tagDTO));
-    }
-
-    @ApiOperation(value = "Get list of Organization Tag")
-    @RequestMapping(value = UNIT_URL + "/tag", method = RequestMethod.GET)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationTag(@PathVariable long unitId,
-                                                                  @RequestParam(value = "filterText",required = false) String filterText,
-                                                                  @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfOrganizationTags(unitId, filterText, masterDataType));
-    }
-
-    @ApiOperation(value = "Delete Organization Tag")
-    @RequestMapping(value = UNIT_URL + "/tag/{tagId}", method = RequestMethod.DELETE)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteOrganizationTag(@PathVariable long unitId, @PathVariable long tagId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.deleteOrganizationTag(unitId, tagId));
-    }
-
-
-
-
-
-
     @ApiOperation(value = "Create a New Tag in Country")
     @RequestMapping(value = COUNTRY_URL + "/tag", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -100,7 +65,35 @@ public class TagController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.deleteCountryTag(countryId, tagId));
     }
 
+    @ApiOperation(value = "Create a New Tag in Organization")
+    @RequestMapping(value = UNIT_URL + "/tag", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addOrganizationTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,tagService.addOrganizationTag(unitId,tagDTO));
+    }
 
+    @ApiOperation(value = "Update a Organization Tag")
+    @RequestMapping(value = UNIT_URL + "/tag/{tagId}", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateOrganizationTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long unitId, @PathVariable long tagId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateOrganizationTag(unitId, tagId, tagDTO));
+    }
+
+    @ApiOperation(value = "Get list of Organization Tag")
+    @RequestMapping(value = UNIT_URL + "/tag", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationTag(@PathVariable long unitId,
+                                                                  @RequestParam(value = "filterText",required = false) String filterText,
+                                                                  @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfOrganizationTags(unitId, filterText, masterDataType));
+    }
+
+    @ApiOperation(value = "Delete Organization Tag")
+    @RequestMapping(value = UNIT_URL + "/tag/{tagId}", method = RequestMethod.DELETE)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteOrganizationTag(@PathVariable long unitId, @PathVariable long tagId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.deleteOrganizationTag(unitId, tagId));
+    }
 
     @ApiOperation(value = "Update a Country Tag Setting ")
     @RequestMapping(value = UNIT_URL + "/tag_setting", method = RequestMethod.PUT)
@@ -110,12 +103,11 @@ public class TagController {
     }
 
     // TO get tags of skill
-    /*@ApiOperation(value = "Get list of Tag")
-    @RequestMapping(value = COUNTRY_URL + "/tag", method = RequestMethod.GET)
+    /*@ApiOperation(value = "Get list of Tags of Skill")
+    @RequestMapping(value = COUNTRY_URL + "/skill/{skillId}/tag", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getCountryTag(@PathVariable long countryId,
-                                                             @RequestParam(value = "filterText",required = false) String filterText,
-                                                             @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfCountryTags(countryId, filterText, masterDataType));
+    public ResponseEntity<Map<String, Object>> getTagsOfSkill(@PathVariable long skillId,
+                                                             @RequestParam(value = "filterText",required = false) String filterText) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getTagsOfSkill(countryId, skillId, filterText));
     }*/
 }
