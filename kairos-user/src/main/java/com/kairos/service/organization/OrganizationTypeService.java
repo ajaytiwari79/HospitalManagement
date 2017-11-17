@@ -31,7 +31,7 @@ public class OrganizationTypeService extends UserBaseService {
     @Inject
     CountryGraphRepository countryGraphRepository;
 
-    public List<OrganizationType> getOrgTypesByCountryId(Long countryId) {
+    public List<OrgTypeLevelWrapper> getOrgTypesByCountryId(Long countryId) {
 
         return organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId);
     }

@@ -26,7 +26,7 @@ public interface OrganizationTypeGraphRepository extends GraphRepository<Organiz
 
     @Query("MATCH (ot:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(c:Country) WHERE id(c)= {0}\n" +
             "Optional Match (ot)-[:"+HAS_LEVEL+"]->(level:Level{deleted:false}) return ot.name as name,id(ot) as id,collect(level) as levels")
-    List<OrganizationType> getOrganizationTypeByCountryId(Long countryId);
+    List<OrgTypeLevelWrapper> getOrganizationTypeByCountryId(Long countryId);
 
     OrganizationType findByName(OrganizationType.OrganizationTypeEnum name);
 
