@@ -33,6 +33,7 @@ import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.client.ClientOrganizationRelationService;
 import com.kairos.service.client.ClientService;
@@ -47,6 +48,7 @@ import com.kairos.util.FormatUtil;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.util.userContext.UserContext;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,6 +162,8 @@ public class OrganizationService extends UserBaseService {
     private SkillService skillService;
     @Autowired
     DayTypeService dayTypeService;
+    @Inject
+    private AccessPageService accessPageService;
 
 
     public Organization getOrganizationById(long id) {
@@ -193,7 +197,7 @@ public class OrganizationService extends UserBaseService {
     }
 
 
-    public HashMap<String, Object> createParentOrganization(ParentOrganizationDTO orgDetails, long countryId) {
+    public HashMap<String, Object> createParentOrganization(ParentOrganizationDTO orgDetails, long countryId,Long organizationId) {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
@@ -218,7 +222,10 @@ public class OrganizationService extends UserBaseService {
         creationDate = new Date().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         phaseRestClient.createDefaultPhases(organization.getId());
-        return organizationResponse(organization, orgDetails);
+        HashMap<String,Object> orgResponse = new HashMap<>();
+        orgResponse.put("orgData",organizationResponse(organization, orgDetails));
+        orgResponse.put("permissions",accessPageService.getPermissionOfUserInUnit(organizationId,organization,UserContext.getUserDetails().getId()));
+        return orgResponse;
     }
 
     public HashMap<String, Object> updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId, long countryId) {
@@ -252,6 +259,7 @@ public class OrganizationService extends UserBaseService {
         response.put("subTypeId", parentOrganizationDTO.getSubTypeId());
         response.put("externalId", organization.getExternalId());
         response.put("homeAddress", filterContactAddressInfo(organization.getContactAddress()));
+        response.put("levelId",organization.getLevel().getId());
         return response;
     }
 
@@ -293,7 +301,6 @@ public class OrganizationService extends UserBaseService {
             workingTimeAgreementObj.setEndDateMillis(obj.getEndDateMillis());
             workingTimeAgreementObj.setExpiryDate(obj.getExpiryDate());
             workingTimeAgreementObj.setExpertise(obj.getExpertise());
-            workingTimeAgreementObj.setEnabled(true);
             workingTimeAgreementObj.setRuleTemplates(obj.getRuleTemplates());
             workingTimeAgreementObj.setStartDateMillis(obj.getStartDateMillis());
             workingTimeAgreementObj.setWta(obj.getWta());
@@ -318,6 +325,7 @@ public class OrganizationService extends UserBaseService {
         // Verify Address here
         AddressDTO addressDTO = orgDetails.getHomeAddress();
         ZipCode zipCode;
+        addressDTO.setVerifiedByGoogleMap(true);
         if (addressDTO.isVerifiedByGoogleMap()) {
             contactAddress.setLongitude(addressDTO.getLongitude());
             contactAddress.setLatitude(addressDTO.getLatitude());
@@ -350,7 +358,8 @@ public class OrganizationService extends UserBaseService {
         }
         logger.info("Geography Data: " + geographyData);
 
-        Level level = countryGraphRepository.getLevel(countryId, orgDetails.getLevelId());
+
+        Level level = organizationTypeGraphRepository.getLevel(orgDetails.getTypeId().get(0),orgDetails.getLevelId());
         if (level == null) {
             throw new InternalError("Level can't be null");
         }
@@ -505,6 +514,7 @@ public class OrganizationService extends UserBaseService {
         response.put("type", ORGANIZATION_LABEL);
         response.put("contactAddress", unit.getContactAddress());
         response.put("children", Collections.emptyList());
+        response.put("permissions",accessPageService.getPermissionOfUserInUnit(parent.getId(),unit,UserContext.getUserDetails().getId()));
         return response;
     }
 
@@ -720,6 +730,7 @@ public class OrganizationService extends UserBaseService {
 
         response.put("organizationTypes", organizationTypesForUnit);
         response.put("businessTypes", businessTypes);
+        response.put("level",organization.getLevel());
         return response;
     }
 
@@ -1043,6 +1054,26 @@ public class OrganizationService extends UserBaseService {
         return organization.getId();
     }
 
+    public Organization getOrganizationDetail(Long id, String type) {
+        Organization organization = null;
+        switch (type.toLowerCase()) {
+            case ORGANIZATION:
+                organization = organizationGraphRepository.findOne(id);
+                break;
+            case GROUP:
+                organization = groupService.getUnitByGroupId(id);
+                break;
+            case TEAM:
+                organization = teamService.getOrganizationByTeamId(id);
+                break;
+            default:
+                throw new UnsupportedOperationException("Type is not valid");
+        }
+        if (!Optional.ofNullable(organization).isPresent()) {
+            throw new DataNotFoundByIdException("Organization not found-" + id);
+        }
+        return organization;
+    }
     public  void updateOrganizationWithoutPhases( List<Long> organizationIds){
 
         organizationGraphRepository.updateOrganizationWithoutPhases(organizationIds);
@@ -1065,10 +1096,9 @@ public class OrganizationService extends UserBaseService {
        return  dayTypeService.getDayTypeByDate(countryId,date);
     }
 
-    public List<Map<String,Object>> getAllDayTypeofOrganization(Long organizationId){
+    public List<DayType> getAllDayTypeofOrganization(Long organizationId){
         Long countryId = organizationGraphRepository.getCountryId(organizationId);
         return  dayTypeService.getAllDayTypeByCountryId(countryId);
-
 
     }
     public List<Map<String,Object>>getUnitsByOrganizationIs(Long orgID){

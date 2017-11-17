@@ -17,7 +17,6 @@ public class WtaDTO {
     private long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
-
     public String getName() {
         return name;
     }
@@ -91,5 +90,17 @@ public class WtaDTO {
         this.organizationSubType = organizationSubType;
     }
 
+    public WtaDTO() {
+    }
 
+    public WtaDTO(String name, String description, long expertiseId, Long organizationType, Long organizationSubType, long startDateMillis, Long endDateMillis, Long expiryDate) {
+        this.name = name;
+        this.description = description;
+        this.expertiseId = expertiseId;
+        this.organizationType = organizationType;
+        this.organizationSubType = organizationSubType;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.expiryDate = expiryDate;
+    }
 }

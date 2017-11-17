@@ -646,7 +646,8 @@ public class ClientController {
     @RequestMapping(value = "/{clientId}/updateClientTempAddress", method = RequestMethod.POST)
     @ApiOperation("updateClientTempAddress")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> changeLocationUpdateClientAddress(@RequestBody ClientExceptionDTO clientExceptionDto,@PathVariable Long unitId, @PathVariable Long clientId) {
+    public ResponseEntity<Map<String, Object>> changeLocationUpdateClientAddress(@RequestBody ClientExceptionDTO clientExceptionDto,
+                                                                                 @PathVariable Long unitId, @PathVariable Long clientId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.changeLocationUpdateClientAddress(clientExceptionDto, unitId, clientId));
 
     }
@@ -714,6 +715,13 @@ public class ClientController {
     @RequestMapping(value = "/{clientId}/staff/contact-person", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> saveContactPerson(@PathVariable long clientId, @RequestBody ContactPersonDTO contactPersonDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.saveContactPerson(clientId, contactPersonDTO));
+    }
+
+    //Prefer Staff
+    @ApiOperation("Update contact person")
+    @RequestMapping(value = "/{clientId}/staff/contact-person",method = RequestMethod.PUT)
+    ResponseEntity<Map<String,Object>> updateContactPerson(@PathVariable Long clientId,@Valid @RequestBody ContactPersonDTO contactPersonDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.updateContactPerson(clientId,contactPersonDTO));
     }
 
 

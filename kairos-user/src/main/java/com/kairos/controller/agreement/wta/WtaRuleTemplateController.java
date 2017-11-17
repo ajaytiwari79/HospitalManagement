@@ -43,7 +43,7 @@ public class WtaRuleTemplateController {
     }
 
     @RequestMapping(value = "/rule_templates/category", method = RequestMethod.POST)
-    ResponseEntity<Map<String,Object>> updateRuleTemplateCategory(@RequestBody WtaRuleTemplateDTO wtaRuleTemplateDTO, @PathVariable long countryId){
+    ResponseEntity<Map<String,Object>> updateRuleTemplateCategory(@Valid @RequestBody WtaRuleTemplateDTO wtaRuleTemplateDTO, @PathVariable long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaRuleTemplateService.updateRuleTemplateCategory(wtaRuleTemplateDTO,countryId));
     }
 

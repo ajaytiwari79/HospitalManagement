@@ -1,7 +1,9 @@
-package com.kairos.client;
+package com.kairos.service.client;
 
 import com.kairos.UserServiceApplication;
+import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
+import com.kairos.response.dto.web.ContactPersonDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,12 +16,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Arrays;
+
 /**
  * Created by prabjot on 17/10/17.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class HouseHoldTest {
+public class ClientServiceIntegrationTest {
 
     @Value("${server.host.http.url}")
     private String url ;
@@ -40,6 +44,33 @@ public class HouseHoldTest {
                 HttpMethod.POST, entity, ClientMinimumDTO.class);
        Assert.assertEquals(409,response.getStatusCodeValue());
     }
+
+    @Test
+    public void contactPersonShouldBeUpdate(){
+        String baseUrl=getBaseUrl(71L,145L);
+        ContactPersonDTO contactPersonDTO = new ContactPersonDTO(new Long(139),new Long(9260),
+                Arrays.asList(new Long(7508)));
+        HttpEntity<ContactPersonDTO> entity = new HttpEntity<>(contactPersonDTO);
+        ResponseEntity<ClientContactPersonStructuredData> response = restTemplate.exchange(
+                baseUrl+"/client/10951/staff/contact-person",
+                HttpMethod.PUT, entity, ClientContactPersonStructuredData.class);
+        System.out.println("response is " + response);
+        Assert.assertEquals(200,response.getStatusCodeValue());
+        Assert.assertNotNull(response.getBody());
+    }
+
+    @Test
+    public void markClientAsDead(){
+        String baseUrl=getBaseUrl(71L,145L);
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl+"/client/10952/dead?deathDate=2017-11-11T07:03:44.155Z",
+                HttpMethod.DELETE, null, String.class);
+        System.out.println("response is " + response);
+        Assert.assertEquals(200,response.getStatusCodeValue());
+        Assert.assertNotNull(response.getBody());
+    }
+
+
 
     public final String getBaseUrl(Long organizationId,Long unitId){
         if(organizationId!=null &&unitId!=null ){

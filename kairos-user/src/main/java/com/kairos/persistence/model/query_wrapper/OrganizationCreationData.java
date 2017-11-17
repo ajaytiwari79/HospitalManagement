@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.query_wrapper;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.BusinessType;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -10,6 +12,8 @@ import java.util.Map;
 /**
  * Created by prabjot on 6/9/17.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
 public class OrganizationCreationData {
 

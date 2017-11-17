@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 
@@ -89,15 +90,21 @@ public class OrganizationMetadataService extends UserBaseService {
         existingLocalAreaTag.setName(localAreaTag.getName());
         existingLocalAreaTag.setColor(localAreaTag.getColor());
 
-
         List<ClientHomeAddressQueryResult> clientHomeAddressQueryResults = clientGraphRepository.getClientsAndHomeAddressByUnitId(unitId);
+        Set<Long> clientIds = clientHomeAddressQueryResults.stream().map(clientHomeAddressQueryResult -> clientHomeAddressQueryResult.getCitizen().getId()).collect(Collectors.toSet());
+
+        Iterable<Client> clientList =  clientGraphRepository.findAll(clientIds,1);
+        Map<Long, Client> citizenMap = new HashMap<>();
+        for (Client citizen : clientList) {
+            citizenMap.put(citizen.getId(), citizen);
+        }
         List<Client> citizenList = new ArrayList<>(clientHomeAddressQueryResults.size());
         for (ClientHomeAddressQueryResult clientHomeAddressQueryResult: clientHomeAddressQueryResults) {
             if(clientHomeAddressQueryResult != null){
                 boolean isVerified = isCoordinateInsidePolygon(existingLocalAreaTag.getPaths(), clientHomeAddressQueryResult.getHomeAddress().getLatitude(),
                         clientHomeAddressQueryResult.getHomeAddress().getLongitude());
-                //TODO Yasir replace findone query from loop
-                Client citizen = clientGraphRepository.findOne(clientHomeAddressQueryResult.getCitizen().getId());
+                //Client citizen = clientGraphRepository.findOne(clientHomeAddressQueryResult.getCitizen().getId());
+                Client citizen = citizenMap.get(clientHomeAddressQueryResult.getCitizen().getId());
                 if(isVerified){
                     //Client citizen = clientHomeAddressQueryResult.getCitizen();
                     citizen.setLocalAreaTag(existingLocalAreaTag);

@@ -6,6 +6,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.ApiExternalStaffService;
@@ -27,6 +28,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +57,8 @@ public class StaffController {
     private StaffAddressService staffAddressService;
     @Inject
     private OrganizationServiceService organizationServiceService;
+    @Inject
+    private EmploymentTypeService employmentTypeService;
 
 
     @RequestMapping(value = "/{staffId}/employment_details", method = RequestMethod.PUT)
@@ -173,7 +177,10 @@ public class StaffController {
     @ApiOperation("get employments of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmployments(@PathVariable long staffId, @PathVariable long unitId, @RequestParam("type") String type) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmployments(staffId, unitId, type));
+        Map<String, Object> responseData = new HashMap<String, Object>(2);
+        responseData.put("employments", employmentService.getEmployments(staffId, unitId, type));
+        responseData.put("employmentTypes", employmentTypeService.getEmploymentTypeOfOrganization(unitId, false) );
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, responseData);
     }
 
     @RequestMapping(value = "/{staffId}/partial_leave", method = RequestMethod.POST)

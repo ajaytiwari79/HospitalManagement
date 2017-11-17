@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.user.agreement.wta.templates;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -9,6 +11,8 @@ import java.util.Map;
  * Created by vipul on 13/10/17.
  */
 @QueryResult
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RuleTemplateWithCategoryDTO {
     private Long id;
     private String name;
@@ -79,7 +83,6 @@ public class RuleTemplateWithCategoryDTO {
     }
 
     public void setRuleTemplateCategory(Map ruleTemplateCategory) {
-        System.out.println("rule template category " + ruleTemplateCategory);
         this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
@@ -362,4 +365,5 @@ public class RuleTemplateWithCategoryDTO {
     public void setRuleTemplateCategoryName(String ruleTemplateCategoryName) {
         this.ruleTemplateCategoryName = ruleTemplateCategoryName;
     }
+
 }

@@ -1,5 +1,8 @@
 package com.kairos.response.dto.web;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -8,6 +11,7 @@ import java.util.List;
 public class WtaRuleTemplateDTO {
 
     private List<Long> ruleTemplateIds;
+    @NotEmpty(message = "error.WtaRuleTemplateDTO.categoryName.notEmpty")     @NotNull(message = "error.WtaRuleTemplateDTO.categoryName.notnull")
     private String categoryName;
 
     public List<Long> getRuleTemplateIds() {

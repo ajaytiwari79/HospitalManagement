@@ -1,36 +1,37 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.*;
-import com.kairos.persistence.model.user.staff.AccessPermission;
-import com.kairos.persistence.model.user.staff.EmploymentAccessPageRelation;
-import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.auth.StaffPermissionDTO;
+import com.kairos.persistence.model.user.auth.StaffPermissionQueryResult;
+import com.kairos.persistence.model.user.auth.StaffTabPermission;
+import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageCustomIdRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import com.kairos.util.userContext.UserContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.inject.Inject;
 import java.util.*;
-
-import static com.kairos.constants.AppConstants.TEAM;
-import static com.kairos.constants.AppConstants.ORGANIZATION;
+import java.util.stream.Collectors;
 
 /**
  * Created by prabjot on 3/1/17.
@@ -59,6 +60,10 @@ public class AccessPageService extends UserBaseService {
     private TreeStructureService treeStructureService;
     @Inject
     private AccessPageCustomIdRepository accessPageCustomIdRepository;
+    @Inject
+    UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    @Inject
+    UserGraphRepository userGraphRepository;
 
     public AccessPage createAccessPage(AccessPageDTO accessPageDTO){
         AccessPage accessPage = new AccessPage(accessPageDTO.getName(),accessPageDTO.isModule(),
@@ -158,127 +163,6 @@ public class AccessPageService extends UserBaseService {
         employmentPageGraphRepository.save(employmentAccessPageRelations);
     }
 
-    public List<Map<String, Object>> getWorkPlaces(long staffId, long unitId,String type) {
-        Staff staff = staffGraphRepository.findOne(staffId);
-        if (staff == null) {
-            return null;
-        }
-        Organization unit;
-        if(ORGANIZATION.equalsIgnoreCase(type)){
-            unit = organizationGraphRepository.findOne(unitId);
-        } else if(TEAM.equalsIgnoreCase(type)){
-            unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
-            System.out.println("getting unit from team" + unit.getId());
-        } else {
-            throw new InternalError("type can not be null");
-        }
-        if (unit == null) {
-            throw new InternalError("Organization not found");
-        }
-        List<AccessGroup> accessGroups;
-        List<Map<String, Object>> units;
-
-        Organization parentOrganization;
-        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parentOrganization = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
-        } else {
-            parentOrganization = organizationGraphRepository.getParentOfOrganization(unit.getId());
-        }
-
-        if (parentOrganization != null) {
-            accessGroups = accessGroupRepository.getAccessGroups(parentOrganization.getId());
-            units = organizationGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
-        } else {
-
-            accessGroups = accessGroupRepository.getAccessGroups(unit.getId());
-            units = organizationGraphRepository.getSubOrgHierarchy(unit.getId());
-        }
-
-        List<Map<String, Object>> employments;
-        List<Map<String, Object>> workPlaces = new ArrayList<>();
-        if (units.isEmpty() && unit.isParentOrganization()) {
-            employments = new ArrayList<>();
-            for (AccessGroup accessGroup : accessGroups) {
-                QueryResult queryResult = new QueryResult();
-                queryResult.setId(unit.getId());
-                queryResult.setName(unit.getName());
-                Map<String, Object> employment = employmentGraphRepository.getEmploymentOfParticularRole(staffId, unit.getId(), accessGroup.getId());
-                if (employment != null && !employment.isEmpty()) {
-                    employments.add(employment);
-                    queryResult.setAccessable(true);
-                } else {
-                    queryResult.setAccessable(false);
-                }
-                Map<String, Object> workPlace = new HashMap<>();
-                workPlace.put("id", accessGroup.getId());
-                workPlace.put("name", accessGroup.getName());
-                workPlace.put("tree", queryResult);
-                workPlace.put("employments", employments);
-                workPlaces.add(workPlace);
-            }
-            return workPlaces;
-        }
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<QueryResult> list;
-        List<Long> ids;
-        for (AccessGroup accessGroup : accessGroups) {
-            list = new ArrayList<>();
-            ids = new ArrayList<>();
-            employments = new ArrayList<>();
-            for (Map<String, Object> unitData : units) {
-                Map<String, Object> parentUnit = (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get("parent");
-                long id = (long) parentUnit.get("id");
-                Map<String, Object> employment;
-                if (ids.contains(id)) {
-                    for (QueryResult queryResult : list) {
-                        if (queryResult.getId() == id) {
-                            List<QueryResult> childs = queryResult.getChildren();
-                            QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get("child"), QueryResult.class);
-                            employment = employmentGraphRepository.getEmploymentOfParticularRole(staffId, child.getId(), accessGroup.getId());
-                            if (employment != null && !employment.isEmpty()) {
-                                employments.add(employment);
-                                child.setAccessable(true);
-                            } else {
-                                child.setAccessable(false);
-                            }
-                            childs.add(child);
-                            break;
-                        }
-                    }
-                } else {
-                    List<QueryResult> queryResults = new ArrayList<>();
-                    QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get("child"), QueryResult.class);
-                    employment = employmentGraphRepository.getEmploymentOfParticularRole(staffId, child.getId(), accessGroup.getId());
-                    if (employment != null && !employment.isEmpty()) {
-                        employments.add(employment);
-                        child.setAccessable(true);
-                    } else {
-                        child.setAccessable(false);
-                    }
-                    queryResults.add(child);
-                    QueryResult queryResult = new QueryResult((String) parentUnit.get("name"), id, queryResults);
-                    employment = employmentGraphRepository.getEmploymentOfParticularRole(staffId, queryResult.getId(), accessGroup.getId());
-                    if (employment != null && !employment.isEmpty()) {
-                        employments.add(employment);
-                        queryResult.setAccessable(true);
-                    } else {
-                        queryResult.setAccessable(false);
-                    }
-                    list.add(queryResult);
-                }
-                ids.add(id);
-            }
-            Map<String, Object> workPlace = new HashMap<>();
-            workPlace.put("id", accessGroup.getId());
-            workPlace.put("name", accessGroup.getName());
-            workPlace.put("tree", treeStructureService.getTreeStructure(list));
-            workPlace.put("employments", employments);
-            workPlaces.add(workPlace);
-        }
-        return workPlaces;
-    }
 
     public AccessPage findByModuleId(String moduleId) {
         return accessPageRepository.findByModuleId(moduleId);
@@ -314,7 +198,143 @@ public class AccessPageService extends UserBaseService {
             throw new InternalError("tab id is not present");
         }
         save(accessPageCustomId);
-        System.out.println("id -->" + tabId);
         return tabId;
     }
+
+    public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long parentOrganizationId,Organization newUnit,Long userId){
+        Organization parentOrganization = organizationGraphRepository.findOne(parentOrganizationId);
+        if(isHubMember(userId)){
+            return getPermissionForHubMember();
+        }
+        List<StaffPermissionQueryResult> staffPermissions = accessPageRepository.getAccessPermissionOfUserForUnit(userId,parentOrganization.getId());
+        Map<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = staffPermissions.stream().collect(Collectors.groupingBy(StaffPermissionQueryResult::getAccessGroupId));
+        Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = permissionByAccessGroup.entrySet();
+        Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
+        List<StaffPermissionQueryResult> allPermissions = new ArrayList<>();
+        while (iterator.hasNext()){
+            allPermissions.addAll(iterator.next().getValue());
+        }
+        createEmploymentWithNewOrganization(newUnit,userId,permissionByAccessGroup,parentOrganizationId);
+        return preparePermissionList(allPermissions);
+    }
+
+    private List<StaffPermissionDTO> preparePermissionList(List<StaffPermissionQueryResult> permissionsOfAllRole){
+        List<StaffPermissionDTO> permissions = new ArrayList<>();
+        List<String> processedModuleIds = new ArrayList<>();
+        for(StaffPermissionQueryResult staffPermission : permissionsOfAllRole){
+            if(!processedModuleIds.contains(staffPermission.getModuleId())){
+                List<StaffPermissionQueryResult> modules = permissionsOfAllRole.stream().filter(module->module.getModuleId().equals(
+                        staffPermission.getModuleId())).collect(Collectors.toList());
+                permissions.add(getUnionOfPermissions(modules));
+                processedModuleIds.add(staffPermission.getModuleId());
+            }
+        }
+        return permissions;
+    }
+
+    private StaffPermissionDTO getUnionOfPermissions(List<StaffPermissionQueryResult> modules){
+        StaffPermissionDTO moduleToReturn = null;
+        List<Map<String,Object>> tabPermissions = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        for(StaffPermissionQueryResult staffPermission : modules){
+            if(!Optional.ofNullable(moduleToReturn).isPresent()){
+                moduleToReturn = objectMapper.convertValue(staffPermission,StaffPermissionDTO.class);
+            } else if(staffPermission.isWrite() || (staffPermission.isRead() && !moduleToReturn.isRead())){
+                moduleToReturn = objectMapper.convertValue(staffPermission,StaffPermissionDTO.class);;
+            }
+            tabPermissions.addAll(staffPermission.getTabPermissions());
+        }
+        moduleToReturn.setTabPermissions(getUnionOfTabPermission(tabPermissions));
+        return moduleToReturn;
+    }
+
+    private List<StaffTabPermission> getUnionOfTabPermission(List<Map<String,Object>> staffTabPermissions){
+        Map<String,StaffTabPermission> tabPermissionToProceed = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        for(Map<String,Object> tabPermission : staffTabPermissions){
+            StaffTabPermission staffTabPermission = objectMapper.convertValue(tabPermission,StaffTabPermission.class);
+            if(!tabPermissionToProceed.containsKey(staffTabPermission.getModuleId())){
+                tabPermissionToProceed.put(staffTabPermission.getModuleId(),staffTabPermission);
+            } else if(staffTabPermission.isWrite() || (staffTabPermission.isRead() && !tabPermissionToProceed.get(staffTabPermission.getId()).isRead())){
+                tabPermissionToProceed.put(staffTabPermission.getModuleId(),staffTabPermission);
+            }
+        }
+        return tabPermissionToProceed.values().stream().collect(Collectors.toList());
+    }
+
+    private void createEmploymentWithNewOrganization(Organization organization,Long userId,
+                                                     Map<Long,List<StaffPermissionQueryResult>> accessPermissionByGroup,Long parentOrganizationId){
+
+        Staff staff;
+        Employment employment;
+        if(organization.isParentOrganization()){
+            CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
+            staff = new Staff();
+            staff.setFirstName(currentUserDetails.getFirstName());
+            staff.setLastName(currentUserDetails.getLastName());
+            staff.setEmail(currentUserDetails.getEmail());
+            employment = new Employment();
+            employment.setStaff(staff);
+            User user = userGraphRepository.findOne(userId);
+            staff.setUser(user);
+        } else {
+            staff = staffGraphRepository.getStaffByUserId(userId,parentOrganizationId);
+            employment = employmentGraphRepository.findEmployment(parentOrganizationId,staff.getId());
+        }
+        UnitEmployment unitEmployment = new UnitEmployment();
+        unitEmployment.setOrganization(organization);
+        employment.getUnitEmployments().add(unitEmployment);
+        Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = accessPermissionByGroup.entrySet();
+        Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<EmploymentAccessPageRelation> employmentAccessPageRelations = new ArrayList<>();
+        List<UnitEmpAccessRelationship> unitEmpAccessRelationships = new ArrayList<>();
+        while (iterator.hasNext()){
+            Map.Entry<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = iterator.next();
+            AccessGroup accessGroup = accessGroupRepository.findOne(permissionByAccessGroup.getKey());
+            AccessPermission accessPermission = new AccessPermission(accessGroup);
+            for(StaffPermissionQueryResult staffPermissionQueryResult : permissionByAccessGroup.getValue()){
+                AccessPage accessPage = objectMapper.convertValue(staffPermissionQueryResult,AccessPage.class);
+                accessPage.setModule(staffPermissionQueryResult.isModule());
+                EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation
+                        (accessPermission,accessPage,staffPermissionQueryResult.isRead(),staffPermissionQueryResult.isWrite());
+                employmentAccessPageRelations.add(employmentAccessPageRelation);
+                for(Map<String,Object> staffTabPermission : staffPermissionQueryResult.getTabPermissions()){
+                    AccessPage subPage = objectMapper.convertValue(staffTabPermission,AccessPage.class);
+                    subPage.setModule(false);
+                    EmploymentAccessPageRelation employmentAccessSubPageRelation = new EmploymentAccessPageRelation(accessPermission,subPage,
+                            staffPermissionQueryResult.isRead(),staffPermissionQueryResult.isWrite());
+                    employmentAccessPageRelations.add(employmentAccessSubPageRelation);
+                }
+            }
+            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+            unitEmpAccessRelationships.add(unitEmpAccessRelationship);
+        }
+        if(organization.isParentOrganization()){
+            organization.getEmployments().add(employment);
+            save(organization);
+        } else {
+            employment.getUnitEmployments().add(unitEmployment);
+            save(employment);
+        }
+        unitEmpAccessGraphRepository.save(unitEmpAccessRelationships);
+        employmentPageGraphRepository.save(employmentAccessPageRelations);
+    }
+
+    private List<StaffPermissionDTO> getPermissionForHubMember(){
+        List<StaffPermissionQueryResult> staffPermissionQueryResults = accessPageRepository.getTabsPermissionForHubUserForUnit();
+        ObjectMapper objectMapper = new ObjectMapper();
+        return staffPermissionQueryResults.parallelStream().map(staffPermissionQueryResult-> objectMapper.
+                convertValue(staffPermissionQueryResult,StaffPermissionDTO.class)).collect(Collectors.toList());
+    }
+
+    public boolean isHubMember(Long userId){
+        Boolean hubMember = accessPageRepository.isHubMember(userId);
+        if(hubMember instanceof Boolean){
+            return hubMember;
+        }
+        return false;
+    }
+
+
 }

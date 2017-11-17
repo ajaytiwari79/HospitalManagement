@@ -1,15 +1,12 @@
 package com.kairos.persistence.model.user.staff;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.enums.Gender;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
  * Created by vipul on 8/9/17.
  */
 @QueryResult
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class StaffPersonalDetailDTO {
     private long id;
     private String lastName;
@@ -29,6 +26,10 @@ public class StaffPersonalDetailDTO {
     private long accumulatedTimeBank;
     private long accumulatedPoints;
     private String name;
+    private String profilePic;
+    protected Gender gender;
+    private String city;
+    private String province;
 
     public long getId() {
         return id;
@@ -168,5 +169,41 @@ public class StaffPersonalDetailDTO {
 
     public String getName() {
         return this.firstName+" "+this.lastName;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
     }
 }
