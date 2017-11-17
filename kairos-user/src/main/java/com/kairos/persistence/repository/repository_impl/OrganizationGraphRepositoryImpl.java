@@ -55,7 +55,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
 
         }
         query +=   "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,c,r\n";
-        query+=    "OPTIONAL MATCH (c)-[houseHoldRel:"+PEOPLE_IN_HOUSEHOLD_LIST+"]->(houseHold) with ca,c,r,houseHoldRel,houseHold\n";
+        query+=    "OPTIONAL MATCH (c)-[houseHoldRel:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(houseHold) with ca,c,r,houseHoldRel,houseHold\n";
         if(StringUtils.isBlank(clientFilterDTO.getPhoneNumber())){
             query += "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail) with cd,ca,c,r,houseHoldRel,houseHold\n";
         }else{
