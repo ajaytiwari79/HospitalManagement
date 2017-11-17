@@ -1091,15 +1091,14 @@ public class OrganizationService extends UserBaseService {
     }
 
 
-    public List<DayType> getDayType(Long unitID, Date date){
-        Long countryId = organizationGraphRepository.getCountryId(unitID);
+    public List<DayType> getDayType(Long organizationId, Date date){
+        Long countryId = organizationGraphRepository.getCountryId(organizationId);
        return  dayTypeService.getDayTypeByDate(countryId,date);
     }
 
-    public List<DayType> getAllDayTypeofOrganization(Long unitID){
-        Long countryId = organizationGraphRepository.getCountryId(unitID);
+    public List<DayType> getAllDayTypeofOrganization(Long organizationId){
+        Long countryId = organizationGraphRepository.getCountryId(organizationId);
         return  dayTypeService.getAllDayTypeByCountryId(countryId);
-
 
     }
     public List<Map<String,Object>>getUnitsByOrganizationIs(Long orgID){
