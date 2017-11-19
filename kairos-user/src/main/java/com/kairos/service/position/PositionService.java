@@ -160,8 +160,7 @@ public class PositionService extends UserBaseService {
         Position position = new Position();
 
         //String name, String description, Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta
-
-        WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId(), 53L);
+        WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
 
         if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
@@ -489,7 +488,7 @@ public class PositionService extends UserBaseService {
 
     private void preparePosition(Position oldPosition, PositionDTO positionDTO) {
         if (!oldPosition.getExpertise().getId().equals(positionDTO.getExpertiseId())) {
-            WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId(), 53L);
+            WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
 
             if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
