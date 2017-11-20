@@ -11,6 +11,7 @@ import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
@@ -502,18 +503,18 @@ public class ClientService extends UserBaseService {
      * @return
      * @auther anil maurya
      */
-    public List<OrganizationService> getClientServices(Long clientId, long orgId) {
+    public List<OrganizationServiceQueryResult> getClientServices(Long clientId, long orgId) {
         logger.debug("Getting Demands  ClientId:" + clientId + " UnitId: " + orgId);
-        List<OrganizationService> serviceList = new ArrayList<>();
+        List<OrganizationServiceQueryResult> serviceList = new ArrayList<>();
         //List<Long> serviceIdList = taskService.getClientTaskServices(clientId, orgId);
         //implements task service rest template client
         List<Long> serviceIdList = taskServiceRestClient.getClientTaskServices(clientId, orgId);
-
-        for (Long id : serviceIdList) {
+        return organizationServiceRepository.getOrganizationServiceByOrgIdAndServiceIds(orgId, serviceIdList);
+        /*for (Long id : serviceIdList) {
             OrganizationService service = organizationServiceRepository.findOne(Long.valueOf(id));
             serviceList.add(service);
         }
-        return serviceList;
+        return serviceList;*/
     }
 
     public List<Long> getClientServicesIds(Long clientId, long orgId) {
@@ -575,8 +576,8 @@ public class ClientService extends UserBaseService {
         return clientGraphRepository.findForbidTeam(clientId);
     }
 
-    public List<Object> getAllUsers(Long teamID, Long clientId) {
-        List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+    public List<Object> getAllUsers(Long teamID, Long clientId, Long unitId) {
+        List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), unitId);
         List<Object> response = new ArrayList<>();
 
         if (data == null) {
@@ -1406,7 +1407,7 @@ public class ClientService extends UserBaseService {
     }
 
     public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId){
-        List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
+        List<OrganizationServiceQueryResult> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
         // TODO Fetch list of staff according to employment type ( According to dynamic value of employmnet type )
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllMainEmploymentStaffDetailByUnitId(unitId);
         List<ClientMinimumDTO> clientMinimumDTOs =  getPeopleInHousehold(clientId);

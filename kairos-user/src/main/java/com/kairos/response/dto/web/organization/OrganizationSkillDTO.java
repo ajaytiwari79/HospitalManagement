@@ -11,7 +11,6 @@ public class OrganizationSkillDTO {
 
     private String customName;
 
-    @NotEmpty(message = "error.Organization.Skill.visitourId.notEmptyOrNotNull") @NotNull(message = "error.Organization.Skill.visitourId.notEmptyOrNotNull")
     private String visitourId;
 
     public String getCustomName() {

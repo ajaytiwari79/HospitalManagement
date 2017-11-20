@@ -321,7 +321,6 @@ public class SkillService extends UserBaseService {
      *
      * @param unitId
      * @param skillId
-     * @param visitourId
      * @return
      */
    /* public boolean updateVisitourIdOfSkill(long unitId, long skillId, String visitourId,String type) {
@@ -336,10 +335,14 @@ public class SkillService extends UserBaseService {
     }*/
 
     public boolean updateSkillOfOrganization(long unitId, long skillId, String type, OrganizationSkillDTO organizationSkillDTO) {
-
+        
         if(ORGANIZATION.equalsIgnoreCase(type)){
-            return skillGraphRepository.updateSkillOfOrganization(unitId, skillId, organizationSkillDTO.getVisitourId(), organizationSkillDTO.getCustomName());
-        } else if(TEAM.equalsIgnoreCase(type)) {
+            if(organizationSkillDTO.getCustomName() == null || organizationSkillDTO.getCustomName() == ""){
+                return skillGraphRepository.updateSkillOfOrganization(unitId, skillId, organizationSkillDTO.getVisitourId());
+            } else {
+                return skillGraphRepository.updateSkillOfOrganizationWithCustomName(unitId, skillId, organizationSkillDTO.getVisitourId(), organizationSkillDTO.getCustomName());
+            }
+         } else if(TEAM.equalsIgnoreCase(type)) {
             return skillGraphRepository.updateVisitourIdOfSkillInTeam(unitId,skillId,organizationSkillDTO.getVisitourId());
         } else {
             throw new InternalError("Type incorrect");
@@ -387,7 +390,7 @@ public class SkillService extends UserBaseService {
         }
 
         List<Map<String, Object>> list = new ArrayList<>();
-        for (Map<String, Object> map : userSkillLevelRelationshipGraphRepository.getStaffSkillRelationship(staffId, selectedSkillId)) {
+        for (Map<String, Object> map : userSkillLevelRelationshipGraphRepository.getStaffSkillRelationship(staffId, selectedSkillId, unitId)) {
             Map<String, Object> data = (Map<String, Object>) map.get("data");
             list.add(data);
         }

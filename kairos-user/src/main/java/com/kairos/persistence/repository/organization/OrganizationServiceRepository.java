@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -58,7 +59,10 @@ public interface OrganizationServiceRepository extends GraphRepository<Organizat
     OrganizationService findByKmdExternalId(String kmdExternalId);
 
     @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}  return id(os) as id, r.customName as name, os.description as description")
-    List<OrganizationService> getOrganizationServiceByOrgId(Long organizationId);
+    List<OrganizationServiceQueryResult> getOrganizationServiceByOrgId(Long organizationId);
+
+    @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0} AND id(os) IN {1} return id(os) as id, r.customName as name, os.description as description")
+    List<OrganizationServiceQueryResult> getOrganizationServiceByOrgIdAndServiceIds(Long organizationId, List<Long> serviceId);
 
     @Query("MATCH (os:OrganizationService{imported:false})-[r:"+LINK_WITH_EXTERNAL_SERVICE+"]->(es:OrganizationService{hasMapped:true}) where id(es)={0}  delete r ")
     OrganizationExternalServiceRelationship removeOrganizationExternalServiceRelationship(Long organizationId);
