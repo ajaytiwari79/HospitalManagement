@@ -73,7 +73,10 @@ public interface SkillGraphRepository extends GraphRepository<Skill>{
     boolean updateVisitourIdOfSkillInOrganization(long unitId, long skillId, String visitourId);
 
     @Query("Match (organization:Organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={0} AND id(skill)={1} set r.visitourId={2}, r.customName={3} return r is not null")
-    boolean updateSkillOfOrganization(long unitId, long skillId, String visitourId, String customName);
+    boolean updateSkillOfOrganizationWithCustomName(long unitId, long skillId, String visitourId, String customName);
+
+    @Query("Match (organization:Organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={0} AND id(skill)={1} set r.visitourId={2}, r.customName=skill.name return r is not null")
+    boolean updateSkillOfOrganization(long unitId, long skillId, String visitourId);
 
     @Query("Match (team:Team)-[r:"+TEAM_HAS_SKILLS+"]->(skill:Skill) where id (team)={0} AND id(skill)={1} with r\n" +
             "set r.visitourId={2} return r is not null")
