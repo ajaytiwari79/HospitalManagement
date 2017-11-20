@@ -8,7 +8,6 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.service.UserBaseService;
-import com.kairos.util.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -60,13 +59,13 @@ public class DayTypeService extends UserBaseService {
     public Map<String, Object> updateDayType(DayType dayType){
         DayType currentDayType = dayTypeGraphRepository.findOne(dayType.getId());
         if (currentDayType!=null){
-
             currentDayType.setName(dayType.getName());
             currentDayType.setCode(dayType.getCode());
             currentDayType.setColorCode(dayType.getColorCode());
             currentDayType.setDescription(dayType.getDescription());
             currentDayType.setAllowTimeSettings(dayType.isAllowTimeSettings());
             currentDayType.setValidDays(dayType.getValidDays());
+            currentDayType.setHolidayType(dayType.isHolidayType());
             save(currentDayType);
             return currentDayType.retrieveDetails();
         }
