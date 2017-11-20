@@ -488,14 +488,12 @@ public class PositionService extends UserBaseService {
     }
 
     private void preparePosition(Position oldPosition, PositionDTO positionDTO) {
-        System.out.println("updating");
         if (!oldPosition.getExpertise().getId().equals(positionDTO.getExpertiseId())) {
             WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
 
             if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
             }
-            System.out.println(Optional.ofNullable(wtaWithRuleTemplateDTO.getId()).isPresent()+"---------------------------------------"+wtaWithRuleTemplateDTO.getId());
             if (Optional.ofNullable(wtaWithRuleTemplateDTO.getId()).isPresent()) {
                 WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
                 WorkingTimeAgreement oldWta = oldPosition.getWta();
