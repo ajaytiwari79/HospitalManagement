@@ -390,7 +390,7 @@ public class SkillService extends UserBaseService {
         }
 
         List<Map<String, Object>> list = new ArrayList<>();
-        for (Map<String, Object> map : userSkillLevelRelationshipGraphRepository.getStaffSkillRelationship(staffId, selectedSkillId)) {
+        for (Map<String, Object> map : userSkillLevelRelationshipGraphRepository.getStaffSkillRelationship(staffId, selectedSkillId, unitId)) {
             Map<String, Object> data = (Map<String, Object>) map.get("data");
             list.add(data);
         }

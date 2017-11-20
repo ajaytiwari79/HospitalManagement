@@ -575,8 +575,8 @@ public class ClientService extends UserBaseService {
         return clientGraphRepository.findForbidTeam(clientId);
     }
 
-    public List<Object> getAllUsers(Long teamID, Long clientId) {
-        List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+    public List<Object> getAllUsers(Long teamID, Long clientId, Long unitId) {
+        List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), unitId);
         List<Object> response = new ArrayList<>();
 
         if (data == null) {
