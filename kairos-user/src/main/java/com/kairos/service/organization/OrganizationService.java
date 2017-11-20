@@ -1058,7 +1058,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = null;
         switch (type.toLowerCase()) {
             case ORGANIZATION:
-                organization = organizationGraphRepository.findOne(id);
+                organization = organizationGraphRepository.findOne(id,1);
                 break;
             case GROUP:
                 organization = groupService.getUnitByGroupId(id);
