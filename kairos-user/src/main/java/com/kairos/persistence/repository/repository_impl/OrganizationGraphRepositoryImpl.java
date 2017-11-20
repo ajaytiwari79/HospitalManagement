@@ -40,12 +40,11 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         queryParameters.put("citizenIds", citizenIds);
 
         queryParameters.put("imagePath", imagePath);
-        if("tab_102".equalsIgnoreCase(moduleId)){
-            queryParameters.put("healthStatus",Arrays.asList(ALIVE,DECEASED));
-        } else {
+        if("module_2".equalsIgnoreCase(moduleId)){
             queryParameters.put("healthStatus",Arrays.asList(ALIVE,DECEASED,TERMINATED));
+        } else {
+            queryParameters.put("healthStatus",Arrays.asList(ALIVE,DECEASED));
         }
-
 
         if(citizenIds.isEmpty() && clientFilterDTO.getServicesTypes().isEmpty() && clientFilterDTO.getTimeSlots().isEmpty() && clientFilterDTO.getTaskTypes().isEmpty() && !clientFilterDTO.isNewDemands()){
             query = "MATCH (c:Client)-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {unitId} AND c.healthStatus IN {healthStatus} AND ( c.firstName=~{name} OR c.lastName=~{name} ) AND c.cprNumber STARTS WITH {cprNumber} with c,r\n";
