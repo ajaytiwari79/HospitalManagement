@@ -411,7 +411,7 @@ public class SkillService extends UserBaseService {
         List<Map<String,Object>> response;
         if (isSelected) {
             staffGraphRepository.addSkillInStaff(staffId, removedSkillIds,new Date().getTime(),new Date().getTime(), Skill.SkillLevel.ADVANCE,true);
-            response = prepareSelectedSkillResponse(staffId,removedSkillIds);
+            response = prepareSelectedSkillResponse(staffId,removedSkillIds, unitId);
         } else {
             staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds,new Date().getTime());
             response = Collections.emptyList();
@@ -424,9 +424,9 @@ public class SkillService extends UserBaseService {
 
     }
 
-    private List<Map<String, Object>> prepareSelectedSkillResponse(long staffId,List<Long> skillId) {
+    private List<Map<String, Object>> prepareSelectedSkillResponse(long staffId,List<Long> skillId, long unitId) {
 
-        List<Map<String,Object>> staffSkillInfo = staffGraphRepository.getStaffSkillInfo(staffId,skillId);
+        List<Map<String,Object>> staffSkillInfo = staffGraphRepository.getStaffSkillInfo(staffId,skillId,unitId);
 
         List<Map<String, Object>> list = new ArrayList<>();
 
