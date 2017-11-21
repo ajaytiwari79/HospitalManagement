@@ -107,7 +107,7 @@ public class PositionService extends UserBaseService {
     public PositionWrapper updatePosition(long positionId, PositionDTO positionDTO) {
 
         List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(positionDTO.getStaffId());
-        if(clientMinimumDTO.size()>0){
+        if (clientMinimumDTO.size() > 0) {
             return new PositionWrapper(clientMinimumDTO);
         }
 
@@ -160,8 +160,7 @@ public class PositionService extends UserBaseService {
         Position position = new Position();
 
         //String name, String description, Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta
-
-        WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId(), 53L);
+        WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
 
         if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
@@ -187,10 +186,11 @@ public class PositionService extends UserBaseService {
         position.setCta(cta);<String, Object>
 
         */
-
-        WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
-
-        save(wta);
+        if (Optional.ofNullable(wtaWithRuleTemplateDTO.getId()).isPresent()) {
+            WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
+            save(wta);
+            position.setWta(wta);
+        }
 
         Staff staff = staffGraphRepository.findOne(positionDTO.getStaffId());
         if (!Optional.ofNullable(staff).isPresent()) {
@@ -199,7 +199,7 @@ public class PositionService extends UserBaseService {
         position.setStaff(staff);
         position.setStartDate(positionDTO.getStartDate());
         position.setEndDate(positionDTO.getEndDate());
-        position.setWta(wta);
+
         position.setTotalWeeklyHours(positionDTO.getTotalWeeklyHours());
         position.setAvgDailyWorkingHours(positionDTO.getAvgDailyWorkingHours());
         position.setHourlyWages(positionDTO.getHourlyWages());
@@ -489,19 +489,20 @@ public class PositionService extends UserBaseService {
 
     private void preparePosition(Position oldPosition, PositionDTO positionDTO) {
         if (!oldPosition.getExpertise().getId().equals(positionDTO.getExpertiseId())) {
-            WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId(), 53L);
+            WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
 
             if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
             }
+            if (Optional.ofNullable(wtaWithRuleTemplateDTO.getId()).isPresent()) {
+                WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
+                WorkingTimeAgreement oldWta = oldPosition.getWta();
+                oldPosition.setWta(wta);
+                wta.setWta(oldWta);
+                save(wta);
+                workingTimeAgreementGraphRepository.breakRelationFromOldWTA(oldPosition.getId(), oldWta.getId());
+            }
             oldPosition.setExpertise(wtaWithRuleTemplateDTO.getExpertise());
-            WorkingTimeAgreement oldWta = oldPosition.getWta();
-            WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
-            oldPosition.setWta(wta);
-            wta.setWta(oldWta);
-            save(wta);
-            workingTimeAgreementGraphRepository.breakRelationFromOldWTA(oldPosition.getId(), oldWta.getId());
-
         }
 
 
@@ -513,7 +514,7 @@ public class PositionService extends UserBaseService {
             oldPosition.setPositionName(positionName);
         }
 
-        if (!oldPosition.getEmploymentType().getId().equals( positionDTO.getEmploymentTypeId())) {
+        if (!oldPosition.getEmploymentType().getId().equals(positionDTO.getEmploymentTypeId())) {
             EmploymentType employmentType = employmentTypeGraphRepository.findOne(positionDTO.getEmploymentTypeId());
             if (!Optional.ofNullable(employmentType).isPresent()) {
                 throw new DataNotFoundByIdException("employmentType Cannot be null" + positionDTO.getEmploymentTypeId());
