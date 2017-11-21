@@ -147,6 +147,19 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
     }
 
+    @RequestMapping(value = COUNTRY_URL, method = RequestMethod.GET)
+    @ApiOperation("Get country  by id")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountry(@PathVariable Long countryId) {
+        if (countryId != null) {
+            if (countryService.getCountryById(countryId) != null) {
+                return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+            }
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+    }
+
     @RequestMapping(value = COUNTRY_URL, method = RequestMethod.DELETE)
     @ApiOperation("Delete country  by id")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
