@@ -359,7 +359,7 @@ public class OrganizationService extends UserBaseService {
         logger.info("Geography Data: " + geographyData);
 
 
-        if(Optional.ofNullable(orgDetails.getTypeId()).isPresent() && orgDetails.getTypeId().size()>0){
+        if(Optional.ofNullable(orgDetails.getTypeId()).isPresent() && orgDetails.getTypeId().size()>0 && Optional.ofNullable(orgDetails.getLevelId()).isPresent()){
             Level level = organizationTypeGraphRepository.getLevel(orgDetails.getTypeId().get(0),orgDetails.getLevelId());
             organization.setLevel(level);
         }
