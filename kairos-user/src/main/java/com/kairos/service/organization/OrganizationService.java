@@ -259,7 +259,7 @@ public class OrganizationService extends UserBaseService {
         response.put("subTypeId", parentOrganizationDTO.getSubTypeId());
         response.put("externalId", organization.getExternalId());
         response.put("homeAddress", filterContactAddressInfo(organization.getContactAddress()));
-        response.put("levelId",organization.getLevel().getId());
+        response.put("levelId",(organization.getLevel() == null)?organization.getLevel():organization.getLevel().getId());
         return response;
     }
 
@@ -359,13 +359,10 @@ public class OrganizationService extends UserBaseService {
         logger.info("Geography Data: " + geographyData);
 
 
-        Level level = organizationTypeGraphRepository.getLevel(orgDetails.getTypeId().get(0),orgDetails.getLevelId());
-        if (level == null) {
-            throw new InternalError("Level can't be null");
+        if(Optional.ofNullable(orgDetails.getTypeId()).isPresent() && orgDetails.getTypeId().size()>0){
+            Level level = organizationTypeGraphRepository.getLevel(orgDetails.getTypeId().get(0),orgDetails.getLevelId());
+            organization.setLevel(level);
         }
-        organization.setLevel(level);
-
-
         // Geography Data
         contactAddress.setMunicipality(municipality);
         contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));

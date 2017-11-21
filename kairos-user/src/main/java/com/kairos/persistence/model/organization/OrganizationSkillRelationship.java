@@ -21,6 +21,7 @@ public class OrganizationSkillRelationship extends UserBaseEntity {
     private boolean isEnabled=true;
     private String iconName;
     private String visitourId;
+    private String customName;
 
     public Organization getOrganization() {
         return organization;
@@ -61,5 +62,13 @@ public class OrganizationSkillRelationship extends UserBaseEntity {
     public String getVisitourId() {
 
         return visitourId;
+    }
+
+    public String getCustomName() {
+        return customName;
+    }
+
+    public void setCustomName(String customName) {
+        this.customName = customName;
     }
 }

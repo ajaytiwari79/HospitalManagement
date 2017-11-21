@@ -4,6 +4,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
+import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.team.Team;
@@ -158,6 +159,18 @@ public class OrganizationServiceService extends UserBaseService {
 
     }
 
+    public OrganizationServiceQueryResult updateCustomNameOfService(long serviceId, long organizationId, String customName){
+        return organizationGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
+    }
+
+    public OrganizationServiceQueryResult updateCustomNameOfSubService(long subServiceId,long organizationId, String customName){
+        return organizationGraphRepository.addCustomNameOfSubServiceForOrganization(subServiceId, organizationId, customName);
+    }
+
+    public boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId){
+        return organizationGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId,organizationId);
+    };
+
     public Map<String,Object> updateServiceToOrganization(long id, long organizationServiceId,boolean isSelected,String type) {
 
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(organizationServiceId);
@@ -178,9 +191,11 @@ public class OrganizationServiceService extends UserBaseService {
                 }else {
                     organizationGraphRepository.updateServiceFromOrganization(id,organizationService.getId());
                 }
+                addDefaultCustomNameRelationShipOfServiceForOrganization(organizationService.getId(), id);
             } else {
                 organizationGraphRepository.removeServiceFromOrganization(id,organizationService.getId());
             }
+//                        getServiceOfSubService
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if(team == null){

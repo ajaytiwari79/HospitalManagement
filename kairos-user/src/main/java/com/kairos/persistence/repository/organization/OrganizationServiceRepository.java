@@ -57,7 +57,7 @@ public interface OrganizationServiceRepository extends GraphRepository<Organizat
 
     OrganizationService findByKmdExternalId(String kmdExternalId);
 
-    @Query("MATCH (o:Organization)-[:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}  return os ")
+    @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}  return id(os) as id, r.customName as name, os.description as description")
     List<OrganizationService> getOrganizationServiceByOrgId(Long organizationId);
 
     @Query("MATCH (os:OrganizationService{imported:false})-[r:"+LINK_WITH_EXTERNAL_SERVICE+"]->(es:OrganizationService{hasMapped:true}) where id(es)={0}  delete r ")
