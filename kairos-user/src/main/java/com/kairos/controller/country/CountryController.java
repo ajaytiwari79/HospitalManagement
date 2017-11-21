@@ -153,7 +153,7 @@ public class CountryController {
     public ResponseEntity<Map<String, Object>> getCountry(@PathVariable Long countryId) {
         if (countryId != null) {
             if (countryService.getCountryById(countryId) != null) {
-                return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+                return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
             }
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
