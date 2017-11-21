@@ -79,8 +79,8 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
     List<WTAWithCountryAndOrganizationTypeDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId);
 
     @Query("match(c:Country) where id(c)={0}\n" +
-            "match(c)<-[:" + BELONGS_TO + "]-(or:OrganizationType)\n" +
-            "optional match(or)-[:" + HAS_SUB_TYPE + "]->(ora:OrganizationType)\n" +
+            "match(c)<-[:" + BELONGS_TO + "]-(or:OrganizationType{isEnable:true})\n" +
+            "optional match(or)-[:" + HAS_SUB_TYPE + "]->(ora:OrganizationType{isEnable:true})\n" +
             "optional match(w:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(ora)\n" +
             "with or,ora,w\n" +
             "with or,ora,{WTA:CASE WHEN w IS NOT NULL THEN collect({id:id(w),name:w.name}) ELSE [] END} as oraRes\n" +
@@ -90,8 +90,8 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
 
     @Query("match(c:Country) where id(c)={0}\n" +
             "match(wta:WorkingTimeAgreement{deleted:false}) where id(wta)={1}\n" +
-            "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]-(or:OrganizationType)\n" +
-            "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(org:OrganizationType)\n" +
+            "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]-(or:OrganizationType{isEnable:true})\n" +
+            "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(org:OrganizationType{isEnable:true})\n" +
             "with or ,org ,{WTA:CASE WHEN wta IS NOT NULL THEN collect({id:id(wta),name:wta.name}) ELSE [] END} as oraRes\n" +
             "WITH {name: or.name,id:id(or), children: CASE WHEN org IS NOT NULL THEN collect({id:id(org),name:org.name,wta:oraRes}) ELSE [] END} as orga \n" +
             "RETURN orga as result")
