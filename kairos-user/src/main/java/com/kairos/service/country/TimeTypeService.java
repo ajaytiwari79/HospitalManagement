@@ -68,10 +68,10 @@ public class TimeTypeService extends UserBaseService {
     public TimeTypeDTO updateTimeType(TimeTypeDTO timeTypeDTO, Long timeTypeId){
         TimeType timeType = timeTypeGraphRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
-            logger.error("TimeType does not exist" + timeTypeDTO.getId());
+            logger.error("TimeType does not exist" + timeTypeId);
             throw new DataNotFoundByIdException("Invalid timeType");
         }
-        int existingCount =timeTypeGraphRepository.findByNameAndTypeAndIdIgnoreCase("(?i)"+timeTypeDTO.getName(),"(?i)"+timeTypeDTO.getType(),timeTypeDTO.getId());
+        int existingCount =timeTypeGraphRepository.findByNameAndTypeAndIdIgnoreCase("(?i)"+timeTypeDTO.getName(),"(?i)"+timeTypeDTO.getType(),timeTypeId);
         if (existingCount>0) {
             logger.error("Country has already a TimeType with name " + timeTypeDTO.getName()+" and type "+timeTypeDTO.getType());
             throw new DuplicateDataException("Country has already a TimeType with name and type");
