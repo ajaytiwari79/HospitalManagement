@@ -162,6 +162,15 @@ public class PositionService extends UserBaseService {
         //String name, String description, Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta
         WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
 
+        if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getName()).isPresent()) {
+            logger.info("Expertise Doesn't contains WTA.Please select different Expertise" + positionDTO.getExpertiseId());
+            throw new DataNotFoundByIdException("Expertise Doesn't contains WTA.Please select different Expertise");
+        }
+        WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
+        save(wta);
+        position.setWta(wta);
+
+
         if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
         }
@@ -186,11 +195,6 @@ public class PositionService extends UserBaseService {
         position.setCta(cta);<String, Object>
 
         */
-        if (Optional.ofNullable(wtaWithRuleTemplateDTO.getId()).isPresent()) {
-            WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
-            save(wta);
-            position.setWta(wta);
-        }
 
         Staff staff = staffGraphRepository.findOne(positionDTO.getStaffId());
         if (!Optional.ofNullable(staff).isPresent()) {
@@ -494,7 +498,10 @@ public class PositionService extends UserBaseService {
             if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
             }
-            if (Optional.ofNullable(wtaWithRuleTemplateDTO.getId()).isPresent()) {
+            if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getName()).isPresent()) {
+                logger.info("Expertise Doesn't contains WTA.Please select different Expertise" + positionDTO.getExpertiseId());
+                throw new DataNotFoundByIdException("Expertise Doesn't contains WTA.Please select different Expertise");
+            } else {
                 WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
                 WorkingTimeAgreement oldWta = oldPosition.getWta();
                 oldPosition.setWta(wta);
@@ -537,7 +544,8 @@ public class PositionService extends UserBaseService {
      * @auth vipul
      * used to get all positions of organization n buy organization and staff Id
      * */
-    public List<PositionQueryResult> getAllPositionByStaff(long id, long unitEmploymentId, long staffId, String type) {
+    public List<PositionQueryResult> getAllPositionByStaff(long id, long unitEmploymentId, long staffId, String
+            type) {
 
         Long unitId = organizationService.getOrganization(id, type);
 
