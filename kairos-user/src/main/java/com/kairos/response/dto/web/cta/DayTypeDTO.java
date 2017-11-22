@@ -10,6 +10,16 @@ public class DayTypeDTO {
    private String name;
    private List<Day> validDays=new ArrayList<>();
 
+    public DayTypeDTO() {
+        //default constructor
+    }
+
+    public DayTypeDTO(Long id, String name, List<Day> validDays) {
+        this.id = id;
+        this.name = name;
+        this.validDays = validDays;
+    }
+
     public Long getId() {
         return id;
     }

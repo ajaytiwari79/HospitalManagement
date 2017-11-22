@@ -8,7 +8,7 @@ public class CTARuleTemplateDefaultDataWrapper {
     private List<DayTypeDTO> dayTypeDTOS=new ArrayList<>();
     private List<PhaseDTO> phaseDTOS=new ArrayList<>();
     private List<TimeTypeDTO> timeTypeDTOS=new ArrayList<>();
-    private List<EmploymentTypeTypeDTO> employmentTypeTypeDTOS=new ArrayList<>();
+    private List<EmploymentTypeDTO> employmentTypeTypeDTOS=new ArrayList<>();
 
     public CTARuleTemplateDefaultDataWrapper() {
         //default
@@ -46,11 +46,11 @@ public class CTARuleTemplateDefaultDataWrapper {
         this.timeTypeDTOS = timeTypeDTOS;
     }
 
-    public List<EmploymentTypeTypeDTO> getEmploymentTypeTypeDTOS() {
+    public List<EmploymentTypeDTO> getEmploymentTypeTypeDTOS() {
         return employmentTypeTypeDTOS;
     }
 
-    public void setEmploymentTypeTypeDTOS(List<EmploymentTypeTypeDTO> employmentTypeTypeDTOS) {
+    public void setEmploymentTypeTypeDTOS(List<EmploymentTypeDTO> employmentTypeTypeDTOS) {
         this.employmentTypeTypeDTOS = employmentTypeTypeDTOS;
     }
 
