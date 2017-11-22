@@ -48,11 +48,11 @@ public class ClientServiceIntegrationTest {
     @Test
     public void contactPersonShouldBeUpdate(){
         String baseUrl=getBaseUrl(71L,145L);
-        ContactPersonDTO contactPersonDTO = new ContactPersonDTO(new Long(139),new Long(9260),
-                Arrays.asList(new Long(7508)));
+        ContactPersonDTO contactPersonDTO = new ContactPersonDTO(new Long(226),new Long(1005),
+                Arrays.asList(new Long(192)));
         HttpEntity<ContactPersonDTO> entity = new HttpEntity<>(contactPersonDTO);
         ResponseEntity<ClientContactPersonStructuredData> response = restTemplate.exchange(
-                baseUrl+"/client/10951/staff/contact-person",
+                baseUrl+"/client/571/staff/contact-person",
                 HttpMethod.PUT, entity, ClientContactPersonStructuredData.class);
         System.out.println("response is " + response);
         Assert.assertEquals(200,response.getStatusCodeValue());
@@ -63,7 +63,7 @@ public class ClientServiceIntegrationTest {
     public void markClientAsDead(){
         String baseUrl=getBaseUrl(71L,145L);
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl+"/client/10952/dead?deathDate=2017-11-11T07:03:44.155Z",
+                baseUrl+"/client/571/dead?deathDate=2017-11-11T07:03:44.155Z",
                 HttpMethod.DELETE, null, String.class);
         System.out.println("response is " + response);
         Assert.assertEquals(200,response.getStatusCodeValue());
