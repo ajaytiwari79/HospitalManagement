@@ -184,9 +184,9 @@ public class SkillService extends UserBaseService {
 
             List<Map<String, Object>> organizationSkills;
             if (parent == null) {
-                organizationSkills = organizationGraphRepository.getSkillsOfParentOrganization(id);
+                organizationSkills = organizationGraphRepository.getSkillsOfParentOrganizationWithActualName(id);
             } else {
-                organizationSkills = organizationGraphRepository.getSkillsOfChildOrganization(parent.getId(), id);
+                organizationSkills = organizationGraphRepository.getSkillsOfChildOrganizationWithActualName(parent.getId(), id);
             }
 
             List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
