@@ -19,6 +19,7 @@ import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
@@ -183,9 +184,9 @@ public class SkillService extends UserBaseService {
 
             List<Map<String, Object>> organizationSkills;
             if (parent == null) {
-                organizationSkills = organizationGraphRepository.getSkillsOfParentOrganization(id);
+                organizationSkills = organizationGraphRepository.getSkillsOfParentOrganizationWithActualName(id);
             } else {
-                organizationSkills = organizationGraphRepository.getSkillsOfChildOrganization(parent.getId(), id);
+                organizationSkills = organizationGraphRepository.getSkillsOfChildOrganizationWithActualName(parent.getId(), id);
             }
 
             List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
@@ -320,10 +321,9 @@ public class SkillService extends UserBaseService {
      *
      * @param unitId
      * @param skillId
-     * @param visitourId
      * @return
      */
-    public boolean updateVisitourIdOfSkill(long unitId, long skillId, String visitourId,String type) {
+   /* public boolean updateVisitourIdOfSkill(long unitId, long skillId, String visitourId,String type) {
 
         if(ORGANIZATION.equalsIgnoreCase(type)){
             return skillGraphRepository.updateVisitourIdOfSkillInOrganization(unitId, skillId, visitourId);
@@ -332,8 +332,22 @@ public class SkillService extends UserBaseService {
         } else {
             throw new InternalError("Type incorrect");
         }
-    }
+    }*/
 
+    public boolean updateSkillOfOrganization(long unitId, long skillId, String type, OrganizationSkillDTO organizationSkillDTO) {
+        
+        if(ORGANIZATION.equalsIgnoreCase(type)){
+            if(organizationSkillDTO.getCustomName() == null || organizationSkillDTO.getCustomName() == ""){
+                return skillGraphRepository.updateSkillOfOrganization(unitId, skillId, organizationSkillDTO.getVisitourId());
+            } else {
+                return skillGraphRepository.updateSkillOfOrganizationWithCustomName(unitId, skillId, organizationSkillDTO.getVisitourId(), organizationSkillDTO.getCustomName());
+            }
+         } else if(TEAM.equalsIgnoreCase(type)) {
+            return skillGraphRepository.updateVisitourIdOfSkillInTeam(unitId,skillId,organizationSkillDTO.getVisitourId());
+        } else {
+            throw new InternalError("Type incorrect");
+        }
+    }
 
     public boolean requestForCreateNewSkill(long unitId, Skill skill) {
         Organization organization = organizationGraphRepository.findOne(unitId);
@@ -376,7 +390,7 @@ public class SkillService extends UserBaseService {
         }
 
         List<Map<String, Object>> list = new ArrayList<>();
-        for (Map<String, Object> map : userSkillLevelRelationshipGraphRepository.getStaffSkillRelationship(staffId, selectedSkillId)) {
+        for (Map<String, Object> map : userSkillLevelRelationshipGraphRepository.getStaffSkillRelationship(staffId, selectedSkillId, unitId)) {
             Map<String, Object> data = (Map<String, Object>) map.get("data");
             list.add(data);
         }
@@ -397,7 +411,7 @@ public class SkillService extends UserBaseService {
         List<Map<String,Object>> response;
         if (isSelected) {
             staffGraphRepository.addSkillInStaff(staffId, removedSkillIds,new Date().getTime(),new Date().getTime(), Skill.SkillLevel.ADVANCE,true);
-            response = prepareSelectedSkillResponse(staffId,removedSkillIds);
+            response = prepareSelectedSkillResponse(staffId,removedSkillIds, unitId);
         } else {
             staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds,new Date().getTime());
             response = Collections.emptyList();
@@ -410,9 +424,9 @@ public class SkillService extends UserBaseService {
 
     }
 
-    private List<Map<String, Object>> prepareSelectedSkillResponse(long staffId,List<Long> skillId) {
+    private List<Map<String, Object>> prepareSelectedSkillResponse(long staffId,List<Long> skillId, long unitId) {
 
-        List<Map<String,Object>> staffSkillInfo = staffGraphRepository.getStaffSkillInfo(staffId,skillId);
+        List<Map<String,Object>> staffSkillInfo = staffGraphRepository.getStaffSkillInfo(staffId,skillId,unitId);
 
         List<Map<String, Object>> list = new ArrayList<>();
 

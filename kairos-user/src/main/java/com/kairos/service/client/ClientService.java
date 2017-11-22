@@ -6,13 +6,16 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.enums.CitizenHealthStatus;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
@@ -47,6 +50,7 @@ import com.kairos.util.userContext.UserContext;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.neo4j.ogm.session.Session;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.inject.Inject;
+import javax.swing.text.html.Option;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
@@ -64,6 +69,8 @@ import java.util.stream.StreamSupport;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.KAIROS;
+import static com.kairos.persistence.model.enums.CitizenHealthStatus.DECEASED;
+import static com.kairos.persistence.model.enums.CitizenHealthStatus.TERMINATED;
 import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 
 /**
@@ -496,18 +503,18 @@ public class ClientService extends UserBaseService {
      * @return
      * @auther anil maurya
      */
-    public List<OrganizationService> getClientServices(Long clientId, long orgId) {
+    public List<OrganizationServiceQueryResult> getClientServices(Long clientId, long orgId) {
         logger.debug("Getting Demands  ClientId:" + clientId + " UnitId: " + orgId);
-        List<OrganizationService> serviceList = new ArrayList<>();
+        List<OrganizationServiceQueryResult> serviceList = new ArrayList<>();
         //List<Long> serviceIdList = taskService.getClientTaskServices(clientId, orgId);
         //implements task service rest template client
         List<Long> serviceIdList = taskServiceRestClient.getClientTaskServices(clientId, orgId);
-
-        for (Long id : serviceIdList) {
+        return organizationServiceRepository.getOrganizationServiceByOrgIdAndServiceIds(orgId, serviceIdList);
+        /*for (Long id : serviceIdList) {
             OrganizationService service = organizationServiceRepository.findOne(Long.valueOf(id));
             serviceList.add(service);
         }
-        return serviceList;
+        return serviceList;*/
     }
 
     public List<Long> getClientServicesIds(Long clientId, long orgId) {
@@ -569,8 +576,8 @@ public class ClientService extends UserBaseService {
         return clientGraphRepository.findForbidTeam(clientId);
     }
 
-    public List<Object> getAllUsers(Long teamID, Long clientId) {
-        List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+    public List<Object> getAllUsers(Long teamID, Long clientId, Long unitId) {
+        List<Map<String, Object>> data = clientGraphRepository.getTeamMembers(teamID, clientId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), unitId);
         List<Object> response = new ArrayList<>();
 
         if (data == null) {
@@ -709,16 +716,25 @@ public class ClientService extends UserBaseService {
      * @auther anil maurya
      */
     public boolean markClientAsDead(Long clientId, String deathDate) throws ParseException {
-        Client client = clientGraphRepository.findOne(clientId);
-        if (client == null) {
+        Client citizen = clientGraphRepository.findOne(clientId);
+        if (!Optional.ofNullable(citizen).isPresent()) {
             throw new DataNotFoundByIdException("Incorrect client id ::" + clientId);
         }
         Date deathDateInDateFormat = DateUtil.convertToOnlyDate(deathDate, MONGODB_QUERY_DATE_FORMAT);
-        client.setCitizenDead(true);
-        client.setDeathDate(deathDateInDateFormat.getTime());
-        clientGraphRepository.save(client);
-        //return plannerService.deleteTasksForCitizen(clientId);
-        return plannerRestClient.deleteTaskForCitizen(clientId);
+        switch (citizen.getHealthStatus()){
+            case ALIVE:
+                citizen.setHealthStatus(DECEASED);
+                citizen.setDeceasedDate(deathDateInDateFormat.getTime());
+                plannerRestClient.deleteTaskForCitizen(clientId,DECEASED,deathDate);
+                break;
+            case DECEASED:
+                citizen.setHealthStatus(TERMINATED);
+                citizen.setTerminatedDate(deathDateInDateFormat.getTime());
+                plannerRestClient.deleteTaskForCitizen(clientId,TERMINATED,deathDate);
+                break;
+        }
+        clientGraphRepository.save(citizen);
+        return true;
 
     }
 
@@ -1082,29 +1098,27 @@ public class ClientService extends UserBaseService {
      * this method is call from exception service from task micro service
      */
     public ClientTemporaryAddress changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId, Long clientId) {
-
-        Client client = clientGraphRepository.findOne(clientId);
+        List<Long> citizenIds = clientExceptionDto.getHouseHoldMembers();
+        citizenIds.add(clientId);
+        List<Client> citizens = clientGraphRepository.findByIdIn(citizenIds);
         ClientTemporaryAddress clientTemporaryAddress = null;
         if (clientExceptionDto.getTempAddress() != null) {
-            clientTemporaryAddress = updateClientTemporaryAddress(clientExceptionDto, unitId, client);
+            clientTemporaryAddress = updateClientTemporaryAddress(clientExceptionDto, unitId);
         }
         if (clientExceptionDto.getTemporaryAddress() != null) {
             clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
-            if (clientTemporaryAddress == null) {
-                throw new InternalError("Address not found");
-            }
-
         }
-
+        for(Client citizen : citizens ){
+            citizen.getTemporaryAddress().add(clientTemporaryAddress);
+        }
+        clientGraphRepository.save(citizens);
         return clientTemporaryAddress;
     }
 
 
-    private ClientTemporaryAddress updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, long unitId, Client client) {
-
+    private ClientTemporaryAddress updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, long unitId) {
         AddressDTO addressDTO = clientExceptionDto.getTempAddress();
         ZipCode zipCode;
-
         ClientTemporaryAddress clientTemporaryAddress = ClientTemporaryAddress.getInstance();
         if (addressDTO.isVerifiedByGoogleMap()) {
             clientTemporaryAddress.setLongitude(addressDTO.getLongitude());
@@ -1148,10 +1162,6 @@ public class ClientService extends UserBaseService {
         clientTemporaryAddress.setCity(zipCode.getName());
         clientTemporaryAddress.setZipCode(zipCode);
         clientTemporaryAddress.setCity(zipCode.getName());
-        List<ClientTemporaryAddress> temporaryAddressList = client.getTemporaryAddress();
-        temporaryAddressList.add(clientTemporaryAddress);
-        client.setTemporaryAddress(temporaryAddressList);
-        clientGraphRepository.save(client);
         return clientTemporaryAddress;
     }
 
@@ -1180,9 +1190,12 @@ public class ClientService extends UserBaseService {
 
         List<Long> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(), taskDemandWrapper.getEndDate().getTime());
 
+        List<CountryHolidayCalendarQueryResult> countryHolidayCalenderList = countryGraphRepository.getCountryHolidayCalendarBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(), taskDemandWrapper.getEndDate().getTime());
+
         TaskDemandVisitWrapper taskDemandVisitWrapper = new TaskDemandVisitWrapper.TaskDemandVisitWrapperBuilder(client,
                 forbiddenStaff, preferredStaff, taskAddress).timeSlotMap(timeSlotMap).countryId(countryId)
                 .publicHolidayList(publicHolidayList).build();
+        taskDemandVisitWrapper.setCountryHolidayCalenderList(countryHolidayCalenderList);
 
         return taskDemandVisitWrapper;
 
@@ -1394,7 +1407,7 @@ public class ClientService extends UserBaseService {
     }
 
     public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId){
-        List<OrganizationService> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
+        List<OrganizationServiceQueryResult> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
         // TODO Fetch list of staff according to employment type ( According to dynamic value of employmnet type )
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS= staffGraphRepository.getAllMainEmploymentStaffDetailByUnitId(unitId);
         List<ClientMinimumDTO> clientMinimumDTOs =  getPeopleInHousehold(clientId);
@@ -1531,7 +1544,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
      * @return
      * @auther Anil maurya
      */
-    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip) {
+    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip,String moduleId) {
         Map<String, Object> response = new HashMap<>();
         List<Long> citizenIds = new ArrayList<>();
         if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()){
@@ -1557,7 +1570,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
         String imagePath = envConfig.getServerHost() + FORWARD_SLASH;
 
-      mapList.addAll( organizationGraphRepositoryImpl.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip));
+      mapList.addAll( organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip,moduleId));
 
         Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
         //anil maurya move some business logic in task demand service (task micro service )

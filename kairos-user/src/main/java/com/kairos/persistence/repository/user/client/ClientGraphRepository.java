@@ -141,8 +141,9 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "             with staff, r as served_by_staff,user  \n" +
             "             OPTIONAL MATCH (staff)-[r:STAFF_HAS_SKILLS{isEnabled:true}]-(s:Skill)\n" +
             "             with staff, served_by_staff, s as skill, r as r,user\n" +
-            "            return  DISTINCT { id:id(staff), staffType:served_by_staff.type, lastName:staff.lastName , firstName:staff.firstName, profilePic: {2} + staff.profilePic, gender:user.gender, isActive:staff.isActive,  skillList: collect ({name: skill.name,level:r.skillLevel})  }as staffList" )
-    List<Map<String,Object>> getTeamMembers(Long teamID, Long clientId, String imageUrl);
+            "             Match (unit:Organization)-[orgSkillRelation:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) WHERE id(unit) = {3} WITH staff, served_by_staff, skill, r,user, orgSkillRelation\n"+
+            "            return  DISTINCT { id:id(staff), staffType:served_by_staff.type, lastName:staff.lastName , firstName:staff.firstName, profilePic: {2} + staff.profilePic, gender:user.gender, isActive:staff.isActive,  skillList: collect ({name: orgSkillRelation.customName,level:r.skillLevel})  }as staffList" )
+    List<Map<String,Object>> getTeamMembers(Long teamID, Long clientId, String imageUrl, Long unitId);
 
 
 
@@ -356,6 +357,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "detach delete clientContactPerson")
     void deleteContactPersonForService(Long organizationId,Long clientId);
 
-
-
+    @Query("Match (n:ClientContactPerson)-[:CLIENT_CONTACT_PERSON_STAFF]->(s:Staff) where id(s)={0}\n" +
+            "Match (n)<-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]-(client:Client) return id(client) as id,client.firstName as firstName,client.lastName as lastName")
+    List<ClientMinimumDTO> getCitizenListForThisContactPerson(Long staffId);
 }

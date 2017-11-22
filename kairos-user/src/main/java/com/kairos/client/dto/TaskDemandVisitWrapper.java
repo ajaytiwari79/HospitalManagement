@@ -1,6 +1,8 @@
 package com.kairos.client.dto;
 
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.client.Client;
+import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 
 import java.util.List;
 import java.util.Map;
@@ -18,8 +20,10 @@ public class TaskDemandVisitWrapper {
     private Map<String, Object> timeSlotMap;
     private  List<Long> publicHolidayList;
     private Map<String, String> flsCredentials;
+    private List<CountryHolidayCalendarQueryResult> countryHolidayCalenderList;
 
     private TaskDemandVisitWrapper(TaskDemandVisitWrapperBuilder builder) {
+
         this.citizen=builder.citizen;
         this.forbiddenStaff=builder.forbiddenStaff;
         this.preferredStaff=builder.preferredStaff;
@@ -44,6 +48,8 @@ public class TaskDemandVisitWrapper {
         private Map<String, Object> timeSlotMap;
         private  List<Long> publicHolidayList;
         private Map<String, String> flsCredentials;
+        private List<CountryHolidayCalendarQueryResult> countryHolidayCalenderList;
+
 
 
         public TaskDemandVisitWrapperBuilder(Client citizen, List<Long> forbiddenStaff,
@@ -75,6 +81,11 @@ public class TaskDemandVisitWrapper {
 
         public TaskDemandVisitWrapperBuilder flsCredentials(Map<String, String> flsCredentials) {
             this.flsCredentials =flsCredentials;
+            return this;
+        }
+
+        public TaskDemandVisitWrapperBuilder countryHolidayCalenderList(List<CountryHolidayCalendarQueryResult> countryHolidayCalenderList) {
+            this.countryHolidayCalenderList =countryHolidayCalenderList;
             return this;
         }
 
@@ -154,6 +165,14 @@ public class TaskDemandVisitWrapper {
 
     public void setFlsCredentials(Map<String, String> flsCredentials) {
         this.flsCredentials = flsCredentials;
+    }
+
+    public List<CountryHolidayCalendarQueryResult> getCountryHolidayCalenderList() {
+        return countryHolidayCalenderList;
+    }
+
+    public void setCountryHolidayCalenderList(List<CountryHolidayCalendarQueryResult> countryHolidayCalenderList) {
+        this.countryHolidayCalenderList = countryHolidayCalenderList;
     }
 }
 

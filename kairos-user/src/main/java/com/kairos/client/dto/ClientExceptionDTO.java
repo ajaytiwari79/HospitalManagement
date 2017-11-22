@@ -2,7 +2,9 @@ package com.kairos.client.dto;
 
 import com.kairos.persistence.model.organization.AddressDTO;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by oodles on 14/2/17.
@@ -25,6 +27,7 @@ public class ClientExceptionDTO {
 
     private boolean updateTaskDuration;
     private boolean updateTaskPriority;
+    private List<Long> houseHoldMembers;
 
     public boolean isUpdateTaskPriority() {
         return updateTaskPriority;
@@ -183,6 +186,14 @@ public class ClientExceptionDTO {
         this.toTime = toTime;
     }
 
+    public List<Long> getHouseHoldMembers() {
+        return Optional.ofNullable(houseHoldMembers).orElse(new ArrayList<>());
+    }
+
+    public void setHouseHoldMembers(List<Long> houseHoldMembers) {
+        this.houseHoldMembers = houseHoldMembers;
+    }
+
     @Override
     public String toString() {
         return "ClientExceptionDTO{" +
@@ -204,4 +215,5 @@ public class ClientExceptionDTO {
                 ", tempAddress=" + tempAddress +
                 '}';
     }
+
 }

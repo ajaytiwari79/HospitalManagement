@@ -1,5 +1,9 @@
 package com.kairos.persistence.model.user.position;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -7,9 +11,13 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 /**
  * Created by vipul on 10/8/17.
  */
+
 @QueryResult
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PositionQueryResult {
     private Expertise expertise;
+    @JsonIgnore
     private boolean isEnabled = true;
     private Long startDate;
     private int workingDaysInWeek;
@@ -23,7 +31,7 @@ public class PositionQueryResult {
     private float salary;
 
     private PositionName positionName;
-
+    private WorkingTimeAgreement workingTimeAgreement;
 
     public int getWorkingDaysInWeek() {
         return workingDaysInWeek;
@@ -127,5 +135,13 @@ public class PositionQueryResult {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public WorkingTimeAgreement getWorkingTimeAgreement() {
+        return workingTimeAgreement;
+    }
+
+    public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
+        this.workingTimeAgreement = workingTimeAgreement;
     }
 }

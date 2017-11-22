@@ -1,4 +1,4 @@
-package com.kairos.client;
+package com.kairos.service.client;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
@@ -54,6 +54,17 @@ public class ClientServiceIntegrationTest {
         ResponseEntity<ClientContactPersonStructuredData> response = restTemplate.exchange(
                 baseUrl+"/client/10951/staff/contact-person",
                 HttpMethod.PUT, entity, ClientContactPersonStructuredData.class);
+        System.out.println("response is " + response);
+        Assert.assertEquals(200,response.getStatusCodeValue());
+        Assert.assertNotNull(response.getBody());
+    }
+
+    @Test
+    public void markClientAsDead(){
+        String baseUrl=getBaseUrl(71L,145L);
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl+"/client/10952/dead?deathDate=2017-11-11T07:03:44.155Z",
+                HttpMethod.DELETE, null, String.class);
         System.out.println("response is " + response);
         Assert.assertEquals(200,response.getStatusCodeValue());
         Assert.assertNotNull(response.getBody());
