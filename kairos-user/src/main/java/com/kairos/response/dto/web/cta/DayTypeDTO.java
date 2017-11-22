@@ -1,0 +1,36 @@
+package com.kairos.response.dto.web.cta;
+
+import com.kairos.persistence.model.user.country.Day;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DayTypeDTO {
+   private Long id;
+   private String name;
+   private List<Day> validDays=new ArrayList<>();
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Day> getValidDays() {
+        return validDays;
+    }
+
+    public void setValidDays(List<Day> validDays) {
+        this.validDays = validDays;
+    }
+}

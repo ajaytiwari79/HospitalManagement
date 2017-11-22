@@ -24,11 +24,11 @@ public class MinimumDailyRestingTimeWTATemplate extends WTABaseRuleTemplate {
         this.continuousDayRestHours = continuousDayRestHours;
     }
 
-    public MinimumDailyRestingTimeWTATemplate(String name, String templateType, boolean isActive,
+    public MinimumDailyRestingTimeWTATemplate(String name, String templateType, boolean disabled,
                                               String description, long continuousDayRestHours) {
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
         this.continuousDayRestHours=continuousDayRestHours;
     }

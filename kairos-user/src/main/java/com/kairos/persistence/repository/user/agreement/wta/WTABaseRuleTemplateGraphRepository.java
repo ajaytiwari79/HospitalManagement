@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.agreement.wta;
 
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import org.springframework.data.neo4j.annotation.Query;
@@ -58,7 +59,7 @@ public interface WTABaseRuleTemplateGraphRepository extends GraphRepository<WTAB
     WTARuleTemplateQueryResponse getRuleTemplateAndCategoryById(long templateId);
 
     @Query("Match (n:WTABaseRuleTemplate) where id(n) in {0} return n")
-    List<WTABaseRuleTemplate> getWtaBaseRuleTemplateByIds(List<Long> templateIds);
+    List<RuleTemplate> getWtaBaseRuleTemplateByIds(List<Long> templateIds);
 
     @Query("MATCH (n:WTABaseRuleTemplate) where id(n) in {0}\n" +
             "Match (n)<-[r:"+HAS_RULE_TEMPLATES+"]-(category:RuleTemplateCategory) delete r")

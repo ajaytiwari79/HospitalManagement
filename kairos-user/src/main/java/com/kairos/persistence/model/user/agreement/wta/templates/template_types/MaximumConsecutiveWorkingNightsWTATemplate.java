@@ -47,13 +47,13 @@ public class MaximumConsecutiveWorkingNightsWTATemplate extends WTABaseRuleTempl
         this.nightsWorked = nightsWorked;
     }
 
-    public MaximumConsecutiveWorkingNightsWTATemplate(String name, String templateType, boolean isActive, String description, List<String> balanceType, boolean checkAgainstTimeRules, long nightsWorked) {
+    public MaximumConsecutiveWorkingNightsWTATemplate(String name, String templateType, boolean disabled, String description, List<String> balanceType, boolean checkAgainstTimeRules, long nightsWorked) {
         this.nightsWorked = nightsWorked;
         this.balanceType = balanceType;
         this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.name = name;
         this.templateType = templateType;
-       this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
 
     }

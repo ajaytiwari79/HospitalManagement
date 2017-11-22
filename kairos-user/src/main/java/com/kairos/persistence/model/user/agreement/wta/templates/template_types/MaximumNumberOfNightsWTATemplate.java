@@ -63,14 +63,14 @@ public class MaximumNumberOfNightsWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public MaximumNumberOfNightsWTATemplate(String name, String templateType, boolean isActive, String description, List<String> balanceType, long nightsWorked, long intervalLength, long validationStartDateMillis, String intervalUnit) {
+    public MaximumNumberOfNightsWTATemplate(String name, String templateType, boolean disabled, String description, List<String> balanceType, long nightsWorked, long intervalLength, long validationStartDateMillis, String intervalUnit) {
         this.nightsWorked = nightsWorked;
         this.balanceType = balanceType;
         this.intervalLength =intervalLength;
         this.validationStartDateMillis =validationStartDateMillis;;
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
         this.intervalUnit = intervalUnit;
     }

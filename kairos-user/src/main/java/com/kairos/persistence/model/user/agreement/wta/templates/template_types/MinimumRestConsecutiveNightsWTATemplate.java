@@ -45,13 +45,13 @@ public class MinimumRestConsecutiveNightsWTATemplate extends WTABaseRuleTemplate
         this.nightsWorked = nightsWorked;
     }
 
-    public MinimumRestConsecutiveNightsWTATemplate(String name, String templateType, boolean isActive, String description, List<String> balanceType, long minimumRest, long nightsWorked) {
+    public MinimumRestConsecutiveNightsWTATemplate(String name, String templateType, boolean disabled, String description, List<String> balanceType, long minimumRest, long nightsWorked) {
         this.nightsWorked = nightsWorked;
         this.balanceType = balanceType;
         this.minimumRest=minimumRest;
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
 
     }

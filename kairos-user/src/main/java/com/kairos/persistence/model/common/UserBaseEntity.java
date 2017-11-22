@@ -8,14 +8,12 @@ import org.neo4j.ogm.annotation.GraphId;
  *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserBaseEntity {
+public abstract class UserBaseEntity {
 
     @GraphId protected Long id;
-
+    protected boolean deleted;
     private Long creationDate;
     private Long lastModificationDate;
-
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -23,7 +21,6 @@ public class UserBaseEntity {
     public Long getId() {
         return id;
     }
-
 
     public Long getCreationDate() {
         return creationDate;
@@ -41,8 +38,11 @@ public class UserBaseEntity {
         this.lastModificationDate = lastModificationDate;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
 
-
-
-
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }

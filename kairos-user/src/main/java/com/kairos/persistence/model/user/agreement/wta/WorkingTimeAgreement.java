@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.response.dto.web.WtaDTO;
@@ -51,7 +51,7 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     private Country country;
 
     @Relationship(type = HAS_RULE_TEMPLATE)
-    private List<WTABaseRuleTemplate> ruleTemplates;//
+    private List<RuleTemplate> ruleTemplates;//
 
 
     // to make a history
@@ -172,11 +172,11 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         return map;
     }
 
-    public List<WTABaseRuleTemplate> getRuleTemplates() {
+    public List<RuleTemplate> getRuleTemplates() {
         return ruleTemplates;
     }
 
-    public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
+    public void setRuleTemplates(List<RuleTemplate> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 
@@ -188,7 +188,7 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     public WorkingTimeAgreement() {
     }
 
-    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, Country country, List<WTABaseRuleTemplate> ruleTemplates, WorkingTimeAgreement wta, Long startDateMillis, Long endDateMillis, Long expiryDate, boolean deleted) {
+    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, Country country, List<RuleTemplate> ruleTemplates, WorkingTimeAgreement wta, Long startDateMillis, Long endDateMillis, Long expiryDate, boolean deleted) {
         this.name = name;
         this.description = description;
         this.expertise = expertise;
@@ -203,7 +203,7 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.deleted = deleted;
     }
 
-    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<WTABaseRuleTemplate> ruleTemplates, Long startDateMillis, Long endDateMillis, Long expiryDate) {
+    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<RuleTemplate> ruleTemplates, Long startDateMillis, Long endDateMillis, Long expiryDate) {
         this.name = name;
         this.description = description;
         this.expertise = expertise;

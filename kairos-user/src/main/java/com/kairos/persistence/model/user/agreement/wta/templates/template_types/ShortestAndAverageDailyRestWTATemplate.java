@@ -79,12 +79,12 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         this.shiftAffiliation = shiftAffiliation;
     }
 
-    public ShortestAndAverageDailyRestWTATemplate(String name, String templateType, boolean isActive,
+    public ShortestAndAverageDailyRestWTATemplate(String name, String templateType, boolean disabled,
                                                   String description, List<String> balanceType, long intervalLength, String intervalUnit, long validationStartDateMillis,
                                                   long continuousDayRestHours, long averageRest, String shiftAffiliation) {
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
         this.balanceType = balanceType;
         this.intervalLength =intervalLength;

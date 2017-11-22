@@ -413,4 +413,9 @@ public class CountryService extends UserBaseService {
         vehicleToUpdate.setIcon(vehicle.getIcon());
         return save(vehicleToUpdate);
     }
+
+    public void getDefaultDataForCTATemplate(){
+
+    }
+
 }

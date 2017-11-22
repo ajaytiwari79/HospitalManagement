@@ -2,12 +2,11 @@ package com.kairos.persistence.model.user.country;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -17,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 
 
 /**
@@ -29,7 +29,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
     * 2 august 2017
     */
 @NodeEntity
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Country extends UserBaseEntity {
 
@@ -52,12 +51,11 @@ public class Country extends UserBaseEntity {
     @Relationship(type = HAS_HOLIDAY)
     private List< CountryHolidayCalender> countryHolidayCalenderList;
 
-    @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY)
-    private List <RuleTemplateCategory> ruleTemplateCategories;
+    @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY,direction =UNDIRECTED )
+    private List <RuleTemplateCategory> ruleTemplateCategories=new ArrayList<>();
 
     @Relationship(type = HAS_RULE_TEMPLATE)
-    private List <WTABaseRuleTemplate> WTABaseRuleTemplate;
-
+    private List<RuleTemplate> WTABaseRuleTemplate;
 
     @JsonIgnore
     @Relationship(type = HAS_ORGANIZATION_SERVICES)
@@ -88,18 +86,11 @@ public class Country extends UserBaseEntity {
         this.name = name;
     }
 
-    public Map<String, Object> retrieveGeneralDetails() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", this.id);
-        map.put("name", this.name);
-        return map;
-    }
-
-    public List<WTABaseRuleTemplate> getWTABaseRuleTemplate() {
+    public List<RuleTemplate> getWTABaseRuleTemplate() {
         return WTABaseRuleTemplate;
     }
 
-    public void setWTABaseRuleTemplate(List<WTABaseRuleTemplate> WTABaseRuleTemplate) {
+    public void setWTABaseRuleTemplate(List<RuleTemplate> WTABaseRuleTemplate) {
         this.WTABaseRuleTemplate = WTABaseRuleTemplate;
     }
 
@@ -172,12 +163,46 @@ public class Country extends UserBaseEntity {
         return Optional.ofNullable(ruleTemplateCategories).orElse(new ArrayList<>());
     }
 
+
+    public void addLevel(Level level){
+        List<Level> levels = Optional.ofNullable(this.levels).orElse(new ArrayList<>());
+        levels.add(level);
+        this.levels = levels;
+    }
+
+    public void addResources(Vehicle vehicle){
+        List<Vehicle> resourceList = Optional.ofNullable(this.resources).orElse(new ArrayList<>());
+        resourceList.add(vehicle);
+        this.resources = resourceList;
+    }
+
+
+    public List<RelationType> getRelationTypes() {
+        return relationTypes;
+    }
+
+    public void setRelationTypes(List<RelationType> relationTypes) {
+        this.relationTypes = relationTypes;
+    }
+
     public void setRuleTemplateCategories(List<RuleTemplateCategory> ruleTemplateCategories) {
         this.ruleTemplateCategories = ruleTemplateCategories;
     }
 
-    public enum Designation {
-        HOME_CARE, NURSING_HOME, HOSPITAL
+    public void addRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
+        if (ruleTemplateCategory == null)
+            throw new NullPointerException("Can't add null ruleTemplateCategory");
+        if (ruleTemplateCategory.getCountry()!= null)
+            throw new IllegalStateException("country is already assigned to ruleTemplateCategory");
+         getRuleTemplateCategories().add(ruleTemplateCategory);
+         ruleTemplateCategory.setCountry(this);
+     }
+
+    public Map<String, Object> retrieveGeneralDetails() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", this.id);
+        map.put("name", this.name);
+        return map;
     }
 
     public Map<String, Object> retrieveDetails() {
@@ -201,24 +226,5 @@ public class Country extends UserBaseEntity {
                 '}';
     }
 
-    public void addLevel(Level level){
-        List<Level> levels = Optional.ofNullable(this.levels).orElse(new ArrayList<>());
-        levels.add(level);
-        this.levels = levels;
-    }
 
-    public void addResources(Vehicle vehicle){
-        List<Vehicle> resourceList = Optional.ofNullable(this.resources).orElse(new ArrayList<>());
-        resourceList.add(vehicle);
-        this.resources = resourceList;
-    }
-
-
-    public List<RelationType> getRelationTypes() {
-        return relationTypes;
-    }
-
-    public void setRelationTypes(List<RelationType> relationTypes) {
-        this.relationTypes = relationTypes;
-    }
 }
