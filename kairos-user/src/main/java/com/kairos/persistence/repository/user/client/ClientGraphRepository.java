@@ -147,8 +147,14 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
 
 
 
-    @Query("MATCH (c:Client)-[:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(ps:Client) where id(c)={0}  return id(ps) as id, ps.firstName as firstName,ps.lastName as lastName,ps.firstName +' '+ ps.lastName as name,ps.cprNumber as cprNumber")
-    List<ClientMinimumDTO> getPeopleInHouseholdList(Long id);
+    /*@Query("MATCH (c:Client)-[:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(ps:Client) where id(c)={0}  return id(ps) as id, ps.firstName
+    as firstName,ps.lastName as lastName,ps.firstName +' '+ ps.lastName as name,ps.cprNumber as cprNumber")
+    List<ClientMinimumDTO> getPeopleInHouseholdList(Long id);*/
+
+    @Query("MATCH (c:Client)-[r:HAS_HOME_ADDRESS]->(ca:ContactAddress) WHERE   id(c)  = {0} WITH ca \n" +
+            "MATCH (c1:Client)-[r1:HAS_HOME_ADDRESS]->(ca) WHERE NOT id(c1) = {0}  return c1\n" +
+            "return id(ps) as id, ps.firstName as firstName,ps.lastName as lastName,ps.firstName +' '+ ps.lastName as name,ps.cprNumber as cprNumber")
+   List<ClientMinimumDTO> getPeopleInHouseholdList(Long clientId);
 
     @Query("MATCH (c:Client)-[r:"+SERVED_BY_STAFF+"]->(s:Staff) WHERE id(c)={0} AND r.type='PREFERRED' " +
             "RETURN {visitourId:s.visitourId} as ids")
@@ -365,9 +371,19 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("Match  (c:Client) WHERE id(c) = {0}  RETURN EXISTS((c)-[:"+HAS_HOME_ADDRESS+"]->(:ContactAddress))")
     boolean isHomeAddressExists(long clientId);
 
-    @Query("MATCH (c:Client)-[r:"+HAS_HOME_ADDRESS+"]->(ca:ContactAddress) WHERE id(c) = {0} AND id(ca) = {1} DELETE r RETURN true")
-    boolean detachHomeAddressRelationOfClient(long clientId, long contactAddressId);
+    /*@Query("MATCH (c:Client)-[r:"+HAS_HOME_ADDRESS+"]->(ca:ContactAddress) WHERE id(c) = {0} AND id(ca) = {1} DELETE r RETURN true")
+    boolean detachHomeAddressRelationOfClient(long clientId, long contactAddressId);*/
 
-    @Query("MATCH (c1:Client)-[r:"+PEOPLE_IN_HOUSEHOLD_LIST+"]->(c2:Client) WHERE id(c1)={0} DELETE r RETURN true")
-    boolean detachHouseholdRelationOfClient(long clientId);
+   /* @Query("MATCH (c1:Client)-[r:"+PEOPLE_IN_HOUSEHOLD_LIST+"]->(c2:Client) WHERE id(c1)={0} DELETE r RETURN true")
+    boolean detachHouseholdRelationOfClient(long clientId);*/
+
+    @Query("MATCH (c:Client)-[r:"+HAS_HOME_ADDRESS+"]->(ca:ContactAddress) WHERE id(ca)={0} AND return c.id")
+    List<Long> getIdsOfAllHouseHoldMembers(long contactAddressId);
+
+    @Query("MATCH (c:Client)-[r:"+HAS_HOME_ADDRESS+"]->(ca:ContactAddress) WHERE id(c) in {1} AND NOT id(ca) = {0} DELETE r,ca RETURN true")
+    boolean detachAddressOfHouseholdMembersWithDifferentAddress(long contactAddressId, List<Long> listOfIdsOfHouseholdMembers) ;
+
+    @Query("MATCH (c:Client),(ca:ContactAddress) WHERE id(c) IN {1} AND id(ca) = {0} CREATE UNIQUE (c)-[r:"+HAS_HOME_ADDRESS+"]->(ca) RETURN true")
+    boolean updateAddressOfAllHouseHoldMembers(long contactAddressId, List<Long> listOfIdsOfHouseholdMembers);
+
 }

@@ -197,8 +197,8 @@ public class ClientAddressService extends UserBaseService {
             return null;
         }
         // Detach relationship with old address and hosehold members
-        detachHomeAddressFromClient(client.getId(), oldContactAddressId);
-        detachHouseHoldMembersFromClient(client.getId());
+//        detachHomeAddressFromClient(client.getId(), oldContactAddressId);
+//        detachHouseHoldMembersFromClient(client.getId());
 
         return addressVerificationService.saveAndUpdateClientAddress(client, contactAddress, type);
     }
@@ -210,9 +210,9 @@ public class ClientAddressService extends UserBaseService {
      * @auhor prerna
      * Detach relationship with old home address
      */
-    public boolean detachHomeAddressFromClient(long clientId, long contactAddressId){
+    /*public boolean detachHomeAddressFromClient(long clientId, long contactAddressId){
         return clientGraphRepository.detachHomeAddressRelationOfClient(clientId, contactAddressId);
-    }
+    }*/
 
     /**
      * @param clientId
@@ -220,9 +220,9 @@ public class ClientAddressService extends UserBaseService {
      * @auhor prerna
      * Detach relationship with House hold members
      */
-    public boolean detachHouseHoldMembersFromClient(long clientId){
+    /*public boolean detachHouseHoldMembersFromClient(long clientId){
         return clientGraphRepository.detachHouseholdRelationOfClient(clientId);
-    }
+    }*/
 
     /**
      * @param unitId
