@@ -27,6 +27,7 @@ public class PositionNameController {
     private PositionNameService positionNameService;
 
 
+<<<<<<< HEAD
     @ApiOperation("Create PositionName")
     @PostMapping(value = "/position_name")
     ResponseEntity<Map<String, Object>> createPositionName( @RequestParam("type") String type,@PathVariable Long unitId, @RequestBody PositionName positionName) {
@@ -37,26 +38,50 @@ public class PositionNameController {
     @PutMapping(value = "/position_name/{positionNameId}")
     ResponseEntity<Map<String, Object>> updatePositionName(@RequestParam("type") String type, @PathVariable Long unitId, @PathVariable long positionNameId, @RequestBody PositionName positionName) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.updatePositionName(unitId, positionNameId, positionName,type));
+=======
+    @ApiOperation("Create PositionCode")
+    @PostMapping(value = "/position_code")
+    ResponseEntity<Map<String, Object>> createPositionName( @RequestParam("type") String type,@PathVariable Long unitId, @RequestBody PositionCode positionCode) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.createPositionCode( unitId, positionCode,type));
     }
 
-    @ApiOperation("Delete PositionName")
-    @DeleteMapping(value = "/position_name/{positionNameId}")
+    @ApiOperation("Update PositionCode")
+    @PutMapping(value = "/position_code/{positionNameId}")
+    ResponseEntity<Map<String, Object>> updatePositionName(@RequestParam("type") String type, @PathVariable Long unitId, @PathVariable long positionNameId, @RequestBody PositionCode positionCode) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.updatePositionCode(unitId, positionNameId, positionCode,type));
+>>>>>>> b503068... changed position to UEP
+    }
+
+    @ApiOperation("Delete PositionCode")
+    @DeleteMapping(value = "/position_code/{positionNameId}")
     ResponseEntity<Map<String, Object>> deletePositionName(@RequestParam("type") String type,@PathVariable Long unitId,  @PathVariable Long positionNameId) {
+<<<<<<< HEAD
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.deletePositionName(unitId,positionNameId,type));
+=======
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.deletePositionCode(unitId,positionNameId,type));
+>>>>>>> b503068... changed position to UEP
     }
 
-    @ApiOperation("Get PositionName")
-    @GetMapping(value = "/position_name/{positionNameId}")
+    @ApiOperation("Get PositionCode")
+    @GetMapping(value = "/position_code/{positionNameId}")
     ResponseEntity<Map<String, Object>> getPositionName(@RequestParam("type") String type,@PathVariable Long positionNameId) {
+<<<<<<< HEAD
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.getPositionName(positionNameId));
+=======
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.getPositionCode(positionNameId));
+>>>>>>> b503068... changed position to UEP
     }
 
     //TODO  fixture org rest call
 
-    @ApiOperation("Get All PositionName")
-    @GetMapping(value = "/position_name")
+    @ApiOperation("Get All PositionCode")
+    @GetMapping(value = "/position_code")
     ResponseEntity<Map<String, Object>> getAllPositionName(@RequestParam("type") String type,@PathVariable Long unitId) {
+<<<<<<< HEAD
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.getAllPositionName(unitId,type));
+=======
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.getAllPositionCodes(unitId,type));
+>>>>>>> b503068... changed position to UEP
     }
 
 

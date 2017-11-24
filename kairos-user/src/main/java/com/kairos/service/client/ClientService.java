@@ -52,8 +52,12 @@ import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
 import org.joda.time.DateTime;
+<<<<<<< HEAD
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+=======
+import org.neo4j.ogm.session.Session;
+>>>>>>> b503068... changed position to UEP
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;

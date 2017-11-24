@@ -45,9 +45,15 @@ public abstract class RelationshipConstants {
     public final static String ORGANIZATION_HAS_TAG = "ORGANIZATION_HAS_TAG";
     public final static String HAS_CUSTOM_SERVICE_NAME_FOR = "HAS_CUSTOM_SERVICE_NAME_FOR";
 
+<<<<<<< HEAD
     public final static String HAS_POSITION_NAME = "HAS_POSITION_NAME";
     public final static String HAS_POSITION = "HAS_POSITION";
     public final static String EMPLOYMENT_TYPE_SETTINGS = "EMPLOYMENT_TYPE_SETTINGS";
+=======
+    public final static String HAS_POSITION_NAME ="HAS_POSITION_NAME";
+    public final static String HAS_UNIT_EMPLOYMENT_POSITION ="HAS_UNIT_EMPLOYMENT_POSITION";
+    public final static String EMPLOYMENT_TYPE_SETTINGS= "EMPLOYMENT_TYPE_SETTINGS";
+>>>>>>> b503068... changed position to UEP
 
 
     // Group

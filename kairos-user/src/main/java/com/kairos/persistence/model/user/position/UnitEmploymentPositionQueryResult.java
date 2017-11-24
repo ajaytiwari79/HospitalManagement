@@ -16,10 +16,10 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PositionQueryResult {
+public class UnitEmploymentPositionQueryResult {
     private Expertise expertise;
     @JsonIgnore
-    private boolean isEnabled = true;
+    private boolean deleted ;
     private Long startDate;
     private int workingDaysInWeek;
     private Long endDate;
@@ -51,12 +51,12 @@ public class PositionQueryResult {
         this.expertise = expertise;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Long getStartDate() {

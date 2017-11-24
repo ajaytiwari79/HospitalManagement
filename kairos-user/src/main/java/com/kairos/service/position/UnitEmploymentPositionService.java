@@ -13,11 +13,17 @@ import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemp
 import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.persistence.model.user.country.EmploymentType;
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.position.PositionCtaWtaQueryResult;
 import com.kairos.persistence.model.user.position.PositionName;
 import com.kairos.persistence.model.user.position.PositionQueryResult;
+=======
+import com.kairos.persistence.model.user.position.UnitEmploymentPosition;
+import com.kairos.persistence.model.user.position.PositionCode;
+import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.UnitEmployment;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -26,11 +32,16 @@ import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreement
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
 import com.kairos.persistence.repository.user.position.PositionGraphRepository;
 import com.kairos.persistence.repository.user.position.PositionNameGraphRepository;
+=======
+import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
+import com.kairos.persistence.repository.user.position.PositionCodeGraphRepository;
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
-import com.kairos.response.dto.web.PositionDTO;
+import com.kairos.response.dto.web.UnitEmploymentPositionDTO;
 import com.kairos.response.dto.web.PositionWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
@@ -60,14 +71,19 @@ import static com.kairos.constants.AppConstants.*;
 
 @Transactional
 @Service
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
 public class PositionService extends UserBaseService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+=======
+public class UnitEmploymentPositionService extends UserBaseService {
+    private final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
-    private PositionGraphRepository positionGraphRepository;
+    private UnitEmploymentPositionGraphRepository unitEmploymentPositionGraphRepository;
     @Inject
     private PositionNameGraphRepository positionNameGraphRepository;
     @Inject
@@ -93,7 +109,7 @@ public class PositionService extends UserBaseService {
     @Inject
     private ClientGraphRepository clientGraphRepository;
 
-    public Position createPosition(Long id, long unitEmploymentId, PositionDTO positionDTO, String type) {
+    public UnitEmploymentPosition createUnitEmploymentPosition(Long id, long unitEmploymentId, UnitEmploymentPositionDTO unitEmploymentPositionDTO, String type) {
         UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
         if (!Optional.ofNullable(unitEmployment).isPresent()) {
             throw new DataNotFoundByIdException("Invalid UnitEmployment id" + unitEmploymentId);
@@ -104,52 +120,52 @@ public class PositionService extends UserBaseService {
             organization = organizationService.getParentOfOrganization(organization.getId());
 
         }
-        Position position = preparePosition(positionDTO, organization, id);
-        List<Position> positions = unitEmployment.getPositions();
+        UnitEmploymentPosition unitEmploymentPosition = preparePosition(unitEmploymentPositionDTO, organization, id);
+        List<UnitEmploymentPosition> unitEmploymentPositions = unitEmployment.getUnitEmploymentPositions();
 
-        positions.add(position);
-        unitEmployment.setPositions(positions);
+        unitEmploymentPositions.add(unitEmploymentPosition);
+        unitEmployment.setUnitEmploymentPositions(unitEmploymentPositions);
         save(unitEmployment);
-        position.setStaff(null);
-        return position;
+        unitEmploymentPosition.setStaff(null);
+        return unitEmploymentPosition;
     }
 
 
-    public PositionWrapper updatePosition(long positionId, PositionDTO positionDTO) {
+    public PositionWrapper updateUnitEmploymentPosition(long positionId, UnitEmploymentPositionDTO unitEmploymentPositionDTO) {
 
-        List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(positionDTO.getStaffId());
+        List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(unitEmploymentPositionDTO.getStaffId());
         if (clientMinimumDTO.size() > 0) {
             return new PositionWrapper(clientMinimumDTO);
         }
 
-        Position oldPosition = positionGraphRepository.findOne(positionId);
-        if (!Optional.ofNullable(oldPosition).isPresent()) {
+        UnitEmploymentPosition oldUnitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(positionId);
+        if (!Optional.ofNullable(oldUnitEmploymentPosition).isPresent()) {
             throw new DataNotFoundByIdException("Invalid positionId id " + positionId + " while updating the position");
         }
-        preparePosition(oldPosition, positionDTO);
-        save(oldPosition);
-        return new PositionWrapper(oldPosition);
+        preparePosition(oldUnitEmploymentPosition, unitEmploymentPositionDTO);
+        save(oldUnitEmploymentPosition);
+        return new PositionWrapper(oldUnitEmploymentPosition);
 
     }
 
 
     public boolean removePosition(long positionId) {
 
-        Position position = positionGraphRepository.findOne(positionId);
-        if (position == null) {
+        UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(positionId);
+        if (unitEmploymentPosition == null) {
             return false;
         }
-        position.setEnabled(false);
-        save(position);
-        if (positionGraphRepository.findOne(positionId).isEnabled()) {
+        unitEmploymentPosition.setDeleted(false);
+        save(unitEmploymentPosition);
+        if (unitEmploymentPositionGraphRepository.findOne(positionId).isDeleted()) {
             return false;
         }
         return true;
     }
 
 
-    public Position getPosition(long positionId) {
-        return positionGraphRepository.findOne(positionId);
+    public UnitEmploymentPosition getUnitEmploymentPosition(long positionId) {
+        return unitEmploymentPositionGraphRepository.findOne(positionId);
     }
     /*
     * Created by vipul
@@ -157,20 +173,21 @@ public class PositionService extends UserBaseService {
     * used to get all positions based on unitEmployment
     * */
 
-    public List<PositionQueryResult> getAllPositions(long unitEmploymentId) {
+    public List<UnitEmploymentPositionQueryResult> getAllUnitEmploymentPositions(long unitEmploymentId) {
         UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
 
         if (unitEmployment == null) {
             throw new DataNotFoundByIdException("Invalid UnitEmployment id" + unitEmploymentId);
         }
-        return positionGraphRepository.findAllPositions(unitEmploymentId);
+        return unitEmploymentPositionGraphRepository.findAllUnitEmploymentPositions(unitEmploymentId);
 
     }
 
-    private Position preparePosition(PositionDTO positionDTO, Organization organization, Long unitId) {
-        Position position = new Position();
+    private UnitEmploymentPosition preparePosition(UnitEmploymentPositionDTO unitEmploymentPositionDTO, Organization organization, Long unitId) {
+        UnitEmploymentPosition unitEmploymentPosition = new UnitEmploymentPosition();
 
         //String name, String description, Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
         /*WTAWithCountryAndOrganizationTypeDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
 
 
@@ -206,18 +223,34 @@ public class PositionService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
         }*/
         position.setExpertise(expertise.get());
+=======
+        WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(unitEmploymentPositionDTO.getExpertiseId());
 
-        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(organization.getId(), positionDTO.getEmploymentTypeId(), false);
-        if (employmentType == null) {
-            throw new DataNotFoundByIdException("Employment Type does not exist in unit " + employmentType.getId() + " AND " + positionDTO.getEmploymentTypeId());
+        if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid Expertize" + unitEmploymentPositionDTO.getExpertiseId());
         }
-        position.setEmploymentType(employmentType);
+        unitEmploymentPosition.setExpertise(wtaWithRuleTemplateDTO.getExpertise());
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
 
+        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(organization.getId(), unitEmploymentPositionDTO.getEmploymentTypeId(), false);
+        if (employmentType == null) {
+            throw new DataNotFoundByIdException("Employment Type does not exist in unit " + employmentType.getId() + " AND " + unitEmploymentPositionDTO.getEmploymentTypeId());
+        }
+        unitEmploymentPosition.setEmploymentType(employmentType);
+
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
         PositionName positionName = positionNameService.getPositionNameByUnitIdAndId(organization.getId(), positionDTO.getPositionNameId());
         if (!Optional.ofNullable(positionName).isPresent()) {
             throw new DataNotFoundByIdException("position Name does not exist in unit " + positionDTO.getPositionNameId());
         }
         position.setPositionName(positionName);
+=======
+        PositionCode positionCode = positionCodeService.getPositionCodeByUnitIdAndId(organization.getId(), unitEmploymentPositionDTO.getPositionNameId());
+        if (!Optional.ofNullable(positionCode).isPresent()) {
+            throw new DataNotFoundByIdException("position Name does not exist in unit " + unitEmploymentPositionDTO.getPositionNameId());
+        }
+        unitEmploymentPosition.setPositionCode(positionCode);
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
 
         /*CostTimeAgreement cta = costTimeAgreementGraphRepository.findOne(positionDTO.getCtaId());
          if (cta == null) {
@@ -226,22 +259,30 @@ public class PositionService extends UserBaseService {
         position.setParent(cta);<String, Object>
 
         */
-
-        Staff staff = staffGraphRepository.findOne(positionDTO.getStaffId());
-        if (!Optional.ofNullable(staff).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid Staff Id" + positionDTO.getStaffId());
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
+=======
+        if (Optional.ofNullable(wtaWithRuleTemplateDTO.getId()).isPresent()) {
+            WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
+            save(wta);
+            unitEmploymentPosition.setWta(wta);
         }
-        position.setStaff(staff);
-        position.setStartDate(positionDTO.getStartDate());
-        position.setEndDate(positionDTO.getEndDate());
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
 
-        position.setTotalWeeklyHours(positionDTO.getTotalWeeklyHours());
-        position.setAvgDailyWorkingHours(positionDTO.getAvgDailyWorkingHours());
-        position.setHourlyWages(positionDTO.getHourlyWages());
-        position.setSalary(positionDTO.getSalary());
-        position.setWorkingDaysInWeek(positionDTO.getWorkingDaysInWeek());
+        Staff staff = staffGraphRepository.findOne(unitEmploymentPositionDTO.getStaffId());
+        if (!Optional.ofNullable(staff).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid Staff Id" + unitEmploymentPositionDTO.getStaffId());
+        }
+        unitEmploymentPosition.setStaff(staff);
+        unitEmploymentPosition.setStartDate(unitEmploymentPositionDTO.getStartDate());
+        unitEmploymentPosition.setEndDate(unitEmploymentPositionDTO.getEndDate());
 
-        return position;
+        unitEmploymentPosition.setTotalWeeklyHours(unitEmploymentPositionDTO.getTotalWeeklyHours());
+        unitEmploymentPosition.setAvgDailyWorkingHours(unitEmploymentPositionDTO.getAvgDailyWorkingHours());
+        unitEmploymentPosition.setHourlyWages(unitEmploymentPositionDTO.getHourlyWages());
+        unitEmploymentPosition.setSalary(unitEmploymentPositionDTO.getSalary());
+        unitEmploymentPosition.setWorkingDaysInWeek(unitEmploymentPositionDTO.getWorkingDaysInWeek());
+
+        return unitEmploymentPosition;
     }
 
     private WorkingTimeAgreement copyWTASettingAndRuleTemplateWithCategory(WTAWithCountryAndOrganizationTypeDTO wtaWithRuleTemplateDTO) {
@@ -521,25 +562,38 @@ public class PositionService extends UserBaseService {
         return wtaBaseRuleTemplateList.get(0);
     }
 
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
     private void preparePosition(Position oldPosition, PositionDTO positionDTO) {
+=======
+    private void preparePosition(UnitEmploymentPosition oldUnitEmploymentPosition, UnitEmploymentPositionDTO unitEmploymentPositionDTO) {
+        if (!oldUnitEmploymentPosition.getExpertise().getId().equals(unitEmploymentPositionDTO.getExpertiseId())) {
+            WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(unitEmploymentPositionDTO.getExpertiseId());
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
 
         /*if (!oldPosition.getExpertise().getId().equals(positionDTO.getExpertiseId())) {
             WTAWithCountryAndOrganizationTypeDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
             System.out.println(Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent());
             if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
+                throw new DataNotFoundByIdException("Invalid Expertize" + unitEmploymentPositionDTO.getExpertiseId());
             }
             if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getName()).isPresent()) {
                 logger.info("Expertise Doesn't contains WTA.Please select different Expertise" + positionDTO.getExpertiseId());
                 throw new DataNotFoundByIdException("Expertise Doesn't contains WTA.Please select different Expertise");
             } else {
                 WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
                 WorkingTimeAgreement oldWta = oldPosition.getWorkingTimeAgreement();
                 oldPosition.setWorkingTimeAgreement(wta);
                 wta.setParentWTA(oldWta);
+=======
+                WorkingTimeAgreement oldWta = oldUnitEmploymentPosition.getWta();
+                oldUnitEmploymentPosition.setWta(wta);
+                wta.setWta(oldWta);
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
                 save(wta);
-                workingTimeAgreementGraphRepository.breakRelationFromOldWTA(oldPosition.getId(), oldWta.getId());
+                workingTimeAgreementGraphRepository.breakRelationFromOldWTA(oldUnitEmploymentPosition.getId(), oldWta.getId());
             }
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
         }*/
 
         Optional<WorkingTimeAgreement> wta = workingTimeAgreementGraphRepository.findById(positionDTO.getWtaId());
@@ -567,24 +621,36 @@ public class PositionService extends UserBaseService {
                 throw new DataNotFoundByIdException("PositionName Cannot be null" + positionDTO.getPositionNameId());
             }
             oldPosition.setPositionName(positionName);
+=======
+            oldUnitEmploymentPosition.setExpertise(wtaWithRuleTemplateDTO.getExpertise());
         }
 
-        if (!oldPosition.getEmploymentType().getId().equals(positionDTO.getEmploymentTypeId())) {
-            EmploymentType employmentType = employmentTypeGraphRepository.findOne(positionDTO.getEmploymentTypeId());
-            if (!Optional.ofNullable(employmentType).isPresent()) {
-                throw new DataNotFoundByIdException("employmentType Cannot be null" + positionDTO.getEmploymentTypeId());
+
+        if (!oldUnitEmploymentPosition.getPositionCode().getId().equals(unitEmploymentPositionDTO.getPositionNameId())) {
+            PositionCode positionCode = positionCodeGraphRepository.findOne(unitEmploymentPositionDTO.getPositionNameId());
+            if (!Optional.ofNullable(positionCode).isPresent()) {
+                throw new DataNotFoundByIdException("PositionName Cannot be null" + unitEmploymentPositionDTO.getPositionNameId());
             }
-            oldPosition.setEmploymentType(employmentType);
+            oldUnitEmploymentPosition.setPositionCode(positionCode);
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
+        }
+
+        if (!oldUnitEmploymentPosition.getEmploymentType().getId().equals(unitEmploymentPositionDTO.getEmploymentTypeId())) {
+            EmploymentType employmentType = employmentTypeGraphRepository.findOne(unitEmploymentPositionDTO.getEmploymentTypeId());
+            if (!Optional.ofNullable(employmentType).isPresent()) {
+                throw new DataNotFoundByIdException("employmentType Cannot be null" + unitEmploymentPositionDTO.getEmploymentTypeId());
+            }
+            oldUnitEmploymentPosition.setEmploymentType(employmentType);
         }
 
 
-        oldPosition.setStartDate(positionDTO.getStartDate());
-        oldPosition.setEndDate(positionDTO.getEndDate());
-        oldPosition.setWorkingDaysInWeek(positionDTO.getWorkingDaysInWeek());
-        oldPosition.setTotalWeeklyHours(positionDTO.getTotalWeeklyHours());
-        oldPosition.setAvgDailyWorkingHours(positionDTO.getAvgDailyWorkingHours());
-        oldPosition.setHourlyWages(positionDTO.getHourlyWages());
-        oldPosition.setSalary(positionDTO.getSalary());
+        oldUnitEmploymentPosition.setStartDate(unitEmploymentPositionDTO.getStartDate());
+        oldUnitEmploymentPosition.setEndDate(unitEmploymentPositionDTO.getEndDate());
+        oldUnitEmploymentPosition.setWorkingDaysInWeek(unitEmploymentPositionDTO.getWorkingDaysInWeek());
+        oldUnitEmploymentPosition.setTotalWeeklyHours(unitEmploymentPositionDTO.getTotalWeeklyHours());
+        oldUnitEmploymentPosition.setAvgDailyWorkingHours(unitEmploymentPositionDTO.getAvgDailyWorkingHours());
+        oldUnitEmploymentPosition.setHourlyWages(unitEmploymentPositionDTO.getHourlyWages());
+        oldUnitEmploymentPosition.setSalary(unitEmploymentPositionDTO.getSalary());
 
     }
 
@@ -592,8 +658,12 @@ public class PositionService extends UserBaseService {
      * @auth vipul
      * used to get all positions of organization n buy organization and staff Id
      * */
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
     public List<PositionQueryResult> getAllPositionByStaff(long id, long unitEmploymentId, long staffId, String
             type) {
+=======
+    public List<UnitEmploymentPositionQueryResult> getAlllUnitEmploymentPositionsOfStaff(long id, long unitEmploymentId, long staffId, String type) {
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
 
         Long unitId = organizationService.getOrganization(id, type);
 
@@ -602,7 +672,7 @@ public class PositionService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Staff Id" + staffId);
         }
 
-        return positionGraphRepository.getAllPositionByStaff(unitId, unitEmploymentId, staffId);
+        return unitEmploymentPositionGraphRepository.getAllUnitEmploymentPositionByStaff(unitId, unitEmploymentId, staffId);
     }
 
     public PositionCtaWtaQueryResult getCtaAndWtaByExpertiseId(Long unitId,Long expertiseId){

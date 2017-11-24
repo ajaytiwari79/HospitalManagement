@@ -1,8 +1,13 @@
 package com.kairos.persistence.repository.user.position;
 
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/persistence/repository/user/position/PositionGraphRepository.java
 import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.position.PositionCtaWtaQueryResult;
 import com.kairos.persistence.model.user.position.PositionQueryResult;
+=======
+import com.kairos.persistence.model.user.position.UnitEmploymentPosition;
+import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/persistence/repository/user/position/UnitEmploymentPositionGraphRepository.java
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
@@ -13,10 +18,17 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 /**
  * Created by pawanmandhan on 26/7/17.
  */
+<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/persistence/repository/user/position/PositionGraphRepository.java
 public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Long> {
 
 
     @Query("MATCH (p:Position{isEnabled:true})<-[:" + HAS_POSITION + "]-(u:UnitEmployment) where id(u)={0}\n" +
+=======
+public interface UnitEmploymentPositionGraphRepository extends GraphRepository<UnitEmploymentPosition> {
+
+
+    @Query("MATCH (p:Position{isDeleted:true})<-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]-(u:UnitEmployment) where id(u)={0}\n" +
+>>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/persistence/repository/user/position/UnitEmploymentPositionGraphRepository.java
             "match (p)-[:"+HAS_POSITION_NAME+"]->(pn:PositionName)\n" +
             "match (p)-[:"+HAS_EMPLOYMENT_TYPE+"]->(et:EmploymentType)\n" +
             "match (p)-[:"+HAS_EXPERTISE_IN+"]->(e:Expertise)\n" +
@@ -35,10 +47,10 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "id(p)   as id," +
             "p.avgDailyWorkingHours as avgDailyWorkingHours,"+
             "p.lastModificationDate as lastModificationDate")
-    List<PositionQueryResult> findAllPositions(long unitEmploymentId);
+    List<UnitEmploymentPositionQueryResult> findAllUnitEmploymentPositions(long unitEmploymentId);
 
     @Query("match(organization:Organization)-[:"+HAS_EMPLOYMENTS+"]->(emp:Employment)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(uEmp:UnitEmployment)  where  Id(organization)={0} And Id(uEmp)={1}\n" +
-            "match(uEmp)-[:"+HAS_POSITION+"]->(p:Position)<-[:"+BELONGS_TO_STAFF+"]-(s:Staff) where id(s)={2}\n" +
+            "match(uEmp)-[:"+ HAS_UNIT_EMPLOYMENT_POSITION +"]->(p:Position)<-[:"+BELONGS_TO_STAFF+"]-(s:Staff) where id(s)={2}\n" +
             "match(p)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) \n" +
             "match(p)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) \n" +
             "match(p)-[:"+HAS_POSITION_NAME+"]->(positionName:PositionName)"+
@@ -55,7 +67,7 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "id(p)   as id," +
             "p.avgDailyWorkingHours as avgDailyWorkingHours,"+
             "p.lastModificationDate as lastModificationDate")
-    List<PositionQueryResult> getAllPositionByStaff(long unitId,long unitEmploymentId, long staffId);
+    List<UnitEmploymentPositionQueryResult> getAllUnitEmploymentPositionByStaff(long unitId, long unitEmploymentId, long staffId);
 
     @Query("Match (org:Organization) where id(org)={0}\n" +
             "Match (e:Expertise) where id(e)={1}\n" +

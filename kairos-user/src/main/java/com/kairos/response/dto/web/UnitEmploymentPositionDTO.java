@@ -1,6 +1,5 @@
 package com.kairos.response.dto.web;
 
-import com.kairos.persistence.model.user.position.Position;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
@@ -8,9 +7,9 @@ import javax.validation.constraints.NotNull;
 /**
  * Created by pawanmandhan on 27/7/17.
  */
-public class PositionDTO {
+public class UnitEmploymentPositionDTO {
 
-    @NotNull(message = "Position Name  is required for position") @Range(min = 0,message = "Position Name is required for position")
+    @NotNull(message = "Position code  is required for position") @Range(min = 0,message = "Position code is required for position")
     private Long positionNameId;
     @NotNull(message = "expertise is required for position")
     @Range(min = 0,message = "expertise is required for position")
@@ -36,20 +35,20 @@ public class PositionDTO {
     // private Long expiryDate;
 
 
-    public PositionDTO() {
+    public UnitEmploymentPositionDTO() {
         //default cons
     }
 
 
-    public PositionDTO(Long positionNameId, Long expertiseId) {
+    public UnitEmploymentPositionDTO(Long positionNameId, Long expertiseId) {
         this.positionNameId = positionNameId;
         this.expertiseId = expertiseId;
     }
 
 
 
-    public PositionDTO(String name, String description, Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours,
-                       float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
+    public UnitEmploymentPositionDTO(String name, String description, Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours,
+                                     float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
         this.salary=salary;
         this.avgDailyWorkingHours =avgDailyWorkingHours;
         this.totalWeeklyHours=totalWeeklyHours;
@@ -61,7 +60,7 @@ public class PositionDTO {
         this.employmentTypeId=employmentTypeId;
     }
 
-    public PositionDTO(Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
+    public UnitEmploymentPositionDTO(Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
         this.positionNameId = positionNameId;
         this.expertiseId = expertiseId;
         this.startDate = startDate;

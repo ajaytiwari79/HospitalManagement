@@ -523,8 +523,13 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("match (n:Organization) where id(n)={0} with n \n" +
             "match (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true})  where org.isKairosHub =false \n" +
+<<<<<<< HEAD
             "match (org)-[:" + HAS_POSITION_NAME + "]->(p:PositionName {isEnabled:true}) return p")
     List<PositionName> getPositionNamesOfParentOrganization(Long organizationId);
+=======
+            "match (org)-[:" + HAS_POSITION_NAME + "]->(p:PositionName {isDeleted:true}) return p")
+    List<PositionCode> getPositionCodesOfParentOrganization(Long organizationId);
+>>>>>>> b503068... changed position to UEP
 
     @Query("MATCH (o:Organization {isEnable:true} )-[:" + HAS_POSITION_NAME + "]->(p:PositionName {isEnabled:true}) where id(o)={0} return p")
     List<PositionName> getPositionNames(Long organizationId);
