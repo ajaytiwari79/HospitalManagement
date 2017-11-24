@@ -360,4 +360,14 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
     @Query("Match (n:ClientContactPerson)-[:CLIENT_CONTACT_PERSON_STAFF]->(s:Staff) where id(s)={0}\n" +
             "Match (n)<-[:CLIENT_CONTACT_PERSON_RELATION_TYPE]-(client:Client) return id(client) as id,client.firstName as firstName,client.lastName as lastName")
     List<ClientMinimumDTO> getCitizenListForThisContactPerson(Long staffId);
+
+    // TO check if home address exists for client
+    @Query("Match  (c:Client) WHERE id(c) = {0}  RETURN EXISTS((c)-[:"+HAS_HOME_ADDRESS+"]->(:ContactAddress))")
+    boolean isHomeAddressExists(long clientId);
+
+    @Query("MATCH (c:Client)-[r:"+HAS_HOME_ADDRESS+"]->(ca:ContactAddress) WHERE id(c) = {0} AND id(ca) = {1} DELETE r RETURN true")
+    boolean detachHomeAddressRelationOfClient(long clientId, long contactAddressId);
+
+    @Query("MATCH (c1:Client)-[r:"+PEOPLE_IN_HOUSEHOLD_LIST+"]->(c2:Client) WHERE id(c1)={0} DELETE r RETURN true")
+    boolean detachHouseholdRelationOfClient(long clientId);
 }

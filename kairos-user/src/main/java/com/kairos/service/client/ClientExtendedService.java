@@ -38,6 +38,7 @@ import java.util.*;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.IMAGES_PATH;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 
 
 /**
@@ -67,6 +68,8 @@ public class ClientExtendedService extends UserBaseService {
     private RegionGraphRepository regionGraphRepository;
     @Inject
     private ContactAddressGraphRepository contactAddressGraphRepository;
+    @Inject
+    private ClientAddressService clientAddressService;
     @Inject
     EnvConfig envConfig;
     @Inject
@@ -267,7 +270,23 @@ public class ClientExtendedService extends UserBaseService {
         }
     }
 
-    public NextToKinDTO updateNextToKinDetail(long unitId,long nextToKinId,NextToKinDTO nextToKinDTO, long clientId){
+    // Add new home address of client after detaching all household members
+    public ContactAddress addNewHomeAddress(long oldContactAddressId, AddressDTO addressDTO, Client client, long unitId, String type ){
+
+
+        ContactAddress contactAddress = ContactAddress.getInstance();
+        contactAddress = verifyAndSaveAddressOfNextToKin(unitId,addressDTO, contactAddress);
+        if (contactAddress == null) {
+            return null;
+        }
+        // Detach relationship with old address and hosehold members
+        clientAddressService.detachHomeAddressFromClient(client.getId(), oldContactAddressId);
+        clientAddressService.detachHouseHoldMembersFromClient(client.getId());
+
+        return addressVerificationService.saveAndUpdateClientAddress(client, contactAddress, type);
+    }
+
+    public NextToKinDTO updateNextToKinDetail(long unitId,long nextToKinId,NextToKinDTO nextToKinDTO, long clientId, Boolean updateHouseholdAddress){
         Client nextToKin = clientGraphRepository.findOne(nextToKinId);
         if(!Optional.ofNullable(nextToKin).isPresent()){
             logger.debug("Finding next to kin by id " + nextToKinId);
@@ -281,7 +300,13 @@ public class ClientExtendedService extends UserBaseService {
 
 
         ContactAddress homeAddress = contactAddressGraphRepository.findOne(homeAddressId);
-        homeAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),homeAddress);
+        // Add new address for nextToKin of client if household adress are not being updated
+        if(updateHouseholdAddress!=null && updateHouseholdAddress==false){
+            homeAddress = addNewHomeAddress(homeAddressId,nextToKinDTO.getHomeAddress(),nextToKin,unitId, HAS_HOME_ADDRESS );
+        } else {
+            homeAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),homeAddress);
+        }
+
         if (!Optional.ofNullable(homeAddress).isPresent()) {
             return null;
         }

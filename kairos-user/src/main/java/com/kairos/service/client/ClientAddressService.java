@@ -29,6 +29,7 @@ import java.io.File;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TEMPORARY_ADDRESS;
 
 
@@ -187,6 +188,42 @@ public class ClientAddressService extends UserBaseService {
         return addressVerificationService.saveAndUpdateClientAddress(client, contactAddress, type);
     }
 
+    // Add new home address of client after detaching all household members
+    public ContactAddress addNewHomeAddress(long oldContactAddressId, AddressDTO addressDTO, Client client, long unitId, String type ){
+
+        ContactAddress contactAddress = ContactAddress.getInstance();
+        contactAddress = persistAddress(addressDTO, client, contactAddress, unitId);
+        if (contactAddress == null) {
+            return null;
+        }
+        // Detach relationship with old address and hosehold members
+        detachHomeAddressFromClient(client.getId(), oldContactAddressId);
+        detachHouseHoldMembersFromClient(client.getId());
+
+        return addressVerificationService.saveAndUpdateClientAddress(client, contactAddress, type);
+    }
+
+    /**
+     * @param clientId
+     * @param contactAddressId
+     * @return if success will return boolean
+     * @auhor prerna
+     * Detach relationship with old home address
+     */
+    public boolean detachHomeAddressFromClient(long clientId, long contactAddressId){
+        return clientGraphRepository.detachHomeAddressRelationOfClient(clientId, contactAddressId);
+    }
+
+    /**
+     * @param clientId
+     * @return if success will return boolean
+     * @auhor prerna
+     * Detach relationship with House hold members
+     */
+    public boolean detachHouseHoldMembersFromClient(long clientId){
+        return clientGraphRepository.detachHouseholdRelationOfClient(clientId);
+    }
+
     /**
      * @param unitId
      * @param clientId
@@ -197,7 +234,7 @@ public class ClientAddressService extends UserBaseService {
      * @auhor prabjot
      * to update address of client based upon parameter {type}
      */
-    public ContactAddress updateAddress(long unitId, long clientId, long addressId, AddressDTO addressDTO, String type) {
+    public ContactAddress updateAddress(long unitId, long clientId, long addressId, AddressDTO addressDTO, String type, Boolean updateHouseholdAddress) {
 
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
@@ -213,7 +250,13 @@ public class ClientAddressService extends UserBaseService {
         if (contactAddress == null) {
             throw new InternalError("Contact address not found");
         }
-        contactAddress = persistAddress(addressDTO, client, contactAddress, unitId);
+
+        if ( updateHouseholdAddress == false  && HAS_HOME_ADDRESS.equals(type)) {
+            return addNewHomeAddress(addressId, addressDTO, client, unitId, type);
+        } else {
+            contactAddress = persistAddress(addressDTO, client, contactAddress, unitId);
+        }
+
         if (contactAddress == null) {
             return null;
         }

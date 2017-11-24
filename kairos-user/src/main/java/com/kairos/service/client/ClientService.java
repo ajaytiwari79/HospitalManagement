@@ -384,7 +384,8 @@ public class ClientService extends UserBaseService {
 
             // Client Language Data
             clientGeneralDetails.put("languageUnderstands", languagesKnownToCitizen(clientId));
-
+            // If
+            clientGeneralDetails.put("hasHomeAddress", clientGraphRepository.isHomeAddressExists(clientId));
             clientGeneralDetails.put("languageUnderstandsIds", clientLanguageRelationGraphRepository.findClientLanguagesId(clientId).toArray());
             Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 

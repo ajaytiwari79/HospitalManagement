@@ -129,7 +129,8 @@ public class ClientController {
     @RequestMapping(value = "/{clientId}/nextToKin/{nextToKinId}", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> updateNextToKin(@Valid @RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId,
                                                         @PathVariable long nextToKinId, @PathVariable long clientId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO,clientId));
+        // @RequestParam Boolean updateHouseholdAddress
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO,clientId, false));
     }
 
     // NextToKin
@@ -205,7 +206,8 @@ public class ClientController {
     @RequestMapping(value = "/{clientId}/address/{addressId}", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> updateClientAddress(@PathVariable long unitId, @PathVariable long clientId, @PathVariable long addressId,
                                                             @RequestBody AddressDTO address, @RequestParam String addressType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientAddressService.updateAddress(unitId, clientId, addressId, address, addressType));
+        // @RequestParam Boolean isHouseholdSelected
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientAddressService.updateAddress(unitId, clientId, addressId, address, addressType, true));
     }
 
     @ApiOperation("Delete Client AddressDTO")
