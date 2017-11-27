@@ -6,7 +6,6 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.enums.CitizenHealthStatus;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -19,7 +18,6 @@ import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryRes
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
-import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -47,25 +45,18 @@ import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.neo4j.ogm.session.Session;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.neo4j.template.Neo4jOperations;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.inject.Inject;
-import javax.swing.text.html.Option;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.KAIROS;
@@ -1098,9 +1089,9 @@ public class ClientService extends UserBaseService {
      * this method is call from exception service from task micro service
      */
     public ClientTemporaryAddress changeLocationUpdateClientAddress(ClientExceptionDTO clientExceptionDto, Long unitId, Long clientId) {
-        List<Long> citizenIds = clientExceptionDto.getHouseHoldMembers();
-        citizenIds.add(clientId);
-        List<Client> citizens = clientGraphRepository.findByIdIn(citizenIds);
+        List<Long> citizensIncludedHouseHoldMembers = new ArrayList<>(clientExceptionDto.getHouseHoldMembers());
+        citizensIncludedHouseHoldMembers.add(clientId);
+        List<Client> citizens = clientGraphRepository.findByIdIn(citizensIncludedHouseHoldMembers);
         ClientTemporaryAddress clientTemporaryAddress = null;
         if (clientExceptionDto.getTempAddress() != null) {
             clientTemporaryAddress = updateClientTemporaryAddress(clientExceptionDto, unitId);
@@ -1109,7 +1100,9 @@ public class ClientService extends UserBaseService {
             clientTemporaryAddress = (ClientTemporaryAddress) contactAddressGraphRepository.findOne(clientExceptionDto.getTemporaryAddress());
         }
         for(Client citizen : citizens ){
-            citizen.getTemporaryAddress().add(clientTemporaryAddress);
+            List<ClientTemporaryAddress> temporaryAddress = citizen.getTemporaryAddress();
+            temporaryAddress.add(clientTemporaryAddress);
+            citizen.setTemporaryAddress(temporaryAddress);
         }
         clientGraphRepository.save(citizens);
         return clientTemporaryAddress;
@@ -1162,7 +1155,8 @@ public class ClientService extends UserBaseService {
         clientTemporaryAddress.setCity(zipCode.getName());
         clientTemporaryAddress.setZipCode(zipCode);
         clientTemporaryAddress.setCity(zipCode.getName());
-        return clientTemporaryAddress;
+        clientTemporaryAddress.setLocationName(addressDTO.getLocationName());
+        return save(clientTemporaryAddress);
     }
 
 
