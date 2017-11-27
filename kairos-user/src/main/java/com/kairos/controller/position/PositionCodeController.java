@@ -21,7 +21,7 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 @RestController
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 @Api(API_ORGANIZATION_UNIT_URL)
-public class PositionNameController {
+public class PositionCodeController {
 
     @Inject
     private PositionNameService positionNameService;

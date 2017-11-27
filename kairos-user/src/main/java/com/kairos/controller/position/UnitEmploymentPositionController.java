@@ -25,11 +25,8 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 @Api(API_ORGANIZATION_UNIT_URL+"/unitEmployment/{unitEmploymentId}")
 public class UnitEmploymentPositionController {
 
-
     @Inject
     private UnitEmploymentPositionService unitEmploymentPositionService;
-
-    private final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
 
     @ApiOperation(value = "Create a New Position")
   //  http://dev.kairosplanning.com/api/v1/organization/71/unit/71/unitEmployment/82/position?moduleId=tab_23&type=Organization
@@ -69,7 +66,7 @@ public class UnitEmploymentPositionController {
     @ApiOperation(value = "Get all positions by organization and staff")
     @RequestMapping(value="/staff/{staffId}/position")
     ResponseEntity<Map<String, Object>> getAlllUnitEmploymentPositionsOfStaff(@PathVariable Long unitId,@RequestParam("type") String type,@PathVariable Long unitEmploymentId,@PathVariable Long staffId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true, unitEmploymentPositionService.getAlllUnitEmploymentPositionsOfStaff(unitId,unitEmploymentId,staffId,type));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true, unitEmploymentPositionService.getAllUnitEmploymentPositionsOfStaff(unitId,unitEmploymentId,staffId,type));
     }
 
 

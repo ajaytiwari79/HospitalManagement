@@ -17,8 +17,10 @@ import javax.validation.constraints.NotNull;
 
 public class PositionName extends UserBaseEntity {
 
-    @NotEmpty(message = "error.position.name.notempty")
-    @NotNull(message = "error.position.name.notnull")
+
+    @NotEmpty(message = "error.PositionCode.name.notempty")
+    @NotNull(message = "error.positionCode.name.notnull")
+
     private String name;
 
     private String description;

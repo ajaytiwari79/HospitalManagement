@@ -1,13 +1,14 @@
 package com.kairos.persistence.repository.user.position;
 
-<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/persistence/repository/user/position/PositionGraphRepository.java
-import com.kairos.persistence.model.user.position.Position;
+import org.springframework.data.neo4j.annotation.Query;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CTA;
+
 import com.kairos.persistence.model.user.position.PositionCtaWtaQueryResult;
-import com.kairos.persistence.model.user.position.PositionQueryResult;
-=======
+
 import com.kairos.persistence.model.user.position.UnitEmploymentPosition;
 import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
->>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/persistence/repository/user/position/UnitEmploymentPositionGraphRepository.java
+
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
@@ -18,17 +19,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 /**
  * Created by pawanmandhan on 26/7/17.
  */
-<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/persistence/repository/user/position/PositionGraphRepository.java
-public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Long> {
 
 
-    @Query("MATCH (p:Position{isEnabled:true})<-[:" + HAS_POSITION + "]-(u:UnitEmployment) where id(u)={0}\n" +
-=======
-public interface UnitEmploymentPositionGraphRepository extends GraphRepository<UnitEmploymentPosition> {
+public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseRepository<UnitEmploymentPosition> {
 
 
     @Query("MATCH (p:Position{isDeleted:true})<-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]-(u:UnitEmployment) where id(u)={0}\n" +
->>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/persistence/repository/user/position/UnitEmploymentPositionGraphRepository.java
+
             "match (p)-[:"+HAS_POSITION_NAME+"]->(pn:PositionName)\n" +
             "match (p)-[:"+HAS_EMPLOYMENT_TYPE+"]->(et:EmploymentType)\n" +
             "match (p)-[:"+HAS_EXPERTISE_IN+"]->(e:Expertise)\n" +
