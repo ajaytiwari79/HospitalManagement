@@ -415,7 +415,6 @@ public class CountryService extends UserBaseService {
     }
 
     public void getDefaultDataForCTATemplate(){
-
     }
 
 }

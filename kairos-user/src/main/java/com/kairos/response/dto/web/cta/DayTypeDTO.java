@@ -12,6 +12,7 @@ public class DayTypeDTO {
 
     public DayTypeDTO() {
         //default constructor
+
     }
 
     public DayTypeDTO(Long id, String name, List<Day> validDays) {
