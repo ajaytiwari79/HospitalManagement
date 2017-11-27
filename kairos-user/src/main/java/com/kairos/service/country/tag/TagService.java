@@ -236,8 +236,40 @@ public class TagService extends UserBaseService {
         }
     }
 
-    /*public List<TagQueryResult> getTagsOfSkill(long skillId, String filterText){
+    public List<Tag> getCountryTagsOfSkill(long countryId, long skillId, String filterText){
+        Country country = countryGraphRepository.findOne(countryId,0);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+        return tagGraphRepository.getCountryTagsOfSkillByIdAndDeleted(skillId, filterText, false);
+    }
 
-    }*/
+    public List<Tag> getCountryTagsOfExpertise(long countryId, long expertiseId, String filterText){
+        Country country = countryGraphRepository.findOne(countryId,0);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+        return tagGraphRepository.getCountryTagsOfExpertiseByIdAndDeleted(expertiseId, filterText, false);
+    }
+
+    public List<Tag> getCountryTagsOfWTA(long countryId, long wtaId, String filterText){
+        Country country = countryGraphRepository.findOne(countryId,0);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+        return tagGraphRepository.getCountryTagsOfWTAByIdAndDeleted(wtaId, filterText, false);
+    }
+
+    public List<Tag> getCountryTagsOfRuleTemplateCategory(long countryId, long ruleTmplCategoryId, String filterText){
+        Country country = countryGraphRepository.findOne(countryId,0);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+        return tagGraphRepository.getCountryTagsOfRuleTemplateCategoryByIdAndDeleted(ruleTmplCategoryId, filterText, false);
+    }
+
+    public List<HashMap<String,String>> getListOfMasterDataType(){
+        return MasterDataTypeEnum.getListOfMasterDataType();
+    }
 }
 

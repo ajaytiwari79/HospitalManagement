@@ -17,7 +17,6 @@ import com.kairos.persistence.repository.organization.OrganizationMetadataReposi
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGraphRepository;
@@ -41,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
@@ -108,11 +106,10 @@ public class SkillService extends UserBaseService {
         logger.info("Added regex to Name: " + name);
         if (skillGraphRepository.checkDuplicateSkill(skillCategoryId, name).isEmpty()) {
             logger.info("Creating unique skill");
-            logger.info("DROOOOOOOOOOOOOOO : "+skillDTO.getTagsId());
             Skill skill = new Skill(skillDTO);
             skill.setSkillCategory(skillCategory);
-            List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(skillDTO.getTagsId(), MasterDataTypeEnum.SKILL);
-            logger.info("t>>>>>>>>ags : "+tags);
+            List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(skillDTO.getTagIds(), MasterDataTypeEnum.SKILL);
+            logger.info("tags for skill : "+tags);
             skill.setTags(tags);
             skillGraphRepository.save(skill);
             Map<String, Object> response = skill.retrieveDetails();
@@ -147,7 +144,7 @@ public class SkillService extends UserBaseService {
                 skill.setName(data.getName());
                 skill.setDescription(data.getDescription());
                 skill.setShortName(data.getShortName());
-                skill.setTags(tagService.getCountryTagsByIdsAndMasterDataType(data.getTagsId(), MasterDataTypeEnum.SKILL));
+                skill.setTags(tagService.getCountryTagsByIdsAndMasterDataType(data.getTagIds(), MasterDataTypeEnum.SKILL));
                 return skillGraphRepository.save(skill).retrieveDetails();
             }
 

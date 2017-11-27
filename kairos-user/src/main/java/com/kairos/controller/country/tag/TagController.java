@@ -103,11 +103,44 @@ public class TagController {
     }
 
     // TO get tags of skill
-    /*@ApiOperation(value = "Get list of Tags of Skill")
+    @ApiOperation(value = "Get list of Tags of Skill")
     @RequestMapping(value = COUNTRY_URL + "/skill/{skillId}/tag", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getTagsOfSkill(@PathVariable long skillId,
+    public ResponseEntity<Map<String, Object>> getTagsOfSkill(@PathVariable long countryId, @PathVariable long skillId,
                                                              @RequestParam(value = "filterText",required = false) String filterText) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getTagsOfSkill(countryId, skillId, filterText));
-    }*/
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getCountryTagsOfSkill(countryId, skillId, filterText));
+    }
+
+    @ApiOperation(value = "Get list of Tags of Expertise")
+    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/tag", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTagsOfExpertise(@PathVariable long countryId, @PathVariable long expertiseId,
+                                                              @RequestParam(value = "filterText",required = false) String filterText) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getCountryTagsOfExpertise(countryId, expertiseId, filterText));
+    }
+
+    @ApiOperation(value = "Get list of Tags of WTA")
+    @RequestMapping(value = COUNTRY_URL + "/wta/{wtaId}/tag", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTagsOfWTA(@PathVariable long countryId, @PathVariable long wtaId,
+                                                              @RequestParam(value = "filterText",required = false) String filterText) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getCountryTagsOfWTA(countryId, wtaId, filterText));
+    }
+
+    @ApiOperation(value = "Get list of Tags of rule Template Category")
+    @RequestMapping(value = COUNTRY_URL + "/rule_template_category/{ruleTemplateCategoryId}/tag", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTagsOfRuleTemplateCategory(@PathVariable long countryId, @PathVariable long ruleTemplateCategoryId,
+                                                              @RequestParam(value = "filterText",required = false) String filterText) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getCountryTagsOfRuleTemplateCategory(countryId, ruleTemplateCategoryId, filterText));
+    }
+
+    @ApiOperation(value = "Get list of Tags Category")
+    @RequestMapping(value = COUNTRY_URL + "/tag_category", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTagsCategory() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfMasterDataType());
+    }
+
+
 }

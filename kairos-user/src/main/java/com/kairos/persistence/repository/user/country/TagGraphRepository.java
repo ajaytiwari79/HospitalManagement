@@ -39,7 +39,7 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
             "UNION\n" +
             "MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0} AND o.showCountryTags=true\n" +
             "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
-            "WHERE id(country)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
+            "WHERE tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
             "return tag\n")
     List<Tag>  getListOfOrganizationTags(Long orgId , boolean deleted, String searchTextRegex);
 
@@ -50,7 +50,7 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
             "UNION\n" +
             "MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0} AND o.showCountryTags=true\n" +
             "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
-            "WHERE id(country)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND r.masterDataType ={3}\n" +
+            "WHERE tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND r.masterDataType ={3}\n" +
             "return tag\n")
     List<Tag>  getListOfOrganizationTagsByMasterDataType(Long orgId , boolean deleted, String searchTextRegex, String masterDataType);
 
@@ -114,6 +114,21 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
     // DONE
     @Query("MATCH (o:Organization) WHERE id(o)={0} CREATE (o)-[:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag{name:{1}, countryTag:false, masterDataType:{2}, deleted:false}) return tag")
     Tag createOrganizationTag(Long countryId, String tagName, String masterDataType);
+
+    @Query("MATCH (s:Skill)-[hasTag:"+HAS_TAG+"]-(tag:Tag) WHERE tag.countryTag=true AND id(s)={0}  AND lower(tag.name) contains lower({1}) AND tag.deleted = {2} return tag")
+    List<Tag> getCountryTagsOfSkillByIdAndDeleted(long skillId, String filterText, boolean deleted);
+
+    @Query("MATCH (e:Expertise)-[hasTag:"+HAS_TAG+"]-(tag:Tag) WHERE tag.countryTag=true AND id(e)={0}  AND lower(tag.name) contains lower({1}) AND tag.deleted = {2} return tag")
+    List<Tag> getCountryTagsOfExpertiseByIdAndDeleted(long expertiseId, String filterText, boolean deleted);
+
+    @Query("MATCH (wta:WorkingTimeAgreement)-[hasTag:"+HAS_TAG+"]-(tag:Tag) WHERE tag.countryTag=true AND id(wta)={0}  AND lower(tag.name) contains lower({1}) AND tag.deleted = {2} return tag")
+    List<Tag> getCountryTagsOfWTAByIdAndDeleted(long wtaId, String filterText, boolean deleted);
+
+    @Query("MATCH (r:RuleTemplateCategory)-[hasTag:"+HAS_TAG+"]-(tag:Tag) WHERE tag.countryTag=true AND id(r)={0}  AND lower(tag.name) contains lower({1}) AND tag.deleted = {2} return tag")
+    List<Tag> getCountryTagsOfRuleTemplateCategoryByIdAndDeleted(long ruleTmplCategoryId, String filterText, boolean deleted);
+
+
+
 
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
