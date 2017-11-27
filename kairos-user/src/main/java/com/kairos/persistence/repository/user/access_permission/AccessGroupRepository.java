@@ -92,4 +92,6 @@ public interface AccessGroupRepository extends GraphRepository<AccessGroup> {
 
     @Query("Match (accessGroup:AccessGroup)-[:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]->(accessPage:AccessPage) with accessPage where id(accessGroup)={0} return accessPage")
     List<AccessPage> getAccessPageByGroup(long accessGroupId);
+
+    List<AccessGroup> findAll();
 }

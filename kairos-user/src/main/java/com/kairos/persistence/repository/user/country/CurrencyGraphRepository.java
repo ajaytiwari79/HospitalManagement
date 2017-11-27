@@ -13,6 +13,8 @@ import java.util.Map;
 @Repository
 public interface CurrencyGraphRepository extends GraphRepository<Currency> {
 
-    @Query("Match (n:Currency{isEnabled:true})-[:RELATED_TO]->(country:Country) where id(country)={0} return {id:id(n),name:n.name, currencyCode:n.currencyCode } as result")
+    @Query("Match (n:Currency{deleted:false})-[:RELATED_TO]->(country:Country) where id(country)={0} return {id:id(n),name:n.name, currencyCode:n.currencyCode } as result")
     List<Map<String,Object>> getCurrencies(long countryId);
+    List<Currency> findByCountryIdAndDeletedFalse(Long countryId);
+
 }

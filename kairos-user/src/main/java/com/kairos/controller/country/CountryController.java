@@ -1111,5 +1111,12 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByCountry(countryId)) ;
     }
 
+    @RequestMapping(value = COUNTRY_URL + "/cta/default-data", method = RequestMethod.GET)
+    @ApiOperation("get default data for cta rule template")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(countryId));
+    }
+
+
 }
 

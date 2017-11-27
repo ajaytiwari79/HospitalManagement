@@ -1,5 +1,6 @@
 package com.kairos.client;
 
+import com.kairos.client.dto.PhaseAndActivityTypeWrapper;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
@@ -44,6 +45,38 @@ public class PhaseRestClient {
             RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 logger.info("RestExchange",restExchange);
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+
+    }
+
+    /**
+     * @Auther anil maurya
+     * @param unitId
+     * @return
+     */
+    public PhaseAndActivityTypeWrapper getPhaseAndActivityType (Long unitId){
+
+        final String baseUrl=getBaseUrl(false);
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<PhaseAndActivityTypeWrapper>> typeReference =
+                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<PhaseAndActivityTypeWrapper>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<PhaseAndActivityTypeWrapper>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/unit/{unitId}/phase/default",
+                            HttpMethod.POST,
+                            null, typeReference, unitId);
+
+            RestTemplateResponseEnvelope<PhaseAndActivityTypeWrapper> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+               return response.getData();
             } else {
                 throw new RuntimeException(response.getMessage());
             }

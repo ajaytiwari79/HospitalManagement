@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by oodles on 9/1/17.
@@ -21,4 +20,5 @@ public interface DayTypeGraphRepository extends GraphRepository<DayType> {
     List<DayType> findByCountryId(long countryId);
     @Query("MATCH (n:DayType) WITH n.validDays AS coll,n UNWIND coll AS x with distinct x,n WHERE x  in {days} return n")
     List<DayType>findByValidDaysContains(@Param("days") List<String> days);
+
 }

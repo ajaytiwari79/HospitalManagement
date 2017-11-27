@@ -63,7 +63,7 @@ public class CurrencyService extends UserBaseService {
         if (currency == null) {
             return false;
         }
-        currency.setEnabled(false);
+        currency.setDeleted(true);
         save(currency);
         return true;
     }
@@ -75,5 +75,9 @@ public class CurrencyService extends UserBaseService {
         response.put("description", currency.getDescription());
         response.put("currencyCode", currency.getCurrencyCode());
         return response;
+    }
+
+    public List<Currency> getCurrencyByCountryId(Long countryId){
+       return  currencyGraphRepository.findByCountryIdAndDeletedFalse(countryId);
     }
 }

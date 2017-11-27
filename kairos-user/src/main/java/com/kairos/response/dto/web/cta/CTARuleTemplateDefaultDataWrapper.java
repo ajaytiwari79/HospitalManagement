@@ -1,5 +1,7 @@
 package com.kairos.response.dto.web.cta;
 
+import com.kairos.persistence.model.user.country.Currency;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +10,10 @@ public class CTARuleTemplateDefaultDataWrapper {
     private List<DayTypeDTO> dayTypeDTOS=new ArrayList<>();
     private List<PhaseDTO> phaseDTOS=new ArrayList<>();
     private List<TimeTypeDTO> timeTypeDTOS=new ArrayList<>();
+    private List<ActivityTypeDTO> activityTypeDTOS=new ArrayList<>();
     private List<EmploymentTypeDTO> employmentTypeTypeDTOS=new ArrayList<>();
+    private List<Currency> currencies=new ArrayList<>();
+
 
     public CTARuleTemplateDefaultDataWrapper() {
         //default

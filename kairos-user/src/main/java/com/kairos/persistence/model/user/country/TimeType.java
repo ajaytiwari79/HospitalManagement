@@ -22,7 +22,6 @@ public class TimeType extends UserBaseEntity {
     private boolean includeInTimeBank = true;
     @Relationship(type = BELONGS_TO , direction=Relationship.OUTGOING)
     private Country country;
-    private boolean deleted;
     private boolean negativeDayBalancePresent;
     private boolean onCallTime;
 

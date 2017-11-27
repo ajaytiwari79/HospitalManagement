@@ -40,7 +40,6 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 	}
 
 
-
 		/**
 		 * Set locale language to resolve text Messages
 		 * @return
