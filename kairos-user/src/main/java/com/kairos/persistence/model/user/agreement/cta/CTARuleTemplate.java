@@ -256,5 +256,6 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append("createdBy", createdBy)
                 .append("lastModifiedBy", lastModifiedBy)
                 .toString();
+
     }
 }
