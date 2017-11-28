@@ -436,7 +436,12 @@ public class StaffService extends UserBaseService {
     }
 
     public List<Staff> batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
-
+/*
+        Client client = createClientObject(staff);
+        boolean isEmploymentExist = (staff.getId()) != null;
+        staff.setUser(user);
+        staff.setClient(client);
+  */
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             logger.error("Access group not found");
@@ -460,7 +465,7 @@ public class StaffService extends UserBaseService {
             //Get the workbook instance for XLS file
             XSSFWorkbook workbook = new XSSFWorkbook(stream);
             //Get first sheet from the workbook
-            XSSFSheet sheet = workbook.getSheetAt(3);
+            XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
@@ -539,6 +544,8 @@ public class StaffService extends UserBaseService {
                             String defaultPassword = user.getFirstName().trim() + "@kairos";
                             user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
                         }
+                        Client client = createClientObject(staff);
+                        staff.setClient(client);
                         staff.setUser(user);
                     }
                     staffGraphRepository.save(staff);
@@ -798,7 +805,7 @@ public class StaffService extends UserBaseService {
         }
 
         Staff staff = createStaffObject(parent, unit, payload);
-        Client client = createClientObject(payload, staff);
+        Client client = createClientObject(staff);
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
         staff.setClient(client);
@@ -859,19 +866,18 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
-    private Client createClientObject(StaffCreationPOJOData payload, Staff staff) {
-        Client client = clientGraphRepository.findByCprNumber(payload.getCprNumber());
+    private Client createClientObject(Staff staff) {
+        Client client = clientGraphRepository.findByCprNumber(staff.getCprNumber());
         if (!Optional.ofNullable(client).isPresent()) {
             client = new Client();
-            client.setFirstName(payload.getFirstName());
-            client.setLastName(payload.getLastName());
-            client.setEmail(payload.getPrivateEmail());
-            client.setCprNumber(payload.getCprNumber());
-            client.setKmdNexusExternalId(payload.getExternalId().toString());
+            client.setFirstName(staff.getFirstName());
+            client.setLastName(staff.getLastName());
+            client.setEmail(staff.getEmail());
+            client.setCprNumber(staff.getCprNumber());
         }
         client.setHomeAddress(staff.getContactAddress());
         ObjectMapper objectMapper = new ObjectMapper();
-        ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
+        ContactDetail contactDetail = objectMapper.convertValue(staff, ContactDetail.class);
         client.setContactDetail(contactDetail);
         return client;
     }

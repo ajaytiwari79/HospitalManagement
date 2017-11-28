@@ -39,7 +39,6 @@ import static com.kairos.constants.AppConstants.*;
  * Created by pawanmandhan on 2/8/17.
  */
 
-
 @Transactional
 @Service
 public class WTAService extends UserBaseService {
