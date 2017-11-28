@@ -58,7 +58,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -270,7 +269,7 @@ public class StaffService extends UserBaseService {
         Map<String, Object> map = new HashMap<>();
         map.put("firstName", staff.getFirstName());
         map.put("lastName", staff.getLastName());
-        map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+ staff.getProfilePic());
+        map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
         map.put("familyName", staff.getFamilyName());
         map.put("active", staff.isActive());
         map.put("signature", staff.getSignature());
@@ -799,8 +798,10 @@ public class StaffService extends UserBaseService {
         }
 
         Staff staff = createStaffObject(parent, unit, payload);
+        Client client = createClientObject(parent, unit, payload);
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
+        staff.setClient(client);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), isEmploymentExist);
         return staff;
@@ -856,6 +857,20 @@ public class StaffService extends UserBaseService {
             staff.setEngineerType(engineerType);
         }
         return staff;
+    }
+
+    private Client createClientObject(Organization parent, Organization unit, StaffCreationPOJOData payload) {
+        Client client = clientGraphRepository.findByCprNumber(payload.getCprNumber());
+
+        if (!Optional.ofNullable(client).isPresent()) {
+            client = new Client();
+            client.setFirstName(payload.getFirstName());
+            client.setLastName(payload.getLastName());
+            client.setEmail(payload.getPrivateEmail());
+            client.setCprNumber(payload.getCprNumber());
+            client.setKmdNexusExternalId(payload.getExternalId().toString());
+        }
+        return client;
     }
 
     private void createEmployment(Organization organization,
@@ -1244,14 +1259,14 @@ public class StaffService extends UserBaseService {
         return unitId;
     }
 
-    public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO){
+    public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO) {
         /*StaffFavouriteFilters alreadyExistFilter = staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, staffFilterDTO.getModuleId());
         if(Optional.ofNullable(alreadyExistFilter).isPresent()){
             throw new DuplicateDataException("StaffFavouriteFilters already exist !");
         }*/
 
 
-        StaffFavouriteFilters staffFavouriteFilters =  new StaffFavouriteFilters();
+        StaffFavouriteFilters staffFavouriteFilters = new StaffFavouriteFilters();
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId);
         AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
@@ -1270,11 +1285,11 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public StaffFilterDTO updateStaffFavouriteFilters( StaffFilterDTO staffFilterDTO){
+    public StaffFilterDTO updateStaffFavouriteFilters(StaffFilterDTO staffFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId);
         StaffFavouriteFilters staffFavouriteFilters = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFilterDTO.getId());
-        if(!Optional.ofNullable(staffFavouriteFilters).isPresent()){
+        if (!Optional.ofNullable(staffFavouriteFilters).isPresent()) {
             throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFilterDTO.getId());
         }
         /*AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
@@ -1284,16 +1299,16 @@ public class StaffService extends UserBaseService {
         staffFavouriteFilters.setEnabled(true);
         save(staffFavouriteFilters);
         staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
-       // staffFilterDTO.setModuleId(accessPage.getModuleId());
+        // staffFilterDTO.setModuleId(accessPage.getModuleId());
         return staffFilterDTO;
 
     }
 
-    public boolean removeStaffFavouriteFilters( Long staffFavouriteFilterId){
+    public boolean removeStaffFavouriteFilters(Long staffFavouriteFilterId) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId);
         StaffFavouriteFilters staffFavouriteFilters = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
-        if(!Optional.ofNullable(staffFavouriteFilters).isPresent()){
+        if (!Optional.ofNullable(staffFavouriteFilters).isPresent()) {
             throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFavouriteFilterId);
         }
 
@@ -1303,20 +1318,20 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public List<StaffFavouriteFilters> getStaffFavouriteFilters(String moduleId){
+    public List<StaffFavouriteFilters> getStaffFavouriteFilters(String moduleId) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId);
         return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staff.getId(), moduleId);
     }
 
 
-
     /**
      * This method return Staff from given user id
+     *
      * @param userId
      * @return
      */
-    public Staff getStaffByUserId(Long userId){
+    public Staff getStaffByUserId(Long userId) {
         return staffGraphRepository.getByUser(userId);
     }
 
