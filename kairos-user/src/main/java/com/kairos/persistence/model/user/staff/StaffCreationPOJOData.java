@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.user.staff;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.Gender;
 import org.hibernate.validator.constraints.Email;
 
@@ -10,11 +12,14 @@ import java.util.Date;
 /**
  * Created by pankaj on 7/3/17.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffCreationPOJOData {
     @NotNull(message = "error.staff.firstname.notnull")
     private String firstName;
     @NotNull(message = "error.staff.lastname.notnull")
     private String lastName;
+    @NotNull(message = "error.staff.cprNumber.notnull")
     private String cprNumber;
     private String familyName;
     private String workPhone;

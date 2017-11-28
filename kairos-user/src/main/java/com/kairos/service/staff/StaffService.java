@@ -798,7 +798,7 @@ public class StaffService extends UserBaseService {
         }
 
         Staff staff = createStaffObject(parent, unit, payload);
-        Client client = createClientObject(parent, unit, payload);
+        Client client = createClientObject(payload, staff);
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
         staff.setClient(client);
@@ -859,9 +859,8 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
-    private Client createClientObject(Organization parent, Organization unit, StaffCreationPOJOData payload) {
+    private Client createClientObject(StaffCreationPOJOData payload, Staff staff) {
         Client client = clientGraphRepository.findByCprNumber(payload.getCprNumber());
-
         if (!Optional.ofNullable(client).isPresent()) {
             client = new Client();
             client.setFirstName(payload.getFirstName());
@@ -870,6 +869,10 @@ public class StaffService extends UserBaseService {
             client.setCprNumber(payload.getCprNumber());
             client.setKmdNexusExternalId(payload.getExternalId().toString());
         }
+        client.setHomeAddress(staff.getContactAddress());
+        ObjectMapper objectMapper = new ObjectMapper();
+        ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
+        client.setContactDetail(contactDetail);
         return client;
     }
 
