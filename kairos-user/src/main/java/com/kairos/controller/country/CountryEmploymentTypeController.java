@@ -75,7 +75,7 @@ public class CountryEmploymentTypeController {
     @RequestMapping(value = COUNTRY_URL + "/employment_type_with_organizationType", method = RequestMethod.GET)
     @ApiOperation("get  expertise level region employment Type organizationType  of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getEmploymentTypeWithOrganizationTypeExpertiseLevel (@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getEmploymentTypeWithOrganizationTypeExpertiseLevel(countryId));
+    public ResponseEntity<Map<String, Object>> getOrganizationMappingDetails (@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getOrganizationMappingDetails(countryId));
     }
 }

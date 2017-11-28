@@ -143,7 +143,7 @@ public class EmploymentTypeService extends UserBaseService {
         return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(unitId, false);
     }
 
-    public OrganizationMappingDTO getEmploymentTypeWithOrganizationTypeExpertiseLevel(Long countryId) {
+    public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId) {
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         // Set employment type
         organizationMappingDTO.setEmploymentTypes(getEmploymentTypeList(countryId, false));
