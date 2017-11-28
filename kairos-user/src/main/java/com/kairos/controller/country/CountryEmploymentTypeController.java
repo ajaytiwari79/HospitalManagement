@@ -1,7 +1,6 @@
 package com.kairos.controller.country;
 
 import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
-import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.util.response.ResponseHandler;
@@ -13,12 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 /**
  * Created by prerna on 2/11/17.
@@ -72,5 +68,14 @@ public class CountryEmploymentTypeController {
     public ResponseEntity<Map<String, Object>> getEmploymentTypeSettinggsForOrganization(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getEmploymentTypeSettingsOfOrganization(unitId));
     }
-
+    /*
+    * By Vipul
+    * API to get expertise level region employment Type organizationType for activity type
+    */
+    @RequestMapping(value = COUNTRY_URL + "/employment_type_with_organizationType", method = RequestMethod.GET)
+    @ApiOperation("get  expertise level region employment Type organizationType  of country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getEmploymentTypeWithOrganizationTypeExpertiseLevel (@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getEmploymentTypeWithOrganizationTypeExpertiseLevel(countryId));
+    }
 }

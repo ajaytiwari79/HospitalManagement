@@ -963,7 +963,7 @@ public class OrganizationController {
      * @param teamId
      * @return OrganizationDTO
      */
-    @ApiOperation("get getOrganization By TeamId ")
+    @ApiOperation("get getOrganizationTypeHierarchy By TeamId ")
     @RequestMapping(value = "/getOrganizationByTeamId/{teamId}", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getOrganizationByTeamId(@PathVariable long teamId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationByTeamId(teamId));
