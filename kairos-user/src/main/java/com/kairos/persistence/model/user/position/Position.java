@@ -27,7 +27,7 @@ public class Position extends UserBaseEntity {
     private CostTimeAgreement cta;
 
     @Relationship(type = HAS_WTA)
-    private WorkingTimeAgreement wta;
+    private WorkingTimeAgreement workingTimeAgreement;
 
     @Relationship(type = HAS_POSITION_NAME)
     private PositionName positionName;
@@ -55,13 +55,13 @@ public class Position extends UserBaseEntity {
     public Position() {
     }
 
-    public Position( Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
+    public Position( Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement workingTimeAgreement,
                     PositionName positionName, String description, Long startDate, Long endDate, Long expiryDate
                     ,int totalWeeklyHours ,float avgDailyWorkingHours,float hourlyWages,float salary,int workingDaysInWeek) {
 
         this.expertise = expertise;
         this.cta = cta;
-        this.wta = wta;
+        this.workingTimeAgreement = workingTimeAgreement;
         this.positionName = positionName;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -145,12 +145,12 @@ public class Position extends UserBaseEntity {
         this.cta = cta;
     }
 
-    public WorkingTimeAgreement getWta() {
-        return wta;
+    public WorkingTimeAgreement getWorkingTimeAgreement() {
+        return workingTimeAgreement;
     }
 
-    public void setWta(WorkingTimeAgreement wta) {
-        this.wta = wta;
+    public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
+        this.workingTimeAgreement = workingTimeAgreement;
     }
 
     public Long getStartDate() {
@@ -185,10 +185,10 @@ public class Position extends UserBaseEntity {
         this.staff = staff;
     }
 
-    public Position(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionName positionName, Staff staff, boolean isEnabled, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
+    public Position(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement workingTimeAgreement, PositionName positionName, Staff staff, boolean isEnabled, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
         this.expertise = expertise;
         this.cta = cta;
-        this.wta = wta;
+        this.workingTimeAgreement = workingTimeAgreement;
         this.positionName = positionName;
         this.staff = staff;
         this.isEnabled = isEnabled;
