@@ -215,7 +215,6 @@ public class ClientAddressService extends UserBaseService {
     }*/
 
     /**
-     * @param clientId
      * @return if success will return boolean
      * @auhor prerna
      * Detach relationship with House hold members
@@ -223,6 +222,24 @@ public class ClientAddressService extends UserBaseService {
     /*public boolean detachHouseHoldMembersFromClient(long clientId){
         return clientGraphRepository.detachHouseholdRelationOfClient(clientId);
     }*/
+
+
+    public boolean updateAddressOfAllHouseHoldMembers(long contactAddressId, long addressIdOfHouseHold){
+        List<Long> listOfIdsOfHouseholdMembers = getListOfAllHouseHoldMemberssByAddressId(addressIdOfHouseHold);
+        if(listOfIdsOfHouseholdMembers.size() > 0){
+            detachAddressOfHouseholdMembersWithDifferentAddress(contactAddressId, listOfIdsOfHouseholdMembers);
+            return clientGraphRepository.updateAddressOfAllHouseHoldMembers(contactAddressId, listOfIdsOfHouseholdMembers);
+        }
+        return true;
+    }
+
+    public boolean detachAddressOfHouseholdMembersWithDifferentAddress(long contactAddressId,List<Long> listOfIdsOfHouseholdMembers){
+        return clientGraphRepository.detachAddressOfHouseholdMembersWithDifferentAddress(contactAddressId, listOfIdsOfHouseholdMembers);
+    }
+
+    public List<Long> getListOfAllHouseHoldMemberssByAddressId(long contactAddressId){
+        return clientGraphRepository.getIdsOfAllHouseHoldMembers(contactAddressId);
+    }
 
     /**
      * @param unitId
@@ -234,7 +251,7 @@ public class ClientAddressService extends UserBaseService {
      * @auhor prabjot
      * to update address of client based upon parameter {type}
      */
-    public ContactAddress updateAddress(long unitId, long clientId, long addressId, AddressDTO addressDTO, String type, Boolean updateHouseholdAddress) {
+    public ContactAddress updateAddress(long unitId, long clientId, long addressId, AddressDTO addressDTO, String type) {
 
         Client client = clientGraphRepository.findOne(clientId);
         if (client == null) {
@@ -251,7 +268,7 @@ public class ClientAddressService extends UserBaseService {
             throw new InternalError("Contact address not found");
         }
 
-        if ( updateHouseholdAddress == false  && HAS_HOME_ADDRESS.equals(type)) {
+        if( addressDTO.isUpdateHouseholdAddress() == false && HAS_HOME_ADDRESS.equals(type)){
             return addNewHomeAddress(addressId, addressDTO, client, unitId, type);
         } else {
             contactAddress = persistAddress(addressDTO, client, contactAddress, unitId);

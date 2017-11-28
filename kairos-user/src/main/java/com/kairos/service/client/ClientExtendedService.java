@@ -280,13 +280,13 @@ public class ClientExtendedService extends UserBaseService {
             return null;
         }
         // Detach relationship with old address and hosehold members
-        clientAddressService.detachHomeAddressFromClient(client.getId(), oldContactAddressId);
-        clientAddressService.detachHouseHoldMembersFromClient(client.getId());
+//        clientAddressService.detachHomeAddressFromClient(client.getId(), oldContactAddressId);
+//        clientAddressService.detachHouseHoldMembersFromClient(client.getId());
 
         return addressVerificationService.saveAndUpdateClientAddress(client, contactAddress, type);
     }
 
-    public NextToKinDTO updateNextToKinDetail(long unitId,long nextToKinId,NextToKinDTO nextToKinDTO, long clientId, Boolean updateHouseholdAddress){
+    public NextToKinDTO updateNextToKinDetail(long unitId,long nextToKinId,NextToKinDTO nextToKinDTO, long clientId){
         Client nextToKin = clientGraphRepository.findOne(nextToKinId);
         if(!Optional.ofNullable(nextToKin).isPresent()){
             logger.debug("Finding next to kin by id " + nextToKinId);
@@ -301,7 +301,7 @@ public class ClientExtendedService extends UserBaseService {
 
         ContactAddress homeAddress = contactAddressGraphRepository.findOne(homeAddressId);
         // Add new address for nextToKin of client if household adress are not being updated
-        if(updateHouseholdAddress!=null && updateHouseholdAddress==false){
+        if(!nextToKinDTO.isUpdateHouseholdAddress()) {
             homeAddress = addNewHomeAddress(homeAddressId,nextToKinDTO.getHomeAddress(),nextToKin,unitId, HAS_HOME_ADDRESS );
         } else {
             homeAddress = verifyAndSaveAddressOfNextToKin(unitId, nextToKinDTO.getHomeAddress(),homeAddress);
