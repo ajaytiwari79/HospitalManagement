@@ -168,7 +168,7 @@ public class PositionService extends UserBaseService {
         }
         WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
         save(wta);
-        position.setWta(wta);
+        position.setWorkingTimeAgreement(wta);
 
 
         if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
@@ -505,8 +505,8 @@ public class PositionService extends UserBaseService {
                 throw new DataNotFoundByIdException("Expertise Doesn't contains WTA.Please select different Expertise");
             } else {
                 WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
-                WorkingTimeAgreement oldWta = oldPosition.getWta();
-                oldPosition.setWta(wta);
+                WorkingTimeAgreement oldWta = oldPosition.getWorkingTimeAgreement();
+                oldPosition.setWorkingTimeAgreement(wta);
                 wta.setWta(oldWta);
                 save(wta);
                 workingTimeAgreementGraphRepository.breakRelationFromOldWTA(oldPosition.getId(), oldWta.getId());

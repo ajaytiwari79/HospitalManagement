@@ -274,7 +274,7 @@ public class DataImportService {
                                 client.setCprNumber(cprNumber);
                                 clientGraphRepository.save(client);
                                 ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation();
-                                clientOrganizationRelation.setOrganization(organization);
+                                clientOrganizationRelation.setOrganizationTypeHierarchy(organization);
                                 clientOrganizationRelation.setClient(client);
                                 clientOrganizationRelationGraphRepository.save(clientOrganizationRelation);
 
@@ -282,7 +282,7 @@ public class DataImportService {
                                 int count = relationGraphRepository.checkClientOrganizationRelationship(client.getId(),organization.getId());
                                 if(count == 0){
                                     ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation();
-                                    clientOrganizationRelation.setOrganization(organization);
+                                    clientOrganizationRelation.setOrganizationTypeHierarchy(organization);
                                     clientOrganizationRelation.setClient(client);
                                     clientOrganizationRelationGraphRepository.save(clientOrganizationRelation);
                                 }

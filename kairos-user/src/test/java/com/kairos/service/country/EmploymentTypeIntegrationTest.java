@@ -1,7 +1,6 @@
 package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
-import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -88,6 +87,16 @@ public class EmploymentTypeIntegrationTest {
     public void getEmploymentTypeList() throws Exception {
         String baseUrl=getBaseUrl(71L,53L, null);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/employment_type/");
+        ResponseEntity<String> response = restTemplate.exchange(
+                builder.toUriString(),
+                HttpMethod.GET, null, String.class);
+        Assert.assertEquals(HttpStatus.OK,response.getStatusCode());
+    }
+
+    @Test
+    public void getOrganizationMappingDetailsTest() throws Exception {
+        String baseUrl=getBaseUrl(71L,53L, null);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/employment_type_with_organizationType");
         ResponseEntity<String> response = restTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.GET, null, String.class);
