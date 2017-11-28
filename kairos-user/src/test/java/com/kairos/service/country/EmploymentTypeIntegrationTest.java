@@ -94,7 +94,7 @@ public class EmploymentTypeIntegrationTest {
     }
 
     @Test
-    public void getEmploymentTypeWithOrganizationTypeExpertiseLevelTest() throws Exception {
+    public void getOrganizationMappingDetailsTest() throws Exception {
         String baseUrl=getBaseUrl(71L,53L, null);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl+"/employment_type_with_organizationType");
         ResponseEntity<String> response = restTemplate.exchange(
