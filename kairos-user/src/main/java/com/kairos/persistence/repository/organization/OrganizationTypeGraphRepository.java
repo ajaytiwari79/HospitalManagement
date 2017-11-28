@@ -113,5 +113,5 @@ public interface OrganizationTypeGraphRepository extends GraphRepository<Organiz
             "optional match(orgType)-[:" + HAS_SUB_TYPE + "]->(orgSubType:OrganizationType{isEnable:true})\n" +
             "WITH {name: orgType.name,id:id(orgType),children:CASE WHEN orgSubType IS NOT NULL THEN collect({id:id(orgSubType),name:orgSubType.name}) ELSE [] END} as organizationType\n" +
             "RETURN organizationType as result")
-    List<Map<String, Object>> getAllOrganizationTypeWithSubType(Long countryId);
+    List<Map<String, Object>> getAllOrganizationTypeWithSubTypeByCountryId(Long countryId);
 }

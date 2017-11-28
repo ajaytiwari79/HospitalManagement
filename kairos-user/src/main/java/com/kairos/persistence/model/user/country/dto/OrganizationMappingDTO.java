@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Created by vipul on 28/11/17.
  */
-public class EmploymentTypeWithOrganizationTypeExpertiseLevelRegionDTO {
+public class OrganizationMappingDTO {
     private List<EmploymentType> employmentTypes;
     private List<Expertise> expertise;
     private List<Level> levels;

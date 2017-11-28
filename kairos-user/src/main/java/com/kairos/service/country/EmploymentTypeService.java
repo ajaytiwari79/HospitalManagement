@@ -6,7 +6,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
-import com.kairos.persistence.model.user.country.dto.EmploymentTypeWithOrganizationTypeExpertiseLevelRegionDTO;
+import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -143,19 +143,19 @@ public class EmploymentTypeService extends UserBaseService {
         return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(unitId, false);
     }
 
-    public EmploymentTypeWithOrganizationTypeExpertiseLevelRegionDTO getEmploymentTypeWithOrganizationTypeExpertiseLevel(Long countryId) {
-        EmploymentTypeWithOrganizationTypeExpertiseLevelRegionDTO employmentTypeWithOrganizationTypeExpertiseLevelRegionDTO = new EmploymentTypeWithOrganizationTypeExpertiseLevelRegionDTO();
+    public OrganizationMappingDTO getEmploymentTypeWithOrganizationTypeExpertiseLevel(Long countryId) {
+        OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         // Set employment type
-        employmentTypeWithOrganizationTypeExpertiseLevelRegionDTO.setEmploymentTypes(getEmploymentTypeList(countryId, false));
+        organizationMappingDTO.setEmploymentTypes(getEmploymentTypeList(countryId, false));
         // set Expertise
-        employmentTypeWithOrganizationTypeExpertiseLevelRegionDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByCountry(countryId));
+        organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByCountry(countryId));
         //set levels
-        employmentTypeWithOrganizationTypeExpertiseLevelRegionDTO.setLevels(countryGraphRepository.getLevelsByCountry(countryId));
+        organizationMappingDTO.setLevels(countryGraphRepository.getLevelsByCountry(countryId));
         // set regions
-        employmentTypeWithOrganizationTypeExpertiseLevelRegionDTO.setRegions(regionService.getRegionByCountryId(countryId));
+        organizationMappingDTO.setRegions(regionService.getRegionByCountryId(countryId));
         //set organization Hierarchy
-        employmentTypeWithOrganizationTypeExpertiseLevelRegionDTO.setOrganizationTypeHierarchy(organizationTypeGraphRepository.getAllOrganizationTypeWithSubType(countryId));
-        return employmentTypeWithOrganizationTypeExpertiseLevelRegionDTO;
+        organizationMappingDTO.setOrganizationTypeHierarchy(organizationTypeGraphRepository.getAllOrganizationTypeWithSubTypeByCountryId(countryId));
+        return organizationMappingDTO;
     }
 
 }
