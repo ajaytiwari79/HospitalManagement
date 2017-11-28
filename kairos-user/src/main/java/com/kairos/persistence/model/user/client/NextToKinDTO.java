@@ -31,6 +31,7 @@ public class NextToKinDTO {
     private Long relationTypeId;
     private Gender gender;
     private Integer age;
+    private boolean updateHouseholdAddress;
 
 
     public Gender getGender() {
@@ -148,6 +149,14 @@ public class NextToKinDTO {
 
     public void setRelationTypeId(Long relationTypeId) {
         this.relationTypeId = relationTypeId;
+    }
+
+    public boolean isUpdateHouseholdAddress() {
+        return updateHouseholdAddress;
+    }
+
+    public void setUpdateHouseholdAddress(boolean updateHouseholdAddress) {
+        this.updateHouseholdAddress = updateHouseholdAddress;
     }
 
     public NextToKinDTO buildResponse(Client nextToKin, String serverUrl, long relationTypeId,

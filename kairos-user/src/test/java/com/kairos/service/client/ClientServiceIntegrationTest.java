@@ -37,7 +37,7 @@ public class ClientServiceIntegrationTest {
     @Test
     public void validateCitizenAsHouseHold(){
         String baseUrl=getBaseUrl(71L,145L);
-        ClientMinimumDTO clientMinimumDTO = new ClientMinimumDTO("Aage","Bag","2503681059");
+        ClientMinimumDTO clientMinimumDTO = new ClientMinimumDTO("Aage","Bag","2503681059", true);
         HttpEntity<ClientMinimumDTO> entity = new HttpEntity<>(clientMinimumDTO);
         ResponseEntity<ClientMinimumDTO> response = restTemplate.exchange(
                 baseUrl+"/client/571/household",

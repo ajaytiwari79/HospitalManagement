@@ -137,6 +137,8 @@ public class ClientService extends UserBaseService {
     Session session;
     @Inject
     OrganizationGraphRepositoryImpl organizationGraphRepositoryImpl;
+    @Inject
+    ClientAddressService clientAddressService;
     public Client createCitizen(Client client) {
 
         Client createClient = null;
@@ -375,7 +377,8 @@ public class ClientService extends UserBaseService {
 
             // Client Language Data
             clientGeneralDetails.put("languageUnderstands", languagesKnownToCitizen(clientId));
-
+            // If
+            clientGeneralDetails.put("hasHomeAddress", clientGraphRepository.isHomeAddressExists(clientId));
             clientGeneralDetails.put("languageUnderstandsIds", clientLanguageRelationGraphRepository.findClientLanguagesId(clientId).toArray());
             Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
 
@@ -601,7 +604,7 @@ public class ClientService extends UserBaseService {
         return response;
     }
 
-    public ClientMinimumDTO addHouseholdToClient(ClientMinimumDTO minimumDTO, long unitId, long clientId) {
+    /*public ClientMinimumDTO addHouseholdToClient(ClientMinimumDTO minimumDTO, long unitId, long clientId) {
         Client client = clientGraphRepository.findOne(clientId);
         if (!Optional.ofNullable(client).isPresent()) {
             logger.debug("Searching client with id " + clientId + " in unit " + unitId);
@@ -623,6 +626,43 @@ public class ClientService extends UserBaseService {
         }
         save(houseHold);
         createHouseHoldRelationship(clientId, houseHold.getId());
+        minimumDTO.setId(houseHold.getId());
+        return minimumDTO;
+    }*/
+
+
+
+    public ClientMinimumDTO addHouseholdToClient(ClientMinimumDTO minimumDTO, long unitId, long clientId) {
+        Client client = clientGraphRepository.findOne(clientId);
+        if (!Optional.ofNullable(client).isPresent()) {
+            logger.debug("Searching client with id " + clientId + " in unit " + unitId);
+            throw new DataNotFoundByIdException("Incorrect client " + clientId);
+        }
+
+        // Check if assigning household member as himself
+        if(minimumDTO.getCprnumber().equals(client.getCprNumber())){
+            throw new DataNotMatchedException("Add another house hold");
+        }
+
+        Client houseHold = saveDetailsOfHouseHold(minimumDTO);
+
+        Long addressIdOfHouseHold = null;
+        if(houseHold.getId() != null && houseHold.getHomeAddress() !=null){
+            addressIdOfHouseHold = houseHold.getHomeAddress().getId();
+        }
+
+        saveAddressOfHouseHold(client, houseHold);
+        save(houseHold);
+
+        if ( !Optional.ofNullable(houseHold.getId()).isPresent()) {
+            addHouseHoldInOrganization(houseHold, unitId);
+        }
+
+        // Check and Update Address of all household members
+        if( addressIdOfHouseHold !=null && minimumDTO.getUpdateAddressOfAllHouseholdMembers() && minimumDTO.getUpdateAddressOfAllHouseholdMembers() == true){
+            clientAddressService.updateAddressOfAllHouseHoldMembers(client.getHomeAddress().getId(), addressIdOfHouseHold);
+        }
+
         minimumDTO.setId(houseHold.getId());
         return minimumDTO;
     }
@@ -1316,6 +1356,7 @@ public class ClientService extends UserBaseService {
                 throw new DataNotFoundByIdException("You can't enter CPR number of dead citizen");
             } else {
                 ClientMinimumDTO clientMinimumDTO = new ClientMinimumDTO();
+                clientMinimumDTO.setId(houseHoldPerson.getId());
                 clientMinimumDTO.setFirstName(houseHoldPerson.getFirstName());
                 clientMinimumDTO.setLastName(houseHoldPerson.getLastName());
                 clientMinimumDTO.setHasSameAddress(hasSameAddress(client, houseHoldPerson));
