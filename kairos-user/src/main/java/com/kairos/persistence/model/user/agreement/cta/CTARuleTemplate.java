@@ -1,16 +1,19 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENT_TYPE;
+
 @NodeEntity
 public class CTARuleTemplate extends RuleTemplate{
     private CTARuleTemplateType ruleTemplateType;
@@ -24,6 +27,7 @@ public class CTARuleTemplate extends RuleTemplate{
     private PhaseInfo phaseInfo;
     private BudgetType budgetType;
     private List<AccessGroup> calculateValueIfPlanned=new ArrayList<>();
+    @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private List<EmploymentType> employmentTypes=new ArrayList<>();
     private ActivityType activityType;
     private PlanningCategory planningCategory;
@@ -37,8 +41,7 @@ public class CTARuleTemplate extends RuleTemplate{
 
     }
 
-    public CTARuleTemplate(String name,String description,RuleTemplateCategory ruleTemplateCategory,
-      CTARuleTemplateType ruleTemplateType,String payrollType,String payrollSystem) {
+    public CTARuleTemplate(String name, String description, CTARuleTemplateType ruleTemplateType, String payrollType, String payrollSystem) {
         this.name=name;
         this.description=description;
         this.ruleTemplateCategory=ruleTemplateCategory;

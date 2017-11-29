@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CompensationTable {
-    private int GranularityLevel;
+    private int granularityLevel;
     private CompensationMeasurementType compensationMeasurementType;
     private List<CompensationTableInterval>compensationTableInterval=new ArrayList<>();
 
     public int getGranularityLevel() {
-        return GranularityLevel;
+        return granularityLevel;
     }
 
     public void setGranularityLevel(int granularityLevel) {
-        GranularityLevel = granularityLevel;
+        this.granularityLevel = granularityLevel;
     }
 
     public CompensationMeasurementType getCompensationMeasurementType() {

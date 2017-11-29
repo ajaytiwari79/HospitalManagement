@@ -8,7 +8,6 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.service.UserBaseService;
-import com.kairos.util.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -89,7 +88,7 @@ public class DayTypeService extends UserBaseService {
      * @return
      */
     public List<DayType> getDayTypeByDate(Long countryId,Date date){
-        Calendar calendar=Calendar.getInstance();
+        Calendar calendar= Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
@@ -99,12 +98,12 @@ public class DayTypeService extends UserBaseService {
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
         Date endDate=calendar.getTime();
-        Optional<CountryHolidayCalender> countryHolidayCalender=countryHolidayCalenderGraphRepository.
+       CountryHolidayCalender countryHolidayCalender=countryHolidayCalenderGraphRepository.
                 findByIdAndHolidayDateBetween(startDate.getTime(),endDate.getTime(),countryId);
 
-        if(countryHolidayCalender.isPresent()){
+        if(Optional.ofNullable(countryHolidayCalender).isPresent()){
             List<DayType> dayTypes=new ArrayList<>();
-            dayTypes.add( countryHolidayCalender.get().getDayType()) ;
+            dayTypes.add(countryHolidayCalender.getDayType()) ;
           return  dayTypes;
         }else{
             Instant instant = Instant.ofEpochMilli(date.getTime());

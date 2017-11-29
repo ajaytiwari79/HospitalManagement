@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
@@ -89,9 +90,9 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
     List<Country> checkDuplicateCountry(String name, Long organizationId);
 
 
-    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"  ]-(l:RuleTemplateCategory) Where id(c)={0} AND  l.name=~{1}\n" +
+    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"  ]-(l:RuleTemplateCategory) Where id(c)={0} AND l.ruleTemplateCategoryType={1} AND l.name=~{2}\n" +
             "return count(r) as number;")
-     int  checkDuplicateRuleTemplate(Long id, String name);
+     int  checkDuplicateRuleTemplate(Long id, RuleTemplateCategoryType ruleTemplateCategoryType, String name);
 
 
     @Query("MATCH (n:Country{isEnabled:true}) RETURN collect({name:n.name, code:n.code}) as list")

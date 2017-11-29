@@ -1,4 +1,48 @@
 package com.kairos.cta;
 
+import com.kairos.UserServiceApplication;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.service.agreement.cta.CostTimeAgreementService;
+import com.kairos.service.agreement.wta.RuleTemplateCategoryService;
+import com.kairos.service.country.DayTypeService;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = UserServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class CostTimeAgreementServiceTest {
+    @Autowired private RuleTemplateCategoryService ruleTemplateCategoryService;
+    @Autowired private CostTimeAgreementService costTimeAgreementService;
+    @Autowired DayTypeService dayTypeService;
+    @Test
+    @Ignore
+    public void addCTARuleTemplateCategory(){
+        RuleTemplateCategory category=new RuleTemplateCategory();
+        category.setName("NONE");
+        category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
+        ruleTemplateCategoryService.createRuleTemplateCategory(53L,category);
+    }
+    @Test
+    @Ignore
+    public void addCTARuleTemplate(){
+        costTimeAgreementService.createDefaultCtaRuleTemplate();
+    }
+    @Test
+
+    public void getHoliday(){
+     Date date= Date.from(LocalDate.of(2018,1,2).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        List<DayType> dayTypes= dayTypeService.getDayTypeByDate(53L,date);
+        System.out.println(dayTypes);
+    }
 }

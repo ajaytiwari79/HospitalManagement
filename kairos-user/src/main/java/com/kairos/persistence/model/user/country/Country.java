@@ -198,6 +198,12 @@ public class Country extends UserBaseEntity {
          ruleTemplateCategory.setCountry(this);
      }
 
+    public void removeRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
+        if (ruleTemplateCategory == null)
+        getRuleTemplateCategories().remove(ruleTemplateCategory);
+        ruleTemplateCategory.setCountry(null);
+    }
+
     public Map<String, Object> retrieveGeneralDetails() {
         Map<String, Object> map = new HashMap<>();
         map.put("id", this.id);

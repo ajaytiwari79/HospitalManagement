@@ -32,7 +32,7 @@ public class RuleTemplateCategory extends UserBaseEntity {
     @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY,direction =UNDIRECTED )
     private Country country;
     @Relationship(type = HAS_RULE_TEMPLATES)
-    private List<RuleTemplate> ruleTemplates;
+    private List<RuleTemplate> ruleTemplates=new ArrayList<>();
     public RuleTemplateCategory(String name, String description, boolean deleted) {
         this.name = name;
         this.description = description;
@@ -48,7 +48,7 @@ public class RuleTemplateCategory extends UserBaseEntity {
     }
 
     public List<RuleTemplate> getRuleTemplates() {
-        return Optional.ofNullable(ruleTemplates).orElse(new ArrayList<RuleTemplate>());
+        return ruleTemplates;
     }
 
     public void setRuleTemplates(List<RuleTemplate> ruleTemplates) {

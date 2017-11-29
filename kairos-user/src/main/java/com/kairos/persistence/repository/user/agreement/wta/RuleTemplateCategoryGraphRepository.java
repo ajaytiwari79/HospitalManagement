@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.agreement.wta;
 
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
@@ -45,4 +46,6 @@ public interface RuleTemplateCategoryGraphRepository extends GraphRepository<Rul
             "delete r\n" +
             "create(WBRT)<-[:HAS_RULE_TEMPLATES]-(newRTC)")
     void updateCategoryOfRuleTemplate(List<Long> wtaBaseRuleTemplateId,String ruleTemplateCategoryName);
+    RuleTemplateCategory findByNameAndRuleTemplateCategoryType(String name, RuleTemplateCategoryType ruleTemplateCategoryType);
+
 }

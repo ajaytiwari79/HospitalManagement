@@ -5,7 +5,6 @@ import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by oodles on 20/9/16.
@@ -23,8 +22,9 @@ public interface CountryHolidayCalenderGraphRepository extends GraphRepository<C
 
     @Query("MATCH (c:Country)-[:HAS_HOLIDAY]->(ch:CountryHolidayCalender)  WHERE ch.googleCalId={0} AND  id(c)={1} return ch ")
     CountryHolidayCalender getExistingHoliday(String id, Long countryId);
-    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]->(ch:CountryHolidayCalender{isEnable:true})  WHERE ch.holidayDate>={0} AND ch.holidayDate<={1}AND  id(c)={2} return ch ")
-    Optional<CountryHolidayCalender> findByIdAndHolidayDateBetween(Long startDateTime, Long endDateTime,Long countryId);
+
+    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " + "where id(c) = {0} AND ch.holidayDate >={1} AND ch.holidayDate <={2} " + "AND ch.isEnabled = true WITH ch as ch " + "MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " + "return ch.holidayDate as holidayDate, dt as dayType ")
+    CountryHolidayCalendarQueryResult findByIdAndHolidayDateBetween(Long countryId, Long start, Long end);
 
 
 }

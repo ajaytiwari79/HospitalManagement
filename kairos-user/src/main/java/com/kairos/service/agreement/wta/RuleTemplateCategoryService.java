@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,11 +38,12 @@ public class RuleTemplateCategoryService extends UserBaseService {
      * Created by vipul on 2/8/17.
      * params countryId and rule template category via name and desc
      */
+    //TODO need to modified this method
 
     public RuleTemplateCategory createRuleTemplateCategory(long countryId, RuleTemplateCategory ruleTemplateCategory) {
 
         String name = "(?i)" + ruleTemplateCategory.getName();
-        int ruleFound = countryGraphRepository.checkDuplicateRuleTemplate(countryId, name);
+        int ruleFound = countryGraphRepository.checkDuplicateRuleTemplate(countryId,ruleTemplateCategory.getRuleTemplateCategoryType(), name);
 
         if (ruleFound != 0) {
             throw new DuplicateDataException("Can't create duplicate rule template category in same country "+name);
@@ -51,15 +51,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
 
         Country country = countryService.getCountryById(countryId);
-        List<RuleTemplateCategory> list = country.getRuleTemplateCategories();
-
-        if (list == null) {
-            list = new ArrayList<RuleTemplateCategory>();
-        }
-
-        list.add(ruleTemplateCategory);
-        country.setRuleTemplateCategories(list);
-
+        country.addRuleTemplateCategory(ruleTemplateCategory);
         save(country);
         return ruleTemplateCategory;
 
