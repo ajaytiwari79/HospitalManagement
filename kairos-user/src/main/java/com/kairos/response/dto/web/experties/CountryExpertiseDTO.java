@@ -18,7 +18,7 @@ public class CountryExpertiseDTO {
     @NotEmpty(message = "error.Expertise.description.notEmpty") @NotNull(message = "error.Expertise.description.notnull")
     private String description;
 
-    private List<Long> tagsId;
+    private List<Long> tags;
 
     public long getId() {
         return id;
@@ -44,11 +44,11 @@ public class CountryExpertiseDTO {
         this.description = description;
     }
 
-    public List<Long> getTagsId() {
-        return tagsId;
+    public List<Long> getTags() {
+        return tags;
     }
 
-    public void setTagsId(List<Long> tagsId) {
-        this.tagsId = tagsId;
+    public void setTags(List<Long> tags) {
+        this.tags = tags;
     }
 }

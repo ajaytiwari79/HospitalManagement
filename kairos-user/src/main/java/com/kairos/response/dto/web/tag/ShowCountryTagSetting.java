@@ -13,4 +13,9 @@ public class ShowCountryTagSetting {
     public void setShowCountryTags(boolean showCountryTags) {
         this.showCountryTags = showCountryTags;
     }
+
+    public ShowCountryTagSetting(boolean showCountryTags){
+        this.showCountryTags = showCountryTags;
+    }
+    ShowCountryTagSetting(){ }
 }

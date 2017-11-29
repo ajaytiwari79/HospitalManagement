@@ -136,7 +136,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "Get list of Tags Category")
-    @RequestMapping(value = COUNTRY_URL + "/tag_category", method = RequestMethod.GET)
+    @RequestMapping(value = "/tag_category", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTagsCategory() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfMasterDataType());

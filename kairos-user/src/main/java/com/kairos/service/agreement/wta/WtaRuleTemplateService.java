@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategory
 import com.kairos.persistence.repository.user.agreement.wta.TemplateCategoryRelationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
 import com.kairos.response.dto.web.WTARuleTemplateDTO;
 import com.kairos.response.dto.web.WtaRuleTemplateDTO;
 import com.kairos.service.UserBaseService;
@@ -174,7 +175,7 @@ public class WtaRuleTemplateService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Country");
         }
 
-        List<RuleTemplateCategory> categoryList = ruleTemplateCategoryRepository.getAllRulesOfCountry(countryId);
+        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryRepository.getAllRulesOfCountry(countryId);
 
         if (categoryList == null) {
             throw new DataNotFoundByIdException("Category List is null");

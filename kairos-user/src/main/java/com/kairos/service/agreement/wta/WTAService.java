@@ -76,7 +76,7 @@ public class WTAService extends UserBaseService {
         List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTAWithCategoryDTO>();
         WorkingTimeAgreement wta = prepareWta(countryId, wtaDTO, wtaRuleTemplateQueryResponseArrayList);
         // Link tags to WTA
-        wta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTagsId(), MasterDataTypeEnum.WTA));
+        wta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
         wta.setCountry(country);
         save(wta);
 
@@ -235,7 +235,7 @@ public class WTAService extends UserBaseService {
             }
             oldWta.setEndDateMillis(wtaDTO.getEndDateMillis());
         }
-        oldWta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTagsId(), MasterDataTypeEnum.WTA));
+        oldWta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
         save(oldWta);
     }
 

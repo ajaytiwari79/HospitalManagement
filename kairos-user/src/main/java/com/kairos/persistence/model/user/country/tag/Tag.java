@@ -31,7 +31,7 @@ public class Tag extends UserBaseEntity {
 
     private boolean countryTag;
 
-    public Tag(){}
+    Tag(){}
     
     public String getName() {
         return name;

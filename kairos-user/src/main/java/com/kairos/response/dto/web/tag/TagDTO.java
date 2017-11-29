@@ -34,4 +34,17 @@ public class TagDTO {
     public void setName(String name) {
         this.name = name;
     }
+
+    public TagDTO(String name, MasterDataTypeEnum masterDataType){
+        this.name = name;
+        this.masterDataType = masterDataType;
+    }
+
+    public TagDTO(Long id, String name, MasterDataTypeEnum masterDataType){
+        this.id = id;
+        this.name = name;
+        this.masterDataType = masterDataType;
+    }
+
+    TagDTO(){}
 }

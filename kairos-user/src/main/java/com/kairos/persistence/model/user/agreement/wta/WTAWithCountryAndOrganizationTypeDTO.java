@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateWithCategoryDTO;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -30,6 +31,7 @@ public class WTAWithCountryAndOrganizationTypeDTO {
     private OrganizationType organizationTypes;//
     private OrganizationType organizationSubTypes;//
     private List<RuleTemplateWithCategoryDTO> ruleTemplates;
+    private List<Tag> tags;
 
     public Long getStartDateMillis() {
         return startDateMillis;
@@ -121,4 +123,11 @@ public class WTAWithCountryAndOrganizationTypeDTO {
         isEnabled = enabled;
     }
 
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 }

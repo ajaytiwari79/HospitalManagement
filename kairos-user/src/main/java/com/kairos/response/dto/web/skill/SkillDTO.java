@@ -20,7 +20,7 @@ public class SkillDTO {
 
     private String shortName;
 
-    private List<Long> tagIds;
+    private List<Long> tags;
 
     public String getName() {
         return name;
@@ -38,12 +38,12 @@ public class SkillDTO {
         this.description = description;
     }
 
-    public List<Long> getTagIds() {
-        return tagIds;
+    public List<Long> getTags() {
+        return tags;
     }
 
-    public void setTagIds(List<Long> tagIds) {
-        this.tagIds = tagIds;
+    public void setTags(List<Long> tags) {
+        this.tags = tags;
     }
 
     public Long getId() {

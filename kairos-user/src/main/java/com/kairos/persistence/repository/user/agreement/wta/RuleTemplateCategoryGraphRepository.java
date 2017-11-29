@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.agreement.wta;
 
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
@@ -15,9 +16,17 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 @Repository
 public interface RuleTemplateCategoryGraphRepository extends GraphRepository<RuleTemplateCategory> {
-    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"]-(l:RuleTemplateCategory{deleted:false}) Where id(c)={0}\n" +
-            "return l")
-    List<RuleTemplateCategory> getAllRulesOfCountry(long countryId);
+    /*@Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"]-(l:RuleTemplateCategory{deleted:false}) Where id(c)={0}\n" +
+            "return l")*/
+    /*@Query("match(c:Country{isEnabled:true})-[r:HAS_RULE_TEMPLATE_CATEGORY]-(l:RuleTemplateCategory{deleted:false}) with c,l\n" +
+            "OPTIONAL MATCH (l)-[:HAS_TAG]-(t:Tag)<-[:COUNTRY_HAS_TAG]-(c) WHERE t.deleted=false AND t.masterDataType='RULE_TEMPLATE_CATEGORY' AND\n" +
+            "id(c)=53 with l,t\n" +
+            "RETURN id(l) as id, l.name as name, l.description as description, CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})  END as tags")*/
+     @Query("match(c:Country{isEnabled:true})-[r:HAS_RULE_TEMPLATE_CATEGORY]-(l:RuleTemplateCategory{deleted:false}) with c,l\n" +
+             "OPTIONAL MATCH (l)-[:HAS_TAG]-(t:Tag)<-[:COUNTRY_HAS_TAG]-(c) WHERE t.deleted=false AND t.masterDataType='RULE_TEMPLATE_CATEGORY' AND\n" +
+             "id(c)={0} with l,t,CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})  END as tags\n" +
+             "RETURN id(l) as id, l.name as name, l.description as description,tags as tags")
+     List<RuleTemplateCategoryTagDTO> getAllRulesOfCountry(long countryId);
 
     @Query("match(l:RuleTemplateCategory) Where id(l)={0} \n" +
             "set l.deleted=true\n" +

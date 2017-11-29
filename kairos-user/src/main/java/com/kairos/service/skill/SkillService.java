@@ -108,7 +108,7 @@ public class SkillService extends UserBaseService {
             logger.info("Creating unique skill");
             Skill skill = new Skill(skillDTO);
             skill.setSkillCategory(skillCategory);
-            List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(skillDTO.getTagIds(), MasterDataTypeEnum.SKILL);
+            List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(skillDTO.getTags(), MasterDataTypeEnum.SKILL);
             logger.info("tags for skill : "+tags);
             skill.setTags(tags);
             skillGraphRepository.save(skill);
@@ -144,7 +144,7 @@ public class SkillService extends UserBaseService {
                 skill.setName(data.getName());
                 skill.setDescription(data.getDescription());
                 skill.setShortName(data.getShortName());
-                skill.setTags(tagService.getCountryTagsByIdsAndMasterDataType(data.getTagIds(), MasterDataTypeEnum.SKILL));
+                skill.setTags(tagService.getCountryTagsByIdsAndMasterDataType(data.getTags(), MasterDataTypeEnum.SKILL));
                 return skillGraphRepository.save(skill).retrieveDetails();
             }
 

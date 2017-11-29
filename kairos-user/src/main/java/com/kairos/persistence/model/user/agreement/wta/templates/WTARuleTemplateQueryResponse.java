@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.agreement.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

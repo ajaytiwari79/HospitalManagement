@@ -6,7 +6,6 @@ import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
@@ -47,7 +46,7 @@ public class ExpertiseService extends UserBaseService {
         }
         Expertise expertise = new Expertise();
         expertise.setCountry(country);
-        expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTagsId(), MasterDataTypeEnum.EXPERTISE));
+        expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
         save(expertise);
         return expertise.retrieveDetails();
     }
@@ -64,7 +63,7 @@ public class ExpertiseService extends UserBaseService {
         }
         currentExpertise.setName(expertiseDTO.getName());
         currentExpertise.setDescription(expertiseDTO.getDescription());
-        currentExpertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTagsId(), MasterDataTypeEnum.EXPERTISE));
+        currentExpertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
         save(currentExpertise);
         return currentExpertise.retrieveDetails();
     }
