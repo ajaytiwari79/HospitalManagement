@@ -55,6 +55,21 @@ public class RuleTemplateCategory extends UserBaseEntity {
         this.ruleTemplates = ruleTemplates;
     }
 
+    public void addRuleTemplate(RuleTemplate ruleTemplate) {
+        if (ruleTemplate == null)
+            throw new NullPointerException("Can't add null ruleTemplate");
+        if (ruleTemplate.getRuleTemplateCategory() != null)
+            throw new IllegalStateException("ruleTemplate is already assigned to an RuleTemplateCategory");
+        getRuleTemplates().add(ruleTemplate);
+        ruleTemplate.setRuleTemplateCategory(this);
+    }
+    public void removeRuleTemplate(RuleTemplate ruleTemplate) {
+        if (ruleTemplate == null)
+            throw new NullPointerException("Can't add null ruleTemplate");
+        getRuleTemplates().remove(ruleTemplate);
+        ruleTemplate.setRuleTemplateCategory(null);
+    }
+
     public String getName() {
         return name;
     }

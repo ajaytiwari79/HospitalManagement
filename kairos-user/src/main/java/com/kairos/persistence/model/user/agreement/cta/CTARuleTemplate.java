@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 @NodeEntity
 public class CTARuleTemplate extends RuleTemplate{
+    private CTARuleTemplateType ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
     private CalculationUnit calculationUnit;
@@ -32,6 +34,17 @@ public class CTARuleTemplate extends RuleTemplate{
     private User lastModifiedBy;
 
     public CTARuleTemplate() {
+
+    }
+
+    public CTARuleTemplate(String name,String description,RuleTemplateCategory ruleTemplateCategory,
+      CTARuleTemplateType ruleTemplateType,String payrollType,String payrollSystem) {
+        this.name=name;
+        this.description=description;
+        this.ruleTemplateCategory=ruleTemplateCategory;
+        this.ruleTemplateType=ruleTemplateType;
+        this.payrollType=payrollType;
+        this.payrollSystem=payrollSystem;
 
     }
 
