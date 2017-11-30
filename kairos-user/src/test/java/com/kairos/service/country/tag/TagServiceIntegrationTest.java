@@ -8,8 +8,10 @@ import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.response.dto.web.tag.ShowCountryTagSetting;
 import com.kairos.response.dto.web.tag.TagDTO;
 import org.junit.Assert;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TagServiceIntegrationTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -54,7 +57,7 @@ public class TagServiceIntegrationTest {
 
 
     @Test
-    public void addCountryTag() throws Exception {
+    public void test1_addCountryTag() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         TagDTO tagDTO = new TagDTO(nameOfTag, masterDataTypeEnum);
         HttpEntity<TagDTO> requestBodyData = new HttpEntity<>(tagDTO);
@@ -75,9 +78,9 @@ public class TagServiceIntegrationTest {
     }
 
     @Test
-    public void updateCountryTag() throws Exception {
+    public void test2_updateCountryTag() throws Exception {
         if(createdTagId == null){
-            logger.info("=======================Tag Id is null");
+            logger.info("Tag Id is null");
             Tag tag = tagService.getCountryTagByName(countryId, nameOfTag, masterDataTypeEnum);
             createdTagId = tag.getId();
         }
@@ -99,7 +102,7 @@ public class TagServiceIntegrationTest {
     }
 
     @Test
-    public void getListOfCountryTags() throws Exception {
+    public void test3_getListOfCountryTags() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>> resTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>>() {
@@ -116,10 +119,10 @@ public class TagServiceIntegrationTest {
     }
 
     @Test
-    public void deleteCountryTag() throws Exception {
+    public void test4_deleteCountryTag() throws Exception {
 
         if(createdTagId == null){
-            logger.info("=======================Tag Id is null");
+            logger.info("Tag Id is null");
             Tag tag = tagService.getCountryTagByName(countryId, nameOfTag, masterDataTypeEnum);
             createdTagId = tag.getId();
         }
@@ -137,7 +140,7 @@ public class TagServiceIntegrationTest {
     }
 
     @Test
-    public void addOrganizationTag() throws Exception {
+    public void test5_addOrganizationTag() throws Exception {
         String baseUrl=getBaseUrl(orgId,null, unitId);
         TagDTO tagDTO = new TagDTO(nameOfTag, masterDataTypeEnum);
         HttpEntity<TagDTO> requestBodyData = new HttpEntity<>(tagDTO);
@@ -158,9 +161,9 @@ public class TagServiceIntegrationTest {
     }
 
     @Test
-    public void updateOrganizationTag() throws Exception {
+    public void test6_updateOrganizationTag() throws Exception {
         if(createdOrgTagId == null){
-            logger.info("=======================Org Tag Id is null");
+            logger.info("Org Tag Id is null");
             Tag tag = tagService.getOrganizationTagByName(unitId, nameOfTag, masterDataTypeEnum);
             createdOrgTagId = tag.getId();
         }
@@ -182,9 +185,9 @@ public class TagServiceIntegrationTest {
     }
 
     @Test
-    public void deleteOrganizationTag() throws Exception {
+    public void test7_deleteOrganizationTag() throws Exception {
         if(createdOrgTagId == null){
-            logger.info("=======================Org Tag Id is null");
+            logger.info("Org Tag Id is null");
             Tag tag = tagService.getOrganizationTagByName(unitId, nameOfTag, masterDataTypeEnum);
             createdOrgTagId = tag.getId();
         }
@@ -202,7 +205,7 @@ public class TagServiceIntegrationTest {
     }
 
     @Test
-    public void getListOfOrganizationTags() throws Exception {
+    public void test8_getListOfOrganizationTags() throws Exception {
         String baseUrl=getBaseUrl(orgId,null, unitId);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>> resTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>>() {
@@ -218,7 +221,7 @@ public class TagServiceIntegrationTest {
     }
 
     @Test
-    public void updateShowCountryTagSettingOfOrganization() throws Exception {
+    public void test9_updateShowCountryTagSettingOfOrganization() throws Exception {
         String baseUrl=getBaseUrl(orgId,null, unitId);
         ShowCountryTagSetting showCountryTagSetting = new ShowCountryTagSetting(true);
         HttpEntity<ShowCountryTagSetting> requestBodyData = new HttpEntity<>(showCountryTagSetting);
@@ -266,7 +269,7 @@ public class TagServiceIntegrationTest {
     }*/
 
     @Test
-    public void getListOfMasterDataType() throws Exception {
+    public void test10_getListOfMasterDataType() throws Exception {
 
         String baseUrl=getBaseUrl(orgId,null, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<ArrayList<HashMap<String,String>>>> resTypeReference =
