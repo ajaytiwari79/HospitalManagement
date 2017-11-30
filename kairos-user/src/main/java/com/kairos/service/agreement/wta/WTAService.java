@@ -23,6 +23,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.WtaDTO;
+import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.expertise.ExpertiseService;
@@ -76,7 +77,12 @@ public class WTAService extends UserBaseService {
         List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTAWithCategoryDTO>();
         WorkingTimeAgreement wta = prepareWta(countryId, wtaDTO, wtaRuleTemplateQueryResponseArrayList);
         // Link tags to WTA
-        wta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
+        List<Long> tagsIds = new ArrayList<Long>();
+        for (  TagDTO tagDTO :  wtaDTO.getTags() ) {
+            tagsIds.add(tagDTO.getId());
+        }
+        wta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(tagsIds, MasterDataTypeEnum.WTA));
+//        wta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
         wta.setCountry(country);
         save(wta);
 
@@ -235,7 +241,12 @@ public class WTAService extends UserBaseService {
             }
             oldWta.setEndDateMillis(wtaDTO.getEndDateMillis());
         }
-        oldWta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
+        List<Long> tagsIds = new ArrayList<Long>();
+        for (  TagDTO tagDTO :  wtaDTO.getTags() ) {
+            tagsIds.add(tagDTO.getId());
+        }
+        oldWta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(tagsIds, MasterDataTypeEnum.WTA));
+//        oldWta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
         save(oldWta);
     }
 

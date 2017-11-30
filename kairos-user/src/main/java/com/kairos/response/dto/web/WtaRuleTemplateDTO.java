@@ -13,7 +13,7 @@ public class WtaRuleTemplateDTO {
     private List<Long> ruleTemplateIds;
     @NotEmpty(message = "error.WtaRuleTemplateDTO.categoryName.notEmpty")     @NotNull(message = "error.WtaRuleTemplateDTO.categoryName.notnull")
     private String categoryName;
-    private List<Long> tagIds;
+    private List<Long> tags;
 
     public List<Long> getRuleTemplateIds() {
         return ruleTemplateIds;
@@ -31,11 +31,11 @@ public class WtaRuleTemplateDTO {
         this.categoryName = categoryName;
     }
 
-    public List<Long> getTagIds() {
-        return tagIds;
+    public List<Long> getTags() {
+        return tags;
     }
 
-    public void setTagIds(List<Long> tagIds) {
-        this.tagIds = tagIds;
+    public void setTags(List<Long> tags) {
+        this.tags = tags;
     }
 }

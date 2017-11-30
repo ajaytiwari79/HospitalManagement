@@ -45,6 +45,8 @@ public class ExpertiseService extends UserBaseService {
             return null;
         }
         Expertise expertise = new Expertise();
+        expertise.setName(expertiseDTO.getName());
+        expertise.setDescription(expertiseDTO.getDescription());
         expertise.setCountry(country);
         expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
         save(expertise);
