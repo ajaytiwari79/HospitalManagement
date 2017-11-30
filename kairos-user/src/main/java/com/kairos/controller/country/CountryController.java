@@ -15,6 +15,8 @@ import com.kairos.persistence.model.user.payment_type.PaymentType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
+import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
+import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.service.country.*;
@@ -149,6 +151,19 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
     }
 
+    @RequestMapping(value = COUNTRY_URL, method = RequestMethod.GET)
+    @ApiOperation("Get country  by id")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountry(@PathVariable Long countryId) {
+        if (countryId != null) {
+            if (countryService.getCountryById(countryId) != null) {
+                return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+            }
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+    }
+
     @RequestMapping(value = COUNTRY_URL, method = RequestMethod.DELETE)
     @ApiOperation("Delete country  by id")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -274,10 +289,10 @@ public class CountryController {
     @ApiOperation(value = "Add a new skill")
     @RequestMapping(value = "/skill_category/{skillCategoryId}/skill", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addSkill(@PathVariable long skillCategoryId, @RequestBody Skill skill) {
+    public ResponseEntity<Map<String, Object>> addSkill(@PathVariable long skillCategoryId, @RequestBody SkillDTO skillDTO) {
 
-        Map<String, Object> response = skillService.createSkill(skill, skillCategoryId);
-        if (skill == null) {
+        Map<String, Object> response = skillService.createSkill(skillDTO, skillCategoryId);
+        if (skillDTO == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
@@ -286,8 +301,8 @@ public class CountryController {
     @ApiOperation(value = "Update a skill by id ")
     @RequestMapping(value = COUNTRY_URL + "/skill", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateSkillById(@PathVariable long countryId, @RequestBody Skill skill) {
-        Map<String, Object> updatedSkill = skillService.updateSkill(countryId, skill);
+    public ResponseEntity<Map<String, Object>> updateSkillById(@PathVariable long countryId, @RequestBody SkillDTO skillDTO) {
+        Map<String, Object> updatedSkill = skillService.updateSkill(countryId, skillDTO);
         if (updatedSkill == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
@@ -309,7 +324,7 @@ public class CountryController {
     @ApiOperation(value = "Create Expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId, @Validated @RequestBody Expertise expertise) {
+    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId, @Validated @RequestBody CountryExpertiseDTO expertise) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, expertiseService.saveExpertise(countryId, expertise));
     }
 
@@ -323,7 +338,7 @@ public class CountryController {
     @ApiOperation(value = "Update expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateExpertise(@RequestBody @Validated Expertise expertise) {
+    public ResponseEntity<Map<String, Object>> updateExpertise(@RequestBody @Validated CountryExpertiseDTO expertise) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(expertise));
     }
 

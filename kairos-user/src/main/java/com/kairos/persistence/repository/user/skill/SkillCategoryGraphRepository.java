@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.skill;
 
+import com.kairos.persistence.model.constants.RelationshipConstants;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import org.springframework.data.neo4j.annotation.Query;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY_HAS_TAG;
 
 /**
  * Created by oodles on 15/9/16.
@@ -26,19 +29,33 @@ public interface SkillCategoryGraphRepository extends GraphRepository<SkillCateg
      * @param id
      * @return  List all SkillCategory by CountryId
      */
-    @Query("MATCH (s:SkillCategory)-[:BELONGS_TO]->(c:Country) where id(c)={0} " +
+    /*@Query("MATCH (s:SkillCategory)-[:BELONGS_TO]->(c:Country) where id(c)={0} " +
             "AND s.isEnabled=true  with s as sc  " +
-            "OPTIONAL MATCH (s:Skill)-[:HAS_CATEGORY]->(sc) WHERE s.isEnabled=true " +
+            "OPTIONAL MATCH (s:Skill)-[:HAS_CATEGORY]->(sc) WHERE s.isEnabled=true with a,sc" +
+            "MATCH (s:Skill)-[:"+ RelationshipConstants.HAS_TAG+"]-(t:Tag)<-[:"+COUNTRY_HAS_TAG+"]-(c:Country{id:{0}}) WHERE t.masterDataType='SKILL' AND t.countryTag=true AND t.deleted = false\n"+
             "return  { skillList: case when s is NULL then [] else collect({ " +
             "  id:id(s), " +
             "  name:s.name,  " +
             "  visitourId:s.visitourId,  " +
             "  shortName:s.shortName,  " +
+            "  tags:{id:id(t),name:t.name,countryTag:t.countryTag},  " +
             "  description:s.description}) END , " +
             "name:sc.name, " +
             "id:id(sc),  " +
             "description:sc.description " +
-            "}AS result")
+            "}AS result")*/
+    @Query("MATCH (s:SkillCategory)-[:BELONGS_TO]->(c:Country) where id(c)=53 AND s.isEnabled=true  with s as sc,c  OPTIONAL MATCH (s:Skill)-[:HAS_CATEGORY]->(sc) WHERE s.isEnabled=true with c,sc,s \n" +
+            " OPTIONAL MATCH (s)-[r:HAS_TAG]->(t:Tag)<-[:COUNTRY_HAS_TAG]-(c) WHERE t.masterDataType='SKILL' AND t.countryTag=true AND t.deleted =false with CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})   END as tags,sc,s\n" +
+            "return  { skillList: case when s is NULL then [] else collect({   \n" +
+            "id:id(s),   \n" +
+            "name:s.name, \n" +
+            "tags:tags,\n" +
+            "visitourId:s.visitourId, \n" +
+            "shortName:s.shortName, \n" +
+            "description:s.description}) END ,\n" +
+            "name:sc.name, \n" +
+            "id:id(sc),  \n" +
+            "description:sc.description} AS result")
     List<Map<String,Object>> findSkillCategoryByCountryId(Long id);
 
     @Query("MATCH (s:Skill)-[:HAS_CATEGORY]->(sc:SkillCategory) where id(sc)={0} AND s.isEnabled=true  return s")

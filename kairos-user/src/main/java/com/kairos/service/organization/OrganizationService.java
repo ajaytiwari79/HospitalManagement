@@ -170,6 +170,16 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.findOne(id, 0);
     }
 
+    public boolean showCountryTagForOrganization(long id) {
+        Organization organization = organizationGraphRepository.findOne(id);
+        if(organization.isShowCountryTags()){
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
     /**
      * Calls OrganizationGraphRepository ,creates a new Organization
      * and return newly created User.
