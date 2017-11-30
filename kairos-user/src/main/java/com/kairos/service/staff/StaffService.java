@@ -1234,14 +1234,15 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public Long verifyStaffBelongsToUnit(long staffId, long id, String type) {
+    public StaffAdditionalInfoQueryResult verifyStaffBelongsToUnit(long staffId, long id, String type) {
         Long unitId = -1L;
         unitId = organizationService.getOrganization(id, type);
-        Staff staff = staffGraphRepository.getStaffByUnitId(unitId, staffId);
+        /*Staff staff = staffGraphRepository.getStaffByUnitId(unitId, staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
             unitId = -1L;
-        }
-        return unitId;
+        }*/
+
+        return staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
     }
 
     public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO){
