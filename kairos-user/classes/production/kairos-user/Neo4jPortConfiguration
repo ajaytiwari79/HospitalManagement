@@ -1,0 +1,18 @@
+1) To run neo4j server on different port, You have changes some fields value in neo4j.conf file
+which is located at conf>>neo4j.conf
+
+You have to change for below fields in neo4j.conf file
+
+# Bolt connector
+dbms.connector.bolt.enabled=true
+#dbms.connector.bolt.tls_level=OPTIONAL
+dbms.connector.bolt.listen_address=:7697   <---
+
+# HTTP Connector. There must be exactly one HTTP connector.
+dbms.connector.http.enabled=true
+dbms.connector.http.listen_address=:7484    <---
+
+# The port the shell will listen on, default is 1337.
+dbms.shell.port=1347   <----
+
+That's it :)

@@ -1111,5 +1111,11 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByCountry(countryId)) ;
     }
 
+    @ApiOperation(value = "Get day types by id")
+    @RequestMapping(value = "/day_types", method = RequestMethod.POST)
+    public ResponseEntity<Map<String,Object>> getDayTypesById(@RequestBody List<Long> dayTypeIds){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
+    }
+
 }
 
