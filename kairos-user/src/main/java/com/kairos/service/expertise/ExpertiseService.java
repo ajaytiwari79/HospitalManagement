@@ -4,6 +4,7 @@ import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
+import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
@@ -53,8 +54,8 @@ public class ExpertiseService extends UserBaseService {
         return expertise.retrieveDetails();
     }
 
-    public List<Expertise> getAllExpertise(long countryId) {
-        return expertiseGraphRepository.getAllExpertiseByCountry(countryId);
+    public List<ExpertiseTagDTO> getAllExpertise(long countryId) {
+        return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
     }
 
 
