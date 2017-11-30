@@ -24,7 +24,7 @@ public class WTAWithCountryAndOrganizationTypeDTO {
     private String name;
     private String description;
     private long id;
-    private boolean isEnabled ;
+
 
     private Expertise expertise;
 
@@ -107,9 +107,6 @@ public class WTAWithCountryAndOrganizationTypeDTO {
         this.organizationSubTypes = organizationSubTypes;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
-    }
 
     public List<RuleTemplateWithCategoryDTO> getRuleTemplates() {
         return ruleTemplates;
@@ -119,9 +116,6 @@ public class WTAWithCountryAndOrganizationTypeDTO {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
 
     public List<Tag> getTags() {
         return tags;

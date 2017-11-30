@@ -83,7 +83,6 @@ public class RuleTemplateWithCategoryDTO {
     }
 
     public void setRuleTemplateCategory(Map ruleTemplateCategory) {
-        System.out.println("rule template category " + ruleTemplateCategory);
         this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
@@ -366,4 +365,5 @@ public class RuleTemplateWithCategoryDTO {
     public void setRuleTemplateCategoryName(String ruleTemplateCategoryName) {
         this.ruleTemplateCategoryName = ruleTemplateCategoryName;
     }
+
 }

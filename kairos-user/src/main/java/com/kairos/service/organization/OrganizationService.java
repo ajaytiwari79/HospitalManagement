@@ -269,6 +269,7 @@ public class OrganizationService extends UserBaseService {
         response.put("subTypeId", parentOrganizationDTO.getSubTypeId());
         response.put("externalId", organization.getExternalId());
         response.put("homeAddress", filterContactAddressInfo(organization.getContactAddress()));
+        response.put("levelId",(organization.getLevel() == null)?organization.getLevel():organization.getLevel().getId());
         return response;
     }
 
@@ -310,7 +311,6 @@ public class OrganizationService extends UserBaseService {
             workingTimeAgreementObj.setEndDateMillis(obj.getEndDateMillis());
             workingTimeAgreementObj.setExpiryDate(obj.getExpiryDate());
             workingTimeAgreementObj.setExpertise(obj.getExpertise());
-            workingTimeAgreementObj.setEnabled(true);
             workingTimeAgreementObj.setRuleTemplates(obj.getRuleTemplates());
             workingTimeAgreementObj.setStartDateMillis(obj.getStartDateMillis());
             workingTimeAgreementObj.setWta(obj.getWta());
@@ -335,6 +335,7 @@ public class OrganizationService extends UserBaseService {
         // Verify Address here
         AddressDTO addressDTO = orgDetails.getHomeAddress();
         ZipCode zipCode;
+        addressDTO.setVerifiedByGoogleMap(true);
         if (addressDTO.isVerifiedByGoogleMap()) {
             contactAddress.setLongitude(addressDTO.getLongitude());
             contactAddress.setLatitude(addressDTO.getLatitude());
@@ -367,13 +368,11 @@ public class OrganizationService extends UserBaseService {
         }
         logger.info("Geography Data: " + geographyData);
 
-        Level level = countryGraphRepository.getLevel(countryId, orgDetails.getLevelId());
-        if (level == null) {
-            throw new InternalError("Level can't be null");
+
+        if(Optional.ofNullable(orgDetails.getTypeId()).isPresent() && orgDetails.getTypeId().size()>0 && Optional.ofNullable(orgDetails.getLevelId()).isPresent()){
+            Level level = organizationTypeGraphRepository.getLevel(orgDetails.getTypeId().get(0),orgDetails.getLevelId());
+            organization.setLevel(level);
         }
-        organization.setLevel(level);
-
-
         // Geography Data
         contactAddress.setMunicipality(municipality);
         contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
@@ -738,6 +737,7 @@ public class OrganizationService extends UserBaseService {
 
         response.put("organizationTypes", organizationTypesForUnit);
         response.put("businessTypes", businessTypes);
+        response.put("level",organization.getLevel());
         return response;
     }
 
@@ -1065,7 +1065,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = null;
         switch (type.toLowerCase()) {
             case ORGANIZATION:
-                organization = organizationGraphRepository.findOne(id);
+                organization = organizationGraphRepository.findOne(id,1);
                 break;
             case GROUP:
                 organization = groupService.getUnitByGroupId(id);
@@ -1098,15 +1098,14 @@ public class OrganizationService extends UserBaseService {
     }
 
 
-    public List<DayType> getDayType(Long unitID, Date date){
-        Long countryId = organizationGraphRepository.getCountryId(unitID);
+    public List<DayType> getDayType(Long organizationId, Date date){
+        Long countryId = organizationGraphRepository.getCountryId(organizationId);
        return  dayTypeService.getDayTypeByDate(countryId,date);
     }
 
-    public List<Map<String,Object>> getAllDayTypeofOrganization(Long unitID){
-        Long countryId = organizationGraphRepository.getCountryId(unitID);
+    public List<DayType> getAllDayTypeofOrganization(Long organizationId){
+        Long countryId = organizationGraphRepository.getCountryId(organizationId);
         return  dayTypeService.getAllDayTypeByCountryId(countryId);
-
 
     }
     public List<Map<String,Object>>getUnitsByOrganizationIs(Long orgID){

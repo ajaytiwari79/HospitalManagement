@@ -35,10 +35,14 @@ public class DayType  extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Country country;
     private List<Day> validDays=new ArrayList<>();
-
+    private boolean holidayType;
     private boolean isEnabled = true;
 
     private boolean allowTimeSettings = false;
+
+    // Constructor
+    public DayType() {
+    }
 
     public String getColorCode() {
         return colorCode;
@@ -104,9 +108,15 @@ public class DayType  extends UserBaseEntity {
         this.allowTimeSettings = allowTimeSettings;
     }
 
-    // Constructor
-    public DayType() {
+    public boolean isHolidayType() {
+        return holidayType;
     }
+
+    public void setHolidayType(boolean holidayType) {
+        this.holidayType = holidayType;
+    }
+
+
 
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap();
@@ -119,6 +129,7 @@ public class DayType  extends UserBaseEntity {
         map.put("lastModificationDate",this.getLastModificationDate());
         map.put("creationDate",this.getCreationDate());
         map.put("allowTimeSettings",this.isAllowTimeSettings());
+        map.put("holidayType",this.isHolidayType());
         map.put("validDays",this.getValidDays());
         return map;
     }

@@ -45,13 +45,13 @@ public interface RuleTemplateCategoryGraphRepository extends GraphRepository<Rul
             "create (rc)-[:"+HAS_RULE_TEMPLATES+"]->(w)" )
     void setRuleTemplateCategoryWithRuleTemplate( Long templateCategoryId,Long ruleTemplateId );
 
-    @Query("MATCH (n:RuleTemplateCategory)-[:"+HAS_RULE_TEMPLATES+"]->(w:WTABaseRuleTemplate)<-[:"+HAS_RULE_TEMPLATE+"]-(c:Country) where n.name={0} AND Id(c)={1} return Id(w)")
+    @Query("MATCH (n:RuleTemplateCategory{deleted:false})-[:"+HAS_RULE_TEMPLATES+"]->(w:WTABaseRuleTemplate)<-[:"+HAS_RULE_TEMPLATE+"]-(c:Country) where n.name={0} AND Id(c)={1} return Id(w)")
     List<Long> findAllExistingRuleTemplateAddedToThiscategory(String ruleTemplateCategoryName, long countryId);
 
-    @Query("MATCH (allRTC:RuleTemplateCategory)\n" +
+    @Query("MATCH (allRTC:RuleTemplateCategory{deleted:false})\n" +
             "match(newRTC:RuleTemplateCategory) where newRTC.name={1} \n" +
             "Match(WBRT:WTABaseRuleTemplate)<-[r:HAS_RULE_TEMPLATES]-(allRTC)  where Id(WBRT) IN {0}\n" +
             "delete r\n" +
-            "create(WBRT)<-[:HAS_RULE_TEMPLATES]-(newRTC)")
+            "MERGE(WBRT)<-[:HAS_RULE_TEMPLATES]-(newRTC)")
     void updateCategoryOfRuleTemplate(List<Long> wtaBaseRuleTemplateId,String ruleTemplateCategoryName);
 }

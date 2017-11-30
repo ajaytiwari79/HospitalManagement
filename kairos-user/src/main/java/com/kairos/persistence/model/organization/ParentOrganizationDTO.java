@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -28,6 +29,10 @@ public class ParentOrganizationDTO {
     AddressDTO homeAddress;
     Long levelId;
 
+    public ParentOrganizationDTO() {
+        //default constructor
+    }
+
     public Long getLevelId() {
         return levelId;
     }
@@ -37,6 +42,7 @@ public class ParentOrganizationDTO {
     }
 
     //list of ids of organization type
+    @Size(min=1, max=1)
     private List<Long> typeId;
     //list of ids of organization subtype
     private List<Long> subTypeId;
@@ -130,5 +136,16 @@ public class ParentOrganizationDTO {
 
     public void setBusinessTypeIds(List<Long> businessTypeIds) {
         this.businessTypeIds = businessTypeIds;
+    }
+
+    public ParentOrganizationDTO(List<Long> businessTypeIds, String description, boolean isVerifiedByGoogleMap, String name,
+                                 Long levelId, List<Long> typeId, List<Long> subTypeId) {
+        this.businessTypeIds = businessTypeIds;
+        this.description = description;
+        this.isVerifiedByGoogleMap = isVerifiedByGoogleMap;
+        this.name = name;
+        this.levelId = levelId;
+        this.typeId = typeId;
+        this.subTypeId = subTypeId;
     }
 }

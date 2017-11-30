@@ -20,6 +20,9 @@ public class EmploymentType extends UserBaseEntity {
     @NotEmpty(message = "error.EmploymentType.name.notEmptyOrNotNull") @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull")
     private String name;
     private String description;
+    private boolean allowedForContactPerson;
+    private boolean allowedForShiftPlan;
+    private boolean allowedForFlexPool;
     private boolean deleted = false;
 
     public String getName() {
@@ -37,6 +40,31 @@ public class EmploymentType extends UserBaseEntity {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public boolean isAllowedForContactPerson() {
+        return allowedForContactPerson;
+    }
+
+    public void setAllowedForContactPerson(boolean allowedForContactPerson) {
+        this.allowedForContactPerson = allowedForContactPerson;
+    }
+
+    public boolean isAllowedForShiftPlan() {
+        return allowedForShiftPlan;
+    }
+
+    public void setAllowedForShiftPlan(boolean allowedForShiftPlan) {
+        this.allowedForShiftPlan = allowedForShiftPlan;
+    }
+
+    public boolean isAllowedForFlexPool() {
+        return allowedForFlexPool;
+    }
+
+    public void setAllowedForFlexPool(boolean allowedForFlexPool) {
+        this.allowedForFlexPool = allowedForFlexPool;
+    }
+
     public boolean isDeleted() {
         return deleted;
     }

@@ -56,7 +56,6 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     private List<WTABaseRuleTemplate> ruleTemplates;//
 
 
-
     // to make a history
     @Relationship(type = HAS_WTA)
     private WorkingTimeAgreement wta;
@@ -67,15 +66,15 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     private Long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
-    private boolean isEnabled = true;
+    private boolean deleted;
 
 
-    public boolean isEnabled() {
-        return isEnabled;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public String getName() {
@@ -194,15 +193,15 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public static WorkingTimeAgreement copyProperties(WorkingTimeAgreement source, WorkingTimeAgreement target){
-        BeanUtils.copyProperties(source,target);
+    public static WorkingTimeAgreement copyProperties(WorkingTimeAgreement source, WorkingTimeAgreement target) {
+        BeanUtils.copyProperties(source, target);
         return target;
     }
 
     public WorkingTimeAgreement() {
     }
 
-    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, Country country, List<WTABaseRuleTemplate> ruleTemplates, WorkingTimeAgreement wta, Long startDateMillis, Long endDateMillis, Long expiryDate, boolean isEnabled) {
+    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, Country country, List<WTABaseRuleTemplate> ruleTemplates, WorkingTimeAgreement wta, Long startDateMillis, Long endDateMillis, Long expiryDate, boolean deleted) {
         this.name = name;
         this.description = description;
         this.expertise = expertise;
@@ -214,7 +213,7 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.expiryDate = expiryDate;
-        this.isEnabled = isEnabled;
+        this.deleted = deleted;
     }
 
     public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<WTABaseRuleTemplate> ruleTemplates, Long startDateMillis, Long endDateMillis, Long expiryDate) {
@@ -228,8 +227,9 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.endDateMillis = endDateMillis;
         this.expiryDate = expiryDate;
     }
+
     public WtaDTO buildwtaDTO() {
-        WtaDTO wtaDTO=new WtaDTO(this.name,this.description ,this.expertise.getId() ,this.organizationType.getId(), this.organizationSubType.getId()  ,this.startDateMillis,this.endDateMillis,this.expiryDate );
+        WtaDTO wtaDTO = new WtaDTO(this.name, this.description, this.expertise.getId(), this.organizationType.getId(), this.organizationSubType.getId(), this.startDateMillis, this.endDateMillis, this.expiryDate);
         return wtaDTO;
     }
 }

@@ -11,8 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by oodles on 21/2/17.
@@ -88,5 +92,14 @@ public class IntegrationService {
         credentials.put("flsDefaultUrl",url);
         credentials.put("userpassword",userPass);
         return credentials;
+    }
+
+    public ConcurrentMap<Long, ConcurrentMap<String,String>> getFLSCredentials(List<Long> unitIds){
+        ConcurrentMap<Long,ConcurrentMap<String,String>> flsCredentials = new ConcurrentHashMap<>();
+        unitIds.forEach(unitId->{
+            ConcurrentMap<String, String> credentailsForUnit = new ConcurrentHashMap<>(getFLS_Credentials(unitId));
+            flsCredentials.put(unitId,credentailsForUnit);
+        });
+        return flsCredentials;
     }
 }

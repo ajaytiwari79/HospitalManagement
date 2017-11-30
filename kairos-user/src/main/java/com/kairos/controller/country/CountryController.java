@@ -1,6 +1,7 @@
 package com.kairos.controller.country;
 
-import com.kairos.persistence.model.dto.TimeTypeDTO;
+import com.kairos.persistence.model.timetype.PresenceTypeDTO;
+import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrgTypeExpertiseDTO;
 import com.kairos.persistence.model.organization.OrganizationType;
@@ -16,6 +17,8 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
+import com.kairos.response.dto.web.OrganizationTypeDTO;
+import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.service.country.*;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.language.LanguageLevelService;
@@ -24,7 +27,6 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
 import com.kairos.service.payment_type.PaymentTypeService;
-import com.kairos.service.country.TimeTypeService;
 import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
@@ -110,6 +112,8 @@ public class CountryController {
     private ExpertiseService expertiseService;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject
+    private PresenceTypeService presenceTypeService;
 
     // Country
     @RequestMapping(value = "/country", method = RequestMethod.POST)
@@ -180,24 +184,23 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/organization_type", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrgTypesByCountryId(@PathVariable Long countryId) {
-        List<Map<String, Object>> response = organizationTypeService.getOrgTypesByCountryId(countryId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrgTypesByCountryId(countryId));
     }
 
     @ApiOperation(value = "Add Organization Types")
     @RequestMapping(value = COUNTRY_URL + "/organization_type", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addOrgTypesByCountryId(@PathVariable Long countryId, @Validated @RequestBody OrganizationType data) {
-        Map<String, Object> response = organizationTypeService.createOrganizationTypeForCountry(countryId, data);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+    public ResponseEntity<Map<String, Object>> addOrgTypesByCountryId(@PathVariable Long countryId,
+                                                                      @Validated @RequestBody OrganizationTypeDTO organizationTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.createOrganizationTypeForCountry(countryId, organizationTypeDTO));
     }
 
     @ApiOperation(value = "Update Organization Types")
-    @RequestMapping(value = COUNTRY_URL + "/organization_type", method = RequestMethod.PUT)
+    @RequestMapping(value = COUNTRY_URL + "/organization_type/{organizationTypeId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateOrganizationType(@Validated @RequestBody OrganizationType data) {
-        Map<String, Object> response = organizationTypeService.updateOrganizationType(data);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+    public ResponseEntity<Map<String, Object>> updateOrganizationType(@PathVariable Long organizationTypeId,
+                                                                      @Validated @RequestBody UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateOrganizationType(organizationTypeId,updateOrganizationTypeDTO));
     }
 
     @ApiOperation(value = "Delete Organization Types")
@@ -357,8 +360,8 @@ public class CountryController {
         if (organization == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.
-                createParentOrganization(organization, countryId,organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, organizationService.
+                createParentOrganization(organization, countryId, organizationId));
     }
 
     @ApiOperation(value = "Update Parent Organization")
@@ -1081,7 +1084,46 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/timeType/{timeTypeId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTimeType(@PathVariable Long timeTypeId, @Validated @RequestBody TimeTypeDTO timeType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updateTimeType(timeType,timeTypeId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updateTimeType(timeType, timeTypeId));
+    }
+
+
+    @ApiOperation(value = "Add presenceType by countryId")
+    @RequestMapping(value = COUNTRY_URL + "/presenceType", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addPresenceType(@PathVariable Long countryId, @Validated @RequestBody PresenceTypeDTO presenceTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, presenceTypeService.addPresenceType(presenceTypeDTO, countryId));
+    }
+
+    @ApiOperation(value = "Get all presenceType by countryId")
+    @RequestMapping(value = COUNTRY_URL + "/presenceType", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllPresenceTypeByCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeByCountry(countryId));
+    }
+
+    @ApiOperation(value = "delete a presenceType by Id")
+    @RequestMapping(value = COUNTRY_URL + "/presenceType/{presenceTypeId}", method = RequestMethod.DELETE)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deletePresenceTypeById(@PathVariable Long presenceTypeId) {
+        presenceTypeService.deletePresenceTypeById(presenceTypeId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
+    @ApiOperation(value = "Update presenceType by Id")
+    @RequestMapping(value = COUNTRY_URL + "/presenceType/{presenceTypeId}", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updatePresenceType(@PathVariable Long countryId,
+                                                                  @PathVariable Long presenceTypeId,
+                                                                  @Validated @RequestBody PresenceTypeDTO presenceTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.updatePresenceType(countryId, presenceTypeId, presenceTypeDTO));
+    }
+
+    @ApiOperation(value = "Get all presenceType with timeType by countryId")
+    @RequestMapping(value = COUNTRY_URL + "/presenceTypeWithTimeType", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByCountry(countryId)) ;
     }
 
 }

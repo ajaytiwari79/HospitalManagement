@@ -9,6 +9,7 @@ import java.util.Map;
  * Created by oodles on 26/10/17.
  */
 public interface CustomOrganizationGraphRepository {
-    List<Map> getClientsWithFilterParameters(ClientFilterDTO clientFilterDTO, List<Long> citizenIds, Long organizationId, String imagePath, String skip);
+    List<Map> getClientsWithFilterParameters(ClientFilterDTO clientFilterDTO, List<Long> citizenIds,
+                                             Long organizationId, String imagePath, String skip,String moduleId);
 
 }
