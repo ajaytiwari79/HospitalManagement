@@ -647,6 +647,10 @@ public class ClientService extends UserBaseService {
         Client houseHold = saveDetailsOfHouseHold(minimumDTO);
 
         Long addressIdOfHouseHold = null;
+        Boolean addHouseHoldInCitizenList = false;
+        if(houseHold.getId() == null ){
+            addHouseHoldInCitizenList = true;
+        }
         if(houseHold.getId() != null && houseHold.getHomeAddress() !=null){
             addressIdOfHouseHold = houseHold.getHomeAddress().getId();
         }
@@ -654,12 +658,13 @@ public class ClientService extends UserBaseService {
         saveAddressOfHouseHold(client, houseHold);
         save(houseHold);
 
-        if ( !Optional.ofNullable(houseHold.getId()).isPresent()) {
+        if ( addHouseHoldInCitizenList ) {
             addHouseHoldInOrganization(houseHold, unitId);
         }
 
         // Check and Update Address of all household members
-        if( addressIdOfHouseHold !=null && minimumDTO.getUpdateAddressOfAllHouseholdMembers() && minimumDTO.getUpdateAddressOfAllHouseholdMembers() == true){
+        if( addressIdOfHouseHold !=null && minimumDTO.getUpdateAddressOfAllHouseholdMembers()){
+//            //  && minimumDTO.getUpdateAddressOfAllHouseholdMembers() == true
             clientAddressService.updateAddressOfAllHouseHoldMembers(client.getHomeAddress().getId(), addressIdOfHouseHold);
         }
 
