@@ -224,7 +224,7 @@ public class ClientAddressService extends UserBaseService {
     }*/
 
 
-    public boolean updateAddressOfAllHouseHoldMembers(long contactAddressId, long addressIdOfHouseHold){
+    public Boolean updateAddressOfAllHouseHoldMembers(long contactAddressId, long addressIdOfHouseHold){
         List<Long> listOfIdsOfHouseholdMembers = getListOfAllHouseHoldMemberssByAddressId(addressIdOfHouseHold);
         if(listOfIdsOfHouseholdMembers.size() > 0){
             detachAddressOfHouseholdMembersWithDifferentAddress(contactAddressId, listOfIdsOfHouseholdMembers);
@@ -233,7 +233,7 @@ public class ClientAddressService extends UserBaseService {
         return true;
     }
 
-    public boolean detachAddressOfHouseholdMembersWithDifferentAddress(long contactAddressId,List<Long> listOfIdsOfHouseholdMembers){
+    public Boolean detachAddressOfHouseholdMembersWithDifferentAddress(long contactAddressId,List<Long> listOfIdsOfHouseholdMembers){
         return clientGraphRepository.detachAddressOfHouseholdMembersWithDifferentAddress(contactAddressId, listOfIdsOfHouseholdMembers);
     }
 
