@@ -435,13 +435,62 @@ public class StaffService extends UserBaseService {
 
     }
 
+    public Map<String, List<Object>> processSheet(long unitId, MultipartFile multipartFile) {
+
+        List<Object> staffList = new ArrayList<>();
+        List<Object> staffErrorList = new ArrayList<>();
+
+        Map<String, List<Object>> responseMap = new HashMap<String, List<Object>>();
+
+        responseMap.put("addedStaff", staffList);
+        responseMap.put("staffErrorList", staffErrorList);
+        try (InputStream stream = multipartFile.getInputStream()) {
+            //Get the workbook instance for XLS file
+            XSSFWorkbook workbook = new XSSFWorkbook(stream);
+            //Get first sheet from the workbook
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIterator = sheet.iterator();
+            if (!rowIterator.hasNext()) {
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 position");
+            }
+            Row header = sheet.getRow(0);
+            int n = header.getLastCellNum();
+            int cprHeader = -1;
+            for (int i = 0; i < n; i++) {
+                String columnHeader = header.getCell(i).getStringCellValue();
+                if (columnHeader.equalsIgnoreCase(CPR_NUMBER)) {
+                    cprHeader = i;
+                    break;
+                }
+            }
+            if (cprHeader == -1) {
+                logger.info("Sheet has no header containing cprNumber. Please add a cpr number header as cprnumber");
+                throw new InternalError("Sheet has no header containing cprNumber. Please add a cpr number header as cprnumber");
+            }
+            logger.info("Sheet has rows");
+            int index = 0;
+            while (rowIterator.hasNext()) {
+
+                Row row = rowIterator.next();
+                if (row.getRowNum() == 0) {
+                    continue;
+                }
+                Cell cell = row.getCell(cprHeader);
+                if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
+                    staffErrorList.add(row.getRowNum());
+                } else {
+                    staffList.add(row.toString());
+                }
+
+            }
+        } catch (Exception e) {
+            System.out.println("err");
+        }
+        return responseMap;
+    }
+
     public List<Staff> batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
-/*
-        Client client = createClientObject(staff);
-        boolean isEmploymentExist = (staff.getId()) != null;
-        staff.setUser(user);
-        staff.setClient(client);
-  */
+
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             logger.error("Access group not found");
@@ -449,6 +498,7 @@ public class StaffService extends UserBaseService {
         }
         ;
         List<Staff> staffList = new ArrayList<>();
+        List<Staff> staffErrorList = new ArrayList<>();
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (unit == null) {
             logger.info("Organization is null");
@@ -471,6 +521,7 @@ public class StaffService extends UserBaseService {
             if (!rowIterator.hasNext()) {
                 throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 position");
             }
+            logger.info("Sheet has rows");
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
                 if (String.valueOf(row.getCell(0)) == null || String.valueOf(row.getCell(0)).isEmpty()) {
@@ -561,6 +612,7 @@ public class StaffService extends UserBaseService {
         }
         return staffList;
     }
+
 
     private ContactAddress extractContactAddressFromRow(Row row) {
 
