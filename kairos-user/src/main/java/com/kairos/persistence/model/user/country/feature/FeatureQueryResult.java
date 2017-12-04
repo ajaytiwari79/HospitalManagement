@@ -1,15 +1,18 @@
-package com.kairos.response.dto.web.feature;
+package com.kairos.persistence.model.user.country.feature;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
  * Created by prerna on 4/12/17.
  */
-public class FeatureDTO {
+@QueryResult
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class FeatureQueryResult {
 
     private Long id;
     private String name;
     private String description;
-
-    public FeatureDTO(){};
 
     public Long getId() {
         return id;
@@ -34,10 +37,4 @@ public class FeatureDTO {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public FeatureDTO(String name, String description){
-        this.name = name;
-        this.description = description;
-    }
-
 }
