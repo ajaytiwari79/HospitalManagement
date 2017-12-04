@@ -437,20 +437,19 @@ public class StaffService extends UserBaseService {
 
 
 
-    public Map<String, List<Object>> batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
+    public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             logger.error("Access group not found");
             throw new InternalError("Access group not found " + accessGroupId);
         }
-        List<Object> staffList = new ArrayList<>();
-        List<Object> staffErrorList = new ArrayList<>();
+        List<Staff> staffList = new ArrayList<>();
+        List<Integer> staffErrorList = new ArrayList<>();
+        StaffUploadBySheetQueryResult  staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
+        staffUploadBySheetQueryResult.setStaffErrorList(staffErrorList);
+        staffUploadBySheetQueryResult.setStaffList(staffList);
 
-        Map<String, List<Object>> responseMap = new HashMap<String, List<Object>>();
-
-        responseMap.put("addedStaff", staffList);
-        responseMap.put("staffErrorList", staffErrorList);
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (unit == null) {
             logger.info("Organization is null");
@@ -508,6 +507,7 @@ public class StaffService extends UserBaseService {
                 if (cprHeaderValue == null || cprHeaderValue.getCellType() == Cell.CELL_TYPE_BLANK) {
                     logger.info(" This row has no CRP Number so skipping this %s",row.getRowNum());
                     staffErrorList.add(row.getRowNum());
+
                 } else {
                     Cell cell = row.getCell(8);
                     cell.setCellType(Cell.CELL_TYPE_STRING);
@@ -579,11 +579,11 @@ public class StaffService extends UserBaseService {
                     }
                 }
             }
-            return responseMap;
+            return staffUploadBySheetQueryResult;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return responseMap;
+        return staffUploadBySheetQueryResult;
     }
 
 
