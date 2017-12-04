@@ -435,8 +435,15 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public Map<String, List<Object>> processSheet(long unitId, MultipartFile multipartFile) {
 
+
+    public Map<String, List<Object>> batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
+
+        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+        if (!Optional.ofNullable(accessGroup).isPresent()) {
+            logger.error("Access group not found");
+            throw new InternalError("Access group not found " + accessGroupId);
+        }
         List<Object> staffList = new ArrayList<>();
         List<Object> staffErrorList = new ArrayList<>();
 
@@ -444,61 +451,6 @@ public class StaffService extends UserBaseService {
 
         responseMap.put("addedStaff", staffList);
         responseMap.put("staffErrorList", staffErrorList);
-        try (InputStream stream = multipartFile.getInputStream()) {
-            //Get the workbook instance for XLS file
-            XSSFWorkbook workbook = new XSSFWorkbook(stream);
-            //Get first sheet from the workbook
-            XSSFSheet sheet = workbook.getSheetAt(0);
-            Iterator<Row> rowIterator = sheet.iterator();
-            if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 position");
-            }
-            Row header = sheet.getRow(0);
-            int n = header.getLastCellNum();
-            int cprHeader = -1;
-            for (int i = 0; i < n; i++) {
-                String columnHeader = header.getCell(i).getStringCellValue();
-                if (columnHeader.equalsIgnoreCase(CPR_NUMBER)) {
-                    cprHeader = i;
-                    break;
-                }
-            }
-            if (cprHeader == -1) {
-                logger.info("Sheet has no header containing cprNumber. Please add a cpr number header as cprnumber");
-                throw new InternalError("Sheet has no header containing cprNumber. Please add a cpr number header as cprnumber");
-            }
-            logger.info("Sheet has rows");
-            int index = 0;
-            while (rowIterator.hasNext()) {
-
-                Row row = rowIterator.next();
-                if (row.getRowNum() == 0) {
-                    continue;
-                }
-                Cell cell = row.getCell(cprHeader);
-                if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) {
-                    staffErrorList.add(row.getRowNum());
-                } else {
-                    staffList.add(row.toString());
-                }
-
-            }
-        } catch (Exception e) {
-            System.out.println("err");
-        }
-        return responseMap;
-    }
-
-    public List<Staff> batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
-
-        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-        if (!Optional.ofNullable(accessGroup).isPresent()) {
-            logger.error("Access group not found");
-            throw new InternalError("Access group not found " + accessGroupId);
-        }
-        ;
-        List<Staff> staffList = new ArrayList<>();
-        List<Staff> staffErrorList = new ArrayList<>();
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (unit == null) {
             logger.info("Organization is null");
@@ -519,8 +471,23 @@ public class StaffService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 position");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 position");
             }
+            Row header = sheet.getRow(0);
+            int NumberOfColumnsInSheet = header.getLastCellNum();
+            int cprHeader = -1;
+            for (int i = 0; i < NumberOfColumnsInSheet; i++) {
+                String columnHeader = header.getCell(i).getStringCellValue();
+                if (columnHeader.equalsIgnoreCase(CPR_NUMBER)) {
+                    cprHeader = i;
+                    break;
+                }
+            }
+            if (cprHeader == -1) {
+                logger.info("Sheet has no header containing cprNumber. Please add a cpr number header as cprnumber");
+                throw new InternalError("Sheet has no header containing cprNumber. Please add a cpr number header as cprnumber");
+            }
+
             logger.info("Sheet has rows");
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
@@ -537,80 +504,86 @@ public class StaffService extends UserBaseService {
                 if (row.getRowNum() == 0) {
                     continue;
                 }
-                Cell cell = row.getCell(8);
-                cell.setCellType(Cell.CELL_TYPE_STRING);
-                if ("14".equals(cell.getStringCellValue())) {
-
-                    cell = row.getCell(2);
+                Cell cprHeaderValue = row.getCell(cprHeader);
+                if (cprHeaderValue == null || cprHeaderValue.getCellType() == Cell.CELL_TYPE_BLANK) {
+                    logger.info(" This row has no CRP Number so skipping this %s",row.getRowNum());
+                    staffErrorList.add(row.getRowNum());
+                } else {
+                    Cell cell = row.getCell(8);
                     cell.setCellType(Cell.CELL_TYPE_STRING);
-                    Long externalId = (StringUtils.isBlank(cell.getStringCellValue())) ? 0 : Long.parseLong(cell.getStringCellValue());
-                    StaffQueryResult staffQueryResult = (Optional.ofNullable(parent).isPresent()) ? staffGraphRepository.getStaffByExternalIdInOrganization(parent.getId(), externalId)
-                            : staffGraphRepository.getStaffByExternalIdInOrganization(unitId, externalId);
-                    Staff staff;
-                    if (Optional.ofNullable(staffQueryResult).isPresent()) {
-                        staff = staffQueryResult.getStaff();
-                    } else {
-                        logger.info("Creating new staff with kmd external id " + externalId + " in unit " + unit.getId());
-                        staff = new Staff();
-                    }
-                    boolean isEmploymentExist = (staff.getId()) != null;
-                    staff.setExternalId(externalId);
-                    if (row.getCell(17) != null) {
-                        staff.setBadgeNumber(row.getCell(17).toString());
-                    }
-                    staff.setFirstName(row.getCell(20).toString());
-                    staff.setLastName(row.getCell(21).toString());
-                    staff.setFamilyName(row.getCell(21).toString());
-                    staff.setUserName(row.getCell(19).toString());
-                    ContactAddress contactAddress = extractContactAddressFromRow(row);
-                    if (!Optional.ofNullable(contactAddress).isPresent()) {
-                        contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
-                    }
-                    ContactDetail contactDetail = extractContactDetailFromRow(row);
-                    if (Optional.ofNullable(staffQueryResult).isPresent()) {
+                    if ("14".equals(cell.getStringCellValue())) {
 
-                        if (Optional.ofNullable(contactDetail).isPresent()) {
-                            contactDetail.setId(staffQueryResult.getContactDetailId());
-                        }
-
-                        if (Optional.ofNullable(contactAddress).isPresent()) {
-                            contactAddress.setId(staffQueryResult.getContactAddressId());
-                        }
-                    }
-                    staff.setContactDetail(contactDetail);
-                    staff.setContactAddress(contactAddress);
-                    cell = row.getCell(2);
-                    if (Optional.ofNullable(cell).isPresent()) {
+                        cell = row.getCell(2);
                         cell.setCellType(Cell.CELL_TYPE_STRING);
-                        User user = userGraphRepository.findByTimeCareExternalId(cell.getStringCellValue());
-                        if (!Optional.ofNullable(user).isPresent()) {
-                            user = new User();
-                            user.setFirstName(row.getCell(20).toString());
-                            user.setLastName(row.getCell(21).toString());
-                            user.setTimeCareExternalId(cell.getStringCellValue());
-                            if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
-                                user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
-                                user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
-                            }
-                            String defaultPassword = user.getFirstName().trim() + "@kairos";
-                            user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
+                        Long externalId = (StringUtils.isBlank(cell.getStringCellValue())) ? 0 : Long.parseLong(cell.getStringCellValue());
+                        StaffQueryResult staffQueryResult = (Optional.ofNullable(parent).isPresent()) ? staffGraphRepository.getStaffByExternalIdInOrganization(parent.getId(), externalId)
+                                : staffGraphRepository.getStaffByExternalIdInOrganization(unitId, externalId);
+                        Staff staff;
+                        if (Optional.ofNullable(staffQueryResult).isPresent()) {
+                            staff = staffQueryResult.getStaff();
+                        } else {
+                            logger.info("Creating new staff with kmd external id " + externalId + " in unit " + unit.getId());
+                            staff = new Staff();
                         }
-                        Client client = createClientObject(staff);
-                        staff.setClient(client);
-                        staff.setUser(user);
-                    }
-                    staffGraphRepository.save(staff);
-                    staffList.add(staff);
-                    if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
-                        createEmployment(parent, unit, staff, accessGroupId, isEmploymentExist);
+                        boolean isEmploymentExist = (staff.getId()) != null;
+                        staff.setExternalId(externalId);
+                        if (row.getCell(17) != null) {
+                            staff.setBadgeNumber(row.getCell(17).toString());
+                        }
+                        staff.setFirstName(row.getCell(20).toString());
+                        staff.setLastName(row.getCell(21).toString());
+                        staff.setFamilyName(row.getCell(21).toString());
+                        staff.setUserName(row.getCell(19).toString());
+                        ContactAddress contactAddress = extractContactAddressFromRow(row);
+                        if (!Optional.ofNullable(contactAddress).isPresent()) {
+                            contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
+                        }
+                        ContactDetail contactDetail = extractContactDetailFromRow(row);
+                        if (Optional.ofNullable(staffQueryResult).isPresent()) {
+
+                            if (Optional.ofNullable(contactDetail).isPresent()) {
+                                contactDetail.setId(staffQueryResult.getContactDetailId());
+                            }
+
+                            if (Optional.ofNullable(contactAddress).isPresent()) {
+                                contactAddress.setId(staffQueryResult.getContactAddressId());
+                            }
+                        }
+                        staff.setContactDetail(contactDetail);
+                        staff.setContactAddress(contactAddress);
+                        cell = row.getCell(2);
+                        if (Optional.ofNullable(cell).isPresent()) {
+                            cell.setCellType(Cell.CELL_TYPE_STRING);
+                            User user = userGraphRepository.findByTimeCareExternalId(cell.getStringCellValue());
+                            if (!Optional.ofNullable(user).isPresent()) {
+                                user = new User();
+                                user.setFirstName(row.getCell(20).toString());
+                                user.setLastName(row.getCell(21).toString());
+                                user.setTimeCareExternalId(cell.getStringCellValue());
+                                if (Optional.ofNullable(contactDetail).isPresent() && Optional.ofNullable(contactDetail.getPrivateEmail()).isPresent()) {
+                                    user.setUserName(contactDetail.getPrivateEmail().toLowerCase());
+                                    user.setEmail(contactDetail.getPrivateEmail().toLowerCase());
+                                }
+                                String defaultPassword = user.getFirstName().trim() + "@kairos";
+                                user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
+                            }
+                            Client client = createClientObject(staff);  // here client is referred as citizen
+                            staff.setClient(client);
+                            staff.setUser(user);
+                        }
+                        staffGraphRepository.save(staff);
+                        staffList.add(staff);
+                        if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
+                            createEmployment(parent, unit, staff, accessGroupId, isEmploymentExist);
+                        }
                     }
                 }
             }
-            return staffList;
+            return responseMap;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return staffList;
+        return responseMap;
     }
 
 
@@ -920,17 +893,15 @@ public class StaffService extends UserBaseService {
 
     private Client createClientObject(Staff staff) {
         Client client = clientGraphRepository.findByCprNumber(staff.getCprNumber());
+        logger.debug("Staff cpr number",staff.getCprNumber());
         if (!Optional.ofNullable(client).isPresent()) {
+            logger.debug("NO CITIZEN found by cpr : cpr number",staff.getCprNumber());
             client = new Client();
             client.setFirstName(staff.getFirstName());
             client.setLastName(staff.getLastName());
             client.setEmail(staff.getEmail());
             client.setCprNumber(staff.getCprNumber());
         }
-        client.setHomeAddress(staff.getContactAddress());
-        ObjectMapper objectMapper = new ObjectMapper();
-        ContactDetail contactDetail = objectMapper.convertValue(staff, ContactDetail.class);
-        client.setContactDetail(contactDetail);
         return client;
     }
 

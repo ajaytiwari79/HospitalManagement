@@ -391,20 +391,6 @@ public class StaffController {
     }
 
 
-    // TODO REMoVE test API
-
-
-    @RequestMapping(value = "/importTest", method = RequestMethod.POST)
-    @ApiOperation("Upload XLSX file ")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> processSheet(@PathVariable long unitId,
-                                                            @RequestParam("file") MultipartFile multipartFile) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffService.processSheet(unitId, multipartFile));
-    }
-
-
     @RequestMapping(value = "/{staffId}/access_permissions", method = RequestMethod.GET)
     @ApiOperation("Get uploaded Staff as per orgnaizationID ")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
