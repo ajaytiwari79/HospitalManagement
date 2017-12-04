@@ -159,8 +159,13 @@ public class ClientExtendedService extends UserBaseService {
 
     private Client validateCPRNumber(String cprNumber){
         Client client = clientGraphRepository.findByCprNumber(cprNumber.trim());
-        if(Optional.ofNullable(client).isPresent() && client.isCitizenDead()){
-            throw new DuplicateDataException("You can't enter the CPR of dead citizen " + cprNumber);
+        if(Optional.ofNullable(client).isPresent()){
+            switch (client.getHealthStatus()){
+                case DECEASED:
+                    throw new DuplicateDataException("You can't enter the CPR of deceased citizen " + cprNumber);
+                case TERMINATED:
+                    throw new DuplicateDataException("You can't enter the CPR of dead citizen " + cprNumber);
+            }
         }
         return client;
     }
