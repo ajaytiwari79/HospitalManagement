@@ -41,6 +41,7 @@ public class AddressDTO {
     private String description;
     private Long municipalityId;
     private String locationName;
+    private boolean updateHouseholdAddress;
 
     public String getLocationName() {
         return locationName;
@@ -262,5 +263,13 @@ public class AddressDTO {
     public Long getMunicipalityId() {
 
         return municipalityId;
+    }
+
+    public boolean isUpdateHouseholdAddress() {
+        return updateHouseholdAddress;
+    }
+
+    public void setUpdateHouseholdAddress(boolean updateHouseholdAddress) {
+        this.updateHouseholdAddress = updateHouseholdAddress;
     }
 }

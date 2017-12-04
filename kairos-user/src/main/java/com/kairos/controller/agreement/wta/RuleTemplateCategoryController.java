@@ -1,5 +1,6 @@
 package com.kairos.controller.agreement.wta;
 
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.service.agreement.wta.RuleTemplateCategoryService;
 import com.kairos.service.country.CountryService;
@@ -40,7 +41,7 @@ public class RuleTemplateCategoryController {
 
     @RequestMapping(value = "/template_category", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getRulesTemplate(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplateCategory(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplateCategory(countryId, RuleTemplateCategoryType.WTA));
     }
 
     @RequestMapping(value = "/template_category/{templateCategoryId}", method = RequestMethod.DELETE)

@@ -60,8 +60,11 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     List<StaffAdditionalInfoQueryResult> getStaffWithAdditionalInfo(long organizationId, long unitId);
 
 
-    @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments MATCH (staffs:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments) with staffs " +
-            "OPTIONAL MATCH (staffs)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) with staffs,collect(id(skills)) as skills OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staffs) with staffs,skills,collect(id(teams)) as teams " +
+    @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments\n"+
+            "MATCH (staffs:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments) with staffs " +
+            "OPTIONAL MATCH (staffs)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) \n"+
+            "with staffs,collect(id(skills)) as skills OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staffs) \n"+
+            "with staffs,skills,collect(id(teams)) as teams \n" +
             "return id(staffs) as id,staffs.firstName+\" \" +staffs.lastName as name,staffs.profilePic as profilePic,teams,skills order by name")
     List<StaffAdditionalInfoQueryResult> getStaffAndCitizenDetailsOfUnit(long unitId);
 
@@ -72,10 +75,10 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     Staff editStaffWorkPlaces(long staffId, List<Long> staffIds);
 
     @Query("Match (unit:Organization),(staff:Staff) where id(staff)={0} AND id(unit)={1} with staff,unit\n" +
-            "Match (unit)-["+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with skill,staff\n" +
-            "OPTIONAL MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill{isEnabled:true}) with skill,r\n" +
-            "Match (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with skill,skillCategory,r\n" +
-            "return {children:collect({id:id(skill),name:skill.name,isSelected:r.isEnabled}),id:id(skillCategory),name:skillCategory.name} as data")
+            "Match (unit)-[orgSkillRelation:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with skill,staff, orgSkillRelation\n" +
+            "OPTIONAL MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill{isEnabled:true}) with skill,r,orgSkillRelation\n" +
+            "Match (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with skill,skillCategory,r,orgSkillRelation\n" +
+            "return {children:collect({id:id(skill),name:orgSkillRelation.customName,isSelected:r.isEnabled}),id:id(skillCategory),name:skillCategory.name} as data")
     List<Map<String,Object>> getSkills(long staffId, long unitId);
 
     @Query("Match (staff:Staff),(skill:Skill) where id(staff)={0} AND id(skill) IN {1} match (staff)-[r:STAFF_HAS_SKILLS]->(skill) set r.isEnabled=false,r.lastModificationDate={2} return r")
@@ -208,9 +211,10 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     void addSkillInStaff(long staffId, List<Long> skillId, long creationDate, long lastModificationDate, Skill.SkillLevel skillLevel, boolean isEnabled);
 
     @Query("Match (staff:Staff),(skill:Skill) where id(staff)={0} and id(skill) IN {1}\n" +
-            "Match (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill)-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory)\n" +
-            "return {id:id(r),skillId:id(skill),name:skill.name,skillCategory:skillCategory.name,startDate:r.startDate,endDate:r.endDate,visitourId:skill.visitourId,lastSyncInVisitour:r.lastModificationDate,status:r.isEnabled,level:r.skillLevel} as data")
-    List<Map<String,Object>> getStaffSkillInfo(long staffId, List<Long> skillId);
+            "Match (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill)-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory) with skill, staff, skillCategory, r\n" +
+            "Match (organization:Organization)-[orgHasSkill:"+ORGANISATION_HAS_SKILL+"]->(skill:Skill) where id(organization)={2} with skill, staff, skillCategory,orgHasSkill, r \n" +
+            "return {id:id(r),skillId:id(skill),name:orgHasSkill.customName,skillCategory:skillCategory.name,startDate:r.startDate,endDate:r.endDate,visitourId:skill.visitourId,lastSyncInVisitour:r.lastModificationDate,status:r.isEnabled,level:r.skillLevel} as data")
+    List<Map<String,Object>> getStaffSkillInfo(long staffId, List<Long> skillId, long unitId);
 
     @Query("Match (staff:Staff) where id(staff)={0} with staff\n" +
             "Match (expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill) where id(expertise)={1} with staff,skill\n" +

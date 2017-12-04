@@ -8,7 +8,6 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.client.PhaseRestClient;
-import com.kairos.client.dto.PhaseAndActivityTypeWrapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
@@ -436,8 +435,10 @@ public class CountryService extends UserBaseService {
      List<TimeTypeDTO> timeTypes=timeTypeService.getAllTimeTypes(countryId);
      List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
      List<AccessGroup> accessGroups=accessGroupService.findAllAccessGroup();
-     PhaseAndActivityTypeWrapper phaseAndActivityTypeWrapper=phaseRestClient.getPhaseAndActivityType(1L);
+     //PhaseAndActivityTypeWrapper phaseAndActivityTypeWrapper=phaseRestClient.getPhaseAndActivityType(1L);
      CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper=new CTARuleTemplateDefaultDataWrapper();
+        ctaRuleTemplateDefaultDataWrapper.getAccessGroupDTOS().addAll(accessGroups);
+        ctaRuleTemplateDefaultDataWrapper.getDayTypeDTOS()
      return ctaRuleTemplateDefaultDataWrapper;
     }
 

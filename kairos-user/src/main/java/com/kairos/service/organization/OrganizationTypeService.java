@@ -31,7 +31,7 @@ public class OrganizationTypeService extends UserBaseService {
     @Inject
     CountryGraphRepository countryGraphRepository;
 
-    public List<OrganizationType> getOrgTypesByCountryId(Long countryId) {
+    public List<OrgTypeLevelWrapper> getOrgTypesByCountryId(Long countryId) {
 
         return organizationTypeGraphRepository.getOrganizationTypeByCountryId(countryId);
     }
@@ -78,14 +78,27 @@ public class OrganizationTypeService extends UserBaseService {
         if(!Optional.ofNullable(orgTypeToUpdate).isPresent()){
             throw new DataNotFoundByIdException("Invalid organization type id " + organizationTypeId);
         }
-        orgTypeToUpdate.getLevels().forEach(level -> {
-            Optional<Level> result = updateOrganizationTypeDTO.getLevelsToUpdate().stream().filter(levelInList->levelInList.getId().equals(level.getId())).findFirst();
+
+        List<Level> levels = orgTypeToUpdate.getLevels();
+        updateOrganizationTypeDTO.getLevelsToUpdate().forEach(levelToUpdate->{
+            if(!Optional.ofNullable(levelToUpdate.getId()).isPresent()){
+                levels.add(new Level(levelToUpdate.getName()));
+            } else {
+                Optional<Level> result = levels.stream().filter(levelInList->levelInList.getId().equals(levelToUpdate.getId())).findFirst();
+                if(result.isPresent()){
+                    Level level = result.get();
+                    level.setName(result.get().getName());
+                }
+            }
+        });
+        updateOrganizationTypeDTO.getLevelsToDelete().forEach(levelToDelete ->{
+            Optional<Level> result = levels.stream().filter(levelInList -> levelInList.getId().equals(levelToDelete)).findFirst();
             if(result.isPresent()){
-                level.setName(result.get().getName());
-            } else if(updateOrganizationTypeDTO.getLevelsToDelete().contains(level.getId())) {
+                Level level = result.get();
                 level.setDeleted(true);
             }
         });
+        orgTypeToUpdate.setLevels(levels);
         orgTypeToUpdate.setName(updateOrganizationTypeDTO.getName());
         return prepareResponse(save(orgTypeToUpdate));
     }
@@ -94,7 +107,8 @@ public class OrganizationTypeService extends UserBaseService {
         OrganizationType response = new OrganizationType();
         response.setId(organizationType.getId());
         response.setName(organizationType.getName());
-        response.setLevels(organizationType.getLevels());
+        List<Level> activeLevels = organizationType.getLevels().parallelStream().filter(level -> !level.isDeleted()).collect(Collectors.toList());
+        response.setLevels(activeLevels);
         return response;
     }
 

@@ -37,7 +37,7 @@ public class OrganizationServiceTest {
     public void createOrganization(){
 
         ParentOrganizationDTO parentOrganizationDTO = new ParentOrganizationDTO(Arrays.asList(94L),"Junit",
-                true,"My pharmacy",10980L,Arrays.asList(10981L),Arrays.asList(0L));
+                true,"My pharmacy",null,Arrays.asList(86L),Arrays.asList(0L));
         parentOrganizationDTO.setVerifiedByGoogleMap(true);
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setStreet1("Frederiksberg");

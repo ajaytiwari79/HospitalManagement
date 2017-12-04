@@ -3,6 +3,7 @@ package com.kairos.service.agreement.wta;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
@@ -49,7 +50,6 @@ public class RuleTemplateCategoryService extends UserBaseService {
             throw new DuplicateDataException("Can't create duplicate rule template category in same country "+name);
         }
 
-
         Country country = countryService.getCountryById(countryId);
         country.addRuleTemplateCategory(ruleTemplateCategory);
         save(country);
@@ -59,12 +59,12 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     }
 
-    public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId) {
+    public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
         Country country = countryService.getCountryById(countryId);
         if (country == null) {
             throw new DataNotFoundByIdException("Country does not exist");
         }
-        return ruleTemplateCategoryGraphRepository.getAllRulesOfCountry(countryId);
+        return ruleTemplateCategoryGraphRepository.getRuleTemplateCategoryByCountry(countryId,ruleTemplateCategoryType);
 
     }
 

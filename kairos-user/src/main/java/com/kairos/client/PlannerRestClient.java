@@ -1,11 +1,13 @@
 package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.persistence.model.enums.CitizenHealthStatus;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -24,17 +26,18 @@ public class PlannerRestClient {
      * @param citizenId
      * @return
      */
-    public boolean deleteTaskForCitizen(Long citizenId){
+    public boolean deleteTaskForCitizen(Long citizenId, CitizenHealthStatus citizenHealthStatus,String date){
 
         final String baseUrl=getBaseUrl(true);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
+            HttpEntity<CitizenHealthStatus> entity = new HttpEntity<>(citizenHealthStatus);
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/planner/citizen/{citizenId}",
+                            baseUrl + "/planner/citizen/{citizenId}/tasks?date=" + date,
                             HttpMethod.DELETE,
-                            null, typeReference, citizenId);
+                            entity, typeReference, citizenId);
 
             RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {

@@ -49,13 +49,15 @@ public class OrganizationTypeIntegrationTest {
     @Test
     public void updateOrganizationType(){
         String baseUrl=getBaseUrl(71L,null);
-        Level level = new Level("Regional");
-        level.setId(10980L  );
-        UpdateOrganizationTypeDTO updateOrganizationTypeDTO = new UpdateOrganizationTypeDTO("test2",Arrays.asList(level),Arrays.asList());
+        Level levelToDelete = new Level("Regional");
+        levelToDelete.setId(10969L);
+        Level levelToCreate = new Level("Junit");
+        UpdateOrganizationTypeDTO updateOrganizationTypeDTO = new UpdateOrganizationTypeDTO("test3",Arrays.asList(),Arrays.asList(levelToDelete.getId()));
         HttpEntity<UpdateOrganizationTypeDTO> entity = new HttpEntity<>(updateOrganizationTypeDTO);
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl+"/country/53/organization_type/10981",
+                baseUrl+"/country/53/organization_type/86",
                 HttpMethod.PUT, entity, String.class);
+        System.out.println("response " + response);
         Assert.assertEquals(true,response.getBody().contains(updateOrganizationTypeDTO.getName()));
     }
 

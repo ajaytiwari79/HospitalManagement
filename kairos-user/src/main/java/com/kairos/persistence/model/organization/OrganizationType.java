@@ -10,9 +10,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -112,7 +110,7 @@ public class OrganizationType extends UserBaseEntity {
     }
 
     public List<Level> getLevels() {
-        return levels;
+        return Optional.ofNullable(levels).orElse(new ArrayList<>());
     }
 
     public void setLevels(List<Level> levels) {

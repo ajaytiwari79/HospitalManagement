@@ -192,16 +192,16 @@ public class Country extends UserBaseEntity {
     public void addRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
         if (ruleTemplateCategory == null)
             throw new NullPointerException("Can't add null ruleTemplateCategory");
-        if (ruleTemplateCategory.getCountry()!= null)
+       /* if (ruleTemplateCategory.getCountry()!= null)
             throw new IllegalStateException("country is already assigned to ruleTemplateCategory");
          getRuleTemplateCategories().add(ruleTemplateCategory);
-         ruleTemplateCategory.setCountry(this);
+         ruleTemplateCategory.setCountry(this);*/
      }
 
     public void removeRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
         if (ruleTemplateCategory == null)
         getRuleTemplateCategories().remove(ruleTemplateCategory);
-        ruleTemplateCategory.setCountry(null);
+       // ruleTemplateCategory.setCountry(null);
     }
 
     public Map<String, Object> retrieveGeneralDetails() {

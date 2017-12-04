@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplateDTO;
@@ -171,7 +172,7 @@ public class WtaRuleTemplateService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Country");
         }
 
-        List<RuleTemplateCategory> categoryList = ruleTemplateCategoryRepository.getAllRulesOfCountry(countryId);
+        List<RuleTemplateCategory> categoryList = ruleTemplateCategoryRepository.getRuleTemplateCategoryByCountry(countryId, RuleTemplateCategoryType.WTA);
 
         if (categoryList == null) {
             throw new DataNotFoundByIdException("Category List is null");

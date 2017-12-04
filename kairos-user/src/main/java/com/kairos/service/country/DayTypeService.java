@@ -1,7 +1,7 @@
 package com.kairos.service.country;
 
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 import com.kairos.persistence.model.user.country.Day;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -59,13 +59,13 @@ public class DayTypeService extends UserBaseService {
     public Map<String, Object> updateDayType(DayType dayType){
         DayType currentDayType = dayTypeGraphRepository.findOne(dayType.getId());
         if (currentDayType!=null){
-
             currentDayType.setName(dayType.getName());
             currentDayType.setCode(dayType.getCode());
             currentDayType.setColorCode(dayType.getColorCode());
             currentDayType.setDescription(dayType.getDescription());
             currentDayType.setAllowTimeSettings(dayType.isAllowTimeSettings());
             currentDayType.setValidDays(dayType.getValidDays());
+            currentDayType.setHolidayType(dayType.isHolidayType());
             save(currentDayType);
             return currentDayType.retrieveDetails();
         }
@@ -98,12 +98,12 @@ public class DayTypeService extends UserBaseService {
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
         Date endDate=calendar.getTime();
-       CountryHolidayCalender countryHolidayCalender=countryHolidayCalenderGraphRepository.
-                findByIdAndHolidayDateBetween(startDate.getTime(),endDate.getTime(),countryId);
+        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult=countryHolidayCalenderGraphRepository.
+                findByIdAndHolidayDateBetween(countryId,startDate.getTime(),endDate.getTime());
 
-        if(Optional.ofNullable(countryHolidayCalender).isPresent()){
+        if(Optional.ofNullable(countryHolidayCalendarQueryResult).isPresent()){
             List<DayType> dayTypes=new ArrayList<>();
-            dayTypes.add(countryHolidayCalender.getDayType()) ;
+            dayTypes.add(countryHolidayCalendarQueryResult.getDayType()) ;
           return  dayTypes;
         }else{
             Instant instant = Instant.ofEpochMilli(date.getTime());

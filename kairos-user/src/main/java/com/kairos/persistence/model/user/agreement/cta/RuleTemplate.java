@@ -2,11 +2,16 @@ package com.kairos.persistence.model.user.agreement.cta;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import org.neo4j.ogm.annotation.Relationship;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATES;
+import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 
 public abstract class RuleTemplate extends UserBaseEntity {
     protected String name;
     protected String description;
     protected boolean disabled;
+    @Relationship(type = HAS_RULE_TEMPLATES,direction =UNDIRECTED)
     protected RuleTemplateCategory ruleTemplateCategory;
 
 

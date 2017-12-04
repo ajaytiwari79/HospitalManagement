@@ -11,7 +11,10 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATES;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATE_CATEGORY;
@@ -31,7 +34,7 @@ public class RuleTemplateCategory extends UserBaseEntity {
     private RuleTemplateCategoryType ruleTemplateCategoryType;
     @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY,direction =UNDIRECTED )
     private Country country;
-    @Relationship(type = HAS_RULE_TEMPLATES)
+    @Relationship(type = HAS_RULE_TEMPLATES,direction =UNDIRECTED)
     private List<RuleTemplate> ruleTemplates=new ArrayList<>();
     public RuleTemplateCategory(String name, String description, boolean deleted) {
         this.name = name;

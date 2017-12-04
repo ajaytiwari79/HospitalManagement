@@ -2,32 +2,29 @@ package com.kairos.service.country;
 
 import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationEmploymentTypeRelationship;
-import com.kairos.persistence.model.organization.OrganizationTimeSlotRelationship;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
-import com.kairos.persistence.model.user.country.RelationType;
-import com.kairos.persistence.model.user.country.TimeType;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
-import com.kairos.persistence.model.user.position.Position;
+import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
+import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.position.PositionGraphRepository;
-import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.region.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import javax.inject.Inject;
-import java.time.LocalTime;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by prerna on 2/11/17.
@@ -46,7 +43,13 @@ public class EmploymentTypeService extends UserBaseService {
     @Inject
     private PositionGraphRepository positionGraphRepository;
     @Inject
+    private RegionService regionService;
+    @Inject
     private OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    private ExpertiseGraphRepository expertiseGraphRepository;
+    @Inject
+    private OrganizationTypeGraphRepository organizationTypeGraphRepository;
 
     public EmploymentType addEmploymentType(Long countryId, EmploymentTypeDTO employmentTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -61,7 +64,7 @@ public class EmploymentTypeService extends UserBaseService {
     }
 
     public EmploymentType updateEmploymentType(long countryId, long employmentTypeId, EmploymentTypeDTO employmentTypeDTO) {
-        Country country = countryGraphRepository.findOne(countryId,0);
+        Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
@@ -91,53 +94,68 @@ public class EmploymentTypeService extends UserBaseService {
     }
 
     public List<EmploymentType> getEmploymentTypeList(long countryId, boolean isDeleted) {
-        Country country = countryGraphRepository.findOne(countryId,0);
+        Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
         return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
     }
 
-    public List<Map<String, Object>> getEmploymentTypeOfOrganization(long unitId, boolean isDeleted){
-        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId,0) : null;
+    public List<Map<String, Object>> getEmploymentTypeOfOrganization(long unitId, boolean isDeleted) {
+        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
             throw new DataNotFoundByIdException("Incorrect unit id ");
         }
-        return organizationGraphRepository.getEmploymentTypeByOrganization(unitId,isDeleted);
+        return organizationGraphRepository.getEmploymentTypeByOrganization(unitId, isDeleted);
     }
 
     public OrganizationEmploymentTypeDTO setEmploymentTypeSettingsOfOrganization(Long unitId, Long employmentTypeId, OrganizationEmploymentTypeDTO organizationEmploymentTypeDTO) {
-        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId,0) : null;
+        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
             throw new DataNotFoundByIdException("Incorrect unit id ");
         }
-        EmploymentType employmentType = employmentTypeGraphRepository.findOne(employmentTypeId,0);
+        EmploymentType employmentType = employmentTypeGraphRepository.findOne(employmentTypeId, 0);
 //        boolean employmentTypeExistInOrganization = employmentTypeGraphRepository.isEmploymentTypeExistInOrganization(unitId, organizationEmploymentTypeDTO.getEmploymentTypeId(), false);
-        if( employmentType == null) {
-            throw new DataNotFoundByIdException("Invalid Employment Type Id : "+employmentTypeId);
+        if (employmentType == null) {
+            throw new DataNotFoundByIdException("Invalid Employment Type Id : " + employmentTypeId);
         }
 
-        Boolean settingUpdated = employmentTypeGraphRepository.setEmploymentTypeSettingsForOrganization(unitId,employmentTypeId,
+        Boolean settingUpdated = employmentTypeGraphRepository.setEmploymentTypeSettingsForOrganization(unitId, employmentTypeId,
                 organizationEmploymentTypeDTO.isAllowedForContactPerson(),
                 organizationEmploymentTypeDTO.isAllowedForShiftPlan(),
-                organizationEmploymentTypeDTO.isAllowedForFlexPool(),new Date().getTime(),new Date().getTime());
-        if(settingUpdated){
+                organizationEmploymentTypeDTO.isAllowedForFlexPool(), new Date().getTime(), new Date().getTime());
+        if (settingUpdated) {
             return organizationEmploymentTypeDTO;
         } else {
-            logger.error("Employment type settings could not be updated in organization " +unitId);
+            logger.error("Employment type settings could not be updated in organization " + unitId);
             throw new InternalError("Employment type settings could not be updated");
         }
     }
 
     public List<EmploymentTypeDTO> getEmploymentTypeSettingsOfOrganization(Long unitId) {
-        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId,0) : null;
+        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
             throw new DataNotFoundByIdException("Incorrect unit id ");
         }
         return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(unitId, false);
+    }
+
+    public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId) {
+        OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
+        // Set employment type
+        organizationMappingDTO.setEmploymentTypes(getEmploymentTypeList(countryId, false));
+        // set Expertise
+        organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByCountry(countryId));
+        //set levels
+        organizationMappingDTO.setLevels(countryGraphRepository.getLevelsByCountry(countryId));
+        // set regions
+        organizationMappingDTO.setRegions(regionService.getRegionByCountryId(countryId));
+        //set organization Hierarchy
+        organizationMappingDTO.setOrganizationTypeHierarchy(organizationTypeGraphRepository.getAllOrganizationTypeWithSubTypeByCountryId(countryId));
+        return organizationMappingDTO;
     }
 
 }

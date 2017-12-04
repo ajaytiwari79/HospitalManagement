@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
@@ -113,6 +114,13 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
             "OPTIONAL MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
             "return ch.holidayDate as result")
     List<Long> getAllCountryHolidaysBetweenDates(Long countryId, Long start, Long end);
+
+    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " +
+            "where id(c) = {0}   AND ch.holidayDate >={1} AND  ch.holidayDate <={2}  " +
+            "AND ch.isEnabled = true WITH  ch as ch  " +
+            "MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
+            "return ch.holidayDate as holidayDate, dt as dayType ")
+    List<CountryHolidayCalendarQueryResult> getCountryHolidayCalendarBetweenDates(Long countryId, Long start, Long end);
 
 
 

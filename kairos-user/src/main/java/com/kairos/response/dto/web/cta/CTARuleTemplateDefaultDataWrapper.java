@@ -1,12 +1,13 @@
 package com.kairos.response.dto.web.cta;
 
+import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.country.Currency;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CTARuleTemplateDefaultDataWrapper {
-    private List<AccessGroupDTO> accessGroupDTOS=new ArrayList<>();
+    private List<AccessGroup> accessGroupDTOS=new ArrayList<>();
     private List<DayTypeDTO> dayTypeDTOS=new ArrayList<>();
     private List<PhaseDTO> phaseDTOS=new ArrayList<>();
     private List<TimeTypeDTO> timeTypeDTOS=new ArrayList<>();
@@ -19,11 +20,11 @@ public class CTARuleTemplateDefaultDataWrapper {
         //default
     }
 
-    public List<AccessGroupDTO> getAccessGroupDTOS() {
+    public List<AccessGroup> getAccessGroupDTOS() {
         return accessGroupDTOS;
     }
 
-    public void setAccessGroupDTOS(List<AccessGroupDTO> accessGroupDTOS) {
+    public void setAccessGroupDTOS(List<AccessGroup> accessGroupDTOS) {
         this.accessGroupDTOS = accessGroupDTOS;
     }
 

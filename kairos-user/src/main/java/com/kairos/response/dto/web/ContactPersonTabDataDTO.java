@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web;
 
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResult;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
@@ -14,16 +15,16 @@ import java.util.List;
  */
 public class ContactPersonTabDataDTO {
 
-    List<OrganizationService> organizationServices;
+    List<OrganizationServiceQueryResult> organizationServices;
     List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
     List<ClientMinimumDTO> peopleHouseHolds;
     List<ClientContactPersonStructuredData> contactPersonDataList;
 
-    public List<OrganizationService> getOrganizationServices() {
+    public List<OrganizationServiceQueryResult> getOrganizationServices() {
         return organizationServices;
     }
 
-    public void setOrganizationServices(List<OrganizationService> organizationServices) {
+    public void setOrganizationServices(List<OrganizationServiceQueryResult> organizationServices) {
         this.organizationServices = organizationServices;
     }
 
