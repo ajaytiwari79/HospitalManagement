@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.agreement.cta;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.TimeType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -12,7 +13,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENT_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @NodeEntity
 public class CTARuleTemplate extends RuleTemplate{
@@ -23,18 +24,23 @@ public class CTARuleTemplate extends RuleTemplate{
     private CompensationTable compensationTable;
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-    private List<Long>dayTypes=new ArrayList<>();
+    @Relationship(type = BELONGS_TO)
+    List<CTARuleTemplateDayTypes>calculateOnDayTypes=new ArrayList<>();
     private PhaseInfo phaseInfo;
     private BudgetType budgetType;
+    @Relationship(type = HAS_ACCESS_GROUP)
     private List<AccessGroup> calculateValueIfPlanned=new ArrayList<>();
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private List<EmploymentType> employmentTypes=new ArrayList<>();
     private ActivityType activityType;
     private PlanningCategory planningCategory;
-    private Function function;
+    private StaffFunction staffFunction;
     private PlannedTimeWithFactor plannedTimeWithFactor;
-    private List<Long>timeTypes=new ArrayList<>();
+    @Relationship(type = HAS_TIME_TYPES)
+    private List<TimeType>timeTypes=new ArrayList<>();
+    @Relationship(type = BELONGS_TO)
     private User createdBy;
+    @Relationship(type = BELONGS_TO)
     private User lastModifiedBy;
 
     public CTARuleTemplate() {
@@ -99,13 +105,6 @@ public class CTARuleTemplate extends RuleTemplate{
         this.approvalWorkFlow = approvalWorkFlow;
     }
 
-    public List<Long> getDayTypes() {
-        return dayTypes;
-    }
-
-    public void setDayTypes(List<Long> dayTypes) {
-        this.dayTypes = dayTypes;
-    }
 
     public PhaseInfo getPhaseInfo() {
         return phaseInfo;
@@ -155,12 +154,12 @@ public class CTARuleTemplate extends RuleTemplate{
         this.planningCategory = planningCategory;
     }
 
-    public Function getFunction() {
-        return function;
+    public StaffFunction getStaffFunction() {
+        return staffFunction;
     }
 
-    public void setFunction(Function function) {
-        this.function = function;
+    public void setStaffFunction(StaffFunction staffFunction) {
+        this.staffFunction = staffFunction;
     }
 
     public PlannedTimeWithFactor getPlannedTimeWithFactor() {
@@ -171,13 +170,23 @@ public class CTARuleTemplate extends RuleTemplate{
         this.plannedTimeWithFactor = plannedTimeWithFactor;
     }
 
-    public List<Long> getTimeTypes() {
+    public CTARuleTemplateType getRuleTemplateType() {
+        return ruleTemplateType;
+    }
+
+    public void setRuleTemplateType(CTARuleTemplateType ruleTemplateType) {
+        this.ruleTemplateType = ruleTemplateType;
+    }
+
+
+    public List<TimeType> getTimeTypes() {
         return timeTypes;
     }
 
-    public void setTimeTypes(List<Long> timeTypes) {
+    public void setTimeTypes(List<TimeType> timeTypes) {
         this.timeTypes = timeTypes;
     }
+
     public User getCreatedBy() {
         return createdBy;
     }
@@ -211,14 +220,13 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append(compensationTable, that.compensationTable)
                 .append(calculateValueAgainst, that.calculateValueAgainst)
                 .append(approvalWorkFlow, that.approvalWorkFlow)
-                .append(dayTypes, that.dayTypes)
                 .append(phaseInfo, that.phaseInfo)
                 .append(budgetType, that.budgetType)
                 .append(calculateValueIfPlanned, that.calculateValueIfPlanned)
                 .append(employmentTypes, that.employmentTypes)
                 .append(activityType, that.activityType)
                 .append(planningCategory, that.planningCategory)
-                .append(function, that.function)
+                .append(staffFunction, that.staffFunction)
                 .append(plannedTimeWithFactor, that.plannedTimeWithFactor)
                 .append(timeTypes, that.timeTypes)
                 .append(createdBy, that.createdBy)
@@ -235,14 +243,13 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append(compensationTable)
                 .append(calculateValueAgainst)
                 .append(approvalWorkFlow)
-                .append(dayTypes)
                 .append(phaseInfo)
                 .append(budgetType)
                 .append(calculateValueIfPlanned)
                 .append(employmentTypes)
                 .append(activityType)
                 .append(planningCategory)
-                .append(function)
+                .append(staffFunction)
                 .append(plannedTimeWithFactor)
                 .append(timeTypes)
                 .append(createdBy)
@@ -259,14 +266,13 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append("compensationTable", compensationTable)
                 .append("calculateValueAgainst", calculateValueAgainst)
                 .append("approvalWorkFlow", approvalWorkFlow)
-                .append("dayTypes", dayTypes)
                 .append("phaseInfo", phaseInfo)
                 .append("budgetType", budgetType)
                 .append("calculateValueIfPlanned", calculateValueIfPlanned)
                 .append("employmentTypes", employmentTypes)
                 .append("activityType", activityType)
                 .append("planningCategory", planningCategory)
-                .append("function", function)
+                .append("staffFunction", staffFunction)
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)
                 .append("timeTypes", timeTypes)
                 .append("createdBy", createdBy)

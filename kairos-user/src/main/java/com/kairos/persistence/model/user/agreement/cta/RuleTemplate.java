@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.neo4j.ogm.annotation.Relationship;
@@ -11,6 +12,7 @@ public abstract class RuleTemplate extends UserBaseEntity {
     protected String name;
     protected String description;
     protected boolean disabled;
+    @JsonManagedReference
     @Relationship(type = HAS_RULE_TEMPLATES,direction =UNDIRECTED)
     protected RuleTemplateCategory ruleTemplateCategory;
 

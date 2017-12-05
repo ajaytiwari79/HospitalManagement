@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.user.agreement.wta.templates;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -32,8 +34,10 @@ public class RuleTemplateCategory extends UserBaseEntity {
     @NotNull(message = "error.RuleTemplate.description.name.notnull")
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
+    @JsonIgnore
     @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY,direction =UNDIRECTED )
     private Country country;
+    @JsonBackReference
     @Relationship(type = HAS_RULE_TEMPLATES,direction =UNDIRECTED)
     private List<RuleTemplate> ruleTemplates=new ArrayList<>();
     public RuleTemplateCategory(String name, String description, boolean deleted) {

@@ -1,64 +1,87 @@
 package com.kairos.response.dto.web.cta;
 
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.country.Currency;
+import com.kairos.persistence.model.timetype.TimeTypeDTO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CTARuleTemplateDefaultDataWrapper {
-    private List<AccessGroup> accessGroupDTOS=new ArrayList<>();
-    private List<DayTypeDTO> dayTypeDTOS=new ArrayList<>();
-    private List<PhaseDTO> phaseDTOS=new ArrayList<>();
-    private List<TimeTypeDTO> timeTypeDTOS=new ArrayList<>();
-    private List<ActivityTypeDTO> activityTypeDTOS=new ArrayList<>();
-    private List<EmploymentTypeDTO> employmentTypeTypeDTOS=new ArrayList<>();
-    private List<Currency> currencies=new ArrayList<>();
+    private List<AccessGroupDTO> accessGroups=new ArrayList<>();
+    private List<DayTypeDTO> dayTypes=new ArrayList<>();
+    private List<PhaseDTO> phases=new ArrayList<>();
+    private List<TimeTypeDTO> timeTypes=new ArrayList<>();
+    private List<ActivityTypeDTO> activityTypes=new ArrayList<>();
+    private List<EmploymentTypeDTO> employmentTypes=new ArrayList<>();
+    private List<Map<String, Object>>currencies=new ArrayList<>();
+    private List<Map<String, Object>>holidayMapList=new ArrayList<>();
 
 
     public CTARuleTemplateDefaultDataWrapper() {
         //default
     }
 
-    public List<AccessGroup> getAccessGroupDTOS() {
-        return accessGroupDTOS;
+    public List<AccessGroupDTO> getAccessGroups() {
+        return accessGroups;
     }
 
-    public void setAccessGroupDTOS(List<AccessGroup> accessGroupDTOS) {
-        this.accessGroupDTOS = accessGroupDTOS;
+    public void setAccessGroups(List<AccessGroupDTO> accessGroups) {
+        this.accessGroups = accessGroups;
     }
 
-    public List<DayTypeDTO> getDayTypeDTOS() {
-        return dayTypeDTOS;
+    public List<DayTypeDTO> getDayTypes() {
+        return dayTypes;
     }
 
-    public void setDayTypeDTOS(List<DayTypeDTO> dayTypeDTOS) {
-        this.dayTypeDTOS = dayTypeDTOS;
+    public void setDayTypes(List<DayTypeDTO> dayTypes) {
+        this.dayTypes = dayTypes;
     }
 
-    public List<PhaseDTO> getPhaseDTOS() {
-        return phaseDTOS;
+    public List<PhaseDTO> getPhases() {
+        return phases;
     }
 
-    public void setPhaseDTOS(List<PhaseDTO> phaseDTOS) {
-        this.phaseDTOS = phaseDTOS;
+    public void setPhases(List<PhaseDTO> phases) {
+        this.phases = phases;
     }
 
-    public List<TimeTypeDTO> getTimeTypeDTOS() {
-        return timeTypeDTOS;
+    public List<TimeTypeDTO> getTimeTypes() {
+        return timeTypes;
     }
 
-    public void setTimeTypeDTOS(List<TimeTypeDTO> timeTypeDTOS) {
-        this.timeTypeDTOS = timeTypeDTOS;
+    public void setTimeTypes(List<TimeTypeDTO> timeTypes) {
+        this.timeTypes = timeTypes;
     }
 
-    public List<EmploymentTypeDTO> getEmploymentTypeTypeDTOS() {
-        return employmentTypeTypeDTOS;
+    public List<ActivityTypeDTO> getActivityTypes() {
+        return activityTypes;
     }
 
-    public void setEmploymentTypeTypeDTOS(List<EmploymentTypeDTO> employmentTypeTypeDTOS) {
-        this.employmentTypeTypeDTOS = employmentTypeTypeDTOS;
+    public void setActivityTypes(List<ActivityTypeDTO> activityTypes) {
+        this.activityTypes = activityTypes;
     }
 
+    public List<EmploymentTypeDTO> getEmploymentTypes() {
+        return employmentTypes;
+    }
 
+    public void setEmploymentTypes(List<EmploymentTypeDTO> employmentTypes) {
+        this.employmentTypes = employmentTypes;
+    }
+
+    public List<Map<String, Object>> getCurrencies() {
+        return currencies;
+    }
+
+    public void setCurrencies(List<Map<String, Object>> currencies) {
+        this.currencies = currencies;
+    }
+
+    public List<Map<String, Object>> getHolidayMapList() {
+        return holidayMapList;
+    }
+
+    public void setHolidayMapList(List<Map<String, Object>> holidayMapList) {
+        this.holidayMapList = holidayMapList;
+    }
 }

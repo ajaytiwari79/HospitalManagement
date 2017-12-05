@@ -9,10 +9,12 @@ import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraph
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
+import com.kairos.response.dto.web.cta.CTARuleTemplateDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -142,6 +144,16 @@ public class CostTimeAgreementService extends UserBaseService {
         return ctaRuleTemplateCategoryWrapper;
     }
 
+    public void updateCTARuleTemplate(Long countryId,Long id,CTARuleTemplateDTO ctaRuleTemplateDTO){
+
+        //Load reference only
+        RuleTemplateCategory ruleTemplateCategory=
+                ruleTemplateCategoryGraphRepository.findOne(ctaRuleTemplateDTO.getRuleTemplateCategoryId(),0);
+        CTARuleTemplate ctaRuleTemplate= ctaRuleTemplateGraphRepository.findOne(id);
+        BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate);
+
+
+    }
 
 
 }
