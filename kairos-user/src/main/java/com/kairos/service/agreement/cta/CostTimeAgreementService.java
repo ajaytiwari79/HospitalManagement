@@ -1,6 +1,7 @@
 package com.kairos.service.agreement.cta;
 
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplate;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateType;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
@@ -9,7 +10,7 @@ import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraph
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
-import com.kairos.response.dto.web.cta.CTARuleTemplateDTO;
+import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
 import org.slf4j.Logger;
@@ -137,23 +138,33 @@ public class CostTimeAgreementService extends UserBaseService {
                 .collect(Collectors.toList());
         List<Long> ruleTemplateCategoryIds=ctaRuleTemplateCategoryList.parallelStream().map(RuleTemplateCategory::getId)
                 .collect(Collectors.toList());
-        List<CTARuleTemplate> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(ruleTemplateCategoryIds);
+        List<CTARuleTemplateDTO> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(ruleTemplateCategoryIds);
         CTARuleTemplateCategoryWrapper ctaRuleTemplateCategoryWrapper=new CTARuleTemplateCategoryWrapper();
         ctaRuleTemplateCategoryWrapper.getRuleTemplateCategories().addAll(ctaRuleTemplateCategoryList);
         ctaRuleTemplateCategoryWrapper.getRuleTemplates().addAll(ruleTemplates);
         return ctaRuleTemplateCategoryWrapper;
     }
 
-    public void updateCTARuleTemplate(Long countryId,Long id,CTARuleTemplateDTO ctaRuleTemplateDTO){
+    public CTARuleTemplateDTO updateCTARuleTemplate(Long countryId,Long id,CTARuleTemplateDTO ctaRuleTemplateDTO){
 
-        //Load reference only
-        RuleTemplateCategory ruleTemplateCategory=
-                ruleTemplateCategoryGraphRepository.findOne(ctaRuleTemplateDTO.getRuleTemplateCategoryId(),0);
+
         CTARuleTemplate ctaRuleTemplate= ctaRuleTemplateGraphRepository.findOne(id);
-        BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate);
 
+        //
 
+        return ctaRuleTemplateDTO;
     }
 
+    public CTARuleTemplateDTO buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate,CTARuleTemplateDTO ctaRuleTemplateDTO){
+        BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate);
+        //Load reference only
+        RuleTemplateCategory ruleTemplateCategory=
+                ruleTemplateCategoryGraphRepository.findOne(ctaRuleTemplateDTO.getRuleTemplateCategory(),0);
+        List<Long> dayTypes=ctaRuleTemplateDTO.getCalculateOnDayTypes().parallelStream().map(CTARuleTemplateDayTypeDTO::getDayType).collect(Collectors.toList());
+
+        ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategory);
+
+   return null;
+    }
 
 }

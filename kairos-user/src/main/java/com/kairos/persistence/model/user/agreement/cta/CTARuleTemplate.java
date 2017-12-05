@@ -26,7 +26,7 @@ public class CTARuleTemplate extends RuleTemplate{
     private ApprovalWorkFlow approvalWorkFlow;
     @Relationship(type = BELONGS_TO)
     List<CTARuleTemplateDayTypes>calculateOnDayTypes=new ArrayList<>();
-    private PhaseInfo phaseInfo;
+    private List<PhaseInfo>phaseInfo=new ArrayList<>();
     private BudgetType budgetType;
     @Relationship(type = HAS_ACCESS_GROUP)
     private List<AccessGroup> calculateValueIfPlanned=new ArrayList<>();
@@ -105,12 +105,17 @@ public class CTARuleTemplate extends RuleTemplate{
         this.approvalWorkFlow = approvalWorkFlow;
     }
 
-
-    public PhaseInfo getPhaseInfo() {
-        return phaseInfo;
+    public List<CTARuleTemplateDayTypes> getCalculateOnDayTypes() {
+        return calculateOnDayTypes;
     }
 
-    public void setPhaseInfo(PhaseInfo phaseInfo) {
+    public void setCalculateOnDayTypes(List<CTARuleTemplateDayTypes> calculateOnDayTypes) {
+        this.calculateOnDayTypes = calculateOnDayTypes;
+    }
+    public List<PhaseInfo> getPhaseInfo() {
+        return phaseInfo;
+    }
+    public void setPhaseInfo(List<PhaseInfo> phaseInfo) {
         this.phaseInfo = phaseInfo;
     }
 

@@ -4,24 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CTARuleTemplateDayTypeDTO {
-    private Long dayTypeId;
-    private List<Long> countryHolidayCalenderIds =new ArrayList<>();
+    private Long dayType;
+    private List<Long> countryHolidayCalenders =new ArrayList<>();
     public CTARuleTemplateDayTypeDTO() {
     }
-
-    public Long getDayTypeId() {
-        return dayTypeId;
+    public Long getDayType() {
+        return dayType;
+    }
+    public void setDayType(Long dayType) {
+        this.dayType = dayType;
     }
 
-    public void setDayTypeId(Long dayTypeId) {
-        this.dayTypeId = dayTypeId;
+    public List<Long> getCountryHolidayCalenders() {
+        return countryHolidayCalenders;
     }
 
-    public List<Long> getCountryHolidayCalenderIds() {
-        return countryHolidayCalenderIds;
-    }
-
-    public void setCountryHolidayCalenderIds(List<Long> countryHolidayCalenderIds) {
-        this.countryHolidayCalenderIds = countryHolidayCalenderIds;
+    public void setCountryHolidayCalenders(List<Long> countryHolidayCalenders) {
+        this.countryHolidayCalenders = countryHolidayCalenders;
     }
 }

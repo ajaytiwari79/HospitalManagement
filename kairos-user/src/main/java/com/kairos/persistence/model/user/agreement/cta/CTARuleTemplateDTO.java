@@ -1,20 +1,25 @@
-package com.kairos.response.dto.web.cta;
+package com.kairos.persistence.model.user.agreement.cta;
 
-import com.kairos.persistence.model.user.agreement.cta.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@QueryResult
 public class CTARuleTemplateDTO {
     @NotNull
     public Long id;
-    public boolean deleted;
     public String name;
     public String description;
     public boolean disabled;
     @NotNull
-    public Long ruleTemplateCategoryId;
+    public Long ruleTemplateCategory;
     private CTARuleTemplateType ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
@@ -22,16 +27,16 @@ public class CTARuleTemplateDTO {
     private CompensationTable compensationTable;
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-    private CTARuleTemplateDayTypeDTO ctaRuleTemplateDayTypeDTO;
-    private PhaseInfo phaseInfo;
+    private List<CTARuleTemplateDayTypeDTO>calculateOnDayTypes=new ArrayList<>();
+    private List<PhaseInfo> phaseInfo=new ArrayList<>();
     private BudgetType budgetType;
-    private List<Long> calculateValueIfPlannedIds =new ArrayList<>();
-    private List<Long> employmentTypeIds =new ArrayList<>();
+    private List<Long> calculateValueIfPlanned =new ArrayList<>();
+    private List<Long> employmentTypes =new ArrayList<>();
     private ActivityType activityType;
     private PlanningCategory planningCategory;
     private StaffFunction staffFunction;
     private PlannedTimeWithFactor plannedTimeWithFactor;
-    private List<Long> timeTypeIds =new ArrayList<>();
+    private List<Long> timeTypes =new ArrayList<>();
 
     public CTARuleTemplateDTO() {
     }
@@ -43,15 +48,6 @@ public class CTARuleTemplateDTO {
     public void setId(Long id) {
         this.id = id;
     }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
     public String getName() {
         return name;
     }
@@ -76,12 +72,12 @@ public class CTARuleTemplateDTO {
         this.disabled = disabled;
     }
 
-    public Long getRuleTemplateCategoryId() {
-        return ruleTemplateCategoryId;
+    public Long getRuleTemplateCategory() {
+        return ruleTemplateCategory;
     }
 
-    public void setRuleTemplateCategory(Long ruleTemplateCategoryId) {
-        this.ruleTemplateCategoryId = ruleTemplateCategoryId;
+    public void setRuleTemplateCategory(Long ruleTemplateCategory) {
+        this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
     public CTARuleTemplateType getRuleTemplateType() {
@@ -140,22 +136,20 @@ public class CTARuleTemplateDTO {
         this.approvalWorkFlow = approvalWorkFlow;
     }
 
-    public CTARuleTemplateDayTypeDTO getCtaRuleTemplateDayTypeDTO() {
-        return ctaRuleTemplateDayTypeDTO;
+    public List<CTARuleTemplateDayTypeDTO> getCalculateOnDayTypes() {
+        return calculateOnDayTypes;
     }
 
-    public void setCtaRuleTemplateDayTypeDTO(CTARuleTemplateDayTypeDTO ctaRuleTemplateDayTypeDTO) {
-        this.ctaRuleTemplateDayTypeDTO = ctaRuleTemplateDayTypeDTO;
+    public void setCalculateOnDayTypes(List<CTARuleTemplateDayTypeDTO> calculateOnDayTypes) {
+        this.calculateOnDayTypes = calculateOnDayTypes;
     }
 
-    public PhaseInfo getPhaseInfo() {
+    public List<PhaseInfo> getPhaseInfo() {
         return phaseInfo;
     }
-
-    public void setPhaseInfo(PhaseInfo phaseInfo) {
+    public void setPhaseInfo(List<PhaseInfo> phaseInfo) {
         this.phaseInfo = phaseInfo;
     }
-
     public BudgetType getBudgetType() {
         return budgetType;
     }
@@ -164,20 +158,20 @@ public class CTARuleTemplateDTO {
         this.budgetType = budgetType;
     }
 
-    public List<Long> getCalculateValueIfPlannedIds() {
-        return calculateValueIfPlannedIds;
+    public List<Long> getCalculateValueIfPlanned() {
+        return calculateValueIfPlanned;
     }
 
-    public void setCalculateValueIfPlannedIds(List<Long> calculateValueIfPlannedIds) {
-        this.calculateValueIfPlannedIds = calculateValueIfPlannedIds;
+    public void setCalculateValueIfPlanned(List<Long> calculateValueIfPlanned) {
+        this.calculateValueIfPlanned = calculateValueIfPlanned;
     }
 
-    public List<Long> getEmploymentTypeIds() {
-        return employmentTypeIds;
+    public List<Long> getEmploymentTypes() {
+        return employmentTypes;
     }
 
-    public void setEmploymentTypeIds(List<Long> employmentTypeIds) {
-        this.employmentTypeIds = employmentTypeIds;
+    public void setEmploymentTypes(List<Long> employmentTypes) {
+        this.employmentTypes = employmentTypes;
     }
 
     public ActivityType getActivityType() {
@@ -212,11 +206,39 @@ public class CTARuleTemplateDTO {
         this.plannedTimeWithFactor = plannedTimeWithFactor;
     }
 
-    public List<Long> getTimeTypeIds() {
-        return timeTypeIds;
+    public List<Long> getTimeTypes() {
+        return timeTypes;
     }
 
-    public void setTimeTypeIds(List<Long> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
+    public void setTimeTypes(List<Long> timeTypes) {
+        this.timeTypes = timeTypes;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("name", name)
+                .append("description", description)
+                .append("disabled", disabled)
+                .append("ruleTemplateCategory", ruleTemplateCategory)
+                .append("ruleTemplateType", ruleTemplateType)
+                .append("payrollType", payrollType)
+                .append("payrollSystem", payrollSystem)
+                .append("calculationUnit", calculationUnit)
+                .append("compensationTable", compensationTable)
+                .append("calculateValueAgainst", calculateValueAgainst)
+                .append("approvalWorkFlow", approvalWorkFlow)
+                .append("ctaRuleTemplateDayTypeDTO", calculateOnDayTypes)
+                .append("phaseInfo", phaseInfo)
+                .append("budgetType", budgetType)
+                .append("calculateValueIfPlanned", calculateValueIfPlanned)
+                .append("employmentTypes", employmentTypes)
+                .append("activityType", activityType)
+                .append("planningCategory", planningCategory)
+                .append("staffFunction", staffFunction)
+                .append("plannedTimeWithFactor", plannedTimeWithFactor)
+                .append("timeTypes", timeTypes)
+                .toString();
     }
 }

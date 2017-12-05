@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.cta;
 
-import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 public class CTARuleTemplateCategoryWrapper {
     private List<RuleTemplateCategory> ruleTemplateCategories=new ArrayList<>();
-    private List<RuleTemplate> ruleTemplates=new ArrayList<>();
+    private List<CTARuleTemplateDTO> ruleTemplates=new ArrayList<>();
 
     public List<RuleTemplateCategory> getRuleTemplateCategories() {
         return ruleTemplateCategories;
@@ -19,11 +19,11 @@ public class CTARuleTemplateCategoryWrapper {
         this.ruleTemplateCategories = ruleTemplateCategories;
     }
 
-    public List<RuleTemplate> getRuleTemplates() {
+    public List<CTARuleTemplateDTO> getRuleTemplates() {
         return ruleTemplates;
     }
 
-    public void setRuleTemplates(List<RuleTemplate> ruleTemplates) {
+    public void setRuleTemplates(List<CTARuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 

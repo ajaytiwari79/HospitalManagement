@@ -1,6 +1,6 @@
 package com.kairos.controller.agreement.cta;
 
-import com.kairos.response.dto.web.cta.CTARuleTemplateDTO;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -39,7 +39,7 @@ public class CostTimeAgreementRuleTemplateController {
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> updateCTARuleTemplate(@PathVariable Long countryId
             ,@RequestBody @Valid CTARuleTemplateDTO ctaRuleTemplateDTO,@PathVariable Long id ) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.loadAllCTARuleTemplateByCountry(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.updateCTARuleTemplate(countryId,id,ctaRuleTemplateDTO));
     }
 
 
