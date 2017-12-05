@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.organization;
 
-import com.kairos.persistence.model.organization.OrganizationTimeSlotRelationship;
-import com.kairos.persistence.model.organization.TimeSlot;
+import com.kairos.persistence.model.organization.time_slot.OrganizationTimeSlotRelationship;
+import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;

@@ -3,9 +3,9 @@ package com.kairos.service.organization;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.InvalidTimeSlotException;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationTimeSlotRelationship;
-import com.kairos.persistence.model.organization.TimeSlot;
-import com.kairos.persistence.model.organization.TimeSlotDTO;
+import com.kairos.persistence.model.organization.time_slot.OrganizationTimeSlotRelationship;
+import com.kairos.persistence.model.organization.time_slot.TimeSlot;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTimeSlotGraphRepository;
 import com.kairos.persistence.repository.organization.TimeSlotGraphRepository;
@@ -17,11 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalField;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;

@@ -1,7 +1,9 @@
-package com.kairos.persistence.model.organization;
+package com.kairos.persistence.model.organization.time_slot;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;

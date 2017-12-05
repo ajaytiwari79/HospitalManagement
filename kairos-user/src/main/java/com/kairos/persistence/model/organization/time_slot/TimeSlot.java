@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.organization;
+package com.kairos.persistence.model.organization.time_slot;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -10,6 +10,21 @@ import org.neo4j.ogm.annotation.NodeEntity;
 public class TimeSlot extends UserBaseEntity {
 
     private String name;
+    private int startHour;
+    private int startMinute;
+    private int endHour;
+    private int endMinute;
+    private boolean isShiftStartTime;
+
+    public TimeSlot(String name, int startHour, int startMinute, int endHour, int endMinute,
+                    TYPE timeSlotType) {
+        this.name = name;
+        this.startHour = startHour;
+        this.startMinute = startMinute;
+        this.endHour = endHour;
+        this.endMinute = endMinute;
+        this.timeSlotType = timeSlotType;
+    }
 
     public String getName() {
         return name;
@@ -37,6 +52,14 @@ public class TimeSlot extends UserBaseEntity {
 
     public void setKmdExternalId(Long kmdExternalId) {
         this.kmdExternalId = kmdExternalId;
+    }
+
+    public boolean isShiftStartTime() {
+        return isShiftStartTime;
+    }
+
+    public void setShiftStartTime(boolean shiftStartTime) {
+        isShiftStartTime = shiftStartTime;
     }
 
     public enum TYPE{

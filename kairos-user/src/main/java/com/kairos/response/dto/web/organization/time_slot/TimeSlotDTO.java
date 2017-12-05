@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.organization;
+package com.kairos.response.dto.web.organization.time_slot;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.NotEmpty;
