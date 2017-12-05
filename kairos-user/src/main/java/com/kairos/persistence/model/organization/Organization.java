@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.client.ContactAddress;
@@ -168,6 +169,10 @@ public class Organization extends UserBaseEntity {
 
     @Relationship(type = HAS_WTA)
     private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
+
+    @Relationship
+    private List<TimeSlotSet> timeSlotSets = new ArrayList<>();
+
     public Level getLevel() {
         return level;
     }
@@ -746,5 +751,13 @@ public class Organization extends UserBaseEntity {
 
     public void setShowCountryTags(boolean showCountryTags) {
         this.showCountryTags = showCountryTags;
+    }
+
+    public List<TimeSlotSet> getTimeSlotSets() {
+        return timeSlotSets;
+    }
+
+    public void setTimeSlotSets(List<TimeSlotSet> timeSlotSets) {
+        this.timeSlotSets = timeSlotSets;
     }
 }

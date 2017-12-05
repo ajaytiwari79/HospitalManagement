@@ -16,6 +16,13 @@ public class TimeSlot extends UserBaseEntity {
     private int endMinute;
     private boolean isShiftStartTime;
 
+    public TimeSlot(String name, int startHour, int endHour, TYPE timeSlotType) {
+        this.name = name;
+        this.startHour = startHour;
+        this.endHour = endHour;
+        this.timeSlotType = timeSlotType;
+    }
+
     public TimeSlot(String name, int startHour, int startMinute, int endHour, int endMinute,
                     TYPE timeSlotType) {
         this.name = name;

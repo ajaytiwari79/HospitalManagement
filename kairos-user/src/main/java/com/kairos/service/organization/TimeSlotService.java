@@ -5,6 +5,7 @@ import com.kairos.custom_exception.InvalidTimeSlotException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.OrganizationTimeSlotRelationship;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTimeSlotGraphRepository;
@@ -17,10 +18,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.persistence.model.organization.time_slot.TimeSlot.TYPE.STANDARD;
 
 /**
  * Created by oodles on 18/10/16.
@@ -121,7 +124,7 @@ public class TimeSlotService extends UserBaseService {
     private Map<String,Object> prepareTimeSlotResponse(Organization unit){
         List<Map<String,Object>> timeSlots;
         if(unit.isStandardTimeSlot()){
-            List<Map<String,Object>> standredTimeSlots = timeSlotGraphRepository.getTimeSlots(unit.getId(), TimeSlot.TYPE.STANDARD);
+            List<Map<String,Object>> standredTimeSlots = timeSlotGraphRepository.getTimeSlots(unit.getId(), STANDARD);
             timeSlots = new ArrayList<>(standredTimeSlots.size());
             for(Map<String,Object> standredTimeSlot : standredTimeSlots){
                 timeSlots.add((Map<String,Object>) standredTimeSlot.get("timeSlot"));
@@ -140,25 +143,27 @@ public class TimeSlotService extends UserBaseService {
     }
 
     public void createDefaultTimeSlots(Organization organization){
-
-        List<TimeSlot> timeSlots = timeSlotGraphRepository.findByTimeSlotType(TimeSlot.TYPE.STANDARD);
-        for(TimeSlot timeSlot :timeSlots){
-            OrganizationTimeSlotRelationship organizationTimeSlotRelationship = new OrganizationTimeSlotRelationship();
-            if(DAY.equals(timeSlot.getName())){
-                organizationTimeSlotRelationship.setStartHour(DAY_START_HOUR);
-                organizationTimeSlotRelationship.setEndHour(DAY_END_HOUR);
-                organizationTimeSlotRelationship.setShiftStartTime(true);
-            } else if(EVENING.equals(timeSlot.getName())){
-                organizationTimeSlotRelationship.setStartHour(EVENING_START_HOUR);
-                organizationTimeSlotRelationship.setEndHour(EVENING_END_HOUR);
-            }  else if(NIGHT.equals(timeSlot.getName())){
-                organizationTimeSlotRelationship.setStartHour(NIGHT_START_HOUR);
-                organizationTimeSlotRelationship.setEndHour(NIGHT_END_HOUR);
+        List<TimeSlot> timeSlots = new ArrayList<>();
+        for(String timeSlotType :Arrays.asList(DAY,EVENING,NIGHT)){
+            TimeSlot timeSlot;
+            if(DAY.equals(timeSlotType)){
+                timeSlot = new TimeSlot(timeSlotType,DAY_START_HOUR,DAY_END_HOUR, STANDARD);
+                timeSlot.setShiftStartTime(true);
+            } else if(EVENING.equals(timeSlotType)){
+                timeSlot = new TimeSlot(timeSlotType,EVENING_START_HOUR,EVENING_END_HOUR, STANDARD);
+            }  else if(NIGHT.equals(timeSlotType)){
+                timeSlot = new TimeSlot(timeSlotType,NIGHT_START_HOUR,NIGHT_END_HOUR, STANDARD);
+            } else {
+                throw new InternalError("Invalid time slot value ");
             }
-            organizationTimeSlotRelationship.setOrganization(organization);
-            organizationTimeSlotRelationship.setTimeSlot(timeSlot);
-            save(organizationTimeSlotRelationship);
+            timeSlots.add(timeSlot);
         }
+        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now());
+        timeSlotSet.setTimeSlots(timeSlots);
+        List<TimeSlotSet> timeSlotSets = organization.getTimeSlotSets();
+        timeSlotSets.add(timeSlotSet);
+        organization.setTimeSlotSets(timeSlotSets);
+        save(organization);
     }
 
     private void validateTimeSlot(long unitId,OrganizationTimeSlotRelationship objToCreate,TimeSlot.TYPE type){
