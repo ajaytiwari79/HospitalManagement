@@ -344,6 +344,7 @@ public class SkillService extends UserBaseService {
         }
     }*/
 
+
     public boolean updateSkillOfOrganization(long unitId, long skillId, String type, OrganizationSkillDTO organizationSkillDTO) {
         
         if(ORGANIZATION.equalsIgnoreCase(type)){

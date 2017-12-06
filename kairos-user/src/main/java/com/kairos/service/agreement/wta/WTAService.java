@@ -84,12 +84,7 @@ public class WTAService extends UserBaseService {
 
         wta = prepareWta(countryId, wtaDTO, wtaRuleTemplateQueryResponseArrayList);
         // Link tags to WTA
-        List<Long> tagsIds = new ArrayList<Long>();
-        for (  TagDTO tagDTO :  wtaDTO.getTags() ) {
-            tagsIds.add(tagDTO.getId());
-        }
-        wta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(tagsIds, MasterDataTypeEnum.WTA));
-//        wta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
+        wta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
 
         wta.setCountry(country);
         save(wta);
@@ -255,12 +250,7 @@ public class WTAService extends UserBaseService {
             }
             oldWta.setEndDateMillis(wtaDTO.getEndDateMillis());
         }
-        List<Long> tagsIds = new ArrayList<Long>();
-        for (  TagDTO tagDTO :  wtaDTO.getTags() ) {
-            tagsIds.add(tagDTO.getId());
-        }
-        oldWta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(tagsIds, MasterDataTypeEnum.WTA));
-//        oldWta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
+        oldWta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
         save(oldWta);
     }
 
