@@ -37,13 +37,19 @@ public interface FeatureGraphRepository extends GraphRepository<Feature>{
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature)\n" +
             "WHERE id(feature)={0} AND id(country) = {1} \n" +
-            "SET feature.name={2},feature.description={3}, feature.lastModificationDate={4} return feature")
-    Feature updateFeature(Long featureId, Long countryId, String name, String description, long lastModificationDate);
+            "SET feature.name={2},feature.description={3}, feature.lastModificationDate={4}\n" +
+            "return id(feature) as id, feature.name as name, feature.description as description")
+    FeatureQueryResult updateFeature(Long featureId, Long countryId, String name, String description, long lastModificationDate);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature)\n" +
             "WHERE id(country)={0} AND feature.deleted= {1} AND lower(feature.name) contains lower({2})\n" +
             "return id(feature) as id, feature.name as name, feature.description as description")
     List<FeatureQueryResult> getListOfFeatures(Long countryId , boolean deleted, String searchTextRegex);
+
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature)\n" +
+            "WHERE id(country)={0} AND feature.deleted= {1} AND id(feature) IN {2}\n" +
+            "return feature")
+    List<Feature> getListOfFeaturesByIds(Long countryId , boolean deleted, List<Long> featureIds);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_FEATURE+"]->(feature:Feature)\n"+
             "WHERE id(country)={0} AND feature.name = {1} AND feature.deleted= {2} return feature")

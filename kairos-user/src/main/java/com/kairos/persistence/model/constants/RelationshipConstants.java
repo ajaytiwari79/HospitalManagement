@@ -189,6 +189,8 @@ public class RelationshipConstants {
 
     public final static  String BELONGS_TO_STAFF="BELONGS_TO_STAFF";
     public final static String UNAVAILABLE_ON = "UNAVAILABLE_ON";
+
+    public final static String VEHICLE_HAS_FEATURE = "VEHICLE_HAS_FEATURE";
     /**
      * Default constructor
      */
