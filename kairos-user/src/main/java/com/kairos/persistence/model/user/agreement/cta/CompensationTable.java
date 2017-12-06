@@ -1,9 +1,12 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
+import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
+
 import java.util.ArrayList;
 import java.util.List;
-
-public class CompensationTable {
+@NodeEntity
+public class CompensationTable extends UserBaseEntity {
     private int granularityLevel;
     private CompensationMeasurementType compensationMeasurementType;
     private List<CompensationTableInterval>compensationTableInterval=new ArrayList<>();

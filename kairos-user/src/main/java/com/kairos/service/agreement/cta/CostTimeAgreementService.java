@@ -1,28 +1,44 @@
 package com.kairos.service.agreement.cta;
 
+import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
+import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateType;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.TimeType;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.TimeTypeGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
+import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Transactional
 @Service
@@ -36,6 +52,12 @@ public class CostTimeAgreementService extends UserBaseService {
     CountryGraphRepository countryGraphRepository;
     private @Autowired
     CTARuleTemplateGraphRepository ctaRuleTemplateGraphRepository;
+    private @Autowired AsynchronousService asynchronousService;
+    private @Autowired DayTypeGraphRepository dayTypeGraphRepository;
+    private @Autowired  EmploymentTypeGraphRepository employmentTypeGraphRepository;
+    private @Autowired AccessGroupRepository accessGroupRepository;
+    private @Autowired TimeTypeGraphRepository timeTypeGraphRepository;
+
 
     public void createDefaultCtaRuleTemplate() {
         RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
@@ -145,26 +167,67 @@ public class CostTimeAgreementService extends UserBaseService {
         return ctaRuleTemplateCategoryWrapper;
     }
 
-    public CTARuleTemplateDTO updateCTARuleTemplate(Long countryId,Long id,CTARuleTemplateDTO ctaRuleTemplateDTO){
-
+    public CTARuleTemplateDTO updateCTARuleTemplate(Long countryId,Long id,CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
 
         CTARuleTemplate ctaRuleTemplate= ctaRuleTemplateGraphRepository.findOne(id);
-
-        //
-
+        this.buildCTARuleTemplate(ctaRuleTemplate,ctaRuleTemplateDTO);
+        this.save(ctaRuleTemplate);
         return ctaRuleTemplateDTO;
     }
 
-    public CTARuleTemplateDTO buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate,CTARuleTemplateDTO ctaRuleTemplateDTO){
+    public CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate,CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
         BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate);
+        CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
+                .buildTimeTypesEmploymentTypeAndAccessGroups(ctaRuleTemplate,ctaRuleTemplateDTO);
         //Load reference only
         RuleTemplateCategory ruleTemplateCategory=
                 ruleTemplateCategoryGraphRepository.findOne(ctaRuleTemplateDTO.getRuleTemplateCategory(),0);
-        List<Long> dayTypes=ctaRuleTemplateDTO.getCalculateOnDayTypes().parallelStream().map(CTARuleTemplateDayTypeDTO::getDayType).collect(Collectors.toList());
+        List<Long> dayTypesIds=ctaRuleTemplateDTO.getCalculateOnDayTypes().parallelStream().map(CTARuleTemplateDayTypeDTO::getDayType).collect(Collectors.toList());
+        Iterable<DayType>dayTypeList=dayTypeGraphRepository.findAll(dayTypesIds,0);
+
+        List<Long> countryHolidayCalendersIds=ctaRuleTemplateDTO.getCalculateOnDayTypes().parallelStream()
+                .map(CTARuleTemplateDayTypeDTO::getCountryHolidayCalenders).flatMap(countryHolidayCalenders ->
+                {return countryHolidayCalenders.stream();}).collect(Collectors.toList());
 
         ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategory);
 
-   return null;
+        // Wait until they are all done
+        CompletableFuture.allOf(hasUpdated).join();
+
+     return ctaRuleTemplate;
     }
+    @Async
+    public CompletableFuture<Boolean> buildTimeTypesEmploymentTypeAndAccessGroups
+            (CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO)
+            throws InterruptedException, ExecutionException {
+
+     Callable<List<TimeType>> timeTypesTask=()->{
+        Iterable<TimeType> timeTypes=timeTypeGraphRepository.findAll(ctaRuleTemplateDTO.getTimeTypes(),0);
+        return  StreamSupport.stream(timeTypes.spliterator(), true).collect(Collectors.toList());
+    };
+
+    Future<List<TimeType>>timeTypesFuture=asynchronousService.executeAsynchronously(timeTypesTask);
+
+    Callable<List<EmploymentType>> employmentTypesTask=()->{
+        Iterable<EmploymentType> employmentTypes=employmentTypeGraphRepository.findAll(ctaRuleTemplateDTO.getEmploymentTypes(),0);
+        return  StreamSupport.stream(employmentTypes.spliterator(), true).collect(Collectors.toList());
+    };
+
+    Future<List<EmploymentType>>employmentTypesFuture=asynchronousService.executeAsynchronously(employmentTypesTask);
+
+    Callable<List<AccessGroup>> accessGroupsTask=()->{
+        Iterable<AccessGroup>   accessGroups=accessGroupRepository.findAll(ctaRuleTemplateDTO.getCalculateValueIfPlanned(),0);
+        return  StreamSupport.stream(accessGroups.spliterator(), true).collect(Collectors.toList());
+
+
+    };
+    Future<List<AccessGroup>>accessGroupsFuture=asynchronousService.executeAsynchronously(accessGroupsTask);
+    //set data
+    ctaRuleTemplate.setTimeTypes(timeTypesFuture.get());
+    ctaRuleTemplate.setEmploymentTypes(employmentTypesFuture.get());
+    ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupsFuture.get());
+    return CompletableFuture.completedFuture(true);
+    }
+
 
 }

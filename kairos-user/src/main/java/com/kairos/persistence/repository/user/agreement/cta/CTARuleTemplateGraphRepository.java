@@ -19,8 +19,16 @@ public interface CTARuleTemplateGraphRepository  extends GraphRepository<CTARule
          " optional  MATCH (p)-[:`HAS_ACCESS_GROUP`]-(accessGroup:`AccessGroup`) "+
          " optional  MATCH (p)-[:`HAS_EMPLOYMENT_TYPE`]-(employmentType:`EmploymentType`) "+
          " optional  MATCH (p)-[:`HAS_TIME_TYPES`]-(timeType:`TimeType`) "+
+         " optional  MATCH (p)-[:`BELONGS_TO`]-(compensationTable:`CompensationTable`) "+
+         " optional  MATCH (p)-[:`BELONGS_TO`]-(calculateValueAgainst:`CalculateValueAgainst`) "+
+         " optional  MATCH (calculateValueAgainst)-[:`BELONGS_TO`]-(fixedValue:`FixedValue`) "+
+         " optional  MATCH (fixedValue)-[:`BELONGS_TO`]-(currency:`Currency`) "+
+         " optional  MATCH (p)-[:`BELONGS_TO`]-(cTARuleTemplatePhaseInfo:`CTARuleTemplatePhaseInfo`) "+
+         " optional  MATCH (p)-[:`BELONGS_TO`]-(activityType:`ActivityType`) "+
+         " optional  MATCH (p)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`) "+
          " with p,m0,cTARuleTemplateDayTypes,dayType,accessGroup,timeType,employmentType,countryHolidayCalender,"+
-         " collect(ID(countryHolidayCalender)) as holidaysIds"+
+         "compensationTable,calculateValueAgainst,fixedValue,currency,cTARuleTemplatePhaseInfo,activityType,plannedTimeWithFactor"+
+         ", collect(ID(countryHolidayCalender)) as holidaysIds"+
          " RETURN p.name as name ,"+
          "p.description as description,"+
          "p.disabled as disabled,"+
@@ -29,18 +37,18 @@ public interface CTARuleTemplateGraphRepository  extends GraphRepository<CTARule
          "p.payrollType as payrollType ,"+
          "p.payrollSystem as payrollSystem ,"+
          "p.calculationUnit as calculationUnit ,"+
-         "p.compensationTable as compensationTable ,"+
-         "p.calculateValueAgainst as calculateValueAgainst ,"+
+         "compensationTable as compensationTable ,"+
+         "calculateValueAgainst as calculateValueAgainst ,"+
          "p.approvalWorkFlow as approvalWorkFlow ,"+
          "collect({dayType:ID(dayType),countryHolidayCalenders:holidaysIds}) as calculateOnDayTypes ,"+
-         "p.phaseInfo as phaseInfo ,"+
+         "collect(cTARuleTemplatePhaseInfo) as phaseInfo ,"+
          "p.budgetType as budgetType ,"+
          "collect(ID(accessGroup)) as calculateValueIfPlanned ,"+
          "collect(ID(employmentType)) as employmentTypes ,"+
-         "p.activityType as activityType ,"+
+         "activityType as activityType ,"+
          "p.planningCategory as planningCategory ,"+
          "p.staffFunction as staffFunction ,"+
-         "p.plannedTimeWithFactor as plannedTimeWithFactor ,"+
+         "plannedTimeWithFactor as plannedTimeWithFactor ,"+
          "collect(ID(timeType)) as timeTypes,"+
          "ID(p) as id")
     List<CTARuleTemplateDTO>findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(List<Long> categoryList);

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
 @RestController
@@ -38,7 +39,7 @@ public class CostTimeAgreementRuleTemplateController {
     @RequestMapping(value = "/cta/rule-template/{id}", method = RequestMethod.PUT)
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> updateCTARuleTemplate(@PathVariable Long countryId
-            ,@RequestBody @Valid CTARuleTemplateDTO ctaRuleTemplateDTO,@PathVariable Long id ) {
+            ,@RequestBody @Valid CTARuleTemplateDTO ctaRuleTemplateDTO,@PathVariable Long id ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.updateCTARuleTemplate(countryId,id,ctaRuleTemplateDTO));
     }
 

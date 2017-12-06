@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -9,7 +8,6 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
 public class CTARuleTemplateDTO {
@@ -28,7 +26,7 @@ public class CTARuleTemplateDTO {
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
     private List<CTARuleTemplateDayTypeDTO>calculateOnDayTypes=new ArrayList<>();
-    private List<PhaseInfo> phaseInfo=new ArrayList<>();
+    private List<CTARuleTemplatePhaseInfo> phaseInfo=new ArrayList<>();
     private BudgetType budgetType;
     private List<Long> calculateValueIfPlanned =new ArrayList<>();
     private List<Long> employmentTypes =new ArrayList<>();
@@ -144,10 +142,10 @@ public class CTARuleTemplateDTO {
         this.calculateOnDayTypes = calculateOnDayTypes;
     }
 
-    public List<PhaseInfo> getPhaseInfo() {
+    public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
         return phaseInfo;
     }
-    public void setPhaseInfo(List<PhaseInfo> phaseInfo) {
+    public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
         this.phaseInfo = phaseInfo;
     }
     public BudgetType getBudgetType() {

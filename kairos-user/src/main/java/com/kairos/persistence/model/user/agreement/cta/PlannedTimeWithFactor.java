@@ -1,8 +1,10 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
+import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Transient;
-
-public class PlannedTimeWithFactor {
+@NodeEntity
+public class PlannedTimeWithFactor extends UserBaseEntity{
     private float scale;
     private boolean add;
     @Transient

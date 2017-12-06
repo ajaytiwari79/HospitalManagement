@@ -39,9 +39,9 @@ public class RuleTemplateCategoryController {
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
     }
 
-    @RequestMapping(value = "/template_category", method = RequestMethod.GET)
-    ResponseEntity<Map<String, Object>> getRulesTemplate(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplateCategory(countryId, RuleTemplateCategoryType.WTA));
+    @RequestMapping(value = "/template_category/{ruleTemplateCategoryType}", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getRulesTemplate(@PathVariable long countryId,@PathVariable RuleTemplateCategoryType ruleTemplateCategoryType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplateCategory(countryId,ruleTemplateCategoryType));
     }
 
     @RequestMapping(value = "/template_category/{templateCategoryId}", method = RequestMethod.DELETE)

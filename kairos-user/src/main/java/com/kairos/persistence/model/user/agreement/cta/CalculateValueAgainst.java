@@ -1,44 +1,20 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+
+@NodeEntity
 public class CalculateValueAgainst {
     private  String calculateValue;
     private float scale;
+    @Relationship(type = BELONGS_TO)
     private FixedValue fixedValue;
-    private  class FixedValue{
-        private float amount;
-        private Long currencyId;
-        private Type type;
-        public float getAmount() {
-            return amount;
-        }
-
-        public void setAmount(float amount) {
-            this.amount = amount;
-        }
-
-        public Long getCurrencyId() {
-            return currencyId;
-        }
-
-        public void setCurrencyId(Long currencyId) {
-            this.currencyId = currencyId;
-        }
-        public Type getType() {
-            return type;
-        }
-
-        public void setType(Type type) {
-            this.type = type;
-        }
-
-    }
 
     public CalculateValueAgainst() {
         //default constractor
     }
-
-
-
     public String getCalculateValue() {
         return calculateValue;
     }
@@ -63,9 +39,7 @@ public class CalculateValueAgainst {
         this.fixedValue = fixedValue;
     }
 
-    public  enum Type{
-        PER_DAY,PER_ACTIVITY,PER_TASK;
-    }
+
 
 
 }

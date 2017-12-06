@@ -21,20 +21,25 @@ public class CTARuleTemplate extends RuleTemplate{
     private String payrollType;
     private String payrollSystem;
     private CalculationUnit calculationUnit;
+    @Relationship(type = BELONGS_TO)
     private CompensationTable compensationTable;
+    @Relationship(type = BELONGS_TO)
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
     @Relationship(type = BELONGS_TO)
     List<CTARuleTemplateDayTypes>calculateOnDayTypes=new ArrayList<>();
-    private List<PhaseInfo>phaseInfo=new ArrayList<>();
+    @Relationship(type = BELONGS_TO)
+    private List<CTARuleTemplatePhaseInfo>phaseInfo=new ArrayList<>();
     private BudgetType budgetType;
     @Relationship(type = HAS_ACCESS_GROUP)
     private List<AccessGroup> calculateValueIfPlanned=new ArrayList<>();
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private List<EmploymentType> employmentTypes=new ArrayList<>();
+    @Relationship(type = BELONGS_TO)
     private ActivityType activityType;
     private PlanningCategory planningCategory;
     private StaffFunction staffFunction;
+    @Relationship(type = BELONGS_TO)
     private PlannedTimeWithFactor plannedTimeWithFactor;
     @Relationship(type = HAS_TIME_TYPES)
     private List<TimeType>timeTypes=new ArrayList<>();
@@ -112,10 +117,10 @@ public class CTARuleTemplate extends RuleTemplate{
     public void setCalculateOnDayTypes(List<CTARuleTemplateDayTypes> calculateOnDayTypes) {
         this.calculateOnDayTypes = calculateOnDayTypes;
     }
-    public List<PhaseInfo> getPhaseInfo() {
+    public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
         return phaseInfo;
     }
-    public void setPhaseInfo(List<PhaseInfo> phaseInfo) {
+    public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
         this.phaseInfo = phaseInfo;
     }
 
