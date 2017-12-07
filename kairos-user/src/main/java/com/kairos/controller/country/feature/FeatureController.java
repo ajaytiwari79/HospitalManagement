@@ -1,6 +1,7 @@
 package com.kairos.controller.country.feature;
 
 import com.kairos.response.dto.web.feature.FeatureDTO;
+import com.kairos.response.dto.web.feature.VehicleFeaturesDTO;
 import com.kairos.service.country.feature.FeatureService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -59,5 +60,12 @@ public class FeatureController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteCountryTag(@PathVariable long countryId, @PathVariable long featureId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,featureService.deleteFeature(countryId, featureId));
+    }
+
+    @ApiOperation(value = "Update Features of vehicles")
+    @RequestMapping(value = COUNTRY_URL + "/vehicle/{vehicleId}/feature", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateFeaturesOfVehicle(@Validated @RequestBody VehicleFeaturesDTO vehicleFeatureDTO, @PathVariable long countryId, @PathVariable long vehicleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,featureService.updateFeaturesOfVehicle(countryId, vehicleId, vehicleFeatureDTO));
     }
 }

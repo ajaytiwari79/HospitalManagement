@@ -184,9 +184,13 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
     @Query("MATCH (country:Country)-[:"+HAS_RESOURCES+"]->(resources:Vehicle{enabled:true}) where id(country)={0} AND id(resources)={1} return resources")
     Vehicle getResources(long countryId, long resourcesId);
 
-    @Query("MATCH (country:Country)-[:"+HAS_RESOURCES+"]->(resources:Vehicle{enabled:true}) where id(country)={0}\n"+
-            "MATCH (resources)-[:"+VEHICLE_HAS_FEATURE+"]->(feature:Feature{deleted:false}) return resources")
-    List<VehicleQueryResult> getResourcesByCountry(Long countryId);
+    @Query("MATCH (country:Country)-[:HAS_RESOURCES]->(res:Vehicle{enabled:true}) where id(country)={0}\n" +
+            "OPTIONAL MATCH (res)-[:VEHICLE_HAS_FEATURE]->(feature:Feature{deleted:false}) with  feature,res\n" +
+            "return id(res) as id,res.name as name, res.icon as icon, res.description as description, CASE WHEN feature IS NULL THEN [] ELSE collect({id:id(feature) ,name: feature.name, description:feature.description}) END as features")
+    List<VehicleQueryResult> getResourcesWithFeaturesByCountry(Long countryId);
+
+    @Query("MATCH (country:Country)-[:HAS_RESOURCES]->(res:Vehicle{enabled:true}) where id(country)={0} return res")
+    List<Vehicle> getResourcesByCountry(Long countryId);
 
     @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND id(employmentType)={1} return employmentType")
     EmploymentType getEmploymentTypeByCountryAndEmploymentType(long countryId, long employmentTypeId);

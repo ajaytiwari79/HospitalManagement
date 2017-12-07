@@ -3,7 +3,9 @@ package com.kairos.service.country.feature;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.user.country.feature.Feature;
+import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.response.dto.web.feature.FeatureDTO;
+import com.kairos.response.dto.web.feature.VehicleFeaturesDTO;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -23,7 +25,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by prerna on 4/12/17.
@@ -46,6 +50,7 @@ public class FeatureServiceIntegrationTest {
     static Long createdFeatureId;
     static Long orgId = 71L;
     static Long countryId = 53L;
+    static Long vehicleId = 10599L;
 
     @Test
     public void test1_addCountryFeature() throws Exception {
@@ -106,6 +111,33 @@ public class FeatureServiceIntegrationTest {
                 HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
 
         logger.info("response.getBody().getData() : "+response.getBody().getData());
+    }
+
+    @Test
+    public void test5_updateFeaturesOfVehicle() throws Exception {
+        if(createdFeatureId == null){
+            logger.info("Feature Id is null");
+            Feature feature = featureService.getFeatureByName(countryId, nameOfFeauture);
+            createdFeatureId = feature.getId();
+        }
+        String baseUrl=getBaseUrl(orgId,countryId, null);
+        VehicleFeaturesDTO vehicleFeaturesDTO = new VehicleFeaturesDTO();
+        List<Long> featureIds = new ArrayList<>();
+        featureIds.add(createdFeatureId);
+        vehicleFeaturesDTO.setFeatures(featureIds);
+
+        HttpEntity<VehicleFeaturesDTO> requestBodyData = new HttpEntity<>(vehicleFeaturesDTO);
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Vehicle>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Vehicle>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<Vehicle>> response = restTemplate.exchange(
+                baseUrl+"/vehicle/"+vehicleId+"/feature",
+                HttpMethod.PUT, requestBodyData, resTypeReference);
+
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
     }
 
     @Test

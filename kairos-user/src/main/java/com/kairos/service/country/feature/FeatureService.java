@@ -11,6 +11,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FeatureGraphRepository;
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.response.dto.web.feature.FeatureDTO;
+import com.kairos.response.dto.web.feature.VehicleFeaturesDTO;
 import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
@@ -101,12 +102,12 @@ public class FeatureService extends UserBaseService{
         return featuresData;
     }
 
-    public Vehicle updateFeaturesOfVehicle(Long vehicleId, Long countryId, List<Long> featureIds){
+    public Vehicle updateFeaturesOfVehicle(Long countryId, Long vehicleId, VehicleFeaturesDTO vehicleFeaturesDTO){
         Vehicle vehicle = vehicleGraphRepository.findOne(vehicleId,0);
         if (vehicle == null) {
             throw new DataNotFoundByIdException("Incorrect vehicle id " + vehicleId);
         }
-        List<Feature> features = featureGraphRepository.getListOfFeaturesByIds(countryId,false, featureIds);
+        List<Feature> features = featureGraphRepository.getListOfFeaturesByIds(countryId,false, vehicleFeaturesDTO.getFeatures());
         vehicle.setFeatures(features);
         vehicleGraphRepository.save(vehicle);
         return vehicle;
