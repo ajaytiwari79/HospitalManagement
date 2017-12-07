@@ -17,6 +17,7 @@ import com.kairos.response.dto.web.organization.OrganizationServiceDTO;
 import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
+import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.*;
 import com.kairos.service.organization.OrganizationService;
@@ -94,6 +95,8 @@ public class OrganizationController {
     private LanguageService languageService;
     @Inject
     private ClientBatchService clientBatchService;
+    @Inject
+    private PresenceTypeService presenceTypeService;
 
 
     /**
@@ -1172,6 +1175,13 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfSubService(serviceId, unitId, organizationServiceDTO.getCustomName()));
     }
 
+    //
+    @ApiOperation(value = "Get timetype_presencetype by unitID")
+    @RequestMapping(value =UNIT_URL+"/timetype_presencetype", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,presenceTypeService.getAllPresenceTypeAndTimeTypesByUnitId(unitId));
+    }
 }
 
 
