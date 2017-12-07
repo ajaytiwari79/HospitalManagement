@@ -15,14 +15,11 @@ import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,7 +68,7 @@ public class TimeSlotService extends UserBaseService {
         if(!Optional.ofNullable(unit).isPresent()){
             throw new InternalError("Unit is not present");
         }
-        TimeSlotSet timeSlotSet = new TimeSlotSet(timeSlotSetDTO.getName(),timeSlotSetDTO.getStartDate());
+        TimeSlotSet timeSlotSet = new TimeSlotSet(timeSlotSetDTO.getName(),timeSlotSetDTO.getStartDate(),unit.getTimeSlotMode());
         timeSlotSet.setEndDate(timeSlotSetDTO.getEndDate());
         ObjectMapper objectMapper = new ObjectMapper();
         List<TimeSlot> timeSlots = timeSlotSetDTO.getTimeSlots().stream().map(timeSlot -> objectMapper.convertValue(timeSlot,TimeSlot.class)).collect(Collectors.toList());
@@ -119,8 +116,7 @@ public class TimeSlotService extends UserBaseService {
             logger.error("Invalid time slot id " + timeSlotSetId);
             throw new DataNotFoundByIdException("Invalid time slot id");
         }
-        List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findByStartDateBetween(timeSlotSet.getEndDate(),timeSlotSetDTO.getEndDate(),
-                new Sort(Sort.Direction.ASC,"startDate"));
+        List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId,timeSlotSet.getEndDate(),timeSlotSetDTO.getEndDate());
         List<TimeSlotSet> timeSlotSetsToUpdate = new ArrayList<>();
         for(TimeSlotSet timeSlotSetToValidate : timeSlotSetsToValidate){
             if(timeSlotSetToValidate.getEndDate().compareTo(timeSlotSetDTO.getEndDate()) <=0){
@@ -149,8 +145,7 @@ public class TimeSlotService extends UserBaseService {
             logger.error("Invalid time slot id " + timeSlotSetId);
             throw new DataNotFoundByIdException("Invalid time slot id");
         }
-        TimeSlotSet timeSlotSet = timeSlotSetRepository.findByStartDateAfter(timeSlotSetToDelete.getEndDate(),
-                new PageRequest(0,1,new Sort(Sort.DEFAULT_DIRECTION,"startDate")));
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOneByStartDateAfter(unitId,timeSlotSetToDelete.getEndDate());
         if(Optional.ofNullable(timeSlotSet).isPresent()){
             timeSlotSet.setStartDate(timeSlotSetToDelete.getEndDate());
             save(timeSlotSet);
@@ -168,23 +163,11 @@ public class TimeSlotService extends UserBaseService {
     }
 
     private Map<String,Object> prepareTimeSlotResponse(Organization unit){
-        List<Map<String,Object>> timeSlots;
-        if(STANDARD.equals(unit.getTimeSlotMode())){
-            List<Map<String,Object>> standredTimeSlots = timeSlotGraphRepository.getTimeSlots(unit.getId(), STANDARD);
-            timeSlots = new ArrayList<>(standredTimeSlots.size());
-            for(Map<String,Object> standredTimeSlot : standredTimeSlots){
-                timeSlots.add((Map<String,Object>) standredTimeSlot.get("timeSlot"));
-            }
-        } else {
-            List<Map<String,Object>> advanceTimeSlots = timeSlotGraphRepository.getTimeSlots(unit.getId(), ADVANCE);
-            timeSlots = new ArrayList<>(advanceTimeSlots.size());
-            for(Map<String,Object> standredTimeSlot : advanceTimeSlots){
-                timeSlots.add((Map<String,Object>) standredTimeSlot.get("timeSlot"));
-            }
-        }
+
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOneByEndDateAfter(unit.getId(),new Date());
         Map<String,Object> response = new HashMap<>();
-        response.put("timeSlots",timeSlots);
-        response.put("standardTimeSlot",unit.getTimeSlotMode().equals(STANDARD)?true:false);
+        response.put("timeSlots",timeSlotSet.getTimeSlots());
+        response.put("standardTimeSlot",STANDARD.equals(unit.getTimeSlotMode())?true:false);
         return response;
     }
 
@@ -204,7 +187,7 @@ public class TimeSlotService extends UserBaseService {
             }
             timeSlots.add(timeSlot);
         }
-        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, new Date());
+        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, new Date(),organization.getTimeSlotMode());
         timeSlotSet.setTimeSlots(timeSlots);
         List<TimeSlotSet> timeSlotSets = organization.getTimeSlotSets();
         timeSlotSets.add(timeSlotSet);

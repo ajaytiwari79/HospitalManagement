@@ -2,10 +2,7 @@ package com.kairos.service.organization.time_slot;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.persistence.model.organization.ParentOrganizationDTO;
-import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
-import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import org.junit.Assert;
@@ -19,13 +16,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
