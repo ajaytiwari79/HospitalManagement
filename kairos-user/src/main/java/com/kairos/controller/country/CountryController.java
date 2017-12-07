@@ -200,7 +200,7 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateOrganizationType(@PathVariable Long organizationTypeId,
                                                                       @Validated @RequestBody UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateOrganizationType(organizationTypeId,updateOrganizationTypeDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateOrganizationType(organizationTypeId, updateOrganizationTypeDTO));
     }
 
     @ApiOperation(value = "Delete Organization Types")
@@ -1123,14 +1123,15 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/presenceTypeWithTimeType", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByCountry(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByCountry(countryId)) ;
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByCountry(countryId));
     }
 
     @ApiOperation(value = "Get day types by id")
     @RequestMapping(value = "/day_types", method = RequestMethod.POST)
-    public ResponseEntity<Map<String,Object>> getDayTypesById(@RequestBody List<Long> dayTypeIds){
+    public ResponseEntity<Map<String, Object>> getDayTypesById(@RequestBody List<Long> dayTypeIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
     }
+
 
 }
 

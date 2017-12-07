@@ -43,7 +43,6 @@ public class TimeTypeServiceIntegrationTest {
     public void test1_addTimeType() throws Exception {
         String baseUrl = getBaseUrl(71L, 53L);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/timeType/");
-
         String expectedUrl = "http://localhost:8095/kairos/user/api/v1/organization/71/country/53/timeType";
         TimeTypeDTO timeTypeDTO = new TimeTypeDTO(name, "PRESENCE DAY", false, false, false, false);
         HttpEntity<TimeTypeDTO> entity = new HttpEntity<>(timeTypeDTO);
