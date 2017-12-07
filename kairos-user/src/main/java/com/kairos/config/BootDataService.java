@@ -27,6 +27,7 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientLanguageRelationGraphRepository;
@@ -266,10 +267,10 @@ public class BootDataService {
         String timeSlotsNames[] = new String[]{"Day","Evening","Night"};
         TimeSlot timeSlot;
         for(String timeSlotName : timeSlotsNames){
-            timeSlot = new TimeSlot();
-            timeSlot.setName(timeSlotName);
-            timeSlot.setTimeSlotType(TimeSlot.TYPE.STANDARD);
-            timeSlotGraphRepository.save(timeSlot);
+           // timeSlot = new TimeSlot();
+           // timeSlot.setName(timeSlotName);
+           // timeSlot.setTimeSlotTimeSlotMode(TimeSlot.TimeSlotMode.STANDARD);
+            //timeSlotGraphRepository.save(timeSlot);
         }
     }
 

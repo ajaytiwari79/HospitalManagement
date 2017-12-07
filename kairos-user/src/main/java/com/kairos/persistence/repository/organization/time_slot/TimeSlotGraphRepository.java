@@ -1,12 +1,15 @@
-package com.kairos.persistence.repository.organization;
+package com.kairos.persistence.repository.organization.time_slot;
+
+import com.kairos.persistence.model.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_TIME_SLOT;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -14,11 +17,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORGAN
  */
 public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
 
-    List<TimeSlot> findByTimeSlotType(TimeSlot.TYPE type);
-
     @Query("Match (organization:Organization) where id(organization)={0}\n" +
             "Match (organization)-[r:"+ORGANIZATION_TIME_SLOT+"{isEnabled:true}]->(timeSlot:TimeSlot{timeSlotType:{1}}) return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute,isShiftStartTime:r.isShiftStartTime} as timeSlot order by r.startHour")
-    List<Map<String,Object>> getTimeSlots(long unitId, TimeSlot.TYPE type);
+    List<Map<String,Object>> getTimeSlots(long unitId, TimeSlotMode timeSlotMode);
 
     @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND id(timeSlot)={1}\n" +
             "Match (organization)-[r:"+ORGANIZATION_TIME_SLOT+"]->(timeSlot:TimeSlot) set r.startHour={2},r.startMinute={3},r.endHour={4},r.endMinute={5},r.isShiftStartTime={6} return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
@@ -37,7 +38,7 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
     Map<String,Object>  getTimeSlotByUnitIdAndTimeSlotId(long unitId, long timeSlotId);
 
     @Query("Match (n:Organization)-[r:"+ORGANIZATION_TIME_SLOT+"]->(timeSlot:TimeSlot{timeSlotType:{1}}) where id(n)={0} set r.isShiftStartTime=false return r")
-    void updateShiftStartTime(long unitId, TimeSlot.TYPE type);
+    void updateShiftStartTime(long unitId, TimeSlotMode timeSlotMode);
 
     @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND timeSlot.kmdExternalId={1}\n" +
             "Match (organization)-[r:"+ORGANIZATION_TIME_SLOT+"]->(timeSlot:TimeSlot)return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
@@ -57,5 +58,12 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
     @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND timeSlot.kmdExternalId={1}\n" +
             "Match (organization)-[r:ORGANIZATION_TIME_SLOT]->(timeSlot) delete r")
     void removeTimeSlotExistByUnitIdAndTimeSlotId(long unitId, long kmdExternalId);
+
+    @Query("Match (organization:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1},deleted:false}) where id(organization)={0} return timeSlotSet order by timeSlotSet.startDate")
+    List<TimeSlotSet> findTimeSlotsByOrganizationId(Long unitId, TimeSlotMode timeSlotMode);
+
+    @Query("Match (timeSlotSet:TimeSlotSet)-[:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot) where id(timeSlotSet)={0} return timeSlot")
+    List<TimeSlot> findTimeSlotsByTimeSlotSet(Long timeSlotSetId);
+
 
 }

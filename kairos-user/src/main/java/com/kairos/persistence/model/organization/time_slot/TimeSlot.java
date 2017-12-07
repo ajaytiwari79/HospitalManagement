@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.organization.time_slot;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.time_slot.TimeSlotMode;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
@@ -16,21 +18,22 @@ public class TimeSlot extends UserBaseEntity {
     private int endMinute;
     private boolean isShiftStartTime;
 
-    public TimeSlot(String name, int startHour, int endHour, TYPE timeSlotType) {
+    public TimeSlot() {
+        //default constructor
+    }
+
+    public TimeSlot(String name, int startHour, int endHour, TimeSlotMode timeSlotTimeSlotMode) {
         this.name = name;
         this.startHour = startHour;
         this.endHour = endHour;
-        this.timeSlotType = timeSlotType;
     }
 
-    public TimeSlot(String name, int startHour, int startMinute, int endHour, int endMinute,
-                    TYPE timeSlotType) {
+    public TimeSlot(String name, int startHour, int startMinute, int endHour, int endMinute) {
         this.name = name;
         this.startHour = startHour;
         this.startMinute = startMinute;
         this.endHour = endHour;
         this.endMinute = endMinute;
-        this.timeSlotType = timeSlotType;
     }
 
     public String getName() {
@@ -41,16 +44,16 @@ public class TimeSlot extends UserBaseEntity {
         this.name = name;
     }
 
-    private TYPE timeSlotType;
+    private TimeSlotMode timeSlotMode;
 
     private Long kmdExternalId; // for importing time slots from KMD
 
-    public TYPE getTimeSlotType() {
-        return timeSlotType;
+    public TimeSlotMode getTimeSlotMode() {
+        return timeSlotMode;
     }
 
-    public void setTimeSlotType(TYPE timeSlotType) {
-        this.timeSlotType = timeSlotType;
+    public void setTimeSlotMode(TimeSlotMode timeSlotMode) {
+        this.timeSlotMode = timeSlotMode;
     }
 
     public Long getKmdExternalId() {
@@ -69,8 +72,46 @@ public class TimeSlot extends UserBaseEntity {
         isShiftStartTime = shiftStartTime;
     }
 
-    public enum TYPE{
-
-        STANDARD,ADVANCE;
+    public int getStartHour() {
+        return startHour;
     }
+
+    public void setStartHour(int startHour) {
+        this.startHour = startHour;
+    }
+
+    public int getStartMinute() {
+        return startMinute;
+    }
+
+    public void setStartMinute(int startMinute) {
+        this.startMinute = startMinute;
+    }
+
+    public int getEndHour() {
+        return endHour;
+    }
+
+    public void setEndHour(int endHour) {
+        this.endHour = endHour;
+    }
+
+    public int getEndMinute() {
+        return endMinute;
+    }
+
+    public void setEndMinute(int endMinute) {
+        this.endMinute = endMinute;
+    }
+
+    public TimeSlot updateTimeSlot(TimeSlotDTO timeSlotDTO){
+        this.startHour = timeSlotDTO.getStartHour();
+        this.startMinute = timeSlotDTO.getStartMinute();
+        this.endHour = timeSlotDTO.getEndHour();
+        this.endMinute = timeSlotDTO.getEndMinute();
+        this.isShiftStartTime = timeSlotDTO.isShiftStartTime();
+        return this;
+    }
+
+
 }

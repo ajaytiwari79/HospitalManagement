@@ -16,6 +16,7 @@ import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.response.dto.web.organization.OrganizationServiceDTO;
 import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.language.LanguageService;
@@ -342,11 +343,38 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlots(unitId));
     }
 
+    @ApiOperation(value = "Get Organization Time Slots")
+    @RequestMapping(value = "/unit/{unitId}/time_slot_set/{timeSlotId}/time_slot", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeSlots(@PathVariable Long timeSlotSetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotByTimeSlotSet(timeSlotSetId));
+    }
+
+    @ApiOperation(value = "Get Organization Time Slot sets")
+    @RequestMapping(value = "/unit/{unitId}/time_slot_set", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeSlotSets(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotSets(unitId));
+    }
+
     @ApiOperation(value = "create new time slot")
     @RequestMapping(value = "/unit/{unitId}/time_slot", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createTimeSlot(@PathVariable long unitId, @Validated @RequestBody TimeSlotDTO timeSlotDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.createTimeSlot(unitId, timeSlotDTO));
+    public ResponseEntity<Map<String, Object>> createTimeSlot(@PathVariable long unitId, @Validated @RequestBody TimeSlotSetDTO timeSlotSetDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.createTimeSlot(unitId, timeSlotSetDTO));
+    }
+
+    @ApiOperation(value = "delete time slot set")
+    @RequestMapping(value = "/unit/{unitId}/time_slot_set/{timeSlotId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Map<String,Object>> deleteTimeSlotSet(@PathVariable Long unitId,@PathVariable Long timeSlotId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.deleteTimeSlotSet(unitId,timeSlotId));
+    }
+
+    @ApiOperation(value = "update time slot set")
+    @RequestMapping(value = "/unit/{unitId}/time_slot_set/{timeSlotSetId}", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String,Object>> updateTimeSlotSet(@PathVariable Long unitId,@PathVariable Long timeSlotSetId,
+                                                                @Validated @RequestBody  TimeSlotSetDTO timeSlotSetDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.updateTimeSlotSet(unitId,timeSlotSetId,timeSlotSetDTO));
     }
 
     @ApiOperation(value = "update time slot type")
@@ -363,11 +391,7 @@ public class OrganizationController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTimeSlot(@PathVariable long unitId, @Validated @RequestBody List<TimeSlotDTO> timeSlotDTO) {
 
-        List<Map<String, Object>> response = timeSlotService.updateTimeSlot(unitId, timeSlotDTO);
-        if (response == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, true, Collections.emptyMap());
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.updateTimeSlot(timeSlotDTO));
     }
 
     @ApiOperation(value = "Delete time slot")

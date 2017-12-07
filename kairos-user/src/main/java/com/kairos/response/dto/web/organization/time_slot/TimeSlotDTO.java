@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeSlotDTO {
-
     @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;
     private int startHour;
@@ -19,6 +18,18 @@ public class TimeSlotDTO {
     private int endMinute;
     private boolean isShiftStartTime;
     private Long id;
+
+    public TimeSlotDTO() {
+        //default constructor
+    }
+
+    public TimeSlotDTO(String name, int startHour, int startMinute, int endHour, int endMinute) {
+        this.name = name;
+        this.startHour = startHour;
+        this.startMinute = startMinute;
+        this.endHour = endHour;
+        this.endMinute = endMinute;
+    }
 
     public String getName() {
         return name;
