@@ -1044,7 +1044,7 @@ public class CountryController {
     @ApiOperation("Get resources of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getVehicleList(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getVehicleList(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getAllVehicleListWithFeatures(countryId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/vehicle/{vehicleId}", method = RequestMethod.PUT)
