@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.agreement.wta.templates;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATES;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TAG;
 
 /**
  * Created by vipul on 2/8/17.
@@ -33,6 +35,9 @@ public class RuleTemplateCategory extends UserBaseEntity {
 
     @Relationship(type = HAS_RULE_TEMPLATES)
     private List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
+
+    @Relationship(type = HAS_TAG)
+    private List<Tag> tags = new ArrayList<>();
 
     public List<WTABaseRuleTemplate> getWtaBaseRuleTemplates() {
         return Optional.ofNullable(wtaBaseRuleTemplates).orElse(new ArrayList<>());
@@ -64,6 +69,14 @@ public class RuleTemplateCategory extends UserBaseEntity {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     public Map<String, Object> printRuleTemp() {

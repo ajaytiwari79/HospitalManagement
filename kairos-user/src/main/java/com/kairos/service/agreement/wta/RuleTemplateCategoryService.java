@@ -3,13 +3,18 @@ package com.kairos.service.agreement.wta;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.response.dto.web.AddRuleTemplateCategoryDTO;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.country.tag.TagService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,7 +33,8 @@ public class RuleTemplateCategoryService extends UserBaseService {
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
     @Inject
     private CountryService countryService;
-
+    @Inject
+    private TagService tagService;
     @Inject
     WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
     @Inject private CountryGraphRepository countryGraphRepository;
@@ -67,7 +73,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     }
 
-    public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId) {
+    public List<RuleTemplateCategoryTagDTO> getRulesTemplateCategory(long countryId) {
         Country country = countryService.getCountryById(countryId);
         if (country == null) {
             throw new DataNotFoundByIdException("Country does not exist");
@@ -104,7 +110,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     }
 
 
-    public Map<String, Object> updateRuleTemplateCategory(Long countryId, Long templateCategoryId, RuleTemplateCategory ruleTemplateCategory) {
+    public Map<String, Object> updateRuleTemplateCategory(Long countryId, Long templateCategoryId, AddRuleTemplateCategoryDTO ruleTemplateCategory) {
         if (countryService.getCountryById(countryId) == null) {
             throw new DataNotFoundByIdException("Country does not exist");
         }
@@ -120,6 +126,8 @@ public class RuleTemplateCategoryService extends UserBaseService {
         }
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategory.getDescription());
+        List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(ruleTemplateCategory.getTags(), MasterDataTypeEnum.RULE_TEMPLATE_CATEGORY);
+        ruleTemplateCategoryObj.setTags(tags);
         save(ruleTemplateCategoryObj);
         return ruleTemplateCategoryObj.printRuleTemp();
 

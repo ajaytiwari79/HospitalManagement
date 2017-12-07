@@ -15,6 +15,7 @@ import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Vehicle;
+import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -168,6 +169,16 @@ public class OrganizationService extends UserBaseService {
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id, 0);
+    }
+
+    public boolean showCountryTagForOrganization(long id) {
+        Organization organization = organizationGraphRepository.findOne(id);
+        if(organization.isShowCountryTags()){
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     /**
@@ -1016,14 +1027,14 @@ public class OrganizationService extends UserBaseService {
 
     }
 
-    public List<Vehicle> getVehicleList(long unitId) {
+    public List<VehicleQueryResult> getVehicleList(long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.debug("Searching organization by id " + unitId);
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
         }
         Long countryId = organizationGraphRepository.getCountryId(unitId);
-        return countryGraphRepository.getResourcesByCountry(countryId);
+        return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }
 
     public List<Long> getAllOrganizationWithoutPhases() {

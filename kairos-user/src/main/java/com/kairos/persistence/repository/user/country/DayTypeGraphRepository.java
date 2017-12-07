@@ -20,4 +20,6 @@ public interface DayTypeGraphRepository extends GraphRepository<DayType> {
     List<DayType> findByCountryId(long countryId);
     @Query("MATCH (n:DayType) WITH n.validDays AS coll,n UNWIND coll AS x with distinct x,n WHERE x  in {days} and n.holidayType=false return n")
     List<DayType>findByValidDaysContains(@Param("days") List<String> days);
+    @Query("Match (n:DayType) where id(n) in {0} return n")
+    List<DayType> getDayTypes(List<Long> dayTypeIds);
 }

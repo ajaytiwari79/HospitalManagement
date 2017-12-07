@@ -123,6 +123,14 @@ public class OrganizationController {
                 organizationService.getOrganizationById(unitId));
     }
 
+    @ApiOperation(value = "Get Organization's showCountryTag setting by Id")
+    @RequestMapping(value = UNIT_URL+"/show_country_tags", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> showCountryTagForOrganization(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.showCountryTagForOrganization(unitId));
+    }
+
     //TODO
     /**
      * Return Organization with given id and return if found.

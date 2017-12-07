@@ -42,10 +42,12 @@ public interface WorkingTimeAgreementGraphRepository extends GraphRepository<Wor
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={0} \n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true}) \n" +
+            "MATCH (wta)-[r:"+HAS_TAG+"]->(t:Tag)<-[:"+ COUNTRY_HAS_TAG +"]-(c) WHERE t.masterDataType='WTA' AND t.countryTag=true AND t.deleted =false\n"+
             "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]->(orgType:OrganizationType)\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orgSubType:OrganizationType) \n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(ruleTempCatg:RuleTemplateCategory)\n" +
             "return wta.isEnabled as isEnabled," +
+            "CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})   END as tags, \n"+
             "wta.startDateMillis as startDateMillis,CASE  WHEN ruleTemp IS NOT NULL THEN collect({active:ruleTemp.isActive,daysLimit:ruleTemp.daysLimit,fromDayOfWeek:ruleTemp.fromDayOfWeek,minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts," +
             " fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts,shiftsLimit:ruleTemp.shiftsLimit," +
             "shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional," +
