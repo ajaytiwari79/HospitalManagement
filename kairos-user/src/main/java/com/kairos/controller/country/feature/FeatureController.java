@@ -18,6 +18,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by prerna on 4/12/17.
@@ -67,5 +68,20 @@ public class FeatureController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateFeaturesOfVehicle(@Validated @RequestBody VehicleFeaturesDTO vehicleFeatureDTO, @PathVariable long countryId, @PathVariable long vehicleId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,featureService.updateFeaturesOfVehicle(countryId, vehicleId, vehicleFeatureDTO));
+    }
+
+    @ApiOperation(value = "Update Features of resources")
+    @RequestMapping(value = UNIT_URL + "/resource/{resourceId}/feature", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateFeaturesOfResource(@Validated @RequestBody VehicleFeaturesDTO vehicleFeatureDTO, @PathVariable long unitId, @PathVariable long resourceId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,featureService.updateFeaturesOfResource(unitId, resourceId, vehicleFeatureDTO));
+    }
+
+    @ApiOperation(value = "Get list of Features of resource")
+    @RequestMapping(value = UNIT_URL + "/resource/{resourceId}/feature", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getFeaturesOfResource(@PathVariable long unitId, @PathVariable long resourceId,
+                                                             @RequestParam(value = "filterText",required = false) String filterText) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,featureService.getFeaturesForResource(unitId,resourceId));
     }
 }

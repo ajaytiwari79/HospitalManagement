@@ -191,6 +191,7 @@ public class RelationshipConstants {
     public final static String UNAVAILABLE_ON = "UNAVAILABLE_ON";
 
     public final static String VEHICLE_HAS_FEATURE = "VEHICLE_HAS_FEATURE";
+    public final static String RESOURCE_HAS_FEATURE = "RESOURCE_HAS_FEATURE";
     /**
      * Default constructor
      */
