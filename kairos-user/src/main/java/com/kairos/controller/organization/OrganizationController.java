@@ -23,6 +23,7 @@ import com.kairos.service.organization.*;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.resources.ResourceService;
+import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tpa_services.IntegrationConfigurationService;
@@ -63,6 +64,9 @@ public class OrganizationController {
 
     @Inject
     private OrganizationService organizationService;
+
+    @Inject
+    private SkillCategoryService skillCategoryService;
     @Inject
     private OrganizationServiceService organizationServiceService;
     @Inject
@@ -1163,6 +1167,12 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getAllDayTypeofOrganization(organizationId));
     }
 
+    @RequestMapping(value = UNIT_URL + "/skill_category", method = RequestMethod.GET)
+    @ApiOperation("Get a skillCategory by id")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllSkillCategory(@PathVariable Long unitId) {
+                return ResponseHandler.generateResponse(HttpStatus.OK, true, skillCategoryService.findSkillCategoryByUnitId(unitId));
+    }
 
     @ApiOperation(value = "Get DayType by unitID")
     @RequestMapping(value ="/units", method = RequestMethod.GET)
