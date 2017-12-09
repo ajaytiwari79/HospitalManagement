@@ -334,6 +334,10 @@ public  class DateUtils {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
+    public static LocalDate asLocalDate(Long date) {
+        return Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
     public static LocalDate asLocalDate(String receivedDate) {
         return LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
     }
@@ -345,6 +349,10 @@ public  class DateUtils {
 
     public static LocalTime asLocalTime(Date date) {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).toLocalTime();
+    }
+
+    public static LocalTime asLocalTime(Long date) {
+        return LocalDateTime.ofInstant(new Date(date).toInstant(), ZoneId.systemDefault()).toLocalTime();
     }
 
     public static Date asDate(LocalTime localTime) {

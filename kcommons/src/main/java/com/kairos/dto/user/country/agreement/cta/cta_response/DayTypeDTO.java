@@ -2,7 +2,6 @@ package com.kairos.dto.user.country.agreement.cta.cta_response;
 
 import com.kairos.enums.Day;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +9,9 @@ public class DayTypeDTO {
    private Long id;
    private String name;
    private List<Day> validDays=new ArrayList<>();
-    private List<LocalDate> holidayDate;
+    private List<CountryHolidayCalenderDTO> countryHolidayCalenderData;
     private boolean holidayType;
+    private boolean allowTimeSettings = false;
     public DayTypeDTO() {
         //default constructor
 
@@ -21,6 +21,22 @@ public class DayTypeDTO {
         this.id = id;
         this.name = name;
         this.validDays = validDays;
+    }
+
+    public DayTypeDTO(Long id, String name, List<Day> validDays, List<CountryHolidayCalenderDTO> countryHolidayCalenderData, boolean holidayType) {
+        this.id = id;
+        this.name = name;
+        this.validDays = validDays;
+        this.countryHolidayCalenderData = countryHolidayCalenderData;
+        this.holidayType = holidayType;
+    }
+
+    public boolean isAllowTimeSettings() {
+        return allowTimeSettings;
+    }
+
+    public void setAllowTimeSettings(boolean allowTimeSettings) {
+        this.allowTimeSettings = allowTimeSettings;
     }
 
     public Long getId() {
@@ -47,12 +63,12 @@ public class DayTypeDTO {
         this.validDays = validDays;
     }
 
-    public List<LocalDate> getHolidayDate() {
-        return holidayDate;
+    public List<CountryHolidayCalenderDTO> getCountryHolidayCalenderData() {
+        return countryHolidayCalenderData;
     }
 
-    public void setHolidayDate(List<LocalDate> holidayDate) {
-        this.holidayDate = holidayDate;
+    public void setCountryHolidayCalenderData(List<CountryHolidayCalenderDTO> countryHolidayCalenderData) {
+        this.countryHolidayCalenderData = countryHolidayCalenderData;
     }
 
     public boolean isHolidayType() {

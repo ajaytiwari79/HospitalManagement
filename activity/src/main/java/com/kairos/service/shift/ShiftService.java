@@ -519,10 +519,10 @@ public class ShiftService extends MongoBaseService {
                         dayOfWeeks.addAll(Arrays.asList(DayOfWeek.values()));
                     }
                 });
-                List<LocalDate> publicHoliday = staffAdditionalInfoDTO.getPublicHoliday().get(dayTypeId);
+                /*List<LocalDate> publicHoliday = staffAdditionalInfoDTO.getPublicHoliday().get(dayTypeId);
                 if (CollectionUtils.isNotEmpty(publicHoliday)) {
                     publicHolidays.addAll(publicHoliday);
-                }
+                }*/
             }
             ctaRuleTemplateDTO.setPublicHolidays(publicHolidays);
             ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));

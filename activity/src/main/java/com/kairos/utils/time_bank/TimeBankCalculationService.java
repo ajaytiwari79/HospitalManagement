@@ -16,7 +16,7 @@ import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributi
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.ScheduledActivitiesDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 
-import com.kairos.constants.AppConstants;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.experties.AppliedFunctionDTO;
 
@@ -109,7 +109,7 @@ public class TimeBankCalculationService {
                         shiftInterval = interval.overlap(shiftInterval);
                         if (!ctaDto.getCtaRuleTemplates().isEmpty()) {
                             for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
-                                boolean ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap,ruleTemplate, ctaDto, shift.getPhaseId(), shiftActivity.getActivity().getId(),shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), DateUtils.asLocalDate(shiftActivity.getStartDate()),shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
+                                boolean ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap,ruleTemplate, ctaDto, shift.getPhaseId(), shiftActivity.getActivity().getId(),shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), DateUtils.asZoneDateTime(shiftActivity.getStartDate()),shiftActivity.getPlannedTimeId()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
                                 if (ruleTemplateValid) {
                                     int ctaTimeBankMin = 0;
                                     if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && interval.contains(shiftActivity.getStartDate().getTime())) {
@@ -232,11 +232,11 @@ public class TimeBankCalculationService {
      * @param shiftPhaseId
      * @param activityId
      * @param timeTypeId
-     * @param shiftDate
+     * @param shiftDateTime
      * @param plannedTimeId
      * @return
      */
-    public boolean validateCTARuleTemplate(Map<Long,DayTypeDTO> dayTypeDTOMap ,CTARuleTemplateDTO ruleTemplate, StaffUnitPositionDetails unitPositionDetails, BigInteger shiftPhaseId, BigInteger activityId,BigInteger timeTypeId,java.time.LocalDate shiftDate,BigInteger plannedTimeId) {
+    public boolean validateCTARuleTemplate(Map<Long,DayTypeDTO> dayTypeDTOMap ,CTARuleTemplateDTO ruleTemplate, StaffUnitPositionDetails unitPositionDetails, BigInteger shiftPhaseId, BigInteger activityId,BigInteger timeTypeId,java.time.ZonedDateTime shiftDateTime,BigInteger plannedTimeId) {
         boolean valid = true;
 
         if (ruleTemplate.getPlannedTimeWithFactor().getAccountType() == null){
@@ -249,12 +249,12 @@ public class TimeBankCalculationService {
         if(!(valid && (ruleTemplate.getActivityIds().contains(activityId) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(timeTypeId))) && ruleTemplate.getPlannedTimeIds().contains(plannedTimeId))) {
             valid = false;
         }
-        if(!(valid && validateDayType(shiftDate,ruleTemplate,dayTypeDTOMap))){
+        if(!(valid && validateDayType(shiftDateTime,ruleTemplate,dayTypeDTOMap))){
             valid=false;
         }
         return valid;
     }
-    private boolean validateDayType(java.time.LocalDate shiftDate,CTARuleTemplateDTO ruleTemplateDTO, Map<Long,DayTypeDTO> dayTypeDTOMap) {
+    /*private boolean validateDayType(java.time.LocalDate shiftDate,CTARuleTemplateDTO ruleTemplateDTO, Map<Long,DayTypeDTO> dayTypeDTOMap) {
         List<DayTypeDTO> dayTypeDTOS = ruleTemplateDTO.getDayTypeIds().stream().map(daytypeId -> dayTypeDTOMap.get(daytypeId)).collect(Collectors.toList());
         boolean valid = false;
         for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {
@@ -269,7 +269,34 @@ public class TimeBankCalculationService {
             }
         }
         return valid;
+    }*/
+
+    private boolean validateDayType(java.time.ZonedDateTime shiftDateTime, CTARuleTemplateDTO ruleTemplateDTO, Map<Long, DayTypeDTO> dayTypeDTOMap) {
+        List<DayTypeDTO> dayTypeDTOS = ruleTemplateDTO.getDayTypeIds().stream().map(daytypeId -> dayTypeDTOMap.get(daytypeId)).collect(Collectors.toList());
+        boolean valid = false;
+        for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {
+            if (dayTypeDTO.isHolidayType()) {
+                for (CountryHolidayCalenderDTO countryHolidayCalenderDTO : dayTypeDTO.getCountryHolidayCalenderData()) {
+                    if (dayTypeDTO.isAllowTimeSettings()) {
+                        DateTimeInterval dateTimeInterval = new DateTimeInterval(DateUtils.asDate(DateUtils.asLocalDate(countryHolidayCalenderDTO.getHolidayDate()), DateUtils.asLocalTime(countryHolidayCalenderDTO.getStartTime())), DateUtils.asDate(DateUtils.asLocalDate(countryHolidayCalenderDTO.getHolidayDate()), DateUtils.asLocalTime(countryHolidayCalenderDTO.getEndTime())));
+                        valid = dateTimeInterval.contains(shiftDateTime);
+                    }else {
+                        valid = countryHolidayCalenderDTO.getHolidayDate().equals(shiftDateTime.toLocalDate());
+                    }
+                    if (valid) {
+                        break;
+                    }
+                }
+            } else {
+                valid = ruleTemplateDTO.getDays() != null && ruleTemplateDTO.getDays().contains(shiftDateTime.getDayOfWeek());
+            }
+            if (valid) {
+                break;
+            }
+        }
+        return valid;
     }
+
     /**
      * @param interval
      * @param startDate
