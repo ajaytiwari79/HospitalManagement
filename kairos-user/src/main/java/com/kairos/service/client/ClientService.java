@@ -25,6 +25,7 @@ import com.kairos.persistence.model.user.staff.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.user.staff.StaffClientData;
 import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.repository_impl.OrganizationGraphRepositoryImpl;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;

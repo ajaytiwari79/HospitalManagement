@@ -1,59 +1,58 @@
-package com.kairos.persistence.model.organization;
+package com.kairos.persistence.model.organization.time_slot;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
- * Created by prabjot on 23/1/17.
+ * Created by prabjot on 11/12/17.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TimeSlotDTO {
+@QueryResult
+public class TimeSlotWrapper {
 
-    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
-    private String name;
+    private Long id;
     private int startHour;
     private int startMinute;
     private int endHour;
     private int endMinute;
     private boolean isShiftStartTime;
-    private Long id;
 
-    public String getName() {
-        return name;
+    public Long getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public int getStartHour() {
         return startHour;
     }
 
-    public int getStartMinute() {
-        return startMinute;
-    }
-
-    public int getEndHour() {
-        return endHour;
-    }
-
-    public int getEndMinute() {
-        return endMinute;
-    }
-
     public void setStartHour(int startHour) {
         this.startHour = startHour;
+    }
+
+    public int getStartMinute() {
+        return startMinute;
     }
 
     public void setStartMinute(int startMinute) {
         this.startMinute = startMinute;
     }
 
+    public int getEndHour() {
+        return endHour;
+    }
+
     public void setEndHour(int endHour) {
         this.endHour = endHour;
+    }
+
+    public int getEndMinute() {
+        return endMinute;
     }
 
     public void setEndMinute(int endMinute) {
@@ -64,20 +63,7 @@ public class TimeSlotDTO {
         return isShiftStartTime;
     }
 
-    public void setIsShiftStartTime(boolean shiftStartTime) {
-        isShiftStartTime = shiftStartTime;
-    }
-
     public void setShiftStartTime(boolean shiftStartTime) {
         isShiftStartTime = shiftStartTime;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-
-        return id;
     }
 }
