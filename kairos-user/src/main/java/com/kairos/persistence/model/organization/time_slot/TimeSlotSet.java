@@ -3,6 +3,8 @@ package com.kairos.persistence.model.organization.time_slot;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.time_slot.TimeSlotMode;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
@@ -24,8 +26,6 @@ public class TimeSlotSet extends UserBaseEntity{
     private Date startDate;
     @DateLong
     private Date endDate;
-    @Relationship(type = HAS_TIME_SLOT)
-    private List<TimeSlot> timeSlots = new ArrayList<>();
     private TimeSlotMode timeSlotMode;
     private boolean deleted;
 
@@ -66,14 +66,6 @@ public class TimeSlotSet extends UserBaseEntity{
         this.endDate = endDate;
     }
 
-    public List<TimeSlot> getTimeSlots() {
-        return timeSlots;
-    }
-
-    public void setTimeSlots(List<TimeSlot> timeSlots) {
-        this.timeSlots = timeSlots;
-    }
-
     public TimeSlotMode getTimeSlotMode() {
         return timeSlotMode;
     }
@@ -93,5 +85,35 @@ public class TimeSlotSet extends UserBaseEntity{
     public void updateTimeSlotSet(TimeSlotSetDTO timeSlotSetDTO){
         this.endDate = timeSlotSetDTO.getEndDate();
         this.name = timeSlotSetDTO.getName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TimeSlotSet that = (TimeSlotSet) o;
+
+        return new EqualsBuilder()
+                .append(deleted, that.deleted)
+                .append(name, that.name)
+                .append(startDate, that.startDate)
+                .append(endDate, that.endDate)
+                .append(timeSlotMode, that.timeSlotMode)
+                .append(id,that.id)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(name)
+                .append(startDate)
+                .append(endDate)
+                .append(timeSlotMode)
+                .append(deleted)
+                .append(id)
+                .toHashCode();
     }
 }

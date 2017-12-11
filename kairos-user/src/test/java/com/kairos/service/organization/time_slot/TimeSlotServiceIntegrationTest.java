@@ -50,11 +50,11 @@ public class TimeSlotServiceIntegrationTest {
         Date endDate;
         try{
             startDate = df.parse("2018-07-01");
-            endDate = df.parse("2018-09-31");
+            endDate = df.parse("2018-09-30");
         } catch (ParseException e){
             throw new RuntimeException(e.getMessage());
         }
-        TimeSlotSetDTO timeSlotSetDTO = new TimeSlotSetDTO("July-Sept", startDate,endDate, Arrays.asList(timeSlotDTO),ADVANCE);
+        TimeSlotSetDTO timeSlotSetDTO = new TimeSlotSetDTO("July-September", startDate,endDate, Arrays.asList(timeSlotDTO),ADVANCE);
 
         String baseUrl=getBaseUrl(145L,145L);
         HttpEntity<TimeSlotSetDTO> entity = new HttpEntity<>(timeSlotSetDTO);

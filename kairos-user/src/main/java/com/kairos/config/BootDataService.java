@@ -72,6 +72,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD;
+
 /**
  * Created by kairosCountryLevel on 8/12/16.
  */
@@ -265,13 +267,14 @@ public class BootDataService {
 
     private void createStandardTimeSlots(){
         String timeSlotsNames[] = new String[]{"Day","Evening","Night"};
-        TimeSlot timeSlot;
+        List<TimeSlot> standardTimeSlots = new ArrayList<>();
         for(String timeSlotName : timeSlotsNames){
-           // timeSlot = new TimeSlot();
-           // timeSlot.setName(timeSlotName);
-           // timeSlot.setTimeSlotTimeSlotMode(TimeSlot.TimeSlotMode.STANDARD);
-            //timeSlotGraphRepository.save(timeSlot);
+            TimeSlot timeSlot = new TimeSlot();
+            timeSlot.setName(timeSlotName);
+            timeSlot.setSystemGeneratedTimeSlots(true);
+            standardTimeSlots.add(timeSlot);
         }
+        timeSlotGraphRepository.save(standardTimeSlots);
     }
 
     private void createGeoGraphicalData() {

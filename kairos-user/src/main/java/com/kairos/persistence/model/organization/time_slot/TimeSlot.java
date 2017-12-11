@@ -12,28 +12,16 @@ import org.neo4j.ogm.annotation.NodeEntity;
 public class TimeSlot extends UserBaseEntity {
 
     private String name;
-    private int startHour;
-    private int startMinute;
-    private int endHour;
-    private int endMinute;
-    private boolean isShiftStartTime;
+    //if value of {systemGeneratedTimeSlots = true},then it will considered
+    //as standard time slots
+    private boolean systemGeneratedTimeSlots;
 
     public TimeSlot() {
         //default constructor
     }
 
-    public TimeSlot(String name, int startHour, int endHour, TimeSlotMode timeSlotTimeSlotMode) {
+    public TimeSlot(String name) {
         this.name = name;
-        this.startHour = startHour;
-        this.endHour = endHour;
-    }
-
-    public TimeSlot(String name, int startHour, int startMinute, int endHour, int endMinute) {
-        this.name = name;
-        this.startHour = startHour;
-        this.startMinute = startMinute;
-        this.endHour = endHour;
-        this.endMinute = endMinute;
     }
 
     public String getName() {
@@ -44,17 +32,8 @@ public class TimeSlot extends UserBaseEntity {
         this.name = name;
     }
 
-    private TimeSlotMode timeSlotMode;
 
     private Long kmdExternalId; // for importing time slots from KMD
-
-    public TimeSlotMode getTimeSlotMode() {
-        return timeSlotMode;
-    }
-
-    public void setTimeSlotMode(TimeSlotMode timeSlotMode) {
-        this.timeSlotMode = timeSlotMode;
-    }
 
     public Long getKmdExternalId() {
         return kmdExternalId;
@@ -64,53 +43,13 @@ public class TimeSlot extends UserBaseEntity {
         this.kmdExternalId = kmdExternalId;
     }
 
-    public boolean isShiftStartTime() {
-        return isShiftStartTime;
+
+    public boolean isSystemGeneratedTimeSlots() {
+        return systemGeneratedTimeSlots;
     }
 
-    public void setShiftStartTime(boolean shiftStartTime) {
-        isShiftStartTime = shiftStartTime;
-    }
-
-    public int getStartHour() {
-        return startHour;
-    }
-
-    public void setStartHour(int startHour) {
-        this.startHour = startHour;
-    }
-
-    public int getStartMinute() {
-        return startMinute;
-    }
-
-    public void setStartMinute(int startMinute) {
-        this.startMinute = startMinute;
-    }
-
-    public int getEndHour() {
-        return endHour;
-    }
-
-    public void setEndHour(int endHour) {
-        this.endHour = endHour;
-    }
-
-    public int getEndMinute() {
-        return endMinute;
-    }
-
-    public void setEndMinute(int endMinute) {
-        this.endMinute = endMinute;
-    }
-
-    public TimeSlot updateTimeSlot(TimeSlotDTO timeSlotDTO){
-        this.startHour = timeSlotDTO.getStartHour();
-        this.startMinute = timeSlotDTO.getStartMinute();
-        this.endHour = timeSlotDTO.getEndHour();
-        this.endMinute = timeSlotDTO.getEndMinute();
-        this.isShiftStartTime = timeSlotDTO.isShiftStartTime();
-        return this;
+    public void setSystemGeneratedTimeSlots(boolean systemGeneratedTimeSlots) {
+        this.systemGeneratedTimeSlots = systemGeneratedTimeSlots;
     }
 
 
