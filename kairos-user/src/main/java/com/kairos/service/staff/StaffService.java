@@ -58,7 +58,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -803,6 +802,7 @@ public class StaffService extends UserBaseService {
         staff.setUser(user);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), isEmploymentExist);
+        staff.setUser(null); // removing user to send in FE
         return staff;
     }
 
@@ -852,7 +852,7 @@ public class StaffService extends UserBaseService {
             contactDetail.setId(staffQueryResult.getContactDetailId());
         }
         if (Optional.ofNullable(payload.getEngineerTypeId()).isPresent()) {
-            EngineerType engineerType = engineerTypeGraphRepository.findOne(payload.getExternalId());
+            EngineerType engineerType = engineerTypeGraphRepository.findOne(payload.getEngineerTypeId());
             staff.setEngineerType(engineerType);
         }
         return staff;
