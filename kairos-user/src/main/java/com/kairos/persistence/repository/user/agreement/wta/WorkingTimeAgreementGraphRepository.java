@@ -6,7 +6,7 @@ import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreementQueryResult;
 import com.kairos.persistence.model.user.expertise.ExpertiseIdListDTO;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by pawanmandhan on 27/7/17.
  */
 @Repository
-public interface WorkingTimeAgreementGraphRepository extends GraphRepository<WorkingTimeAgreement> {
+public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository<WorkingTimeAgreement,Long> {
 
     @Query("MATCH (wta:WorkingTimeAgreement {deleted:false}) where id(wta)={0} \n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true})\n" +

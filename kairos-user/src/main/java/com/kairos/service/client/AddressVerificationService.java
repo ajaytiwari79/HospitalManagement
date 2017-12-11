@@ -14,6 +14,8 @@ import com.kairos.service.country.HousingTypeService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -28,7 +30,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 @Service
 public class AddressVerificationService {
-    private final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
     private Scheduler scheduler;

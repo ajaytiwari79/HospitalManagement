@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.organization;
 import com.kairos.persistence.model.organization.TimeSlot;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORGAN
 /**
  * Created by oodles on 17/11/16.
  */
-public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
+public interface TimeSlotGraphRepository extends Neo4jBaseRepository<TimeSlot,Long>{
 
     List<TimeSlot> findByTimeSlotType(TimeSlot.TYPE type);
 

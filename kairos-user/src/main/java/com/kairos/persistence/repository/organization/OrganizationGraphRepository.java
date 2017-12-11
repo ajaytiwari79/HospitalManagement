@@ -10,7 +10,7 @@ import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.position.PositionName;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,7 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Interface for CRUD operation on Organization
  */
 @Repository
-public interface OrganizationGraphRepository extends GraphRepository<Organization>,CustomOrganizationGraphRepository {
+public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organization,Long>,CustomOrganizationGraphRepository {
 
     @Query("MATCH (o:Organization) return {name:o.name, id:id(o)} as organization")
     List<Map<String, Object>> findAllOrganizations();

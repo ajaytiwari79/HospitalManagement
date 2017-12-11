@@ -211,7 +211,6 @@ public class CTARuleTemplateDTO {
     public void setTimeTypes(List<Long> timeTypes) {
         this.timeTypes = timeTypes;
     }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this)

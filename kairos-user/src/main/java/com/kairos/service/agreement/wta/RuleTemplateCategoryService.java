@@ -69,7 +69,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     }
 
     public boolean exists(long templateCategoryId) {
-        return ruleTemplateCategoryGraphRepository.exists(templateCategoryId);
+        return ruleTemplateCategoryGraphRepository.existsById(templateCategoryId);
     }
 
 
@@ -84,7 +84,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
         }
 
         List<Long> wtaBaseRuleTemplateList =wtaBaseRuleTemplateGraphRepository.findAllWTABelongsByTemplateCategoryId(templateCategoryId);
-        RuleTemplateCategory noneRuleTemplateCategory=ruleTemplateCategoryGraphRepository.findByName(countryId,"NONE");
+        RuleTemplateCategory noneRuleTemplateCategory=ruleTemplateCategoryGraphRepository.findByName(countryId,"NONE",RuleTemplateCategoryType.WTA);
 
         wtaBaseRuleTemplateGraphRepository.deleteRelationOfRuleTemplateCategoryAndWTA(templateCategoryId,wtaBaseRuleTemplateList);
 

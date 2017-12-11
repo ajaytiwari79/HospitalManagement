@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.user.position;
 import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.position.PositionQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 /**
  * Created by pawanmandhan on 26/7/17.
  */
-public interface PositionGraphRepository extends GraphRepository<Position> {
+public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Long> {
 
 
     @Query("MATCH (p:Position{isEnabled:true})<-[:" + HAS_POSITION + "]-(u:UnitEmployment) where id(u)={0}\n" +

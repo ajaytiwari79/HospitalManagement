@@ -23,10 +23,10 @@ import com.kairos.response.dto.web.PatientRelative;
 import com.kairos.response.dto.web.PatientWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.region.RegionService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.inject.Inject;
 import java.util.Date;
 import java.util.Map;
@@ -79,7 +79,7 @@ public class ExternalClientService extends UserBaseService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
 
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public void addClientRelativeDetailsFromKmd(PatientRelative patientRelative, Client client, long unitId) {
         /*Client nextToKin = client.getNextToKin();

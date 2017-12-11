@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.user.client;
 
 import com.kairos.persistence.model.user.client.AccessToLocation;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ADDRE
  * Created by oodles on 23/11/16.
  */
 @Repository
-public interface AccessToLocationGraphRepository extends GraphRepository<AccessToLocation> {
+public interface AccessToLocationGraphRepository extends Neo4jBaseRepository<AccessToLocation,Long> {
 
 
     @Query("MATCH (c:Client)-[r]->(cd:ContactAddress{isEnabled:true}) WHERE id(c)={0}   WITH cd,r " +

@@ -1,12 +1,13 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
+import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 
 @NodeEntity
-public class CalculateValueAgainst {
+public class CalculateValueAgainst extends UserBaseEntity{
     private  String calculateValue;
     private float scale;
     @Relationship(type = BELONGS_TO)
@@ -15,6 +16,13 @@ public class CalculateValueAgainst {
     public CalculateValueAgainst() {
         //default constractor
     }
+
+    public CalculateValueAgainst(String calculateValue, float scale, FixedValue fixedValue) {
+        this.calculateValue = calculateValue;
+        this.scale = scale;
+        this.fixedValue = fixedValue;
+    }
+
     public String getCalculateValue() {
         return calculateValue;
     }

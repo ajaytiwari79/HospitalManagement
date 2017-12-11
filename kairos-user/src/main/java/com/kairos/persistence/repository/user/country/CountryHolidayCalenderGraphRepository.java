@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  */
 
 @Repository
-public interface CountryHolidayCalenderGraphRepository extends GraphRepository<CountryHolidayCalender> {
+public interface CountryHolidayCalenderGraphRepository extends Neo4jBaseRepository<CountryHolidayCalender,Long> {
     List<CountryHolidayCalender> findAll();
 
     @Query("MATCH (ch:CountryHolidayCalender) WHERE id(ch) ={0}   SET ch.disabled = true return ch")

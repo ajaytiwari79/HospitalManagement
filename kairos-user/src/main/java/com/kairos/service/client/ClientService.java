@@ -46,7 +46,8 @@ import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.userContext.UserContext;
 import org.joda.time.DateTime;
-import org.neo4j.ogm.session.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
@@ -70,7 +71,7 @@ import static com.kairos.util.DateUtil.MONGODB_QUERY_DATE_FORMAT;
 @Service
 @Transactional
 public class ClientService extends UserBaseService {
-    private final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Inject
     EnvConfig envConfig;
     @Inject
@@ -133,8 +134,6 @@ public class ClientService extends UserBaseService {
     TaskDemandRestClient taskDemandRestClient;
     @Autowired
     TableConfigRestClient tableConfigRestClient;
-    @Inject
-    Session session;
     @Inject
     OrganizationGraphRepositoryImpl organizationGraphRepositoryImpl;
     @Inject
@@ -1144,7 +1143,7 @@ public class ClientService extends UserBaseService {
             temporaryAddress.add(clientTemporaryAddress);
             citizen.setTemporaryAddress(temporaryAddress);
         }
-        clientGraphRepository.save(citizens);
+        clientGraphRepository.saveAll(citizens);
         return clientTemporaryAddress;
     }
 
@@ -1526,7 +1525,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
     }
 
     public void addClientContactPersonRelationShip(List<Long> households, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, ClientContactPerson clientContactPerson){
-        for(Client client : clientGraphRepository.findAll(households) ) {
+        for(Client client : clientGraphRepository.findAllById(households) ) {
             ClientContactPersonRelationship clientContactPersonRelationship = new ClientContactPersonRelationship();
             clientContactPersonRelationship.setClient(client);
             clientContactPersonRelationship.setClientContactPerson(clientContactPerson);

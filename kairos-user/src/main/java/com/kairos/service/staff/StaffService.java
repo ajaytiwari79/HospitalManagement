@@ -996,7 +996,7 @@ public class StaffService extends UserBaseService {
                     }
                 }
             }
-            staffGraphRepository.save(staffList);
+            staffGraphRepository.saveAll(staffList);
         } catch (Exception e) {
             e.printStackTrace();
         }

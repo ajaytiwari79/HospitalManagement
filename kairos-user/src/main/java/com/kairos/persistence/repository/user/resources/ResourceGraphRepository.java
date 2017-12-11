@@ -9,7 +9,7 @@ import com.kairos.persistence.model.user.resources.ResourceDTO;
 import com.kairos.persistence.model.user.resources.ResourceUnAvailability;
 import com.kairos.persistence.model.user.resources.ResourceWrapper;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,7 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.UNAVA
  * Interface for CRUD operation on Resources
  */
 @Repository
-public interface ResourceGraphRepository extends GraphRepository<Resource> {
+public interface ResourceGraphRepository extends Neo4jBaseRepository<Resource,Long> {
 
     /**
      * @return List of Resource

@@ -28,12 +28,12 @@ import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
 import com.kairos.util.FormatUtil;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
@@ -46,7 +46,7 @@ import static com.kairos.constants.AppConstants.TEAM_LABEL;
 @Service
 public class TeamService extends UserBaseService {
 
-    private static final Logger logger = Logger.getLogger(TeamService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TeamService.class);
 
     @Inject
     private TeamGraphRepository teamGraphRepository;

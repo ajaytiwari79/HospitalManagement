@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.access_permission;
 import com.kairos.persistence.model.user.staff.AccessPermission;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by prabjot on 3/1/17.
  */
 @Repository
-public interface AccessPermissionGraphRepository extends GraphRepository<AccessPermission> {
+public interface AccessPermissionGraphRepository extends Neo4jBaseRepository<AccessPermission,Long> {
 
     List<AccessPermission> findAll();
 

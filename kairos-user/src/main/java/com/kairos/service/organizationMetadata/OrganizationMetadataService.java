@@ -93,7 +93,7 @@ public class OrganizationMetadataService extends UserBaseService {
         List<ClientHomeAddressQueryResult> clientHomeAddressQueryResults = clientGraphRepository.getClientsAndHomeAddressByUnitId(unitId);
         Set<Long> clientIds = clientHomeAddressQueryResults.stream().map(clientHomeAddressQueryResult -> clientHomeAddressQueryResult.getCitizen().getId()).collect(Collectors.toSet());
 
-        Iterable<Client> clientList =  clientGraphRepository.findAll(clientIds,1);
+        Iterable<Client> clientList =  clientGraphRepository.findAllById(clientIds,1);
         Map<Long, Client> citizenMap = new HashMap<>();
         for (Client citizen : clientList) {
             citizenMap.put(citizen.getId(), citizen);
@@ -117,7 +117,7 @@ public class OrganizationMetadataService extends UserBaseService {
                 }
             }
         }
-        clientGraphRepository.save(citizenList);
+        clientGraphRepository.saveAll(citizenList);
 
         return save(existingLocalAreaTag);
     }
@@ -130,7 +130,7 @@ public class OrganizationMetadataService extends UserBaseService {
         for(Client citizen  : citizenList){
             citizen.setLocalAreaTag(null);
         }
-        clientGraphRepository.save(citizenList);
+        clientGraphRepository.saveAll(citizenList);
 
         organizationMetadataRepository.save(localAreaTag);
         if (localAreaTag.isDeleted()) {

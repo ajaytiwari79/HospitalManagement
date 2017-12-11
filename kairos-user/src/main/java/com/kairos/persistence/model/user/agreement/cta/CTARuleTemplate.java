@@ -21,13 +21,13 @@ public class CTARuleTemplate extends RuleTemplate{
     private String payrollType;
     private String payrollSystem;
     private CalculationUnit calculationUnit;
-    @Relationship(type = BELONGS_TO)
+    @Relationship(type = HAS_COMPENSATION_TABLE)
     private CompensationTable compensationTable;
     @Relationship(type = BELONGS_TO)
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
     @Relationship(type = BELONGS_TO)
-    List<CTARuleTemplateDayTypes>calculateOnDayTypes=new ArrayList<>();
+    List<CTARuleTemplateDayType>calculateOnDayTypes=new ArrayList<>();
     @Relationship(type = BELONGS_TO)
     private List<CTARuleTemplatePhaseInfo>phaseInfo=new ArrayList<>();
     private BudgetType budgetType;
@@ -110,11 +110,11 @@ public class CTARuleTemplate extends RuleTemplate{
         this.approvalWorkFlow = approvalWorkFlow;
     }
 
-    public List<CTARuleTemplateDayTypes> getCalculateOnDayTypes() {
+    public List<CTARuleTemplateDayType> getCalculateOnDayTypes() {
         return calculateOnDayTypes;
     }
 
-    public void setCalculateOnDayTypes(List<CTARuleTemplateDayTypes> calculateOnDayTypes) {
+    public void setCalculateOnDayTypes(List<CTARuleTemplateDayType> calculateOnDayTypes) {
         this.calculateOnDayTypes = calculateOnDayTypes;
     }
     public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {

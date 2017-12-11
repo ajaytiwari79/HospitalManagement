@@ -1,21 +1,51 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
-import java.time.LocalTime;
+import java.time.LocalDate;
 
-public class CompensationTableInterval {
-    private LocalTime from;
-    private LocalTime to;
+@NodeEntity
+public class CompensationTableInterval extends UserBaseEntity {
+   // private LocalTime from;
+   // private LocalTime to;
     private float value;
+
+    public float getValue() {
+        return value;
+    }
+
+    public void setValue(float value) {
+        this.value = value;
+    }
+
+    @DateLong
+     private LocalDate startDate;
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+/*public CompensationTableInterval(LocalDate startDate) {
+        this.startDate = startDate;
+    }*/
 
     public CompensationTableInterval() {
         //default constructor
     }
 
-    public LocalTime getFrom() {
+    /*public CompensationTableInterval(LocalTime from, LocalTime to, float value) {
+        this.from = from;
+        this.to = to;
+        this.value = value;
+    }*/
+
+    /*public LocalTime getFrom() {
         return from;
     }
 
@@ -70,5 +100,5 @@ public class CompensationTableInterval {
                 .append("to", to)
                 .append("value", value)
                 .toString();
-    }
+    }*/
 }

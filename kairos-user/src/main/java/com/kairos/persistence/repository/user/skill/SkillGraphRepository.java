@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.user.skill;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
  * SkillGraphRepository
  */
 @Repository
-public interface SkillGraphRepository extends GraphRepository<Skill>{
+public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
 
 
     /**
@@ -45,7 +45,6 @@ public interface SkillGraphRepository extends GraphRepository<Skill>{
      *
      * @param aLong
      */
-    @Override
     @Query("MATCH (s:Skill) where id(s) = {0} DETACH DELETE s")
     void delete(Long aLong);
 

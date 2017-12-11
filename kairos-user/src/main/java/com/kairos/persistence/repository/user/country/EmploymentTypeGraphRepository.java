@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 import com.kairos.persistence.model.user.country.EmploymentType;
 
@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_E
  * Created by prerna on 3/11/17.
  */
 @Repository
-public interface EmploymentTypeGraphRepository extends GraphRepository<EmploymentType>{
+public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<EmploymentType,Long>{
 
         List<EmploymentType> findAll();
 

@@ -14,6 +14,17 @@ public class PlannedTimeWithFactor extends UserBaseEntity{
     public PlannedTimeWithFactor() {
     }
 
+    public PlannedTimeWithFactor(float scale, boolean add, AccountType accountType) {
+        this.scale = scale;
+        this.add = add;
+        this.accountType = accountType;
+    }
+
+    public static PlannedTimeWithFactor buildPlannedTimeWithFactor(float scale, boolean add, AccountType accountType){
+        return new PlannedTimeWithFactor(scale,add,accountType);
+
+    }
+
     public float getScale() {
         return scale;
     }

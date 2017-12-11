@@ -4,7 +4,7 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_C
  * Created by prabjot on 28/10/16.
  */
 @Repository
-public interface ExpertiseGraphRepository extends GraphRepository<Expertise> {
+public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,Long> {
 
     @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) return expertise")
     List<Expertise> getAllExpertiseByCountry(long countryId);

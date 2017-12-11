@@ -3,9 +3,12 @@ package com.kairos.cta;
 import com.kairos.UserServiceApplication;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.agreement.wta.RuleTemplateCategoryService;
+import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -24,6 +27,7 @@ import java.util.List;
 public class CostTimeAgreementServiceTest {
     @Autowired private RuleTemplateCategoryService ruleTemplateCategoryService;
     @Autowired private CostTimeAgreementService costTimeAgreementService;
+    @Autowired private CurrencyService currencyService;
     @Autowired DayTypeService dayTypeService;
     @Test
     @Ignore
@@ -33,16 +37,38 @@ public class CostTimeAgreementServiceTest {
         category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
         ruleTemplateCategoryService.createRuleTemplateCategory(53L,category);
     }
+
     @Test
-    @Ignore
-    public void addCTARuleTemplate(){
-        costTimeAgreementService.createDefaultCtaRuleTemplate();
+    public void addCTARuleTemplate()
+    {
+        costTimeAgreementService.createDefaultCtaRuleTemplate(53L);
     }
     @Test
-
     public void getHoliday(){
      Date date= Date.from(LocalDate.of(2018,1,2).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
         List<DayType> dayTypes= dayTypeService.getDayTypeByDate(53L,date);
         System.out.println(dayTypes);
     }
+    @Test
+    public void getAllRuleTemplate(){
+        CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS= costTimeAgreementService.loadAllCTARuleTemplateByCountry(53L);
+        System.out.println(ctaRuleTemplateDTOS);
+    }
+    @Test
+    public void getCurrency(){
+
+        Currency currency=currencyService.getCurrencyByCountryId(53L);
+        System.out.println(currency);
+
+    }
+
+
+    @Test
+    public void saveCom(){
+        costTimeAgreementService.saveInterval();
+
+
+    }
+
+
 }

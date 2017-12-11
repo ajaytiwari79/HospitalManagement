@@ -20,12 +20,12 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.country.HousingTypeService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.FormatUtil;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
@@ -39,7 +39,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_T
 @Service
 @Transactional
 public class ClientAddressService extends UserBaseService {
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     @Inject
     private ClientGraphRepository clientGraphRepository;

@@ -9,7 +9,7 @@ import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 24/10/16.
  */
 @Repository
-public interface StaffGraphRepository extends GraphRepository<Staff> {
+public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
 
     @Override
     List<Staff> findAll();

@@ -17,6 +17,12 @@ public class FixedValue extends UserBaseEntity {
     public FixedValue() {
     }
 
+    public FixedValue(float amount, Currency currency, Type type) {
+        this.amount = amount;
+        this.currency = currency;
+        this.type = type;
+    }
+
     public float getAmount() {
         return amount;
     }

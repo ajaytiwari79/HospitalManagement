@@ -77,7 +77,7 @@ public class CurrencyService extends UserBaseService {
         return response;
     }
 
-    public List<Currency> getCurrencyByCountryId(Long countryId){
-       return  currencyGraphRepository.findByCountryIdAndDeletedFalse(countryId);
+    public Currency getCurrencyByCountryId(Long countryId){
+       return  currencyGraphRepository.findFirstByCountryIdAndDeletedFalse(countryId);
     }
 }

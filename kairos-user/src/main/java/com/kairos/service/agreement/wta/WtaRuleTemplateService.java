@@ -64,7 +64,7 @@ public class WtaRuleTemplateService extends UserBaseService {
 
         RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("NONE");
         ruleTemplateCategoryService.createRuleTemplateCategory(countryId, ruleTemplateCategory);
-        ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE");
+        ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE",RuleTemplateCategoryType.WTA);
         String MONTHS = "MONTHS";
         String TUESDAY = "TUESDAY";
         long timeInMins = 10;
@@ -418,9 +418,9 @@ public class WtaRuleTemplateService extends UserBaseService {
 
         RuleTemplateCategory templateCategory = null;
         if (StringUtils.isEmpty(templateDTO.getCategory())) {
-            templateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE");
+            templateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE",RuleTemplateCategoryType.WTA);
         } else {
-            templateCategory = ruleTemplateCategoryRepository.findByName(countryId, templateDTO.getCategory());
+            templateCategory = ruleTemplateCategoryRepository.findByName(countryId, templateDTO.getCategory(),RuleTemplateCategoryType.WTA);
         }
         if (!Optional.ofNullable(templateCategory).isPresent())
             throw new InvalidRequestException("Incorrect category " + templateDTO.getCategory());
@@ -442,7 +442,7 @@ public class WtaRuleTemplateService extends UserBaseService {
         // This Method will get all the previous
         Map<String, Object> response = new HashMap();
         List<RuleTemplate> wtaBaseRuleTemplates = wtaRuleTemplateGraphRepository.getWtaBaseRuleTemplateByIds(wtaRuleTemplateDTO.getRuleTemplateIds());
-        RuleTemplateCategory previousRuleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "(?i)" + wtaRuleTemplateDTO.getCategoryName());
+        RuleTemplateCategory previousRuleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "(?i)" + wtaRuleTemplateDTO.getCategoryName(),RuleTemplateCategoryType.WTA);
         if (!Optional.ofNullable(previousRuleTemplateCategory).isPresent()) {  // Rule Template Category does not exist So creating  a new one and adding in country
             previousRuleTemplateCategory = new RuleTemplateCategory(wtaRuleTemplateDTO.getCategoryName());
             Country country = countryGraphRepository.findOne(countryId);

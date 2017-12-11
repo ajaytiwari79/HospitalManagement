@@ -2,14 +2,28 @@ package com.kairos.persistence.model.user.agreement.cta;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_COMPENSATION_TABLE_INTERVAL;
+
 @NodeEntity
 public class CompensationTable extends UserBaseEntity {
     private int granularityLevel;
     private CompensationMeasurementType compensationMeasurementType;
+    @Relationship(type = HAS_COMPENSATION_TABLE_INTERVAL)
     private List<CompensationTableInterval>compensationTableInterval=new ArrayList<>();
+
+    public CompensationTable() {
+        //default
+    }
+
+    public CompensationTable(int granularityLevel, CompensationMeasurementType compensationMeasurementType) {
+        this.granularityLevel = granularityLevel;
+        this.compensationMeasurementType = compensationMeasurementType;
+    }
 
     public int getGranularityLevel() {
         return granularityLevel;

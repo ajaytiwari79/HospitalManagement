@@ -6,7 +6,7 @@ import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult
 import com.kairos.persistence.model.user.auth.TabPermission;
 import com.kairos.persistence.model.user.auth.User;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Interface for CRUD operation on User
  */
 @Repository
-public interface UserGraphRepository extends GraphRepository<User> {
+public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
 
     User findByUserNameIgnoreCase(String userName);

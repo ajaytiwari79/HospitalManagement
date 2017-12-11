@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.user.agreement.wta;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by vipul on 2/8/17.
  */
 @Repository
-public interface RuleTemplateCategoryGraphRepository extends GraphRepository<RuleTemplateCategory> {
+public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository<RuleTemplateCategory,Long> {
     @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"]-(l:RuleTemplateCategory{deleted:false}) Where id(c)={0} AND l.ruleTemplateCategoryType={1}\n" +
             "return l")
     List<RuleTemplateCategory> getRuleTemplateCategoryByCountry(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType);
@@ -26,8 +26,8 @@ public interface RuleTemplateCategoryGraphRepository extends GraphRepository<Rul
     void softDelete(long ruleTemplateCategoryId);
 
 
-    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"]->(l:RuleTemplateCategory{deleted:false}) Where id(c)={0} and l.name=~{1} return l")
-    RuleTemplateCategory findByName(Long countryId, String name);
+    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"]-(l:RuleTemplateCategory{deleted:false}) Where id(c)={0} and l.name=~{1} and l.ruleTemplateCategoryType={2} return l")
+    RuleTemplateCategory findByName(Long countryId, String name,RuleTemplateCategoryType ruleTemplateCategoryType);
 
     @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"]->(l:RuleTemplateCategory{deleted:false}) Where id(c)={0} and l.name IN {1} return l")
     List<RuleTemplateCategory> findByNames(Long countryId, ArrayList<String> categoryNames );

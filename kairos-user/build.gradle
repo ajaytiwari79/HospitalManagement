@@ -1,65 +1,56 @@
 buildscript {
 	ext {
-		springBootVersion = '1.5.6.RELEASE'
+		springBootVersion = '2.0.0.M7'
 		swaggerVersion = '2.5.0'
-		jacksonVersion= '2.5.4'
-		neo4jBoltDriverVersion = '2.1.1'
-		neo4jOgmVersion="2.1.1"
+		jacksonVersion= '2.9.2'
         projectVersion="0.0.1"
         version="0.0.1"
 	}
 	repositories {
 		mavenCentral()
 		jcenter()
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath 'org.springframework:springloaded:1.2.7.RELEASE'
-		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
 	}
 }
 
-plugins {
-    id 'net.researchgate.release' version '2.4.0'
-	id "org.sonarqube" version "2.5"
-
-}
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
+apply plugin: "io.spring.dependency-management"
 apply plugin: 'idea'
 apply plugin: 'application'
-apply plugin: "org.sonarqube"
-
 version = "$projectVersion-SNAPSHOT"
+
 sourceCompatibility = 1.8
+
 mainClassName = 'com.kairos.UserServiceApplication'
 
 repositories {
 	mavenCentral()
 	jcenter()
+	maven { url "https://repo.spring.io/snapshot" }
+	maven { url "https://repo.spring.io/milestone" }
+
 }
 
-idea {
-	module {
-		inheritOutputDirs = false
-		outputDir = file("$buildDir/classes/main/")
-	}
-}
 
 task wrapper(type: Wrapper) { gradleVersion = '4.1' }
 
 ext {
-	springCloudVersion = 'Dalston.SR3'
+	springCloudVersion = 'Finchley.M5'
 }
 
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-aop')
 	compile('org.springframework.boot:spring-boot-starter-cache')
-	compile('org.springframework.cloud:spring-cloud-starter-eureka')
-	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-server')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
 	compile('org.springframework.cloud:spring-cloud-starter-oauth2')
 	compile('org.springframework.cloud:spring-cloud-starter-security')
 	compile('org.springframework.boot:spring-boot-starter-data-neo4j')
@@ -69,9 +60,10 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-mail')
 	compile('org.springframework.boot:spring-boot-starter-websocket')
-	compile("org.springframework.ws:spring-ws-core:2.3.0.RELEASE")
 	compile group: 'com.sun.mail', name: 'javax.mail', version:'1.5.6'
 	// Google Calender API
+	// https://mvnrepository.com/artifact/org.springframework.ws/spring-ws-core
+	compile group: 'org.springframework.ws', name: 'spring-ws-core', version: '3.0.0.RELEASE'
 	compile 'com.google.api-client:google-api-client:1.22.0'
 	compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'
 	compile 'com.google.apis:google-api-services-calendar:v3-rev239-1.22.0'
@@ -93,22 +85,14 @@ dependencies {
 	// https://mvnrepository.com/artifact/joda-time/joda-time
 	compile group: 'joda-time', name: 'joda-time', version: '2.9.4'
 
-	compile group: 'org.neo4j', name: 'neo4j-ogm-bolt-driver', version: neo4jBoltDriverVersion
-
-	compile group: 'org.neo4j', name: 'neo4j-ogm-core', version: neo4jOgmVersion
-
 
 	// Swagger
 	compile "io.springfox:springfox-swagger2:${swaggerVersion}"
 	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
 	compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion
 	compile group: 'org.json', name: 'json', version: '20160810'
 	// https://mvnrepository.com/artifact/com.lowagie/itext
 	compile group: 'com.lowagie', name: 'itext', version: '4.2.1'
-	compile 'org.springframework:springloaded:1.2.7.RELEASE'
 	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-jwt
 	compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
 
@@ -121,51 +105,4 @@ dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
-}
-
-
-
-def profile = "development"
-bootRun {
-	args = ["--spring.profile.active="+profile]
-	systemProperty "spring.profiles.active", "development"
-}
-// Task Properties to be able to push to sonarqube
-sonarqube {
-    properties {
-        property "sonar.projectName", "kairos-user"
-        property "sonar.projectKey", "KC-U"
-        property "sonar.projectVersion",projectVersion
-        property "sonar.login","admin"
-        property "sonar.password","Oodlesadmin@123"
-        property "sonar.exclusions", "**/test/**"
-        //f1601d358fe3614c11dd5c9ceb3b9402e648fa08
-        property "sonar.host.url","http://dev.kairosplanning.com:9000"
-    }
-}
-
-//gradle release plugin
-release {
-    failOnCommitNeeded = true
-    failOnPublishNeeded = true
-    failOnSnapshotDependencies = true
-    failOnUnversionedFiles = true
-    failOnUpdateNeeded = true
-    revertOnFail = true
-    preCommitText = ''
-    preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
-    tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
-    newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
-    tagTemplate = '${version}'
-    versionPropertyFile = 'app-version.properties'
-    versionProperties = []
-    buildTasks = ['test','bootRepackage']
-    git {
-        requireBranch = 'master'
-        pushToRemote = 'origin'
-        pushToBranchPrefix = ''
-        commitVersionFileOnly = false
-    }
-
-
 }

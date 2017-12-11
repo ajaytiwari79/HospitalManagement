@@ -26,8 +26,9 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.FileUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,8 +48,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_H
 @Service
 @Transactional
 public class ClientExtendedService extends UserBaseService {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final Logger logger = Logger.getLogger(this.getClass());
 
     @Inject
     private ClientGraphRepository clientGraphRepository;
@@ -600,11 +601,11 @@ public class ClientExtendedService extends UserBaseService {
 
 
     public boolean deleteMedicalDiagnose(Long diagnoseId) {
-        if (clientDiagnoseGraphRepository.exists(diagnoseId)) {
+        if (clientDiagnoseGraphRepository.existsById(diagnoseId)) {
             logger.debug("diagnose exist");
         }
-        clientDiagnoseGraphRepository.delete(diagnoseId);
-        boolean result = clientDiagnoseGraphRepository.exists(diagnoseId);
+        clientDiagnoseGraphRepository.deleteById(diagnoseId);
+        boolean result = clientDiagnoseGraphRepository.existsById(diagnoseId);
         if (!result) {
             logger.debug("deleted diagnose not exist ");
         }
@@ -701,7 +702,7 @@ public class ClientExtendedService extends UserBaseService {
                 theDir.mkdir();
                 result = true;
             } catch (SecurityException se) {
-                logger.debug(se);
+                logger.debug("{}",se);
             }
             if (result) {
                 logger.debug("DIR created");

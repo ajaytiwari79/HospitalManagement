@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.user.region;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by oodles on 28/12/16.
  */
 @Repository
-public interface ZipCodeGraphRepository extends GraphRepository<ZipCode>{
+public interface ZipCodeGraphRepository extends Neo4jBaseRepository<ZipCode,Long>{
 
 
     @Query("Match (n:ZipCode{isEnable:true}) where n.zipCode={0} return n")

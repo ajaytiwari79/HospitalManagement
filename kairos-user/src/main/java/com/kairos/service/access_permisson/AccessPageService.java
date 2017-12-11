@@ -113,7 +113,7 @@ public class AccessPageService extends UserBaseService {
             AccessPage accessPage = objectMapper.convertValue(child,AccessPage.class);
             accessPages.add(accessPage);
         }
-        accessPageRepository.save(accessPages);
+        accessPageRepository.saveAll(accessPages);
         //setPermissionToAccessPage();
     }
 
@@ -132,7 +132,7 @@ public class AccessPageService extends UserBaseService {
                 employmentAccessPageRelations.add(employmentAccessPageRelation);
             }
         }
-        employmentPageGraphRepository.save(employmentAccessPageRelations);
+        employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
     }
 
     public void setPagePermissionToStaff(AccessPermission accessPermission,long accessGroupId) {
@@ -146,7 +146,7 @@ public class AccessPageService extends UserBaseService {
             employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
             employmentAccessPageRelations.add(employmentAccessPageRelation);
         }
-        employmentPageGraphRepository.save(employmentAccessPageRelations);
+        employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
     }
 
     public void setPagePermissionToAdmin(AccessPermission accessPermission) {
@@ -160,7 +160,7 @@ public class AccessPageService extends UserBaseService {
             employmentAccessPageRelation.setLastModificationDate(new DateTime().getMillis());
             employmentAccessPageRelations.add(employmentAccessPageRelation);
         }
-        employmentPageGraphRepository.save(employmentAccessPageRelations);
+        employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
     }
 
 
@@ -317,8 +317,8 @@ public class AccessPageService extends UserBaseService {
             employment.getUnitEmployments().add(unitEmployment);
             save(employment);
         }
-        unitEmpAccessGraphRepository.save(unitEmpAccessRelationships);
-        employmentPageGraphRepository.save(employmentAccessPageRelations);
+        unitEmpAccessGraphRepository.saveAll(unitEmpAccessRelationships);
+        employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
     }
 
     private List<StaffPermissionDTO> getPermissionForHubMember(){

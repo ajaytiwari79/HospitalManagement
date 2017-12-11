@@ -7,8 +7,11 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -19,23 +22,22 @@ public class CostTimeAgreement extends UserBaseEntity {
 
     @NotEmpty(message = "error.parent.name.notempty") @NotNull(message = "error.parent.name.notnull")
     private String name;
-
     private String description;
-
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
-
     @Relationship(type = HAS_SUB_TYPE)
-    private List<OrganizationType> organizationTypeList;
-
+    private List<OrganizationType> organizationTypeList=new ArrayList<>();
     @Relationship(type = BELONGS_TO)
     private Country country;
-
     @Relationship(type = HAS_CTA_PARENT)
     private CostTimeAgreement parent;
-    private Long startDate;
-    private Long endDate;
-    private Long expiryDate;
+    @DateLong
+    private Date startDate;
+    @DateLong
+    private Date endDate;
+    @DateLong
+    private Date expiryDate;
+    private boolean disabled;
 
 
     public String getName() {
@@ -89,27 +91,27 @@ public class CostTimeAgreement extends UserBaseEntity {
         return true;
     }
 
-    public Long getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Long startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public Long getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Long endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
-    public Long getExpiryDate() {
+    public Date getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Long expiryDate) {
+    public void setExpiryDate(Date expiryDate) {
         this.expiryDate = expiryDate;
     }
 }

@@ -4,7 +4,7 @@ import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_R
 /**
  * Created by pawanmandhan on 5/8/17.
  */
-public interface WTABaseRuleTemplateGraphRepository extends GraphRepository<WTABaseRuleTemplate> {
+public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<WTABaseRuleTemplate,Long> {
 
 
 

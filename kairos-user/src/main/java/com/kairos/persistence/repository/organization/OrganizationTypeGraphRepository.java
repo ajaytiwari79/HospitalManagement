@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.organization;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by oodles on 14/10/16.
  */
 @Repository
-public interface OrganizationTypeGraphRepository extends GraphRepository<OrganizationType> {
+public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<OrganizationType,Long> {
 
     @Override
     List<OrganizationType> findAll();
