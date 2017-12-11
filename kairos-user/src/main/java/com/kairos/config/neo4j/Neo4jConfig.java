@@ -2,9 +2,6 @@ package com.kairos.config.neo4j;
 
 
 import com.kairos.config.env.EnvConfig;
-import org.neo4j.ogm.authentication.UsernamePasswordCredentials;
-import org.neo4j.ogm.config.ClasspathConfigurationSource;
-import org.neo4j.ogm.config.ConfigurationSource;
 import org.neo4j.ogm.session.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,27 +42,14 @@ public class Neo4jConfig implements EnvironmentAware {
     }
     @Bean
     public org.neo4j.ogm.config.Configuration configuration() {
-        ConfigurationSource properties = new ClasspathConfigurationSource("ogm.properties");
         org.neo4j.ogm.config.Configuration configuration = new org.neo4j.ogm.config.Configuration.Builder()
-                .
-        configuration.getDriverClassName(this.environment.getProperty(NEO4J_DRIVER);
-        configuration.
+                .connectionPoolSize(Integer.parseInt(this.environment.getProperty(CONNECTION_POOL_SIZE)))
+                .uri(this.environment.getProperty(NEO4J_URI))
+                .credentials(this.environment.getProperty(NEO4J_USER_NAME),this.environment.getProperty(NEO4J_PASSWORD))
+                 .build();
+
         return configuration;
     }
-
-    @Bean
-    public org.neo4j.ogm.config.Configuration configuration() {
-        org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
-        config
-                .driverConfiguration()
-                .setDriverClassName(this.environment.getProperty(NEO4J_DRIVER))
-                .setURI(this.environment.getProperty(NEO4J_URI)).setCredentials(this.environment.getProperty(NEO4J_USER_NAME),this.environment.getProperty(NEO4J_PASSWORD))
-                .setConnectionPoolSize(Integer.parseInt(this.environment.getProperty(CONNECTION_POOL_SIZE)));
-        return config;
-    }
-
-
-
 
     /**
      * Bean for enviroment variables
