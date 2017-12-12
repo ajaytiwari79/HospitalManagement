@@ -44,7 +44,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public RuleTemplateCategory createRuleTemplateCategory(long countryId, RuleTemplateCategory ruleTemplateCategory) {
 
         String name = "(?i)" + ruleTemplateCategory.getName();
-        int ruleFound = countryGraphRepository.checkDuplicateRuleTemplate(countryId,ruleTemplateCategory.getRuleTemplateCategoryType(), name);
+        int ruleFound = countryGraphRepository.checkDuplicateRuleTemplateCategory(countryId,ruleTemplateCategory.getRuleTemplateCategoryType(), name);
 
         if (ruleFound != 0) {
             throw new DuplicateDataException("Can't create duplicate rule template category in same country "+name);

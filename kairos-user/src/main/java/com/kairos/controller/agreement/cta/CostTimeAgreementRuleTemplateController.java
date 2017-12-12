@@ -31,6 +31,15 @@ public class CostTimeAgreementRuleTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.loadAllCTARuleTemplateByCountry(countryId));
     }
 
+    //
+    //TODO
+    @RequestMapping(value = "/cta/rule-templates", method = RequestMethod.POST)
+    @ApiOperation("get CTA rule template")
+    public ResponseEntity<Map<String, Object>> createDefaultCtaRuleTemplate(@PathVariable Long countryId ) {
+        costTimeAgreementService.createDefaultCtaRuleTemplate(countryId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
+
     /**
      * @auther anil maurya
      * @param countryId

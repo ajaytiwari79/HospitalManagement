@@ -10,7 +10,6 @@ import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.agreement.wta.RuleTemplateCategoryService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +28,8 @@ public class CostTimeAgreementServiceTest {
     @Autowired private CostTimeAgreementService costTimeAgreementService;
     @Autowired private CurrencyService currencyService;
     @Autowired DayTypeService dayTypeService;
+
     @Test
-    @Ignore
     public void addCTARuleTemplateCategory(){
         RuleTemplateCategory category=new RuleTemplateCategory();
         category.setName("NONE");
