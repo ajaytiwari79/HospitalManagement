@@ -27,6 +27,7 @@ import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
+import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -305,7 +306,7 @@ public class TeamService extends UserBaseService {
         int countOfRel = teamGraphRepository.countRelBetweenStaffAndTeam(teamId,staffId);
         if(countOfRel == 0){
 
-           int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId,staffId,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
+           int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId,staffId, DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
             if(countOfRelCreated>0){
                 if(updateTeamIdOfStaffInVisitour(team.getVisitourId(),staffId, unitId)){
                     staff.setVisitourTeamId(team.getVisitourId());

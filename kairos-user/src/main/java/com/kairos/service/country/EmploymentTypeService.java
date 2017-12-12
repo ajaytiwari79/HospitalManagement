@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.position.PositionGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.region.RegionService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

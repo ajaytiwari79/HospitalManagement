@@ -8,6 +8,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -147,7 +148,7 @@ public class OrganizationTypeService extends UserBaseService {
     public void addExpertiseInOrgType(long orgTypeId,long expertiseId,boolean isSelected){
         if(isSelected){
                 if(organizationTypeGraphRepository.orgTypeHasAlreadySkill(orgTypeId, expertiseId) == 0){
-                    organizationTypeGraphRepository.addExpertiseInOrgType(orgTypeId,expertiseId,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
+                    organizationTypeGraphRepository.addExpertiseInOrgType(orgTypeId,expertiseId, DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
                 } else {
                     organizationTypeGraphRepository.updateOrgTypeExpertise(orgTypeId,expertiseId,DateUtil.getCurrentDate().getTime());
                 }

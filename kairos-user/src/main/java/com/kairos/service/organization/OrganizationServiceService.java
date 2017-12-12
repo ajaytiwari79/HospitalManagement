@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepos
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -187,7 +188,7 @@ public class OrganizationServiceService extends UserBaseService {
             if(isSelected){
                 logger.info("check if already exist-------> "+organizationGraphRepository.isServiceAlreadyExist(id,organizationService.getId()));
                 if(organizationGraphRepository.isServiceAlreadyExist(id,organizationService.getId()) == 0){
-                    organizationGraphRepository.addOrganizationServiceInUnit(id,Arrays.asList(organizationService.getId()),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
+                    organizationGraphRepository.addOrganizationServiceInUnit(id,Arrays.asList(organizationService.getId()), DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
                 }else {
                     organizationGraphRepository.updateServiceFromOrganization(id,organizationService.getId());
                 }

@@ -14,6 +14,7 @@ import com.kairos.response.dto.web.feature.FeatureDTO;
 import com.kairos.response.dto.web.feature.VehicleFeaturesDTO;
 import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

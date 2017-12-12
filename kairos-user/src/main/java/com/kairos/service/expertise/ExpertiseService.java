@@ -12,6 +12,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -111,7 +112,7 @@ public class ExpertiseService extends UserBaseService {
         if(isSelected){
             for(long skillId : skillIds){
                 if(expertiseGraphRepository.expertiseHasAlreadySkill(expertiseId,skillId) == 0){
-                    expertiseGraphRepository.addSkillInExpertise(expertiseId,skillId,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
+                    expertiseGraphRepository.addSkillInExpertise(expertiseId,skillId, DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
                 } else {
                     expertiseGraphRepository.updateExpertiseSkill(expertiseId,skillId,DateUtil.getCurrentDate().getTime());
                 }
