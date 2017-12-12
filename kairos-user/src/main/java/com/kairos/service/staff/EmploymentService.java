@@ -155,7 +155,7 @@ public class EmploymentService extends UserBaseService {
                 AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
                 unitEmployment = new UnitEmployment();
                 unitEmployment.setOrganization(unit);
-                unitEmployment.setStartDate(new Date().getTime());
+                unitEmployment.setStartDate(DateUtil.getCurrentDate().getTime());
                 employment.getUnitEmployments().add(unitEmployment);
                 employmentGraphRepository.save(employment);
                 AccessPermission accessPermission = new AccessPermission(accessGroup);

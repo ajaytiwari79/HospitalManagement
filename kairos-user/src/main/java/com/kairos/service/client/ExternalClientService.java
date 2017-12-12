@@ -289,7 +289,7 @@ public class ExternalClientService extends UserBaseService {
             int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
             if (count == 0) {
                 logger.debug("Creating Existing Client relationship from KMD : " + client.getId());
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, new Date().getTime());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDate().getTime());
                 relationService.createRelation(relation);
             }
             saveAddressDetails(patientWrapper, client, unitId);

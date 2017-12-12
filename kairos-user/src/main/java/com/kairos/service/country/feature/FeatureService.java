@@ -52,7 +52,7 @@ public class FeatureService extends UserBaseService{
         if( featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
             throw new DuplicateDataException("Feature already exists with same name " +featureDTO.getName() );
         }
-        return featureGraphRepository.createFeature(countryId,featureDTO.getName(), featureDTO.getDescription(), new Date().getTime());
+        return featureGraphRepository.createFeature(countryId,featureDTO.getName(), featureDTO.getDescription(), DateUtil.getCurrentDate().getTime());
     }
 
     public FeatureQueryResult updateFeature(Long countryId, Long featureId, FeatureDTO featureDTO) {
@@ -68,7 +68,7 @@ public class FeatureService extends UserBaseService{
         if( ! ( feature.getName().equalsIgnoreCase(featureDTO.getName()) ) && featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
             throw new DuplicateDataException("Feature already exists with name " +featureDTO.getName() );
         }
-        return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), new Date().getTime());
+        return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), DateUtil.getCurrentDate().getTime());
     }
 
 

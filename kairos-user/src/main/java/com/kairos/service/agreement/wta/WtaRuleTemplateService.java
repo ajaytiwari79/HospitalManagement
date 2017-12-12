@@ -72,7 +72,7 @@ public class WtaRuleTemplateService extends UserBaseService {
         String TUESDAY = "TUESDAY";
         long timeInMins = 10;
         long daysCount = 10;
-        long dateInMillis = new Date().getTime();
+        long dateInMillis = DateUtil.getCurrentDate().getTime();
 
 
         MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = new MaximumShiftLengthWTATemplate(TEMPLATE1_NAME, TEMPLATE1, true, TEMPLATE1_DESCRIPTION, timeInMins, ruleTemplate, true);

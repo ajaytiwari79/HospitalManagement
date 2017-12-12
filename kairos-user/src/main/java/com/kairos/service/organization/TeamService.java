@@ -305,7 +305,7 @@ public class TeamService extends UserBaseService {
         int countOfRel = teamGraphRepository.countRelBetweenStaffAndTeam(teamId,staffId);
         if(countOfRel == 0){
 
-           int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId,staffId,new Date().getTime(),new Date().getTime());
+           int countOfRelCreated = teamGraphRepository.linkOfTeamAndStaff(teamId,staffId,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
             if(countOfRelCreated>0){
                 if(updateTeamIdOfStaffInVisitour(team.getVisitourId(),staffId, unitId)){
                     staff.setVisitourTeamId(team.getVisitourId());
@@ -316,7 +316,7 @@ public class TeamService extends UserBaseService {
                 throw new InternalError("something went wrong on server");
             }
         } else {
-            int countOfRelCreated = teamGraphRepository.updateStaffTeamRelationship(teamId,staffId,new Date().getTime(),isAssigned);
+            int countOfRelCreated = teamGraphRepository.updateStaffTeamRelationship(teamId,staffId,DateUtil.getCurrentDate().getTime(),isAssigned);
             if(countOfRelCreated>0){
                 if(!isAssigned){
                     staff.setVisitourTeamId("");

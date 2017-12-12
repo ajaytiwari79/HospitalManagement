@@ -125,7 +125,7 @@ public class EmploymentTypeService extends UserBaseService {
         Boolean settingUpdated = employmentTypeGraphRepository.setEmploymentTypeSettingsForOrganization(unitId, employmentTypeId,
                 organizationEmploymentTypeDTO.isAllowedForContactPerson(),
                 organizationEmploymentTypeDTO.isAllowedForShiftPlan(),
-                organizationEmploymentTypeDTO.isAllowedForFlexPool(), new Date().getTime(), new Date().getTime());
+                organizationEmploymentTypeDTO.isAllowedForFlexPool(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         if (settingUpdated) {
             return organizationEmploymentTypeDTO;
         } else {

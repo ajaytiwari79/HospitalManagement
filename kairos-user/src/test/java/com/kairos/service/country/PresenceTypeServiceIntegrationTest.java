@@ -39,7 +39,7 @@ public class PresenceTypeServiceIntegrationTest {
     @Test
     public void test1_AddPresenceType() throws Exception {
         String baseUrl = getBaseUrl(71L, 53L);
-        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PRESENCE TYPE" + new Date().getTime());
+        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PRESENCE TYPE" + DateUtil.getCurrentDate().getTime());
         HttpEntity<PresenceTypeDTO> requestBodyData = new HttpEntity<>(presenceTypeDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PresenceTypeDTO>> typeReference =
@@ -82,7 +82,7 @@ public class PresenceTypeServiceIntegrationTest {
     @Test
     public void test3_updatePresenceType() throws Exception {
         String baseUrl = getBaseUrl(71L, 53L);
-        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PRESENCE TYPE" + new Date().getTime());
+        PresenceTypeDTO presenceTypeDTO = new PresenceTypeDTO("PRESENCE TYPE" + DateUtil.getCurrentDate().getTime());
         HttpEntity<PresenceTypeDTO> requestBodyData = new HttpEntity<>(presenceTypeDTO);
         ResponseEntity<PresenceTypeDTO> response = restTemplate.exchange(
                 baseUrl + "/presenceType/" + createdId,

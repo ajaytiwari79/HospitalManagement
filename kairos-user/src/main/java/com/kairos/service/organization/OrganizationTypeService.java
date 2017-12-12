@@ -147,12 +147,12 @@ public class OrganizationTypeService extends UserBaseService {
     public void addExpertiseInOrgType(long orgTypeId,long expertiseId,boolean isSelected){
         if(isSelected){
                 if(organizationTypeGraphRepository.orgTypeHasAlreadySkill(orgTypeId, expertiseId) == 0){
-                    organizationTypeGraphRepository.addExpertiseInOrgType(orgTypeId,expertiseId,new Date().getTime(),new Date().getTime());
+                    organizationTypeGraphRepository.addExpertiseInOrgType(orgTypeId,expertiseId,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
                 } else {
-                    organizationTypeGraphRepository.updateOrgTypeExpertise(orgTypeId,expertiseId,new Date().getTime());
+                    organizationTypeGraphRepository.updateOrgTypeExpertise(orgTypeId,expertiseId,DateUtil.getCurrentDate().getTime());
                 }
         } else {
-            organizationTypeGraphRepository.deleteOrgTypeExpertise(orgTypeId,expertiseId,new Date().getTime());
+            organizationTypeGraphRepository.deleteOrgTypeExpertise(orgTypeId,expertiseId,DateUtil.getCurrentDate().getTime());
         }
     }
 

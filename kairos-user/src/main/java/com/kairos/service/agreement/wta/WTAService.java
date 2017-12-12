@@ -140,7 +140,7 @@ public class WTAService extends UserBaseService {
 
         wta.setRuleTemplates(wtaBaseRuleTemplates);
 
-        Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? new Date().getTime() : wtaDTO.getStartDateMillis();
+        Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? DateUtil.getCurrentDate().getTime() : wtaDTO.getStartDateMillis();
         wta.setStartDateMillis(dateInMillies);
 
 
@@ -246,7 +246,7 @@ public class WTAService extends UserBaseService {
 
 
         if (wtaDTO.getStartDateMillis() == 0) {
-            oldWta.setStartDateMillis(new Date().getTime());
+            oldWta.setStartDateMillis(DateUtil.getCurrentDate().getTime());
         } else oldWta.setStartDateMillis(wtaDTO.getStartDateMillis());
 
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {

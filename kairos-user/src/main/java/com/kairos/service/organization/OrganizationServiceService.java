@@ -187,7 +187,7 @@ public class OrganizationServiceService extends UserBaseService {
             if(isSelected){
                 logger.info("check if already exist-------> "+organizationGraphRepository.isServiceAlreadyExist(id,organizationService.getId()));
                 if(organizationGraphRepository.isServiceAlreadyExist(id,organizationService.getId()) == 0){
-                    organizationGraphRepository.addOrganizationServiceInUnit(id,Arrays.asList(organizationService.getId()),new Date().getTime(),new Date().getTime());
+                    organizationGraphRepository.addOrganizationServiceInUnit(id,Arrays.asList(organizationService.getId()),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
                 }else {
                     organizationGraphRepository.updateServiceFromOrganization(id,organizationService.getId());
                 }
@@ -203,12 +203,12 @@ public class OrganizationServiceService extends UserBaseService {
             }
             if(isSelected){
                 if(teamGraphRepository.countOfServices(id,organizationService.getId()) == 0){
-                    teamGraphRepository.addServiceInTeam(id,organizationService.getId(),new Date().getTime(),new Date().getTime());
+                    teamGraphRepository.addServiceInTeam(id,organizationService.getId(),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
                 }else {
-                    teamGraphRepository.updateOrganizationService(id,organizationServiceId,true,new Date().getTime());
+                    teamGraphRepository.updateOrganizationService(id,organizationServiceId,true,DateUtil.getCurrentDate().getTime());
                 }
             } else {
-                teamGraphRepository.updateOrganizationService(id,organizationServiceId,false,new Date().getTime());
+                teamGraphRepository.updateOrganizationService(id,organizationServiceId,false,DateUtil.getCurrentDate().getTime());
             }
 
         }

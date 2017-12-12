@@ -3,6 +3,7 @@ package com.kairos.service.country;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
+import com.kairos.util.DateUtil;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class TimeTypeServiceIntegrationTest {
 
     static Long createdId;
     static Long createdIdForDelete;
-    String name = "ABC" + new Date().toString();
+    String name = "ABC" + DateUtil.getCurrentDate().toString();
 
     @Test
     public void test1_addTimeType() throws Exception {
@@ -85,7 +86,7 @@ public class TimeTypeServiceIntegrationTest {
     public void test3_updateTimeType() throws Exception {
         String baseUrl = getBaseUrl(71L, 53L);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/timeType/" + createdId);
-        name = "ABC" + new Date().toString();
+        name = "ABC" + DateUtil.getCurrentDate().toString();
         TimeTypeDTO timeTypeDTO = new TimeTypeDTO(name, "PRESENCE DAY", false, false, false, false);
         HttpEntity<TimeTypeDTO> entity = new HttpEntity<>(timeTypeDTO);
         ResponseEntity<TimeTypeDTO> response = restTemplate.exchange(
