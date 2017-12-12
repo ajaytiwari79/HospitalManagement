@@ -119,7 +119,7 @@ public class AccessPageService extends UserBaseService {
 
     public void setPermissionToAccessPage(){
         List<AccessPermission> accessPermissions = accessPermissionGraphRepository.findAll();
-        List<AccessPage> accessPages = accessPageRepository.findAll();
+        List<AccessPage> accessPages = (List<AccessPage> )accessPageRepository.findAll();
 
         List<EmploymentAccessPageRelation> employmentAccessPageRelations = new ArrayList<>(accessPages.size());
         for(AccessPermission accessPermission : accessPermissions){
@@ -150,7 +150,7 @@ public class AccessPageService extends UserBaseService {
     }
 
     public void setPagePermissionToAdmin(AccessPermission accessPermission) {
-        List<AccessPage> accessPages = accessPageRepository.findAll();
+        List<AccessPage> accessPages =(List<AccessPage>) accessPageRepository.findAll();
         List<EmploymentAccessPageRelation> employmentAccessPageRelations = new ArrayList<>(accessPages.size());
         for (AccessPage accessPage : accessPages) {
             EmploymentAccessPageRelation employmentAccessPageRelation = new EmploymentAccessPageRelation(accessPermission, accessPage);

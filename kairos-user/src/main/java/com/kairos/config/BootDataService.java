@@ -389,7 +389,7 @@ public class BootDataService {
         medicalCareService.setCreationDate(new Date().getTime());
         medicalCareService.setLastModificationDate(new Date().getTime());
 
-        organizationServiceRepository.save(Arrays.asList(homeCareService, medicalCareService));
+        organizationServiceRepository.saveAll(Arrays.asList(homeCareService, medicalCareService));
 
     }
 
@@ -484,7 +484,7 @@ public class BootDataService {
         registeredStatus.setDescription("Relationship of Citizen is registered formally");
         registeredStatus.setCountry(denmark);
 
-        citizenStatusGraphRepository.save(Arrays.asList(registeredStatus,livingPartnerStatus,disvorcedStatus,marriedStatus,singleStatus,deadStatus));
+        citizenStatusGraphRepository.saveAll(Arrays.asList(registeredStatus,livingPartnerStatus,disvorcedStatus,marriedStatus,singleStatus,deadStatus));
     }
 
     private void createCitizen() {
@@ -788,7 +788,7 @@ public class BootDataService {
         nestingTeam.setName("Nesting Team");
         nestingTeam.setCreationDate(new Date().getTime());
         nestingTeam.setLastModificationDate(new Date().getTime());
-        teamGraphRepository.save(Arrays.asList(nestingTeam));
+        teamGraphRepository.saveAll(Arrays.asList(nestingTeam));
     }
 
     private void linkingOfStaffAndTeam() {
@@ -892,7 +892,7 @@ public class BootDataService {
         experiencedTeam.setName("Experienced Team");
         experiencedTeam.setCreationDate(new Date().getTime());
         experiencedTeam.setLastModificationDate(new Date().getTime());
-        teamGraphRepository.save(Arrays.asList(nestingTeam, experiencedTeam));
+        teamGraphRepository.saveAll(Arrays.asList(nestingTeam, experiencedTeam));
     }
 
     private void createGroupForCityLevel(){
@@ -969,7 +969,7 @@ public class BootDataService {
         paySafecard.setCreationDate(new Date().getTime());
         paySafecard.setLastModificationDate(new Date().getTime());
         paySafecard.setCountry(denmark);
-        paymentTypeGraphRepository.save(Arrays.asList(creditCard,paySafecard));
+        paymentTypeGraphRepository.saveAll(Arrays.asList(creditCard,paySafecard));
     }
 
     private void createCurrency(){

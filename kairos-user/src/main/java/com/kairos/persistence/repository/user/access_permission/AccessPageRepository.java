@@ -20,12 +20,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Long> {
-
-    @Override
-    List<AccessPage> findAll();
-
-    List<AccessPage> findAll(Iterable<Long> accessPageIds);
-
     @Query("Match (org:Organization) where id(org)={0}\n" +
             "match (org)-[:"+HAS_SUB_ORGANIZATION+"*]->(n)\n" +
             "Match (n)-[:HAS_GROUP]->(group:Group)-[:"+HAS_TEAM+"]->(team:Team)-[:"+TEAM_HAS_MEMBER+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={1} with staff\n" +
