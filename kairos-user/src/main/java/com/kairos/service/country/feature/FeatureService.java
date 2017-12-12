@@ -14,6 +14,7 @@ import com.kairos.response.dto.web.feature.FeatureDTO;
 import com.kairos.response.dto.web.feature.VehicleFeaturesDTO;
 import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ public class FeatureService extends UserBaseService{
         if( featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
             throw new DuplicateDataException("Feature already exists with same name " +featureDTO.getName() );
         }
-        return featureGraphRepository.createFeature(countryId,featureDTO.getName(), featureDTO.getDescription(), new Date().getTime());
+        return featureGraphRepository.createFeature(countryId,featureDTO.getName(), featureDTO.getDescription(), DateUtil.getCurrentDate().getTime());
     }
 
     public FeatureQueryResult updateFeature(Long countryId, Long featureId, FeatureDTO featureDTO) {
@@ -68,7 +69,7 @@ public class FeatureService extends UserBaseService{
         if( ! ( feature.getName().equalsIgnoreCase(featureDTO.getName()) ) && featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
             throw new DuplicateDataException("Feature already exists with name " +featureDTO.getName() );
         }
-        return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), new Date().getTime());
+        return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), DateUtil.getCurrentDate().getTime());
     }
 
 

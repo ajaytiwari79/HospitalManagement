@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.user.access_permission.AccessPageReposi
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import com.kairos.util.DateUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -109,8 +110,8 @@ public class AccessGroupService extends UserBaseService {
             accessGroupList = new ArrayList<>(accessGroupNames.length);
             for (String name : accessGroupNames) {
                 AccessGroup accessGroup = new AccessGroup(name);
-                accessGroup.setCreationDate(new Date().getTime());
-                accessGroup.setLastModificationDate(new Date().getTime());
+                accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
+                accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
                 if(TASK_GIVERS.equals(name)){
                     accessGroup.setTypeOfTaskGiver(true);
                 }
@@ -220,8 +221,8 @@ public class AccessGroupService extends UserBaseService {
     }
 
     public boolean setAccessPagePermissions(long accessGroupId, List<Long> accessGroupIds,boolean isSelected) {
-        long creationDate = new Date().getTime();
-        long lastModificationDate = new Date().getTime();
+        long creationDate = DateUtil.getCurrentDate().getTime();
+        long lastModificationDate = DateUtil.getCurrentDate().getTime();
         accessGroupRepository.updateAccessPagePermission(accessGroupId,accessGroupIds,isSelected,creationDate,lastModificationDate);
         return true;
     }

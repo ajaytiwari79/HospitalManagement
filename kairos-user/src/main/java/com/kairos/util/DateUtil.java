@@ -87,7 +87,7 @@ public class DateUtil {
 
     public static Date getFirstDayOfCurrentWeek() {
         Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
+        c.setTime(DateUtil.getCurrentDate());
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         return c.getTime();
     }
@@ -207,5 +207,9 @@ public class DateUtil {
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = isoFormat.parse(dateReceived);
         return date.getTime();
+    }
+
+    public static Date getCurrentDate(){
+        return new Date();
     }
 }

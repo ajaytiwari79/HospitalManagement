@@ -41,7 +41,7 @@ public  class Tst {
 
 
         Tst tst = new Tst();
-        tst.setDate(new Date());
+        tst.setDate(DateUtil.getCurrentDate());
 
         System.out.println("to string " + tst.toString());
 

@@ -23,6 +23,7 @@ import com.kairos.response.dto.web.PatientRelative;
 import com.kairos.response.dto.web.PatientWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.region.RegionService;
+import com.kairos.util.DateUtil;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -289,7 +290,7 @@ public class ExternalClientService extends UserBaseService {
             int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
             if (count == 0) {
                 logger.debug("Creating Existing Client relationship from KMD : " + client.getId());
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, new Date().getTime());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDate().getTime());
                 relationService.createRelation(relation);
             }
             saveAddressDetails(patientWrapper, client, unitId);
