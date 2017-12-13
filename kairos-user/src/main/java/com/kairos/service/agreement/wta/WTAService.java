@@ -25,6 +25,8 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.WtaDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.agreement.RuleTemplateCategoryService;
+import com.kairos.service.agreement.RuleTemplateService;
 import com.kairos.service.expertise.ExpertiseService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -61,7 +63,7 @@ public class WTAService extends UserBaseService {
     @Inject
     ExpertiseService expertiseService;
     @Inject
-    private WtaRuleTemplateService wtaRuleTemplateService;
+    private RuleTemplateService ruleTemplateService;
     @Inject
     private RuleTemplateCategoryService ruleTemplateCategoryService;
 
@@ -147,7 +149,7 @@ public class WTAService extends UserBaseService {
 
         if (wtaDTO.getRuleTemplates() != null || !wtaDTO.getRuleTemplates().isEmpty()) {
             for (long ruleTemplateId : wtaDTO.getRuleTemplates()) {
-                WTARuleTemplateQueryResponse wtaBaseRuleTemplate = wtaRuleTemplateService.getRuleTemplateById(ruleTemplateId);
+                WTARuleTemplateQueryResponse wtaBaseRuleTemplate = ruleTemplateService.getRuleTemplateById(ruleTemplateId);
                 WTABaseRuleTemplate wtaBaseRuleTemplateCopy = new WTABaseRuleTemplate();
                 if (!Optional.ofNullable(wtaBaseRuleTemplate).isPresent()) {
                     throw new DataNotFoundByIdException("Invalid RuleTemplate Id " + ruleTemplateId);

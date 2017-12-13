@@ -7,9 +7,10 @@ import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
-import com.kairos.service.agreement.wta.RuleTemplateCategoryService;
+import com.kairos.service.agreement.RuleTemplateCategoryService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,8 @@ public class CostTimeAgreementServiceTest {
 
 
     }
+    @Test
+    @Ignore
     public  void changeCTARuleTemplateCategory() throws Exception{
         CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS= costTimeAgreementService.loadAllCTARuleTemplateByCountry(53L);
         ArrayList arrayList = new ArrayList();

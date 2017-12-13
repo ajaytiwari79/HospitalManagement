@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
  * Constants for relationship types
  */
 
-public class RelationshipConstants {
+public abstract class RelationshipConstants {
 
     // Organization
     public final static String COUNTRY = "BELONGS_TO";
@@ -114,7 +114,7 @@ public class RelationshipConstants {
     public static final String HAS_CTA = "HAS_CTA";
     public static final String HAS_COMPENSATION_TABLE = "HAS_COMPENSATION_TABLE";
     public static final String HAS_COMPENSATION_TABLE_INTERVAL = "HAS_COMPENSATION_TABLE_INTERVAL";
-    public static final String HAS_CTA_PARENT = "HAS_CTA_PARENT";
+    public static final String HAS_PARENT_CTA = "HAS_PARENT_CTA";
     public static final String HAS_WTA = "HAS_WTA";
 
 
@@ -190,6 +190,6 @@ public class RelationshipConstants {
     /**
      * Default constructor
      */
-    public RelationshipConstants() throws UnknownHostException {
+    private RelationshipConstants() throws UnknownHostException {
     }
 }

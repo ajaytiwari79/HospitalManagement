@@ -1,8 +1,8 @@
-package com.kairos.controller.agreement.wta;
+package com.kairos.controller.agreement;
 
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.service.agreement.wta.RuleTemplateCategoryService;
+import com.kairos.service.agreement.RuleTemplateCategoryService;
 import com.kairos.service.country.CountryService;
 import com.kairos.util.response.ResponseHandler;
 import org.springframework.http.HttpStatus;

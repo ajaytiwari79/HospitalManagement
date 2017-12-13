@@ -1,7 +1,6 @@
 package com.kairos.controller.agreement.cta;
 
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateWrapper;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -51,17 +50,6 @@ public class CostTimeAgreementRuleTemplateController {
     public ResponseEntity<Map<String, Object>> updateCTARuleTemplate(@PathVariable Long countryId
             ,@RequestBody @Valid CTARuleTemplateDTO ctaRuleTemplateDTO,@PathVariable Long id ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.updateCTARuleTemplate(countryId,id,ctaRuleTemplateDTO));
-    }
-
-    /**
-     * @auther Vipul Pandey
-     * @param rule template
-     * @return
-     */
-    @RequestMapping(value = "/cta/rule-template-category", method = RequestMethod.PUT)
-    @ApiOperation("get CTA rule template")
-    public ResponseEntity<Map<String, Object>> changeCTARuleTemplateCategory(@PathVariable Long countryId,@RequestBody @Valid CTARuleTemplateWrapper ctaRuleTemplateWrapper ) throws ExecutionException, InterruptedException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.changeCTARuleTemplateCategory(countryId,ctaRuleTemplateWrapper));
     }
 
 }

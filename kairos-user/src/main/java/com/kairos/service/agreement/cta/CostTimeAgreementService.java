@@ -210,8 +210,9 @@ public class CostTimeAgreementService extends UserBaseService {
         return ctaRuleTemplateDTO;
     }
 
-    public CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
-        BeanUtils.copyProperties(ctaRuleTemplateDTO, ctaRuleTemplate, "calculateOnDayTypes", "compensationTable");
+
+    public CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate,CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
+        BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes");
 
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
                 .buildTimeTypesEmploymentTypeAndAccessGroups(ctaRuleTemplate, ctaRuleTemplateDTO);
@@ -269,44 +270,13 @@ public class CostTimeAgreementService extends UserBaseService {
         return CompletableFuture.completedFuture(true);
     }
 
+
     public void saveInterval() {
         CompensationTableInterval tableInterval = new CompensationTableInterval();
         tableInterval.setValue(2.3F);
-        tableInterval.setStartDate(LocalDate.now());
         this.save(tableInterval);
     }
 
 
-    public RuleTemplateCategory changeCTARuleTemplateCategory(Long countryId, CTARuleTemplateWrapper ctaRuleTemplateWrapper) {
-        RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory();
-        boolean ruleTemplateCategoryFound = false;
-        Country country = countryGraphRepository.findOne(countryId);
-        List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
-        for (int i = 0; i < ruleTemplateCategories.size(); i++) {
-            if (ruleTemplateCategories.get(i).getName().equalsIgnoreCase(ctaRuleTemplateWrapper.getRuleTemplateCategory()) &&
-                    ruleTemplateCategories.get(i).getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.CTA)) {
-                ruleTemplateCategoryFound = true;
-                ruleTemplateCategory = ruleTemplateCategories.get(i);
-                break;
-            }
-        }
-
-
-        if (!ruleTemplateCategoryFound) {
-            ruleTemplateCategory.setName(ctaRuleTemplateWrapper.getRuleTemplateCategory());
-            ruleTemplateCategory.setDeleted(false);
-            ruleTemplateCategory.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
-            country.addRuleTemplateCategory(ruleTemplateCategory);
-            save(country);
-            ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ctaRuleTemplateWrapper.getCtaRuleTemplateList(), ruleTemplateCategory.getName());
-        } else {
-            List<Long> ctaRuleTemplates = ruleTemplateCategoryGraphRepository.findAllExistingCTARuleTemplateByCategory(ruleTemplateCategory.getName(), countryId);
-            List<Long> ruleTemplateIdsNeedToAddInCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(ctaRuleTemplates, ctaRuleTemplateWrapper.getCtaRuleTemplateList());
-            List<Long> ruleTemplateIdsNeedToRemoveFromCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(ctaRuleTemplateWrapper.getCtaRuleTemplateList(), ctaRuleTemplates);
-            ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateIdsNeedToAddInCategory, ruleTemplateCategory.getName());
-            ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateIdsNeedToRemoveFromCategory, "NONE");
-        }
-        return ruleTemplateCategory;
-    }
 
 }

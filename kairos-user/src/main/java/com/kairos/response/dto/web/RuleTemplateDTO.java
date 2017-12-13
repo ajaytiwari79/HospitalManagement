@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -8,11 +9,14 @@ import java.util.List;
 /**
  * Created by prabjot on 18/8/17.
  */
-public class WtaRuleTemplateDTO {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude()
+public class RuleTemplateDTO {
 
     private List<Long> ruleTemplateIds;
-    @NotEmpty(message = "error.WtaRuleTemplateDTO.categoryName.notEmpty")     @NotNull(message = "error.WtaRuleTemplateDTO.categoryName.notnull")
+    @NotNull(message = "error.WtaRuleTemplateDTO.categoryName.notnull")
     private String categoryName;
+    private String ruleTemplateCategoryType;
 
     public List<Long> getRuleTemplateIds() {
         return ruleTemplateIds;
@@ -28,5 +32,13 @@ public class WtaRuleTemplateDTO {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public String getRuleTemplateCategoryType() {
+        return ruleTemplateCategoryType;
+    }
+
+    public void setRuleTemplateCategoryType(String ruleTemplateCategoryType) {
+        this.ruleTemplateCategoryType = ruleTemplateCategoryType;
     }
 }

@@ -13,11 +13,12 @@ public class AccessPageQueryResult {
 
     private long id;
     private String name;
-    private boolean isSelected;
-    private boolean isModule;
-    private boolean isRead;
-    private boolean isWrite;
+    private boolean selected;
+    private boolean module;
+    private boolean read;
+    private boolean write;
     private boolean active;
+    private String moduleId;
 
 
     public String getModuleId() {
@@ -26,25 +27,6 @@ public class AccessPageQueryResult {
 
     public void setModuleId(String moduleId) {
         this.moduleId = moduleId;
-    }
-
-    private String moduleId;
-
-    public void setRead(boolean read) {
-        isRead = read;
-    }
-
-    public void setWrite(boolean write) {
-        isWrite = write;
-    }
-
-    public boolean isRead() {
-
-        return isRead;
-    }
-
-    public boolean isWrite() {
-        return isWrite;
     }
 
     private List<AccessPageQueryResult> children = new ArrayList<>();
@@ -65,14 +47,6 @@ public class AccessPageQueryResult {
         return name;
     }
 
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public boolean isModule() {
-        return isModule;
-    }
-
     public void setId(long id) {
         this.id = id;
     }
@@ -81,13 +55,6 @@ public class AccessPageQueryResult {
         this.name = name;
     }
 
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
-
-    public void setModule(boolean module) {
-        isModule = module;
-    }
 
     public boolean isActive() {
         return active;
@@ -97,16 +64,50 @@ public class AccessPageQueryResult {
         this.active = active;
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isModule() {
+        return module;
+    }
+
+    public void setModule(boolean module) {
+        this.module = module;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
+    }
+
+    public boolean isWrite() {
+        return write;
+    }
+
+    public void setWrite(boolean write) {
+        this.write = write;
+    }
+
     @Override
     public String toString() {
         return "AccessPageQueryResult{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", isRead=" + isRead +
-                ", isWrite=" + isWrite +
+                ", selected=" + selected +
+                ", module=" + module +
+                ", read=" + read +
+                ", write=" + write +
+                ", active=" + active +
                 ", moduleId='" + moduleId + '\'' +
+                ", children=" + children +
                 '}';
     }
-
-
 }
