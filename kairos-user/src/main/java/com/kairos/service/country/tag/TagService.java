@@ -263,8 +263,10 @@ public class TagService extends UserBaseService {
         return tagGraphRepository.getCountryTagsOfRuleTemplateCategoryByIdAndDeleted(ruleTmplCategoryId, filterText, false);
     }
 
-    public List<HashMap<String,String>> getListOfMasterDataType(){
-        return MasterDataTypeEnum.getListOfMasterDataType();
+    public HashMap<String,Object> getListOfMasterDataType(){
+        HashMap<String, Object> tagCategoryData = new HashMap<String,Object>();
+        tagCategoryData.put("tagCategories",MasterDataTypeEnum.getListOfMasterDataType());
+        return tagCategoryData;
     }
 
     public HashMap<String,Object> getListOfMasterDataType(Long orgId){
