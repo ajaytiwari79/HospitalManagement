@@ -62,13 +62,4 @@ public class CostTimeAgreementServiceTest {
 
     }
 
-
-    @Test
-    public void saveCom(){
-        costTimeAgreementService.saveInterval();
-
-
-    }
-
-
 }

@@ -29,7 +29,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -193,7 +192,7 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate,CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
-        BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes","compensationTable");
+        BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes");
 
         CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
                 .buildTimeTypesEmploymentTypeAndAccessGroups(ctaRuleTemplate,ctaRuleTemplateDTO);
@@ -207,9 +206,7 @@ public class CostTimeAgreementService extends UserBaseService {
                 {return countryHolidayCalenders.stream();}).collect(Collectors.toList());
 
         ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategory);
-        //update compensation table
-         CompensationTable compensationTable= ctaRuleTemplate.getCompensationTable();
-         BeanUtils.copyProperties(ctaRuleTemplateDTO.getCompensationTable(),compensationTable);
+
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
 
@@ -248,11 +245,5 @@ public class CostTimeAgreementService extends UserBaseService {
     return CompletableFuture.completedFuture(true);
     }
 
-    public void saveInterval(){
-        CompensationTableInterval tableInterval=new CompensationTableInterval();
-        tableInterval.setValue(2.3F);
-        tableInterval.setStartDate(LocalDate.now());
-     this.save(tableInterval);
-    }
 
 }
