@@ -24,6 +24,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.DateUtil;
 import com.kairos.util.FileUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -621,7 +622,7 @@ public class ClientExtendedService extends UserBaseService {
         if (accessToLocation == null) {
             return null;
         }
-        String fileName = new Date().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtil.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
         if(new File(IMAGES_PATH).isDirectory()){
@@ -651,7 +652,7 @@ public class ClientExtendedService extends UserBaseService {
     }
 
     private String writeFile(MultipartFile multipartFile){
-        String fileName = new Date().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtil.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
         if(new File(IMAGES_PATH).isDirectory()){
@@ -684,7 +685,7 @@ public class ClientExtendedService extends UserBaseService {
             return null;
         }
 
-        String fileName = new Date().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtil.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
         createDirectory(IMAGES_PATH);
         final String path = IMAGES_PATH + File.separator + fileName.trim();
         if(new File(IMAGES_PATH).isDirectory()){

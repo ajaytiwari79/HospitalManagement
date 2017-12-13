@@ -87,7 +87,7 @@ public class DateUtil {
 
     public static Date getFirstDayOfCurrentWeek() {
         Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
+        c.setTime(DateUtil.getCurrentDate());
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         return c.getTime();
     }
@@ -209,6 +209,7 @@ public class DateUtil {
         return date.getTime();
     }
 
+
     public static LocalDate asLocalDate(Date date) {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
@@ -226,4 +227,7 @@ public class DateUtil {
     }
 
 
+    public static Date getCurrentDate(){
+        return new Date();
+    }
 }

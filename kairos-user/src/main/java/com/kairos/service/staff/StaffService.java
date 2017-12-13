@@ -47,6 +47,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import com.kairos.util.FileUtil;
 import com.kairos.util.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
@@ -142,7 +143,7 @@ public class StaffService extends UserBaseService {
             return null;
         }
         createDirectory(IMAGES_PATH);
-        String fileName = new Date().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtil.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
         final String path = IMAGES_PATH + File.separator + fileName;
         FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
@@ -221,7 +222,7 @@ public class StaffService extends UserBaseService {
         if (oldExpertise != null) {
             staffGraphRepository.removeSkillsByExpertise(objectToUpdate.getId(), oldExpertise.getId());
         }
-        staffGraphRepository.updateSkillsByExpertise(objectToUpdate.getId(), expertise.getId(), new Date().getTime(), new Date().getTime(), Skill.SkillLevel.ADVANCE);
+        staffGraphRepository.updateSkillsByExpertise(objectToUpdate.getId(), expertise.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
 
         return staffPersonalDetail;
     }
@@ -802,6 +803,7 @@ public class StaffService extends UserBaseService {
         staff.setUser(user);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), isEmploymentExist);
+        staff.setUser(null); // removing user to send in FE
         return staff;
     }
 
@@ -851,7 +853,7 @@ public class StaffService extends UserBaseService {
             contactDetail.setId(staffQueryResult.getContactDetailId());
         }
         if (Optional.ofNullable(payload.getEngineerTypeId()).isPresent()) {
-            EngineerType engineerType = engineerTypeGraphRepository.findOne(payload.getExternalId());
+            EngineerType engineerType = engineerTypeGraphRepository.findOne(payload.getEngineerTypeId());
             staff.setEngineerType(engineerType);
         }
         return staff;

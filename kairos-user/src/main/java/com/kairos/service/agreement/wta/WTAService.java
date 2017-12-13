@@ -28,6 +28,7 @@ import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.expertise.ExpertiseService;
+import com.kairos.util.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -140,7 +141,7 @@ public class WTAService extends UserBaseService {
 
         wta.setRuleTemplates(wtaBaseRuleTemplates);
 
-        Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? new Date().getTime() : wtaDTO.getStartDateMillis();
+        Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? DateUtil.getCurrentDate().getTime() : wtaDTO.getStartDateMillis();
         wta.setStartDateMillis(dateInMillies);
 
 
@@ -246,7 +247,7 @@ public class WTAService extends UserBaseService {
 
 
         if (wtaDTO.getStartDateMillis() == 0) {
-            oldWta.setStartDateMillis(new Date().getTime());
+            oldWta.setStartDateMillis(DateUtil.getCurrentDate().getTime());
         } else oldWta.setStartDateMillis(wtaDTO.getStartDateMillis());
 
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {

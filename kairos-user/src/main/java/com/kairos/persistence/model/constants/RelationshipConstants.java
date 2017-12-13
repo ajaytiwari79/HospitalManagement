@@ -193,6 +193,8 @@ public class RelationshipConstants {
     public final static String HAS_TIME_SLOT_SET = "HAS_TIME_SLOT_SET";
     public final static String HAS_TIME_SLOT = "HAS_TIME_SLOT";
 
+    public final static String RESOURCE_HAS_FEATURE = "RESOURCE_HAS_FEATURE";
+
     /**
      * Default constructor
      */

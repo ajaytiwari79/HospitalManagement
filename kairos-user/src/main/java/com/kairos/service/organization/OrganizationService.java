@@ -45,6 +45,7 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
@@ -203,7 +204,7 @@ public class OrganizationService extends UserBaseService {
         }
         accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization);
-        organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), new Date().getTime(), new Date().getTime());
+        organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         return organization;
     }
 
@@ -228,9 +229,9 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization);
-        long creationDate = new Date().getTime();
+        long creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
-        creationDate = new Date().getTime();
+        creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         phaseRestClient.createDefaultPhases(organization.getId());
         HashMap<String,Object> orgResponse = new HashMap<>();

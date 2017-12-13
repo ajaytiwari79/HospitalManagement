@@ -198,7 +198,7 @@ public class ClientService extends UserBaseService {
                     throw new DuplicateDataException("Can't create citizen with same CPR in same Organization");
                 }
                 logger.debug("Creating Existing Client relationship : " + client.getId());
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, new Date().getTime());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDate().getTime());
                 relationService.createRelation(relation);
                 return client;
             } else {
@@ -705,7 +705,7 @@ public class ClientService extends UserBaseService {
     }
 
     private void createHouseHoldRelationship(long clientId, long houseHoldId) {
-        clientGraphRepository.createHouseHoldRelationship(clientId, houseHoldId, new Date().getTime(), new Date().getTime());
+        clientGraphRepository.createHouseHoldRelationship(clientId, houseHoldId, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
     }
 
     private void saveAddressOfHouseHold(Client client, Client houseHold) {
@@ -873,7 +873,7 @@ public class ClientService extends UserBaseService {
      * to assign staff to client,there can be multiple staff assign to multiple citizen
      */
     public boolean assignStaffToCitizen(long citizenId, long staffId, ClientStaffRelation.StaffType staffType) {
-        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, new Date().getTime(), new Date().getTime());
+        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         return true;
     }
 
@@ -885,7 +885,7 @@ public class ClientService extends UserBaseService {
         for (Map<String, Object> map : staffQueryData) {
             staffIds.add((long) ((Map<String, Object>) map.get("data")).get("id"));
         }
-        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, new Date().getTime(), new Date().getTime());
+        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         long endTime = System.currentTimeMillis();
         logger.info("time taken, client>>assignStaffToCitizen " + (endTime - startTime) + "  ms");
         return true;

@@ -11,6 +11,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class TagService extends UserBaseService {
         if( tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false) ){
             throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
         }
-        return tagGraphRepository.createCountryTag(countryId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), new Date().getTime());
+        return tagGraphRepository.createCountryTag(countryId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), DateUtil.getCurrentDate().getTime());
     }
 
     public Tag  updateCountryTag(Long countryId, Long tagId, TagDTO tagDTO) {
@@ -64,7 +65,7 @@ public class TagService extends UserBaseService {
         if( ! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false) ){
             throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
         }
-        return tagGraphRepository.updateCountryTag(tagId, countryId, tagDTO.getName(), new Date().getTime());
+        return tagGraphRepository.updateCountryTag(tagId, countryId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
     }
 
     public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType){
@@ -124,7 +125,7 @@ public class TagService extends UserBaseService {
     }
 
     /*public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO) {
-        return tagGraphRepository.addOrganizationTag(tagDTO.getName(), organizationId, tagDTO.getMasterDataType(), new Date().getTime(), new Date().getTime() );
+        return tagGraphRepository.addOrganizationTag(tagDTO.getName(), organizationId, tagDTO.getMasterDataType(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime() );
     }*/
 
     public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO) {
@@ -136,7 +137,7 @@ public class TagService extends UserBaseService {
         if( tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false) ){
             throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
         }
-        return tagGraphRepository.createOrganizationTag(organizationId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), new Date().getTime());
+        return tagGraphRepository.createOrganizationTag(organizationId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), DateUtil.getCurrentDate().getTime());
     }
 
     public Tag  updateOrganizationTag(Long organizationId, Long tagId, TagDTO tagDTO) {
@@ -151,7 +152,7 @@ public class TagService extends UserBaseService {
         if( ! ( tag.getName().equalsIgnoreCase(tagDTO.getName()) ) && tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false) ){
             throw new DuplicateDataException("Tag already exists with name " +tagDTO.getName() );
         }
-        return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), new Date().getTime());
+        return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
     }
 
     public Boolean deleteOrganizationTag(Long orgId, Long tagId){

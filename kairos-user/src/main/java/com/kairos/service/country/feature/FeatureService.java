@@ -5,22 +5,22 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.feature.Feature;
 import com.kairos.persistence.model.user.country.feature.FeatureQueryResult;
-import com.kairos.persistence.model.user.country.tag.Tag;
+import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FeatureGraphRepository;
+import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.response.dto.web.feature.FeatureDTO;
 import com.kairos.response.dto.web.feature.VehicleFeaturesDTO;
-import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +41,9 @@ public class FeatureService extends UserBaseService{
     @Autowired
     VehicleGraphRepository vehicleGraphRepository;
 
+    @Autowired
+    ResourceGraphRepository resourceGraphRepository;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public Feature addCountryFeature(Long countryId, FeatureDTO featureDTO) {
@@ -52,7 +55,7 @@ public class FeatureService extends UserBaseService{
         if( featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
             throw new DuplicateDataException("Feature already exists with same name " +featureDTO.getName() );
         }
-        return featureGraphRepository.createFeature(countryId,featureDTO.getName(), featureDTO.getDescription(), new Date().getTime());
+        return featureGraphRepository.createFeature(countryId,featureDTO.getName(), featureDTO.getDescription(), DateUtil.getCurrentDate().getTime());
     }
 
     public FeatureQueryResult updateFeature(Long countryId, Long featureId, FeatureDTO featureDTO) {
@@ -68,7 +71,7 @@ public class FeatureService extends UserBaseService{
         if( ! ( feature.getName().equalsIgnoreCase(featureDTO.getName()) ) && featureGraphRepository.isFeatureExistsWithSameName(featureDTO.getName(), countryId, false) ){
             throw new DuplicateDataException("Feature already exists with name " +featureDTO.getName() );
         }
-        return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), new Date().getTime());
+        return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), DateUtil.getCurrentDate().getTime());
     }
 
 
@@ -107,13 +110,41 @@ public class FeatureService extends UserBaseService{
         if (vehicle == null) {
             throw new DataNotFoundByIdException("Incorrect vehicle id " + vehicleId);
         }
-        List<Feature> features = featureGraphRepository.getListOfFeaturesByIds(countryId,false, vehicleFeaturesDTO.getFeatures());
+        List<Feature> features = featureGraphRepository.getListOfFeaturesByCountryAndIds(countryId,false, vehicleFeaturesDTO.getFeatures());
         vehicle.setFeatures(features);
         vehicleGraphRepository.save(vehicle);
         return vehicle;
     }
 
-    public Feature getFeatureByName(long countryId, String name){
+    public List<FeatureQueryResult> fetchAvailableFeaturesOfResources(Long organizationId, Long resourceId){
+        return featureGraphRepository.getResourcesAvailableFeatures(organizationId, resourceId, false);
+    }
+
+    public List<FeatureQueryResult> fetchSelectedFeaturesOfResources(Long organizationId, Long resourceId){
+        return featureGraphRepository.getResourcesSelectedFeatures(organizationId, resourceId, false);
+    }
+
+    public HashMap<String,List<FeatureQueryResult>> getFeaturesForResource(Long organizationId, Long resourceId){
+        HashMap<String, List<FeatureQueryResult>> featuresData = new HashMap<>();
+        featuresData.put("availableFeatures",fetchAvailableFeaturesOfResources(organizationId,resourceId));
+        featuresData.put("selectedFeatures",fetchSelectedFeaturesOfResources(organizationId,resourceId));
+        return featuresData;
+    }
+
+    public Resource updateFeaturesOfResource(Long organizationId, Long resourceId, VehicleFeaturesDTO vehicleFeaturesDTO){
+        Resource resource = resourceGraphRepository.getResourceOfOrganizationById(organizationId, resourceId, false);
+        if (resource == null) {
+            throw new DataNotFoundByIdException("Incorrect resource id " + resourceId);
+        }
+        List<Feature> features = featureGraphRepository.getAvailableFeaturesOfResourceByOrganizationAndIds(organizationId, resourceId, false, vehicleFeaturesDTO.getFeatures());
+        resource.setFeatures(features);
+        resourceGraphRepository.save(resource);
+        return resource;
+    }
+
+    public Feature getFeatureByName( Long countryId, String name){
         return featureGraphRepository.getFeatureByName(countryId, name, false);
     }
+
+
 }

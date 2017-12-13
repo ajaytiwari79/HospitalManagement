@@ -6,6 +6,7 @@ import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.service.control_panel.ControlPanelService;
 import com.kairos.util.BeanFactoryUtil;
+import com.kairos.util.DateUtil;
 import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -130,7 +131,7 @@ public class DynamicCronScheduler implements  DisposableBean  {
             @Override
             public void run() {
                 logger.info("control pannel exist--> " + controlPanel.getId());
-                controlPanel.setLastRunTime(new Date());
+                controlPanel.setLastRunTime(DateUtil.getCurrentDate());
                 controlPanel.setNextRunTime(getNextExecutionTime(trigger, controlPanel.getLastRunTime(), timeZone));
                 controlPanelService.setScheduleLastRunTime(controlPanel);
 
@@ -143,8 +144,8 @@ public class DynamicCronScheduler implements  DisposableBean  {
                 headers.add("Authorization", "Basic " + base64ClientCredentials);
                 HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
                 String importShiftStatusXMLURI = envConfig.getCarteServerHost()+KETTLE_TRANS_STATUS;
-                //   String startDate = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-                //     String endDate = DateFormatUtils.format(DateUtil.addWeeksInDate(new Date(), 5), "yyyy-MM-dd");
+                //   String startDate = DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy-MM-dd");
+                //     String endDate = DateFormatUtils.format(DateUtil.addWeeksInDate(DateUtil.getCurrentDate(), 5), "yyyy-MM-dd");
                 //  String startDate = DateFormatUtils.format(controlPanel.getStartDateMillis(), "yyyy-MM-dd");
                 //  String endDate = DateFormatUtils.format(controlPanel.getEndDate(), "yyyy-MM-dd");
                 Long workplaceId = Long.valueOf(String.valueOf("15"));
@@ -162,11 +163,11 @@ public class DynamicCronScheduler implements  DisposableBean  {
                         logger.info("!!===============Hit to carte server from Kairos==============!!");
                         importShiftURI = envConfig.getCarteServerHost()+KETTLE_EXECUTE_TRANS+IMPORT_TIMECARE_SHIFTS_PATH+"&intWorkPlaceId="+workplaceId+"&weeks="+weeks+"&jobId="+controlPanel.getId();
                         logger.info("importShiftURI----> "+importShiftURI);
-                        Date started = new Date();
+                        Date started = DateUtil.getCurrentDate();
                         ResponseEntity<String> importResult = restTemplate.exchange(importShiftURI, HttpMethod.GET, entity, String.class);
                         if (importResult.getStatusCodeValue() == 200) {
                             ResponseEntity<String> resultStatusXml = restTemplate.exchange(importShiftStatusXMLURI, HttpMethod.GET, entity, String.class);
-                            Date stopped = new Date();
+                            Date stopped = DateUtil.getCurrentDate();
                             try {
                                 JAXBContext jaxbContext = JAXBContext.newInstance(Transstatus.class);
                                 Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
