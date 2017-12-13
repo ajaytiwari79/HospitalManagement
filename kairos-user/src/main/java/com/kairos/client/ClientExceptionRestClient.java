@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,6 +18,7 @@ import java.util.List;
 /**
  * Created by prabjot on 13/12/17.
  */
+@Component
 public class ClientExceptionRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(PhaseRestClient.class);
@@ -34,7 +36,7 @@ public class ClientExceptionRestClient {
             ResponseEntity<RestTemplateResponseEnvelope<List<ClientExceptionTypesDTO>>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/client_exception_type",
-                            HttpMethod.POST,
+                            HttpMethod.GET,
                             null, typeReference);
 
             RestTemplateResponseEnvelope<List<ClientExceptionTypesDTO>> response = restExchange.getBody();

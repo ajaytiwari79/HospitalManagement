@@ -10,37 +10,37 @@ import java.util.Map;
  */
 public class ClientPersonalCalenderPrerequisiteDTO {
 
-    private List<ClientExceptionTypesDTO> clientExceptionTypesDTOList;
-    private List<Map<String,Object>> clientTemporaryAddresses;
-    private List<TimeSlotWrapper> timeSlotWrappers;
+    private List<ClientExceptionTypesDTO> exceptionTypes;
+    private List<Map<String,Object>> temporaryAddresses;
+    private List<TimeSlotWrapper> timeSlots;
 
-    public ClientPersonalCalenderPrerequisiteDTO(List<ClientExceptionTypesDTO> clientExceptionTypesDTOList, List<Map<String, Object>> clientTemporaryAddresses, List<TimeSlotWrapper> timeSlotWrappers) {
-        this.clientExceptionTypesDTOList = clientExceptionTypesDTOList;
-        this.clientTemporaryAddresses = clientTemporaryAddresses;
-        this.timeSlotWrappers = timeSlotWrappers;
+    public ClientPersonalCalenderPrerequisiteDTO(List<ClientExceptionTypesDTO> exceptionTypes, List<Map<String, Object>> temporaryAddresses, List<TimeSlotWrapper> timeSlots) {
+        this.exceptionTypes = exceptionTypes;
+        this.temporaryAddresses = temporaryAddresses;
+        this.timeSlots = timeSlots;
     }
 
-    public List<ClientExceptionTypesDTO> getClientExceptionTypesDTOList() {
-        return clientExceptionTypesDTOList;
+    public List<ClientExceptionTypesDTO> getExceptionTypes() {
+        return exceptionTypes;
     }
 
-    public void setClientExceptionTypesDTOList(List<ClientExceptionTypesDTO> clientExceptionTypesDTOList) {
-        this.clientExceptionTypesDTOList = clientExceptionTypesDTOList;
+    public void setExceptionTypes(List<ClientExceptionTypesDTO> exceptionTypes) {
+        this.exceptionTypes = exceptionTypes;
     }
 
-    public List<Map<String, Object>> getClientTemporaryAddresses() {
-        return clientTemporaryAddresses;
+    public List<Map<String, Object>> getTemporaryAddresses() {
+        return temporaryAddresses;
     }
 
-    public void setClientTemporaryAddresses(List<Map<String, Object>> clientTemporaryAddresses) {
-        this.clientTemporaryAddresses = clientTemporaryAddresses;
+    public void setTemporaryAddresses(List<Map<String, Object>> temporaryAddresses) {
+        this.temporaryAddresses = temporaryAddresses;
     }
 
-    public List<TimeSlotWrapper> getTimeSlotWrappers() {
-        return timeSlotWrappers;
+    public List<TimeSlotWrapper> getTimeSlots() {
+        return timeSlots;
     }
 
-    public void setTimeSlotWrappers(List<TimeSlotWrapper> timeSlotWrappers) {
-        this.timeSlotWrappers = timeSlotWrappers;
+    public void setTimeSlots(List<TimeSlotWrapper> timeSlots) {
+        this.timeSlots = timeSlots;
     }
 }
