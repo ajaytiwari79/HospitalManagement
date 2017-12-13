@@ -3,6 +3,8 @@ package com.kairos.service.country.feature;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.user.country.feature.Feature;
+import com.kairos.persistence.model.user.country.feature.FeatureQueryResult;
+import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.response.dto.web.feature.FeatureDTO;
 import com.kairos.response.dto.web.feature.VehicleFeaturesDTO;
@@ -50,6 +52,8 @@ public class FeatureServiceIntegrationTest {
     static Long createdFeatureId;
     static Long orgId = 71L;
     static Long countryId = 53L;
+    static Long unitId = 145L;
+    static Long resourceId = 6353L;
     static Long vehicleId = 10599L;
 
     @Test
@@ -114,6 +118,26 @@ public class FeatureServiceIntegrationTest {
     }
 
     @Test
+    public void test4_deleteFeature() throws Exception {
+        if(createdFeatureId == null){
+            logger.info("Feature Id is null");
+            Feature feature = featureService.getFeatureByName(countryId, nameOfFeauture);
+            createdFeatureId = feature.getId();
+        }
+        String baseUrl=getBaseUrl(orgId,countryId, null);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = restTemplate.exchange(
+                baseUrl+"/feature/"+createdFeatureId,
+                HttpMethod.DELETE, null, resTypeReference);
+
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
+    }
+
+    @Test
     public void test5_updateFeaturesOfVehicle() throws Exception {
         if(createdFeatureId == null){
             logger.info("Feature Id is null");
@@ -141,23 +165,50 @@ public class FeatureServiceIntegrationTest {
     }
 
     @Test
-    public void test4_deleteFeature() throws Exception {
+    public void test6_updateFeaturesOfReource() throws Exception {
         if(createdFeatureId == null){
             logger.info("Feature Id is null");
             Feature feature = featureService.getFeatureByName(countryId, nameOfFeauture);
+
             createdFeatureId = feature.getId();
         }
-        String baseUrl=getBaseUrl(orgId,countryId, null);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> resTypeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        String baseUrl=getBaseUrl(orgId,null, unitId);
+        VehicleFeaturesDTO vehicleFeaturesDTO = new VehicleFeaturesDTO();
+
+        List<Long> featureIds = new ArrayList<>();
+        featureIds.add(createdFeatureId);
+        vehicleFeaturesDTO.setFeatures(featureIds);
+        logger.info("vehicleFeaturesDTO : "+vehicleFeaturesDTO.getFeatures().get(0));
+
+        HttpEntity<VehicleFeaturesDTO> requestBodyData = new HttpEntity<>(vehicleFeaturesDTO);
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Resource>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Resource>>() {
                 };
 
-        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = restTemplate.exchange(
-                baseUrl+"/feature/"+createdFeatureId,
-                HttpMethod.DELETE, null, resTypeReference);
+        ResponseEntity<RestTemplateResponseEnvelope<Resource>> response = restTemplate.exchange(
+                baseUrl+"/resource/"+resourceId+"/feature",
+                HttpMethod.PUT, requestBodyData, resTypeReference);
 
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
                 HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
+    }
+
+    @Test
+    public void test7_getListOfFeaturesOfResource() throws Exception {
+        String baseUrl=getBaseUrl(orgId,null, unitId);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,List<FeatureQueryResult>>>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,List<FeatureQueryResult>>>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<HashMap<String,List<FeatureQueryResult>>>> response = restTemplate.exchange(
+                baseUrl+"/resource/"+resourceId+"/feature",
+                HttpMethod.GET, null, resTypeReference);
+
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
+
+        logger.info("response.getBody().getData() : "+response.getBody().getData());
     }
 
     public final String getBaseUrl(Long organizationId,Long countryId, Long unitId){
