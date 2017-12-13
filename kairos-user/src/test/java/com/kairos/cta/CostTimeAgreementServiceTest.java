@@ -68,6 +68,9 @@ public class CostTimeAgreementServiceTest {
 
 
     }
-
+    public  void changeCTARuleTemplateCategory() throws Exception{
+        CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS= costTimeAgreementService.loadAllCTARuleTemplateByCountry(53L);
+        //CTARuleTemplate ctaRuleTemplate =(CTARuleTemplate) ctaRuleTemplateDTOS.getRuleTemplates().get(0);
+    }
 
 }

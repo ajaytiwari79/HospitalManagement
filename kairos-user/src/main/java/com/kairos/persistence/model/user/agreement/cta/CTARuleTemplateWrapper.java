@@ -7,14 +7,14 @@ import java.util.List;
  */
 public class CTARuleTemplateWrapper {
     private String ruleTemplateCategory;
-    private List<Long> ctaList;
+    private List<Long> ctaRuleTemplateList;
 
     public CTARuleTemplateWrapper() {
     }
 
-    public CTARuleTemplateWrapper(String ruleTemplateCategory, List<Long> ctaList) {
+    public CTARuleTemplateWrapper(String ruleTemplateCategory, List<Long> ctaRuleTemplateList) {
         this.ruleTemplateCategory = ruleTemplateCategory;
-        this.ctaList = ctaList;
+        this.ctaRuleTemplateList = ctaRuleTemplateList;
     }
 
     public String getRuleTemplateCategory() {
@@ -25,11 +25,11 @@ public class CTARuleTemplateWrapper {
         this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
-    public List<Long> getCtaList() {
-        return ctaList;
+    public List<Long> getCtaRuleTemplateList() {
+        return ctaRuleTemplateList;
     }
 
-    public void setCtaList(List<Long> ctaList) {
-        this.ctaList = ctaList;
+    public void setCtaRuleTemplateList(List<Long> ctaRuleTemplateList) {
+        this.ctaRuleTemplateList = ctaRuleTemplateList;
     }
 }

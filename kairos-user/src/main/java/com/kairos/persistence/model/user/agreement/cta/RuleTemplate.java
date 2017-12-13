@@ -18,7 +18,7 @@ public abstract class RuleTemplate extends UserBaseEntity {
 
 
     public RuleTemplate() {
-        //default constractor
+        //default constructor
     }
 
     public String getName() {

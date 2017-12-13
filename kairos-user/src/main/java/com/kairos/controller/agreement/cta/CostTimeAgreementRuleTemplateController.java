@@ -58,7 +58,7 @@ public class CostTimeAgreementRuleTemplateController {
      * @param rule template
      * @return
      */
-    @RequestMapping(value = "/cta/rule-template/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/cta/rule-template-category", method = RequestMethod.PUT)
     @ApiOperation("get CTA rule template")
     public ResponseEntity<Map<String, Object>> changeCTARuleTemplateCategory(@PathVariable Long countryId,@RequestBody @Valid CTARuleTemplateWrapper ctaRuleTemplateWrapper ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,costTimeAgreementService.changeCTARuleTemplateCategory(countryId,ctaRuleTemplateWrapper));

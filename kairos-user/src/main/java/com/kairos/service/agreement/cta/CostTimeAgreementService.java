@@ -20,6 +20,7 @@ import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CurrencyService;
+import com.kairos.util.ArrayUtil;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -276,9 +277,36 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
 
-    public CTARuleTemplateWrapper changeCTARuleTemplateCategory(Long countryId, CTARuleTemplateWrapper ctaRuleTemplateWrapper) {
+    public RuleTemplateCategory changeCTARuleTemplateCategory(Long countryId, CTARuleTemplateWrapper ctaRuleTemplateWrapper) {
+        RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory();
+        boolean ruleTemplateCategoryFound = false;
+        Country country = countryGraphRepository.findOne(countryId);
+        List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
+        for (int i = 0; i < ruleTemplateCategories.size(); i++) {
+            if (ruleTemplateCategories.get(i).getName().equalsIgnoreCase(ctaRuleTemplateWrapper.getRuleTemplateCategory()) &&
+                    ruleTemplateCategories.get(i).getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.CTA)) {
+                ruleTemplateCategoryFound = true;
+                ruleTemplateCategory = ruleTemplateCategories.get(i);
+                break;
+            }
+        }
 
-        return ctaRuleTemplateWrapper;
+
+        if (!ruleTemplateCategoryFound) {
+            ruleTemplateCategory.setName(ctaRuleTemplateWrapper.getRuleTemplateCategory());
+            ruleTemplateCategory.setDeleted(false);
+            ruleTemplateCategory.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
+            country.addRuleTemplateCategory(ruleTemplateCategory);
+            save(country);
+            ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ctaRuleTemplateWrapper.getCtaRuleTemplateList(), ruleTemplateCategory.getName());
+        } else {
+            List<Long> ctaRuleTemplates = ruleTemplateCategoryGraphRepository.findAllExistingCTARuleTemplateByCategory(ruleTemplateCategory.getName(), countryId);
+            List<Long> ruleTemplateIdsNeedToAddInCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(ctaRuleTemplates, ctaRuleTemplateWrapper.getCtaRuleTemplateList());
+            List<Long> ruleTemplateIdsNeedToRemoveFromCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(ctaRuleTemplateWrapper.getCtaRuleTemplateList(), ctaRuleTemplates);
+            ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateIdsNeedToAddInCategory, ruleTemplateCategory.getName());
+            ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateIdsNeedToRemoveFromCategory, "NONE");
+        }
+        return ruleTemplateCategory;
     }
 
 }

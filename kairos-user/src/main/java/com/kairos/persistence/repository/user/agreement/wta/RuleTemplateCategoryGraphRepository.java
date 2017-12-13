@@ -46,6 +46,19 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
             "delete r\n" +
             "MERGE(WBRT)<-[:HAS_RULE_TEMPLATES]-(newRTC)")
     void updateCategoryOfRuleTemplate(List<Long> wtaBaseRuleTemplateId,String ruleTemplateCategoryName);
+
+    // CTA PART
+    @Query("match(newRTC:RuleTemplateCategory{ruleTemplateCategoryType:'CTA',deleted:false}) where newRTC.name={1} \n" +
+            "Match(ctaRuleTemplates:CTARuleTemplate)-[r:HAS_RULE_TEMPLATES]-(:RuleTemplateCategory{ruleTemplateCategoryType:'CTA',deleted:false})  where Id(ctaRuleTemplates) IN {0}\n" +
+            "delete r\n" +
+            "MERGE(ctaRuleTemplates)<-[:HAS_RULE_TEMPLATES]-(newRTC)")
+    void updateCategoryOfCTARuleTemplate(List<Long> ctaRuleTemplateList,String ruleTemplateCategoryName);
+
+    @Query("match (c:Country)-[:"+HAS_RULE_TEMPLATE_CATEGORY+"]-(n:RuleTemplateCategory{ruleTemplateCategoryType:'CTA',deleted:false})-[:"+HAS_RULE_TEMPLATES+"]-(ctaRuleTemplates:CTARuleTemplate)\n" +
+            "where n.name={0} AND Id(c)={1} return Id(ctaRuleTemplates)")
+    List<Long> findAllExistingCTARuleTemplateByCategory(String ruleTemplateCategoryName, long countryId);
+
+
     RuleTemplateCategory findByNameAndRuleTemplateCategoryType(String name, RuleTemplateCategoryType ruleTemplateCategoryType);
 
 }
