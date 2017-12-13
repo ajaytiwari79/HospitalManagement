@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.skill;
 
-import com.kairos.persistence.model.constants.RelationshipConstants;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import org.springframework.data.neo4j.annotation.Query;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY_HAS_TAG;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANISATION_HAS_SKILL;
 
 /**
  * Created by oodles on 15/9/16.
@@ -57,6 +56,13 @@ public interface SkillCategoryGraphRepository extends GraphRepository<SkillCateg
             "id:id(sc),  \n" +
             "description:sc.description} AS result")
     List<Map<String,Object>> findSkillCategoryByCountryId(Long id);
+
+    @Query("MATCH (s:Skill)<-[:"+ORGANISATION_HAS_SKILL+"]-(organization:Organization) where id(organization)={0} AND s.isEnabled=true " +
+            " OPTIONAL MATCH (s)-[:HAS_CATEGORY]->(sc:SkillCategory) WHERE sc.isEnabled=true with sc,s \n" +
+            "return  { skillList: case when s is NULL then [] else collect({   \n" +
+            "id:id(s), name:s.name, shortName:s.shortName, description:s.description}) END ,\n" +
+            "name:sc.name, id:id(sc), description:sc.description} AS result")
+    List<Map<String,Object>> findSkillCategoryByUnitId(Long id);
 
     @Query("MATCH (s:Skill)-[:HAS_CATEGORY]->(sc:SkillCategory) where id(sc)={0} AND s.isEnabled=true  return s")
     List<Skill> getThisCategorySkills(long id);
