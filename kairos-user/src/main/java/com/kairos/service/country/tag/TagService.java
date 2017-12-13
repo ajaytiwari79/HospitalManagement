@@ -6,9 +6,11 @@ import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
+import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
+import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
@@ -35,6 +37,9 @@ public class TagService extends UserBaseService {
 
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
+
+    @Inject
+    private SkillGraphRepository skillGraphRepository;
 
     public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
@@ -215,6 +220,17 @@ public class TagService extends UserBaseService {
         }
     }
 
+    public List<Tag> getOrganizationTagsByIdsAndMasterDataType(Long orgId, List<Long> tagsId, MasterDataTypeEnum masterDataType){
+        logger.info("tagsId : "+tagsId);
+        if (tagsId != null && tagsId.size() > 0) {
+            List<Tag> tags = tagGraphRepository.getOrganizationTagsById(orgId, tagsId, masterDataType.toString(), false);
+            logger.info("tags : "+tags);
+            return tags;
+        } else {
+            return new ArrayList<Tag>();
+        }
+    }
+
     public List<Tag> getCountryTagsOfSkill(long countryId, long skillId, String filterText){
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
@@ -252,7 +268,16 @@ public class TagService extends UserBaseService {
     }
 
 
+    public boolean updateOrganizationTagsOfSkill(Long skillId, Long orgId, List<Long> tagsId){
+        Skill skill = skillGraphRepository.findOne(skillId);
+        skillGraphRepository.removeAllOrganizationTags(orgId,skillId);
+        List<Tag> listOfTags = tagGraphRepository.getTagsOfSkillByDeleted(skillId, false);
+        listOfTags.addAll(getOrganizationTagsByIdsAndMasterDataType(orgId,tagsId,MasterDataTypeEnum.SKILL));
+        skill.setTags(listOfTags);
+        skillGraphRepository.save(skill);
+        return true;
 
+    }
     // Methods created for test cases
 
     public Tag getCountryTagByName(long countryId, String name, MasterDataTypeEnum masterDataTypeEnum){

@@ -17,6 +17,7 @@ import com.kairos.persistence.repository.organization.OrganizationMetadataReposi
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGraphRepository;
@@ -96,6 +97,8 @@ public class SkillService extends UserBaseService {
     private TaskDemandRestClient taskDemandRestClient;
     @Inject
     private TagService tagService;
+    @Inject
+    private TagGraphRepository tagGraphRepository;
 
 
     public Map<String, Object> createSkill(SkillDTO skillDTO, long skillCategoryId) {
@@ -145,7 +148,10 @@ public class SkillService extends UserBaseService {
                 skill.setName(data.getName());
                 skill.setDescription(data.getDescription());
                 skill.setShortName(data.getShortName());
-                skill.setTags(tagService.getCountryTagsByIdsAndMasterDataType(data.getTags(), MasterDataTypeEnum.SKILL));
+                skillGraphRepository.removeAllCountryTags(data.getId());
+                List<Tag> listOfTags = tagGraphRepository.getTagsOfSkillByDeleted(data.getId(),false);
+                listOfTags.addAll(tagService.getCountryTagsByIdsAndMasterDataType(data.getTags(), MasterDataTypeEnum.SKILL));
+                skill.setTags(listOfTags);
                 return skillGraphRepository.save(skill).retrieveDetails();
             }
 
@@ -344,15 +350,20 @@ public class SkillService extends UserBaseService {
         }
     }*/
 
-
     public boolean updateSkillOfOrganization(long unitId, long skillId, String type, OrganizationSkillDTO organizationSkillDTO) {
         
         if(ORGANIZATION.equalsIgnoreCase(type)){
+            Boolean skillUpdated = false;
             if(organizationSkillDTO.getCustomName() == null || organizationSkillDTO.getCustomName() == ""){
-                return skillGraphRepository.updateSkillOfOrganization(unitId, skillId, organizationSkillDTO.getVisitourId());
+                skillUpdated =  skillGraphRepository.updateSkillOfOrganization(unitId, skillId, organizationSkillDTO.getVisitourId());
             } else {
-                return skillGraphRepository.updateSkillOfOrganizationWithCustomName(unitId, skillId, organizationSkillDTO.getVisitourId(), organizationSkillDTO.getCustomName());
+//                updateOrganizationTagsOfSkill
+                skillUpdated =  skillGraphRepository.updateSkillOfOrganizationWithCustomName(unitId, skillId, organizationSkillDTO.getVisitourId(), organizationSkillDTO.getCustomName());
             }
+            if(skillUpdated){
+                tagService.updateOrganizationTagsOfSkill(skillId, unitId, organizationSkillDTO.getTags());
+            }
+            return skillUpdated;
          } else if(TEAM.equalsIgnoreCase(type)) {
             return skillGraphRepository.updateVisitourIdOfSkillInTeam(unitId,skillId,organizationSkillDTO.getVisitourId());
         } else {
