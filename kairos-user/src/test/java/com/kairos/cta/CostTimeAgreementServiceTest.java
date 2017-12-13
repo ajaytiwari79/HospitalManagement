@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -70,7 +71,10 @@ public class CostTimeAgreementServiceTest {
     }
     public  void changeCTARuleTemplateCategory() throws Exception{
         CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS= costTimeAgreementService.loadAllCTARuleTemplateByCountry(53L);
-        //CTARuleTemplate ctaRuleTemplate =(CTARuleTemplate) ctaRuleTemplateDTOS.getRuleTemplates().get(0);
+        ArrayList arrayList = new ArrayList();
+         List<Long> ctaRuleTemplateList=null;
+        ctaRuleTemplateList.add(ctaRuleTemplateDTOS.getRuleTemplates().get(0).getId());
+        String ruleTemplateCategory="test";
     }
 
 }
