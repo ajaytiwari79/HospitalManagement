@@ -16,6 +16,7 @@ import com.kairos.persistence.repository.user.country.EmploymentTypeGraphReposit
 import com.kairos.persistence.repository.user.country.TimeTypeGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -173,10 +175,10 @@ public class CostTimeAgreementService extends UserBaseService {
                 .collect(Collectors.toList());
         List<Long> ruleTemplateCategoryIds=ctaRuleTemplateCategoryList.parallelStream().map(RuleTemplateCategory::getId)
                 .collect(Collectors.toList());
-        List<CTARuleTemplateDTO> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(ruleTemplateCategoryIds);
+        List<CTARuleTemplateQueryResult> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(ruleTemplateCategoryIds);
         CTARuleTemplateCategoryWrapper ctaRuleTemplateCategoryWrapper=new CTARuleTemplateCategoryWrapper();
         ctaRuleTemplateCategoryWrapper.getRuleTemplateCategories().addAll(ctaRuleTemplateCategoryList);
-        ctaRuleTemplateCategoryWrapper.getRuleTemplates().addAll(ruleTemplates);
+        ctaRuleTemplateCategoryWrapper.setRuleTemplates(ruleTemplates);
         return ctaRuleTemplateCategoryWrapper;
     }
 

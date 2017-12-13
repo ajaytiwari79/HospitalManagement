@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.country.Country;
@@ -16,7 +18,8 @@ import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class CostTimeAgreement extends UserBaseEntity {
     private String name;
