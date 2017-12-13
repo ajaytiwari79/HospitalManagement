@@ -368,10 +368,11 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "create new time slot set")
-    @RequestMapping(value = "/unit/{unitId}/time_slot_set/{timeSlotId}/time_slot", method = RequestMethod.POST)
+    @RequestMapping(value = "/unit/{unitId}/time_slot_set/{timeSlotSetId}/time_slot", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createTimeSlot(@PathVariable long unitId, @Validated @RequestBody TimeSlotDTO timeSlotDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.createTimeSlot(unitId, timeSlotDTO));
+    public ResponseEntity<Map<String, Object>> createTimeSlot(@PathVariable Long timeSlotSetId,
+                                                              @Validated @RequestBody TimeSlotDTO timeSlotDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.createTimeSlot(timeSlotSetId, timeSlotDTO));
     }
 
     @ApiOperation(value = "delete time slot set")
@@ -925,7 +926,7 @@ public class OrganizationController {
      * @param unitId
      * @return
      */
-    @ApiOperation(value = "Get skills of organization")
+    @ApiOperation(value = "Get current time slots of organization")
     @RequestMapping(value = "/unit/{unitId}/current/time_slots", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getCurrentTimeSlotsOfOrganization(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,

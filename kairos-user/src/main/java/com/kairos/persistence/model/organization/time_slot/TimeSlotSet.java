@@ -28,6 +28,7 @@ public class TimeSlotSet extends UserBaseEntity{
     private Date endDate;
     private TimeSlotMode timeSlotMode;
     private boolean deleted;
+    private boolean defaultSet = false;
 
 
 
@@ -85,6 +86,14 @@ public class TimeSlotSet extends UserBaseEntity{
     public void updateTimeSlotSet(TimeSlotSetDTO timeSlotSetDTO){
         this.endDate = timeSlotSetDTO.getEndDate();
         this.name = timeSlotSetDTO.getName();
+    }
+
+    public boolean isDefaultSet() {
+        return defaultSet;
+    }
+
+    public void setDefaultSet(boolean defaultSet) {
+        this.defaultSet = defaultSet;
     }
 
     @Override

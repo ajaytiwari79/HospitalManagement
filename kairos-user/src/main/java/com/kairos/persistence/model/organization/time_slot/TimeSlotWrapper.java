@@ -18,6 +18,15 @@ public class TimeSlotWrapper {
     private int endHour;
     private int endMinute;
     private boolean isShiftStartTime;
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Long getId() {
         return id;

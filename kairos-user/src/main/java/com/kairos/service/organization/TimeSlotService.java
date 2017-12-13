@@ -15,6 +15,7 @@ import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,12 +58,16 @@ public class TimeSlotService extends UserBaseService {
         return timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSetId);
     }
 
-    public List<TimeSlotSet> getTimeSlotSets(Long unitId) {
+    public Map<String, Object> getTimeSlotSets(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId, 0);
         if (organization == null) {
             throw new InternalError("Organization can not found");
         }
-        return timeSlotGraphRepository.findTimeSlotsByOrganizationId(unitId, organization.getTimeSlotMode());
+        List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotsByOrganizationId(unitId, organization.getTimeSlotMode());
+        Map<String,Object> timeSlotSetData = new HashMap<>();
+        timeSlotSetData.put("timeSlotSets",timeSlotSets);
+        timeSlotSetData.put("standardTimeSlot", STANDARD.equals(organization.getTimeSlotMode()) ? true : false);
+        return timeSlotSetData;
     }
 
     public TimeSlotSet createTimeSlotSet(long unitId, TimeSlotSetDTO timeSlotSetDTO) {
@@ -80,8 +85,8 @@ public class TimeSlotService extends UserBaseService {
         return timeSlotSet;
     }
 
-    public TimeSlotDTO createTimeSlot(Long timeSlotId,TimeSlotDTO timeSlotDTO){
-        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotId);
+    public TimeSlotDTO createTimeSlot(Long timeSlotSetId,TimeSlotDTO timeSlotDTO){
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
         if(!Optional.ofNullable(timeSlotSet).isPresent()){
             throw new DataNotFoundByIdException("Invalid time slot id");
         }
@@ -135,6 +140,7 @@ public class TimeSlotService extends UserBaseService {
                 break;
             }
         }
+        updateTimeSlot(timeSlotSetDTO.getTimeSlots(),timeSlotSet.getId());
         timeSlotSet.updateTimeSlotSet(timeSlotSetDTO);
         timeSlotSetsToUpdate.add(timeSlotSet);
         timeSlotSetRepository.save(timeSlotSetsToUpdate);
@@ -149,7 +155,7 @@ public class TimeSlotService extends UserBaseService {
         }
         organization.setTimeSlotMode((standardTimeSlot) ? STANDARD : ADVANCE);
         organizationGraphRepository.save(organization);
-        return prepareTimeSlotResponse(organization);
+        return getTimeSlotSets(unitId);
 
     }
 
@@ -178,11 +184,13 @@ public class TimeSlotService extends UserBaseService {
             save(timeSlotSet);
         }
         timeSlotSetToDelete.setDeleted(true);
+        save(timeSlotSetToDelete);
         return true;
     }
 
     public boolean deleteTimeSlot(long timeSlotId,Long timeSlotSetId) {
-        return timeSlotGraphRepository.deleteTimeSlot(timeSlotId,timeSlotSetId);
+        timeSlotGraphRepository.deleteTimeSlot(timeSlotSetId,timeSlotId);
+        return true;
     }
 
     private Map<String, Object> prepareTimeSlotResponse(Organization unit) {
@@ -196,6 +204,7 @@ public class TimeSlotService extends UserBaseService {
     public void createDefaultTimeSlots(Organization organization) {
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, new Date(),organization.getTimeSlotMode());
+        timeSlotSet.setDefaultSet(true);
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
         for (TimeSlot timeSlot : timeSlots) {
             TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = new TimeSlotSetTimeSlotRelationship();
@@ -330,4 +339,9 @@ public class TimeSlotService extends UserBaseService {
         }
 
     }*/
+
+
+    public List<TimeSlot> getTimeSlotsOfCountry(Long countryId){
+        return timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
+    }
 }

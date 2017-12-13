@@ -31,7 +31,7 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
 
     @Query("Match (timeSlotSet:TimeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot)\n" +
             "where id(timeSlotSet)={0} and id(timeSlot)={1} set r.deleted=true")
-    boolean deleteTimeSlot(Long timeSlotSetId,Long timeSlotId);
+    void deleteTimeSlot(Long timeSlotSetId,Long timeSlotId);
 
     @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND id(timeSlot)={1}\n" +
             "Match (organization)-[r:ORGANIZATION_TIME_SLOT]->(timeSlot:TimeSlot)return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
@@ -64,7 +64,7 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
 
     @Query("Match (timeSlotSet:TimeSlotSet)-[r:"+HAS_TIME_SLOT+"{deleted:false}]->(timeSlot:TimeSlot)\n" +
             "where id(timeSlotSet)={0}\n" +
-            "return id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.isShiftStartTime as shiftStartTime")
+            "return id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.isShiftStartTime as shiftStartTime order by r.startHour")
     List<TimeSlotWrapper> findTimeSlotsByTimeSlotSet(Long timeSlotSetId);
 
     List<TimeSlot> findBySystemGeneratedTimeSlotsIsTrue();
