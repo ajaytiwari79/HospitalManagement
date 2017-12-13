@@ -88,15 +88,17 @@ public class RuleTemplateCategoryService extends UserBaseService {
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
             throw new ActionNotPermittedException("Can't delete none template category " + templateCategoryId);
         }
-
-        List<Long> wtaBaseRuleTemplateList = wtaBaseRuleTemplateGraphRepository.findAllWTABelongsByTemplateCategoryId(templateCategoryId);
-        RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
-
-        wtaBaseRuleTemplateGraphRepository.deleteRelationOfRuleTemplateCategoryAndWTA(templateCategoryId, wtaBaseRuleTemplateList);
-
-        wtaBaseRuleTemplateGraphRepository.setAllWTAWithCategoryNone(noneRuleTemplateCategory.getId(), wtaBaseRuleTemplateList);
-
-        ruleTemplateCategoryGraphRepository.softDelete(templateCategoryId);
+        if (ruleTemplateCategory.getRuleTemplateCategoryType().equals("CTA")) {
+            List<Long> ctaRuleTemplates = ruleTemplateCategoryGraphRepository.findAllExistingCTARuleTemplateByCategory(ruleTemplateCategory.getName(), countryId);
+            RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
+            ruleTemplateCategoryGraphRepository.deleteRelationOfRuleTemplateCategoryAndCTA(templateCategoryId, ctaRuleTemplates);
+            ruleTemplateCategoryGraphRepository.setAllCTAWithCategoryNone(noneRuleTemplateCategory.getId(), ctaRuleTemplates);
+        } else {
+            List<Long> wtaBaseRuleTemplateList = wtaBaseRuleTemplateGraphRepository.findAllWTABelongsByTemplateCategoryId(templateCategoryId);
+            RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
+            wtaBaseRuleTemplateGraphRepository.deleteRelationOfRuleTemplateCategoryAndWTA(templateCategoryId, wtaBaseRuleTemplateList);
+            wtaBaseRuleTemplateGraphRepository.setAllWTAWithCategoryNone(noneRuleTemplateCategory.getId(), wtaBaseRuleTemplateList);
+        }
         return true;
 
     }
@@ -191,15 +193,10 @@ public class RuleTemplateCategoryService extends UserBaseService {
         boolean ruleTemplateCategoryFound = false;
         Country country = countryGraphRepository.findOne(countryId);
         List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
-        for (int i = 0; i < ruleTemplateCategories.size(); i++) {
-            if (ruleTemplateCategories.get(i).getName().equalsIgnoreCase(ruleTemplateDTO.getCategoryName()) &&
-                    ruleTemplateCategories.get(i).getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.CTA)) {
-                ruleTemplateCategoryFound = true;
-                ruleTemplateCategory = ruleTemplateCategories.get(i);
-                break;
-            }
-        }
-        if (!ruleTemplateCategoryFound) {
+       Optional<RuleTemplateCategory> countryRuleTemplateCategory=ruleTemplateCategories.parallelStream().filter(ruleTemplateCategory1->"CTA".equalsIgnoreCase(ruleTemplateCategory1.getRuleTemplateCategoryType().toString())
+                &&ruleTemplateCategory1.getName().equalsIgnoreCase(ruleTemplateDTO.getCategoryName())).findFirst();
+
+        if (!countryRuleTemplateCategory.isPresent()) {
             ruleTemplateCategory.setName(ruleTemplateDTO.getCategoryName());
             ruleTemplateCategory.setDeleted(false);
             ruleTemplateCategory.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);

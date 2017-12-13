@@ -61,4 +61,14 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
 
     RuleTemplateCategory findByNameAndRuleTemplateCategoryType(String name, RuleTemplateCategoryType ruleTemplateCategoryType);
 
+    @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
+            "match (r:CTARuleTemplate) where id(r) IN {1}\n" +
+            "match(rt)-[rel:"+HAS_RULE_TEMPLATES+"]->(r)\n" +
+            "delete rel set rt.deleted=false")
+    void deleteRelationOfRuleTemplateCategoryAndCTA(long ruleTemplateId, List<Long> ctaRuleTemplateIds );
+
+    @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
+            "match (r:CTARuleTemplate) where id(r) IN {1}\n" +
+            "create (rt)-[rq:"+HAS_RULE_TEMPLATES+"]->(r)")
+    void setAllCTAWithCategoryNone(long ruleTemplateId, List<Long> ctaRuleTemplateIds);
 }
