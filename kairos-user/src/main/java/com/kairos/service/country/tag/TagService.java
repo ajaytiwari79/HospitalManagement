@@ -267,6 +267,16 @@ public class TagService extends UserBaseService {
         return MasterDataTypeEnum.getListOfMasterDataType();
     }
 
+    public HashMap<String,Object> getListOfMasterDataType(Long orgId){
+        Organization organization = organizationGraphRepository.findOne(orgId);
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Incorrect Unit Id " + orgId);
+        }
+        HashMap<String, Object> tagCategoryData = new HashMap<String,Object>();
+        tagCategoryData.put("tagCategories",MasterDataTypeEnum.getListOfMasterDataType());
+        tagCategoryData.put("showCountryTags", organization.isShowCountryTags() != null ? organization.isShowCountryTags(): false);
+        return tagCategoryData;
+    }
 
     public boolean updateOrganizationTagsOfSkill(Long skillId, Long orgId, List<Long> tagsId){
         Skill skill = skillGraphRepository.findOne(skillId);
