@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.response.dto.web.client.CitizenSupplier;
 
 import java.util.Date;
 

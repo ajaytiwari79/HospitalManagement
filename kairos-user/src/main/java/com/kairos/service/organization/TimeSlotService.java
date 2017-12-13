@@ -224,6 +224,10 @@ public class TimeSlotService extends UserBaseService {
             timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
         }
         save(timeSlotSetTimeSlotRelationships);
+        List<TimeSlotSet> timeSlotSets = organization.getTimeSlotSets();
+        timeSlotSets.add(timeSlotSet);
+        organization.setTimeSlotSets(timeSlotSets);
+        save(organization);
     }
 
     /*private void validateTimeSlot(long unitId,OrganizationTimeSlotRelationship objToCreate,TimeSlot.TimeSlotMode timeSlotMode){

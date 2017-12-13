@@ -10,7 +10,7 @@ import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
-import com.kairos.response.dto.web.ClientFilterDTO;
+import com.kairos.response.dto.web.client.ClientFilterDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.response.dto.web.organization.OrganizationServiceDTO;

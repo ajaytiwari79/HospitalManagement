@@ -18,6 +18,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.*;
+import com.kairos.response.dto.web.client.CitizenSupplier;
 import com.kairos.service.client.ExternalClientService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
