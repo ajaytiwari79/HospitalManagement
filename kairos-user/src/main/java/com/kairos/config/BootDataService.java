@@ -15,6 +15,7 @@ import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.payment_type.PaymentType;
@@ -36,6 +37,7 @@ import com.kairos.persistence.repository.user.client.ContactAddressGraphReposito
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CurrencyGraphRepository;
+import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
@@ -166,6 +168,8 @@ public class BootDataService {
     private AccessPageService accessPageService;
     @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    @Inject
+    private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
 
     private List<Long> skillList;
     private com.kairos.persistence.model.organization.OrganizationService homeCareService;
@@ -253,6 +257,7 @@ public class BootDataService {
             //createCitizen();
         }
             startRegisteredCronJobs();
+            createEquipmentCategories();
 
     }
 
@@ -982,5 +987,41 @@ public class BootDataService {
         currency.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         currency.setCountry(denmark);
         currencyGraphRepository.save(currency);
+    }
+
+    private void createEquipmentCategories(){
+        if( ! equipmentCategoryGraphRepository.ifEquipmentCategoryExists()){
+            logger.info("In IFFFFFFFFFFFFFFFFFFF createEquipmentCategories");
+            EquipmentCategory equipmentCategorySmall = new EquipmentCategory();
+            equipmentCategorySmall.setName("Small");
+            equipmentCategorySmall.setDescription("Small");
+            equipmentCategorySmall.setWeightInKg(20F);
+            equipmentCategorySmall.setHeightInCm(20F);
+            equipmentCategorySmall.setWidthInCm(20F);
+            equipmentCategorySmall.setLengthInCm(20F);
+            equipmentCategorySmall.setVolumeInCm(20F);
+
+            EquipmentCategory equipmentCategoryMedium = new EquipmentCategory();
+            equipmentCategoryMedium.setName("Medium");
+            equipmentCategoryMedium.setDescription("Medium");
+            equipmentCategoryMedium.setWeightInKg(50F);
+            equipmentCategoryMedium.setHeightInCm(50F);
+            equipmentCategoryMedium.setWidthInCm(50F);
+            equipmentCategoryMedium.setLengthInCm(50F);
+            equipmentCategoryMedium.setVolumeInCm(50F);
+
+            EquipmentCategory equipmentCategoryLarge = new EquipmentCategory();
+            equipmentCategoryLarge.setName("Large");
+            equipmentCategoryLarge.setDescription("Large");
+            equipmentCategoryLarge.setWeightInKg(100F);
+            equipmentCategoryLarge.setHeightInCm(100F);
+            equipmentCategoryLarge.setWidthInCm(100F);
+            equipmentCategoryLarge.setLengthInCm(100F);
+            equipmentCategoryLarge.setVolumeInCm(100F);
+
+            equipmentCategoryGraphRepository.save(Arrays.asList(equipmentCategorySmall, equipmentCategoryMedium, equipmentCategoryLarge));
+        } else {
+            logger.info("In ELSEEEEEEEEEEEEEEEEEEEE createEquipmentCategories");
+        }
     }
 }

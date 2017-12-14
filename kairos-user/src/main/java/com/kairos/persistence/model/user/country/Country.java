@@ -8,6 +8,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.user.country.equipment.Equipment;
 import com.kairos.persistence.model.user.country.feature.Feature;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.resources.Vehicle;
@@ -65,6 +66,10 @@ public class Country extends UserBaseEntity {
 
     @Relationship(type = COUNTRY_HAS_FEATURE )
     private List<Feature> features;
+
+    @Relationship(type = COUNTRY_HAS_EQUIPMENT )
+    private List<Equipment> equipments;
+
     @JsonIgnore
     @Relationship(type = HAS_ORGANIZATION_SERVICES)
     private List<OrganizationService> organizationServices;
@@ -242,5 +247,13 @@ public class Country extends UserBaseEntity {
 
     public void setFeatures(List<Feature> features) {
         this.features = features;
+    }
+
+    public List<Equipment> getEquipments() {
+        return equipments;
+    }
+
+    public void setEquipments(List<Equipment> equipments) {
+        this.equipments = equipments;
     }
 }
