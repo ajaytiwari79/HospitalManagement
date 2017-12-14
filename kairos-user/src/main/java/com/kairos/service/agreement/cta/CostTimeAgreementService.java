@@ -250,20 +250,53 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
 
-    public CollectiveTimeAgreementDTO createCostTimeAgreement(Long countryId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO){
+    public CollectiveTimeAgreementDTO createCostTimeAgreement(Long countryId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
         logger.debug("saving CostTimeAgreement country {}",countryId);
         CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
         BeanUtils.copyProperties(costTimeAgreement,collectiveTimeAgreementDTO);
-        Optional<Expertise> expertise=expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise());
-        Iterable<CTARuleTemplate> ctaRuleTemplates=ctaRuleTemplateGraphRepository.findAllById(collectiveTimeAgreementDTO.getRuleTemplates(),0);
-        List<RuleTemplate> ruleTemplates= StreamSupport.stream(ctaRuleTemplates.spliterator(), true).collect(Collectors.toList());
-        List<OrganizationType> organizationTypes=(List<OrganizationType>)organizationTypeGraphRepository.findAllById(collectiveTimeAgreementDTO.getOrganizationTypeList(),0);
-          if(expertise.isPresent())
-               costTimeAgreement.setExpertise(expertise.get());
-        costTimeAgreement.setRuleTemplates(ruleTemplates);
-        costTimeAgreement.setOrganizationTypes(organizationTypes);
+        CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO);
+
+        // Wait until they are all done
+        CompletableFuture.allOf(hasUpdated).join();
         this.save(costTimeAgreement);
         return collectiveTimeAgreementDTO;
     }
 
-}
+    @Async
+    public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO)
+            throws InterruptedException, ExecutionException {
+
+
+        Callable<Optional<Expertise>> expertiseCallable=()->{
+            Optional<Expertise> expertise=expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise());
+            return  expertise;
+        };
+
+        Future<Optional<Expertise>>expertiseFuture=asynchronousService.executeAsynchronously(expertiseCallable);
+
+        Callable<List<RuleTemplate>> ctaRuleTemplatesCallable=()->{
+            Iterable<CTARuleTemplate> ctaRuleTemplates=ctaRuleTemplateGraphRepository.findAllById(collectiveTimeAgreementDTO.getRuleTemplates(),0);
+            return  StreamSupport.stream(ctaRuleTemplates.spliterator(), true).collect(Collectors.toList());
+        };
+
+        Future<List<RuleTemplate>>ctaRuleTemplatesFuture=asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
+
+
+        Callable<List<OrganizationType>> OrganizationTypesListCallable=()->{
+            List<OrganizationType> organizationTypes=(List<OrganizationType>)organizationTypeGraphRepository.findAllById(collectiveTimeAgreementDTO.getOrganizationTypeList(),0);
+            return  organizationTypes;
+
+
+        };
+        Future<List<OrganizationType>>organizationTypesFuture=asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
+        //set data
+         if(expertiseFuture.get().isPresent())
+             costTimeAgreement.setExpertise(expertiseFuture.get().get());
+        costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
+        costTimeAgreement.setOrganizationTypes(organizationTypesFuture.get());
+
+        return CompletableFuture.completedFuture(true);
+    }
+
+    }

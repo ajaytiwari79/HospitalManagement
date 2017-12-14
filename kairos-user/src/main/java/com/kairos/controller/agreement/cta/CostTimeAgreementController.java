@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 
@@ -28,7 +29,7 @@ public class CostTimeAgreementController {
     @RequestMapping(value = "/country/{countryId}/cta/", method = RequestMethod.POST)
     @ApiOperation("Create CTA")
     public ResponseEntity<Map<String, Object>> updateCTARuleTemplate(@PathVariable Long countryId
-            , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) {
+            , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 costTimeAgreementService.createCostTimeAgreement(countryId,collectiveTimeAgreementDTO));
     }
