@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType.CTA;
+
 /**
  * Created by vipul on 2/8/17.
  */
@@ -88,9 +90,12 @@ public class RuleTemplateCategoryService extends UserBaseService {
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
             throw new ActionNotPermittedException("Can't delete none template category " + templateCategoryId);
         }
-        if (ruleTemplateCategory.getRuleTemplateCategoryType().equals("CTA")) {
+        System.out.print(ruleTemplateCategory.getRuleTemplateCategoryType().equals(CTA));
+
+
+        if (ruleTemplateCategory.getRuleTemplateCategoryType().equals(CTA)) {
             List<Long> ctaRuleTemplates = ruleTemplateCategoryGraphRepository.findAllExistingCTARuleTemplateByCategory(ruleTemplateCategory.getName(), countryId);
-            RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
+            RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, "NONE", CTA);
             ruleTemplateCategoryGraphRepository.deleteRelationOfRuleTemplateCategoryAndCTA(templateCategoryId, ctaRuleTemplates);
             ruleTemplateCategoryGraphRepository.setAllCTAWithCategoryNone(noneRuleTemplateCategory.getId(), ctaRuleTemplates);
         } else {
@@ -199,7 +204,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
         if (!countryRuleTemplateCategory.isPresent()) {
             ruleTemplateCategory.setName(ruleTemplateDTO.getCategoryName());
             ruleTemplateCategory.setDeleted(false);
-            ruleTemplateCategory.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
+            ruleTemplateCategory.setRuleTemplateCategoryType(CTA);
             country.addRuleTemplateCategory(ruleTemplateCategory);
             save(country);
             ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateDTO.getRuleTemplateIds(), ruleTemplateCategory.getName());
