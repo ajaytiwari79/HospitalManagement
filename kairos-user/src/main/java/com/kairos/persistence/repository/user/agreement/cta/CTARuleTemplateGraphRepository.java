@@ -29,7 +29,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          " optional  MATCH (p)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`) "+
          " with p,m0,cTARuleTemplateDayTypes,dayType,accessGroup,timeType,employmentType,countryHolidayCalender,"+
          "compensationTable,compensationTableInterval,calculateValueAgainst,fixedValue,currency,cTARuleTemplatePhaseInfo,activityType,plannedTimeWithFactor"+
-         ", collect(ID(countryHolidayCalender)) as holidaysIds"+
+         ", collect(distinct ID(countryHolidayCalender)) as holidaysIds"+
          " RETURN p.name as name ,"+
          "p.description as description,"+
          "p.disabled as disabled,"+
@@ -42,16 +42,16 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
           "compensationTableInterval:collect(distinct{id:ID(compensationTableInterval),to:compensationTableInterval.to,from:compensationTableInterval.from,value:compensationTableInterval.value}) } as compensationTable ,"+
          "calculateValueAgainst as calculateValueAgainst ,"+
          "p.approvalWorkFlow as approvalWorkFlow ,"+
-         "collect({dayType:ID(dayType),countryHolidayCalenders:holidaysIds}) as calculateOnDayTypes ,"+
-         "collect(cTARuleTemplatePhaseInfo) as phaseInfo ,"+
+         "collect(distinct {dayType:ID(dayType),countryHolidayCalenders:holidaysIds}) as calculateOnDayTypes ,"+
+         "collect(distinct cTARuleTemplatePhaseInfo) as phaseInfo ,"+
          "p.budgetType as budgetType ,"+
-         "collect(ID(accessGroup)) as calculateValueIfPlanned ,"+
-         "collect(ID(employmentType)) as employmentTypes ,"+
+         "collect(distinct ID(accessGroup)) as calculateValueIfPlanned ,"+
+         "collect(distinct ID(employmentType)) as employmentTypes ,"+
          "activityType as activityType ,"+
          "p.planningCategory as planningCategory ,"+
          "p.staffFunction as staffFunction ,"+
          "plannedTimeWithFactor as plannedTimeWithFactor ,"+
-         "collect(ID(timeType)) as timeTypes,"+
+         "collect(distinct ID(timeType)) as timeTypes,"+
          "ID(p) as id")
     List<CTARuleTemplateQueryResult>findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(List<Long> categoryList);
 

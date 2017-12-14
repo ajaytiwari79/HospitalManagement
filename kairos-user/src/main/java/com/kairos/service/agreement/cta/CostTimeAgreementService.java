@@ -1,11 +1,15 @@
 package com.kairos.service.agreement.cta;
 
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
+import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.Currency;
+import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
@@ -14,9 +18,11 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.TimeTypeGraphRepository;
+import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
+import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
@@ -30,9 +36,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -44,21 +48,19 @@ import java.util.stream.StreamSupport;
 @Service
 public class CostTimeAgreementService extends UserBaseService {
     private Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
-    private @Autowired
-    UserService userService;
-    private @Autowired
-    RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
-    private @Autowired
-    CountryGraphRepository countryGraphRepository;
-    private @Autowired
-    CTARuleTemplateGraphRepository ctaRuleTemplateGraphRepository;
+    private @Autowired UserService userService;
+    private @Autowired RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
+    private @Autowired CountryGraphRepository countryGraphRepository;
+    private @Autowired CTARuleTemplateGraphRepository ctaRuleTemplateGraphRepository;
     private @Autowired AsynchronousService asynchronousService;
     private @Autowired DayTypeGraphRepository dayTypeGraphRepository;
     private @Autowired  EmploymentTypeGraphRepository employmentTypeGraphRepository;
     private @Autowired AccessGroupRepository accessGroupRepository;
     private @Autowired TimeTypeGraphRepository timeTypeGraphRepository;
     private @Autowired UserGraphRepository userGraphRepository;
-    @Autowired private CurrencyService currencyService;
+    private  @Autowired CurrencyService currencyService;
+    private  @Autowired ExpertiseGraphRepository expertiseGraphRepository;
+    private @Autowired OrganizationTypeGraphRepository organizationTypeGraphRepository;
 
 
     public void createDefaultCtaRuleTemplate(Long countryId) {
@@ -247,5 +249,21 @@ public class CostTimeAgreementService extends UserBaseService {
     return CompletableFuture.completedFuture(true);
     }
 
+
+    public CollectiveTimeAgreementDTO createCostTimeAgreement(Long countryId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO){
+        logger.debug("saving CostTimeAgreement country {}",countryId);
+        CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
+        BeanUtils.copyProperties(costTimeAgreement,collectiveTimeAgreementDTO);
+        Optional<Expertise> expertise=expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise());
+        Iterable<CTARuleTemplate> ctaRuleTemplates=ctaRuleTemplateGraphRepository.findAllById(collectiveTimeAgreementDTO.getRuleTemplates(),0);
+        List<RuleTemplate> ruleTemplates= StreamSupport.stream(ctaRuleTemplates.spliterator(), true).collect(Collectors.toList());
+        List<OrganizationType> organizationTypes=(List<OrganizationType>)organizationTypeGraphRepository.findAllById(collectiveTimeAgreementDTO.getOrganizationTypeList(),0);
+          if(expertise.isPresent())
+               costTimeAgreement.setExpertise(expertise.get());
+        costTimeAgreement.setRuleTemplates(ruleTemplates);
+        costTimeAgreement.setOrganizationTypes(organizationTypes);
+        this.save(costTimeAgreement);
+        return collectiveTimeAgreementDTO;
+    }
 
 }
