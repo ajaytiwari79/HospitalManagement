@@ -12,6 +12,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
@@ -25,6 +26,7 @@ import com.kairos.persistence.model.user.staff.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.user.staff.StaffClientData;
 import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.repository_impl.OrganizationGraphRepositoryImpl;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
@@ -37,6 +39,10 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.*;
+import com.kairos.response.dto.web.client.ClientExceptionTypesDTO;
+import com.kairos.response.dto.web.client.ClientFilterDTO;
+import com.kairos.response.dto.web.client.ClientPersonalCalenderPrerequisiteDTO;
+import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.integration.IntegrationService;
@@ -134,11 +140,12 @@ public class ClientService extends UserBaseService {
     @Autowired
     TableConfigRestClient tableConfigRestClient;
     @Inject
-    Session session;
-    @Inject
     OrganizationGraphRepositoryImpl organizationGraphRepositoryImpl;
     @Inject
     ClientAddressService clientAddressService;
+    @Inject
+    private ClientExceptionRestClient clientExceptionRestClient;
+
     public Client createCitizen(Client client) {
 
         Client createClient = null;
@@ -1583,7 +1590,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
      * @return
      * @auther Anil maurya
      */
-    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip,String moduleId) {
+    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip, String moduleId) {
         Map<String, Object> response = new HashMap<>();
         List<Long> citizenIds = new ArrayList<>();
         if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()){
@@ -1631,6 +1638,22 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
     private void deleteContactPersonForService(Long organizationServiceId,Long clientId){
         clientGraphRepository.deleteContactPersonForService(organizationServiceId,clientId);
+    }
+
+    public ClientPersonalCalenderPrerequisiteDTO getPrerequisiteForPersonalCalender(Long unitId,Long clientId){
+
+        Organization organization = organizationGraphRepository.findOne(unitId,0);
+        if(!Optional.ofNullable(organization).isPresent()){
+            throw new InternalError("Invalid Organization id");
+        }
+
+        List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(clientId);
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(organization.getId(),organization.getTimeSlotMode(),
+                new Date());
+        List<ClientExceptionTypesDTO> clientExceptionTypesDTOS = clientExceptionRestClient.getClientExceptionTypes();
+        ClientPersonalCalenderPrerequisiteDTO clientPersonalCalenderPrerequisiteDTO = new ClientPersonalCalenderPrerequisiteDTO(clientExceptionTypesDTOS,
+                temporaryAddressList,timeSlotWrappers);
+        return clientPersonalCalenderPrerequisiteDTO;
     }
 
 }

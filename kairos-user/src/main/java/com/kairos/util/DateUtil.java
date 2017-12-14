@@ -127,7 +127,7 @@ public class DateUtil {
     }
 
 
-    public static Date convertToOnlyDate(String receivedDate,String dateFormat) throws ParseException {
+    public static Date convertToOnlyDate(String receivedDate, String dateFormat) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = simpleDateFormat.parse(receivedDate);
@@ -208,6 +208,24 @@ public class DateUtil {
         Date date = isoFormat.parse(dateReceived);
         return date.getTime();
     }
+
+
+    public static LocalDate asLocalDate(Date date) {
+        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    public static LocalTime asLocalTime(Date date) {
+        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalTime();
+    }
+
+    public static Date asDate(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static Date asDate(LocalDate localDate) {
+        return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+    }
+
 
     public static Date getCurrentDate(){
         return new Date();

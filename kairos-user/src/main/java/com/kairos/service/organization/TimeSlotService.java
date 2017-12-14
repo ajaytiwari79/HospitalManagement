@@ -1,30 +1,34 @@
 package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.custom_exception.InvalidTimeSlotException;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.UnitNotFoundException;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationTimeSlotRelationship;
-import com.kairos.persistence.model.organization.TimeSlot;
-import com.kairos.persistence.model.organization.TimeSlotDTO;
+import com.kairos.persistence.model.organization.time_slot.TimeSlot;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSetTimeSlotRelationship;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationTimeSlotGraphRepository;
-import com.kairos.persistence.repository.organization.TimeSlotGraphRepository;
-import com.kairos.response.dto.web.KMDTimeSlotDTO;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotSetRepository;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.DateUtil;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalField;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.ADVANCE;
+import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD;
 
 /**
  * Created by oodles on 18/10/16.
@@ -37,135 +41,196 @@ public class TimeSlotService extends UserBaseService {
     @Inject
     private TimeSlotGraphRepository timeSlotGraphRepository;
     @Inject
-    private OrganizationTimeSlotGraphRepository organizationTimeSlotGraphRepository;
+    private TimeSlotSetRepository timeSlotSetRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(TimeSlotService.class);
 
     public Map<String, Object> getTimeSlots(long unitId) {
 
-        Organization organization = organizationGraphRepository.findOne(unitId,0);
-        if(organization == null){
+        Organization organization = organizationGraphRepository.findOne(unitId, 0);
+        if (organization == null) {
             throw new InternalError("Organization can not found");
         }
         return prepareTimeSlotResponse(organization);
     }
 
-    public Object createTimeSlot(long unitId, TimeSlotDTO timeSlotDTO) {
-        Organization unit = organizationGraphRepository.findOne(unitId);
-        if(unit == null){
-            return null;
+    public List<TimeSlotWrapper> getTimeSlotByTimeSlotSet(Long timeSlotSetId) {
+        return timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSetId);
+    }
+
+    public Map<String, Object> getTimeSlotSets(Long unitId) {
+        Organization organization = organizationGraphRepository.findOne(unitId, 0);
+        if (organization == null) {
+            throw new InternalError("Organization can not found");
         }
-        if(timeSlotDTO.isShiftStartTime()){
-            timeSlotGraphRepository.updateShiftStartTime(unitId, TimeSlot.TYPE.ADVANCE);
+        List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotsByOrganizationId(unitId, organization.getTimeSlotMode());
+        Map<String,Object> timeSlotSetData = new HashMap<>();
+        timeSlotSetData.put("timeSlotSets",timeSlotSets);
+        timeSlotSetData.put("standardTimeSlot", STANDARD.equals(organization.getTimeSlotMode()) ? true : false);
+        return timeSlotSetData;
+    }
+
+    public TimeSlotSet createTimeSlotSet(long unitId, TimeSlotSetDTO timeSlotSetDTO) {
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new InternalError("Unit is not present");
         }
-        TimeSlot timeSlot = new TimeSlot();
-        timeSlot.setName(timeSlotDTO.getName());
-        timeSlot.setTimeSlotType(TimeSlot.TYPE.ADVANCE);
+        TimeSlotSet timeSlotSet = new TimeSlotSet(timeSlotSetDTO.getName(), timeSlotSetDTO.getStartDate(), unit.getTimeSlotMode());
+        timeSlotSet.setEndDate(timeSlotSetDTO.getEndDate());
+        saveTimeSlots(timeSlotSetDTO,timeSlotSet);
+        List<TimeSlotSet> timeSlotSets = unit.getTimeSlotSets();
+        timeSlotSets.add(timeSlotSet);
+        unit.setTimeSlotSets(timeSlotSets);
+        save(unit);
+        return timeSlotSet;
+    }
+
+    public TimeSlotDTO createTimeSlot(Long timeSlotSetId,TimeSlotDTO timeSlotDTO){
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
+        if(!Optional.ofNullable(timeSlotSet).isPresent()){
+            throw new DataNotFoundByIdException("Invalid time slot id");
+        }
+        TimeSlot timeSlot = new TimeSlot(timeSlotDTO.getName());
         ObjectMapper objectMapper = new ObjectMapper();
-        Map resultMap = objectMapper.convertValue(timeSlotDTO, Map.class);
-        OrganizationTimeSlotRelationship organizationTimeSlotRelationship = objectMapper.convertValue(timeSlotDTO,OrganizationTimeSlotRelationship.class);
-        //validateTimeSlot(unitId,organizationTimeSlotRelationship,TimeSlot.TYPE.ADVANCE);
-        organizationTimeSlotRelationship.setTimeSlot(timeSlot);
-        organizationTimeSlotRelationship.setOrganization(unit);
-        organizationTimeSlotRelationship.setShiftStartTime(timeSlotDTO.isShiftStartTime());
-        save(organizationTimeSlotRelationship);
-        resultMap.put("id",timeSlot.getId());
-        return resultMap;
+        TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue(timeSlotDTO,TimeSlotSetTimeSlotRelationship.class);
+        timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
+        timeSlotSetTimeSlotRelationship.setTimeSlotSet(timeSlotSet);
+        save(timeSlotSetTimeSlotRelationship);
+        timeSlotDTO.setId(timeSlot.getId());
+        return timeSlotDTO;
     }
 
-    public Map<String, Object> updateTimeSlotType(long unitId,boolean standardTimeSlot){
+    private void saveTimeSlots(TimeSlotSetDTO timeSlotSetDTO,TimeSlotSet timeSlotSet){
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
+        for(TimeSlotDTO timeSlotDTO : timeSlotSetDTO.getTimeSlots()){
+            TimeSlot timeSlot = new TimeSlot(timeSlotDTO.getName());
+            timeSlot.setId(timeSlotDTO.getId());
+            TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue
+                    (timeSlotDTO,TimeSlotSetTimeSlotRelationship.class);
+            timeSlotSetTimeSlotRelationship.setTimeSlotSet(timeSlotSet);
+            timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
+            timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
+        }
+        save(timeSlotSetTimeSlotRelationships);
+    }
+
+    public List<TimeSlotSet> updateTimeSlotSet(Long unitId, Long timeSlotSetId, TimeSlotSetDTO timeSlotSetDTO) {
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new UnitNotFoundException("Invalid unit id ");
+        }
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
+        if (!Optional.ofNullable(timeSlotSet).isPresent()) {
+            logger.error("Invalid time slot id " + timeSlotSetId);
+            throw new DataNotFoundByIdException("Invalid time slot id");
+        }
+        List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getEndDate(), timeSlotSetDTO.getEndDate());
+        List<TimeSlotSet> timeSlotSetsToUpdate = new ArrayList<>();
+        for (TimeSlotSet timeSlotSetToValidate : timeSlotSetsToValidate) {
+
+            if (timeSlotSetToValidate.getEndDate().compareTo(timeSlotSetDTO.getEndDate()) <= 0) {
+                timeSlotSetToValidate.setDeleted(true);
+                timeSlotSetsToUpdate.add(timeSlotSetToValidate);
+            } else {
+                LocalDate dateAsLocalDate = DateUtil.asLocalDate(timeSlotSetDTO.getEndDate());
+                timeSlotSetToValidate.setStartDate(DateUtil.asDate(dateAsLocalDate.plusDays(1)));
+                timeSlotSetsToUpdate.add(timeSlotSetToValidate);
+                break;
+            }
+        }
+        updateTimeSlot(timeSlotSetDTO.getTimeSlots(),timeSlotSet.getId());
+        timeSlotSet.updateTimeSlotSet(timeSlotSetDTO);
+        timeSlotSetsToUpdate.add(timeSlotSet);
+        timeSlotSetRepository.save(timeSlotSetsToUpdate);
+        return timeSlotSetsToUpdate;
+    }
+
+
+    public Map<String, Object> updateTimeSlotType(long unitId, boolean standardTimeSlot) {
         Organization organization = organizationGraphRepository.findOne(unitId);
-        if(organization == null){
+        if (organization == null) {
             throw new InternalError("Organization can not found");
         }
-        organization.setStandardTimeSlot(standardTimeSlot);
+        organization.setTimeSlotMode((standardTimeSlot) ? STANDARD : ADVANCE);
         organizationGraphRepository.save(organization);
-        return prepareTimeSlotResponse(organization);
+        return getTimeSlotSets(unitId);
 
     }
 
-    public List<Map<String,Object>> updateTimeSlot(long unitId,List<TimeSlotDTO> timeSlotDTO){
+    public List<TimeSlotDTO> updateTimeSlot(List<TimeSlotDTO> timeSlotDTOS,Long timeSlotSetId) {
 
-        List<Map<String,Object>> response = new ArrayList<>();
-        for(TimeSlotDTO objectToUpdate : timeSlotDTO){
-            TimeSlot timeSlot = timeSlotGraphRepository.findOne(objectToUpdate.getId());
-            if(timeSlot == null){
-                return null;
-            }
-            if(objectToUpdate.isShiftStartTime()){
-                timeSlotGraphRepository.updateShiftStartTime(unitId,timeSlot.getTimeSlotType());
-            }
-            ObjectMapper objectMapper = new ObjectMapper();
-            OrganizationTimeSlotRelationship organizationTimeSlotRelationship = objectMapper.convertValue(objectToUpdate,OrganizationTimeSlotRelationship.class);
-            organizationTimeSlotRelationship.setId(timeSlot.getId());
-            //validateTimeSlot(unitId,organizationTimeSlotRelationship,timeSlot.getTimeSlotType());
-
-            Map<String,Object> queryResponse;
-            if(timeSlot.getTimeSlotType().equals(TimeSlot.TYPE.ADVANCE)){
-                queryResponse = timeSlotGraphRepository.updateAdvanceTimeSlot(unitId,timeSlot.getId(),objectToUpdate.getName(),objectToUpdate.getStartHour(),
-                        objectToUpdate.getStartMinute(),objectToUpdate.getEndHour(),objectToUpdate.getEndMinute(),objectToUpdate.isShiftStartTime());
-                response.add(queryResponse);
-            } else {
-                queryResponse = timeSlotGraphRepository.updateStandardTimeSlot(unitId,timeSlot.getId(),objectToUpdate.getStartHour(),
-                        objectToUpdate.getStartMinute(),objectToUpdate.getEndHour(),objectToUpdate.getEndMinute(),objectToUpdate.isShiftStartTime());
-                response.add(queryResponse);
-            }
+        for(TimeSlotDTO timeSlotDTO : timeSlotDTOS){
+            timeSlotGraphRepository.updateTimeSlot(timeSlotSetId,timeSlotDTO.getId(),timeSlotDTO.getName(),timeSlotDTO.getStartHour(),
+                    timeSlotDTO.getStartMinute(),timeSlotDTO.getEndHour(),timeSlotDTO.getEndMinute(),timeSlotDTO.isShiftStartTime());
         }
+        return timeSlotDTOS;
+    }
+
+    public boolean deleteTimeSlotSet(Long unitId, Long timeSlotSetId) {
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new UnitNotFoundException("Invalid unit id ");
+        }
+        TimeSlotSet timeSlotSetToDelete = timeSlotSetRepository.findOne(timeSlotSetId);
+        if (!Optional.ofNullable(timeSlotSetToDelete).isPresent()) {
+            logger.error("Invalid time slot id " + timeSlotSetId);
+            throw new DataNotFoundByIdException("Invalid time slot id");
+        }
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOneByStartDateAfter(unitId, timeSlotSetToDelete.getEndDate());
+        if (Optional.ofNullable(timeSlotSet).isPresent()) {
+            timeSlotSet.setStartDate(timeSlotSetToDelete.getEndDate());
+            save(timeSlotSet);
+        }
+        timeSlotSetToDelete.setDeleted(true);
+        save(timeSlotSetToDelete);
+        return true;
+    }
+
+    public boolean deleteTimeSlot(long timeSlotId,Long timeSlotSetId) {
+        timeSlotGraphRepository.deleteTimeSlot(timeSlotSetId,timeSlotId);
+        return true;
+    }
+
+    private Map<String, Object> prepareTimeSlotResponse(Organization unit) {
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(),unit.getTimeSlotMode(),new Date());
+        Map<String, Object> response = new HashMap<>();
+        response.put("timeSlots", timeSlotWrappers);
+        response.put("standardTimeSlot", STANDARD.equals(unit.getTimeSlotMode()) ? true : false);
         return response;
     }
 
-    public boolean deleteTimeSlot(long unitId,long timeSlotId){
-        TimeSlot timeSlot= timeSlotGraphRepository.findOne(timeSlotId);
-        if(timeSlot == null){
-            return false;
+    public void createDefaultTimeSlots(Organization organization) {
+        List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
+        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, new Date(),organization.getTimeSlotMode());
+        timeSlotSet.setDefaultSet(true);
+        List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
+        for (TimeSlot timeSlot : timeSlots) {
+            TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = new TimeSlotSetTimeSlotRelationship();
+            if (DAY.equals(timeSlot.getName())) {
+                timeSlotSetTimeSlotRelationship.setStartHour(DAY_START_HOUR);
+                timeSlotSetTimeSlotRelationship.setEndHour(DAY_END_HOUR);
+                timeSlotSetTimeSlotRelationship.setShiftStartTime(true);
+            } else if (EVENING.equals(timeSlot.getName())) {
+                timeSlotSetTimeSlotRelationship.setStartHour(EVENING_START_HOUR);
+                timeSlotSetTimeSlotRelationship.setEndHour(EVENING_END_HOUR);
+            } else if (NIGHT.equals(timeSlot.getName())) {
+                timeSlotSetTimeSlotRelationship.setStartHour(NIGHT_START_HOUR);
+                timeSlotSetTimeSlotRelationship.setEndHour(NIGHT_END_HOUR);
+            }
+            timeSlotSetTimeSlotRelationship.setTimeSlotSet(timeSlotSet);
+            timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
+            timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
         }
-        return timeSlotGraphRepository.deleteTimeSlot(unitId,timeSlotId);
+        save(timeSlotSetTimeSlotRelationships);
+        List<TimeSlotSet> timeSlotSets = organization.getTimeSlotSets();
+        timeSlotSets.add(timeSlotSet);
+        organization.setTimeSlotSets(timeSlotSets);
+        save(organization);
     }
 
-    private Map<String,Object> prepareTimeSlotResponse(Organization unit){
-        List<Map<String,Object>> timeSlots;
-        if(unit.isStandardTimeSlot()){
-            List<Map<String,Object>> standredTimeSlots = timeSlotGraphRepository.getTimeSlots(unit.getId(), TimeSlot.TYPE.STANDARD);
-            timeSlots = new ArrayList<>(standredTimeSlots.size());
-            for(Map<String,Object> standredTimeSlot : standredTimeSlots){
-                timeSlots.add((Map<String,Object>) standredTimeSlot.get("timeSlot"));
-            }
-        } else {
-            List<Map<String,Object>> advanceTimeSlots = timeSlotGraphRepository.getTimeSlots(unit.getId(), TimeSlot.TYPE.ADVANCE);
-            timeSlots = new ArrayList<>(advanceTimeSlots.size());
-            for(Map<String,Object> standredTimeSlot : advanceTimeSlots){
-                timeSlots.add((Map<String,Object>) standredTimeSlot.get("timeSlot"));
-            }
-        }
-        Map<String,Object> response = new HashMap<>();
-        response.put("timeSlots",timeSlots);
-        response.put("standardTimeSlot",unit.isStandardTimeSlot());
-        return response;
-    }
-
-    public void createDefaultTimeSlots(Organization organization){
-
-        List<TimeSlot> timeSlots = timeSlotGraphRepository.findByTimeSlotType(TimeSlot.TYPE.STANDARD);
-        for(TimeSlot timeSlot :timeSlots){
-            OrganizationTimeSlotRelationship organizationTimeSlotRelationship = new OrganizationTimeSlotRelationship();
-            if(DAY.equals(timeSlot.getName())){
-                organizationTimeSlotRelationship.setStartHour(DAY_START_HOUR);
-                organizationTimeSlotRelationship.setEndHour(DAY_END_HOUR);
-                organizationTimeSlotRelationship.setShiftStartTime(true);
-            } else if(EVENING.equals(timeSlot.getName())){
-                organizationTimeSlotRelationship.setStartHour(EVENING_START_HOUR);
-                organizationTimeSlotRelationship.setEndHour(EVENING_END_HOUR);
-            }  else if(NIGHT.equals(timeSlot.getName())){
-                organizationTimeSlotRelationship.setStartHour(NIGHT_START_HOUR);
-                organizationTimeSlotRelationship.setEndHour(NIGHT_END_HOUR);
-            }
-            organizationTimeSlotRelationship.setOrganization(organization);
-            organizationTimeSlotRelationship.setTimeSlot(timeSlot);
-            save(organizationTimeSlotRelationship);
-        }
-    }
-
-    private void validateTimeSlot(long unitId,OrganizationTimeSlotRelationship objToCreate,TimeSlot.TYPE type){
+    /*private void validateTimeSlot(long unitId,OrganizationTimeSlotRelationship objToCreate,TimeSlot.TimeSlotMode timeSlotMode){
 
         Calendar startSlot = Calendar.getInstance();
         startSlot.set(Calendar.HOUR_OF_DAY,objToCreate.getStartHour());
@@ -185,7 +250,7 @@ public class TimeSlotService extends UserBaseService {
 
         long totalDiff = diffHours * 60 * 60 + diffMinutes * 60 + diffSeconds;
 
-        List<Map<String,Object>> organizationTimeSlotRelationships = organizationTimeSlotGraphRepository.getOrganizationTimeSlots(unitId, type);
+        List<Map<String,Object>> organizationTimeSlotRelationships = organizationTimeSlotGraphRepository.getOrganizationTimeSlots(unitId, timeSlotMode);
         ObjectMapper objectMapperForQueryResult = new ObjectMapper();
         OrganizationTimeSlotRelationship  queryResult;
         Calendar dbObjStartSlot;
@@ -214,30 +279,33 @@ public class TimeSlotService extends UserBaseService {
         if(totalDiff > 86400){
             throw new InvalidTimeSlotException("Time slot cannot grater then 24");
         }
-    }
+    }*/
 
     /**
-     * @auther anil maurya
      * @param unitId
      * @return
+     * @auther anil maurya
      */
-    public List<Map<String,Object>> getCurrentTimeSlotOfUnit(Long unitId){
-        List<Map<String,Object>> currentTimeSlots= timeSlotGraphRepository.getUnitCurrentTimeSlots(unitId);
+    public List<Map<String, Object>> getCurrentTimeSlotOfUnit(Long unitId) {
+        List<Map<String, Object>> currentTimeSlots = timeSlotGraphRepository.getUnitCurrentTimeSlots(unitId);
 
         return currentTimeSlots;
     }
 
-    public Map<String,Object> getTimeSlotByUnitIdAndTimeSlotExternalId(Long unitId, Long kmdExternalId){
-        Map<String,Object> timeSlot = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotExternalId(unitId, kmdExternalId);
+    public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotExternalId(Long unitId, Long kmdExternalId) {
+        Map<String, Object> timeSlot = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotExternalId(unitId, kmdExternalId);
         return timeSlot;
     }
 
-    public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long unitId, Long timeSlotId){
+    public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long unitId, Long timeSlotId) {
         Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId);
         return timeSlotMap;
     }
 
-    public TimeSlot importTimeSlotsFromKMD(Organization unit, KMDTimeSlotDTO kmdTimeSlotDTO){
+
+    //@prabjot
+    //TODO for now i dont know the timeslot set for kmd, will implement it later
+    /*public TimeSlot importTimeSlotsFromKMD(Organization unit, KMDTimeSlotDTO kmdTimeSlotDTO){
         try {
             TimeSlot timeSlot = timeSlotGraphRepository.findByKmdExternalId(kmdTimeSlotDTO.getId());
             if (unit == null) {
@@ -248,14 +316,14 @@ public class TimeSlotService extends UserBaseService {
             }
 
             timeSlot.setName(kmdTimeSlotDTO.getTitle());
-            timeSlot.setTimeSlotType(TimeSlot.TYPE.ADVANCE);
+            timeSlot.setTimeSlotTimeSlotMode(TimeSlot.TimeSlotMode.ADVANCE);
             timeSlot.setKmdExternalId(kmdTimeSlotDTO.getId());
             timeSlotGraphRepository.removeTimeSlotExistByUnitIdAndTimeSlotId(unit.getId(), kmdTimeSlotDTO.getId());
             Boolean hasTimeSlotForGivenUnit = timeSlotGraphRepository.hasTimeSlotExistByUnitIdAndTimeSlotId(unit.getId(), kmdTimeSlotDTO.getId());
             if (!hasTimeSlotForGivenUnit) {
 
                 OrganizationTimeSlotRelationship organizationTimeSlotRelationship = new OrganizationTimeSlotRelationship();
-                //validateTimeSlot(unitId,organizationTimeSlotRelationship,TimeSlot.TYPE.ADVANCE);
+                //validateTimeSlot(unitId,organizationTimeSlotRelationship,TimeSlot.TimeSlotMode.ADVANCE);
                 LocalTime startDuration = LocalTime.parse(kmdTimeSlotDTO.getStart());
                 LocalTime endDuration = LocalTime.parse(kmdTimeSlotDTO.getEnd());
                 organizationTimeSlotRelationship.setEnabled(true);
@@ -274,5 +342,10 @@ public class TimeSlotService extends UserBaseService {
             return null;
         }
 
+    }*/
+
+
+    public List<TimeSlot> getTimeSlotsOfCountry(Long countryId){
+        return timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
     }
 }

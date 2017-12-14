@@ -8,6 +8,7 @@ import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.*;
@@ -21,14 +22,12 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.model.user.resources.FuelType;
 import com.kairos.persistence.model.user.resources.Resource;
-import com.kairos.persistence.model.user.resources.ResourceUnAvailability;
-import com.kairos.persistence.model.user.resources.VehicleType;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientLanguageRelationGraphRepository;
@@ -73,6 +72,8 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.*;
+
+import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD;
 
 /**
  * Created by kairosCountryLevel on 8/12/16.
@@ -267,13 +268,14 @@ public class BootDataService {
 
     private void createStandardTimeSlots(){
         String timeSlotsNames[] = new String[]{"Day","Evening","Night"};
-        TimeSlot timeSlot;
+        List<TimeSlot> standardTimeSlots = new ArrayList<>();
         for(String timeSlotName : timeSlotsNames){
-            timeSlot = new TimeSlot();
+            TimeSlot timeSlot = new TimeSlot();
             timeSlot.setName(timeSlotName);
-            timeSlot.setTimeSlotType(TimeSlot.TYPE.STANDARD);
-            timeSlotGraphRepository.save(timeSlot);
+            timeSlot.setSystemGeneratedTimeSlots(true);
+            standardTimeSlots.add(timeSlot);
         }
+        timeSlotGraphRepository.save(standardTimeSlots);
     }
 
     private void createGeoGraphicalData() {
