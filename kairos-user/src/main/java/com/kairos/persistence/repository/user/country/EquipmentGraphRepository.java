@@ -8,9 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY_HAS_EQUIPMENT;
-import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY_HAS_FEATURE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.EQUIPMENT_HAS_CATEGORY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by prerna on 12/12/17.
@@ -32,7 +30,7 @@ public interface EquipmentGraphRepository extends GraphRepository<Equipment> {
     Equipment getEquipmentById(Long equipmentId, Long countryId, boolean isDeleted);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
-            "WHERE id(country)=53 AND equipment.deleted= false AND lower(equipment.name) contains lower(\"\")\n" +
+            "WHERE id(country)={0} AND equipment.deleted= {1} AND lower(equipment.name) contains lower({2})\n" +
             "WITH equipment\n" +
             "MATCH (equipment)-[:"+EQUIPMENT_HAS_CATEGORY+"]-(equipCat:EquipmentCategory) \n" +
             "return id(equipment) as id, equipment.name as name, equipment.description as description, {id:id(equipCat) , name:equipCat.name, description:equipCat.description} as category")
@@ -50,5 +48,15 @@ public interface EquipmentGraphRepository extends GraphRepository<Equipment> {
     @Query("MATCH (equipment:Equipment)-[r:"+EQUIPMENT_HAS_CATEGORY+"]->(equipmentCat:EquipmentCategory)\n"+
             "DELETE r")
     void detachEquipmentCategory(long equipmentId);
+
+
+    @Query("MATCH (o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(res:Resource{deleted:false})-[:"+RESOURCE_HAS_EQUIPMENT+"]->(equipment:Equipment{deleted:{2}}) where id(o)={0} AND id(res)={1}\n" +
+            "return id(equipment) as id, equipment.name as name, equipment.description as description")
+    List<EquipmentQueryResult> getResourcesSelectedEquipments(Long organizationId, Long resourceId, boolean deleted);
+
+    @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
+            "WHERE id(country)={0} AND equipment.deleted= {1} AND id(equipment) IN {2} return equipment")
+    List<Equipment> getListOfEquipmentByIds(Long countryId , boolean deleted, List<Long> equipmentIds);
+
 
 }
