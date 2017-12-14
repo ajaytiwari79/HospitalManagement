@@ -1158,14 +1158,18 @@ public class ClientService extends UserBaseService {
             clientTemporaryAddress.setLatitude(addressDTO.getLatitude());
             zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
         } else {
-            Map<String, Object> tomtomResponse = addressVerificationService.verifyAddressClientException(addressDTO, unitId);
+
+            //TODO igonored tomtom service for now, enable later
+            /*Map<String, Object> tomtomResponse = addressVerificationService.verifyAddressClientException(addressDTO, unitId);
             if (tomtomResponse == null) {
                 throw new InternalError("Address not verified by tomtom");
-            }
-            clientTemporaryAddress.setVerifiedByVisitour(true);
+            }*/
+            clientTemporaryAddress.setVerifiedByVisitour(false);
             clientTemporaryAddress.setCountry("Denmark");
-            clientTemporaryAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
-            clientTemporaryAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
+            //clientTemporaryAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
+           // clientTemporaryAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
+            clientTemporaryAddress.setLongitude(clientTemporaryAddress.getLongitude());
+            clientTemporaryAddress.setLatitude(clientTemporaryAddress.getLatitude());
             zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
         }
 
