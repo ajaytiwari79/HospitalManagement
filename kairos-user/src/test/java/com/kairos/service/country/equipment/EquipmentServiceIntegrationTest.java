@@ -9,6 +9,7 @@ import com.kairos.response.dto.web.equipment.EquipmentDTO;
 import com.kairos.service.country.feature.FeatureService;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -71,6 +72,7 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void test2_addCountryEquipment() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         EquipmentCategory equipmentCategory = equipmentService.getEquipmentCategoryByName("Small");
@@ -95,6 +97,7 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void test3_updateEquipment() throws Exception {
 
         if(createdEquipmentId == null){
@@ -127,6 +130,7 @@ public class EquipmentServiceIntegrationTest {
 
 
     @Test
+    @Ignore
     public void test4_getListOfEquipments() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>> resTypeReference =
@@ -144,6 +148,7 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void test5_deleteEquipment() throws Exception {
         if(createdEquipmentId == null){
             logger.info("Equipment Id is null");
