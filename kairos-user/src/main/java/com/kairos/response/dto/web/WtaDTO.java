@@ -19,7 +19,7 @@ public class WtaDTO {
     private long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
-    private List<TagDTO> tags;
+    private List<Long> tags;
 
     public String getName() {
         return name;
@@ -94,11 +94,11 @@ public class WtaDTO {
         this.organizationSubType = organizationSubType;
     }
 
-    public List<TagDTO> getTags() {
+    public List<Long> getTags() {
         return tags;
     }
 
-    public void setTags(List<TagDTO> tags) {
+    public void setTags(List<Long> tags) {
         this.tags = tags;
     }
 

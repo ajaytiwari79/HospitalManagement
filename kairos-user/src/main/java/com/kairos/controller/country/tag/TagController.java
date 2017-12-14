@@ -142,5 +142,12 @@ public class TagController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfMasterDataType());
     }
 
+    @ApiOperation(value = "Get list of Tags Category for organization")
+    @RequestMapping(value = UNIT_URL + "/tag_category", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTagsCategoryForOrganization(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfMasterDataType(unitId));
+    }
+
 
 }

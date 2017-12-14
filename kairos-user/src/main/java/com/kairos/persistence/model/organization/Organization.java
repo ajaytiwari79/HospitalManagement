@@ -195,7 +195,7 @@ public class Organization extends UserBaseEntity {
 
     private int nightShiftTimeDeduction = 7; //in percentage
     private boolean phaseGenerated=true;
-    private boolean showCountryTags=true;
+    private Boolean showCountryTags=true;
 
 
     public Organization(String name, List<Group> groupList, List<Organization> children) {
@@ -702,11 +702,11 @@ public class Organization extends UserBaseEntity {
         this.resourceList = resourceList;
     }
 
-    public boolean isShowCountryTags() {
+    public Boolean isShowCountryTags() {
         return showCountryTags;
     }
 
-    public void setShowCountryTags(boolean showCountryTags) {
+    public void setShowCountryTags(Boolean showCountryTags) {
         this.showCountryTags = showCountryTags;
     }
 

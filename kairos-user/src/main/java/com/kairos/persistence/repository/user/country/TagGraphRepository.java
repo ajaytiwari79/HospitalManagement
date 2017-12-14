@@ -45,12 +45,12 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
 
     // DONE
     @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag {countryTag:false})\n" +
-            "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND r.masterDataType ={3}\n" +
+            "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n" +
             "UNION\n" +
             "MATCH (country:Country)<-[:" + COUNTRY + "]-(o:Organization) where id(o)={0} AND o.showCountryTags=true\n" +
             "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag {countryTag:true})\n" +
-            "WHERE tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND r.masterDataType ={3}\n" +
+            "WHERE tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n")
     List<TagQueryResult>  getListOfOrganizationTagsByMasterDataType(Long orgId , boolean deleted, String searchTextRegex, String masterDataType);
 
@@ -148,22 +148,22 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
     Tag getOrganizationTagByName(long orgId, String name, String masterDataType, boolean deleted);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(tag) IN {0} AND tag.deleted= {2} AND r.masterDataType ={1}\n" +
+            "WHERE id(tag) IN {0} AND tag.deleted= {2} AND tag.masterDataType ={1}\n" +
             "return tag")
     List<Tag> getCountryTagsByIdAndMasterDataType(List<Long> tagIds, String masterDataType, boolean deleted);
 
     @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(tag) IN {0} AND tag.deleted= {2} AND r.masterDataType ={1}\n" +
+            "WHERE id(tag) IN {0} AND tag.deleted= {2} AND tag.masterDataType ={1}\n" +
             "return tag")
     List<Tag> getOrganizationTagsByIdAndMasterDataType(List<Long> tagIds, String masterDataType, boolean deleted);
 
     @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE tag.name={0} AND id(org) = {1} AND r.masterDataType ={2} AND tag.deleted={3} \n" +
+            "WHERE tag.name={0} AND id(org) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
             "RETURN CASE WHEN count(tag)>0 THEN true ELSE false END")
     boolean isOrganizationTagExistsWithSameNameAndDataType(String name, Long orgId, MasterDataTypeEnum masterDataType, boolean isDeleted);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(country)={0} AND r.masterDataType = {1} AND tag.deleted= {2} return tag")
+            "WHERE id(country)={0} AND tag.masterDataType = {1} AND tag.deleted= {2} return tag")
         //collect({id:tag.id, masterDataType:r.masterDataType, name:tag.name}) as data
     List<Tag> getListOfCountryTagsByDataType(Long countryId, MasterDataTypeEnum masterDataType, boolean deleted);
 
@@ -171,11 +171,11 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
     List<Tag> getTagsById(List<Long> tagIds, boolean deleted);
 
     @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(tag) IN {0} AND tag.deleted= {2} AND r.masterDataType ={1}\n" +
+            "WHERE id(tag) IN {0} AND tag.deleted= {2} AND tag.masterDataType ={1}\n" +
             "return tag\n" +
             "UNION\n" +
             "Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(tag) IN {0} AND tag.deleted= {2} AND r.masterDataType ={1}\n" +
+            "WHERE id(tag) IN {0} AND tag.deleted= {2} AND tag.masterDataType ={1}\n" +
             "return tag\n")
     List<Tag> getTagsById(List<Long> tagIds, String masterDataType, boolean deleted);
 
@@ -185,9 +185,20 @@ public interface TagGraphRepository extends GraphRepository<Tag> {
 
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_TAG+"]->(tag:Tag)\n" +
-            "WHERE id(country)={0} AND tag.deleted= {1} AND e.masterDataType={2}\n" +
-            "return id(tag) as id, tag.name as name, r.masterDataType as masterDataType")
+            "WHERE id(country)={0} AND tag.deleted= {1} AND tag.masterDataType={2}\n" +
+            "return id(tag) as id, tag.name as name, tag.masterDataType as masterDataType")
     List<TagQueryResult> getListOfCountryTagsByMasterDataType(Long countryId , boolean deleted, String masterDataType);
+
+
+    @Query("MATCH (s:Skill)-[hasTag:"+HAS_TAG+"]-(tag:Tag) WHERE  id(s)={0} AND tag.deleted = {1} return tag")
+    List<Tag> getTagsOfSkillByDeleted(long skillId, boolean deleted);
+
+    @Query( "Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag{countryTag:false})\n" +
+            "WHERE id(org)={0} AND id(tag) IN {1} AND tag.deleted= {3} AND tag.masterDataType ={2}\n" +
+            "return tag\n")
+    List<Tag> getOrganizationTagsById(Long orgId, List<Long> tagIds, String masterDataType, boolean deleted);
+
+
 
 }
 

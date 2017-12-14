@@ -272,11 +272,11 @@ public class TagServiceIntegrationTest {
     public void test10_getListOfMasterDataType() throws Exception {
 
         String baseUrl=getBaseUrl(orgId,null, null);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<ArrayList<HashMap<String,String>>>> resTypeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<ArrayList<HashMap<String,String>>>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>>() {
                 };
 
-        ResponseEntity<RestTemplateResponseEnvelope<ArrayList<HashMap<String,String>>>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<HashMap<String,Object>>> response = restTemplate.exchange(
                 baseUrl+"/tag_category",
                 HttpMethod.GET, null, resTypeReference);
 
