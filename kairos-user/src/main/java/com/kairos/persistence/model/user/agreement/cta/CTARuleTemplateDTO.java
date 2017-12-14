@@ -31,7 +31,7 @@ public class CTARuleTemplateDTO {
     private List<Long> employmentTypes =new ArrayList<>();
     private ActivityType activityType;
     private PlanningCategory planningCategory;
-    private StaffFunction staffFunction;
+    private List<StaffFunction> staffFunctions=new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private List<Long> timeTypes =new ArrayList<>();
 
@@ -187,12 +187,12 @@ public class CTARuleTemplateDTO {
         this.planningCategory = planningCategory;
     }
 
-    public StaffFunction getStaffFunction() {
-        return staffFunction;
+    public List<StaffFunction> getStaffFunctions() {
+        return staffFunctions;
     }
 
-    public void setStaffFunction(StaffFunction staffFunction) {
-        this.staffFunction = staffFunction;
+    public void setStaffFunctions(List<StaffFunction> staffFunctions) {
+        this.staffFunctions = staffFunctions;
     }
 
     public PlannedTimeWithFactor getPlannedTimeWithFactor() {
@@ -232,7 +232,7 @@ public class CTARuleTemplateDTO {
                 .append("employmentTypes", employmentTypes)
                 .append("activityType", activityType)
                 .append("planningCategory", planningCategory)
-                .append("staffFunction", staffFunction)
+                .append("staffFunctions", staffFunctions)
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)
                 .append("timeTypes", timeTypes)
                 .toString();

@@ -42,6 +42,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Transactional
@@ -161,7 +162,7 @@ public class CostTimeAgreementService extends UserBaseService {
         ctaRuleTemplate.setBudgetType(BudgetType.ACTIVITY_COST);
         ctaRuleTemplate.setActivityType(new ActivityType());
         ctaRuleTemplate.setPlanningCategory(PlanningCategory.DEVIATION_FROM_PLANNED);
-        ctaRuleTemplate.setStaffFunction(StaffFunction.TRAINING_COORDINATOR);
+        ctaRuleTemplate.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
         ctaRuleTemplate.setPlannedTimeWithFactor(PlannedTimeWithFactor.buildPlannedTimeWithFactor(10,true,AccountType.DUTYTIME_ACCOUNT));
 
         return ctaRuleTemplate;

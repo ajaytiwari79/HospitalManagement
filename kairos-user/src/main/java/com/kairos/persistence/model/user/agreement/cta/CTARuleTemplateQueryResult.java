@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
 public class CTARuleTemplateQueryResult {
     @NotNull

@@ -39,7 +39,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          "p.payrollSystem as payrollSystem ,"+
          "p.calculationUnit as calculationUnit ,"+
          "{id:ID(compensationTable),granularityLevel:compensationTable.granularityLevel,compensationMeasurementType:compensationTable.compensationMeasurementType, "+
-          "compensationTableInterval:collect(distinct{id:ID(compensationTableInterval),to:compensationTableInterval.to,from:compensationTableInterval.from,value:compensationTableInterval.value}) } as compensationTable ,"+
+          "compensationTableInterval:CASE WHEN compensationTableInterval IS NOT NULL THEN collect(distinct{id:ID(compensationTableInterval),to:compensationTableInterval.to,from:compensationTableInterval.from,value:compensationTableInterval.value}) ELSE [] END } as compensationTable ,"+
          "calculateValueAgainst as calculateValueAgainst ,"+
          "p.approvalWorkFlow as approvalWorkFlow ,"+
          "collect(distinct {dayType:ID(dayType),countryHolidayCalenders:holidaysIds}) as calculateOnDayTypes ,"+

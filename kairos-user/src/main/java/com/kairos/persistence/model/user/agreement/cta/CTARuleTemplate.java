@@ -38,7 +38,7 @@ public class CTARuleTemplate extends RuleTemplate{
     @Relationship(type = BELONGS_TO)
     private ActivityType activityType;
     private PlanningCategory planningCategory;
-    private StaffFunction staffFunction;
+    private List<StaffFunction> staffFunctions=new ArrayList<>();
     @Relationship(type = BELONGS_TO)
     private PlannedTimeWithFactor plannedTimeWithFactor;
     @Relationship(type = HAS_TIME_TYPES)
@@ -164,12 +164,12 @@ public class CTARuleTemplate extends RuleTemplate{
         this.planningCategory = planningCategory;
     }
 
-    public StaffFunction getStaffFunction() {
-        return staffFunction;
+    public List<StaffFunction> getStaffFunctions() {
+        return staffFunctions;
     }
 
-    public void setStaffFunction(StaffFunction staffFunction) {
-        this.staffFunction = staffFunction;
+    public void setStaffFunctions(List<StaffFunction> staffFunctions) {
+        this.staffFunctions = staffFunctions;
     }
 
     public PlannedTimeWithFactor getPlannedTimeWithFactor() {
@@ -236,7 +236,7 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append(employmentTypes, that.employmentTypes)
                 .append(activityType, that.activityType)
                 .append(planningCategory, that.planningCategory)
-                .append(staffFunction, that.staffFunction)
+                .append(staffFunctions, that.staffFunctions)
                 .append(plannedTimeWithFactor, that.plannedTimeWithFactor)
                 .append(timeTypes, that.timeTypes)
                 .append(createdBy, that.createdBy)
@@ -259,7 +259,7 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append(employmentTypes)
                 .append(activityType)
                 .append(planningCategory)
-                .append(staffFunction)
+                .append(staffFunctions)
                 .append(plannedTimeWithFactor)
                 .append(timeTypes)
                 .append(createdBy)
@@ -282,7 +282,7 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append("employmentTypes", employmentTypes)
                 .append("activityType", activityType)
                 .append("planningCategory", planningCategory)
-                .append("staffFunction", staffFunction)
+                .append("staffFunction", staffFunctions)
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)
                 .append("timeTypes", timeTypes)
                 .append("createdBy", createdBy)
