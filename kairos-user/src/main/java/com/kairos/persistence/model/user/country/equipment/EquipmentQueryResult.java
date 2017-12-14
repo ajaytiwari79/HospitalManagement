@@ -1,7 +1,11 @@
 package com.kairos.persistence.model.user.country.equipment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.response.dto.web.equipment.EquipmentCategoryDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by prerna on 12/12/17.
@@ -12,7 +16,7 @@ public class EquipmentQueryResult {
     private Long id;
     private String name;
     private String description;
-    private EquipmentCategory category;
+    private Map<String,Object> category;
 
     public Long getId() {
         return id;
@@ -38,11 +42,11 @@ public class EquipmentQueryResult {
         this.description = description;
     }
 
-    public EquipmentCategory getCategory() {
+    public Map<String,Object> getCategory() {
         return category;
     }
 
-    public void setCategory(EquipmentCategory category) {
+    public void setCategory(Map<String,Object> category) {
         this.category = category;
     }
 }

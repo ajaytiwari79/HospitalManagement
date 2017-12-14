@@ -47,9 +47,9 @@ public class EquipmentController {
     }
 
     @ApiOperation(value = "Update a Country Equipment")
-    @RequestMapping(value = COUNTRY_URL + "/equipment/{euipmentId}", method = RequestMethod.PUT)
+    @RequestMapping(value = COUNTRY_URL + "/equipment/{equipmentId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateCountryEquipment(@Validated @RequestBody EquipmentDTO equipmentDTO, @PathVariable long countryId, @PathVariable long equipmentId) {
+    public ResponseEntity<Map<String, Object>> updateCountryEquipment(@Validated @RequestBody EquipmentDTO equipmentDTO, @PathVariable long countryId, @PathVariable Long equipmentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,equipmentService.updateEquipment(countryId, equipmentId, equipmentDTO));
     }
 
@@ -62,7 +62,7 @@ public class EquipmentController {
     }
 
     @ApiOperation(value = "Delete Equipment")
-    @RequestMapping(value = COUNTRY_URL + "/equipment/{euipmentId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = COUNTRY_URL + "/equipment/{equipmentId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteCountryEquipment(@PathVariable long countryId, @PathVariable long equipmentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,equipmentService.deleteEquipment(countryId, equipmentId));
