@@ -137,6 +137,7 @@ public class FeatureService extends UserBaseService{
             throw new DataNotFoundByIdException("Incorrect resource id " + resourceId);
         }
         List<Feature> features = featureGraphRepository.getAvailableFeaturesOfResourceByOrganizationAndIds(organizationId, resourceId, false, vehicleFeaturesDTO.getFeatures());
+        featureGraphRepository.detachResourceFeatures(resourceId);
         resource.setFeatures(features);
         resourceGraphRepository.save(resource);
         return resource;
