@@ -7,7 +7,6 @@ import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.*;
-import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -21,13 +20,11 @@ import com.kairos.persistence.repository.user.country.TimeTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
 import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CurrencyService;
-import com.kairos.util.ArrayUtil;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +34,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.*;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -194,7 +190,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
     public CTARuleTemplateDTO updateCTARuleTemplate(Long countryId, Long id, CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
 
-        CTARuleTemplate ctaRuleTemplate = ctaRuleTemplateGraphRepository.findOne(id);
+        CTARuleTemplate ctaRuleTemplate= ctaRuleTemplateGraphRepository.findOne(id,3);
         Long userId = UserContext.getUserDetails().getId();
         User user = userGraphRepository.findOne(userId, 0);
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
