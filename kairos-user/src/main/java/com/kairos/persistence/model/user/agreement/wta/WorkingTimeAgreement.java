@@ -9,7 +9,6 @@ import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.response.dto.web.WtaDTO;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.beans.BeanUtils;
@@ -21,44 +20,37 @@ import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
-/**
- * Created by pawanmandhan on 26/7/17.
- */
-
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class WorkingTimeAgreement extends UserBaseEntity {
-
-    @NotEmpty(message = "error.wta.name.notempty")
     @NotNull(message = "error.wta.name.notnull")
     private String name;
 
     private String description;
 
     @Relationship(type = HAS_EXPERTISE_IN)
-    private Expertise expertise;//
+    private Expertise expertise;
 
     @Relationship(type = BELONGS_TO_ORG_TYPE)
-    private OrganizationType organizationType;//
+    private OrganizationType organizationType;
 
     @Relationship(type = BELONGS_TO_ORG_SUB_TYPE)
-    private OrganizationType organizationSubType;//
+    private OrganizationType organizationSubType;
 
     @JsonIgnore
     @Relationship(type = BELONGS_TO)
     private Country country;
 
     @Relationship(type = HAS_RULE_TEMPLATE)
-    private List<RuleTemplate> ruleTemplates;//
-
+    private List<RuleTemplate> ruleTemplates;
 
     // to make a history
-    @Relationship(type = HAS_WTA)
+    @Relationship(type = HAS_PARENT_CTA)
     private WorkingTimeAgreement wta;
 
-    private Long startDateMillis;
+    private Long startDate;
     private Long endDateMillis;
     private Long expiryDate;
     private boolean deleted;
@@ -121,12 +113,12 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.wta = wta;
     }
 
-    public Long getStartDateMillis() {
-        return startDateMillis;
+    public Long getStartDate() {
+        return startDate;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
+    public void setStartDate(Long startDate) {
+        this.startDate = startDate;
     }
 
     public Long getEndDateMillis() {
@@ -197,7 +189,7 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.country = country;
         this.ruleTemplates = ruleTemplates;
         this.wta = wta;
-        this.startDateMillis = startDateMillis;
+        this.startDate = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.expiryDate = expiryDate;
         this.deleted = deleted;
@@ -210,13 +202,13 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.organizationType = organizationType;
         this.organizationSubType = organizationSubType;
         this.ruleTemplates = ruleTemplates;
-        this.startDateMillis = startDateMillis;
+        this.startDate = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.expiryDate = expiryDate;
     }
 
     public WtaDTO buildwtaDTO() {
-        WtaDTO wtaDTO = new WtaDTO(this.name, this.description, this.expertise.getId(), this.organizationType.getId(), this.organizationSubType.getId(), this.startDateMillis, this.endDateMillis, this.expiryDate);
+        WtaDTO wtaDTO = new WtaDTO(this.name, this.description, this.expertise.getId(), this.organizationType.getId(), this.organizationSubType.getId(), this.startDate, this.endDateMillis, this.expiryDate);
         return wtaDTO;
     }
 }

@@ -173,7 +173,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_RULE_TEMPLATE="HAS_RULE_TEMPLATE";
     public final static String HAS_RULE_TEMPLATE_CATEGORY="HAS_RULE_TEMPLATE_CATEGORY";
     public final static String HAS_RULE_TEMPLATES = "HAS_RULE_TEMPLATES";
-    public final static String HAS_TIME_TYPES = "HAS_RULE_TEMPLATES";
+    public final static String HAS_TIME_TYPES = "HAS_TIME_TYPES";
     public final static String HAS_LEVEL = "HAS_LEVEL";
     public final static String HAS_RELATION_TYPES="HAS_RELATION_TYPES";
     public final static String RELATION_TYPE="RELATION_TYPE";

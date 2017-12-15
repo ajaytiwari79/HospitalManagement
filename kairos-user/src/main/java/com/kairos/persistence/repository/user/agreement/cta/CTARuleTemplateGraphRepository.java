@@ -40,7 +40,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          "p.calculationUnit as calculationUnit ,"+
          "{id:ID(compensationTable),granularityLevel:compensationTable.granularityLevel,compensationMeasurementType:compensationTable.compensationMeasurementType, "+
           "compensationTableInterval:CASE WHEN compensationTableInterval IS NOT NULL THEN collect(distinct{id:ID(compensationTableInterval),to:compensationTableInterval.to,from:compensationTableInterval.from,value:compensationTableInterval.value}) ELSE [] END } as compensationTable ,"+
-         "calculateValueAgainst as calculateValueAgainst ,"+
+         "{id:ID(calculateValueAgainst),scale:calculateValueAgainst.scale,fixedValue:{id:ID(fixedValue),amount:fixedValue.amount,type:fixedValue.type,currencyId:ID(currency)}} as calculateValueAgainst ,"+
          "p.approvalWorkFlow as approvalWorkFlow ,"+
          "collect(distinct {dayType:ID(dayType),countryHolidayCalenders:holidaysIds}) as calculateOnDayTypes ,"+
          "collect(distinct cTARuleTemplatePhaseInfo) as phaseInfo ,"+
@@ -49,7 +49,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          "collect(distinct ID(employmentType)) as employmentTypes ,"+
          "activityType as activityType ,"+
          "p.planningCategory as planningCategory ,"+
-         "p.staffFunction as staffFunction ,"+
+         "p.staffFunctions as staffFunctions ,"+
          "plannedTimeWithFactor as plannedTimeWithFactor ,"+
          "collect(distinct ID(timeType)) as timeTypes,"+
          "ID(p) as id")

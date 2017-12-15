@@ -28,7 +28,7 @@ public class CTARuleTemplateQueryResult {
     private String payrollSystem;
     private CalculationUnit calculationUnit;
     private Map<String,Object> compensationTable;
-    private CalculateValueAgainst calculateValueAgainst;
+    private Map<String,Object> calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
     private List<CTARuleTemplateDayTypeDTO> calculateOnDayTypes=new ArrayList<>();
     private List<CTARuleTemplatePhaseInfo> phaseInfo=new ArrayList<>();
@@ -37,7 +37,7 @@ public class CTARuleTemplateQueryResult {
     private List<Long> employmentTypes =new ArrayList<>();
     private ActivityType activityType;
     private PlanningCategory planningCategory;
-    private StaffFunction staffFunction;
+    private List<StaffFunction> staffFunctions=new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private List<Long> timeTypes =new ArrayList<>();
 
@@ -123,11 +123,11 @@ public class CTARuleTemplateQueryResult {
         this.compensationTable = compensationTable;
     }
 
-    public CalculateValueAgainst getCalculateValueAgainst() {
+    public Map<String, Object> getCalculateValueAgainst() {
         return calculateValueAgainst;
     }
 
-    public void setCalculateValueAgainst(CalculateValueAgainst calculateValueAgainst) {
+    public void setCalculateValueAgainst(Map<String, Object> calculateValueAgainst) {
         this.calculateValueAgainst = calculateValueAgainst;
     }
 
@@ -193,12 +193,12 @@ public class CTARuleTemplateQueryResult {
         this.planningCategory = planningCategory;
     }
 
-    public StaffFunction getStaffFunction() {
-        return staffFunction;
+    public List<StaffFunction> getStaffFunctions() {
+        return staffFunctions;
     }
 
-    public void setStaffFunction(StaffFunction staffFunction) {
-        this.staffFunction = staffFunction;
+    public void setStaffFunctions(List<StaffFunction> staffFunctions) {
+        this.staffFunctions = staffFunctions;
     }
 
     public PlannedTimeWithFactor getPlannedTimeWithFactor() {
@@ -238,7 +238,7 @@ public class CTARuleTemplateQueryResult {
                 .append("employmentTypes", employmentTypes)
                 .append("activityType", activityType)
                 .append("planningCategory", planningCategory)
-                .append("staffFunction", staffFunction)
+                .append("staffFunction", staffFunctions)
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)
                 .append("timeTypes", timeTypes)
                 .toString();
