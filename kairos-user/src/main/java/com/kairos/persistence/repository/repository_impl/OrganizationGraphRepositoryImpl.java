@@ -39,7 +39,9 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         queryParameters.put("citizenIds", citizenIds);
 
         queryParameters.put("imagePath", imagePath);
-        if("module_2".equalsIgnoreCase(moduleId)){
+
+
+        if(Arrays.asList("module_2","tab_1").contains(moduleId)){
             queryParameters.put("healthStatus",Arrays.asList(ALIVE,DECEASED,TERMINATED));
         } else {
             queryParameters.put("healthStatus",Arrays.asList(ALIVE,DECEASED));
