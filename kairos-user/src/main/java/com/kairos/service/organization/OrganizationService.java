@@ -14,7 +14,6 @@ import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.*;
@@ -60,6 +59,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
@@ -597,6 +597,10 @@ public class OrganizationService extends UserBaseService {
             response.put("generalTabInfo", teamInfo);
             response.put("otherData", Collections.emptyMap());
         }
+
+        boolean result = assignUnitTimeZone(id,"Europe/Brussels");
+        logger.info("TIME SLOT ASSIGNED "+result);
+
         return response;
     }
 
@@ -1114,6 +1118,23 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.getOrganizationChildList(orgID);
     }
 
+    public List<String> getAvailableZoneIds(){
+        Set<String> allZones = ZoneId.getAvailableZoneIds();
+        List<String> zoneList = new ArrayList<>(allZones);
+        Collections.sort(zoneList);
+        return zoneList;
+    }
+
+    public boolean assignUnitTimeZone(Long unitId, String zoneIdString){
+        ZoneId zoneId = ZoneId.of(zoneIdString);
+        if (!Optional.ofNullable(zoneId).isPresent()) {
+            throw new InternalError("Zone Id not found by "+zoneIdString);
+        }
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        unit.setTimeZone(zoneId);
+        organizationGraphRepository.save(unit);
+        return true;
+    }
 
 
 }

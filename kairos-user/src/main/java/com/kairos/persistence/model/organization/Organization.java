@@ -22,12 +22,15 @@ import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.staff.Employment;
+import com.kairos.util.ZoneIdStringConverter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -196,7 +199,8 @@ public class Organization extends UserBaseEntity {
     private int nightShiftTimeDeduction = 7; //in percentage
     private boolean phaseGenerated=true;
     private Boolean showCountryTags=true;
-
+    @Convert(ZoneIdStringConverter.class)
+    private ZoneId timeZone;
 
     public Organization(String name, List<Group> groupList, List<Organization> children) {
         this.name = name;
@@ -724,5 +728,13 @@ public class Organization extends UserBaseEntity {
 
     public void setTimeSlotMode(TimeSlotMode timeSlotMode) {
         this.timeSlotMode = timeSlotMode;
+    }
+
+    public ZoneId getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(ZoneId timeZone) {
+        this.timeZone = timeZone;
     }
 }

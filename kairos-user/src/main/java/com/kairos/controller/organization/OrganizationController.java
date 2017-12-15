@@ -1230,6 +1230,20 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,presenceTypeService.getAllPresenceTypeAndTimeTypesByUnitId(unitId));
     }
+
+    @ApiOperation(value = "Get available time zones")
+    @RequestMapping(value =UNIT_URL+"/timeZones", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllTimeZones(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getAvailableZoneIds());
+    }
+
+    @ApiOperation(value = "Assign time zone to unit")
+    @RequestMapping(value =UNIT_URL+"/timeZone", method = RequestMethod.POST)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> assignUnitTimeZone(@PathVariable Long unitId, @RequestBody String zoneId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.assignUnitTimeZone(unitId, zoneId));
+    }
 }
 
 
