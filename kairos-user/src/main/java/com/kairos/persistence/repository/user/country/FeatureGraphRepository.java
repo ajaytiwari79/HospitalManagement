@@ -69,4 +69,8 @@ public interface FeatureGraphRepository extends GraphRepository<Feature>{
             "WHERE id(res) ={1}\n" +
             "return feature")
     List<Feature> getAvailableFeaturesOfResourceByOrganizationAndIds(Long organizationId , Long resourceId, boolean deleted, List<Long> featureIds);
+
+    @Query("MATCH (resource:Resource)-[r:"+RESOURCE_HAS_FEATURE+"]->(feature:Feature)\n"+
+            "DELETE r")
+    void detachResourceFeatures(long resourceId);
 }
