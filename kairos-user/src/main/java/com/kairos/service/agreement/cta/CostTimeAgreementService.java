@@ -1,11 +1,15 @@
 package com.kairos.service.agreement.cta;
 
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
+import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.Currency;
+import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
@@ -14,8 +18,11 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.TimeTypeGraphRepository;
+import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
+import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
@@ -33,49 +40,34 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Transactional
 @Service
 public class CostTimeAgreementService extends UserBaseService {
     private Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
-    private
-    @Autowired
-    UserService userService;
-    private
-    @Autowired
-    RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
-    private
-    @Autowired
-    CountryGraphRepository countryGraphRepository;
-    private
-    @Autowired
-    CTARuleTemplateGraphRepository ctaRuleTemplateGraphRepository;
-    private
-    @Autowired
-    AsynchronousService asynchronousService;
-    private
-    @Autowired
-    DayTypeGraphRepository dayTypeGraphRepository;
-    private
-    @Autowired
-    EmploymentTypeGraphRepository employmentTypeGraphRepository;
-    private
-    @Autowired
-    AccessGroupRepository accessGroupRepository;
-    private
-    @Autowired
-    TimeTypeGraphRepository timeTypeGraphRepository;
-    private
-    @Autowired
-    UserGraphRepository userGraphRepository;
-    @Autowired
-    private CurrencyService currencyService;
+
+
+    private @Autowired UserService userService;
+    private @Autowired RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
+    private @Autowired CountryGraphRepository countryGraphRepository;
+    private @Autowired CTARuleTemplateGraphRepository ctaRuleTemplateGraphRepository;
+    private @Autowired AsynchronousService asynchronousService;
+    private @Autowired DayTypeGraphRepository dayTypeGraphRepository;
+    private @Autowired  EmploymentTypeGraphRepository employmentTypeGraphRepository;
+    private @Autowired AccessGroupRepository accessGroupRepository;
+    private @Autowired TimeTypeGraphRepository timeTypeGraphRepository;
+    private @Autowired UserGraphRepository userGraphRepository;
+    private  @Autowired CurrencyService currencyService;
+    private  @Autowired ExpertiseGraphRepository expertiseGraphRepository;
+    private @Autowired OrganizationTypeGraphRepository organizationTypeGraphRepository;
 
 
     public void createDefaultCtaRuleTemplate(Long countryId) {
@@ -176,9 +168,9 @@ public class CostTimeAgreementService extends UserBaseService {
         ctaRuleTemplate.setBudgetType(BudgetType.ACTIVITY_COST);
         ctaRuleTemplate.setActivityType(new ActivityType());
         ctaRuleTemplate.setPlanningCategory(PlanningCategory.DEVIATION_FROM_PLANNED);
-        ctaRuleTemplate.setStaffFunction(StaffFunction.TRAINING_COORDINATOR);
-        ctaRuleTemplate.setPlannedTimeWithFactor(PlannedTimeWithFactor.buildPlannedTimeWithFactor(10, true, AccountType.DUTYTIME_ACCOUNT));
 
+        ctaRuleTemplate.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
+        ctaRuleTemplate.setPlannedTimeWithFactor(PlannedTimeWithFactor.buildPlannedTimeWithFactor(10,true,AccountType.DUTYTIME_ACCOUNT));
         return ctaRuleTemplate;
 
 
@@ -192,10 +184,11 @@ public class CostTimeAgreementService extends UserBaseService {
                 .collect(Collectors.toList());
         List<Long> ruleTemplateCategoryIds = ctaRuleTemplateCategoryList.parallelStream().map(RuleTemplateCategory::getId)
                 .collect(Collectors.toList());
-        List<CTARuleTemplateDTO> ruleTemplates = ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(ruleTemplateCategoryIds);
-        CTARuleTemplateCategoryWrapper ctaRuleTemplateCategoryWrapper = new CTARuleTemplateCategoryWrapper();
+
+        List<CTARuleTemplateQueryResult> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(ruleTemplateCategoryIds);
+        CTARuleTemplateCategoryWrapper ctaRuleTemplateCategoryWrapper=new CTARuleTemplateCategoryWrapper();
         ctaRuleTemplateCategoryWrapper.getRuleTemplateCategories().addAll(ctaRuleTemplateCategoryList);
-        ctaRuleTemplateCategoryWrapper.getRuleTemplates().addAll(ruleTemplates);
+        ctaRuleTemplateCategoryWrapper.setRuleTemplates(ruleTemplates);
         return ctaRuleTemplateCategoryWrapper;
     }
 
@@ -279,4 +272,54 @@ public class CostTimeAgreementService extends UserBaseService {
 
 
 
-}
+
+    public CollectiveTimeAgreementDTO createCostTimeAgreement(Long countryId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+        logger.debug("saving CostTimeAgreement country {}",countryId);
+        CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
+        BeanUtils.copyProperties(costTimeAgreement,collectiveTimeAgreementDTO);
+        CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO);
+
+        // Wait until they are all done
+        CompletableFuture.allOf(hasUpdated).join();
+        this.save(costTimeAgreement);
+        return collectiveTimeAgreementDTO;
+    }
+
+    @Async
+    public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO)
+            throws InterruptedException, ExecutionException {
+
+
+        Callable<Optional<Expertise>> expertiseCallable=()->{
+            Optional<Expertise> expertise=expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise());
+            return  expertise;
+        };
+
+        Future<Optional<Expertise>>expertiseFuture=asynchronousService.executeAsynchronously(expertiseCallable);
+
+        Callable<List<RuleTemplate>> ctaRuleTemplatesCallable=()->{
+            Iterable<CTARuleTemplate> ctaRuleTemplates=ctaRuleTemplateGraphRepository.findAllById(collectiveTimeAgreementDTO.getRuleTemplates(),0);
+            return  StreamSupport.stream(ctaRuleTemplates.spliterator(), true).collect(Collectors.toList());
+        };
+
+        Future<List<RuleTemplate>>ctaRuleTemplatesFuture=asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
+
+
+        Callable<List<OrganizationType>> OrganizationTypesListCallable=()->{
+            List<OrganizationType> organizationTypes=(List<OrganizationType>)organizationTypeGraphRepository.findAllById(collectiveTimeAgreementDTO.getOrganizationTypeList(),0);
+            return  organizationTypes;
+
+
+        };
+        Future<List<OrganizationType>>organizationTypesFuture=asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
+        //set data
+         if(expertiseFuture.get().isPresent())
+             costTimeAgreement.setExpertise(expertiseFuture.get().get());
+        costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
+        costTimeAgreement.setOrganizationTypes(organizationTypesFuture.get());
+
+        return CompletableFuture.completedFuture(true);
+    }
+
+    }

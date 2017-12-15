@@ -1,16 +1,20 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
+import com.kairos.config.neo4j.converter.LocalTimeStringConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 
 import java.time.LocalTime;
 
 @NodeEntity
 public class CompensationTableInterval extends UserBaseEntity {
+   @Convert(LocalTimeStringConverter.class)
     private LocalTime from;
+    @Convert(LocalTimeStringConverter.class)
     private LocalTime to;
     private float value;
 

@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.user.agreement.cta;
 
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplate;
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +19,8 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          " optional  MATCH (p)-[:`HAS_ACCESS_GROUP`]-(accessGroup:`AccessGroup`) "+
          " optional  MATCH (p)-[:`HAS_EMPLOYMENT_TYPE`]-(employmentType:`EmploymentType`) "+
          " optional  MATCH (p)-[:`HAS_TIME_TYPES`]-(timeType:`TimeType`) "+
-         " optional  MATCH (p)-[:`BELONGS_TO`]-(compensationTable:`CompensationTable`) "+
+         " optional  MATCH (p)-[:`HAS_COMPENSATION_TABLE`]-(compensationTable:`CompensationTable`) "+
+         " optional  MATCH (compensationTable)-[:`HAS_COMPENSATION_TABLE_INTERVAL`]-(compensationTableInterval:`CompensationTableInterval`) "+
          " optional  MATCH (p)-[:`BELONGS_TO`]-(calculateValueAgainst:`CalculateValueAgainst`) "+
          " optional  MATCH (calculateValueAgainst)-[:`BELONGS_TO`]-(fixedValue:`FixedValue`) "+
          " optional  MATCH (fixedValue)-[:`BELONGS_TO`]-(currency:`Currency`) "+
@@ -27,8 +28,8 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          " optional  MATCH (p)-[:`BELONGS_TO`]-(activityType:`ActivityType`) "+
          " optional  MATCH (p)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`) "+
          " with p,m0,cTARuleTemplateDayTypes,dayType,accessGroup,timeType,employmentType,countryHolidayCalender,"+
-         "compensationTable,calculateValueAgainst,fixedValue,currency,cTARuleTemplatePhaseInfo,activityType,plannedTimeWithFactor"+
-         ", collect(ID(countryHolidayCalender)) as holidaysIds"+
+         "compensationTable,compensationTableInterval,calculateValueAgainst,fixedValue,currency,cTARuleTemplatePhaseInfo,activityType,plannedTimeWithFactor"+
+         ", collect(distinct ID(countryHolidayCalender)) as holidaysIds"+
          " RETURN p.name as name ,"+
          "p.description as description,"+
          "p.disabled as disabled,"+
@@ -37,20 +38,21 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          "p.payrollType as payrollType ,"+
          "p.payrollSystem as payrollSystem ,"+
          "p.calculationUnit as calculationUnit ,"+
-         "compensationTable as compensationTable ,"+
+         "{id:ID(compensationTable),granularityLevel:compensationTable.granularityLevel,compensationMeasurementType:compensationTable.compensationMeasurementType, "+
+          "compensationTableInterval:CASE WHEN compensationTableInterval IS NOT NULL THEN collect(distinct{id:ID(compensationTableInterval),to:compensationTableInterval.to,from:compensationTableInterval.from,value:compensationTableInterval.value}) ELSE [] END } as compensationTable ,"+
          "calculateValueAgainst as calculateValueAgainst ,"+
          "p.approvalWorkFlow as approvalWorkFlow ,"+
-         "collect({dayType:ID(dayType),countryHolidayCalenders:holidaysIds}) as calculateOnDayTypes ,"+
-         "collect(cTARuleTemplatePhaseInfo) as phaseInfo ,"+
+         "collect(distinct {dayType:ID(dayType),countryHolidayCalenders:holidaysIds}) as calculateOnDayTypes ,"+
+         "collect(distinct cTARuleTemplatePhaseInfo) as phaseInfo ,"+
          "p.budgetType as budgetType ,"+
-         "collect(ID(accessGroup)) as calculateValueIfPlanned ,"+
-         "collect(ID(employmentType)) as employmentTypes ,"+
+         "collect(distinct ID(accessGroup)) as calculateValueIfPlanned ,"+
+         "collect(distinct ID(employmentType)) as employmentTypes ,"+
          "activityType as activityType ,"+
          "p.planningCategory as planningCategory ,"+
          "p.staffFunction as staffFunction ,"+
          "plannedTimeWithFactor as plannedTimeWithFactor ,"+
-         "collect(ID(timeType)) as timeTypes,"+
+         "collect(distinct ID(timeType)) as timeTypes,"+
          "ID(p) as id")
-    List<CTARuleTemplateDTO>findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(List<Long> categoryList);
+    List<CTARuleTemplateQueryResult>findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(List<Long> categoryList);
 
 }

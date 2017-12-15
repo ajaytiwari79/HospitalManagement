@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -8,8 +10,12 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CTARuleTemplateDTO {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@QueryResult
+public class CTARuleTemplateQueryResult {
     @NotNull
     public Long id;
     public String name;
@@ -21,21 +27,21 @@ public class CTARuleTemplateDTO {
     private String payrollType;
     private String payrollSystem;
     private CalculationUnit calculationUnit;
-    private CompensationTable compensationTable;
+    private Map<String,Object> compensationTable;
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-    private List<CTARuleTemplateDayTypeDTO>calculateOnDayTypes=new ArrayList<>();
+    private List<CTARuleTemplateDayTypeDTO> calculateOnDayTypes=new ArrayList<>();
     private List<CTARuleTemplatePhaseInfo> phaseInfo=new ArrayList<>();
     private BudgetType budgetType;
     private List<Long> calculateValueIfPlanned =new ArrayList<>();
     private List<Long> employmentTypes =new ArrayList<>();
     private ActivityType activityType;
     private PlanningCategory planningCategory;
-    private List<StaffFunction> staffFunctions=new ArrayList<>();
+    private StaffFunction staffFunction;
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private List<Long> timeTypes =new ArrayList<>();
 
-    public CTARuleTemplateDTO() {
+    public CTARuleTemplateQueryResult() {
     }
 
     public Long getId() {
@@ -109,11 +115,11 @@ public class CTARuleTemplateDTO {
         this.calculationUnit = calculationUnit;
     }
 
-    public CompensationTable getCompensationTable() {
+    public Map<String,Object> getCompensationTable() {
         return compensationTable;
     }
 
-    public void setCompensationTable(CompensationTable compensationTable) {
+    public void setCompensationTable(Map<String,Object> compensationTable) {
         this.compensationTable = compensationTable;
     }
 
@@ -187,12 +193,12 @@ public class CTARuleTemplateDTO {
         this.planningCategory = planningCategory;
     }
 
-    public List<StaffFunction> getStaffFunctions() {
-        return staffFunctions;
+    public StaffFunction getStaffFunction() {
+        return staffFunction;
     }
 
-    public void setStaffFunctions(List<StaffFunction> staffFunctions) {
-        this.staffFunctions = staffFunctions;
+    public void setStaffFunction(StaffFunction staffFunction) {
+        this.staffFunction = staffFunction;
     }
 
     public PlannedTimeWithFactor getPlannedTimeWithFactor() {
@@ -232,7 +238,7 @@ public class CTARuleTemplateDTO {
                 .append("employmentTypes", employmentTypes)
                 .append("activityType", activityType)
                 .append("planningCategory", planningCategory)
-                .append("staffFunctions", staffFunctions)
+                .append("staffFunction", staffFunction)
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)
                 .append("timeTypes", timeTypes)
                 .toString();
