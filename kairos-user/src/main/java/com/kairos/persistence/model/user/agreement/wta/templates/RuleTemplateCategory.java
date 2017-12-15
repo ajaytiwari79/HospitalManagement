@@ -8,7 +8,6 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.country.Country;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -27,10 +26,8 @@ import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 @NodeEntity
 public class RuleTemplateCategory extends UserBaseEntity {
 
-    @NotEmpty(message = "error.RuleTemplate.description.notEmpty")
     @NotNull(message = "error.RuleTemplate.description.notnull")
     private String name;
-    @NotEmpty(message = "error.RuleTemplate.description.notEmpty")
     @NotNull(message = "error.RuleTemplate.description.name.notnull")
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;

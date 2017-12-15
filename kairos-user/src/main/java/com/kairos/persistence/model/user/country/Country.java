@@ -32,12 +32,14 @@ import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Country extends UserBaseEntity {
 
-    @NotEmpty(message = "error.Country.name.notEmpty") @NotNull(message = "error.Country.name.notnull")
+    @NotEmpty(message = "error.Country.name.notEmpty")
+    @NotNull(message = "error.Country.name.notnull")
     private String name;
 
     private boolean isEnabled = true;
 
-    @NotEmpty(message = "error.Country.code.notEmpty") @NotNull(message = "error.Country.code.notnull")
+    @NotEmpty(message = "error.Country.code.notEmpty")
+    @NotNull(message = "error.Country.code.notnull")
     private String code;
 
     public String getCode() {
@@ -49,10 +51,10 @@ public class Country extends UserBaseEntity {
     }
 
     @Relationship(type = HAS_HOLIDAY)
-    private List< CountryHolidayCalender> countryHolidayCalenderList;
+    private List<CountryHolidayCalender> countryHolidayCalenderList;
 
-    @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY,direction =UNDIRECTED )
-    private List <RuleTemplateCategory> ruleTemplateCategories=new ArrayList<>();
+    @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY, direction = UNDIRECTED)
+    private List<RuleTemplateCategory> ruleTemplateCategories = new ArrayList<>();
 
     @Relationship(type = HAS_RULE_TEMPLATE)
     private List<RuleTemplate> WTABaseRuleTemplate;
@@ -149,7 +151,7 @@ public class Country extends UserBaseEntity {
         this.employmentTypeList = employmentTypeList;
     }
 
-    public void addEmploymentType(EmploymentType employmentType){
+    public void addEmploymentType(EmploymentType employmentType) {
         List<EmploymentType> employmentTypeList = Optional.ofNullable(this.employmentTypeList).orElse(new ArrayList<>());
         employmentTypeList.add(employmentType);
         this.employmentTypeList = employmentTypeList;
@@ -164,13 +166,13 @@ public class Country extends UserBaseEntity {
     }
 
 
-    public void addLevel(Level level){
+    public void addLevel(Level level) {
         List<Level> levels = Optional.ofNullable(this.levels).orElse(new ArrayList<>());
         levels.add(level);
         this.levels = levels;
     }
 
-    public void addResources(Vehicle vehicle){
+    public void addResources(Vehicle vehicle) {
         List<Vehicle> resourceList = Optional.ofNullable(this.resources).orElse(new ArrayList<>());
         resourceList.add(vehicle);
         this.resources = resourceList;
@@ -192,16 +194,17 @@ public class Country extends UserBaseEntity {
     public void addRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
         if (ruleTemplateCategory == null)
             throw new NullPointerException("Can't add null ruleTemplateCategory");
-        if (ruleTemplateCategory.getCountry()!= null)
+        if (ruleTemplateCategory.getCountry() != null)
             throw new IllegalStateException("country is already assigned to ruleTemplateCategory");
-         getRuleTemplateCategories().add(ruleTemplateCategory);
-         ruleTemplateCategory.setCountry(this);
-     }
+        getRuleTemplateCategories().add(ruleTemplateCategory);
+        ruleTemplateCategory.setCountry(this);
+    }
 
     public void removeRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
         if (ruleTemplateCategory == null)
-        getRuleTemplateCategories().remove(ruleTemplateCategory);
+            getRuleTemplateCategories().remove(ruleTemplateCategory);
         ruleTemplateCategory.setCountry(null);
+
     }
 
     public Map<String, Object> retrieveGeneralDetails() {
@@ -213,12 +216,12 @@ public class Country extends UserBaseEntity {
 
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("code",this.code);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        map.put("googleCalendarCode",this.getGoogleCalendarCode());
+        map.put("id", this.id);
+        map.put("name", this.name);
+        map.put("code", this.code);
+        map.put("lastModificationDate", this.getLastModificationDate());
+        map.put("creationDate", this.getCreationDate());
+        map.put("googleCalendarCode", this.getGoogleCalendarCode());
         return map;
     }
 
@@ -228,7 +231,7 @@ public class Country extends UserBaseEntity {
                 "name='" + name + '\'' +
                 ", isEnabled=" + isEnabled +
                 ", code='" + code + '\'' +
-                '}'+
+                '}' +
                 '}';
     }
 

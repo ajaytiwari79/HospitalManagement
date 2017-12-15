@@ -94,7 +94,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
 
     @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"  ]-(l:RuleTemplateCategory) Where id(c)={0} AND l.ruleTemplateCategoryType={1} AND l.name=~{2}\n" +
             "return count(r) as number;")
-     int  checkDuplicateRuleTemplate(Long id, RuleTemplateCategoryType ruleTemplateCategoryType, String name);
+     int checkDuplicateRuleTemplateCategory(Long id, RuleTemplateCategoryType ruleTemplateCategoryType, String name);
 
 
     @Query("MATCH (n:Country{isEnabled:true}) RETURN collect({name:n.name, code:n.code}) as list")
