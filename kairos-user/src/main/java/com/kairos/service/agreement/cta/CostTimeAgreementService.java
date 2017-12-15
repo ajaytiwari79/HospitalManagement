@@ -14,10 +14,7 @@ import com.kairos.persistence.repository.user.access_permission.AccessGroupRepos
 import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.TimeTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.*;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
@@ -62,6 +59,7 @@ public class CostTimeAgreementService extends UserBaseService {
     private  @Autowired CurrencyService currencyService;
     private  @Autowired ExpertiseGraphRepository expertiseGraphRepository;
     private @Autowired OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    private @Autowired CurrencyGraphRepository currencyGraphRepository;
 
 
     public void createDefaultCtaRuleTemplate(Long countryId) {
@@ -187,7 +185,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
     public CTARuleTemplateDTO updateCTARuleTemplate(Long countryId,Long id,CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
 
-        CTARuleTemplate ctaRuleTemplate= ctaRuleTemplateGraphRepository.findOne(id);
+        CTARuleTemplate ctaRuleTemplate= ctaRuleTemplateGraphRepository.findOne(id,3);
         Long userId = UserContext.getUserDetails().getId();
         User user=userGraphRepository.findOne(userId,0);
         this.buildCTARuleTemplate(ctaRuleTemplate,ctaRuleTemplateDTO);
@@ -211,6 +209,11 @@ public class CostTimeAgreementService extends UserBaseService {
                 {return countryHolidayCalenders.stream();}).collect(Collectors.toList());
 
         ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategory);
+        if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue()!=null
+                && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId()!=null){
+            Currency currency=currencyGraphRepository.findOne(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId());
+            ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().setCurrency(currency);
+        }
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
