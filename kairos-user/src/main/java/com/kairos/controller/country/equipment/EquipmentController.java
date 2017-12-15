@@ -1,6 +1,7 @@
 package com.kairos.controller.country.equipment;
 
 import com.kairos.response.dto.web.equipment.EquipmentDTO;
+import com.kairos.response.dto.web.equipment.VehicleEquipmentDTO;
 import com.kairos.service.country.equipment.EquipmentService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by prerna on 12/12/17.
@@ -47,9 +49,9 @@ public class EquipmentController {
     }
 
     @ApiOperation(value = "Update a Country Equipment")
-    @RequestMapping(value = COUNTRY_URL + "/equipment/{euipmentId}", method = RequestMethod.PUT)
+    @RequestMapping(value = COUNTRY_URL + "/equipment/{equipmentId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateCountryEquipment(@Validated @RequestBody EquipmentDTO equipmentDTO, @PathVariable long countryId, @PathVariable long equipmentId) {
+    public ResponseEntity<Map<String, Object>> updateCountryEquipment(@Validated @RequestBody EquipmentDTO equipmentDTO, @PathVariable long countryId, @PathVariable Long equipmentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,equipmentService.updateEquipment(countryId, equipmentId, equipmentDTO));
     }
 
@@ -62,9 +64,27 @@ public class EquipmentController {
     }
 
     @ApiOperation(value = "Delete Equipment")
-    @RequestMapping(value = COUNTRY_URL + "/equipment/{euipmentId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = COUNTRY_URL + "/equipment/{equipmentId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteCountryEquipment(@PathVariable long countryId, @PathVariable long equipmentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,equipmentService.deleteEquipment(countryId, equipmentId));
+    }
+
+
+
+
+    @ApiOperation(value = "Update Features of resources")
+    @RequestMapping(value = UNIT_URL + "/resource/{resourceId}/equipment", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateFeaturesOfResource(@Validated @RequestBody VehicleEquipmentDTO vehicleFeatureDTO, @PathVariable long unitId, @PathVariable long resourceId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,equipmentService.updateEquipmentsOfResource(unitId, resourceId, vehicleFeatureDTO));
+    }
+
+    @ApiOperation(value = "Get list of Features of resource")
+    @RequestMapping(value = UNIT_URL + "/resource/{resourceId}/equipment", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getFeaturesOfResource(@PathVariable long unitId, @PathVariable long resourceId,
+                                                                     @RequestParam(value = "filterText",required = false) String filterText) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,equipmentService.getEquipmentsForResource(unitId,resourceId));
     }
 }
