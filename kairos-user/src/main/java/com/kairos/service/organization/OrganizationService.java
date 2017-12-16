@@ -183,6 +183,11 @@ public class OrganizationService extends UserBaseService {
 
     }
 
+    public Long getCountryIdOfOrganization(long orgId) {
+        Organization organization = organizationGraphRepository.findOne(orgId, 1);
+        return organization.getCountry().getId();
+    }
+
     /**
      * Calls OrganizationGraphRepository ,creates a new Organization
      * and return newly created User.
