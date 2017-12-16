@@ -72,7 +72,6 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void test2_addCountryEquipment() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         EquipmentCategory equipmentCategory = equipmentService.getEquipmentCategoryByName("Small");
@@ -97,7 +96,6 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void test3_updateEquipment() throws Exception {
 
         if(createdEquipmentId == null){
@@ -105,6 +103,7 @@ public class EquipmentServiceIntegrationTest {
             Equipment equipment = equipmentService.getEquipmentByName(countryId, nameOfEquipment);
             createdEquipmentId = equipment.getId();
         }
+        logger.info("createdEquipmentId : "+createdEquipmentId);
         String baseUrl=getBaseUrl(orgId,countryId, null);
 
         EquipmentCategory equipmentCategory = equipmentService.getEquipmentCategoryByName("Medium");
@@ -130,7 +129,6 @@ public class EquipmentServiceIntegrationTest {
 
 
     @Test
-    @Ignore
     public void test4_getListOfEquipments() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>> resTypeReference =
@@ -148,13 +146,13 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void test5_deleteEquipment() throws Exception {
         if(createdEquipmentId == null){
             logger.info("Equipment Id is null");
             Equipment equipment = equipmentService.getEquipmentByName(countryId, nameOfEquipment);
             createdEquipmentId = equipment.getId();
         }
+        logger.info("createdEquipmentId : "+createdEquipmentId);
         String baseUrl=getBaseUrl(orgId,countryId, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> resTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {

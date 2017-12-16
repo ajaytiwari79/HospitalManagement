@@ -991,7 +991,6 @@ public class BootDataService {
 
     private void createEquipmentCategories(){
         if( ! equipmentCategoryGraphRepository.ifEquipmentCategoryExists()){
-            logger.info("In IFFFFFFFFFFFFFFFFFFF createEquipmentCategories");
             EquipmentCategory equipmentCategorySmall = new EquipmentCategory();
             equipmentCategorySmall.setName("Small");
             equipmentCategorySmall.setDescription("Small");
@@ -1020,8 +1019,6 @@ public class BootDataService {
             equipmentCategoryLarge.setVolumeInCm(100F);
 
             equipmentCategoryGraphRepository.save(Arrays.asList(equipmentCategorySmall, equipmentCategoryMedium, equipmentCategoryLarge));
-        } else {
-            logger.info("In ELSEEEEEEEEEEEEEEEEEEEE createEquipmentCategories");
         }
     }
 }
