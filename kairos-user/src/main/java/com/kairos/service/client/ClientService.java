@@ -1652,7 +1652,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
             throw new InternalError("Invalid Organization id");
         }
 
-        List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(clientId);
+        List<Map<String, Object>> temporaryAddressList = FormatUtil.formatNeoResponse(clientGraphRepository.getClientTemporaryAddressById(clientId));
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(organization.getId(),organization.getTimeSlotMode(),
                 new Date());
         List<ClientExceptionTypesDTO> clientExceptionTypesDTOS = clientExceptionRestClient.getClientExceptionTypes();
