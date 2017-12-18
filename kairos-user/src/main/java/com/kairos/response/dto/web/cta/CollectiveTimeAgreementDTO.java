@@ -2,6 +2,7 @@ package com.kairos.response.dto.web.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.organization.OrganizationType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +12,10 @@ public class CollectiveTimeAgreementDTO {
     private String name;
     private String description;
     private Long expertise;
-    private List<Long> organizationTypeList=new ArrayList<>();
+    private Long organizationType;
+    private Long organizationSubType;
     private List<Long> ruleTemplates=new ArrayList<>();
     private boolean disabled;
-
     public CollectiveTimeAgreementDTO() {
 
     }
@@ -43,12 +44,20 @@ public class CollectiveTimeAgreementDTO {
         this.expertise = expertise;
     }
 
-    public List<Long> getOrganizationTypeList() {
-        return organizationTypeList;
+    public Long getOrganizationType() {
+        return organizationType;
     }
 
-    public void setOrganizationTypeList(List<Long> organizationTypeList) {
-        this.organizationTypeList = organizationTypeList;
+    public void setOrganizationType(Long organizationType) {
+        this.organizationType = organizationType;
+    }
+
+    public Long getOrganizationSubType() {
+        return organizationSubType;
+    }
+
+    public void setOrganizationSubType(Long organizationSubType) {
+        this.organizationSubType = organizationSubType;
     }
 
     public List<Long> getRuleTemplates() {
@@ -65,5 +74,18 @@ public class CollectiveTimeAgreementDTO {
 
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
+    }
+
+    @Override
+    public String toString() {
+        return "CollectiveTimeAgreementDTO{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", expertise=" + expertise +
+                ", organizationType=" + organizationType +
+                ", organizationSubType=" + organizationSubType +
+                ", ruleTemplates=" + ruleTemplates +
+                ", disabled=" + disabled +
+                '}';
     }
 }
