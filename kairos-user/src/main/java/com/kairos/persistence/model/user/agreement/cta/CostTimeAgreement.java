@@ -27,7 +27,9 @@ public class CostTimeAgreement extends UserBaseEntity {
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
     @Relationship(type = HAS_SUB_TYPE)
-    private List<OrganizationType> organizationTypes=new ArrayList<>();
+    private OrganizationType organizationType;
+    @Relationship(type = BELONGS_TO_ORG_SUB_TYPE)
+    private OrganizationType organizationSubType;
     @Relationship(type = BELONGS_TO)
     private Country country;
     @Relationship(type = HAS_PARENT_CTA)
@@ -65,14 +67,6 @@ public class CostTimeAgreement extends UserBaseEntity {
 
     public void setExpertise(Expertise expertise) {
         this.expertise = expertise;
-    }
-
-    public List<OrganizationType> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<OrganizationType> organizationTypes) {
-        this.organizationTypes = organizationTypes;
     }
 
     public List<RuleTemplate> getRuleTemplates() {
@@ -126,29 +120,35 @@ public class CostTimeAgreement extends UserBaseEntity {
         this.endDate = endDate;
     }
 
-    public void addOrganizationType(OrganizationType organizationType) {
-        if (organizationType == null)
+
+    public void addRuleTemplate(RuleTemplate ruleTemplate) {
+        if (ruleTemplate == null)
             throw new NullPointerException("Can't add null ruleTemplateCategory");
-           getOrganizationTypes().add(organizationType);
-
-    }
-
-    public void removeOrganizationType(OrganizationType organizationType) {
-        if (organizationType == null)
-            getOrganizationTypes().remove(organizationType);
-    }
-
-    public void addRuleTemplate(OrganizationType organizationType) {
-        if (organizationType == null)
-            throw new NullPointerException("Can't add null ruleTemplateCategory");
-        getOrganizationTypes().add(organizationType);
+        getRuleTemplates().add(ruleTemplate);
 
     }
 
     public void removeOrganizationType(RuleTemplate ruleTemplate) {
         if (ruleTemplate == null)
-            getOrganizationTypes().remove(ruleTemplate);
+            getRuleTemplates().remove(ruleTemplate);
     }
+
+    public OrganizationType getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(OrganizationType organizationType) {
+        this.organizationType = organizationType;
+    }
+
+    public OrganizationType getOrganizationSubType() {
+        return organizationSubType;
+    }
+
+    public void setOrganizationSubType(OrganizationType organizationSubType) {
+        this.organizationSubType = organizationSubType;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -163,7 +163,8 @@ public class CostTimeAgreement extends UserBaseEntity {
                 .append(name, that.name)
                 .append(description, that.description)
                 .append(expertise, that.expertise)
-                .append(organizationTypes, that.organizationTypes)
+                .append(organizationType, that.organizationType)
+                .append(organizationSubType, that.organizationSubType)
                 .append(country, that.country)
                 .append(parent, that.parent)
                 .append(ruleTemplates, that.ruleTemplates)
@@ -178,7 +179,8 @@ public class CostTimeAgreement extends UserBaseEntity {
                 .append(name)
                 .append(description)
                 .append(expertise)
-                .append(organizationTypes)
+                .append(organizationType)
+                .append(organizationSubType)
                 .append(country)
                 .append(parent)
                 .append(ruleTemplates)
