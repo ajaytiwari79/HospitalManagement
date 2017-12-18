@@ -34,7 +34,7 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
     void deleteTimeSlot(Long timeSlotSetId,Long timeSlotId);
 
     @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND id(timeSlot)={1}\n" +
-            "Match (organization)-[r:ORGANIZATION_TIME_SLOT]->(timeSlot:TimeSlot)return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
+            "Match (organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot)return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
     Map<String,Object>  getTimeSlotByUnitIdAndTimeSlotId(long unitId, long timeSlotId);
 
     @Query("Match (n:Organization)-[r:"+ORGANIZATION_TIME_SLOT+"]->(timeSlot:TimeSlot{timeSlotType:{1}}) where id(n)={0} set r.isShiftStartTime=false return r")
