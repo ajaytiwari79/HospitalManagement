@@ -50,7 +50,7 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     @Relationship(type = HAS_PARENT_CTA)
     private WorkingTimeAgreement wta;
 
-    private Long startDate;
+    private Long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
     private boolean deleted;
@@ -113,12 +113,12 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.wta = wta;
     }
 
-    public Long getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
     public Long getEndDateMillis() {
@@ -189,7 +189,7 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.country = country;
         this.ruleTemplates = ruleTemplates;
         this.wta = wta;
-        this.startDate = startDateMillis;
+        this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.expiryDate = expiryDate;
         this.deleted = deleted;
@@ -202,13 +202,13 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.organizationType = organizationType;
         this.organizationSubType = organizationSubType;
         this.ruleTemplates = ruleTemplates;
-        this.startDate = startDateMillis;
+        this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.expiryDate = expiryDate;
     }
 
     public WtaDTO buildwtaDTO() {
-        WtaDTO wtaDTO = new WtaDTO(this.name, this.description, this.expertise.getId(), this.organizationType.getId(), this.organizationSubType.getId(), this.startDate, this.endDateMillis, this.expiryDate);
+        WtaDTO wtaDTO = new WtaDTO(this.name, this.description, this.expertise.getId(), this.organizationType.getId(), this.organizationSubType.getId(), this.startDateMillis, this.endDateMillis, this.expiryDate);
         return wtaDTO;
     }
 }
