@@ -195,7 +195,6 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public Map<String, Object> changeCTARuleTemplateCategory(Long countryId, RuleTemplateDTO ruleTemplateDTO) {
         Map<String, Object> response = new HashMap();
         RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory();
-        boolean ruleTemplateCategoryFound = false;
         Country country = countryGraphRepository.findOne(countryId);
         List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
        Optional<RuleTemplateCategory> countryRuleTemplateCategory=ruleTemplateCategories.parallelStream().filter(ruleTemplateCategory1->"CTA".equalsIgnoreCase(ruleTemplateCategory1.getRuleTemplateCategoryType().toString())
@@ -208,14 +207,15 @@ public class RuleTemplateCategoryService extends UserBaseService {
             country.addRuleTemplateCategory(ruleTemplateCategory);
             save(country);
             ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateDTO.getRuleTemplateIds(), ruleTemplateCategory.getName());
+            response.put("category", ruleTemplateCategory);
         } else {
             List<Long> ctaRuleTemplates = ruleTemplateCategoryGraphRepository.findAllExistingCTARuleTemplateByCategory(ruleTemplateCategory.getName(), countryId);
             List<Long> ruleTemplateIdsNeedToAddInCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(ctaRuleTemplates, ruleTemplateDTO.getRuleTemplateIds());
             List<Long> ruleTemplateIdsNeedToRemoveFromCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(ruleTemplateDTO.getRuleTemplateIds(), ctaRuleTemplates);
-            ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateIdsNeedToAddInCategory, ruleTemplateCategory.getName());
+            ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateIdsNeedToAddInCategory, ruleTemplateDTO.getCategoryName());
             ruleTemplateCategoryGraphRepository.updateCategoryOfCTARuleTemplate(ruleTemplateIdsNeedToRemoveFromCategory, "NONE");
         }
-        response.put("category", ruleTemplateCategory);
+
         return response;
     }
 
