@@ -221,7 +221,6 @@ public class PositionService extends UserBaseService {
         wta.setName(wtaWithRuleTemplateDTO.getName());
         wta.setDescription(wtaWithRuleTemplateDTO.getDescription());
         wta.setEndDateMillis(wtaWithRuleTemplateDTO.getEndDateMillis());
-        wta.setStartDateMillis(wtaWithRuleTemplateDTO.getStartDateMillis());
         wtaWithRuleTemplateDTO.getRuleTemplates();
 
         List<RuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
