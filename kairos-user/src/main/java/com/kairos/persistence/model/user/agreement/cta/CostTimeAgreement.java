@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -41,6 +42,10 @@ public class CostTimeAgreement extends UserBaseEntity {
     @DateLong
     private Date endDate;
     private boolean disabled;
+    @Relationship(type = BELONGS_TO)
+    private User createdBy;
+    @Relationship(type = BELONGS_TO)
+    private User lastModifiedBy;
 
     public CostTimeAgreement() {
     }
@@ -149,6 +154,24 @@ public class CostTimeAgreement extends UserBaseEntity {
         this.organizationSubType = organizationSubType;
     }
 
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        if(this.getId()!=null)
+            throw new UnsupportedOperationException("can't modified this property");
+        this.createdBy = createdBy;
+        this.createdBy = createdBy;
+    }
+
+    public User getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(User lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
 
     @Override
     public boolean equals(Object o) {

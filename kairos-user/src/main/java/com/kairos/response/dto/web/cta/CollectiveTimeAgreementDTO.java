@@ -2,7 +2,6 @@ package com.kairos.response.dto.web.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.organization.OrganizationType;
 
 import java.util.ArrayList;
 import java.util.List;
