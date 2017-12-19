@@ -22,7 +22,7 @@ public class CitizenStatus extends UserBaseEntity {
     @NotEmpty(message = "error.CitizenStatus.name.notEmpty") @NotNull(message = "error.CitizenStatus.name.notnull")
     String name;
 
-    @NotEmpty(message = "error.CitizenStatus.description.notEmpty") @NotNull(message = "error.CitizenStatus.description.notnull")
+    //@NotEmpty(message = "error.CitizenStatus.description.notEmpty") @NotNull(message = "error.CitizenStatus.description.notnull")
     String description;
 
     @Relationship(type = CIVILIAN_STATUS)

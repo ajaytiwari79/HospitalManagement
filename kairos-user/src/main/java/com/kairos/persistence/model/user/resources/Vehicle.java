@@ -20,7 +20,7 @@ import java.util.List;
 public class Vehicle extends UserBaseEntity {
     @NotNull(message = "error.name.notnull")
     private String name;
-    @NotNull(message = "error.description.notnull")
+    //@NotNull(message = "error.description.notnull")
     private String description;
     @NotNull(message = "error.Resource.icon.notnull")
     private String icon;

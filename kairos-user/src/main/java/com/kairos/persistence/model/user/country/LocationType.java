@@ -26,7 +26,7 @@ public class LocationType extends UserBaseEntity {
     private String name;
 
 
-    @NotEmpty(message = "error.LocationType.description.notEmpty") @NotNull(message = "error.LocationType.description.notnull")
+    // @NotEmpty(message = "error.LocationType.description.notEmpty") @NotNull(message = "error.LocationType.description.notnull")
     private String description;
 
     @Relationship(type = BELONGS_TO)

@@ -17,7 +17,7 @@ public class ParentOrganizationDTO {
 
     private List<Long> businessTypeIds;
 
-    @NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
+    //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
     private String description;
     private String externalId;
     private boolean isAddressProtected;
