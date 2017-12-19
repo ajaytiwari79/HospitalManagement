@@ -83,5 +83,8 @@ public interface ResourceGraphRepository extends GraphRepository<Resource> {
     @Query("MATCH(o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})  where id(o)={0} AND r.registrationNumber={1} return r")
     Resource getResourceByRegistrationNumberAndUnit(Long organizationId,String registrationNumber);
 
+    @Query("MATCH(o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})  where id(o)={0} AND id(r)={1} return r")
+    Resource getResourceOfOrganizationById(Long organizationId,Long resourceId, boolean deleted);
+
 
 }

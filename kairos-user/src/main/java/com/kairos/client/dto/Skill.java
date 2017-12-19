@@ -14,7 +14,7 @@ public class Skill {
     @NotEmpty(message = "error.Skill.name.notEmpty") @NotNull(message = "error.Skill.name.notnull")
     private String name;
 
-    @NotEmpty(message = "error.Skill.description.notEmpty") @NotNull(message = "error.Skill.description.notnull")
+    //@NotEmpty(message = "error.Skill.description.notEmpty") @NotNull(message = "error.Skill.description.notnull")
     private String description;
 
     private boolean isEnabled = true;

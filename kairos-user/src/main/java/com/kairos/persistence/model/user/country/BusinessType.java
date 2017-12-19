@@ -27,7 +27,7 @@ public class BusinessType extends UserBaseEntity {
 
 
 
-    @NotEmpty(message = "error.BusinessType.description.notEmpty") @NotNull(message = "error.BusinessType.description.notnull")
+    //@NotEmpty(message = "error.BusinessType.description.notEmpty") @NotNull(message = "error.BusinessType.description.notnull")
     private String description;
 
     @Relationship(type = BELONGS_TO)

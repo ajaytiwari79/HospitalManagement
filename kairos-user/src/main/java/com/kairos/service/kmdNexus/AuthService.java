@@ -1,5 +1,6 @@
 package com.kairos.service.kmdNexus;
 import com.kairos.constants.AppConstants;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;
@@ -32,7 +33,7 @@ public class AuthService {
     private long lastUpdated ;
     private final long oneHourMS = 3100000;
     public void kmdAuth()  {
-        if( new Date().getTime()-lastUpdated < oneHourMS){
+        if( DateUtil.getCurrentDate().getTime()-lastUpdated < oneHourMS){
             return;
         }
         dokmdAuth();
@@ -64,6 +65,6 @@ public class AuthService {
         JacksonJsonParser jsonParser = new JacksonJsonParser();
         Map<String,Object> parsedData = jsonParser.parseMap(responseEntity);
         AppConstants.KMD_NEXUS_ACCESS_TOKEN = parsedData.get("access_token")+"";
-        lastUpdated = new Date().getTime();
+        lastUpdated = DateUtil.getCurrentDate().getTime();
     }
 }

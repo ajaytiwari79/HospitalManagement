@@ -25,7 +25,7 @@ public class EmployeeLimit extends UserBaseEntity {
 
     private String name;
 
-    @NotEmpty(message = "error.EmployeeLimit.description.notEmpty") @NotNull(message = "error.EmployeeLimit.description.notnull")
+    //@NotEmpty(message = "error.EmployeeLimit.description.notEmpty") @NotNull(message = "error.EmployeeLimit.description.notnull")
     private String description;
 
     private int  minimum;

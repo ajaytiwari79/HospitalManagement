@@ -254,6 +254,7 @@ public class AppConstants {
     public static final String REQUEST_TO_CREATE_NEW_UTILITY = "Request to create new utility";
     public static final String UNIT = "unit";
     public static final String SUCCESS = "success";
+    public static final String TIME_SLOT_SET_NAME = "Time slot 1";
 
 
 

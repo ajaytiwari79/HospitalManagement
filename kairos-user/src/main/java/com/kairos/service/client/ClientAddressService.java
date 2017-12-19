@@ -29,6 +29,7 @@ import java.io.File;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TEMPORARY_ADDRESS;
 
 
@@ -187,6 +188,59 @@ public class ClientAddressService extends UserBaseService {
         return addressVerificationService.saveAndUpdateClientAddress(client, contactAddress, type);
     }
 
+    // Add new home address of client after detaching all household members
+    public ContactAddress addNewHomeAddress(long oldContactAddressId, AddressDTO addressDTO, Client client, long unitId, String type ){
+
+        ContactAddress contactAddress = ContactAddress.getInstance();
+        contactAddress = persistAddress(addressDTO, client, contactAddress, unitId);
+        if (contactAddress == null) {
+            return null;
+        }
+        // Detach relationship with old address and hosehold members
+//        detachHomeAddressFromClient(client.getId(), oldContactAddressId);
+//        detachHouseHoldMembersFromClient(client.getId());
+
+        return addressVerificationService.saveAndUpdateClientAddress(client, contactAddress, type);
+    }
+
+    /**
+     * @param clientId
+     * @param contactAddressId
+     * @return if success will return boolean
+     * @auhor prerna
+     * Detach relationship with old home address
+     */
+    /*public boolean detachHomeAddressFromClient(long clientId, long contactAddressId){
+        return clientGraphRepository.detachHomeAddressRelationOfClient(clientId, contactAddressId);
+    }*/
+
+    /**
+     * @return if success will return boolean
+     * @auhor prerna
+     * Detach relationship with House hold members
+     */
+    /*public boolean detachHouseHoldMembersFromClient(long clientId){
+        return clientGraphRepository.detachHouseholdRelationOfClient(clientId);
+    }*/
+
+
+    public Boolean updateAddressOfAllHouseHoldMembers(long contactAddressId, long addressIdOfHouseHold){
+        List<Long> listOfIdsOfHouseholdMembers = getListOfAllHouseHoldMemberssByAddressId(addressIdOfHouseHold);
+        if(listOfIdsOfHouseholdMembers.size() > 0){
+            detachAddressOfHouseholdMembersWithDifferentAddress(contactAddressId, listOfIdsOfHouseholdMembers);
+            return clientGraphRepository.updateAddressOfAllHouseHoldMembers(contactAddressId, listOfIdsOfHouseholdMembers);
+        }
+        return true;
+    }
+
+    public Boolean detachAddressOfHouseholdMembersWithDifferentAddress(long contactAddressId,List<Long> listOfIdsOfHouseholdMembers){
+        return clientGraphRepository.detachAddressOfHouseholdMembersWithDifferentAddress(contactAddressId, listOfIdsOfHouseholdMembers);
+    }
+
+    public List<Long> getListOfAllHouseHoldMemberssByAddressId(long contactAddressId){
+        return clientGraphRepository.getIdsOfAllHouseHoldMembers(contactAddressId);
+    }
+
     /**
      * @param unitId
      * @param clientId
@@ -213,7 +267,13 @@ public class ClientAddressService extends UserBaseService {
         if (contactAddress == null) {
             throw new InternalError("Contact address not found");
         }
-        contactAddress = persistAddress(addressDTO, client, contactAddress, unitId);
+
+        if( addressDTO.isUpdateHouseholdAddress() == false && HAS_HOME_ADDRESS.equals(type)){
+            return addNewHomeAddress(addressId, addressDTO, client, unitId, type);
+        } else {
+            contactAddress = persistAddress(addressDTO, client, contactAddress, unitId);
+        }
+
         if (contactAddress == null) {
             return null;
         }

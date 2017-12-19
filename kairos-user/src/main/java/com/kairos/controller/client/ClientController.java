@@ -129,6 +129,7 @@ public class ClientController {
     @RequestMapping(value = "/{clientId}/nextToKin/{nextToKinId}", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> updateNextToKin(@Valid @RequestBody NextToKinDTO nextToKinDTO, @PathVariable long unitId,
                                                         @PathVariable long nextToKinId, @PathVariable long clientId) {
+        // @RequestParam Boolean updateHouseholdAddress
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientExtendedService.updateNextToKinDetail(unitId, nextToKinId,nextToKinDTO,clientId));
     }
 
@@ -205,6 +206,7 @@ public class ClientController {
     @RequestMapping(value = "/{clientId}/address/{addressId}", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> updateClientAddress(@PathVariable long unitId, @PathVariable long clientId, @PathVariable long addressId,
                                                             @RequestBody AddressDTO address, @RequestParam String addressType) {
+        // @RequestParam Boolean isHouseholdSelected
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientAddressService.updateAddress(unitId, clientId, addressId, address, addressType));
     }
 
@@ -722,6 +724,13 @@ public class ClientController {
     @RequestMapping(value = "/{clientId}/staff/contact-person",method = RequestMethod.PUT)
     ResponseEntity<Map<String,Object>> updateContactPerson(@PathVariable Long clientId,@Valid @RequestBody ContactPersonDTO contactPersonDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.updateContactPerson(clientId,contactPersonDTO));
+    }
+
+    //Prefer Staff
+    @ApiOperation("Get personal_calander_prerequisite of citizen")
+    @RequestMapping(value = "/{clientId}/personal_calander_prerequisite",method = RequestMethod.GET)
+    ResponseEntity<Map<String,Object>> getPrerequisiteForPersonalCalender(@PathVariable Long unitId,@PathVariable Long clientId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, clientService.getPrerequisiteForPersonalCalender(unitId,clientId));
     }
 
 

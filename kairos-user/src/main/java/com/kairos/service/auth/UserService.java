@@ -368,7 +368,6 @@ public class UserService extends UserBaseService {
      * @return list of permissions.
      */
     public List<Map<String,Object>> getPermissions(long organizationId) {
-
         Organization organization = organizationGraphRepository.findOne(organizationId,0);
         if(organization == null){
             return Collections.emptyList();

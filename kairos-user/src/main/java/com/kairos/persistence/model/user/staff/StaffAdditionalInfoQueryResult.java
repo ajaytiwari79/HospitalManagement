@@ -17,6 +17,7 @@ public class StaffAdditionalInfoQueryResult {
     private List<Long> teams;
     private List<Long> skills;
     private String profilePic;
+    private Long unitId;
 
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
@@ -58,5 +59,13 @@ public class StaffAdditionalInfoQueryResult {
 
     public List<Long> getSkills() {
         return Optional.ofNullable(skills).orElse(new ArrayList<>());
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 }

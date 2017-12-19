@@ -15,6 +15,7 @@ import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Vehicle;
+import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -44,6 +45,7 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
@@ -170,6 +172,21 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.findOne(id, 0);
     }
 
+    public boolean showCountryTagForOrganization(long id) {
+        Organization organization = organizationGraphRepository.findOne(id);
+        if(organization.isShowCountryTags()){
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public Long getCountryIdOfOrganization(long orgId) {
+        Organization organization = organizationGraphRepository.findOne(orgId, 1);
+        return organization.getCountry().getId();
+    }
+
     /**
      * Calls OrganizationGraphRepository ,creates a new Organization
      * and return newly created User.
@@ -192,7 +209,7 @@ public class OrganizationService extends UserBaseService {
         }
         accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization);
-        organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), new Date().getTime(), new Date().getTime());
+        organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         return organization;
     }
 
@@ -217,9 +234,9 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization);
-        long creationDate = new Date().getTime();
+        long creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
-        creationDate = new Date().getTime();
+        creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         phaseRestClient.createDefaultPhases(organization.getId());
         HashMap<String,Object> orgResponse = new HashMap<>();
@@ -1016,14 +1033,14 @@ public class OrganizationService extends UserBaseService {
 
     }
 
-    public List<Vehicle> getVehicleList(long unitId) {
+    public List<VehicleQueryResult> getVehicleList(long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.debug("Searching organization by id " + unitId);
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
         }
         Long countryId = organizationGraphRepository.getCountryId(unitId);
-        return countryGraphRepository.getResourcesByCountry(countryId);
+        return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }
 
     public List<Long> getAllOrganizationWithoutPhases() {

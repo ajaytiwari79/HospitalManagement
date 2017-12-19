@@ -2,6 +2,7 @@ package com.kairos.controller.kmdNexus;
 
 import com.kairos.service.kmdNexus.AuthService;
 import com.kairos.service.kmdNexus.CitizenService;
+import com.kairos.util.DateUtil;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +53,10 @@ public class CitizenController {
      */
     @RequestMapping(value = "/grants", method = RequestMethod.GET)
     public String getCitizenGrants(){
-        logger.info("Start syncing grants---------> "+new Date());
+        logger.info("Start syncing grants---------> "+ DateUtil.getCurrentDate());
         authService.kmdAuth();
         citizenService.getCitizenGrantsFromKMD();
-        logger.info("End syncing grants---------> "+new Date());
+        logger.info("End syncing grants---------> "+DateUtil.getCurrentDate());
         return "Citizen Grants Sync";
     }
 

@@ -25,7 +25,7 @@ public class Group extends UserBaseEntity {
     @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;
     private boolean isEnabled =true;
-    @NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
+    //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
     private String description;
 
     @Relationship(type = HAS_TEAM)

@@ -17,11 +17,13 @@ public class ClientMinimumDTO {
     private String cprnumber;
     private String name;
     private Boolean hasSameAddress;
+    private boolean updateAddressOfAllHouseholdMembers;
 
-    public ClientMinimumDTO(String firstName, String lastName, String cprNumber) {
+    public ClientMinimumDTO(String firstName, String lastName, String cprNumber, boolean updateAddressOfAllHouseholdMembers) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.cprnumber = cprNumber;
+        this.updateAddressOfAllHouseholdMembers = updateAddressOfAllHouseholdMembers;
     }
 
     public Boolean getHasSameAddress() {
@@ -66,6 +68,14 @@ public class ClientMinimumDTO {
 
     public String getName() {
         return this.firstName+" "+this.lastName;
+    }
+
+    public boolean getUpdateAddressOfAllHouseholdMembers() {
+        return updateAddressOfAllHouseholdMembers;
+    }
+
+    public void setUpdateAddressOfAllHouseholdMembers(boolean updateAddressOfAllHouseholdMembers) {
+        this.updateAddressOfAllHouseholdMembers = updateAddressOfAllHouseholdMembers;
     }
 
     public ClientMinimumDTO() {

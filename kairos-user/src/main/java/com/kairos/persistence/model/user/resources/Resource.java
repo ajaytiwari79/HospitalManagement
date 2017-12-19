@@ -3,10 +3,14 @@ package com.kairos.persistence.model.user.resources;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.constants.RelationshipConstants;
+import com.kairos.persistence.model.user.country.feature.Feature;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.RESOURCE_HAS_FEATURE;
 
 /**
  * Created by arvind on 6/10/16.
@@ -25,6 +29,9 @@ public class Resource extends UserBaseEntity {
     private boolean enabled ;
     private boolean deleted ;
     private Long decommissionDate;
+
+    @Relationship(type = RESOURCE_HAS_FEATURE)
+    private List<Feature> features = new ArrayList<>();
 
     public Resource(Vehicle vehicleType, String registrationNumber, String number, String modelDescription,
                     float costPerKM,FuelType fuelType) {
@@ -112,6 +119,14 @@ public class Resource extends UserBaseEntity {
 
     public void setDecommissionDate(Long decommissionDate) {
         this.decommissionDate = decommissionDate;
+    }
+
+    public List<Feature> getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(List<Feature> features) {
+        this.features = features;
     }
 }
 

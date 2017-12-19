@@ -25,7 +25,7 @@ public class KairosStatus extends UserBaseEntity {
     @NotEmpty(message = "error.KairosStatus.name.notEmpty") @NotNull(message = "error.KairosStatus.name.notnull")
     private String name;
 
-    @NotEmpty(message = "error.KairosStatus.description.notEmpty") @NotNull(message = "error.KairosStatus.description.notnull")
+    //@NotEmpty(message = "error.KairosStatus.description.notEmpty") @NotNull(message = "error.KairosStatus.description.notnull")
     private String description;
 
 
