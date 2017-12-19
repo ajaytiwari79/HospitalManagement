@@ -835,7 +835,7 @@ public class StaffService extends UserBaseService {
         staff.setUser(user);
         staff.setClient(client);
         staffGraphRepository.save(staff);
-        createEmployment(parent, unit, staff, payload.getAccessGroupId(), isEmploymentExist);
+     //   createEmployment(parent, unit, staff, payload.getAccessGroupId(), isEmploymentExist);
         return staff;
     }
 
