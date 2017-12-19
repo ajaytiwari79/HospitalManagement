@@ -17,7 +17,7 @@ public class EquipmentDTO {
 
     @NotEmpty(message = "error.equipment.name.notNullAndEmpty") @NotNull(message = "error.equipment.name.notNullAndEmpty")
     private String name;
-    @NotEmpty(message = "error.equipment.description.notNullAndEmpty") @NotNull(message = "error.equipment.description.notNullAndEmpty")
+    //@NotEmpty(message = "error.equipment.description.notNullAndEmpty") @NotNull(message = "error.equipment.description.notNullAndEmpty")
     private String description;
     public EquipmentCategoryDTO equipmentCategory;
 

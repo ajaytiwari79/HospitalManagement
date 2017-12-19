@@ -26,7 +26,7 @@ public class OwnershipType extends UserBaseEntity {
 
 
 
-    @NotEmpty(message = "error.OwnershipType.description.notEmpty") @NotNull(message = "error.OwnershipType.description.notnull")
+    //@NotEmpty(message = "error.OwnershipType.description.notEmpty") @NotNull(message = "error.OwnershipType.description.notnull")
     private String description;
 
     @Relationship(type = BELONGS_TO)

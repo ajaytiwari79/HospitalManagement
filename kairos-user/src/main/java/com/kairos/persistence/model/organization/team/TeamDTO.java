@@ -15,7 +15,7 @@ public class TeamDTO {
     @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;
 
-    @NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
+    //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
     private String description;
 
     @NotEmpty(message = "error.visitour.teamid.notnull") @NotNull(message = "error.visitour.teamid.notnull")
