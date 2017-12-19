@@ -10,6 +10,7 @@ import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY_HAS_EQUIPMENT;
 import static com.kairos.persistence.model.constants.RelationshipConstants.COUNTRY_HAS_FEATURE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.EQUIPMENT_HAS_CATEGORY;
 
 /**
  * Created by prerna on 12/12/17.
@@ -28,14 +29,26 @@ public interface EquipmentGraphRepository extends GraphRepository<Equipment> {
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
             "WHERE id(equipment)={0} AND id(country) = {1} AND equipment.deleted={2} \n" +
             "RETURN equipment")
-    Equipment getEquipmentById(Long tagId, Long countryId, boolean isDeleted);
+    Equipment getEquipmentById(Long equipmentId, Long countryId, boolean isDeleted);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
-            "WHERE id(country)={0} AND equipment.deleted= {1} AND lower(equipment.name) contains lower({2})\n" +
-            "return id(equipment) as id, equipment.name as name, equipment.description as description, equipment.category as category")
+            "WHERE id(country)=53 AND equipment.deleted= false AND lower(equipment.name) contains lower(\"\")\n" +
+            "WITH equipment\n" +
+            "MATCH (equipment)-[:"+EQUIPMENT_HAS_CATEGORY+"]-(equipCat:EquipmentCategory) \n" +
+            "return id(equipment) as id, equipment.name as name, equipment.description as description, {id:id(equipCat) , name:equipCat.name, description:equipCat.description} as category")
     List<EquipmentQueryResult> getListOfEquipment(Long countryId , boolean deleted, String searchTextRegex);
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n"+
             "WHERE id(country)={0} AND equipment.name = {1} AND equipment.deleted= {2} return equipment")
     Equipment getEquipmentByName(long countryId, String name, boolean deleted);
+
+    @Query("MATCH (c:Country),(e:Equipment)\n" +
+            "WHERE id(c)={0} AND id(e)={1}\n" +
+            "CREATE (c)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(e)")
+    void addEquipmentInCountry(long countryId, long equipmentId);
+
+    @Query("MATCH (equipment:Equipment)-[r:"+EQUIPMENT_HAS_CATEGORY+"]->(equipmentCat:EquipmentCategory)\n"+
+            "DELETE r")
+    void detachEquipmentCategory(long equipmentId);
+
 }

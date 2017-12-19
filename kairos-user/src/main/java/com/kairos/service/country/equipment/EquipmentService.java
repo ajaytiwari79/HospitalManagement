@@ -5,7 +5,6 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.equipment.Equipment;
 import com.kairos.persistence.model.user.country.equipment.EquipmentCategory;
-import com.kairos.persistence.model.user.country.equipment.EquipmentQueryResult;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentGraphRepository;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -48,15 +46,15 @@ public class EquipmentService extends UserBaseService {
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
-        logger.info("equipmentDTO : "+equipmentDTO.getName());
         if( equipmentGraphRepository.isEquipmentExistsWithSameName(equipmentDTO.getName(), countryId, false) ){
             throw new DuplicateDataException("Equipment already exists with same name " +equipmentDTO.getName() );
         }
         Equipment equipment = new Equipment();
         equipment.setName(equipmentDTO.getName());
         equipment.setDescription(equipmentDTO.getDescription());
-        equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getId(),0));
+        equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getEquipmentCategory().getId(),0));
         save(equipment);
+        equipmentGraphRepository.addEquipmentInCountry(countryId,equipment.getId());
         return equipment;
     }
 
@@ -75,7 +73,8 @@ public class EquipmentService extends UserBaseService {
         }
         equipment.setName(equipmentDTO.getName());
         equipment.setDescription(equipmentDTO.getDescription());
-        equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getId(),0));
+        equipmentGraphRepository.detachEquipmentCategory(equipmentId);
+        equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getEquipmentCategory().getId(),0));
         save(equipment);
         return equipment;
         //return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), new Date().getTime());

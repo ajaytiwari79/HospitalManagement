@@ -19,7 +19,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
 
-    @Query("Match (org:Organization)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1}}) where id(org)={0} AND (timeSlotSet.endDate=null OR timeSlotSet.endDate>={2})\n" +
+    @Query("Match (org:Organization)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1}}) where id(org)={0} AND (timeSlotSet.endDate is null OR timeSlotSet.endDate>={2})\n" +
             "Match (timeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot)\n" +
             "return id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.isShiftStartTime as shiftStartTime order by timeSlotSet.startDate DESC LIMIT 1")
     List<TimeSlotWrapper> getTimeSlots(Long unitId, TimeSlotMode timeSlotMode, Date currentDate);
@@ -34,7 +34,7 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
     void deleteTimeSlot(Long timeSlotSetId,Long timeSlotId);
 
     @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND id(timeSlot)={1}\n" +
-            "Match (organization)-[r:ORGANIZATION_TIME_SLOT]->(timeSlot:TimeSlot)return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
+            "Match (organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot)return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
     Map<String,Object>  getTimeSlotByUnitIdAndTimeSlotId(long unitId, long timeSlotId);
 
     @Query("Match (n:Organization)-[r:"+ORGANIZATION_TIME_SLOT+"]->(timeSlot:TimeSlot{timeSlotType:{1}}) where id(n)={0} set r.isShiftStartTime=false return r")
