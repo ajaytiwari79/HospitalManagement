@@ -105,8 +105,12 @@ public class TimeSlotService extends UserBaseService {
         ObjectMapper objectMapper = new ObjectMapper();
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
         for(TimeSlotDTO timeSlotDTO : timeSlotSetDTO.getTimeSlots()){
-            TimeSlot timeSlot = new TimeSlot(timeSlotDTO.getName());
-            timeSlot.setId(timeSlotDTO.getId());
+
+            TimeSlot timeSlot = (Optional.ofNullable(timeSlotDTO.getId()).isPresent())?
+                    timeSlotGraphRepository.findOne(timeSlotDTO.getId()):new TimeSlot(timeSlotDTO.getName());
+            if(timeSlot == null){
+                throw new InternalError("Invalid time slot id");
+            }
             TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue
                     (timeSlotDTO,TimeSlotSetTimeSlotRelationship.class);
             timeSlotSetTimeSlotRelationship.setId(null);
