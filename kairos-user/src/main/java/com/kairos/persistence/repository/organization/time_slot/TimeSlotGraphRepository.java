@@ -21,7 +21,7 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
 
     @Query("Match (org:Organization)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1}}) where id(org)={0} AND (timeSlotSet.endDate is null OR timeSlotSet.endDate>={2}) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
             "Match (timeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot) with timeSlot order by timeSlot.startHour,r\n" +
-            "return id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.isShiftStartTime as shiftStartTime")
+            "return id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.shiftStartTime as shiftStartTime")
     List<TimeSlotWrapper> getTimeSlots(Long unitId, TimeSlotMode timeSlotMode, Date currentDate);
 
 
@@ -37,7 +37,7 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
             "Match (organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot)return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
     Map<String,Object>  getTimeSlotByUnitIdAndTimeSlotId(long unitId, long timeSlotId);
 
-    @Query("Match (n:Organization)-[r:"+ORGANIZATION_TIME_SLOT+"]->(timeSlot:TimeSlot{timeSlotType:{1}}) where id(n)={0} set r.isShiftStartTime=false return r")
+    @Query("Match (n:Organization)-[r:"+ORGANIZATION_TIME_SLOT+"]->(timeSlot:TimeSlot{timeSlotType:{1}}) where id(n)={0} set r.shiftStartTime=false return r")
     void updateShiftStartTime(long unitId, TimeSlotMode timeSlotMode);
 
     @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND timeSlot.kmdExternalId={1}\n" +
@@ -46,7 +46,7 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
 
     @Query("Match (organization:Organization) where id(organization)={0} with organization,{timeSlotType:case when organization.standardTimeSlot then 'STANDARD' else 'ADVANCE' end} as type \n"+
             "Match (organization)-[r:ORGANIZATION_TIME_SLOT{isEnabled:true}]->(timeSlot:TimeSlot{timeSlotType:type.timeSlotType})\n"+
-            "return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute,isShiftStartTime:r.isShiftStartTime} as timeSlot order by r.startHour")
+            "return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute,shiftStartTime:r.shiftStartTime} as timeSlot order by r.startHour")
     List<Map<String,Object>> getUnitCurrentTimeSlots(long unitId);
 
     TimeSlot findByKmdExternalId(Long kmdExternalId);
