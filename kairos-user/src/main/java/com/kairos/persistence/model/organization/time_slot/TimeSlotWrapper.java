@@ -17,7 +17,7 @@ public class TimeSlotWrapper {
     private int startMinute;
     private int endHour;
     private int endMinute;
-    private boolean isShiftStartTime;
+    private boolean shiftStartTime = false;
     private String name;
 
     public String getName() {
@@ -69,10 +69,10 @@ public class TimeSlotWrapper {
     }
 
     public boolean isShiftStartTime() {
-        return isShiftStartTime;
+        return shiftStartTime;
     }
 
     public void setShiftStartTime(boolean shiftStartTime) {
-        isShiftStartTime = shiftStartTime;
+        this.shiftStartTime = shiftStartTime;
     }
 }
