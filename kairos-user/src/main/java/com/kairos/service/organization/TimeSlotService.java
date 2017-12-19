@@ -109,6 +109,7 @@ public class TimeSlotService extends UserBaseService {
             timeSlot.setId(timeSlotDTO.getId());
             TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue
                     (timeSlotDTO,TimeSlotSetTimeSlotRelationship.class);
+            timeSlotSetTimeSlotRelationship.setId(null);
             timeSlotSetTimeSlotRelationship.setTimeSlotSet(timeSlotSet);
             timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
             timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
@@ -142,6 +143,8 @@ public class TimeSlotService extends UserBaseService {
         }
         updateTimeSlot(timeSlotSetDTO.getTimeSlots(),timeSlotSet.getId());
         timeSlotSet.updateTimeSlotSet(timeSlotSetDTO);
+        timeSlotSet.setName(timeSlotSetDTO.getName());
+        timeSlotSet.setEndDate(timeSlotSetDTO.getEndDate());
         timeSlotSetsToUpdate.add(timeSlotSet);
         timeSlotSetRepository.save(timeSlotSetsToUpdate);
         return timeSlotSetsToUpdate;
@@ -286,10 +289,13 @@ public class TimeSlotService extends UserBaseService {
      * @return
      * @auther anil maurya
      */
-    public List<Map<String, Object>> getCurrentTimeSlotOfUnit(Long unitId) {
-        List<Map<String, Object>> currentTimeSlots = timeSlotGraphRepository.getUnitCurrentTimeSlots(unitId);
-
-        return currentTimeSlots;
+    public List<TimeSlotWrapper> getCurrentTimeSlotOfUnit(Long unitId) {
+        Organization unit = organizationGraphRepository.findOne(unitId,0);
+        if(!Optional.ofNullable(unit).isPresent()){
+            throw new InternalError("Unit is null");
+        }
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(),unit.getTimeSlotMode(),new Date());
+        return timeSlotWrappers;
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotExternalId(Long unitId, Long kmdExternalId) {

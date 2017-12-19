@@ -26,7 +26,7 @@ public interface TimeSlotSetRepository extends GraphRepository<TimeSlotSet> {
     TimeSlotSet findOneByEndDateAfter(Long unitId,Date endDate);
 
     @Query("Match (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} AND " +
-            "(timeSlotSet.startDate>{1} AND timeSlotSet.startDate < {2}) return timeSlotSet order by timeSlotSet.startDate")
+            "(timeSlotSet.startDate>={1} AND timeSlotSet.startDate < {2}) return timeSlotSet order by timeSlotSet.startDate")
     List<TimeSlotSet> findTimeSlotSetByStartDateBetween(Long unitId,Date startDate, Date endDate);
 
 }
