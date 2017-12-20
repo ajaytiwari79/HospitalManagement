@@ -6,6 +6,7 @@ import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,7 @@ public class TimeSlotServiceIntegrationTest {
     }
 
 
+    @Ignore
     @Test
     public void updateTimeSlotSet(){
         Date endDate;
