@@ -128,12 +128,12 @@ public class WTAController {
       * Created by vipul on 11 august 2017
       * http://xyz.example.com/api/v1/organization/71/country/53/organization_type/93/wta
     */
-
-    @ApiOperation(value = "Get WTA by Org subType")
-    @RequestMapping(value = UNIT_URL + "/wta", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getWTAOfOrganization(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByOrganizationSubType(unitId));
-    }
+//
+//    @ApiOperation(value = "Get WTA by Org subType")
+//    @RequestMapping(value = UNIT_URL + "/wta", method = RequestMethod.GET)
+//    public ResponseEntity<Map<String, Object>> getWTAOfOrganization(@PathVariable long unitId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByOrganizationSubType(unitId));
+//    }
 
 
 }
