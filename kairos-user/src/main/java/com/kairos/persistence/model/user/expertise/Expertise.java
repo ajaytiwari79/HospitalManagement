@@ -83,4 +83,6 @@ public class Expertise extends UserBaseEntity {
         map.put("creationDate",this.getCreationDate());
         return map;
     }
+
+
 }

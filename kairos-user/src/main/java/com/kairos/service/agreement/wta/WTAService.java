@@ -350,7 +350,6 @@ public class WTAService extends UserBaseService {
                 maximumShiftLengthWTATemplate.setTemplateType(wtaBaseRuleTemplate.getTemplateType());
                 maximumShiftLengthWTATemplate.setDisabled(wtaBaseRuleTemplate.getActive());
                 wtaBaseRuleTemplateCopy = save(maximumShiftLengthWTATemplate);
-
                 break;
 
             case TEMPLATE2:

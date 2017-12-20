@@ -197,7 +197,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
         RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory();
         Country country = countryGraphRepository.findOne(countryId);
         List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
-       Optional<RuleTemplateCategory> countryRuleTemplateCategory=ruleTemplateCategories.parallelStream().filter(ruleTemplateCategory1->"CTA".equalsIgnoreCase(ruleTemplateCategory1.getRuleTemplateCategoryType().toString())
+        Optional<RuleTemplateCategory> countryRuleTemplateCategory=ruleTemplateCategories.parallelStream().filter(ruleTemplateCategory1->"CTA".equalsIgnoreCase(ruleTemplateCategory1.getRuleTemplateCategoryType().toString())
                 &&ruleTemplateCategory1.getName().equalsIgnoreCase(ruleTemplateDTO.getCategoryName())).findFirst();
 
         if (!countryRuleTemplateCategory.isPresent()) {

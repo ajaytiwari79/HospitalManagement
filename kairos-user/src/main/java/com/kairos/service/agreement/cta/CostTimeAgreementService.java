@@ -27,9 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -174,7 +176,7 @@ public class CostTimeAgreementService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
         List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
         List<RuleTemplateCategory> ctaRuleTemplateCategoryList = ruleTemplateCategories.parallelStream().filter(
-                ruleTemplateCategory -> RuleTemplateCategoryType.CTA.equals(ruleTemplateCategory.getRuleTemplateCategoryType()))
+                ruleTemplateCategory -> RuleTemplateCategoryType.CTA.equals(ruleTemplateCategory.getRuleTemplateCategoryType())&&ruleTemplateCategory.isDeleted()==false)
                 .collect(Collectors.toList());
         List<Long> ruleTemplateCategoryIds = ctaRuleTemplateCategoryList.parallelStream().map(RuleTemplateCategory::getId)
                 .collect(Collectors.toList());
@@ -304,18 +306,18 @@ public class CostTimeAgreementService extends UserBaseService {
         Future<List<RuleTemplate>>ctaRuleTemplatesFuture=asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
 
 
-        Callable<List<OrganizationType>> OrganizationTypesListCallable=()->{
-            List<OrganizationType> organizationTypes=(List<OrganizationType>)organizationTypeGraphRepository.findAllById(collectiveTimeAgreementDTO.getOrganizationTypeList(),0);
-            return  organizationTypes;
+        Callable<Optional<OrganizationType>> OrganizationTypesListCallable=()->{
+            Optional<OrganizationType> organizationType=organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationType(),0);
+            return  organizationType;
 
 
         };
-        Future<List<OrganizationType>>organizationTypesFuture=asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
+        Future<Optional<OrganizationType>>organizationTypesFuture=asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
         //set data
          if(expertiseFuture.get().isPresent())
              costTimeAgreement.setExpertise(expertiseFuture.get().get());
         costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
-        costTimeAgreement.setOrganizationTypes(organizationTypesFuture.get());
+        costTimeAgreement.setOrganizationType(organizationTypesFuture.get().get());
 
         return CompletableFuture.completedFuture(true);
     }

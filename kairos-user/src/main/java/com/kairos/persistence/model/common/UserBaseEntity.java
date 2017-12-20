@@ -2,17 +2,21 @@ package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.Id;
+
+import java.io.Serializable;
 
 /**
  * Contains common fields of an entity
  *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class UserBaseEntity {
 
-    @GeneratedValue
-    @Id protected Long id;
+public abstract class UserBaseEntity implements Serializable {
+
+    //@GeneratedValue
+    @GraphId protected Long id;
     protected boolean deleted;
     private Long creationDate;
     private Long lastModificationDate;
