@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by pawanmandhan on 27/7/17.
  */
 @Repository
-public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository<WorkingTimeAgreement,Long> {
+public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository<WorkingTimeAgreement, Long> {
 
     @Query("MATCH (wta:WorkingTimeAgreement {deleted:false}) where id(wta)={0} \n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true})\n" +
@@ -136,4 +136,10 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
 
     @Query("match(p:Position)-[r:" + HAS_WTA + "]->(w:WorkingTimeAgreement) where Id(p)={0} AND ID(w)={1} delete r")
     void breakRelationFromOldWTA(Long positionId, Long wtaId);
+
+
+    @Query("MATCH (wta:WorkingTimeAgreement {deleted:false})-[:" + BELONGS_TO_ORGANIZATION + "]->(organization:Organization{isEnabled:true} where id(organization)={0} return wta\n")
+    List<WorkingTimeAgreement> getWtaByOrganization(Long organizationId);
+
+
 }

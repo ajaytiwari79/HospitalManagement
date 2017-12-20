@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
@@ -24,7 +25,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
+/**
+ * @Author vipul
+ *
+ * @Modified added organization and staff for personal copy
+ */
 public class WorkingTimeAgreement extends UserBaseEntity {
+
     @NotNull(message = "error.wta.name.notnull")
     private String name;
 
@@ -50,10 +57,12 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     @Relationship(type = HAS_PARENT_CTA)
     private WorkingTimeAgreement wta;
 
+    @Relationship(type = BELONGS_TO_ORGANIZATION)
+    private Organization organization;
+
     private Long startDate;
     private Long endDateMillis;
     private Long expiryDate;
-    private boolean deleted;
 
 
     public boolean isDeleted() {
@@ -151,6 +160,14 @@ public class WorkingTimeAgreement extends UserBaseEntity {
 
     public void setOrganizationSubType(OrganizationType organizationSubType) {
         this.organizationSubType = organizationSubType;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public Map<String, Object> retrieveDetails() {
