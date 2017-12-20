@@ -1235,7 +1235,7 @@ public class ClientService extends UserBaseService {
         taskAddress.setStreet(homeAddress.getStreet1());
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId());
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId(),new Date());
         Long countryId = countryGraphRepository.getCountryIdByUnitId(taskDemandWrapper.getUnitId());
 
         List<Long> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(), taskDemandWrapper.getEndDate().getTime());
