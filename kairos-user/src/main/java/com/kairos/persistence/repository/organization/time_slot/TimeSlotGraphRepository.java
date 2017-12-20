@@ -33,9 +33,10 @@ public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
             "where id(timeSlotSet)={0} and id(timeSlot)={1} set r.deleted=true")
     void deleteTimeSlot(Long timeSlotSetId,Long timeSlotId);
 
-    @Query("Match (organization:Organization),(timeSlot:TimeSlot) where id(organization)={0} AND id(timeSlot)={1}\n" +
-            "Match (organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet)-[r:"+HAS_TIME_SLOT+"]->(timeSlot:TimeSlot)return {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
-    Map<String,Object>  getTimeSlotByUnitIdAndTimeSlotId(long unitId, long timeSlotId);
+    @Query("Match (org:Organization) where id(org)={0}\n" +
+            "Match (org)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:org.timeSlotMode}) where (timeSlotSet.endDate is null OR timeSlotSet.endDate>={2}) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
+            "Match (timeSlotSet:TimeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot) where id(timeSlot)={1} return distinct {id:id(timeSlot),name:timeSlot.name,startHour:r.startHour,startMinute:r.startMinute,endHour:r.endHour,endMinute:r.endMinute} as timeSlot")
+    Map<String,Object>  getTimeSlotByUnitIdAndTimeSlotId(long unitId, long timeSlotId,Date date);
 
     @Query("Match (n:Organization)-[r:"+ORGANIZATION_TIME_SLOT+"]->(timeSlot:TimeSlot{timeSlotType:{1}}) where id(n)={0} set r.shiftStartTime=false return r")
     void updateShiftStartTime(long unitId, TimeSlotMode timeSlotMode);

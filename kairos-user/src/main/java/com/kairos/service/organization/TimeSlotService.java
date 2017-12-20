@@ -168,11 +168,47 @@ public class TimeSlotService extends UserBaseService {
 
     public List<TimeSlotDTO> updateTimeSlot(List<TimeSlotDTO> timeSlotDTOS,Long timeSlotSetId) {
 
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
+        if(timeSlotSet == null){
+            throw new InternalError("Invalid time slot set id ");
+        }
+
+        List<TimeSlotDTO> timeSlotsToUpdate = new ArrayList<>();
+        List<TimeSlotDTO> timeSlotsToCreate = new ArrayList<>();
         for(TimeSlotDTO timeSlotDTO : timeSlotDTOS){
+            if(timeSlotDTO.getId() == null){
+                timeSlotsToCreate.add(timeSlotDTO);
+            } else {
+                timeSlotsToUpdate.add(timeSlotDTO);
+            }
+        }
+
+        for(TimeSlotDTO timeSlotDTO : timeSlotsToUpdate){
             timeSlotGraphRepository.updateTimeSlot(timeSlotSetId,timeSlotDTO.getId(),timeSlotDTO.getName(),timeSlotDTO.getStartHour(),
                     timeSlotDTO.getStartMinute(),timeSlotDTO.getEndHour(),timeSlotDTO.getEndMinute(),timeSlotDTO.isShiftStartTime());
         }
-        return timeSlotDTOS;
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
+        for(TimeSlotDTO timeSlotDTO : timeSlotsToCreate){
+
+            TimeSlot timeSlot = new TimeSlot(timeSlotDTO.getName());
+            TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue
+                    (timeSlotDTO,TimeSlotSetTimeSlotRelationship.class);
+            timeSlotSetTimeSlotRelationship.setId(null);
+            timeSlotSetTimeSlotRelationship.setTimeSlotSet(timeSlotSet);
+            timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
+            timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
+        }
+        save(timeSlotSetTimeSlotRelationships);
+
+        List<TimeSlotDTO> newCreatedTimeSlots = new ArrayList<>();
+        for(TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship : timeSlotSetTimeSlotRelationships){
+            TimeSlotDTO timeSlotDTO = objectMapper.convertValue(timeSlotSetTimeSlotRelationship,TimeSlotDTO.class);
+            timeSlotDTO.setId(timeSlotSetTimeSlotRelationship.getTimeSlot().getId());
+            newCreatedTimeSlots.add(timeSlotDTO);
+        }
+        return newCreatedTimeSlots;
     }
 
     public boolean deleteTimeSlotSet(Long unitId, Long timeSlotSetId) {
@@ -308,7 +344,7 @@ public class TimeSlotService extends UserBaseService {
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long unitId, Long timeSlotId) {
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId);
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId,new Date());
         return timeSlotMap;
     }
 
