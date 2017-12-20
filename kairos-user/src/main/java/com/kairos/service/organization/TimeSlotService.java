@@ -190,7 +190,7 @@ public class TimeSlotService extends UserBaseService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
-        for(TimeSlotDTO timeSlotDTO : timeSlotsToUpdate){
+        for(TimeSlotDTO timeSlotDTO : timeSlotsToCreate){
 
             TimeSlot timeSlot = new TimeSlot(timeSlotDTO.getName());
             TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue
@@ -344,7 +344,7 @@ public class TimeSlotService extends UserBaseService {
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long unitId, Long timeSlotId) {
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId);
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId,new Date());
         return timeSlotMap;
     }
 
