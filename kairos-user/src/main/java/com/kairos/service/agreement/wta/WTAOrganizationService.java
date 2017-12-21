@@ -2,15 +2,20 @@ package com.kairos.service.agreement.wta;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.service.UserBaseService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -62,24 +67,14 @@ public class WTAOrganizationService extends UserBaseService {
         }
         if (checked) {
 
-            WorkingTimeAgreement.copyProperties(workingTimeAgreement, newWtaObject,"id");
+            WorkingTimeAgreement.copyProperties(workingTimeAgreement, newWtaObject, "id");
+            List<RuleTemplate> ruleTemplates = new ArrayList<>();
             if (workingTimeAgreement.getRuleTemplates().size() > 0) {
-                copyRuleTemplates(workingTimeAgreement, newWtaObject);
+                ruleTemplates = copyRuleTemplates(workingTimeAgreement.getRuleTemplates());
             }
-            setExpertiseAndUnlinkBasicProperties(workingTimeAgreement, newWtaObject,unitId);
-            Expertise e = new Expertise();
-            e.setName(workingTimeAgreement.getExpertise().getName());
-            e.setDescription(workingTimeAgreement.getExpertise().getDescription());
-            e.setId(workingTimeAgreement.getExpertise().getId());
-            workingTimeAgreement.setExpertise(e);
-
-            newWtaObject.setId(null);
-            newWtaObject.setCountry(null);
-            newWtaObject.setOrganizationType(null);
-            newWtaObject.setOrganizationSubType(null);
-            newWtaObject.setOrganization(organizationGraphRepository.findOne(unitId, 0));
-            newWtaObject.setParentWTA(workingTimeAgreement);
-         //   save(newWtaObject);
+            setExpertiseAndUnlinkBasicProperties(workingTimeAgreement, newWtaObject, unitId);
+            newWtaObject.setRuleTemplates(ruleTemplates);
+             save(newWtaObject);
 
         } else {
             workingTimeAgreement.setDeleted(true);
@@ -91,15 +86,21 @@ public class WTAOrganizationService extends UserBaseService {
 
     }
 
-    private void copyRuleTemplates(WorkingTimeAgreement oldWTA, WorkingTimeAgreement newWta) {
-        Expertise e = new Expertise();
-        e.setName(oldWTA.getExpertise().getName());
-        e.setDescription(oldWTA.getExpertise().getDescription());
-        e.setId(oldWTA.getExpertise().getId());
-        newWta.setExpertise(e);
-
+    private List<RuleTemplate> copyRuleTemplates(List<RuleTemplate> ruleTemplates) {
+        List<RuleTemplate> wtaBaseRuleTemplates = new ArrayList<RuleTemplate>(20);
+        for (RuleTemplate ruleTemplate : ruleTemplates) {
+            WTABaseRuleTemplate ruleTemplateCopy = new WTABaseRuleTemplate();
+            BeanUtils.copyProperties(ruleTemplate, ruleTemplateCopy, "id");
+            ruleTemplateCopy.setRuleTemplateCategory(null);
+            RuleTemplateCategory rtcCopy = ruleTemplate.getRuleTemplateCategory();
+            rtcCopy.setId(null);
+            ruleTemplateCopy.setRuleTemplateCategory(rtcCopy);
+            wtaBaseRuleTemplates.add(ruleTemplateCopy);
+        }
+        return wtaBaseRuleTemplates;
     }
-    private void setExpertiseAndUnlinkBasicProperties(WorkingTimeAgreement oldWTA, WorkingTimeAgreement newWta,Long unitId) {
+
+    private void setExpertiseAndUnlinkBasicProperties(WorkingTimeAgreement oldWTA, WorkingTimeAgreement newWta, Long unitId) {
         Expertise e = new Expertise();
         e.setName(oldWTA.getExpertise().getName());
         e.setDescription(oldWTA.getExpertise().getDescription());
