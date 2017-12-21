@@ -114,4 +114,13 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "WITH {name: orgType.name,id:id(orgType),children:CASE WHEN orgSubType IS NOT NULL THEN collect({id:id(orgSubType),name:orgSubType.name}) ELSE [] END} as organizationType\n" +
             "RETURN organizationType as result")
     List<Map<String, Object>> getAllOrganizationTypeWithSubTypeByCountryId(Long countryId);
+
+    @Query("match(country:Country) where id(country)={0} \n"+
+            "match(country)<-[:" + BELONGS_TO + "]-(orgType:OrganizationType{isEnable:true}) return orgType")
+    List<OrganizationType> findOrganizationTypeByCountry(Long countryId);
+
+    @Query("MATCH (pot:OrganizationType {isEnable:true})-[:HAS_SUB_TYPE]-(ot:OrganizationType{isEnable:true}) WHERE id(pot)={0} return ot")
+    List<OrganizationType> getOrganizationSubTypesByTypeId(Long organizationTypeId);
+
+
 }

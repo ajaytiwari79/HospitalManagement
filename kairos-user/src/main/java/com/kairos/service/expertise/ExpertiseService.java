@@ -126,4 +126,8 @@ public class ExpertiseService extends UserBaseService {
     public List<ExpertiseDTO> getAllFreeExpertise(List<Long> expertiseIds){
         return expertiseGraphRepository.getAllFreeExpertises(expertiseIds);
     }
+
+    public Expertise getExpertiseByCountryId(Long countryId){
+        return expertiseGraphRepository.getExpertiesByCountry(countryId);
+    }
 }

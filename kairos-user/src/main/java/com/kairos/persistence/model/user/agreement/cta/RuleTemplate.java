@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.agreement.cta;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import org.neo4j.ogm.annotation.Relationship;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATES;

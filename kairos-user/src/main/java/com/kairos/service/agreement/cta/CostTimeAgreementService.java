@@ -11,6 +11,7 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraphRepository;
+import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.*;
@@ -23,6 +24,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.util.userContext.UserContext;
+import org.apache.commons.codec.language.bm.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +67,8 @@ public class CostTimeAgreementService extends UserBaseService {
     private  @Autowired ExpertiseGraphRepository expertiseGraphRepository;
     private @Autowired OrganizationTypeGraphRepository organizationTypeGraphRepository;
     private @Autowired CurrencyGraphRepository currencyGraphRepository;
+    private @Autowired CountryHolidayCalenderGraphRepository countryHolidayCalenderGraphRepository;
+    private @Autowired CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
 
 
     public void createDefaultCtaRuleTemplate(Long countryId) {
@@ -82,6 +87,10 @@ public class CostTimeAgreementService extends UserBaseService {
         }
 
     }
+
+    /*public List<CTARuleTemplateDTO> getDefaultCtaRuleTemplate(Long countryId){
+
+    }*/
 
     private CTARuleTemplate createRuleTemplate(CTARuleTemplateType ctaRuleTemplateType, Currency currency) {
         CTARuleTemplate ctaRuleTemplate = null;
@@ -172,6 +181,16 @@ public class CostTimeAgreementService extends UserBaseService {
 
     }
 
+    /*public getPreRequisiteData(){
+
+    }*/
+    public CTARuleTemplate updateCTARuleTemplate(Long ctaRuleTemplateId, CTARuleTemplateDTO ctaRuleTemplateDTO){
+        CTARuleTemplate ctaRuleTemplate = ctaRuleTemplateGraphRepository.findOne(ctaRuleTemplateId, 2);
+        BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes,");
+        ctaRuleTemplateGraphRepository.save(ctaRuleTemplate);
+       return ctaRuleTemplate;
+    }
+
     public CTARuleTemplateCategoryWrapper loadAllCTARuleTemplateByCountry(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
@@ -188,16 +207,7 @@ public class CostTimeAgreementService extends UserBaseService {
         return ctaRuleTemplateCategoryWrapper;
     }
 
-    public CTARuleTemplateDTO updateCTARuleTemplate(Long countryId, Long id, CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
 
-        CTARuleTemplate ctaRuleTemplate= ctaRuleTemplateGraphRepository.findOne(id,3);
-        Long userId = UserContext.getUserDetails().getId();
-        User user = userGraphRepository.findOne(userId, 0);
-        this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
-        ctaRuleTemplate.setLastModifiedBy(user);
-        this.save(ctaRuleTemplate);
-        return ctaRuleTemplateDTO;
-    }
 
 
     public CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate,CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
@@ -253,7 +263,6 @@ public class CostTimeAgreementService extends UserBaseService {
             Iterable<AccessGroup> accessGroups = accessGroupRepository.findAllById(ctaRuleTemplateDTO.getCalculateValueIfPlanned(), 0);
             return StreamSupport.stream(accessGroups.spliterator(), true).collect(Collectors.toList());
 
-
         };
         Future<List<AccessGroup>> accessGroupsFuture = asynchronousService.executeAsynchronously(accessGroupsTask);
         //set data
@@ -286,11 +295,60 @@ public class CostTimeAgreementService extends UserBaseService {
         return collectiveTimeAgreementDTO;
     }
 
+    public CollectiveTimeAgreementDTO updateCostTimeAgreement(Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+        CostTimeAgreement costTimeAgreement=collectiveTimeAgreementGraphRepository.findOne(ctaId,3);
+        BeanUtils.copyProperties(costTimeAgreement,collectiveTimeAgreementDTO);
+        CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
+                .buildCTAToUpdate(costTimeAgreement,collectiveTimeAgreementDTO);
+        CompletableFuture.allOf(hasUpdated).join();
+        this.save(costTimeAgreement);
+        return collectiveTimeAgreementDTO;
+    }
+
+    public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO){
+        for (CTARuleTemplateDayType ctaRuleTemplateDayType : ctaRuleTemplate.getCalculateOnDayTypes()) {
+
+            DayType dayType = dayTypeGraphRepository.findOne(ctaRuleTemplateDayType.getDayType().getId());
+            List<Long> countryHolidayCalendarIds = new ArrayList<>();
+            for (CountryHolidayCalender countryHolidayCalender : ctaRuleTemplateDayType.getCountryHolidayCalenders()) {
+                countryHolidayCalendarIds.add(countryHolidayCalender.getId());
+            }
+            List<CountryHolidayCalender> countryHolidayCalenders = countryHolidayCalenderGraphRepository.getCountryHolidayCalendarsById(countryHolidayCalendarIds);
+            ctaRuleTemplateDayType.setDayType(dayTypeGraphRepository.findOne(ctaRuleTemplateDayType.getDayType().getId()));
+            ctaRuleTemplateDayType.setCountryHolidayCalenders(countryHolidayCalenders);
+        }
+
+        // Fetch Access Group
+        List<Long> accessGroupIds = ctaRuleTemplateDTO.getCalculateValueIfPlanned();
+        /*for (AccessGroup accessGroup : ctaRuleTemplate.getCalculateValueIfPlanned()) {
+            accessGroupIds.add(accessGroup.getId());
+        }*/
+        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupRepository.getAccessGroupById(accessGroupIds));
+
+        // Fetch Employment Type
+        List<Long> employmentTypeIds = ctaRuleTemplateDTO.getEmploymentTypes();
+        /*for (EmploymentType employmentType : ctaRuleTemplate.getEmploymentTypes()) {
+            employmentTypeIds.add(employmentType.getId());
+        }*/
+        ctaRuleTemplate.setEmploymentTypes(employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds, false));
+
+        // Fetch Time Type
+        List<Long> timeTypeIds = ctaRuleTemplateDTO.getTimeTypes();
+        /*for (TimeType timeType : ctaRuleTemplate.getTimeTypes()) {
+            timeTypeIds.add(timeType.getId());
+        }*/
+        ctaRuleTemplate.setTimeTypes(timeTypeGraphRepository.findTimeTypeByIds(timeTypeIds));
+
+
+        return ctaRuleTemplate;
+    }
+
     @Async
     public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO)
             throws InterruptedException, ExecutionException {
 
 
+        // Get Experties
         Callable<Optional<Expertise>> expertiseCallable=()->{
             Optional<Expertise> expertise=expertiseGraphRepository.findById(collectiveTimeAgreementDTO.getExpertise());
             return  expertise;
@@ -298,28 +356,79 @@ public class CostTimeAgreementService extends UserBaseService {
 
         Future<Optional<Expertise>>expertiseFuture=asynchronousService.executeAsynchronously(expertiseCallable);
 
-        Callable<List<RuleTemplate>> ctaRuleTemplatesCallable=()->{
-            Iterable<CTARuleTemplate> ctaRuleTemplates=ctaRuleTemplateGraphRepository.findAllById(collectiveTimeAgreementDTO.getRuleTemplates(),0);
-            return  StreamSupport.stream(ctaRuleTemplates.spliterator(), true).collect(Collectors.toList());
-        };
 
+              // Get Rule Templates
+        Callable<List<RuleTemplate>> ctaRuleTemplatesCallable=()-> {
+            List<RuleTemplate> ruleTemplates = new ArrayList<>();
+            for(CTARuleTemplateDTO ctaRuleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()){
+                CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate() ;
+                BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes,");
+               //
+                ctaRuleTemplate.cloneCTARuleTemplate();
+                ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
+                ruleTemplates.add(ctaRuleTemplate);
+            }
+            return ruleTemplates;
+        };
         Future<List<RuleTemplate>>ctaRuleTemplatesFuture=asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
 
-
+        // Get Organization Type
         Callable<Optional<OrganizationType>> OrganizationTypesListCallable=()->{
             Optional<OrganizationType> organizationType=organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationType(),0);
             return  organizationType;
-
-
         };
         Future<Optional<OrganizationType>>organizationTypesFuture=asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
+
+
+        // Get Organization Sub Type
+        Callable<Optional<OrganizationType>> OrganizationSubTypesListCallable=()->{
+            Optional<OrganizationType> organizationType=organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationType(),0);
+            return  organizationType;
+        };
+        Future<Optional<OrganizationType>>organizationSubTypesFuture=asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
+
+
         //set data
          if(expertiseFuture.get().isPresent())
              costTimeAgreement.setExpertise(expertiseFuture.get().get());
         costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
         costTimeAgreement.setOrganizationType(organizationTypesFuture.get().get());
+        costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
+        return CompletableFuture.completedFuture(true);
+    }
+
+
+    public CompletableFuture<Boolean> buildCTAToUpdate(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO)
+            throws InterruptedException, ExecutionException {
+
+        // Get Rule Templates
+        Callable<List<RuleTemplate>> ctaRuleTemplatesCallable=()-> {
+            List<RuleTemplate> ruleTemplates = new ArrayList<>();
+            for(CTARuleTemplateDTO ctaRuleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()){
+                CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate() ;
+                BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes,");
+                //
+//                ctaRuleTemplate.cloneCTARuleTemplate();
+//                ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, true);
+                ruleTemplates.add(ctaRuleTemplate);
+            }
+            return ruleTemplates;
+        };
+        Future<List<RuleTemplate>>ctaRuleTemplatesFuture=asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
 
         return CompletableFuture.completedFuture(true);
+    }
+
+
+
+    public CTARuleTemplateDTO updateCTARuleTemplate(Long countryId, Long id, CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
+        CTARuleTemplate ctaRuleTemplate= ctaRuleTemplateGraphRepository.findOne(id,3);
+        Long userId = UserContext.getUserDetails().getId();
+        User user = userGraphRepository.findOne(userId, 0);
+        this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
+        ctaRuleTemplate.setLastModifiedBy(user);
+        this.save(ctaRuleTemplate);
+        return ctaRuleTemplateDTO;
     }
 
     }

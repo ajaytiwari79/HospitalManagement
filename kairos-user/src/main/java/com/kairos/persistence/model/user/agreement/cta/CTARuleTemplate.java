@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.agreement.cta;
 
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.TimeType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -10,13 +11,44 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @NodeEntity
 public class CTARuleTemplate extends RuleTemplate{
+
+    public CTARuleTemplate cloneCTARuleTemplate(){
+        this.setId(null);
+        for (CompensationTableInterval compensationTableInterval : this.getCompensationTable().getCompensationTableInterval()) {
+            compensationTableInterval.setId(null);
+        }
+        this.getCompensationTable().setId(null);
+        this.getCalculateValueAgainst().getFixedValue().setId(null);
+        this.getCalculateValueAgainst().setId(null);
+
+        for (CTARuleTemplateDayType ctaRuleTemplateDayType : this.getCalculateOnDayTypes()) {
+            ctaRuleTemplateDayType.setId(null);
+            //DayType not clone
+           /* for (CountryHolidayCalender countryHolidayCalender : ctaRuleTemplateDayType.getCountryHolidayCalenders()) {
+                countryHolidayCalender.setId(null);
+            }*/
+        }
+
+        for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : this.getPhaseInfo()) {
+            ctaRuleTemplatePhaseInfo.setId(null);
+        }
+
+        this.getActivityType().setId(null);
+        this.getPlannedTimeWithFactor().setId(null);
+        return this;
+    }
+
     private CTARuleTemplateType ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
@@ -60,6 +92,10 @@ public class CTARuleTemplate extends RuleTemplate{
         this.payrollType=payrollType;
         this.payrollSystem=payrollSystem;
 
+    }
+
+    public CTARuleTemplate buildCTARuleTemplateFromDTO(CTARuleTemplateDTO ctaRuleTemplateDTO){
+        return this;
     }
 
     public String getPayrollType() {
@@ -215,6 +251,9 @@ public class CTARuleTemplate extends RuleTemplate{
         this.lastModifiedBy = lastModifiedBy;
     }
 
+
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -290,4 +329,5 @@ public class CTARuleTemplate extends RuleTemplate{
                 .toString();
 
     }
+
 }

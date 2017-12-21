@@ -93,5 +93,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     @Query("Match (accessGroup:AccessGroup)-[:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]->(accessPage:AccessPage) with accessPage where id(accessGroup)={0} return accessPage")
     List<AccessPage> getAccessPageByGroup(long accessGroupId);
 
+    @Query("MATCH (accessGroup:AccessGroup) WHERE id(accessGroup) IN {0} return accessGroup")
+    List<AccessGroup> getAccessGroupById(List<Long> accessGrpIds);
+
     List<AccessGroup> findAll();
 }
+
