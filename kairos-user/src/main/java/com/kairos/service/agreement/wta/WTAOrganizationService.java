@@ -66,6 +66,13 @@ public class WTAOrganizationService extends UserBaseService {
             if (workingTimeAgreement.getRuleTemplates().size() > 0) {
                 copyRuleTemplates(workingTimeAgreement, newWtaObject);
             }
+            setExpertiseAndUnlinkBasicProperties(workingTimeAgreement, newWtaObject,unitId);
+            Expertise e = new Expertise();
+            e.setName(workingTimeAgreement.getExpertise().getName());
+            e.setDescription(workingTimeAgreement.getExpertise().getDescription());
+            e.setId(workingTimeAgreement.getExpertise().getId());
+            workingTimeAgreement.setExpertise(e);
+
             newWtaObject.setId(null);
             newWtaObject.setCountry(null);
             newWtaObject.setOrganizationType(null);
@@ -90,6 +97,20 @@ public class WTAOrganizationService extends UserBaseService {
         e.setDescription(oldWTA.getExpertise().getDescription());
         e.setId(oldWTA.getExpertise().getId());
         newWta.setExpertise(e);
+
+    }
+    private void setExpertiseAndUnlinkBasicProperties(WorkingTimeAgreement oldWTA, WorkingTimeAgreement newWta,Long unitId) {
+        Expertise e = new Expertise();
+        e.setName(oldWTA.getExpertise().getName());
+        e.setDescription(oldWTA.getExpertise().getDescription());
+        e.setId(oldWTA.getExpertise().getId());
+        newWta.setExpertise(e);
+        newWta.setId(null);
+        newWta.setCountry(null);
+        newWta.setOrganizationType(null);
+        newWta.setOrganizationSubType(null);
+        newWta.setOrganization(organizationGraphRepository.findOne(unitId, 0));
+        newWta.setParentWTA(oldWTA);
     }
 
 }
