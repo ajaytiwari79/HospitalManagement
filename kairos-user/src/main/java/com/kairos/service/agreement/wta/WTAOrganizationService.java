@@ -3,6 +3,7 @@ package com.kairos.service.agreement.wta;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
+import com.kairos.persistence.model.user.agreement.wta.WTAOrganizationMappingDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
@@ -15,10 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,28 +43,31 @@ public class WTAOrganizationService extends UserBaseService {
         return workingTimeAgreements;
     }
 
-    public List<WorkingTimeAgreement> getWTAForOrganizationMapping(Long unitId) {
+    public HashMap<String, Object> getWTAForOrganizationMapping(Long unitId) {
+        HashMap<String, Object> hs = new HashMap<>(2);
+
         Organization organization = organizationGraphRepository.findOne(unitId, 1);
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new DataNotFoundByIdException("Invalid unit  " + unitId);
         }
-        List<WorkingTimeAgreement> workingTimeAgreements = Collections.EMPTY_LIST;
         if (Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
             List<Long> subTypes = organization.getOrganizationSubTypes().stream().map(type -> type.getId()).collect(Collectors.toList());
-            workingTimeAgreements = workingTimeAgreementGraphRepository.getAllWTAByOrganizationSubType(subTypes);
+            List<WTAOrganizationMappingDTO> countryWTA = workingTimeAgreementGraphRepository.getAllWTAByOrganizationSubType(subTypes);
+            hs.put("countryWTA", countryWTA);
         }
-
-        return workingTimeAgreements;
+        List<WTAOrganizationMappingDTO> organizationWTA=workingTimeAgreementGraphRepository.getAllWTAByOrganizationId(unitId);
+        hs.put("organizationWTA", organizationWTA);
+        return hs;
     }
 
     public WorkingTimeAgreement linkWTAWithOrganization(Long workingTimeAgreementId, Long unitId, boolean checked) {
-        WorkingTimeAgreement workingTimeAgreement = workingTimeAgreementGraphRepository.findOne(workingTimeAgreementId, 2);
-        WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
-        if (!Optional.ofNullable(workingTimeAgreement).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid wtaId  " + workingTimeAgreementId);
-        }
+        WorkingTimeAgreement workingTimeAgreement;
         if (checked) {
-
+            workingTimeAgreement = workingTimeAgreementGraphRepository.findOne(workingTimeAgreementId, 2);
+            WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
+            if (!Optional.ofNullable(workingTimeAgreement).isPresent()) {
+                throw new DataNotFoundByIdException("Invalid wtaId  " + workingTimeAgreementId);
+            }
             WorkingTimeAgreement.copyProperties(workingTimeAgreement, newWtaObject, "id");
             List<RuleTemplate> ruleTemplates = new ArrayList<>();
             if (workingTimeAgreement.getRuleTemplates().size() > 0) {
@@ -74,16 +75,16 @@ public class WTAOrganizationService extends UserBaseService {
             }
             setExpertiseAndUnlinkBasicProperties(workingTimeAgreement, newWtaObject, unitId);
             newWtaObject.setRuleTemplates(ruleTemplates);
-             save(newWtaObject);
-
+            save(newWtaObject);
+            newWtaObject.setOrganization(null);
+            newWtaObject.setParentWTA(workingTimeAgreement.basicDetails());
+            return newWtaObject;
         } else {
+            workingTimeAgreement = workingTimeAgreementGraphRepository.getChildWTAbyParentWTA(workingTimeAgreementId, unitId);
             workingTimeAgreement.setDeleted(true);
             save(workingTimeAgreement);
+            return workingTimeAgreement;
         }
-        newWtaObject.setOrganization(null);
-        newWtaObject.setParentWTA(workingTimeAgreement.basicDetails());
-        return newWtaObject;
-
     }
 
     private List<RuleTemplate> copyRuleTemplates(List<RuleTemplate> ruleTemplates) {

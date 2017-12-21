@@ -1,9 +1,6 @@
 package com.kairos.persistence.repository.user.agreement.wta;
 
-import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
-import com.kairos.persistence.model.user.agreement.wta.WTAWithRuleTemplateDTO;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreementQueryResult;
+import com.kairos.persistence.model.user.agreement.wta.*;
 import com.kairos.persistence.model.user.expertise.ExpertiseIdListDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -140,7 +137,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORGANIZATION + "]->(organization:Organization) where id(organization)={0}\n" +
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
-            "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
+            "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({active:ruleTemp.isActive,daysLimit:ruleTemp.daysLimit,isActive:ruleTemp.isActive,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
             "shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional," +
@@ -150,14 +147,21 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,intervalLength:ruleTemp.intervalLength,intervalUnit:ruleTemp.intervalUnit,validationStartDateMillis:ruleTemp.validationStartDateMillis," +
             "daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
             "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id"
-            )
-    List<WTAWithCountryAndOrganizationTypeDTO>  getWtaByOrganization(Long organizationId);
+    )
+    List<WTAWithCountryAndOrganizationTypeDTO> getWtaByOrganization(Long organizationId);
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(o:OrganizationType) where id(o) IN {0} \n" +
-            "RETURN wta"
-    )
-    List<WorkingTimeAgreement> getAllWTAByOrganizationSubType(List<Long> organizationSubTypeId);
+            "RETURN Id(wta) as id, wta.name as name")
+    List<WTAOrganizationMappingDTO> getAllWTAByOrganizationSubType(List<Long> organizationSubTypeId);
 
+    @Query("match(pw:WorkingTimeAgreement{deleted:false})<-[:" + HAS_PARENT_WTA + "]-(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORGANIZATION + "]->(o:Organization) where id(o) = {0} \n" +
+            "RETURN Id(wta) as id, wta.name as name ,id(pw) as parentId")
+    List<WTAOrganizationMappingDTO> getAllWTAByOrganizationId(Long organizationId);
+
+
+    @Query("match(pw:WorkingTimeAgreement{deleted:false})<-[:" + HAS_PARENT_WTA + "]-(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORGANIZATION + "]->(o:Organization) where id(pw)={0} and id(o)={1}\n" +
+            "return wta")
+    WorkingTimeAgreement getChildWTAbyParentWTA(Long parentwtaId, Long organizationId);
 
 
 }
