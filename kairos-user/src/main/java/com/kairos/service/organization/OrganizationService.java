@@ -502,8 +502,10 @@ public class OrganizationService extends UserBaseService {
                 contactAddress.setZipCode(zipCode);
                 contactAddress.setCity(zipCode.getName());
                 unit.setContactAddress(contactAddress);
+            } else{
+                return null;
             }
-            return null;
+
 
         }
 
