@@ -2,14 +2,19 @@ package com.kairos.service.country.equipment;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.equipment.Equipment;
 import com.kairos.persistence.model.user.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.user.country.equipment.EquipmentQueryResult;
+import com.kairos.persistence.model.user.resources.Resource;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentGraphRepository;
+import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.response.dto.web.equipment.EquipmentDTO;
+import com.kairos.response.dto.web.equipment.VehicleEquipmentDTO;
 import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,13 +35,19 @@ public class EquipmentService extends UserBaseService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
-    EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
+    private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
 
     @Inject
-    CountryGraphRepository countryGraphRepository;
+    private CountryGraphRepository countryGraphRepository;
 
     @Inject
-    EquipmentGraphRepository equipmentGraphRepository;
+    private EquipmentGraphRepository equipmentGraphRepository;
+
+    @Inject
+    private ResourceGraphRepository resourceGraphRepository;
+
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
 
     public List<EquipmentCategory> getListOfEquipmentCategories(Long countryId){
         return equipmentCategoryGraphRepository.getEquipmentCategories();
@@ -48,15 +58,15 @@ public class EquipmentService extends UserBaseService {
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
-        logger.info("equipmentDTO : "+equipmentDTO.getName());
         if( equipmentGraphRepository.isEquipmentExistsWithSameName(equipmentDTO.getName(), countryId, false) ){
             throw new DuplicateDataException("Equipment already exists with same name " +equipmentDTO.getName() );
         }
         Equipment equipment = new Equipment();
         equipment.setName(equipmentDTO.getName());
         equipment.setDescription(equipmentDTO.getDescription());
-        equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getId(),0));
+        equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getEquipmentCategory().getId(),0));
         save(equipment);
+        equipmentGraphRepository.addEquipmentInCountry(countryId,equipment.getId());
         return equipment;
     }
 
@@ -75,7 +85,8 @@ public class EquipmentService extends UserBaseService {
         }
         equipment.setName(equipmentDTO.getName());
         equipment.setDescription(equipmentDTO.getDescription());
-        equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getId(),0));
+        equipmentGraphRepository.detachEquipmentCategory(equipmentId);
+        equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getEquipmentCategory().getId(),0));
         save(equipment);
         return equipment;
         //return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), new Date().getTime());
@@ -119,4 +130,35 @@ public class EquipmentService extends UserBaseService {
         return equipmentGraphRepository.getEquipmentByName(countryId, name, false);
     }
 
+
+
+    public List<EquipmentQueryResult> fetchSelectedEquipmentsOfResources(Long organizationId, Long resourceId){
+        return equipmentGraphRepository.getResourcesSelectedEquipments(organizationId, resourceId, false);
+    }
+
+    public HashMap<String,List<EquipmentQueryResult>> getEquipmentsForResource(Long organizationId, Long resourceId){
+        Organization organization = organizationGraphRepository.findOne(organizationId,1);
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Incorrect organization id " + organizationId);
+        }
+        HashMap<String, List<EquipmentQueryResult>> featuresData = new HashMap<>();
+        featuresData.put("availableEquipments",equipmentGraphRepository.getListOfEquipment(organization.getCountry().getId(), false, ""));
+        featuresData.put("selectedEquipments",fetchSelectedEquipmentsOfResources(organizationId,resourceId));
+        return featuresData;
+    }
+
+    public Resource updateEquipmentsOfResource(Long organizationId, Long resourceId, VehicleEquipmentDTO vehicleEquipmentDTO){
+        Resource resource = resourceGraphRepository.getResourceOfOrganizationById(organizationId, resourceId, false);
+        if (resource == null) {
+            throw new DataNotFoundByIdException("Incorrect resource id " + resourceId);
+        }
+        Organization organization = organizationGraphRepository.findOne(organizationId,1);
+        if (organization == null) {
+            throw new DataNotFoundByIdException("Incorrect organization id " + organizationId);
+        }
+        List<Equipment> equipments = equipmentGraphRepository.getListOfEquipmentByIds(organization.getCountry().getId(), false, vehicleEquipmentDTO.getEquipments());
+        resource.setEquipments(equipments);
+        resourceGraphRepository.save(resource);
+        return resource;
+    }
 }

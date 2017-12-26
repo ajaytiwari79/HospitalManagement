@@ -4,8 +4,11 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.user.country.equipment.Equipment;
 import com.kairos.persistence.model.user.country.equipment.EquipmentCategory;
+import com.kairos.persistence.model.user.country.equipment.EquipmentQueryResult;
+import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.response.dto.web.equipment.EquipmentCategoryDTO;
 import com.kairos.response.dto.web.equipment.EquipmentDTO;
+import com.kairos.response.dto.web.equipment.VehicleEquipmentDTO;
 import com.kairos.service.country.feature.FeatureService;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -27,6 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -53,6 +57,8 @@ public class EquipmentServiceIntegrationTest {
     static Long createdEquipmentId;
     static Long orgId = 71L;
     static Long countryId = 53L;
+    static Long unitId = 145L;
+    static Long resourceId = 10644L;
 
     @Test
     public void test1_getListOfEquipmentCategories() throws Exception {
@@ -72,7 +78,6 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void test2_addCountryEquipment() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         EquipmentCategory equipmentCategory = equipmentService.getEquipmentCategoryByName("Small");
@@ -97,7 +102,6 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void test3_updateEquipment() throws Exception {
 
         if(createdEquipmentId == null){
@@ -105,6 +109,7 @@ public class EquipmentServiceIntegrationTest {
             Equipment equipment = equipmentService.getEquipmentByName(countryId, nameOfEquipment);
             createdEquipmentId = equipment.getId();
         }
+        logger.info("createdEquipmentId : "+createdEquipmentId);
         String baseUrl=getBaseUrl(orgId,countryId, null);
 
         EquipmentCategory equipmentCategory = equipmentService.getEquipmentCategoryByName("Medium");
@@ -130,7 +135,6 @@ public class EquipmentServiceIntegrationTest {
 
 
     @Test
-    @Ignore
     public void test4_getListOfEquipments() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>> resTypeReference =
@@ -148,13 +152,13 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void test5_deleteEquipment() throws Exception {
         if(createdEquipmentId == null){
             logger.info("Equipment Id is null");
             Equipment equipment = equipmentService.getEquipmentByName(countryId, nameOfEquipment);
             createdEquipmentId = equipment.getId();
         }
+        logger.info("createdEquipmentId : "+createdEquipmentId);
         String baseUrl=getBaseUrl(orgId,countryId, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> resTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
@@ -168,6 +172,51 @@ public class EquipmentServiceIntegrationTest {
                 HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
     }
 
+
+    @Test
+    public void test6_updateEquipmentsOfReource() throws Exception {
+        if(createdEquipmentId == null){
+            logger.info("Equipment Id is null");
+            Equipment equipment = equipmentService.getEquipmentByName(countryId, nameOfEquipment);
+            createdEquipmentId = equipment.getId();
+        }
+        String baseUrl=getBaseUrl(orgId,null, unitId);
+        VehicleEquipmentDTO vehicleEquipmentDTO = new VehicleEquipmentDTO();
+
+        List<Long> equipmentIds = new ArrayList<>();
+        equipmentIds.add(createdEquipmentId);
+        vehicleEquipmentDTO.setEquipments(equipmentIds);
+
+        HttpEntity<VehicleEquipmentDTO> requestBodyData = new HttpEntity<>(vehicleEquipmentDTO);
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Resource>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Resource>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<Resource>> response = restTemplate.exchange(
+                baseUrl+"/resource/"+resourceId+"/equipment",
+                HttpMethod.PUT, requestBodyData, resTypeReference);
+
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
+    }
+
+    @Test
+    public void test7_getListOfEquipmentsOfResource() throws Exception {
+        String baseUrl=getBaseUrl(orgId,null, unitId);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,List<EquipmentQueryResult>>>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,List<EquipmentQueryResult>>>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<HashMap<String,List<EquipmentQueryResult>>>> response = restTemplate.exchange(
+                baseUrl+"/resource/"+resourceId+"/equipment",
+                HttpMethod.GET, null, resTypeReference);
+
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
+
+        logger.info("response.getBody().getData() : "+response.getBody().getData());
+    }
 
     public final String getBaseUrl(Long organizationId,Long countryId, Long unitId){
         if(organizationId!=null && countryId!=null ){
