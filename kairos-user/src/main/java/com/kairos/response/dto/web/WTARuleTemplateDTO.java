@@ -1,5 +1,7 @@
 package com.kairos.response.dto.web;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -8,6 +10,8 @@ import java.util.List;
 /**
  * Created by pawanmandhan on 8/8/17.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WTARuleTemplateDTO {
 
     private Long id;
@@ -332,4 +336,5 @@ public class WTARuleTemplateDTO {
     public boolean isProportional() {
         return proportional;
     }
+
 }

@@ -163,5 +163,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "return wta")
     WorkingTimeAgreement getChildWTAbyParentWTA(Long parentwtaId, Long organizationId);
 
-
+    @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORGANIZATION + "]->(organization:Organization)" +
+            " where id(organization)={1} AND wta.name =~{0} AND id(wta)<>{2} return CASE  WHEN count(wta) >0   THEN true else false end")
+    boolean checkUniqueWTANameInOrganization(String name,Long unitId,Long wtaId);
 }

@@ -131,9 +131,9 @@ public class WTAService extends UserBaseService {
 
         Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? new Date().getTime() : wtaDTO.getStartDateMillis();
 
-
+        wta.setStartDateMillis(dateInMillies);
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
-            if (wtaDTO.getStartDateMillis() > wtaDTO.getEndDateMillis()) {
+            if (dateInMillies > wtaDTO.getEndDateMillis()) {
                 throw new InvalidRequestException("End Date must not be greater than start date");
 
             }
@@ -231,7 +231,6 @@ public class WTAService extends UserBaseService {
         copyRuleTemplates(wtaDTO, wtaBaseRuleTemplates, wtaRuleTemplateQueryResponseArrayList);
 
         oldWta.setRuleTemplates(wtaBaseRuleTemplates);
-
 
 
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
