@@ -60,7 +60,7 @@ public class PayGroupAreaService extends UserBaseService{
     private PayGroupArea getPayGroupAreaById(Long payGroupAreaId){
         PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
         if(payGroupArea == null){
-            throw new DataNotFoundByIdException("Invalid Opay group id");
+            throw new DataNotFoundByIdException("Invalid pay group id");
         }
         return payGroupArea;
     }

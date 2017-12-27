@@ -78,7 +78,7 @@ public class PayLevelService extends UserBaseService {
         }
         Expertise expertise = expertiseGraphRepository.findOne(payLevelDTO.getExpertiseId());
         if(expertise == null){
-            throw new InternalError("Invalida expertise id ");
+            throw new InternalError("Invalid expertise id ");
         }
 
         PayLevel payLevel = new PayLevel(payLevelDTO.getName(),country,expertise,organizationType,payLevelDTO.getPaymentUnit(),
