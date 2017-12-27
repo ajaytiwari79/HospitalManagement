@@ -198,6 +198,7 @@ public class RelationshipConstants {
     public final static String RESOURCE_HAS_FEATURE = "RESOURCE_HAS_FEATURE";
     public final static String RESOURCE_HAS_EQUIPMENT = "RESOURCE_HAS_EQUIPMENT";
     public final static String LOCATED_IN = "LOCATED_IN";
+    public final static String HAS_PAY_LEVEL_MATRIX = "HAS_PAY_LEVEL_MATRIX";
 
 
     /**
