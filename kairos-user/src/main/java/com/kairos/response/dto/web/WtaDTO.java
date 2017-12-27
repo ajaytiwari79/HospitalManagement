@@ -6,8 +6,6 @@ import java.util.List;
  * Created by pawanmandhan on 2/8/17.
  */
 public class WtaDTO {
-
-
     private String name;
     private String description;
     private long expertiseId;

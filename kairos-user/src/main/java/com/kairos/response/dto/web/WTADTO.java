@@ -10,7 +10,7 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WTAUpdateDTO {
+public class WTADTO {
     private String name;
     private String description;
     private long expertiseId;
@@ -18,6 +18,9 @@ public class WTAUpdateDTO {
     private Long endDateMillis;
     private Long expiryDate;
     private List<WTARuleTemplateDTO> ruleTemplates;
+    private Long organizationType;
+    private Long organizationSubType;
+
 
     public String getName() {
         return name;
@@ -75,7 +78,23 @@ public class WTAUpdateDTO {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public WTAUpdateDTO() {
+    public Long getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(Long organizationType) {
+        this.organizationType = organizationType;
+    }
+
+    public Long getOrganizationSubType() {
+        return organizationSubType;
+    }
+
+    public void setOrganizationSubType(Long organizationSubType) {
+        this.organizationSubType = organizationSubType;
+    }
+
+    public WTADTO() {
         //default cons
     }
 

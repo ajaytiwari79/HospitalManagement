@@ -25,10 +25,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -165,6 +162,7 @@ public class Organization extends UserBaseEntity {
 
     @Relationship(type = HAS_WTA)
     private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
+
     public Level getLevel() {
         return level;
     }
@@ -184,7 +182,7 @@ public class Organization extends UserBaseEntity {
     private int dayShiftTimeDeduction = 4; //in percentage
 
     private int nightShiftTimeDeduction = 7; //in percentage
-    private boolean phaseGenerated=true;
+    private boolean phaseGenerated = true;
 
 
     public Organization(String name, List<Group> groupList, List<Organization> children) {
@@ -706,6 +704,24 @@ public class Organization extends UserBaseEntity {
         this.workingTimeAgreements = workingTimeAgreements;
     }
 
+    public void addWorkingTimeAgreements(WorkingTimeAgreement workingTimeAgreement) {
+        if (workingTimeAgreement == null)
+            throw new NullPointerException("Can't add null workingTimeAgreement");
+        workingTimeAgreements.add(workingTimeAgreement);
+    }
+
+    public void removeWorkingTimeAgreements(WorkingTimeAgreement workingTimeAgreement) {
+        if (workingTimeAgreement != null) {
+            Iterator itr = workingTimeAgreements.iterator();
+            while (itr.hasNext()) {
+                if (((WorkingTimeAgreement) itr.next()).getId().equals(workingTimeAgreement.getId())) {
+                    itr.remove();
+                    break;
+                }
+            }
+        }
+    }
+
     public List<PositionName> getPositionNameList() {
         return positionNameList;
     }
@@ -722,7 +738,7 @@ public class Organization extends UserBaseEntity {
         this.phaseGenerated = phaseGenerated;
     }
 
-    public void addResource(Resource resource){
+    public void addResource(Resource resource) {
         List<Resource> resourceList = this.getResourceList();
         resourceList.add(resource);
         this.resourceList = resourceList;

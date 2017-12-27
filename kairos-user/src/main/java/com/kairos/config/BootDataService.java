@@ -601,7 +601,7 @@ public class BootDataService {
         kairosCountryLevel.setEmail("kairos_denmark@kairos.com");
         kairosCountryLevel.setContactDetail(new ContactDetail("info@kairos.com", "kairos_denmark@kairos.com", "431311", "653322"));
 //        kairosCountryLevel.setContactAddress(new ContactAddress("Thorsgade", 2, 5000, "Odense", 4345, "Commercial"));
-//        kairosCountryLevel.setOrganizationTypes(privateOrganization);
+//        kairosCountryLevel.setOrganizationType(privateOrganization);
         kairosCountryLevel.setCostCenterCode("OD12");
         kairosCountryLevel.setOrganizationLevel(OrganizationLevel.COUNTRY);
         kairosCountryLevel.setCountry(denmark);

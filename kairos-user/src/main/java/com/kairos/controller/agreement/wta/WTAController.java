@@ -1,7 +1,6 @@
 package com.kairos.controller.agreement.wta;
 
-import com.kairos.response.dto.web.WTAUpdateDTO;
-import com.kairos.response.dto.web.WtaDTO;
+import com.kairos.response.dto.web.WTADTO;
 import com.kairos.service.agreement.wta.WTAOrganizationService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.util.response.ResponseHandler;
@@ -33,14 +32,14 @@ public class WTAController {
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value = COUNTRY_URL + "/wta")
-    public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @RequestBody WtaDTO wta) {
+    public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @RequestBody WTADTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.createWta(countryId, wta));
     }
 
     @ApiOperation(value = "Update WTA")
     @PutMapping(value = COUNTRY_URL + "/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long countryId, @PathVariable long wtaId, @RequestBody WtaDTO wta) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWta(countryId, wtaId, wta));
+    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long countryId, @PathVariable long wtaId, @RequestBody WTADTO wta) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfCountry(countryId, wtaId, wta));
     }
 
     @ApiOperation(value = "Get WTA")
@@ -138,18 +137,6 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.getAllWTAByOrganization(unitId));
     }
 
-    @ApiOperation(value = "Get WTA by Org subType")
-    @RequestMapping(value = UNIT_URL + "/wta-organization-mapping", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getOrganizationMappingWTADetails(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.getWTAForOrganizationMapping(unitId));
-    }
-
-    @ApiOperation(value = "copy WTA in organization")
-    @RequestMapping(value = UNIT_URL + "/copy-wta-settings/wta/{wtaId}", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> linkWTAWithOrganization(@PathVariable long unitId, @PathVariable long wtaId, @RequestParam(value = "checked") boolean checked) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.linkWTAWithOrganization(wtaId, unitId, checked));
-    }
-
 
     @ApiOperation(value = "Remove WTA from organization ")
     @DeleteMapping(value = UNIT_URL + "/wta/{wtaId}")
@@ -160,7 +147,7 @@ public class WTAController {
 
     @ApiOperation(value = "Update WTA")
     @PutMapping(value = UNIT_URL + "/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateWtaOfOrganization(@PathVariable long unitId, @PathVariable long wtaId, @RequestBody WTAUpdateDTO wta) {
+    public ResponseEntity<Map<String, Object>> updateWtaOfOrganization(@PathVariable long unitId, @PathVariable long wtaId, @RequestBody WTADTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.updateWtaOfOrganization(unitId, wtaId, wta));
     }
 
