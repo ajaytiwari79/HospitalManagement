@@ -79,7 +79,7 @@ public class WTAService extends UserBaseService {
      * @return
      * @Author Vipul
      */
-    public HashMap createWta(long countryId, WTADTO wtaDTO) {
+    public WorkingTimeAgreement createWta(long countryId, WTADTO wtaDTO) {
         Country country = countryRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country id " + countryId);
@@ -90,8 +90,7 @@ public class WTAService extends UserBaseService {
         if (Optional.ofNullable(wta).isPresent()) {
             throw new DuplicateDataException("Duplicate WTA name" + wtaDTO.getName());
         }
-        List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTAWithCategoryDTO>();
-        wta = prepareWta(countryId, wtaDTO, wtaRuleTemplateQueryResponseArrayList);
+        wta = prepareWta(countryId, wtaDTO);
 
         wta.setCountry(country);
         save(wta);
@@ -101,7 +100,10 @@ public class WTAService extends UserBaseService {
         hs.put("id", wta.getId());
         hs.put("name", wta.getName());
         hs.put("ruleTemplates", wta.getRuleTemplates());
-        return hs;
+        wta.setOrganizationType(wta.getOrganizationType().basicDetails());
+        wta.setOrganizationSubType(wta.getOrganizationSubType().basicDetails());
+        wta.getExpertise().setCountry(null);
+        return wta;
     }
 
     private void checkUniquenessOfData(long countryId, long organizationSubTypeId, long organizationTypeId, long expertiseId) {
@@ -114,7 +116,7 @@ public class WTAService extends UserBaseService {
         return;
     }
 
-    private WorkingTimeAgreement prepareWta(long countryId, WTADTO wtaDTO, List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList) {
+    private WorkingTimeAgreement prepareWta(long countryId, WTADTO wtaDTO) {
 
         WorkingTimeAgreement wta = new WorkingTimeAgreement();
         wta.setDescription(wtaDTO.getDescription());
@@ -209,7 +211,7 @@ public class WTAService extends UserBaseService {
             throw new DuplicateDataException("Duplicate WTA name " + updateDTO.getName());
         }
 
-         oldWta = prepareWta(oldWta, updateDTO);
+        oldWta = prepareWta(oldWta, updateDTO);
         List<RuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
             ruleTemplates = wtaOrganizationService.copyRuleTemplatesWithNew(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "COUNTRY", countryId);

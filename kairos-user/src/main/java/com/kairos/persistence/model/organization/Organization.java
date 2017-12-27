@@ -710,18 +710,6 @@ public class Organization extends UserBaseEntity {
         workingTimeAgreements.add(workingTimeAgreement);
     }
 
-    public void removeWorkingTimeAgreements(WorkingTimeAgreement workingTimeAgreement) {
-        if (workingTimeAgreement != null) {
-            Iterator itr = workingTimeAgreements.iterator();
-            while (itr.hasNext()) {
-                if (((WorkingTimeAgreement) itr.next()).getId().equals(workingTimeAgreement.getId())) {
-                    itr.remove();
-                    break;
-                }
-            }
-        }
-    }
-
     public List<PositionName> getPositionNameList() {
         return positionNameList;
     }
