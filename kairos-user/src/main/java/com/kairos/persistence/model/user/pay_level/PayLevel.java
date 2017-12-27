@@ -5,22 +5,31 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
 /**
  * Created by prabjot on 21/12/17.
  */
 public class PayLevel extends UserBaseEntity {
     private String name;
+
+    @Relationship(type = BELONGS_TO)
     private Country country;
+    @Relationship(type = HAS_EXPERTISE)
     private Expertise expertise;
+    @Relationship(type = HAS_ORGANIZATION_TYPE)
     private OrganizationType organizationType;
+    @Relationship(type = HAS_LEVEL)
     private Level level;
     private PaymentUnit paymentUnit;
+    @Relationship(type = HAS_PAY_LEVEL_MATRIX)
     private List<PayLevelMatrix> payLevelMatrices=new ArrayList<>();
     @DateLong
     private Date startDate;
@@ -33,16 +42,14 @@ public class PayLevel extends UserBaseEntity {
         //default constructor
     }
 
-    public PayLevel(String name, Country country, Expertise expertise, OrganizationType organizationType, Level level,
-                    PaymentUnit paymentUnit, Date startDate, Date endDate) {
+    public PayLevel(String name, Country country, Expertise expertise, OrganizationType organizationType,
+                    PaymentUnit paymentUnit, Date startDate) {
         this.name = name;
         this.country = country;
         this.expertise = expertise;
         this.organizationType = organizationType;
-        this.level = level;
         this.paymentUnit = paymentUnit;
         this.startDate = startDate;
-        this.endDate = endDate;
     }
 
     public Country getCountry() {

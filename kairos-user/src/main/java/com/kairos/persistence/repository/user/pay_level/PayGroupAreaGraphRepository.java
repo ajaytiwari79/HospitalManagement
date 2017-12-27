@@ -14,6 +14,4 @@ import java.util.List;
 @Repository
 public interface PayGroupAreaGraphRepository extends GraphRepository<PayGroupArea> {
 
-    @Depth(value = 0)
-    List<PayGroupArea> findByDeletedIsFalseAndCountry(Country country);
 }

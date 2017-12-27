@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +60,7 @@ public class PayGroupAreaService extends UserBaseService{
     private PayGroupArea getPayGroupAreaById(Long payGroupAreaId){
         PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
         if(payGroupArea == null){
-            throw new DataNotFoundByIdException("Invalid pay group id");
+            throw new DataNotFoundByIdException("Invalid Opay group id");
         }
         return payGroupArea;
     }
@@ -69,6 +70,6 @@ public class PayGroupAreaService extends UserBaseService{
         if(country == null){
             throw new InternalError("Invalid country id");
         }
-        return payGroupAreaGraphRepository.findByDeletedIsFalseAndCountry(country);
+        return new ArrayList<>();
     }
 }
