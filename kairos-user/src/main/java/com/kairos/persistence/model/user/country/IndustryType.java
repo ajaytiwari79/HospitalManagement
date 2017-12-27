@@ -24,7 +24,7 @@ public class IndustryType extends UserBaseEntity {
     @NotEmpty(message = "error.IndustryType.name.notEmpty") @NotNull(message = "error.IndustryType.name.notnull")
     private String name;
 
-    @NotEmpty(message = "error.IndustryType.description.notEmpty") @NotNull(message = "error.IndustryType.description.notnull")
+    //@NotEmpty(message = "error.IndustryType.description.notEmpty") @NotNull(message = "error.IndustryType.description.notnull")
     private String description;
 
     @Relationship(type = BELONGS_TO)
