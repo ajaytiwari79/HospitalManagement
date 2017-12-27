@@ -198,6 +198,7 @@ public class TimeSlotService extends UserBaseService {
         Map<String, Object> response = new HashMap<>();
         response.put("timeSlots", timeSlotWrappers);
         response.put("standardTimeSlot", STANDARD.equals(unit.getTimeSlotMode()) ? true : false);
+        response.put("timeZone", unit.getTimeZone().toString());
         return response;
     }
 

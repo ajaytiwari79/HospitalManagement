@@ -35,6 +35,11 @@ import java.util.List;
 @EnableCircuitBreaker
 public class UserServiceApplication extends WebMvcConfigurerAdapter{
 
+	static{
+		java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+		System.setProperty("user.timezone", "UTC");
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(UserServiceApplication.class, args);
 	}
