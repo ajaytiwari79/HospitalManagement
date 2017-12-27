@@ -46,6 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
@@ -1235,13 +1236,14 @@ public class OrganizationController {
     @RequestMapping(value =UNIT_URL+"/timeZones", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllTimeZones(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getAvailableZoneIds());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getAvailableZoneIds(unitId));
     }
 
     @ApiOperation(value = "Assign time zone to unit")
     @RequestMapping(value =UNIT_URL+"/timeZone", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> assignUnitTimeZone(@PathVariable Long unitId, @RequestBody String zoneId) {
+    public ResponseEntity<Map<String, Object>> assignUnitTimeZone(@PathVariable Long unitId,  @RequestBody Map<String, Object> data) {
+        String zoneId = (String) data.get("zoneId");
         return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.assignUnitTimeZone(unitId, zoneId));
     }
 }

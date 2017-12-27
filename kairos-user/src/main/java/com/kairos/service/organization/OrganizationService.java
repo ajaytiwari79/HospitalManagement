@@ -598,10 +598,7 @@ public class OrganizationService extends UserBaseService {
             response.put("otherData", Collections.emptyMap());
         }
 
-        boolean result = assignUnitTimeZone(id,"Europe/Brussels");
-        logger.info("TIME SLOT ASSIGNED "+result);
-
-        return response;
+       return response;
     }
 
 
@@ -1118,11 +1115,20 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.getOrganizationChildList(orgID);
     }
 
-    public List<String> getAvailableZoneIds(){
+    public Map<String, Object> getAvailableZoneIds(Long unitId){
         Set<String> allZones = ZoneId.getAvailableZoneIds();
         List<String> zoneList = new ArrayList<>(allZones);
         Collections.sort(zoneList);
-        return zoneList;
+
+        Map<String, Object> timeZonesData = new HashedMap();
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
+        }
+
+        timeZonesData.put("selectedTimeZone", unit.getTimeZone()!=null? unit.getTimeZone().getId() : null);
+        timeZonesData.put("allTimeZones",zoneList);
+        return timeZonesData;
     }
 
     public boolean assignUnitTimeZone(Long unitId, String zoneIdString){
