@@ -15,7 +15,7 @@ public class CountryExpertiseDTO {
     @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull")
     private String name;
 
-    @NotEmpty(message = "error.Expertise.description.notEmpty") @NotNull(message = "error.Expertise.description.notnull")
+    //@NotEmpty(message = "error.Expertise.description.notEmpty") @NotNull(message = "error.Expertise.description.notnull")
     private String description;
 
     private List<Long> tags;

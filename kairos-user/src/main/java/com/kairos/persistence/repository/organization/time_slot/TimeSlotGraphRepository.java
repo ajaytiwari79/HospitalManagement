@@ -19,7 +19,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
 
-    @Query("Match (org:Organization)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1}}) where id(org)={0} AND (timeSlotSet.endDate=null OR timeSlotSet.endDate>={2})\n" +
+    @Query("Match (org:Organization)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1}}) where id(org)={0} AND (timeSlotSet.endDate is null OR timeSlotSet.endDate>={2})\n" +
             "Match (timeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot)\n" +
             "return id(timeSlot) as id,timeSlot.name as name,r.startHour as startHour,r.startMinute as startMinute,r.endHour as endHour,r.endMinute as endMinute,r.isShiftStartTime as shiftStartTime order by timeSlotSet.startDate DESC LIMIT 1")
     List<TimeSlotWrapper> getTimeSlots(Long unitId, TimeSlotMode timeSlotMode, Date currentDate);

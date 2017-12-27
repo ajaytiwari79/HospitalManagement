@@ -27,7 +27,7 @@ public class VatType extends UserBaseEntity {
 
     private int code;
 
-    @NotEmpty(message = "error.VatType.description.notEmpty") @NotNull(message = "error.VatType.description.notnull")
+    //@NotEmpty(message = "error.VatType.description.notEmpty") @NotNull(message = "error.VatType.description.notnull")
     private String description;
 
     @NotEmpty(message = "error.VatType.percentage.notEmpty") @NotNull(message = "error.VatType.percentage.notnull")

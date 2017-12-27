@@ -5,6 +5,7 @@ import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
@@ -180,6 +181,11 @@ public class OrganizationService extends UserBaseService {
             return false;
         }
 
+    }
+
+    public Long getCountryIdOfOrganization(long orgId) {
+        Organization organization = organizationGraphRepository.findOne(orgId, 1);
+        return organization.getCountry().getId();
     }
 
     /**
@@ -496,8 +502,10 @@ public class OrganizationService extends UserBaseService {
                 contactAddress.setZipCode(zipCode);
                 contactAddress.setCity(zipCode.getName());
                 unit.setContactAddress(contactAddress);
+            } else{
+                return null;
             }
-            return null;
+
 
         }
 
@@ -1115,6 +1123,7 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.getOrganizationChildList(orgID);
     }
 
+
     public Map<String, Object> getAvailableZoneIds(Long unitId){
         Set<String> allZones = ZoneId.getAvailableZoneIds();
         List<String> zoneList = new ArrayList<>(allZones);
@@ -1140,6 +1149,20 @@ public class OrganizationService extends UserBaseService {
         unit.setTimeZone(zoneId);
         organizationGraphRepository.save(unit);
         return true;
+    }
+
+
+    public Organization fetchParentOrganization(Long unitId){
+        Organization parent = null;
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+        } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
+            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+        } else {
+            parent = unit;
+        }
+        return parent;
     }
 
 

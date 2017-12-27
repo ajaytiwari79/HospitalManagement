@@ -2,7 +2,6 @@ package com.kairos.response.dto.web.equipment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.user.country.equipment.EquipmentCategory;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -18,9 +17,9 @@ public class EquipmentDTO {
 
     @NotEmpty(message = "error.equipment.name.notNullAndEmpty") @NotNull(message = "error.equipment.name.notNullAndEmpty")
     private String name;
-    @NotEmpty(message = "error.equipment.description.notNullAndEmpty") @NotNull(message = "error.equipment.description.notNullAndEmpty")
+    //@NotEmpty(message = "error.equipment.description.notNullAndEmpty") @NotNull(message = "error.equipment.description.notNullAndEmpty")
     private String description;
-    public EquipmentCategoryDTO equipmentCategoryDTO;
+    public EquipmentCategoryDTO equipmentCategory;
 
     public Long getId() {
         return id;
@@ -46,21 +45,21 @@ public class EquipmentDTO {
         this.description = description;
     }
 
-    public EquipmentCategoryDTO getEquipmentCategoryDTO() {
-        return equipmentCategoryDTO;
+    public EquipmentCategoryDTO getEquipmentCategory() {
+        return equipmentCategory;
     }
 
-    public void setEquipmentCategoryDTO(EquipmentCategoryDTO equipmentCategoryDTO) {
-        this.equipmentCategoryDTO = equipmentCategoryDTO;
+    public void setEquipmentCategory(EquipmentCategoryDTO equipmentCategory) {
+        this.equipmentCategory = equipmentCategory;
     }
 
     public EquipmentDTO(){
         //default constructor
     }
 
-    public EquipmentDTO(String name, String description, EquipmentCategoryDTO equipmentCategoryDTO){
+    public EquipmentDTO(String name, String description, EquipmentCategoryDTO equipmentCategory){
         this.name = name;
         this.description = description;
-        this.equipmentCategoryDTO = equipmentCategoryDTO;
+        this.equipmentCategory = equipmentCategory;
     }
 }
