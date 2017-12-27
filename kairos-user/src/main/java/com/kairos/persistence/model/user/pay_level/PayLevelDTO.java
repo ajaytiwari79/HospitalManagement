@@ -1,8 +1,11 @@
 package com.kairos.persistence.model.user.pay_level;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -17,6 +20,7 @@ public class PayLevelDTO {
     private Long LevelId;
     private Long expertiseId;
     private PaymentUnit paymentUnit;
+    @NotNull(message = "Start date can't be null")
     @DateLong
     private Date startDate;
     @DateLong
@@ -95,5 +99,35 @@ public class PayLevelDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PayLevelDTO that = (PayLevelDTO) o;
+
+        return new EqualsBuilder()
+                .append(id, that.id)
+                .append(name, that.name)
+                .append(OrganizationTypeId, that.OrganizationTypeId)
+                .append(LevelId, that.LevelId)
+                .append(expertiseId, that.expertiseId)
+                .append(paymentUnit, that.paymentUnit)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(name)
+                .append(OrganizationTypeId)
+                .append(LevelId)
+                .append(expertiseId)
+                .append(paymentUnit)
+                .toHashCode();
     }
 }

@@ -15,19 +15,21 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
  * Created by prabjot on 26/12/17.
  */
 @Api(value = API_ORGANIZATION_COUNTRY_URL)
-@RestController(API_ORGANIZATION_COUNTRY_URL)
+@RestController
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
 public class PayLevelController {
 
     @Inject
     private PayLevelService payLevelService;
 
-    @RequestMapping(value = API_ORGANIZATION_COUNTRY_URL+ "/pay_level")
+    @RequestMapping(value = "/pay_level",method = GET)
     public ResponseEntity<Map<String,Object>> getPayLevels(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,payLevelService.getPayLevels(countryId));
     }

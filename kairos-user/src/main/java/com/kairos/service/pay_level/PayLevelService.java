@@ -1,12 +1,12 @@
 package com.kairos.service.pay_level;
 
+import com.kairos.custom_exception.DataNotMatchedException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.pay_level.PayLevel;
-import com.kairos.persistence.model.user.pay_level.PayLevelDTO;
-import com.kairos.persistence.model.user.pay_level.PayLevelGlobalData;
+import com.kairos.persistence.model.user.pay_level.*;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
@@ -39,21 +39,31 @@ public class PayLevelService extends UserBaseService {
         List<PayLevelGlobalData> payLevelGlobalData = payLevelGraphRepository.getPayLevelGlobalData(countryId);
         List<PayLevelDTO> payLevelDTOS = payLevelGraphRepository.getPayLevels(countryId);
         Map<String,Object> payLevelResponse = new HashMap<>();
-        payLevelResponse.put("payLevelGlobalData",payLevelGlobalData);
+        PayLevelGlobalDataWrapper payLevelGlobalDataWrapper = new PayLevelGlobalDataWrapper(payLevelGlobalData, PaymentUnit.getValues());
+        payLevelResponse.put("payLevelGlobalData",payLevelGlobalDataWrapper);
         payLevelResponse.put("payLevels",payLevelDTOS);
         return payLevelResponse;
 
     }
 
-    public PayLevel createPayLevel(Long countryId, PayLevelDTO payLevelDTO){
-
+    public PayLevelDTO createPayLevel(Long countryId, PayLevelDTO payLevelDTO){
+        validatePayLevel(countryId,payLevelDTO);
         PayLevel payLevel = validatePayLevelMetaData(countryId,payLevelDTO);
         save(payLevel);
-        return payLevel;
+        payLevelDTO.setId(payLevel.getId());
+        return payLevelDTO;
     }
 
     private void validatePayLevel(Long countryId,PayLevelDTO payLevelDTO){
 
+        List<PayLevelDTO> payLevels = payLevelGraphRepository.findByOrganizationTypeAndExpertiseId(countryId,
+                payLevelDTO.getOrganizationTypeId(),payLevelDTO.getExpertiseId(),payLevelDTO.getLevelId());
+        payLevels.forEach(payLevelToValidate -> {
+
+            if(payLevelToValidate.getEndDate() == null || payLevelDTO.getStartDate().compareTo(payLevelToValidate.getEndDate())<=0){
+                throw new DuplicateDataException("Pay level already exist");
+            }
+        });
 
     }
 
@@ -75,7 +85,7 @@ public class PayLevelService extends UserBaseService {
                 payLevelDTO.getStartDate());
 
         if(Optional.ofNullable(payLevelDTO.getLevelId()).isPresent()){
-            Level level = countryGraphRepository.getLevel(countryId,payLevelDTO.getLevelId());
+            Level level = organizationTypeGraphRepository.getLevel(payLevelDTO.getOrganizationTypeId(),payLevelDTO.getLevelId());
             if(level == null){
                 throw new InternalError("Invalid level id");
             }
