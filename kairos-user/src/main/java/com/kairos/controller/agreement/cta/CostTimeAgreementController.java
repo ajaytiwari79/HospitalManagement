@@ -27,7 +27,7 @@ public class CostTimeAgreementController {
      * @param countryId
      * @return
      */
-    @RequestMapping(value = "/country/{countryId}/cta/", method = RequestMethod.POST)
+    @RequestMapping(value = "/country/{countryId}/cta", method = RequestMethod.POST)
     @ApiOperation("Create CTA")
     public ResponseEntity<Map<String, Object>> createCTA(@PathVariable Long countryId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
@@ -35,12 +35,20 @@ public class CostTimeAgreementController {
                 costTimeAgreementService.createCostTimeAgreement(countryId,collectiveTimeAgreementDTO));
     }
 
-    @RequestMapping(value = "/country/{countryId}/cta/", method = RequestMethod.PUT)
+
+    @RequestMapping(value = "/country/{countryId}/cta/{ctaId}", method = RequestMethod.PUT)
     @ApiOperation("Update CTA")
-    public ResponseEntity<Map<String, Object>> updateCTA(@PathVariable Long countryId
+    public ResponseEntity<Map<String, Object>> updateCTA(@PathVariable Long countryId, @PathVariable Long ctaId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                costTimeAgreementService.updateCostTimeAgreement(countryId,collectiveTimeAgreementDTO));
+                costTimeAgreementService.updateCostTimeAgreement(countryId, ctaId, collectiveTimeAgreementDTO));
+    }
+
+    @RequestMapping(value = "/country/{countryId}/cta", method = RequestMethod.GET)
+    @ApiOperation("GET CTA")
+    public ResponseEntity<Map<String, Object>> getCTA(@PathVariable Long countryId) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                costTimeAgreementService.loadAllCTAByCountry(countryId));
     }
 
     @RequestMapping(value = "/country/{countryId}/cta_rule_template/{templateId}", method = RequestMethod.PUT)
@@ -50,4 +58,5 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 costTimeAgreementService.updateCTARuleTemplate(countryId,templateId, ctaRuleTemplateDTO));
     }
+
 }

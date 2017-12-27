@@ -23,32 +23,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NodeEntity
 public class CTARuleTemplate extends RuleTemplate{
 
-    public CTARuleTemplate cloneCTARuleTemplate(){
-        this.setId(null);
-        for (CompensationTableInterval compensationTableInterval : this.getCompensationTable().getCompensationTableInterval()) {
-            compensationTableInterval.setId(null);
-        }
-        this.getCompensationTable().setId(null);
-        this.getCalculateValueAgainst().getFixedValue().setId(null);
-        this.getCalculateValueAgainst().setId(null);
-
-        for (CTARuleTemplateDayType ctaRuleTemplateDayType : this.getCalculateOnDayTypes()) {
-            ctaRuleTemplateDayType.setId(null);
-            //DayType not clone
-           /* for (CountryHolidayCalender countryHolidayCalender : ctaRuleTemplateDayType.getCountryHolidayCalenders()) {
-                countryHolidayCalender.setId(null);
-            }*/
-        }
-
-        for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : this.getPhaseInfo()) {
-            ctaRuleTemplatePhaseInfo.setId(null);
-        }
-
-        this.getActivityType().setId(null);
-        this.getPlannedTimeWithFactor().setId(null);
-        return this;
-    }
-
     private CTARuleTemplateType ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
@@ -91,6 +65,43 @@ public class CTARuleTemplate extends RuleTemplate{
         this.ruleTemplateType=ruleTemplateType;
         this.payrollType=payrollType;
         this.payrollSystem=payrollSystem;
+
+    }
+
+    public  void cloneCTARuleTemplate(){
+        this.setId(null);
+        if(this.getCompensationTable() != null){
+            for (CompensationTableInterval compensationTableInterval : this.getCompensationTable().getCompensationTableInterval()) {
+                compensationTableInterval.setId(null);
+            }
+            this.getCompensationTable().setId(null);
+        }
+
+        if(this.getCalculateValueAgainst() != null ){
+            this.getCalculateValueAgainst().getFixedValue().setId(null);
+            this.getCalculateValueAgainst().setId(null);
+        }
+
+        /*if(this.getCalculateOnDayTypes() != null){
+            for (CTARuleTemplateDayType ctaRuleTemplateDayType : this.getCalculateOnDayTypes()) {
+                ctaRuleTemplateDayType.setId(null);
+                //DayType not clone
+                for (CountryHolidayCalender countryHolidayCalender : ctaRuleTemplateDayType.getCountryHolidayCalenders()) {
+                    countryHolidayCalender.setId(null);
+                }
+            }
+        }*/
+        if(this.getPhaseInfo() != null){
+            for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : this.getPhaseInfo()) {
+                ctaRuleTemplatePhaseInfo.setId(null);
+            }
+        }
+        if(this.getActivityType() != null){
+            this.getActivityType().setId(null);
+        }
+        if(this.getPlannedTimeWithFactor() != null){
+            this.getPlannedTimeWithFactor().setId(null);
+        }
 
     }
 
