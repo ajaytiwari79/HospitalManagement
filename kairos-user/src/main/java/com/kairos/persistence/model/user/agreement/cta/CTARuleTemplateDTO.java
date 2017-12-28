@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.country.CountryHolidayCalender;
+import com.kairos.persistence.model.user.country.TimeType;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -210,6 +213,39 @@ public class CTARuleTemplateDTO {
     public void setTimeTypes(List<Long> timeTypes) {
         this.timeTypes = timeTypes;
     }
+
+    public CTARuleTemplateDTO cloneNew(){
+        this.setId(null);
+        for (CompensationTableInterval compensationTableInterval : this.getCompensationTable().getCompensationTableInterval()) {
+            compensationTableInterval.setId(null);
+        }
+        this.getCompensationTable().setId(null);
+        this.getCalculateValueAgainst().getFixedValue().setId(null);
+        this.getCalculateValueAgainst().setId(null);
+        for (CTARuleTemplateDayTypeDTO ctaRuleTemplateDayType : this.getCalculateOnDayTypes()) {
+            ctaRuleTemplateDayType.setId(null);
+        }
+
+        for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : this.getPhaseInfo()) {
+            ctaRuleTemplatePhaseInfo.setId(null);
+        }
+
+        this.getActivityType().setId(null);
+        this.getPlannedTimeWithFactor().setId(null);
+
+        return this;
+    }
+
+    public CTARuleTemplateDTO(String name, String description, CTARuleTemplateType ruleTemplateType, String payrollType, String payrollSystem) {
+        this.name=name;
+        this.description=description;
+        this.ruleTemplateCategory=ruleTemplateCategory;
+        this.ruleTemplateType=ruleTemplateType;
+        this.payrollType=payrollType;
+        this.payrollSystem=payrollSystem;
+
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
