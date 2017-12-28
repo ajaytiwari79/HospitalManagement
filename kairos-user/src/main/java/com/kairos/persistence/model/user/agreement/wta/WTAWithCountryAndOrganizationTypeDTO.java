@@ -1,9 +1,9 @@
 package com.kairos.persistence.model.user.agreement.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateWithCategoryDTO;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * Created by vipul on 21/8/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
 public class WTAWithCountryAndOrganizationTypeDTO {
 
@@ -27,9 +27,10 @@ public class WTAWithCountryAndOrganizationTypeDTO {
 
     private Expertise expertise;
 
-    private OrganizationType organizationTypes;//
-    private OrganizationType organizationSubTypes;//
+    private OrganizationType organizationType;//
+    private OrganizationType organizationSubType;//
     private List<RuleTemplateWithCategoryDTO> ruleTemplates;
+    private List<Tag> tags;
 
     public Long getStartDateMillis() {
         return startDateMillis;
@@ -81,12 +82,12 @@ public class WTAWithCountryAndOrganizationTypeDTO {
     }
 
 
-    public OrganizationType getOrganizationTypes() {
-        return organizationTypes;
+    public OrganizationType getOrganizationType() {
+        return organizationType;
     }
 
-    public void setOrganizationTypes(OrganizationType organizationTypes) {
-        this.organizationTypes = organizationTypes;
+    public void setOrganizationType(OrganizationType organizationType) {
+        this.organizationType = organizationType;
     }
 
     public Expertise getExpertise() {
@@ -97,12 +98,12 @@ public class WTAWithCountryAndOrganizationTypeDTO {
         this.expertise = expertise;
     }
 
-    public OrganizationType getOrganizationSubTypes() {
-        return organizationSubTypes;
+    public OrganizationType getOrganizationSubType() {
+        return organizationSubType;
     }
 
-    public void setOrganizationSubTypes(OrganizationType organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
+    public void setOrganizationSubType(OrganizationType organizationSubType) {
+        this.organizationSubType = organizationSubType;
     }
 
 
@@ -115,4 +116,11 @@ public class WTAWithCountryAndOrganizationTypeDTO {
     }
 
 
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 }

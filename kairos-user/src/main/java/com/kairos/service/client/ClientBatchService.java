@@ -14,6 +14,7 @@ import com.kairos.persistence.repository.user.client.ContactAddressGraphReposito
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.util.DateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -379,7 +380,7 @@ public class ClientBatchService {
                 if (connectToOrganization) {
                     if (client != null) {
                         logger.info("Creating relationship : " + client.getId());
-                        relation = new ClientOrganizationRelation(client, currentOrganization, new Date().getTime());
+                        relation = new ClientOrganizationRelation(client, currentOrganization, DateUtil.getCurrentDate().getTime());
                         relationService.createRelation(relation);
 
                         Map<String, Object> clientInfo = new HashMap<>();

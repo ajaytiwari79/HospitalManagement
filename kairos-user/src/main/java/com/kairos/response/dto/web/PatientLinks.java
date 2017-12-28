@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.response.dto.web.client.CitizenOverviewForms;
 
 /**
  * Created by oodles on 19/4/17.

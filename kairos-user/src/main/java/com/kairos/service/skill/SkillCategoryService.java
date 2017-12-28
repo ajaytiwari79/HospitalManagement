@@ -106,4 +106,15 @@ public class SkillCategoryService extends UserBaseService {
         }
         return objectList;
     }
+
+
+    public List<Object> findSkillCategoryByUnitId(Long unitId) {
+        List<Object> objectList = new ArrayList<>();
+        List<Map<String,Object>> mapList = skillCategoryGraphRepository.findSkillCategoryByUnitId(unitId);
+        for(Map<String,Object> map :  mapList){
+            Object o = map.get("result");
+            objectList.add(o);
+        }
+        return objectList;
+    }
 }

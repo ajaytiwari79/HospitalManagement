@@ -22,7 +22,7 @@ public class ApiResponse {
         this.httpStatus = httpStatus;
         this.status = httpStatus.value();
         this.isSuccess = isSuccess;
-        this.timeStamp = new Date().getTime();
+        this.timeStamp = DateUtil.getCurrentDate().getTime();
         this.data = data;
         return new ResponseEntity<ApiResponse>(this, httpStatus);
     }

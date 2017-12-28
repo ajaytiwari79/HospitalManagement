@@ -8,27 +8,33 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATES;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATE_CATEGORY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
+
+/**
+ * Created by vipul on 2/8/17.
+ * used to store Rule Template Category
+ */
+
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class RuleTemplateCategory extends UserBaseEntity {
 
-    @NotNull(message = "error.RuleTemplate.description.notnull")
+     @NotNull(message = "error.RuleTemplate.description.notnull")
     private String name;
-    @NotNull(message = "error.RuleTemplate.description.name.notnull")
+    //@NotEmpty(message = "error.RuleTemplate.description.notEmpty")
+    //@NotNull(message = "error.RuleTemplate.description.name.notnull")
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
     @JsonIgnore
@@ -54,7 +60,8 @@ public class RuleTemplateCategory extends UserBaseEntity {
     public List<RuleTemplate> getRuleTemplates() {
         return ruleTemplates;
     }
-
+    @Relationship(type = HAS_TAG)
+    private List<Tag> tags = new ArrayList<>();
     public void setRuleTemplates(List<RuleTemplate> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
@@ -110,6 +117,13 @@ public class RuleTemplateCategory extends UserBaseEntity {
 
     public void setCountry(Country country) {
         this.country = country;
+    }
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     public Map<String, Object> printRuleTemp() {

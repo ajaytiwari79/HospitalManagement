@@ -21,7 +21,7 @@ public class OrganizationService extends UserBaseEntity {
     @NotEmpty(message = "error.OrganizationService.name.notEmpty") @NotNull(message = "error.OrganizationService.name.notnull")
     private String name;
 
-    @NotEmpty(message = "error.OrganizationService.description.notEmpty") @NotNull(message = "error.OrganizationService.description.notnull")
+   // @NotEmpty(message = "error.OrganizationService.description.notEmpty") @NotNull(message = "error.OrganizationService.description.notnull")
     private String description;
 
 

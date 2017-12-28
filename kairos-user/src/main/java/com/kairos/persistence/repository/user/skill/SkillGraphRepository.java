@@ -9,8 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANISATION_HAS_SKILL;
-import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_SKILLS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -80,6 +79,13 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
     @Query("Match (team:Team)-[r:"+TEAM_HAS_SKILLS+"]->(skill:Skill) where id (team)={0} AND id(skill)={1} with r\n" +
             "set r.visitourId={2} return r is not null")
     boolean updateVisitourIdOfSkillInTeam(long unitId, long skillId, String visitourId);
+
+    @Query("Match (skill:Skill)-[r:"+HAS_TAG+"]-(tag:Tag{countryTag:true}) WHERE id(skill) = {0} DELETE r ")
+    void removeAllCountryTags(long skillId);
+
+    @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag) WHERE id(org)={0} with tag \n"+
+            "Match (skill:Skill)-[skillTagRel:"+HAS_TAG+"]-(tag) WHERE id(skill) = {1} DELETE  skillTagRel ")
+    void removeAllOrganizationTags(long orgId, long skillId);
 
 
 

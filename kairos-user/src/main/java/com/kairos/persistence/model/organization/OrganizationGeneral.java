@@ -19,7 +19,7 @@ public class OrganizationGeneral {
     private String eanNumber;
     private String costCenterCode;
     private String costCenterName;
-    @NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
+    //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
     private String description;
     @NotNull(message = "error.OrganizationType.name.notEmpty")
     private List<Long> organizationTypeId;

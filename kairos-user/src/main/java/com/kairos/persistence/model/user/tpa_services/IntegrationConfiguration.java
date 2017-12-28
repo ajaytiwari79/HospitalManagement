@@ -18,7 +18,7 @@ public class IntegrationConfiguration extends UserBaseEntity {
 
     @NotEmpty(message = "name can not be null") @NotNull(message = "name can not be null")
     private String name;
-    @NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
+    //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
     private String description;
 
     @NotEmpty(message = "unique key can not be null") @NotNull(message = "unique key can not be null")

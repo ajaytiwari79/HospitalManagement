@@ -5,11 +5,10 @@ import com.kairos.persistence.model.organization.StaffRelationship;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientStaffRelation;
 import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
-import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -67,6 +66,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
             "with staffs,skills,collect(id(teams)) as teams \n" +
             "return id(staffs) as id,staffs.firstName+\" \" +staffs.lastName as name,staffs.profilePic as profilePic,teams,skills order by name")
     List<StaffAdditionalInfoQueryResult> getStaffAndCitizenDetailsOfUnit(long unitId);
+
+    @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments,organization\n"+
+            "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments) where id(staff)={1} with staff,organization\n"+
+            "OPTIONAL MATCH (staff)-[:STAFF_HAS_SKILLS{isEnabled:true}]->(skills:Skill{isEnabled:true}) with staff,collect(id(skills)) as skills,organization\n"+
+            "OPTIONAL MATCH (teams:Team)-[:TEAM_HAS_MEMBER{isEnabled:true}]->(staff) with staff,skills,collect(id(teams)) as teams,organization\n"+
+            "return id(staff) as id,staff.firstName+\" \"+staff.lastName as name,staff.profilePic as profilePic,teams,skills,id(organization) as unitId order by name")
+    StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndStaffId(long unitId, long staffId);
 
     @Query("MATCH (staff:Staff) where id(staff)={0} Match (team)-[r:TEAM_HAS_MEMBER]->(staff) SET r.isEnabled=false return r")
     List<StaffRelationship> removeStaffFromAllTeams(long staffId);
@@ -305,7 +311,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
             "where id(organization)={0} with staff\n" +
             "optional match (staff)-[:"+HAS_CONTACT_ADDRESS+"]->(contactAddress:ContactAddress) with staff,contactAddress\n" +
             "optional match (staff)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) with staff,contactDetail,contactAddress\n" +
-            "return staff,id(contactAddress) as contactAddressId,id(contactDetail) as contactDetailId")
+            "return staff,id(contactAddress) as contactAddressId,id(contactDetail) as contactDetailId LIMIT 1")
     StaffQueryResult getStaffByExternalIdInOrganization(Long organizationId, Long externalId);
 
     @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments ,organization\n" +

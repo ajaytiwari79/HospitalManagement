@@ -7,7 +7,6 @@ import com.kairos.persistence.model.user.country.Country;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -148,6 +147,16 @@ public class OrganizationType extends UserBaseEntity {
         return map;
     }
 
+    public OrganizationType(Long id,@NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull") String name, String description) {
+        this.name = name;
+        this.id=id;
+        this.description = description;
+    }
+
+    public OrganizationType basicDetails(){
+        OrganizationType organizationType = new OrganizationType(this.id, this.name, this.description);
+        return organizationType;
+    }
     @Override
     public String toString() {
         return "OrganizationType{" +
