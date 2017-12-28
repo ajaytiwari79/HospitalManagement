@@ -599,7 +599,6 @@ public class WTAService extends UserBaseService {
                 numberOfWeekendShiftInPeriodWTATemplate.setToDayOfWeek(wtaBaseRuleTemplate.getToDayOfWeek());
                 numberOfWeekendShiftInPeriodWTATemplate.setProportional(wtaBaseRuleTemplate.getProportional());
                 numberOfWeekendShiftInPeriodWTATemplate.setDisabled(wtaBaseRuleTemplate.getDisabled());
-
                 wtaBaseRuleTemplateCopy = save(numberOfWeekendShiftInPeriodWTATemplate);
                 break;
             case TEMPLATE14:
