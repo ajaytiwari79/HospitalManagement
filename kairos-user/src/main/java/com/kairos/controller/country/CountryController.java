@@ -1,13 +1,12 @@
 package com.kairos.controller.country;
 
-import com.kairos.persistence.model.timetype.PresenceTypeDTO;
-import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrgTypeExpertiseDTO;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.ParentOrganizationDTO;
+import com.kairos.persistence.model.timetype.PresenceTypeDTO;
+import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.*;
-import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillDTO;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
@@ -17,6 +16,8 @@ import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
+import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
+import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.country.*;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.language.LanguageLevelService;
@@ -24,6 +25,7 @@ import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
+import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.skill.SkillCategoryService;
 import com.kairos.service.skill.SkillService;
@@ -112,6 +114,8 @@ public class CountryController {
     private TimeTypeService timeTypeService;
     @Inject
     private PresenceTypeService presenceTypeService;
+    @Inject
+    private TimeSlotService timeSlotService;
 
     // Country
     @RequestMapping(value = "/country", method = RequestMethod.POST)
@@ -146,6 +150,19 @@ public class CountryController {
         if (countryList.size() != 0)
             return ResponseHandler.generateResponse(HttpStatus.OK, true, countryList);
 
+        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+    }
+
+    @RequestMapping(value = COUNTRY_URL, method = RequestMethod.GET)
+    @ApiOperation("Get country  by id")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountry(@PathVariable Long countryId) {
+        if (countryId != null) {
+            if (countryService.getCountryById(countryId) != null) {
+                return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+            }
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+        }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
     }
 
@@ -185,7 +202,7 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateOrganizationType(@PathVariable Long organizationTypeId,
                                                                       @Validated @RequestBody UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateOrganizationType(organizationTypeId,updateOrganizationTypeDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateOrganizationType(organizationTypeId, updateOrganizationTypeDTO));
     }
 
     @ApiOperation(value = "Delete Organization Types")
@@ -274,10 +291,10 @@ public class CountryController {
     @ApiOperation(value = "Add a new skill")
     @RequestMapping(value = "/skill_category/{skillCategoryId}/skill", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addSkill(@PathVariable long skillCategoryId, @RequestBody Skill skill) {
+    public ResponseEntity<Map<String, Object>> addSkill(@PathVariable long skillCategoryId, @RequestBody SkillDTO skillDTO) {
 
-        Map<String, Object> response = skillService.createSkill(skill, skillCategoryId);
-        if (skill == null) {
+        Map<String, Object> response = skillService.createSkill(skillDTO, skillCategoryId);
+        if (skillDTO == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
@@ -286,8 +303,8 @@ public class CountryController {
     @ApiOperation(value = "Update a skill by id ")
     @RequestMapping(value = COUNTRY_URL + "/skill", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateSkillById(@PathVariable long countryId, @RequestBody Skill skill) {
-        Map<String, Object> updatedSkill = skillService.updateSkill(countryId, skill);
+    public ResponseEntity<Map<String, Object>> updateSkillById(@PathVariable long countryId, @RequestBody SkillDTO skillDTO) {
+        Map<String, Object> updatedSkill = skillService.updateSkill(countryId, skillDTO);
         if (updatedSkill == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
         }
@@ -309,7 +326,7 @@ public class CountryController {
     @ApiOperation(value = "Create Expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId, @Validated @RequestBody Expertise expertise) {
+    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId, @Validated @RequestBody CountryExpertiseDTO expertise) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, expertiseService.saveExpertise(countryId, expertise));
     }
 
@@ -323,7 +340,7 @@ public class CountryController {
     @ApiOperation(value = "Update expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateExpertise(@RequestBody @Validated Expertise expertise) {
+    public ResponseEntity<Map<String, Object>> updateExpertise(@RequestBody @Validated CountryExpertiseDTO expertise) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(expertise));
     }
 
@@ -1029,7 +1046,7 @@ public class CountryController {
     @ApiOperation("Get resources of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getVehicleList(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getVehicleList(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getAllVehicleListWithFeatures(countryId));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/vehicle/{vehicleId}", method = RequestMethod.PUT)
@@ -1108,13 +1125,23 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/presenceTypeWithTimeType", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByCountry(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByCountry(countryId)) ;
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, presenceTypeService.getAllPresenceTypeAndTimeTypesByCountry(countryId));
     }
 
+    @ApiOperation(value = "Get day types by id")
+    @RequestMapping(value = "/day_types", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> getDayTypesById(@RequestBody List<Long> dayTypeIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
+    }
     @RequestMapping(value = COUNTRY_URL + "/cta/default-data", method = RequestMethod.GET)
     @ApiOperation("get default data for cta rule template")
     public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(countryId));
+    }
+    @ApiOperation(value = "Get day types by id")
+    @RequestMapping(value = COUNTRY_URL + "/time_slots", method = RequestMethod.GET)
+     public ResponseEntity<Map<String, Object>> getTimeSlotOfCountry(@PathVariable Long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry(countryId));
     }
 
 

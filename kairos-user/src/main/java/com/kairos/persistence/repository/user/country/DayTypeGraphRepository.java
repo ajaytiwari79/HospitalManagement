@@ -21,4 +21,6 @@ public interface DayTypeGraphRepository extends Neo4jBaseRepository<DayType,Long
     @Query("MATCH (n:DayType) WITH n.validDays AS coll,n UNWIND coll AS x with distinct x,n WHERE x  in {days} and n.holidayType=false return n")
     List<DayType>findByValidDaysContains(@Param("days") List<String> days);
 
+    @Query("Match (n:DayType) where id(n) in {0} return n")
+    List<DayType> getDayTypes(List<Long> dayTypeIds);
 }

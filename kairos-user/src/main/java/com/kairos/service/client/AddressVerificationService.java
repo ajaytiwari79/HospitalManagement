@@ -85,7 +85,7 @@ public class AddressVerificationService {
 
 
     public Map<String, Object> verifyAddressClientException(AddressDTO contactAddress, long unitId) {
-        logger.debug("Finding zipcode with value:" + contactAddress.getZipCodeValue());
+        logger.info("Finding zipcode with value:" + contactAddress.getZipCodeValue());
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         ZipCode zipCode = zipCodeGraphRepository.findByZipCode(contactAddress.getZipCodeValue());
         String municipalityName;
@@ -102,7 +102,7 @@ public class AddressVerificationService {
         if (zipCode == null) {
             throw new ZipCodeNotFound("Provided ZipCode not exist in database");
         }
-        logger.debug("Verifying with Information \n house: " +
+        logger.info("Verifying with Information \n house: " +
                 contactAddress.getHouseNumber() + "\n City:" +
                 contactAddress.getMunicipalityName() +
                 "\n ZipCode: " + zipCode.getName() +

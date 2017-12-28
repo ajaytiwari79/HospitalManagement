@@ -1,5 +1,6 @@
 package com.kairos;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -46,7 +47,16 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableEurekaClient
 @EnableCircuitBreaker
 public class UserServiceApplication extends WebMvcConfigurerAdapter{
+
 	public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");
+
+
+	static{
+		java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+		System.setProperty("user.timezone", "UTC");
+	}
+
+
 	public static void main(String[] args) {
 		SpringApplication.run(UserServiceApplication.class, args);
 	}
@@ -79,6 +89,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 		javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer());
 		javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer());
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		objectMapper.registerModule(javaTimeModule);
 		return objectMapper;
 	}

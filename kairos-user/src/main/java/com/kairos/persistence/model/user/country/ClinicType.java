@@ -22,7 +22,7 @@ public class ClinicType extends UserBaseEntity {
     private String name;
 
 
-    @NotEmpty(message = "error.ClinicType.description.notEmpty") @NotNull(message = "error.ClinicType.description.notnull")
+    //@NotEmpty(message = "error.ClinicType.description.notEmpty") @NotNull(message = "error.ClinicType.description.notnull")
     private String description;
 
 

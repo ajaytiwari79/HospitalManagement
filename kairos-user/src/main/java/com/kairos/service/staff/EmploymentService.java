@@ -27,6 +27,7 @@ import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -155,7 +156,7 @@ public class EmploymentService extends UserBaseService {
                 AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
                 unitEmployment = new UnitEmployment();
                 unitEmployment.setOrganization(unit);
-                unitEmployment.setStartDate(new Date().getTime());
+                unitEmployment.setStartDate(DateUtil.getCurrentDate().getTime());
                 employment.getUnitEmployments().add(unitEmployment);
                 employmentGraphRepository.save(employment);
                 AccessPermission accessPermission = new AccessPermission(accessGroup);

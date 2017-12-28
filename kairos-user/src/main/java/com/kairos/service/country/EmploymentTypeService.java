@@ -14,7 +14,9 @@ import com.kairos.persistence.repository.user.country.EmploymentTypeGraphReposit
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.position.PositionGraphRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.region.RegionService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -50,6 +52,8 @@ public class EmploymentTypeService extends UserBaseService {
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    @Inject
+    private OrganizationService organizationService;
 
     public EmploymentType addEmploymentType(Long countryId, EmploymentTypeDTO employmentTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -107,7 +111,8 @@ public class EmploymentTypeService extends UserBaseService {
             logger.error("Incorrect unit id " + unitId);
             throw new DataNotFoundByIdException("Incorrect unit id ");
         }
-        return organizationGraphRepository.getEmploymentTypeByOrganization(unitId, isDeleted);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        return organizationGraphRepository.getEmploymentTypeByOrganization(parent.getId(), isDeleted);
     }
 
     public OrganizationEmploymentTypeDTO setEmploymentTypeSettingsOfOrganization(Long unitId, Long employmentTypeId, OrganizationEmploymentTypeDTO organizationEmploymentTypeDTO) {
@@ -125,7 +130,7 @@ public class EmploymentTypeService extends UserBaseService {
         Boolean settingUpdated = employmentTypeGraphRepository.setEmploymentTypeSettingsForOrganization(unitId, employmentTypeId,
                 organizationEmploymentTypeDTO.isAllowedForContactPerson(),
                 organizationEmploymentTypeDTO.isAllowedForShiftPlan(),
-                organizationEmploymentTypeDTO.isAllowedForFlexPool(), new Date().getTime(), new Date().getTime());
+                organizationEmploymentTypeDTO.isAllowedForFlexPool(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         if (settingUpdated) {
             return organizationEmploymentTypeDTO;
         } else {
@@ -140,7 +145,8 @@ public class EmploymentTypeService extends UserBaseService {
             logger.error("Incorrect unit id " + unitId);
             throw new DataNotFoundByIdException("Incorrect unit id ");
         }
-        return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(unitId, false);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(parent.getId(), false);
     }
 
     public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId) {

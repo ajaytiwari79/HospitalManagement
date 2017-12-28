@@ -390,9 +390,9 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client,Long>{
     /*@Query("MATCH (c:Client)-[r:HAS_HOME_ADDRESS]->(ca:ContactAddress) WHERE id(c) in {1} AND NOT id(ca) = {0} WITH r,ca \n" +
             "MATCH (ca)-[z:ZIP_CODE]->(ZipCode) WITH r,ca,z \n" +
             "MATCH (ca)-[m:MUNICIPALITY]->(Municipality) DELETE m,z,r,ca RETURN true")*/
-    boolean detachAddressOfHouseholdMembersWithDifferentAddress(long contactAddressId, List<Long> listOfIdsOfHouseholdMembers) ;
+    Boolean detachAddressOfHouseholdMembersWithDifferentAddress(long contactAddressId, List<Long> listOfIdsOfHouseholdMembers) ;
 
     @Query("MATCH (c:Client),(ca:ContactAddress) WHERE id(c) IN {1} AND id(ca) = {0} CREATE UNIQUE (c)-[r:"+HAS_HOME_ADDRESS+"]->(ca) RETURN true LIMIT 1")
-    boolean updateAddressOfAllHouseHoldMembers(long contactAddressId, List<Long> listOfIdsOfHouseholdMembers);
+    Boolean updateAddressOfAllHouseHoldMembers(long contactAddressId, List<Long> listOfIdsOfHouseholdMembers);
 
 }

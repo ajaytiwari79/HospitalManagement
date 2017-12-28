@@ -17,6 +17,7 @@ import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryR
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.resources.Vehicle;
+import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -401,6 +402,14 @@ public class CountryService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect country id");
         }
         return countryGraphRepository.getResourcesByCountry(countryId);
+    }
+
+    public List<VehicleQueryResult> getAllVehicleListWithFeatures(Long countryId) {
+        if (!Optional.ofNullable(countryId).isPresent()) {
+            logger.error("Finding country by id::" + countryId);
+            throw new DataNotFoundByIdException("Incorrect country id");
+        }
+        return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }
 
     public boolean deleteVehicle(Long countryId, Long resourcesId) {

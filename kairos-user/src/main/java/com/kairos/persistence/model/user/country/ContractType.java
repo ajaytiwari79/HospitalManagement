@@ -26,7 +26,7 @@ public class ContractType extends UserBaseEntity {
 
     private int code;
 
-    @NotEmpty(message = "error.ContractType.description.notEmpty") @NotNull(message = "error.ContractType.description.notnull")
+    //@NotEmpty(message = "error.ContractType.description.notEmpty") @NotNull(message = "error.ContractType.description.notnull")
     private String description;
 
     @Relationship(type = BELONGS_TO)

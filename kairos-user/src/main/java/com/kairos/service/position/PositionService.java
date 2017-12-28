@@ -509,7 +509,7 @@ public class PositionService extends UserBaseService {
                 WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
                 WorkingTimeAgreement oldWta = oldPosition.getWorkingTimeAgreement();
                 oldPosition.setWorkingTimeAgreement(wta);
-                wta.setWta(oldWta);
+                wta.setParentWTA(oldWta);
                 save(wta);
                 workingTimeAgreementGraphRepository.breakRelationFromOldWTA(oldPosition.getId(), oldWta.getId());
             }

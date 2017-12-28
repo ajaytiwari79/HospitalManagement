@@ -84,10 +84,10 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "optional Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_EXPERTISE]->(expertise) where id(orgType)={1} return collect({id:id(expertise),name:expertise.name,isSelected:case when r.isEnabled then true else false end}) as expertise")
     OrgTypeExpertiseQueryResult getExpertiseOfOrganizationType(long countryId, long orgTypeId);
 
-    @Query("match(o:OrganizationType) where  id(o) in {0} \n" +
-            "match(workingTimeAgreement:WorkingTimeAgreement{deleted:false})-[:BELONGS_TO]->(o)\n" +
+    @Query("match(ost:OrganizationType) where  id(ost) in {0} \n" +
+            "match(workingTimeAgreement:WorkingTimeAgreement{deleted:false})-[:"+BELONGS_TO_ORG_SUB_TYPE+"]->(ost)\n" +
             "return workingTimeAgreement")
-    List<WorkingTimeAgreement> getAllWTAByOrganiationType(List<Long> organizationTypeIds);
+    List<WorkingTimeAgreement> getAllWTAByOrganiationSubType(List<Long> organizationSubTypeIds);
 
     @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
     List<Organization> getOrganizationsByOrganizationType(long orgTypeId);

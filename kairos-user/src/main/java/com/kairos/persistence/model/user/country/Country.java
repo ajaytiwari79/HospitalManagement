@@ -7,6 +7,9 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.user.country.equipment.Equipment;
+import com.kairos.persistence.model.user.country.feature.Feature;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -59,6 +62,15 @@ public class Country extends UserBaseEntity {
     @Relationship(type = HAS_RULE_TEMPLATE)
     private List<RuleTemplate> WTABaseRuleTemplate;
 
+
+    @Relationship(type = COUNTRY_HAS_TAG)
+    private List<Tag> tags;
+
+    @Relationship(type = COUNTRY_HAS_FEATURE )
+    private List<Feature> features;
+
+    @Relationship(type = COUNTRY_HAS_EQUIPMENT )
+    private List<Equipment> equipments;
     @JsonIgnore
     @Relationship(type = HAS_ORGANIZATION_SERVICES)
     private List<OrganizationService> organizationServices;
@@ -115,11 +127,11 @@ public class Country extends UserBaseEntity {
         this.countryHolidayCalenderList = countryHolidayCalenderList;
     }
 
-//    public List<OrganizationType> getOrganizationTypes() {
+//    public List<OrganizationType> getOrganizationType() {
 //        return organizationTypeList;
 //    }
 //
-//    public void setOrganizationTypes(List<OrganizationType> organizationTypeList) {
+//    public void setOrganizationType(List<OrganizationType> organizationTypeList) {
 //        this.organizationTypeList = organizationTypeList;
 //    }
 
@@ -179,15 +191,7 @@ public class Country extends UserBaseEntity {
     }
 
 
-    public List<RelationType> getRelationTypes() {
-        return relationTypes;
-    }
-
-    public void setRelationTypes(List<RelationType> relationTypes) {
-        this.relationTypes = relationTypes;
-    }
-
-    public void setRuleTemplateCategories(List<RuleTemplateCategory> ruleTemplateCategories) {
+       public void setRuleTemplateCategories(List<RuleTemplateCategory> ruleTemplateCategories) {
         this.ruleTemplateCategories = ruleTemplateCategories;
     }
 
@@ -236,4 +240,35 @@ public class Country extends UserBaseEntity {
     }
 
 
+    public List<RelationType> getRelationTypes() {
+        return relationTypes;
+    }
+
+    public void setRelationTypes(List<RelationType> relationTypes) {
+        this.relationTypes = relationTypes;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public List<Feature> getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(List<Feature> features) {
+        this.features = features;
+    }
+
+    public List<Equipment> getEquipments() {
+        return equipments;
+    }
+
+    public void setEquipments(List<Equipment> equipments) {
+        this.equipments = equipments;
+    }
 }

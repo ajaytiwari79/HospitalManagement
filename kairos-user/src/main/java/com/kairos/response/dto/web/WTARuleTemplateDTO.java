@@ -1,5 +1,8 @@
 package com.kairos.response.dto.web;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -8,6 +11,8 @@ import java.util.List;
 /**
  * Created by pawanmandhan on 8/8/17.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WTARuleTemplateDTO {
 
     private Long id;
@@ -48,6 +53,7 @@ public class WTARuleTemplateDTO {
     private long shiftsLimit;//19
     private boolean onlyCompositeShifts;//19
     private String activityCode;//20
+    private RuleTemplateCategory ruleTemplateCategory;
 
     public String getName() {
         return name;
@@ -331,5 +337,13 @@ public class WTARuleTemplateDTO {
 
     public boolean isProportional() {
         return proportional;
+    }
+
+    public RuleTemplateCategory getRuleTemplateCategory() {
+        return ruleTemplateCategory;
+    }
+
+    public void setRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
+        this.ruleTemplateCategory = ruleTemplateCategory;
     }
 }

@@ -128,6 +128,7 @@ public class AppConstants {
     public static final int EVENING_END_HOUR = 23;
     public static final int NIGHT_START_HOUR = 23;
     public static final int NIGHT_END_HOUR = 7;
+    public static final String CPR_NUMBER="cprNumber";
 
     //KMD Nexus
     public static final String KMD_NEXUS_CLIENT_ID = "third_party_vendor";
@@ -254,6 +255,7 @@ public class AppConstants {
     public static final String REQUEST_TO_CREATE_NEW_UTILITY = "Request to create new utility";
     public static final String UNIT = "unit";
     public static final String SUCCESS = "success";
+    public static final String TIME_SLOT_SET_NAME = "Time slot 1";
 
 
 

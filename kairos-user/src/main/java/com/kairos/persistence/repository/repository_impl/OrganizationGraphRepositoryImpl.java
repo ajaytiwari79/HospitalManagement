@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
-import com.kairos.response.dto.web.ClientFilterDTO;
+import com.kairos.response.dto.web.client.ClientFilterDTO;
 import org.apache.commons.lang.StringUtils;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
@@ -11,7 +11,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.persistence.model.constants.RelationshipConstants.PEOPLE_IN_HOUSEHOLD_LIST;
 import static com.kairos.persistence.model.enums.CitizenHealthStatus.ALIVE;
 import static com.kairos.persistence.model.enums.CitizenHealthStatus.DECEASED;
@@ -40,7 +39,9 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         queryParameters.put("citizenIds", citizenIds);
 
         queryParameters.put("imagePath", imagePath);
-        if("module_2".equalsIgnoreCase(moduleId)){
+
+
+        if(Arrays.asList("module_2","tab_1").contains(moduleId)){
             queryParameters.put("healthStatus",Arrays.asList(ALIVE,DECEASED,TERMINATED));
         } else {
             queryParameters.put("healthStatus",Arrays.asList(ALIVE,DECEASED));
