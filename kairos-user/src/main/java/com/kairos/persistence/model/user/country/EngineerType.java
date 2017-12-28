@@ -26,7 +26,7 @@ public class EngineerType extends UserBaseEntity {
     private String name;
 
 
-    @NotEmpty(message = "error.EngineerType.description.notEmpty") @NotNull(message = "error.EngineerType.description.notnull")
+    //@NotEmpty(message = "error.EngineerType.description.notEmpty") @NotNull(message = "error.EngineerType.description.notnull")
     private String description;
 
     private String visitourCode;

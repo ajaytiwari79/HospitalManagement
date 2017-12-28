@@ -1,5 +1,7 @@
 package com.kairos.response.dto.web;
 
+import com.kairos.response.dto.web.tag.TagDTO;
+
 import java.util.List;
 
 /**
@@ -17,6 +19,8 @@ public class WtaDTO {
     private long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
+    private List<Long> tags;
+
     public String getName() {
         return name;
     }
@@ -88,6 +92,14 @@ public class WtaDTO {
 
     public void setOrganizationSubType(Long organizationSubType) {
         this.organizationSubType = organizationSubType;
+    }
+
+    public List<Long> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Long> tags) {
+        this.tags = tags;
     }
 
     public WtaDTO() {

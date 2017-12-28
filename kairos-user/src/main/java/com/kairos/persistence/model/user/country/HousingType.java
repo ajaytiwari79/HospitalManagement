@@ -26,7 +26,7 @@ public class HousingType extends UserBaseEntity {
     @NotEmpty(message = "error.HousingType.name.notEmpty") @NotNull(message = "error.HousingType.name.notnull")
     private String name;
 
-    @NotEmpty(message = "error.HousingType.description.notEmpty") @NotNull(message = "error.HousingType.description.notnull")
+    //@NotEmpty(message = "error.HousingType.description.notEmpty") @NotNull(message = "error.HousingType.description.notnull")
     private String description;
 
 

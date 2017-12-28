@@ -22,7 +22,7 @@ public class Language extends UserBaseEntity {
     private String name;
 
 
-    @NotEmpty(message = "error.Language.description.notEmpty") @NotNull(message = "error.Language.description.notnull")
+    //@NotEmpty(message = "error.Language.description.notEmpty") @NotNull(message = "error.Language.description.notnull")
     private String description;
 
     @Relationship(type =  BELONGS_TO)

@@ -3,6 +3,7 @@ package com.kairos.service.agreement.wta;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
@@ -24,10 +25,12 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.WtaDTO;
+import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
-import com.kairos.service.agreement.RuleTemplateCategoryService;
 import com.kairos.service.agreement.RuleTemplateService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.expertise.ExpertiseService;
+import com.kairos.util.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +69,8 @@ public class WTAService extends UserBaseService {
     private RuleTemplateService ruleTemplateService;
     @Inject
     private RuleTemplateCategoryService ruleTemplateCategoryService;
+    @Inject
+    private TagService tagService;
 
     public HashMap createWta(long countryId, WtaDTO wtaDTO) {
         Country country = countryRepository.findOne(countryId);
@@ -79,7 +84,10 @@ public class WTAService extends UserBaseService {
             throw new DuplicateDataException("Duplicate WTA name" + wtaDTO.getName());
         }
         List<WTAWithCategoryDTO> wtaRuleTemplateQueryResponseArrayList = new ArrayList<WTAWithCategoryDTO>();
+
         wta = prepareWta(countryId, wtaDTO, wtaRuleTemplateQueryResponseArrayList);
+        // Link tags to WTA
+        wta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
 
         wta.setCountry(country);
         save(wta);
@@ -129,8 +137,8 @@ public class WTAService extends UserBaseService {
         copyRuleTemplates(wtaDTO, wtaBaseRuleTemplates, wtaRuleTemplateQueryResponseArrayList);
 
         wta.setRuleTemplates(wtaBaseRuleTemplates);
-
-        Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? new Date().getTime() : wtaDTO.getStartDateMillis();
+        Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? DateUtil.getCurrentDate().getTime() : wtaDTO.getStartDateMillis();
+        wta.setStartDateMillis(dateInMillies);
 
 
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
@@ -233,7 +241,9 @@ public class WTAService extends UserBaseService {
 
         oldWta.setRuleTemplates(wtaBaseRuleTemplates);
 
-
+        if (wtaDTO.getStartDateMillis() == 0) {
+            oldWta.setStartDateMillis(DateUtil.getCurrentDate().getTime());
+        } else oldWta.setStartDateMillis(wtaDTO.getStartDateMillis());
 
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
             if (wtaDTO.getStartDateMillis() > wtaDTO.getEndDateMillis()) {
@@ -241,6 +251,7 @@ public class WTAService extends UserBaseService {
             }
             oldWta.setEndDateMillis(wtaDTO.getEndDateMillis());
         }
+        oldWta.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA));
         save(oldWta);
     }
 

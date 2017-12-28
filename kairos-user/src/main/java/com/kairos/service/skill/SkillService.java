@@ -4,9 +4,11 @@ import com.kairos.client.SkillServiceTemplateClient;
 import com.kairos.client.TaskDemandRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -15,13 +17,16 @@ import com.kairos.persistence.repository.organization.OrganizationMetadataReposi
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.mail.MailService;
@@ -29,6 +34,7 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
@@ -91,18 +96,26 @@ public class SkillService extends UserBaseService {
     private TimeSlotService timeSlotService;
     @Inject
     private TaskDemandRestClient taskDemandRestClient;
+    @Inject
+    private TagService tagService;
+    @Inject
+    private TagGraphRepository tagGraphRepository;
 
 
-    public Map<String, Object> createSkill(Skill skill, long skillCategoryId) {
+    public Map<String, Object> createSkill(SkillDTO skillDTO, long skillCategoryId) {
         SkillCategory skillCategory = skillCategoryGraphRepository.findOne(skillCategoryId);
         if (skillCategory == null) {
             return null;
         }
-        String name = "(?i)" + skill.getName();
+        String name = "(?i)" + skillDTO.getName();
         logger.info("Added regex to Name: " + name);
         if (skillGraphRepository.checkDuplicateSkill(skillCategoryId, name).isEmpty()) {
             logger.info("Creating unique skill");
+            Skill skill = new Skill(skillDTO);
             skill.setSkillCategory(skillCategory);
+            List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(skillDTO.getTags(), MasterDataTypeEnum.SKILL);
+            logger.info("tags for skill : "+tags);
+            skill.setTags(tags);
             skillGraphRepository.save(skill);
             Map<String, Object> response = skill.retrieveDetails();
             return response;
@@ -128,7 +141,7 @@ public class SkillService extends UserBaseService {
     }
 
 
-    public Map<String, Object> updateSkill(long countryId, Skill data) {
+    public Map<String, Object> updateSkill(long countryId, SkillDTO data) {
         if (data != null) {
             Skill skill = skillGraphRepository.findOne(data.getId());
 
@@ -136,6 +149,10 @@ public class SkillService extends UserBaseService {
                 skill.setName(data.getName());
                 skill.setDescription(data.getDescription());
                 skill.setShortName(data.getShortName());
+                skillGraphRepository.removeAllCountryTags(data.getId());
+                List<Tag> listOfTags = tagGraphRepository.getTagsOfSkillByDeleted(data.getId(),false);
+                listOfTags.addAll(tagService.getCountryTagsByIdsAndMasterDataType(data.getTags(), MasterDataTypeEnum.SKILL));
+                skill.setTags(listOfTags);
                 return skillGraphRepository.save(skill).retrieveDetails();
             }
 
@@ -284,17 +301,17 @@ public class SkillService extends UserBaseService {
 
             if (isSelected) {
                 if (organizationGraphRepository.isSkillAlreadyExist(id, skillId) == 0) {
-                    organizationGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), new Date().getTime(), new Date().getTime());
+                    organizationGraphRepository.addSkillInOrganization(id, Arrays.asList(skillId), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
                 } else {
-                    organizationGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), new Date().getTime(), new Date().getTime());
+                    organizationGraphRepository.updateSkillInOrganization(id, Arrays.asList(skillId), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
                 }
             } else {
-                organizationGraphRepository.removeSkillFromOrganization(id, skillId, new Date().getTime());
+                organizationGraphRepository.removeSkillFromOrganization(id, skillId, DateUtil.getCurrentDate().getTime());
             }
             return getAllAvailableSkills(id, type);
 
         } else if (TEAM.equalsIgnoreCase(type)) {
-            long createdDate = new Date().getTime();
+            long createdDate = DateUtil.getCurrentDate().getTime();
             if (isSelected) {
                 teamGraphRepository.addSkillInTeam(id,skillId, visitourId,createdDate, createdDate,true);
             } else {
@@ -337,11 +354,17 @@ public class SkillService extends UserBaseService {
     public boolean updateSkillOfOrganization(long unitId, long skillId, String type, OrganizationSkillDTO organizationSkillDTO) {
         
         if(ORGANIZATION.equalsIgnoreCase(type)){
+            Boolean skillUpdated = false;
             if(organizationSkillDTO.getCustomName() == null || organizationSkillDTO.getCustomName() == ""){
-                return skillGraphRepository.updateSkillOfOrganization(unitId, skillId, organizationSkillDTO.getVisitourId());
+                skillUpdated =  skillGraphRepository.updateSkillOfOrganization(unitId, skillId, organizationSkillDTO.getVisitourId());
             } else {
-                return skillGraphRepository.updateSkillOfOrganizationWithCustomName(unitId, skillId, organizationSkillDTO.getVisitourId(), organizationSkillDTO.getCustomName());
+//                updateOrganizationTagsOfSkill
+                skillUpdated =  skillGraphRepository.updateSkillOfOrganizationWithCustomName(unitId, skillId, organizationSkillDTO.getVisitourId(), organizationSkillDTO.getCustomName());
             }
+            if(skillUpdated){
+                tagService.updateOrganizationTagsOfSkill(skillId, unitId, organizationSkillDTO.getTags());
+            }
+            return skillUpdated;
          } else if(TEAM.equalsIgnoreCase(type)) {
             return skillGraphRepository.updateVisitourIdOfSkillInTeam(unitId,skillId,organizationSkillDTO.getVisitourId());
         } else {
@@ -410,10 +433,10 @@ public class SkillService extends UserBaseService {
         }
         List<Map<String,Object>> response;
         if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds,new Date().getTime(),new Date().getTime(), Skill.SkillLevel.ADVANCE,true);
+            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE,true);
             response = prepareSelectedSkillResponse(staffId,removedSkillIds, unitId);
         } else {
-            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds,new Date().getTime());
+            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds,DateUtil.getCurrentDate().getTime());
             response = Collections.emptyList();
         }
         if (staffGraphRepository.checkIfStaffIsTaskGiver(staffId,unitId)!=0){
@@ -460,7 +483,7 @@ public class SkillService extends UserBaseService {
             throw new InternalError("staff can not be null");
         }
 
-        long lastModificationDate = new Date().getTime();
+        long lastModificationDate = DateUtil.getCurrentDate().getTime();
         if (isSelected) {
             staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, Skill.SkillLevel.ADVANCE,true);
         } else {

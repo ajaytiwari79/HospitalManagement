@@ -12,6 +12,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
@@ -25,6 +26,7 @@ import com.kairos.persistence.model.user.staff.StaffAdditionalInfoQueryResult;
 import com.kairos.persistence.model.user.staff.StaffClientData;
 import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.repository_impl.OrganizationGraphRepositoryImpl;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
@@ -37,6 +39,10 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.*;
+import com.kairos.response.dto.web.client.ClientExceptionTypesDTO;
+import com.kairos.response.dto.web.client.ClientFilterDTO;
+import com.kairos.response.dto.web.client.ClientPersonalCalenderPrerequisiteDTO;
+import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.integration.IntegrationService;
@@ -138,6 +144,9 @@ public class ClientService extends UserBaseService {
     OrganizationGraphRepositoryImpl organizationGraphRepositoryImpl;
     @Inject
     ClientAddressService clientAddressService;
+    @Inject
+    private ClientExceptionRestClient clientExceptionRestClient;
+
     public Client createCitizen(Client client) {
 
         Client createClient = null;
@@ -190,7 +199,7 @@ public class ClientService extends UserBaseService {
                     throw new DuplicateDataException("Can't create citizen with same CPR in same Organization");
                 }
                 logger.debug("Creating Existing Client relationship : " + client.getId());
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, new Date().getTime());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtil.getCurrentDate().getTime());
                 relationService.createRelation(relation);
                 return client;
             } else {
@@ -646,6 +655,10 @@ public class ClientService extends UserBaseService {
         Client houseHold = saveDetailsOfHouseHold(minimumDTO);
 
         Long addressIdOfHouseHold = null;
+        Boolean addHouseHoldInCitizenList = false;
+        if(houseHold.getId() == null ){
+            addHouseHoldInCitizenList = true;
+        }
         if(houseHold.getId() != null && houseHold.getHomeAddress() !=null){
             addressIdOfHouseHold = houseHold.getHomeAddress().getId();
         }
@@ -653,12 +666,13 @@ public class ClientService extends UserBaseService {
         saveAddressOfHouseHold(client, houseHold);
         save(houseHold);
 
-        if ( !Optional.ofNullable(houseHold.getId()).isPresent()) {
+        if ( addHouseHoldInCitizenList ) {
             addHouseHoldInOrganization(houseHold, unitId);
         }
 
         // Check and Update Address of all household members
-        if( addressIdOfHouseHold !=null && minimumDTO.getUpdateAddressOfAllHouseholdMembers() && minimumDTO.getUpdateAddressOfAllHouseholdMembers() == true){
+        if( addressIdOfHouseHold !=null && minimumDTO.getUpdateAddressOfAllHouseholdMembers()){
+//            //  && minimumDTO.getUpdateAddressOfAllHouseholdMembers() == true
             clientAddressService.updateAddressOfAllHouseHoldMembers(client.getHomeAddress().getId(), addressIdOfHouseHold);
         }
 
@@ -697,7 +711,7 @@ public class ClientService extends UserBaseService {
     }
 
     private void createHouseHoldRelationship(long clientId, long houseHoldId) {
-        clientGraphRepository.createHouseHoldRelationship(clientId, houseHoldId, new Date().getTime(), new Date().getTime());
+        clientGraphRepository.createHouseHoldRelationship(clientId, houseHoldId, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
     }
 
     private void saveAddressOfHouseHold(Client client, Client houseHold) {
@@ -865,7 +879,7 @@ public class ClientService extends UserBaseService {
      * to assign staff to client,there can be multiple staff assign to multiple citizen
      */
     public boolean assignStaffToCitizen(long citizenId, long staffId, ClientStaffRelation.StaffType staffType) {
-        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, new Date().getTime(), new Date().getTime());
+        clientGraphRepository.assignStaffToClient(citizenId, staffId, staffType, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         return true;
     }
 
@@ -877,7 +891,7 @@ public class ClientService extends UserBaseService {
         for (Map<String, Object> map : staffQueryData) {
             staffIds.add((long) ((Map<String, Object>) map.get("data")).get("id"));
         }
-        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, new Date().getTime(), new Date().getTime());
+        clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         long endTime = System.currentTimeMillis();
         logger.info("time taken, client>>assignStaffToCitizen " + (endTime - startTime) + "  ms");
         return true;
@@ -1157,14 +1171,18 @@ public class ClientService extends UserBaseService {
             clientTemporaryAddress.setLatitude(addressDTO.getLatitude());
             zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
         } else {
-            Map<String, Object> tomtomResponse = addressVerificationService.verifyAddressClientException(addressDTO, unitId);
+
+            //TODO igonored tomtom service for now, enable later
+            /*Map<String, Object> tomtomResponse = addressVerificationService.verifyAddressClientException(addressDTO, unitId);
             if (tomtomResponse == null) {
                 throw new InternalError("Address not verified by tomtom");
-            }
-            clientTemporaryAddress.setVerifiedByVisitour(true);
+            }*/
+            clientTemporaryAddress.setVerifiedByVisitour(false);
             clientTemporaryAddress.setCountry("Denmark");
-            clientTemporaryAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
-            clientTemporaryAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
+            //clientTemporaryAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
+           // clientTemporaryAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
+            clientTemporaryAddress.setLongitude(clientTemporaryAddress.getLongitude());
+            clientTemporaryAddress.setLatitude(clientTemporaryAddress.getLatitude());
             zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
         }
 
@@ -1578,7 +1596,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
      * @return
      * @auther Anil maurya
      */
-    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip,String moduleId) {
+    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip, String moduleId) {
         Map<String, Object> response = new HashMap<>();
         List<Long> citizenIds = new ArrayList<>();
         if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()){
@@ -1626,6 +1644,22 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
     private void deleteContactPersonForService(Long organizationServiceId,Long clientId){
         clientGraphRepository.deleteContactPersonForService(organizationServiceId,clientId);
+    }
+
+    public ClientPersonalCalenderPrerequisiteDTO getPrerequisiteForPersonalCalender(Long unitId,Long clientId){
+
+        Organization organization = organizationGraphRepository.findOne(unitId,0);
+        if(!Optional.ofNullable(organization).isPresent()){
+            throw new InternalError("Invalid Organization id");
+        }
+
+        List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(clientId);
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(organization.getId(),organization.getTimeSlotMode(),
+                new Date());
+        List<ClientExceptionTypesDTO> clientExceptionTypesDTOS = clientExceptionRestClient.getClientExceptionTypes();
+        ClientPersonalCalenderPrerequisiteDTO clientPersonalCalenderPrerequisiteDTO = new ClientPersonalCalenderPrerequisiteDTO(clientExceptionTypesDTOS,
+                temporaryAddressList,timeSlotWrappers);
+        return clientPersonalCalenderPrerequisiteDTO;
     }
 
 }

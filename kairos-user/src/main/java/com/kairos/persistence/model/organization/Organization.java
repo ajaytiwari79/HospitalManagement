@@ -5,13 +5,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
 import com.kairos.persistence.model.user.position.PositionName;
@@ -19,18 +22,22 @@ import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.staff.Employment;
+import com.kairos.util.ZoneIdStringConverter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD;
 
 
 /**
@@ -70,7 +77,7 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = KAIROS_STATUS)
     private KairosStatus kairosStatus;
 
-    private boolean standardTimeSlot = true;
+    private TimeSlotMode timeSlotMode = STANDARD;
     private boolean isParentOrganization;
     private boolean isPrekairos;
     private boolean showPersonNames;
@@ -125,6 +132,8 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = ORGANIZATION_HAS_OFFICE_RESOURCE)
     private List<OfficeResources> officeResourcesList;
 
+    @Relationship(type = ORGANIZATION_HAS_TAG)
+    private List<Tag> tags;
 
     @Relationship(type = HAS_EMPLOYMENTS)
     private List<Employment> employments = new ArrayList<>();
@@ -165,6 +174,10 @@ public class Organization extends UserBaseEntity {
 
     @Relationship(type = HAS_WTA)
     private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
+
+    @Relationship(type = HAS_TIME_SLOT_SET)
+    private List<TimeSlotSet> timeSlotSets = new ArrayList<>();
+
     public Level getLevel() {
         return level;
     }
@@ -185,7 +198,9 @@ public class Organization extends UserBaseEntity {
 
     private int nightShiftTimeDeduction = 7; //in percentage
     private boolean phaseGenerated=true;
-
+    private Boolean showCountryTags=true;
+    @Convert(ZoneIdStringConverter.class)
+    private ZoneId timeZone;
 
     public Organization(String name, List<Group> groupList, List<Organization> children) {
         this.name = name;
@@ -195,6 +210,7 @@ public class Organization extends UserBaseEntity {
 
     public Organization() {
     }
+
 
     public List<LocalAreaTag> getLocalAreaTags() {
         return localAreaTags;
@@ -445,6 +461,13 @@ public class Organization extends UserBaseEntity {
         this.officeResourcesList = officeResourcesList;
     }
 
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 
     public Map<String, Object> retrieveOrganizationUnitDetails() {
         Map<String, Object> map = new HashMap<>();
@@ -572,13 +595,6 @@ public class Organization extends UserBaseEntity {
         this.kairosStatus = kairosStatus;
     }
 
-    public boolean isStandardTimeSlot() {
-        return standardTimeSlot;
-    }
-
-    public void setStandardTimeSlot(boolean standardTimeSlot) {
-        this.standardTimeSlot = standardTimeSlot;
-    }
 
     public boolean isParentOrganization() {
         return isParentOrganization;
@@ -652,44 +668,6 @@ public class Organization extends UserBaseEntity {
         this.nightShiftTimeDeduction = nightShiftTimeDeduction;
     }
 
-    @Override
-    public String toString() {
-        return "{Organization={" +
-                "isEnable=" + isEnable +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", childLevel='" + childLevel + '\'' +
-                ", eanNumber='" + eanNumber + '\'' +
-                ", formalName='" + formalName + '\'' +
-                ", costCenterCode='" + costCenterCode + '\'' +
-                ", costCenterName='" + costCenterName + '\'' +
-                ", shortName='" + shortName + '\'' +
-                ", webSiteUrl='" + webSiteUrl + '\'' +
-                ", clientSince=" + clientSince +
-                ", cvrNumber='" + cvrNumber + '\'' +
-                ", pNumber='" + pNumber + '\'' +
-                ", isKairosHub=" + isKairosHub +
-                ", standardTimeSlot=" + standardTimeSlot +
-                ", isParentOrganization=" + isParentOrganization +
-                ", isPrekairos=" + isPrekairos +
-                ", showPersonNames=" + showPersonNames +
-                ", isOneTimeSyncPerformed=" + isOneTimeSyncPerformed +
-                ", departments=" + departments +
-                ", publicPhoneNumberList=" + publicPhoneNumberList +
-                ", officeResourcesList=" + officeResourcesList +
-                ", description='" + description + '\'' +
-                ", externalId='" + externalId + '\'' +
-                ", estimoteAppId='" + estimoteAppId + '\'' +
-                ", estimoteAppToken='" + estimoteAppToken + '\'' +
-                ", endTimeDeduction=" + endTimeDeduction +
-                ", kmdExternalId='" + kmdExternalId + '\'' +
-                ", dayShiftTimeDeduction=" + dayShiftTimeDeduction +
-                ", nightShiftTimeDeduction=" + nightShiftTimeDeduction +
-                ", workingTimeAgreements=" + workingTimeAgreements +
-                '}' +
-                '}';
-    }
-
     public boolean isAutoGeneratedPerformed() {
         return isAutoGeneratedPerformed;
     }
@@ -728,5 +706,35 @@ public class Organization extends UserBaseEntity {
         this.resourceList = resourceList;
     }
 
+    public Boolean isShowCountryTags() {
+        return showCountryTags;
+    }
 
+    public void setShowCountryTags(Boolean showCountryTags) {
+        this.showCountryTags = showCountryTags;
+    }
+
+    public List<TimeSlotSet> getTimeSlotSets() {
+        return timeSlotSets;
+    }
+
+    public void setTimeSlotSets(List<TimeSlotSet> timeSlotSets) {
+        this.timeSlotSets = timeSlotSets;
+    }
+
+    public TimeSlotMode getTimeSlotMode() {
+        return timeSlotMode;
+    }
+
+    public void setTimeSlotMode(TimeSlotMode timeSlotMode) {
+        this.timeSlotMode = timeSlotMode;
+    }
+
+    public ZoneId getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(ZoneId timeZone) {
+        this.timeZone = timeZone;
+    }
 }

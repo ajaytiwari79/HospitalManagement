@@ -8,12 +8,14 @@ import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.payment_type.PaymentType;
@@ -21,14 +23,12 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Province;
 import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.model.user.resources.FuelType;
 import com.kairos.persistence.model.user.resources.Resource;
-import com.kairos.persistence.model.user.resources.ResourceUnAvailability;
-import com.kairos.persistence.model.user.resources.VehicleType;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientLanguageRelationGraphRepository;
@@ -37,6 +37,7 @@ import com.kairos.persistence.repository.user.client.ContactAddressGraphReposito
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CurrencyGraphRepository;
+import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepository;
@@ -64,6 +65,7 @@ import com.kairos.service.organization.OrganizationTypeService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +74,8 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.*;
+
+import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD;
 
 /**
  * Created by kairosCountryLevel on 8/12/16.
@@ -164,6 +168,8 @@ public class BootDataService {
     private AccessPageService accessPageService;
     @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    @Inject
+    private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
 
     private List<Long> skillList;
     private com.kairos.persistence.model.organization.OrganizationService homeCareService;
@@ -251,6 +257,7 @@ public class BootDataService {
             //createCitizen();
         }
             startRegisteredCronJobs();
+            createEquipmentCategories();
 
     }
 
@@ -266,13 +273,14 @@ public class BootDataService {
 
     private void createStandardTimeSlots(){
         String timeSlotsNames[] = new String[]{"Day","Evening","Night"};
-        TimeSlot timeSlot;
+        List<TimeSlot> standardTimeSlots = new ArrayList<>();
         for(String timeSlotName : timeSlotsNames){
-            timeSlot = new TimeSlot();
+            TimeSlot timeSlot = new TimeSlot();
             timeSlot.setName(timeSlotName);
-            timeSlot.setTimeSlotType(TimeSlot.TYPE.STANDARD);
-            timeSlotGraphRepository.save(timeSlot);
+            timeSlot.setSystemGeneratedTimeSlots(true);
+            standardTimeSlots.add(timeSlot);
         }
+        timeSlotGraphRepository.saveAll(standardTimeSlots);
     }
 
     private void createGeoGraphicalData() {
@@ -341,8 +349,8 @@ public class BootDataService {
         Skill skill;
         for (String personalSkill : personalSkills) {
             skill = new Skill(personalSkill, personalSkillCategory);
-            skill.setCreationDate(new Date().getTime());
-            skill.setLastModificationDate(new Date().getTime());
+            skill.setCreationDate(DateUtil.getCurrentDate().getTime());
+            skill.setLastModificationDate(DateUtil.getCurrentDate().getTime());
             skillGraphRepository.save(skill);
             skillList.add(skill.getId());
         }
@@ -351,8 +359,8 @@ public class BootDataService {
         String medicalSkills[] = new String[]{"Pharma knowledge", "Basic Medical Checkup", "Basic Nursing"};
         for (String medicalSkill : medicalSkills) {
             skill = new Skill(medicalSkill, medicalSkillCategory);
-            skill.setCreationDate(new Date().getTime());
-            skill.setLastModificationDate(new Date().getTime());
+            skill.setCreationDate(DateUtil.getCurrentDate().getTime());
+            skill.setLastModificationDate(DateUtil.getCurrentDate().getTime());
             skillGraphRepository.save(skill);
             skillList.add(skill.getId());
         }
@@ -361,8 +369,8 @@ public class BootDataService {
         String homeSkills[] = new String[]{"Home Cleaning", "Dish Washing", "Cooking food"};
         for (String homeSkill : homeSkills) {
             skill = new Skill(homeSkill, homeSkillCategory);
-            skill.setCreationDate(new Date().getTime());
-            skill.setLastModificationDate(new Date().getTime());
+            skill.setCreationDate(DateUtil.getCurrentDate().getTime());
+            skill.setLastModificationDate(DateUtil.getCurrentDate().getTime());
             skillGraphRepository.save(skill);
             skillList.add(skill.getId());
         }
@@ -378,16 +386,16 @@ public class BootDataService {
                 new com.kairos.persistence.model.organization.OrganizationService("Home Dusting"),
                 new com.kairos.persistence.model.organization.OrganizationService("Home Cooking"),
                 new com.kairos.persistence.model.organization.OrganizationService("Home Maintenance")));
-        homeCareService.setCreationDate(new Date().getTime());
-        homeCareService.setLastModificationDate(new Date().getTime());
+        homeCareService.setCreationDate(DateUtil.getCurrentDate().getTime());
+        homeCareService.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
         medicalCareService = new com.kairos.persistence.model.organization.OrganizationService("Medical Service");
         medicalCareService.setOrganizationSubService(Arrays.asList(
                 new com.kairos.persistence.model.organization.OrganizationService("Basic Checkup"),
                 new com.kairos.persistence.model.organization.OrganizationService("Disease Diagnose"),
                 new com.kairos.persistence.model.organization.OrganizationService("Medication")));
-        medicalCareService.setCreationDate(new Date().getTime());
-        medicalCareService.setLastModificationDate(new Date().getTime());
+        medicalCareService.setCreationDate(DateUtil.getCurrentDate().getTime());
+        medicalCareService.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
         organizationServiceRepository.saveAll(Arrays.asList(homeCareService, medicalCareService));
 
@@ -395,13 +403,13 @@ public class BootDataService {
 
     private void createOrganizationTypes() {
         publicOrganization = new OrganizationType(OrganizationType.OrganizationTypeEnum.PUBLIC.value,homeCareService.getOrganizationSubService());
-        publicOrganization.setCreationDate(new Date().getTime());
-        publicOrganization.setLastModificationDate(new Date().getTime());
+        publicOrganization.setCreationDate(DateUtil.getCurrentDate().getTime());
+        publicOrganization.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         publicOrganization.setCountry(denmark);
 
         privateOrganization = new OrganizationType(OrganizationType.OrganizationTypeEnum.PRIVATE.value,medicalCareService.getOrganizationSubService());
-        privateOrganization.setCreationDate(new Date().getTime());
-        privateOrganization.setLastModificationDate(new Date().getTime());
+        privateOrganization.setCreationDate(DateUtil.getCurrentDate().getTime());
+        privateOrganization.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         privateOrganization.setCountry(denmark);
 
         ngoOrganization = new OrganizationType(OrganizationType.OrganizationTypeEnum.NGO.value,
@@ -409,8 +417,8 @@ public class BootDataService {
         ngoOrganization.setCountry(denmark);
 
 
-        ngoOrganization.setCreationDate(new Date().getTime());
-        ngoOrganization.setLastModificationDate(new Date().getTime());
+        ngoOrganization.setCreationDate(DateUtil.getCurrentDate().getTime());
+        ngoOrganization.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         ngoOrganization.setCountry(denmark);
 
 
@@ -424,7 +432,7 @@ public class BootDataService {
     private void createCountries() {
         denmark = new Country();
         denmark.setName("Denmark");
-        // denmark.setCountryHolidayCalenderList(Arrays.asList(new CountryHolidayCalender("Halloween", new Date().getTime()), new CountryHolidayCalender("Christmas",  1474696870000L)));
+        // denmark.setCountryHolidayCalenderList(Arrays.asList(new CountryHolidayCalender("Halloween", DateUtil.getCurrentDate().getTime()), new CountryHolidayCalender("Christmas",  1474696870000L)));
         // denmark.setOrganizationServices(Arrays.asList(homeCareService, medicalCareService));
         countryGraphRepository.save(denmark);
 
@@ -433,7 +441,7 @@ public class BootDataService {
         Long d = new DateTime().withTime(9,20,0,0).getMillis();
         Long e = new DateTime().withTime(15,20,0,0).getMillis();
         logger.info("Half day Leave timing: "+d+" and :   "+e);
-        // germany.setCountryHolidayCalenderList(Arrays.asList(new CountryHolidayCalender("Halloween", new Date().getTime() ,d,e), new CountryHolidayCalender("Christmas",  1474696870000L)));
+        // germany.setCountryHolidayCalenderList(Arrays.asList(new CountryHolidayCalender("Halloween", DateUtil.getCurrentDate().getTime() ,d,e), new CountryHolidayCalender("Christmas",  1474696870000L)));
         // germany.setOrganizationServices(Arrays.asList(homeCareService, medicalCareService));
         countryGraphRepository.save(germany);
 
@@ -622,7 +630,7 @@ public class BootDataService {
         kairosCountryLevel.setOrganizationSetting(organizationSetting);
 
         organizationService.createOrganization(kairosCountryLevel, null);
-        //organizationGraphRepository.addSkillInOrganization(kairosCountryLevel.getId(),skillList,new Date().getTime(),new Date().getTime());
+        //organizationGraphRepository.addSkillInOrganization(kairosCountryLevel.getId(),skillList,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
         createEmployment();
         createTeam();
         createGroup();
@@ -644,8 +652,8 @@ public class BootDataService {
 //        michal.setHomeAddress(new ContactAddress("Baker Street", 3, 1221, "Glostrup", 4533, "Apartments"));
         michal.setContactDetail(new ContactDetail("micky21@kairoscountrylevel.com", "micky21@gmail.com", "536533", "facebook.com/micky_original"));
         michal.setAge(27);
-        michal.setCreationDate(new Date().getTime());
-        michal.setLastModificationDate(new Date().getTime());
+        michal.setCreationDate(DateUtil.getCurrentDate().getTime());
+        michal.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
         liva = new User();
         liva.setCprNumber("1808920669");
@@ -659,8 +667,8 @@ public class BootDataService {
 //        liva.setHomeAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
         liva.setContactDetail(new ContactDetail("liva33@kairosCountryLevel.com", "liva31@gmail.com", "536533", "facebook.com/liva33_cool"));
         liva.setAge(24);
-        liva.setCreationDate(new Date().getTime());
-        liva.setLastModificationDate(new Date().getTime());
+        liva.setCreationDate(DateUtil.getCurrentDate().getTime());
+        liva.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
         alma = new User();
         alma.setCprNumber("2512864166");
@@ -674,8 +682,8 @@ public class BootDataService {
 //        alma.setHomeAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
         alma.setContactDetail(new ContactDetail("alma_01@kairoscountrylevel.com", "alma007@gmail.com", "536533", "facebook.com/alma_cool"));
         alma.setAge(28);
-        alma.setCreationDate(new Date().getTime());
-        alma.setLastModificationDate(new Date().getTime());*/
+        alma.setCreationDate(DateUtil.getCurrentDate().getTime());
+        alma.setLastModificationDate(DateUtil.getCurrentDate().getTime());*/
 
         admin = new User();
         admin.setCprNumber("0309514297");
@@ -689,8 +697,8 @@ public class BootDataService {
 //        admin.setHomeAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
         admin.setContactDetail(new ContactDetail("ulrik_01@kairoscountrylevel.com", "alma007@gmail.com", "536533", "facebook.com/ulrik_cool"));
         admin.setAge(28);
-        admin.setCreationDate(new Date().getTime());
-        admin.setLastModificationDate(new Date().getTime());
+        admin.setCreationDate(DateUtil.getCurrentDate().getTime());
+        admin.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         //userGraphRepository.save(Arrays.asList(michal, liva, alma,admin));
         userGraphRepository.save(admin);
     }
@@ -786,8 +794,8 @@ public class BootDataService {
         //creating teams
         nestingTeam = new Team();
         nestingTeam.setName("Nesting Team");
-        nestingTeam.setCreationDate(new Date().getTime());
-        nestingTeam.setLastModificationDate(new Date().getTime());
+        nestingTeam.setCreationDate(DateUtil.getCurrentDate().getTime());
+        nestingTeam.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         teamGraphRepository.saveAll(Arrays.asList(nestingTeam));
     }
 
@@ -870,7 +878,7 @@ public class BootDataService {
         kairosRegionLevel.setOrganizationSetting(organizationSetting);
         organizationService.createOrganization(kairosRegionLevel, kairosCountryLevel.getId());
 
-        //organizationGraphRepository.addOrganizationServiceInUnit(kairosRegionLevel.getId(),Arrays.asList(privateOrganization.getOrganizationServiceList().get(0).getId()),new Date().getTime(),new Date().getTime());
+        //organizationGraphRepository.addOrganizationServiceInUnit(kairosRegionLevel.getId(),Arrays.asList(privateOrganization.getOrganizationServiceList().get(0).getId()),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
     }
 
 
@@ -885,13 +893,13 @@ public class BootDataService {
     private void createTeamsForCityLevel(){
         nestingTeam = new Team();
         nestingTeam.setName("Nesting Team");
-        nestingTeam.setCreationDate(new Date().getTime());
-        nestingTeam.setLastModificationDate(new Date().getTime());
+        nestingTeam.setCreationDate(DateUtil.getCurrentDate().getTime());
+        nestingTeam.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
         experiencedTeam = new Team();
         experiencedTeam.setName("Experienced Team");
-        experiencedTeam.setCreationDate(new Date().getTime());
-        experiencedTeam.setLastModificationDate(new Date().getTime());
+        experiencedTeam.setCreationDate(DateUtil.getCurrentDate().getTime());
+        experiencedTeam.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         teamGraphRepository.saveAll(Arrays.asList(nestingTeam, experiencedTeam));
     }
 
@@ -960,14 +968,14 @@ public class BootDataService {
     private void createPaymentTypes(){
         PaymentType creditCard = new PaymentType();
         creditCard.setName("Credit Cards");
-        creditCard.setCreationDate(new Date().getTime());
-        creditCard.setLastModificationDate(new Date().getTime());
+        creditCard.setCreationDate(DateUtil.getCurrentDate().getTime());
+        creditCard.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         creditCard.setCountry(denmark);
 
         PaymentType paySafecard = new PaymentType();
         paySafecard.setName("Paysafecard");
-        paySafecard.setCreationDate(new Date().getTime());
-        paySafecard.setLastModificationDate(new Date().getTime());
+        paySafecard.setCreationDate(DateUtil.getCurrentDate().getTime());
+        paySafecard.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         paySafecard.setCountry(denmark);
         paymentTypeGraphRepository.saveAll(Arrays.asList(creditCard,paySafecard));
     }
@@ -975,9 +983,42 @@ public class BootDataService {
     private void createCurrency(){
         com.kairos.persistence.model.user.country.Currency currency = new com.kairos.persistence.model.user.country.Currency();
         currency.setName("krone");
-        currency.setCreationDate(new Date().getTime());
-        currency.setLastModificationDate(new Date().getTime());
+        currency.setCreationDate(DateUtil.getCurrentDate().getTime());
+        currency.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         currency.setCountry(denmark);
         currencyGraphRepository.save(currency);
+    }
+
+    private void createEquipmentCategories(){
+        if( ! equipmentCategoryGraphRepository.ifEquipmentCategoryExists()){
+            EquipmentCategory equipmentCategorySmall = new EquipmentCategory();
+            equipmentCategorySmall.setName("Small");
+            equipmentCategorySmall.setDescription("Small");
+            equipmentCategorySmall.setWeightInKg(20F);
+            equipmentCategorySmall.setHeightInCm(20F);
+            equipmentCategorySmall.setWidthInCm(20F);
+            equipmentCategorySmall.setLengthInCm(20F);
+            equipmentCategorySmall.setVolumeInCm(20F);
+
+            EquipmentCategory equipmentCategoryMedium = new EquipmentCategory();
+            equipmentCategoryMedium.setName("Medium");
+            equipmentCategoryMedium.setDescription("Medium");
+            equipmentCategoryMedium.setWeightInKg(50F);
+            equipmentCategoryMedium.setHeightInCm(50F);
+            equipmentCategoryMedium.setWidthInCm(50F);
+            equipmentCategoryMedium.setLengthInCm(50F);
+            equipmentCategoryMedium.setVolumeInCm(50F);
+
+            EquipmentCategory equipmentCategoryLarge = new EquipmentCategory();
+            equipmentCategoryLarge.setName("Large");
+            equipmentCategoryLarge.setDescription("Large");
+            equipmentCategoryLarge.setWeightInKg(100F);
+            equipmentCategoryLarge.setHeightInCm(100F);
+            equipmentCategoryLarge.setWidthInCm(100F);
+            equipmentCategoryLarge.setLengthInCm(100F);
+            equipmentCategoryLarge.setVolumeInCm(100F);
+
+            equipmentCategoryGraphRepository.saveAll(Arrays.asList(equipmentCategorySmall, equipmentCategoryMedium, equipmentCategoryLarge));
+        }
     }
 }

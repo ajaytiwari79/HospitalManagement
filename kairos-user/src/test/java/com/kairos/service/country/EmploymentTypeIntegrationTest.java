@@ -2,6 +2,7 @@ package com.kairos.service.country;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
+import com.kairos.util.DateUtil;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class EmploymentTypeIntegrationTest {
     public void addEmploymentType() throws Exception {
         String baseUrl=getBaseUrl(71L,53L, null);
         EmploymentTypeDTO employmentTypeDTO =new EmploymentTypeDTO();
-        employmentTypeDTO.setName("Test Employment "+ new Date().toString());
+        employmentTypeDTO.setName("Test Employment "+ DateUtil.getCurrentDate().toString());
         employmentTypeDTO.setDescription("Test Employment Description");
         employmentTypeDTO.setAllowedForFlexPool(true);
         employmentTypeDTO.setAllowedForShiftPlan(true);
@@ -52,7 +53,7 @@ public class EmploymentTypeIntegrationTest {
     @Ignore
     public void updateEmploymentType() throws Exception {
         String baseUrl=getBaseUrl(71L,53L, null);
-        String name="Test Employment Type "+ new Date().toString();
+        String name="Test Employment Type "+ DateUtil.getCurrentDate().toString();
 
 
         EmploymentTypeDTO employmentTypeDTO =new EmploymentTypeDTO();

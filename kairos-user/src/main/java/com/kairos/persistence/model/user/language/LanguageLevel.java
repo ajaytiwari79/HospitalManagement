@@ -23,7 +23,7 @@ public class LanguageLevel extends UserBaseEntity {
     private String name;
 
 
-    @NotEmpty(message = "error.LanguageLevel.description.notEmpty") @NotNull(message = "error.LanguageLevel.description.notnull")
+    //@NotEmpty(message = "error.LanguageLevel.description.notEmpty") @NotNull(message = "error.LanguageLevel.description.notnull")
     private String description;
 
     @Relationship(type =  BELONGS_TO)

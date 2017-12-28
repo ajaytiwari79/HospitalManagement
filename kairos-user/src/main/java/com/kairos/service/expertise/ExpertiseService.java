@@ -1,13 +1,18 @@
 package com.kairos.service.expertise;
+import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
+import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.country.tag.TagService;
+import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,31 +37,37 @@ public class ExpertiseService extends UserBaseService {
     ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     StaffGraphRepository staffGraphRepository;
+    @Inject
+    TagService tagService;
 
 
-    public Map<String, Object> saveExpertise(long countryId, Expertise expertise) {
+    public Map<String, Object> saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null){
             return null;
         }
+        Expertise expertise = new Expertise();
+        expertise.setName(expertiseDTO.getName());
+        expertise.setDescription(expertiseDTO.getDescription());
         expertise.setCountry(country);
+        expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
         save(expertise);
         return expertise.retrieveDetails();
     }
 
-    public List<Expertise> getAllExpertise(long countryId) {
-        return expertiseGraphRepository.getAllExpertiseByCountry(countryId);
+    public List<ExpertiseTagDTO> getAllExpertise(long countryId) {
+        return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
     }
 
 
-    public Map<String, Object> updateExpertise(Expertise expertise) {
-        Expertise currentExpertise = expertiseGraphRepository.findOne(expertise.getId());
+    public Map<String, Object> updateExpertise(CountryExpertiseDTO expertiseDTO) {
+        Expertise currentExpertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
         if (currentExpertise == null) {
             return null;
         }
-        currentExpertise.setName(expertise.getName());
-        currentExpertise.setDescription(expertise.getDescription());
-
+        currentExpertise.setName(expertiseDTO.getName());
+        currentExpertise.setDescription(expertiseDTO.getDescription());
+        currentExpertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
         save(currentExpertise);
         return currentExpertise.retrieveDetails();
     }
@@ -101,13 +112,13 @@ public class ExpertiseService extends UserBaseService {
         if(isSelected){
             for(long skillId : skillIds){
                 if(expertiseGraphRepository.expertiseHasAlreadySkill(expertiseId,skillId) == 0){
-                    expertiseGraphRepository.addSkillInExpertise(expertiseId,skillId,new Date().getTime(),new Date().getTime());
+                    expertiseGraphRepository.addSkillInExpertise(expertiseId,skillId, DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
                 } else {
-                    expertiseGraphRepository.updateExpertiseSkill(expertiseId,skillId,new Date().getTime());
+                    expertiseGraphRepository.updateExpertiseSkill(expertiseId,skillId,DateUtil.getCurrentDate().getTime());
                 }
             }
         } else {
-            expertiseGraphRepository.deleteExpertiseSkill(expertiseId,skillIds,new Date().getTime());
+            expertiseGraphRepository.deleteExpertiseSkill(expertiseId,skillIds,DateUtil.getCurrentDate().getTime());
         }
     }
 

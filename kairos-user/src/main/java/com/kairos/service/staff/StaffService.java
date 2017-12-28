@@ -33,7 +33,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
-import com.kairos.response.dto.web.ClientStaffInfoDTO;
+import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.response.dto.web.StaffTaskDTO;
@@ -47,6 +47,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import com.kairos.util.FileUtil;
 import com.kairos.util.userContext.UserContext;
 import org.apache.commons.lang3.StringUtils;
@@ -58,7 +59,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -143,7 +143,7 @@ public class StaffService extends UserBaseService {
             return null;
         }
         createDirectory(IMAGES_PATH);
-        String fileName = new Date().getTime() + multipartFile.getOriginalFilename();
+        String fileName = DateUtil.getCurrentDate().getTime() + multipartFile.getOriginalFilename();
         final String path = IMAGES_PATH + File.separator + fileName;
         FileUtil.writeFile(path, multipartFile);
         staff.setProfilePic(fileName);
@@ -222,7 +222,7 @@ public class StaffService extends UserBaseService {
         if (oldExpertise != null) {
             staffGraphRepository.removeSkillsByExpertise(objectToUpdate.getId(), oldExpertise.getId());
         }
-        staffGraphRepository.updateSkillsByExpertise(objectToUpdate.getId(), expertise.getId(), new Date().getTime(), new Date().getTime(), Skill.SkillLevel.ADVANCE);
+        staffGraphRepository.updateSkillsByExpertise(objectToUpdate.getId(), expertise.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
 
         return staffPersonalDetail;
     }
@@ -803,6 +803,7 @@ public class StaffService extends UserBaseService {
         staff.setUser(user);
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), isEmploymentExist);
+        staff.setUser(null); // removing user to send in FE
         return staff;
     }
 
@@ -852,7 +853,7 @@ public class StaffService extends UserBaseService {
             contactDetail.setId(staffQueryResult.getContactDetailId());
         }
         if (Optional.ofNullable(payload.getEngineerTypeId()).isPresent()) {
-            EngineerType engineerType = engineerTypeGraphRepository.findOne(payload.getExternalId());
+            EngineerType engineerType = engineerTypeGraphRepository.findOne(payload.getEngineerTypeId());
             staff.setEngineerType(engineerType);
         }
         return staff;
@@ -1234,14 +1235,15 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public Long verifyStaffBelongsToUnit(long staffId, long id, String type) {
+    public StaffAdditionalInfoQueryResult verifyStaffBelongsToUnit(long staffId, long id, String type) {
         Long unitId = -1L;
         unitId = organizationService.getOrganization(id, type);
-        Staff staff = staffGraphRepository.getStaffByUnitId(unitId, staffId);
+        /*Staff staff = staffGraphRepository.getStaffByUnitId(unitId, staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
             unitId = -1L;
-        }
-        return unitId;
+        }*/
+
+        return staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
     }
 
     public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO){

@@ -9,6 +9,13 @@ import java.net.UnknownHostException;
 
 public abstract class RelationshipConstants {
 
+    // Country
+    public final static String COUNTRY_HAS_TAG = "COUNTRY_HAS_TAG";
+    public final static String COUNTRY_HAS_FEATURE = "COUNTRY_HAS_FEATURE";
+    public final static String COUNTRY_HAS_EQUIPMENT = "COUNTRY_HAS_EQUIPMENT";
+    public final static String EQUIPMENT_HAS_CATEGORY = "EQUIPMENT_HAS_CATEGORY";
+    public final static String HAS_TAG = "HAS_TAG";
+
     // Organization
     public final static String COUNTRY = "BELONGS_TO";
     public final static String HAS_GROUP = "HAS_GROUP";
@@ -35,6 +42,7 @@ public abstract class RelationshipConstants {
     public final static String CURRENCY = "CURRENCY";
     public final static String ORGANIZATION_HAS_OFFICE_RESOURCE ="ORGANIZATION_HAS_OFFICE_RESOURCE";
     public final static String HAS_EMPLOYMENT_TYPE = "HAS_EMPLOYMENT_TYPE";
+    public final static String ORGANIZATION_HAS_TAG = "ORGANIZATION_HAS_TAG";
     public final static String HAS_CUSTOM_SERVICE_NAME_FOR = "HAS_CUSTOM_SERVICE_NAME_FOR";
 
     public final static String HAS_POSITION_NAME ="HAS_POSITION_NAME";
@@ -187,6 +195,15 @@ public abstract class RelationshipConstants {
 
     public final static  String BELONGS_TO_STAFF="BELONGS_TO_STAFF";
     public final static String UNAVAILABLE_ON = "UNAVAILABLE_ON";
+    public final static String VEHICLE_HAS_FEATURE = "VEHICLE_HAS_FEATURE";
+    public final static String HAS_TIME_SLOT_SET = "HAS_TIME_SLOT_SET";
+    public final static String HAS_TIME_SLOT = "HAS_TIME_SLOT";
+
+    public final static String RESOURCE_HAS_FEATURE = "RESOURCE_HAS_FEATURE";
+    public final static String RESOURCE_HAS_EQUIPMENT = "RESOURCE_HAS_EQUIPMENT";
+    public final static String LOCATED_IN = "LOCATED_IN";
+
+
     /**
      * Default constructor
      */

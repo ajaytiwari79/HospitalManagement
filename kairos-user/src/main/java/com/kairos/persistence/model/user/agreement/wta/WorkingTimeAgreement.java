@@ -7,6 +7,7 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.response.dto.web.WtaDTO;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -14,6 +15,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.beans.BeanUtils;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,9 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     // to make a history
     @Relationship(type = HAS_PARENT_CTA)
     private WorkingTimeAgreement wta;
+
+    @Relationship(type = HAS_TAG)
+    private List<Tag> tags = new ArrayList<>();
 
     private Long startDateMillis;
     private Long endDateMillis;
@@ -151,6 +156,14 @@ public class WorkingTimeAgreement extends UserBaseEntity {
 
     public void setOrganizationSubType(OrganizationType organizationSubType) {
         this.organizationSubType = organizationSubType;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     public Map<String, Object> retrieveDetails() {

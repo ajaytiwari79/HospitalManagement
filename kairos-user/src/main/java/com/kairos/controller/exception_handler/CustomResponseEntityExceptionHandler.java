@@ -400,4 +400,17 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	}
 
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(value = UnitNotFoundException.class)
+	@ResponseBody
+	public ResponseEnvelope unitNotFoundExceptionHandler(UnitNotFoundException ex,HttpServletRequest request) {
+		logger.error("Invalid unit id ",ex);
+		ResponseEnvelope errorMessage=new ResponseEnvelope();
+		errorMessage.setSuccess(false);
+		errorMessage.setPath(request.getRequestURL().toString());
+		errorMessage.setMessage(ex.getMessage());
+		return  errorMessage;
+
+	}
+
 }

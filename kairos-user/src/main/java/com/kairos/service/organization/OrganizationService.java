@@ -5,6 +5,7 @@ import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
@@ -14,7 +15,7 @@ import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.model.user.resources.Vehicle;
+import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -44,6 +45,7 @@ import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
@@ -58,6 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
@@ -170,6 +173,21 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.findOne(id, 0);
     }
 
+    public boolean showCountryTagForOrganization(long id) {
+        Organization organization = organizationGraphRepository.findOne(id);
+        if(organization.isShowCountryTags()){
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public Long getCountryIdOfOrganization(long orgId) {
+        Organization organization = organizationGraphRepository.findOne(orgId, 1);
+        return organization.getCountry().getId();
+    }
+
     /**
      * Calls OrganizationGraphRepository ,creates a new Organization
      * and return newly created User.
@@ -192,7 +210,7 @@ public class OrganizationService extends UserBaseService {
         }
         accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization);
-        organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), new Date().getTime(), new Date().getTime());
+        organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         return organization;
     }
 
@@ -217,9 +235,9 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization);
-        long creationDate = new Date().getTime();
+        long creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
-        creationDate = new Date().getTime();
+        creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         phaseRestClient.createDefaultPhases(organization.getId());
         HashMap<String,Object> orgResponse = new HashMap<>();
@@ -483,8 +501,10 @@ public class OrganizationService extends UserBaseService {
                 contactAddress.setZipCode(zipCode);
                 contactAddress.setCity(zipCode.getName());
                 unit.setContactAddress(contactAddress);
+            } else{
+                return null;
             }
-            return null;
+
 
         }
 
@@ -584,7 +604,8 @@ public class OrganizationService extends UserBaseService {
             response.put("generalTabInfo", teamInfo);
             response.put("otherData", Collections.emptyMap());
         }
-        return response;
+
+       return response;
     }
 
 
@@ -1015,14 +1036,14 @@ public class OrganizationService extends UserBaseService {
 
     }
 
-    public List<Vehicle> getVehicleList(long unitId) {
+    public List<VehicleQueryResult> getVehicleList(long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.debug("Searching organization by id " + unitId);
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
         }
         Long countryId = organizationGraphRepository.getCountryId(unitId);
-        return countryGraphRepository.getResourcesByCountry(countryId);
+        return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }
 
     public List<Long> getAllOrganizationWithoutPhases() {
@@ -1101,6 +1122,47 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.getOrganizationChildList(orgID);
     }
 
+
+    public Map<String, Object> getAvailableZoneIds(Long unitId){
+        Set<String> allZones = ZoneId.getAvailableZoneIds();
+        List<String> zoneList = new ArrayList<>(allZones);
+        Collections.sort(zoneList);
+
+        Map<String, Object> timeZonesData = new HashedMap();
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
+        }
+
+        timeZonesData.put("selectedTimeZone", unit.getTimeZone()!=null? unit.getTimeZone().getId() : null);
+        timeZonesData.put("allTimeZones",zoneList);
+        return timeZonesData;
+    }
+
+    public boolean assignUnitTimeZone(Long unitId, String zoneIdString){
+        ZoneId zoneId = ZoneId.of(zoneIdString);
+        if (!Optional.ofNullable(zoneId).isPresent()) {
+            throw new InternalError("Zone Id not found by "+zoneIdString);
+        }
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        unit.setTimeZone(zoneId);
+        organizationGraphRepository.save(unit);
+        return true;
+    }
+
+
+    public Organization fetchParentOrganization(Long unitId){
+        Organization parent = null;
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+        } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
+            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+        } else {
+            parent = unit;
+        }
+        return parent;
+    }
 
 
 }

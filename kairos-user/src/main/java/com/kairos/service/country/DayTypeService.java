@@ -150,4 +150,9 @@ public class DayTypeService extends UserBaseService {
         return danishName;
     }
 
+    public List<DayType> getDayTypes(List<Long> dayTypeIds){
+        return dayTypeGraphRepository.getDayTypes(dayTypeIds);
+    }
+
+
 }

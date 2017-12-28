@@ -2,6 +2,7 @@ package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -17,6 +18,8 @@ public class RuleTemplateDTO {
     @NotNull(message = "error.WtaRuleTemplateDTO.categoryName.notnull")
     private String categoryName;
     private String ruleTemplateCategoryType;
+    private List<Long> tags;
+    private  RuleTemplateCategory ruleTemplateCategory;
 
     public List<Long> getRuleTemplateIds() {
         return ruleTemplateIds;
@@ -40,5 +43,20 @@ public class RuleTemplateDTO {
 
     public void setRuleTemplateCategoryType(String ruleTemplateCategoryType) {
         this.ruleTemplateCategoryType = ruleTemplateCategoryType;
+    }
+    public List<Long> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Long> tags) {
+        this.tags = tags;
+    }
+
+    public RuleTemplateCategory getRuleTemplateCategory() {
+        return ruleTemplateCategory;
+    }
+
+    public void setRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
+        this.ruleTemplateCategory = ruleTemplateCategory;
     }
 }

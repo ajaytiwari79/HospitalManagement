@@ -1,10 +1,12 @@
 package com.kairos.service.agreement;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
@@ -14,8 +16,13 @@ import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategory
 import com.kairos.persistence.repository.user.agreement.wta.TemplateCategoryRelationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
+import com.kairos.response.dto.web.RuleTemplateDTO;
 import com.kairos.response.dto.web.WTARuleTemplateDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.country.tag.TagService;
+import com.kairos.util.ArrayUtil;
+import com.kairos.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +53,8 @@ public class RuleTemplateService extends UserBaseService {
     private RuleTemplateCategoryService ruleTemplateCategoryService;
     @Inject
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryRepository;
+    @Inject
+    private TagService tagService;
 
     public boolean createRuleTemplate(long countryId) {
 
@@ -65,7 +74,7 @@ public class RuleTemplateService extends UserBaseService {
         String TUESDAY = "TUESDAY";
         long timeInMins = 10;
         long daysCount = 10;
-        long dateInMillis = new Date().getTime();
+        long dateInMillis = DateUtil.getCurrentDate().getTime();
 
 
         MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = new MaximumShiftLengthWTATemplate(TEMPLATE1_NAME, TEMPLATE1, true, TEMPLATE1_DESCRIPTION, timeInMins, ruleTemplate, true);
@@ -168,7 +177,7 @@ public class RuleTemplateService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Country");
         }
 
-        List<RuleTemplateCategory> categoryList = ruleTemplateCategoryRepository.getRuleTemplateCategoryByCountry(countryId, RuleTemplateCategoryType.WTA);
+        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryRepository.getAllRulesOfCountry(countryId);
 
         if (categoryList == null) {
             throw new DataNotFoundByIdException("Category List is null");
@@ -428,8 +437,60 @@ public class RuleTemplateService extends UserBaseService {
     }
 
 
+    /*
+    *
+    * This method will change the category of rule Template when we change the rule template all existing rule templates wil set to none
+     * and new rule temp wll be setted to  this new rule template category
+    * */
+    public Map<String, Object> updateRuleTemplateCategory(RuleTemplateDTO wtaRuleTemplateDTO, long countryId) {
+        // This Method will get all the previous
+        Map<String, Object> response = new HashMap();
+        List<RuleTemplate> wtaBaseRuleTemplates = wtaRuleTemplateGraphRepository.getWtaBaseRuleTemplateByIds(wtaRuleTemplateDTO.getRuleTemplateIds());
+        RuleTemplateCategory previousRuleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "(?i)" + wtaRuleTemplateDTO.getCategoryName(),RuleTemplateCategoryType.WTA);
+        if (!Optional.ofNullable(previousRuleTemplateCategory).isPresent()) {  // Rule Template Category does not exist So creating  a new one and adding in country
+            previousRuleTemplateCategory = new RuleTemplateCategory(wtaRuleTemplateDTO.getCategoryName());
+            Country country = countryGraphRepository.findOne(countryId);
+            List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
+            ruleTemplateCategories.add(previousRuleTemplateCategory);
+            country.setRuleTemplateCategories(ruleTemplateCategories);
+            countryGraphRepository.save(country);
+            // Break Previous Relation
+            wtaRuleTemplateGraphRepository.deleteOldCategories(wtaRuleTemplateDTO.getRuleTemplateIds());
+            previousRuleTemplateCategory.setRuleTemplates(wtaBaseRuleTemplates);
+            // Save Tags in Rule Template Category
+            previousRuleTemplateCategory.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaRuleTemplateDTO.getTags(), MasterDataTypeEnum.RULE_TEMPLATE_CATEGORY));
+            save(previousRuleTemplateCategory);
+            response.put("category", previousRuleTemplateCategory);
+            response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, previousRuleTemplateCategory));
 
+        } else {
+            List<Long> previousBaseRuleTemplates = ruleTemplateCategoryRepository.findAllExistingRuleTemplateAddedToThiscategory(wtaRuleTemplateDTO.getCategoryName(), countryId);
+            List<Long> newRuleTemplates = wtaRuleTemplateDTO.getRuleTemplateIds();
+            List<Long> ruleTemplateIdsNeedToAddInCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(previousBaseRuleTemplates, newRuleTemplates);
+            List<Long> ruleTemplateIdsNeedToRemoveFromCategory = ArrayUtil.getUniqueElementWhichIsNotInFirst(newRuleTemplates, previousBaseRuleTemplates);
+            ruleTemplateCategoryRepository.updateCategoryOfRuleTemplate(ruleTemplateIdsNeedToAddInCategory, wtaRuleTemplateDTO.getCategoryName());
+            ruleTemplateCategoryRepository.updateCategoryOfRuleTemplate(ruleTemplateIdsNeedToRemoveFromCategory, "NONE");
+            // Save Tags in Rule Template Category
+            previousRuleTemplateCategory.setTags(tagService.getCountryTagsByIdsAndMasterDataType(wtaRuleTemplateDTO.getTags(),MasterDataTypeEnum.RULE_TEMPLATE_CATEGORY));
+            save(previousRuleTemplateCategory);
+            response.put("templateList", getJsonOfUpdatedTemplates(wtaBaseRuleTemplates, previousRuleTemplateCategory));
+        }
+        return response;
+    }
 
+    private List<RuleTemplateDTO> getJsonOfUpdatedTemplates(List<RuleTemplate> wtaBaseRuleTemplates, RuleTemplateCategory ruleTemplateCategory) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<RuleTemplateDTO> wtaBaseRuleTemplateDTOS = new ArrayList<>(wtaBaseRuleTemplates.size());
+        wtaBaseRuleTemplates.forEach(wtaBaseRuleTemplate -> {
+            RuleTemplateDTO wtaBaseRuleTemplateDTO = objectMapper.convertValue(wtaBaseRuleTemplate, RuleTemplateDTO.class);
+            wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplateCategory);
+
+            wtaBaseRuleTemplateDTOS.add(wtaBaseRuleTemplateDTO);
+        });
+
+        return wtaBaseRuleTemplateDTOS;
+    }
     public WTARuleTemplateQueryResponse getRuleTemplateById(Long ruleTemplateId) {
         return wtaRuleTemplateGraphRepository.getRuleTemplateAndCategoryById(ruleTemplateId);
     }
