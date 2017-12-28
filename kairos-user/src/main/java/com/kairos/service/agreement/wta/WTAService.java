@@ -27,6 +27,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.WtaDTO;
 import com.kairos.response.dto.web.tag.TagDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.agreement.RuleTemplateCategoryService;
 import com.kairos.service.agreement.RuleTemplateService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.expertise.ExpertiseService;

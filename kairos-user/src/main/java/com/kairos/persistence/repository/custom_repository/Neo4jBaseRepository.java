@@ -1,5 +1,5 @@
 package com.kairos.persistence.repository.custom_repository;
-import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 

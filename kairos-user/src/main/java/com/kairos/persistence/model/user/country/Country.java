@@ -7,13 +7,9 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-<<<<<<< HEAD
-=======
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.country.equipment.Equipment;
 import com.kairos.persistence.model.user.country.feature.Feature;
 import com.kairos.persistence.model.user.country.tag.Tag;
->>>>>>> development
 import com.kairos.persistence.model.user.resources.Vehicle;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -64,10 +60,8 @@ public class Country extends UserBaseEntity {
     private List<RuleTemplateCategory> ruleTemplateCategories = new ArrayList<>();
 
     @Relationship(type = HAS_RULE_TEMPLATE)
-<<<<<<< HEAD
     private List<RuleTemplate> WTABaseRuleTemplate;
-=======
-    private List <WTABaseRuleTemplate> WTABaseRuleTemplate;
+
 
     @Relationship(type = COUNTRY_HAS_TAG)
     private List<Tag> tags;
@@ -77,8 +71,6 @@ public class Country extends UserBaseEntity {
 
     @Relationship(type = COUNTRY_HAS_EQUIPMENT )
     private List<Equipment> equipments;
->>>>>>> development
-
     @JsonIgnore
     @Relationship(type = HAS_ORGANIZATION_SERVICES)
     private List<OrganizationService> organizationServices;
@@ -199,15 +191,7 @@ public class Country extends UserBaseEntity {
     }
 
 
-    public List<RelationType> getRelationTypes() {
-        return relationTypes;
-    }
-
-    public void setRelationTypes(List<RelationType> relationTypes) {
-        this.relationTypes = relationTypes;
-    }
-
-    public void setRuleTemplateCategories(List<RuleTemplateCategory> ruleTemplateCategories) {
+       public void setRuleTemplateCategories(List<RuleTemplateCategory> ruleTemplateCategories) {
         this.ruleTemplateCategories = ruleTemplateCategories;
     }
 
@@ -256,8 +240,6 @@ public class Country extends UserBaseEntity {
     }
 
 
-<<<<<<< HEAD
-=======
     public List<RelationType> getRelationTypes() {
         return relationTypes;
     }
@@ -289,5 +271,4 @@ public class Country extends UserBaseEntity {
     public void setEquipments(List<Equipment> equipments) {
         this.equipments = equipments;
     }
->>>>>>> development
 }

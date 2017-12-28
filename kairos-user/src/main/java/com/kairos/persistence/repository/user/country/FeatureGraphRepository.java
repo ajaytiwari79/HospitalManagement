@@ -1,12 +1,9 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.country.feature.Feature;
 import com.kairos.persistence.model.user.country.feature.FeatureQueryResult;
-import com.kairos.persistence.model.user.country.tag.Tag;
-import com.kairos.persistence.model.user.resources.ResourceWrapper;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +14,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prerna on 4/12/17.
  */
 @Repository
-public interface FeatureGraphRepository extends GraphRepository<Feature>{
+public interface FeatureGraphRepository extends Neo4jBaseRepository<Feature,Long> {
 
     List<Feature> findAll();
 
