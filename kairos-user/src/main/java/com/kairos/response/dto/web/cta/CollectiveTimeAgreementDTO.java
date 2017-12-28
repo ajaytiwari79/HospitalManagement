@@ -3,8 +3,10 @@ package com.kairos.response.dto.web.cta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,6 +18,8 @@ public class CollectiveTimeAgreementDTO {
     private Long organizationType;
     private Long organizationSubType;
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
+    private Date startDate;
+    private Date endDate;
     private boolean disabled;
     public CollectiveTimeAgreementDTO() {
 
@@ -69,7 +73,23 @@ public class CollectiveTimeAgreementDTO {
         this.organizationSubType = organizationSubType;
     }
 
-    /*public List<Long> getRuleTemplates() {
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+/*public List<Long> getRuleTemplates() {
         return ruleTemplates;
     }
 

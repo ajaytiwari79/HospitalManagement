@@ -94,8 +94,6 @@ public class CostTimeAgreementServiceTest {
     @Test
     public void saveCom(){
         costTimeAgreementService.saveInterval();
-
-
     }
 
     @Test
@@ -107,11 +105,11 @@ public class CostTimeAgreementServiceTest {
         List<CTARuleTemplateDTO> ctaRuleTemplates = new ArrayList<>();
         ctaRuleTemplates.add(ctaRuleTemplateDTO);
         Expertise expertise = expertiseService.getExpertiseByCountryId(countryId);
-        OrganizationType organizationType = organizationService.getOrganizationTypeById(countryId).get(0);
+        OrganizationType organizationType = organizationService.getOrganizationTypeByCountryAndId(countryId,86L);
         OrganizationType organizationSubType = organizationService.getOrganizationSubTypeById(organizationType.getId()).get(0);
         CollectiveTimeAgreementDTO collectiveTimeAgreementDTO = new CollectiveTimeAgreementDTO
                 ("CTA TEST", "Test description", expertise.getId(), organizationType.getId(), organizationSubType.getId(), ctaRuleTemplates);
-       /* try{
+        /*try{
             collectiveTimeAgreementDTO = costTimeAgreementService.createCostTimeAgreement(countryId, collectiveTimeAgreementDTO);
         } catch (Exception e){
             logger.info("Exception occured");
@@ -139,7 +137,7 @@ public class CostTimeAgreementServiceTest {
         List<CTARuleTemplateDTO> ctaRuleTemplates = new ArrayList<>();
         ctaRuleTemplates.add(ctaRuleTemplateDTO);
         Expertise expertise = expertiseService.getExpertiseByCountryId(countryId);
-        OrganizationType organizationType = organizationService.getOrganizationTypeById(countryId).get(0);
+        OrganizationType organizationType = organizationService.getOrganizationTypeByCountryId(countryId).get(0);
         OrganizationType organizationSubType = organizationService.getOrganizationSubTypeById(organizationType.getId()).get(0);
         CollectiveTimeAgreementDTO collectiveTimeAgreementDTO = new CollectiveTimeAgreementDTO
                 ("CTA TEST", "Test description", expertise.getId(), organizationType.getId(),
@@ -186,7 +184,7 @@ public class CostTimeAgreementServiceTest {
         List<CTARuleTemplateDTO> ctaRuleTemplates = new ArrayList<>();
         ctaRuleTemplates.add(ctaRuleTemplateDTO);
         Expertise expertise = expertiseService.getExpertiseByCountryId(countryId);
-        OrganizationType organizationType = organizationService.getOrganizationTypeById(countryId).get(0);
+        OrganizationType organizationType = organizationService.getOrganizationTypeByCountryId(countryId).get(0);
         OrganizationType organizationSubType = organizationService.getOrganizationSubTypeById(organizationType.getId()).get(0);
         CollectiveTimeAgreementDTO collectiveTimeAgreementDTO = new CollectiveTimeAgreementDTO
                 ("CTA TEST", "Test description", expertise.getId(), organizationType.getId(),

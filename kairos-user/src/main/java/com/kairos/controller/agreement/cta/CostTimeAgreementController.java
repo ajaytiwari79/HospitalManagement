@@ -35,13 +35,19 @@ public class CostTimeAgreementController {
                 costTimeAgreementService.createCostTimeAgreement(countryId,collectiveTimeAgreementDTO));
     }
 
-
     @RequestMapping(value = "/country/{countryId}/cta/{ctaId}", method = RequestMethod.PUT)
     @ApiOperation("Update CTA")
     public ResponseEntity<Map<String, Object>> updateCTA(@PathVariable Long countryId, @PathVariable Long ctaId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 costTimeAgreementService.updateCostTimeAgreement(countryId, ctaId, collectiveTimeAgreementDTO));
+    }
+
+    @RequestMapping(value = "/country/{countryId}/cta/{ctaId}", method = RequestMethod.DELETE)
+    @ApiOperation("Delete CTA")
+    public ResponseEntity<Map<String, Object>> deleteCTA(@PathVariable Long countryId, @PathVariable Long ctaId) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                costTimeAgreementService.deleteCostTimeAgreement(countryId, ctaId));
     }
 
     @RequestMapping(value = "/country/{countryId}/cta", method = RequestMethod.GET)
