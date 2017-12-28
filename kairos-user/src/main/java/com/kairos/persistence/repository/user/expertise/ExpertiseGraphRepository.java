@@ -10,9 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.EXPERTISE_HAS_SKILLS;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CATEGORY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -47,9 +45,10 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     void deleteExpertiseSkill(long expertiseId, List<Long> skillId, long lastModificationDate);
 
     @Query("Match (expertise:Expertise) where id(expertise)={0} with expertise\n" +
-            "Match (skillCategory:SkillCategory{isEnabled:true})-[:"+BELONGS_TO+"]->(country:Country) where id(country)={1} with skillCategory,expertise\n" +
-            "Match (skill:Skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory) with skill,skillCategory,expertise\n" +
-            "optional Match (expertise)-[r:"+EXPERTISE_HAS_SKILLS+"]->(skill) with collect({id:id(skill),name:skill.name,isSelected:case when r.isEnabled then true else false end}) as skill,skillCategory\n" +
+            "Match (skillCategory:SkillCategory{isEnabled:true})-[:"+BELONGS_TO+"]->(country:Country) where id(country)={1} with skillCategory,expertise,country\n" +
+            "Match (skill:Skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory) with skill,skillCategory,expertise,country\n" +
+            "OPTIONAL MATCH (skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(country)  with skill,skillCategory,expertise, CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as tags\n" +
+            "optional Match (expertise)-[r:"+EXPERTISE_HAS_SKILLS+"]->(skill) with collect({id:id(skill),name:skill.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as skill,skillCategory\n" +
             "return collect({id:id(skillCategory),name:skillCategory.name,children:skill}) as skills")
     ExpertiseSkillQueryResult getExpertiseSkills(long expertiseId, long countryId);
 

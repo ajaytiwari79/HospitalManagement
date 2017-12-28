@@ -68,15 +68,15 @@ public class TagController {
     @ApiOperation(value = "Create a New Tag in Organization")
     @RequestMapping(value = UNIT_URL + "/tag", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addOrganizationTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,tagService.addOrganizationTag(unitId,tagDTO));
+    public ResponseEntity<Map<String, Object>> addOrganizationTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long unitId, @RequestParam("type") String type) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,tagService.addOrganizationTag(unitId,tagDTO, type));
     }
 
     @ApiOperation(value = "Update a Organization Tag")
     @RequestMapping(value = UNIT_URL + "/tag/{tagId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateOrganizationTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long unitId, @PathVariable long tagId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateOrganizationTag(unitId, tagId, tagDTO));
+    public ResponseEntity<Map<String, Object>> updateOrganizationTag(@Validated @RequestBody TagDTO tagDTO, @PathVariable long unitId, @PathVariable long tagId, @RequestParam("type") String type) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateOrganizationTag(unitId, tagId, tagDTO, type));
     }
 
     @ApiOperation(value = "Get list of Organization Tag")
@@ -84,15 +84,15 @@ public class TagController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationTag(@PathVariable long unitId,
                                                                   @RequestParam(value = "filterText",required = false) String filterText,
-                                                                  @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfOrganizationTags(unitId, filterText, masterDataType));
+                                                                  @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType, @RequestParam("type") String type) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfOrganizationTags(unitId, filterText, masterDataType, type));
     }
 
     @ApiOperation(value = "Delete Organization Tag")
     @RequestMapping(value = UNIT_URL + "/tag/{tagId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteOrganizationTag(@PathVariable long unitId, @PathVariable long tagId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.deleteOrganizationTag(unitId, tagId));
+    public ResponseEntity<Map<String, Object>> deleteOrganizationTag(@PathVariable long unitId, @PathVariable long tagId, @RequestParam("type") String type) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.deleteOrganizationTag(unitId, tagId, type));
     }
 
     @ApiOperation(value = "Update a Country Tag Setting ")

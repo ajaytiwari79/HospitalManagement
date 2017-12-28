@@ -14,6 +14,4 @@ import java.util.List;
 @Repository
 public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGroupArea,Long> {
 
-    @Depth(value = 0)
-    List<PayGroupArea> findByDeletedIsFalseAndCountry(Country country);
 }

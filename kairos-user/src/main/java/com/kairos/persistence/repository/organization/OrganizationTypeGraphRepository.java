@@ -80,8 +80,10 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("Match (orgType:OrganizationType),(expertise:Expertise) where id(orgType)={0} AND id(expertise)={1} match (orgType)-[r:" + ORG_TYPE_HAS_EXPERTISE + "]->(expertise) set r.isEnabled=false,r.lastModificationDate={2} return r")
     void deleteOrgTypeExpertise(long orgTypeId, long expertiseId, long lastModificationDate);
 
-    @Query("Match (expertise:Expertise{isEnabled:true})-[:BELONGS_TO]->(country:Country) where id(country)={0} with expertise\n" +
-            "optional Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_EXPERTISE]->(expertise) where id(orgType)={1} return collect({id:id(expertise),name:expertise.name,isSelected:case when r.isEnabled then true else false end}) as expertise")
+    @Query("Match (expertise:Expertise{isEnabled:true})-[:BELONGS_TO]->(country:Country) where id(country)={0} with expertise, country\n" +
+            "optional Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_EXPERTISE]->(expertise) where id(orgType)={1} WITH expertise,country,r\n"+
+            "OPTIONAL MATCH (expertise)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(country)  with r,expertise, CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as tags\n"+
+            "return collect({id:id(expertise),name:expertise.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as expertise")
     OrgTypeExpertiseQueryResult getExpertiseOfOrganizationType(long countryId, long orgTypeId);
 
     @Query("match(ost:OrganizationType) where  id(ost) in {0} \n" +

@@ -105,10 +105,15 @@ public class TimeSlotService extends UserBaseService {
         ObjectMapper objectMapper = new ObjectMapper();
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
         for(TimeSlotDTO timeSlotDTO : timeSlotSetDTO.getTimeSlots()){
-            TimeSlot timeSlot = new TimeSlot(timeSlotDTO.getName());
-            timeSlot.setId(timeSlotDTO.getId());
+
+            TimeSlot timeSlot = (Optional.ofNullable(timeSlotDTO.getId()).isPresent())?
+                    timeSlotGraphRepository.findOne(timeSlotDTO.getId()):new TimeSlot(timeSlotDTO.getName());
+            if(timeSlot == null){
+                throw new InternalError("Invalid time slot id");
+            }
             TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue
                     (timeSlotDTO,TimeSlotSetTimeSlotRelationship.class);
+            timeSlotSetTimeSlotRelationship.setId(null);
             timeSlotSetTimeSlotRelationship.setTimeSlotSet(timeSlotSet);
             timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
             timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
@@ -142,6 +147,8 @@ public class TimeSlotService extends UserBaseService {
         }
         updateTimeSlot(timeSlotSetDTO.getTimeSlots(),timeSlotSet.getId());
         timeSlotSet.updateTimeSlotSet(timeSlotSetDTO);
+        timeSlotSet.setName(timeSlotSetDTO.getName());
+        timeSlotSet.setEndDate(timeSlotSetDTO.getEndDate());
         timeSlotSetsToUpdate.add(timeSlotSet);
         timeSlotSetRepository.saveAll(timeSlotSetsToUpdate);
         return timeSlotSetsToUpdate;
@@ -161,11 +168,47 @@ public class TimeSlotService extends UserBaseService {
 
     public List<TimeSlotDTO> updateTimeSlot(List<TimeSlotDTO> timeSlotDTOS,Long timeSlotSetId) {
 
+        TimeSlotSet timeSlotSet = timeSlotSetRepository.findOne(timeSlotSetId);
+        if(timeSlotSet == null){
+            throw new InternalError("Invalid time slot set id ");
+        }
+
+        List<TimeSlotDTO> timeSlotsToUpdate = new ArrayList<>();
+        List<TimeSlotDTO> timeSlotsToCreate = new ArrayList<>();
         for(TimeSlotDTO timeSlotDTO : timeSlotDTOS){
+            if(timeSlotDTO.getId() == null){
+                timeSlotsToCreate.add(timeSlotDTO);
+            } else {
+                timeSlotsToUpdate.add(timeSlotDTO);
+            }
+        }
+
+        for(TimeSlotDTO timeSlotDTO : timeSlotsToUpdate){
             timeSlotGraphRepository.updateTimeSlot(timeSlotSetId,timeSlotDTO.getId(),timeSlotDTO.getName(),timeSlotDTO.getStartHour(),
                     timeSlotDTO.getStartMinute(),timeSlotDTO.getEndHour(),timeSlotDTO.getEndMinute(),timeSlotDTO.isShiftStartTime());
         }
-        return timeSlotDTOS;
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
+        for(TimeSlotDTO timeSlotDTO : timeSlotsToCreate){
+
+            TimeSlot timeSlot = new TimeSlot(timeSlotDTO.getName());
+            TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = objectMapper.convertValue
+                    (timeSlotDTO,TimeSlotSetTimeSlotRelationship.class);
+            timeSlotSetTimeSlotRelationship.setId(null);
+            timeSlotSetTimeSlotRelationship.setTimeSlotSet(timeSlotSet);
+            timeSlotSetTimeSlotRelationship.setTimeSlot(timeSlot);
+            timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
+        }
+        save(timeSlotSetTimeSlotRelationships);
+
+        List<TimeSlotDTO> newCreatedTimeSlots = new ArrayList<>();
+        for(TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship : timeSlotSetTimeSlotRelationships){
+            TimeSlotDTO timeSlotDTO = objectMapper.convertValue(timeSlotSetTimeSlotRelationship,TimeSlotDTO.class);
+            timeSlotDTO.setId(timeSlotSetTimeSlotRelationship.getTimeSlot().getId());
+            newCreatedTimeSlots.add(timeSlotDTO);
+        }
+        return newCreatedTimeSlots;
     }
 
     public boolean deleteTimeSlotSet(Long unitId, Long timeSlotSetId) {
@@ -198,7 +241,7 @@ public class TimeSlotService extends UserBaseService {
         Map<String, Object> response = new HashMap<>();
         response.put("timeSlots", timeSlotWrappers);
         response.put("standardTimeSlot", STANDARD.equals(unit.getTimeSlotMode()) ? true : false);
-        response.put("timeZone", unit.getTimeZone().toString());
+        response.put("timeZone", unit.getTimeZone()!=null? unit.getTimeZone().getId() : null);
         return response;
     }
 
@@ -287,10 +330,13 @@ public class TimeSlotService extends UserBaseService {
      * @return
      * @auther anil maurya
      */
-    public List<Map<String, Object>> getCurrentTimeSlotOfUnit(Long unitId) {
-        List<Map<String, Object>> currentTimeSlots = timeSlotGraphRepository.getUnitCurrentTimeSlots(unitId);
-
-        return currentTimeSlots;
+    public List<TimeSlotWrapper> getCurrentTimeSlotOfUnit(Long unitId) {
+        Organization unit = organizationGraphRepository.findOne(unitId,0);
+        if(!Optional.ofNullable(unit).isPresent()){
+            throw new InternalError("Unit is null");
+        }
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(),unit.getTimeSlotMode(),new Date());
+        return timeSlotWrappers;
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotExternalId(Long unitId, Long kmdExternalId) {
@@ -299,7 +345,7 @@ public class TimeSlotService extends UserBaseService {
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotId(Long unitId, Long timeSlotId) {
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId);
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(unitId, timeSlotId,new Date());
         return timeSlotMap;
     }
 

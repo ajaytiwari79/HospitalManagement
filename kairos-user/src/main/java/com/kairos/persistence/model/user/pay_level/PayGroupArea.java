@@ -1,25 +1,17 @@
 package com.kairos.persistence.model.user.pay_level;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.country.Country;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
-
-import static com.kairos.persistence.model.constants.RelationshipConstants.LOCATED_IN;
 
 /**
  * Created by prabjot on 20/12/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class PayGroupArea extends UserBaseEntity {
-
     private String name;
-    private String description;
-    private boolean deleted;
-    @Relationship(type = LOCATED_IN)
-    Country country;
-
-
+    private float value;
 
     public PayGroupArea() {
         //default constructor
@@ -27,8 +19,8 @@ public class PayGroupArea extends UserBaseEntity {
 
     public PayGroupArea(String name, String description) {
         this.name = name;
-        this.description = description;
     }
+
 
     public String getName() {
         return name;
@@ -38,27 +30,11 @@ public class PayGroupArea extends UserBaseEntity {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public float getValue() {
+        return value;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public Country getCountry() {
-        return country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
+    public void setValue(float value) {
+        this.value = value;
     }
 }
