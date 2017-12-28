@@ -2,6 +2,7 @@ package com.kairos.service.agreement.cta;
 
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.agreement.cta.*;
@@ -9,6 +10,7 @@ import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCat
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CTARuleTemplateGraphRepository;
@@ -67,6 +69,7 @@ public class CostTimeAgreementService extends UserBaseService {
     private @Autowired CurrencyGraphRepository currencyGraphRepository;
     private @Autowired CountryHolidayCalenderGraphRepository countryHolidayCalenderGraphRepository;
     private @Autowired CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
+    private @Autowired OrganizationGraphRepository organizationGraphRepository;
 
 
     public void createDefaultCtaRuleTemplate(Long countryId) {
@@ -399,43 +402,39 @@ public class CostTimeAgreementService extends UserBaseService {
         return collectiveTimeAgreementDTO;
     }
 
-    public CollectiveTimeAgreementDTO createCostTimeAgreementUnit(Long countryId,Long unitId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
-        logger.info("saving CostTimeAgreement country {}",countryId);
-        if(unitId != null){
-
-        } else {
-
+    public CollectiveTimeAgreementDTO updateCostTimeAgreementForOrg(Long ctaId, Long orgId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+        Boolean cTALinkedWithCountry = collectiveTimeAgreementGraphRepository.isCTALinkedWithCountry(ctaId);
+        CostTimeAgreement costTimeAgreement = collectiveTimeAgreementGraphRepository.findOne(ctaId);
+        CostTimeAgreement newCostTimeAgreement=new CostTimeAgreement();
+        if(costTimeAgreement == null){
+            throw new DataNotFoundByIdException("Invalid CTA Id");
         }
-        CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
-        BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement,"calculateOnDayTypes"); // correct
+        // Clone and create new
+        if(cTALinkedWithCountry){
+            // Remove linking of old CTA with org
+            collectiveTimeAgreementGraphRepository.detachCTAFromOrganization(orgId, ctaId);
+        } else {
+            // Set disabled of old CTA as true
+            costTimeAgreement.setDisabled(true);
+        }
+
+
+        BeanUtils.copyProperties(collectiveTimeAgreementDTO, newCostTimeAgreement);
         CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, false);
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, true);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
-        this.save(costTimeAgreement);
+        // Set Parent CTA in new CTA
+        newCostTimeAgreement.setParent(costTimeAgreement);
+        this.save(newCostTimeAgreement);
         BeanUtils.copyProperties(costTimeAgreement,collectiveTimeAgreementDTO);
         return collectiveTimeAgreementDTO;
     }
 
-    public CompletableFuture<Boolean> buildCTAToUpdate(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO)
-            throws InterruptedException, ExecutionException {
-        costTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
-        costTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
-
-        // Get Rule Templates
-        Callable<List<RuleTemplate>> ctaRuleTemplatesCallable=()-> {
-            List<RuleTemplate> ruleTemplates = new ArrayList<>();
-            for(CTARuleTemplateDTO ctaRuleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()){
-                CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate() ;
-                BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes,");
-                ruleTemplates.add(ctaRuleTemplate);
-            }
-            return ruleTemplates;
-        };
-        Future<List<RuleTemplate>>ctaRuleTemplatesFuture=asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
-
-        return CompletableFuture.completedFuture(true);
+    public List<CTAListQueryResult> loadAllCTAByUnit(Long countryId) {
+        Country country = countryGraphRepository.findOne(countryId);
+        return  collectiveTimeAgreementGraphRepository.findCTAByCountryId(countryId);
     }
 
     public CTARuleTemplateDTO updateCTARuleTemplate(Long countryId, Long id, CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
@@ -448,4 +447,13 @@ public class CostTimeAgreementService extends UserBaseService {
         return ctaRuleTemplateDTO;
     }
 
+    public Boolean setCTAToOrganizationByOrgSubType(Long organizationId, List<Long> orgSubTypeId){
+        List<CostTimeAgreement> costTimeAgreements  = collectiveTimeAgreementGraphRepository.getAllCTAByOrganiationSubType(orgSubTypeId, false);
+        collectiveTimeAgreementGraphRepository.detachAllCTAFromOrganization(organizationId);
+        Organization org = organizationGraphRepository.findOne(organizationId);
+        org.setCostTimeAgreements(costTimeAgreements);
+        organizationGraphRepository.save(org);
+        return true;
     }
+
+}

@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.agreement.cta;
 
+import com.kairos.persistence.model.constants.RelationshipConstants;
 import com.kairos.persistence.model.user.agreement.cta.CTAListQueryResult;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
@@ -8,6 +9,9 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO_ORG_SUB_TYPE;
 
 @Repository
 public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseRepository<CostTimeAgreement,Long> {
@@ -47,5 +51,20 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     @Query("MATCH (cta:CostTimeAgreement)-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0} AND id(cta) = {1} AND cta.deleted={2} return cta")
     CostTimeAgreement findCTAByCountryAndIdAndDeleted(Long countryId, Long ctaId, Boolean deleted);
 
+    @Query("match(ost:OrganizationType) where  id(ost) in {0} \n" +
+            "match(cta:CostTimeAgreement)-[:"+ BELONGS_TO_ORG_SUB_TYPE+"]->(ost) WHERE cta.deleted={1}\n" +
+            "return cta")
+    List<CostTimeAgreement> getAllCTAByOrganiationSubType(List<Long> organizationSubTypeIds, Boolean deleted);
 
+    @Query("Match (organization:Organization) where id(organization)={0} with organization"+
+            "Match (organization)-[r:HAS_CTA]->(cta:CostTimeAgreement)  WHERE id(cta) = {1} DELETE r")
+    void detachCTAFromOrganization(Long orgId, Long ctaId);
+
+    @Query("Match (organization:Organization) where id(organization)={0} with organization"+
+        "Match (organization)-[r:HAS_CTA]->(cta:CostTimeAgreement) DELETE r")
+    void detachAllCTAFromOrganization(Long orgId);
+
+    @Query("Match (cta:CostTimeAgreement)-[r:"+BELONGS_TO+"]-(country:Country) WHERE id(cta) = {0}\n" +
+            "RETURN CASE WHEN r IS NULL THEN false ELSE true END")
+    Boolean isCTALinkedWithCountry(Long ctaId);
 }
