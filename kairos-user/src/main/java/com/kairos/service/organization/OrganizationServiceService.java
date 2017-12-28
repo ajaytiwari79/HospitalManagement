@@ -190,6 +190,7 @@ public class OrganizationServiceService extends UserBaseService {
                 if(organizationGraphRepository.isServiceAlreadyExist(id,organizationService.getId()) == 0){
                     organizationGraphRepository.addOrganizationServiceInUnit(id,Arrays.asList(organizationService.getId()), DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
                 }else {
+                    logger.info("logger are"+id+"with"+organizationService.getId());
                     organizationGraphRepository.updateServiceFromOrganization(id,organizationService.getId());
                 }
                 addDefaultCustomNameRelationShipOfServiceForOrganization(organizationService.getId(), id);

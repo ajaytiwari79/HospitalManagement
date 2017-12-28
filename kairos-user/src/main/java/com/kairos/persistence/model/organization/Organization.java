@@ -54,13 +54,13 @@ public class Organization extends UserBaseEntity {
     private String name;
     private String email;
 
-
     @Property(name = "organizationLevel")
     @EnumString(OrganizationLevel.class)
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
 
 
     private String childLevel;
+
     private String eanNumber;
     @NotNull(message = "error.Organization.formal.notnull")
     private String formalName;
