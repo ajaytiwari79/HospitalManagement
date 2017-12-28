@@ -26,7 +26,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             Object handler) throws Exception {
 
 
-        final Map<String, String> pathVariables = (Map<String, String>) request
+       final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
         String orgIdStirng=pathVariables.get("organizationId");
@@ -51,7 +51,6 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(Optional.ofNullable(tabId).isPresent()){
             UserContext.setTabId(tabId);
         }
-
 
         return true;
     }

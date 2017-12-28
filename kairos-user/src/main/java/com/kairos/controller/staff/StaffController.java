@@ -179,7 +179,7 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getEmployments(@PathVariable long staffId, @PathVariable long unitId, @RequestParam("type") String type) {
         Map<String, Object> responseData = new HashMap<String, Object>(2);
         responseData.put("employments", employmentService.getEmployments(staffId, unitId, type));
-        responseData.put("employmentTypes", employmentTypeService.getEmploymentTypeOfOrganization(unitId, false) );
+        responseData.put("employmentTypes", employmentTypeService.getEmploymentTypeOfOrganization(unitId, false));
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responseData);
     }
 
@@ -387,8 +387,9 @@ public class StaffController {
                                                                 @RequestParam("file") MultipartFile multipartFile,
                                                                 @RequestParam("accessGroupId") Long accessGroupId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffService.batchAddStaffToDatabase(unitId, multipartFile,accessGroupId));
+                staffService.batchAddStaffToDatabase(unitId, multipartFile, accessGroupId));
     }
+
 
     @RequestMapping(value = "/{staffId}/access_permissions", method = RequestMethod.GET)
     @ApiOperation("Get uploaded Staff as per orgnaizationID ")
@@ -558,8 +559,8 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> verifyStaffBelongsToUnit(@RequestParam("type") String type,@PathVariable long unitId, @PathVariable long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.verifyStaffBelongsToUnit(staffId, unitId,type));
+    public ResponseEntity<Map<String, Object>> verifyStaffBelongsToUnit(@RequestParam("type") String type, @PathVariable long unitId, @PathVariable long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.verifyStaffBelongsToUnit(staffId, unitId, type));
     }
 
     @RequestMapping(value = "/current_user/{userId}", method = RequestMethod.GET)
@@ -568,7 +569,6 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getStaffByUser(@PathVariable long userId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByUserId(userId));
     }
-
 
 
 }

@@ -127,11 +127,11 @@ public class Country extends UserBaseEntity {
         this.countryHolidayCalenderList = countryHolidayCalenderList;
     }
 
-//    public List<OrganizationType> getOrganizationTypes() {
+//    public List<OrganizationType> getOrganizationType() {
 //        return organizationTypeList;
 //    }
 //
-//    public void setOrganizationTypes(List<OrganizationType> organizationTypeList) {
+//    public void setOrganizationType(List<OrganizationType> organizationTypeList) {
 //        this.organizationTypeList = organizationTypeList;
 //    }
 

@@ -40,14 +40,14 @@ public abstract class RelationshipConstants {
     public final static String ORGANIZATION = "ORGANIZATION";
     public final static String PAYMENT_TYPE = "PAYMENT_TYPE";
     public final static String CURRENCY = "CURRENCY";
-    public final static String ORGANIZATION_HAS_OFFICE_RESOURCE ="ORGANIZATION_HAS_OFFICE_RESOURCE";
+    public final static String ORGANIZATION_HAS_OFFICE_RESOURCE = "ORGANIZATION_HAS_OFFICE_RESOURCE";
     public final static String HAS_EMPLOYMENT_TYPE = "HAS_EMPLOYMENT_TYPE";
     public final static String ORGANIZATION_HAS_TAG = "ORGANIZATION_HAS_TAG";
     public final static String HAS_CUSTOM_SERVICE_NAME_FOR = "HAS_CUSTOM_SERVICE_NAME_FOR";
 
-    public final static String HAS_POSITION_NAME ="HAS_POSITION_NAME";
-    public final static String HAS_POSITION ="HAS_POSITION";
-    public final static String EMPLOYMENT_TYPE_SETTINGS= "EMPLOYMENT_TYPE_SETTINGS";
+    public final static String HAS_POSITION_NAME = "HAS_POSITION_NAME";
+    public final static String HAS_POSITION = "HAS_POSITION";
+    public final static String EMPLOYMENT_TYPE_SETTINGS = "EMPLOYMENT_TYPE_SETTINGS";
 
 
     // Group
@@ -63,12 +63,10 @@ public abstract class RelationshipConstants {
     public final static String HAS_TEAM_LEADER = "HAS_TEAM_LEADER";
 
 
-
     // Skill ,Skill type, Skill Category , Country
 
 
-
-    public final static String STAFF_HAS_SKILLS ="STAFF_HAS_SKILLS";
+    public final static String STAFF_HAS_SKILLS = "STAFF_HAS_SKILLS";
 
     public final static String SKILL_OF_LEVEL = "SKILL_OF_LEVEL";
     public final static String HAS_HOLIDAY = "HAS_HOLIDAY";
@@ -108,23 +106,24 @@ public abstract class RelationshipConstants {
     public final static String HAS_ALLERGY = "HAS_ALLERGY";
 
     public final static String ORGANIZATION_HAS_RESOURCE = "ORGANIZATION_HAS_RESOURCE";
-    public final static String ORGANIZATION_HAS_DEPARTMENT ="ORGANIZATION_HAS_DEPARTMENT";
-    public final static String ORGANIZATION_SUB_SERVICE ="ORGANIZATION_SUB_SERVICE";
-    public final static String LINK_WITH_EXTERNAL_SERVICE ="LINK_WITH_EXTERNAL_SERVICE";
+    public final static String ORGANIZATION_HAS_DEPARTMENT = "ORGANIZATION_HAS_DEPARTMENT";
+    public final static String ORGANIZATION_SUB_SERVICE = "ORGANIZATION_SUB_SERVICE";
+    public final static String LINK_WITH_EXTERNAL_SERVICE = "LINK_WITH_EXTERNAL_SERVICE";
 
 
-    public static final String RESOURCE_NOT_AVAILABLE_ON="RESOURCE_NOT_AVAILABLE_ON";
+    public static final String RESOURCE_NOT_AVAILABLE_ON = "RESOURCE_NOT_AVAILABLE_ON";
     public static final String BELONGS_TO = "BELONGS_TO";
     public static final String HAS_EXPERTISE = "HAS_EXPERTISE";
-    public static final String BELONGS_TO_ORG_SUB_TYPE="BELONGS_TO_ORG_SUB_TYPE";
-    public static final String BELONGS_TO_ORG_TYPE="BELONGS_TO_ORG_TYPE";
+    public static final String BELONGS_TO_ORG_SUB_TYPE = "BELONGS_TO_ORG_SUB_TYPE";
+    public static final String BELONGS_TO_ORG_TYPE = "BELONGS_TO_ORG_TYPE";
 
     public static final String HAS_CTA = "HAS_CTA";
     public static final String HAS_COMPENSATION_TABLE = "HAS_COMPENSATION_TABLE";
     public static final String HAS_COMPENSATION_TABLE_INTERVAL = "HAS_COMPENSATION_TABLE_INTERVAL";
     public static final String HAS_PARENT_CTA = "HAS_PARENT_CTA";
+    public static final String HAS_PARENT_WTA = "HAS_PARENT_WTA";
     public static final String HAS_WTA = "HAS_WTA";
-
+    public static final String BELONGS_TO_ORGANIZATION = "BELONGS_TO_ORGANIZATION";
 
     public static final String HAS_ORGANIZATION_SERVICES = "HAS_ORGANIZATION_SERVICES";
     public static final String CIVILIAN_STATUS = "CIVILIAN_STATUS";
@@ -169,7 +168,7 @@ public abstract class RelationshipConstants {
     public final static String NEXT_TO_KIN = "NEXT_TO_KIN";
     public final static String PEOPLE_IN_HOUSEHOLD_LIST = "PEOPLE_IN_HOUSEHOLD_LIST";
     public final static String MUNICIPALITY = "MUNICIPALITY";
-    public final static String  PROVINCE = "PROVINCE";
+    public final static String PROVINCE = "PROVINCE";
     public final static String REGION = "REGION";
     public final static String KAIROS_STATUS = "KAIROS_STATUS";
     public final static String TYPE_OF_HOUSING = "TYPE_OF_HOUSING";
@@ -178,22 +177,22 @@ public abstract class RelationshipConstants {
     public final static String CLIENT_CONTACT_PERSON_SERVICE = "CLIENT_CONTACT_PERSON_SERVICE";
 
     // RULE Template
-    public final static String HAS_RULE_TEMPLATE="HAS_RULE_TEMPLATE";
-    public final static String HAS_RULE_TEMPLATE_CATEGORY="HAS_RULE_TEMPLATE_CATEGORY";
+    public final static String HAS_RULE_TEMPLATE = "HAS_RULE_TEMPLATE";
+    public final static String HAS_RULE_TEMPLATE_CATEGORY = "HAS_RULE_TEMPLATE_CATEGORY";
     public final static String HAS_RULE_TEMPLATES = "HAS_RULE_TEMPLATES";
     public final static String HAS_TIME_TYPES = "HAS_TIME_TYPES";
     public final static String HAS_LEVEL = "HAS_LEVEL";
-    public final static String HAS_RELATION_TYPES="HAS_RELATION_TYPES";
-    public final static String RELATION_TYPE="RELATION_TYPE";
-    public final static String RELATION_WITH_NEXT_TO_KIN="RELATION_WITH_NEXT_TO_KIN";
-    public final static String HAS_RELATION_OF="HAS_RELATION_OF";
-    public final static String HAS_RESOURCES="HAS_RESOURCES";
+    public final static String HAS_RELATION_TYPES = "HAS_RELATION_TYPES";
+    public final static String RELATION_TYPE = "RELATION_TYPE";
+    public final static String RELATION_WITH_NEXT_TO_KIN = "RELATION_WITH_NEXT_TO_KIN";
+    public final static String HAS_RELATION_OF = "HAS_RELATION_OF";
+    public final static String HAS_RESOURCES = "HAS_RESOURCES";
 
     public final static String FILTER_BY_PAGE = "FILTER_BY_PAGE";
 
     public final static String HAS_FAVOURITE_FILTERS = "HAS_FAVOURITE_FILTERS";
 
-    public final static  String BELONGS_TO_STAFF="BELONGS_TO_STAFF";
+    public final static String BELONGS_TO_STAFF = "BELONGS_TO_STAFF";
     public final static String UNAVAILABLE_ON = "UNAVAILABLE_ON";
     public final static String VEHICLE_HAS_FEATURE = "VEHICLE_HAS_FEATURE";
     public final static String HAS_TIME_SLOT_SET = "HAS_TIME_SLOT_SET";

@@ -5,9 +5,9 @@ import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCat
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -34,17 +34,12 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
      List<RuleTemplateCategoryTagDTO> getAllRulesOfCountry(long countryId);
 
 
-    @Query("match(l:RuleTemplateCategory) Where id(l)={0} \n" +
-            "set l.deleted=true\n" +
-            "return l;")
-    void softDelete(long ruleTemplateCategoryId);
 
-
-    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"]-(l:RuleTemplateCategory{deleted:false}) Where id(c)={0} and l.name=~{1} and l.ruleTemplateCategoryType={2} return l")
+    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"]-(l:RuleTemplateCategory{deleted:false}) Where id(c)={0} and l.name=~{1} and l.ruleTemplateCategoryType={2} return l LIMIT 1")
     RuleTemplateCategory findByName(Long countryId, String name,RuleTemplateCategoryType ruleTemplateCategoryType);
 
-    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"]->(l:RuleTemplateCategory{deleted:false}) Where id(c)={0} and l.name IN {1} return l")
-    List<RuleTemplateCategory> findByNames(Long countryId, ArrayList<String> categoryNames );
+    @Query("match(l:RuleTemplateCategory{deleted:false}) Where l.name=~{0} and l.ruleTemplateCategoryType={1} return l")
+    RuleTemplateCategory findByName( String name,RuleTemplateCategoryType ruleTemplateCategoryType);
 
     @Query("match(rc:RuleTemplateCategory) where id(rc)={0}\n" +
             "match (w:WTABaseRuleTemplate) where id(w)={1}\n" +
