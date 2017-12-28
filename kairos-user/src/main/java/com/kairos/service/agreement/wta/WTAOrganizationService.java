@@ -98,7 +98,7 @@ public class WTAOrganizationService extends UserBaseService {
 
         List<RuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
-            ruleTemplates = copyRuleTemplatesWithNew(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "ORGANIZATION", unitId);
+            ruleTemplates = copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "ORGANIZATION", unitId);
             newWta.setRuleTemplates(ruleTemplates);
         }
 
@@ -161,7 +161,7 @@ public class WTAOrganizationService extends UserBaseService {
         return ruleTemplateCategory;
     }
 
-    protected List<RuleTemplate> copyRuleTemplatesWithNew(List<RuleTemplate> ruleTemplates, List<WTARuleTemplateDTO> ruleTemplatesWithNew, String source, Long id) {
+    protected List<RuleTemplate> copyRuleTemplates(List<RuleTemplate> ruleTemplates, List<WTARuleTemplateDTO> ruleTemplatesWithNew, String source, Long id) {
         List<RuleTemplate> wtaBaseRuleTemplates = new ArrayList<RuleTemplate>(20);
 
         for (WTARuleTemplateDTO ruleTemplate : ruleTemplatesWithNew) {
@@ -196,7 +196,6 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumShiftLengthWTATemplate.setTemplateType(ruleTemplate.getTemplateType());
                     minimumShiftLengthWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     minimumShiftLengthWTATemplate.setDisabled(ruleTemplate.isActive());
-
                     wtaBaseRuleTemplates.add(minimumShiftLengthWTATemplate);
                     break;
 

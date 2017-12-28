@@ -143,7 +143,6 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> deleteWtaFromOrganization(@PathVariable long wtaId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.removeWta(wtaId));
     }
-    //updateWtaOfOrganization
 
     @ApiOperation(value = "Update WTA")
     @PutMapping(value = UNIT_URL + "/wta/{wtaId}")

@@ -143,7 +143,7 @@ public class WTAService extends UserBaseService {
 
         List<RuleTemplate> ruleTemplates = new ArrayList<>();
         if (wtaDTO.getRuleTemplates().size() > 0) {
-            ruleTemplates = wtaOrganizationService.copyRuleTemplatesWithNew(null, wtaDTO.getRuleTemplates(), "COUNTRY", countryId);
+            ruleTemplates = wtaOrganizationService.copyRuleTemplates(null, wtaDTO.getRuleTemplates(), "COUNTRY", countryId);
             wta.setRuleTemplates(ruleTemplates);
         }
 
@@ -214,7 +214,7 @@ public class WTAService extends UserBaseService {
         oldWta = prepareWta(oldWta, updateDTO);
         List<RuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
-            ruleTemplates = wtaOrganizationService.copyRuleTemplatesWithNew(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "COUNTRY", countryId);
+            ruleTemplates = wtaOrganizationService.copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "COUNTRY", countryId);
             oldWta.setRuleTemplates(ruleTemplates);
         }
         save(oldWta);

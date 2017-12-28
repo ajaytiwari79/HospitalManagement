@@ -223,6 +223,14 @@ public class OrganizationService extends UserBaseService {
         creationDate = new Date().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         phaseRestClient.createDefaultPhases(organization.getId());
+        // @ modified by vipul for KSP-107
+        /**
+         * @Modified vipul
+         * when creating an organization linking all existing wta with this subtype to organization
+         */
+        List<WorkingTimeAgreement> allWta = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
+        organization.setWorkingTimeAgreements(allWta);
+
         HashMap<String, Object> orgResponse = new HashMap<>();
         orgResponse.put("orgData", organizationResponse(organization, orgDetails));
         orgResponse.put("permissions", accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
@@ -287,13 +295,6 @@ public class OrganizationService extends UserBaseService {
         List<OrganizationType> organizationTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getTypeId());
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getSubTypeId());
 
-        // @ modified by vipul for KSP-107
-        /**
-         * @Modified vipul
-         * when creating an organization linking all existing wta with this subtype to organization
-         */
-        List<WorkingTimeAgreement> allWta = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
-        organization.setWorkingTimeAgreements(allWta);
 
         // BusinessType
         List<BusinessType> businessTypes = businessTypeGraphRepository.findByIdIn(orgDetails.getBusinessTypeIds());
@@ -497,6 +498,7 @@ public class OrganizationService extends UserBaseService {
          */
         List<WorkingTimeAgreement> allWta = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(organizationDTO.getOrganizationSubTypeId());
         unit.setWorkingTimeAgreements(allWta);
+
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
         response.put("name", unit.getName());
