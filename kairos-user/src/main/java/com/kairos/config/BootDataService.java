@@ -9,11 +9,14 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.payment_type.PaymentType;
@@ -30,6 +33,7 @@ import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientLanguageRelationGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
@@ -52,6 +56,8 @@ import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository
 import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.agreement.RuleTemplateCategoryService;
+import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.auth.RoleServiceUser;
 import com.kairos.service.auth.UserRoleServiceUser;
 import com.kairos.service.auth.UserService;
@@ -65,6 +71,7 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import org.joda.time.DateTime;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -164,6 +171,12 @@ public class BootDataService {
     private AccessPageService accessPageService;
     @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    @Inject
+    private RuleTemplateCategoryService ruleTemplateCategoryService;
+    @Inject
+    private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
+    @Inject
+    private CostTimeAgreementService costTimeAgreementService;
 
     private List<Long> skillList;
     private com.kairos.persistence.model.organization.OrganizationService homeCareService;
@@ -250,6 +263,7 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
+         createCTARuleTemplateCategory();
             startRegisteredCronJobs();
 
     }
@@ -979,5 +993,19 @@ public class BootDataService {
         currency.setLastModificationDate(new Date().getTime());
         currency.setCountry(denmark);
         currencyGraphRepository.save(currency);
+    }
+
+    private void createCTARuleTemplateCategory(){
+        RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
+                .findByName(53L, "NONE", RuleTemplateCategoryType.CTA);
+
+        if (category == null) {
+            category=new RuleTemplateCategory();
+            category.setName("NONE");
+            category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
+            ruleTemplateCategoryService.createRuleTemplateCategory(53L,category);
+        }
+        logger.info("creating CTA rule template");
+        costTimeAgreementService.createDefaultCtaRuleTemplate(53L);
     }
 }
