@@ -140,7 +140,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "t.name as name ," +
             "t.templateType as templateType," +
             "r as ruleTemplateCategory," +
-            "t.isActive as isActive,"+
+            "t.isDisabled as isDisabled,"+
             "t.description as description," +
             "t.daysLimit as daysLimit,"+
             "t.creationDate as creationDate,"+

@@ -514,7 +514,7 @@ public class Staff extends UserBaseEntity {
                 ", familyName='" + familyName + '\'' +
                 ", signature='" + signature + '\'' +
                 ", nationalInsuranceNumber='" + nationalInsuranceNumber + '\'' +
-                ", isActive=" + isActive +
+                ", isDisabled=" + isActive +
                 ", inactiveFrom=" + inactiveFrom +
                 ", organizationId=" + organizationId +
                 ", visitourId=" + visitourId +

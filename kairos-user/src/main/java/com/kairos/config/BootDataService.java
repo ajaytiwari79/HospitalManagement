@@ -734,7 +734,7 @@ public class BootDataService {
         michalAsStaff.setFamilyName("Micky");
         michalAsStaff.setFirstName("Michael J");
         michalAsStaff.setLastName("John");
-        michalAsStaff.setActive(true);
+        michalAsStaff.setDisabled(true);
         michalAsStaff.getContactDetail().setPrivatePhone("9711588672");
         michalAsStaff.getContactDetail().setWorkPhone("9718420411");
         michalAsStaff.getContactDetail().setMobilePhone("7000000000");
@@ -754,7 +754,7 @@ public class BootDataService {
         livaAsStaff.setFamilyName("Liva");
         livaAsStaff.setFirstName("Liva J");
         livaAsStaff.setLastName("Rasmussen");
-        livaAsStaff.setActive(true);
+        livaAsStaff.setDisabled(true);
         livaAsStaff.setNationalInsuranceNumber("NIN44500981");
         livaAsStaff.setEmail("liva@oodlestechnologies.com");
         livaAsStaff.setLanguage(danish);
@@ -774,7 +774,7 @@ public class BootDataService {
         almaAsStaff.setFamilyName("Alma");
         almaAsStaff.setFirstName("Alma L");
         almaAsStaff.setLastName("Krogh");
-        almaAsStaff.setActive(true);
+        almaAsStaff.setDisabled(true);
         almaAsStaff.setEmail("alma@oodlestechnologies.com");
         almaAsStaff.setNationalInsuranceNumber("NIN44500331");
         almaAsStaff.setLanguage(danish);

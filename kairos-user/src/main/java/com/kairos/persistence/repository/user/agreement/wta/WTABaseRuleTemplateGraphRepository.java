@@ -27,7 +27,7 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.name as name ," +
             "t.templateType as templateType," +
             "r as ruleTemplateCategory," +
-            "t.isActive as isActive," +
+            "t.disabled as disabled," +
             "t.description as description," +
             "t.daysLimit as daysLimit," +
             "t.creationDate as creationDate," +
