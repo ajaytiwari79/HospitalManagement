@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.user.agreement.wta;
 
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
+import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
@@ -55,7 +55,7 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.shiftsLimit as shiftsLimit," +
             "t.activityCode as activityCode," +
             "t.onlyCompositeShifts as onlyCompositeShifts")
-    WTARuleTemplateQueryResponse getRuleTemplateAndCategoryById(long templateId);
+    RuleTemplateCategoryDTO getRuleTemplateAndCategoryById(long templateId);
 
     @Query("Match (n:WTABaseRuleTemplate) where id(n) in {0} return n")
     List<RuleTemplate> getWtaBaseRuleTemplateByIds(List<Long> templateIds);

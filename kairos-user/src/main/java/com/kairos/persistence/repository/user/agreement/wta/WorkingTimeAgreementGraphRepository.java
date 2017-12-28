@@ -35,14 +35,14 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "RETURN ruleTemplates as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
             "expertise as expertise,wta.creationDate as creationDate, wta.endDateMillis as endDateMillis,wta.name as name,id(wta) as id"
     )
-    List<WorkingTimeAgreementQueryResult> getAllWTAByOrganizationId(long organizationId);
+    List<WTAWithCountryAndOrganizationTypeDTO> getAllWTAByOrganizationId(long organizationId);
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={0} \n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true}) \n" +
             "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]->(orgType:OrganizationType)\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orgSubType:OrganizationType) \n" +
-
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTempCatg:RuleTemplateCategory)\n" +
+            "with wta,expertise,orgType,orgSubType,ruleTemp,ruleTempCatg optional MATCH (wta)-[r:"+HAS_TAG+"]->(t:Tag)<-[:"+ COUNTRY_HAS_TAG +"]-(c) WHERE t.masterDataType='WTA' AND t.countryTag=true AND t.deleted =false\n"+
             "return wta.isEnabled as isEnabled," +
             "CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})   END as tags, \n"+
             "wta.startDateMillis as startDateMillis,CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,fromDayOfWeek:ruleTemp.fromDayOfWeek,minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts," +
@@ -130,7 +130,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
             "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id LIMIT 1"
     )
-    WTAWithRuleTemplateDTO getWTAByExpertiseAndCountry(Long expertiseId);
+    WTAWithCountryAndOrganizationTypeDTO getWTAByExpertiseAndCountry(Long expertiseId);
 
 
     @Query("match(p:Position)-[r:" + HAS_WTA + "]->(w:WorkingTimeAgreement) where Id(p)={0} AND ID(w)={1} delete r")

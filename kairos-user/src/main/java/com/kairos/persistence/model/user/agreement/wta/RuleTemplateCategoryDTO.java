@@ -1,43 +1,40 @@
-package com.kairos.persistence.model.user.agreement.wta.templates;
+package com.kairos.persistence.model.user.agreement.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.springframework.data.neo4j.annotation.QueryResult;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 
 import java.util.List;
 
 /**
- * Created by pawanmandhan on 10/8/17.
+ * Created by vipul on 12/10/17.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@QueryResult
-public class WTABaseRuleTemplateDTO {
-
+public class RuleTemplateCategoryDTO {
+    private RuleTemplateCategory ruleTemplateCategory;
     private Long id;
     private String name;
     private String templateType;
-    private RuleTemplateCategory ruleTemplateCategory;
+    private String category;
     private Long timeLimit;
     private List<String> balanceType;
-    private Boolean checkAgainstTimeRules;
+    private boolean checkAgainstTimeRules;
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
-    private Boolean disabled;
+    private  boolean disabled;
     private String description;
     private Long creationDate;
     private Long lastModificationDate;
     private Long nightsWorked;
-    private Long interval;
+    private Long intervalLength;
     private String intervalUnit;
     private Long validationStartDateMillis;
-
-    private Boolean balanceAdjustment;
-    private Boolean useShiftTimes;
+    private boolean balanceAdjustment;
+    private boolean useShiftTimes;
     private Long maximumAvgTime;
     private Double maximumVetoPercentage;
-
     private Long numberShiftsPerPeriod;
     private Long numberOfWeeks;
     private String fromDayOfWeek;
@@ -51,8 +48,24 @@ public class WTABaseRuleTemplateDTO {
     private Long averageRest;
     private String shiftAffiliation;
     private Long shiftsLimit;
-    private Boolean onlyCompositeShifts;
+    private boolean onlyCompositeShifts;
     private String activityCode;
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public RuleTemplateCategory getRuleTemplateCategory() {
+        return ruleTemplateCategory;
+    }
+
+    public void setRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
+        this.ruleTemplateCategory = ruleTemplateCategory;
+    }
 
     public Long getId() {
         return id;
@@ -78,14 +91,6 @@ public class WTABaseRuleTemplateDTO {
         this.templateType = templateType;
     }
 
-    public RuleTemplateCategory getRuleTemplateCategory() {
-        return ruleTemplateCategory;
-    }
-
-    public void setRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
-        this.ruleTemplateCategory = ruleTemplateCategory;
-    }
-
     public Long getTimeLimit() {
         return timeLimit;
     }
@@ -102,11 +107,11 @@ public class WTABaseRuleTemplateDTO {
         this.balanceType = balanceType;
     }
 
-    public Boolean getCheckAgainstTimeRules() {
+    public boolean isCheckAgainstTimeRules() {
         return checkAgainstTimeRules;
     }
 
-    public void setCheckAgainstTimeRules(Boolean checkAgainstTimeRules) {
+    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
     }
 
@@ -134,16 +139,12 @@ public class WTABaseRuleTemplateDTO {
         this.daysWorked = daysWorked;
     }
 
-    public Boolean getDisabled() {
+    public boolean isDisabled() {
         return disabled;
     }
 
-    public void setDisabled(Boolean disabled) {
+    public void setDisabled(boolean disabled) {
         this.disabled = disabled;
-    }
-
-    public boolean isProportional() {
-        return proportional;
     }
 
     public String getDescription() {
@@ -178,12 +179,12 @@ public class WTABaseRuleTemplateDTO {
         this.nightsWorked = nightsWorked;
     }
 
-    public Long getInterval() {
-        return interval;
+    public Long getIntervalLength() {
+        return intervalLength;
     }
 
-    public void setInterval(Long interval) {
-        this.interval = interval;
+    public void setIntervalLength(Long intervalLength) {
+        this.intervalLength = intervalLength;
     }
 
     public String getIntervalUnit() {
@@ -202,19 +203,19 @@ public class WTABaseRuleTemplateDTO {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public Boolean getBalanceAdjustment() {
+    public boolean isBalanceAdjustment() {
         return balanceAdjustment;
     }
 
-    public void setBalanceAdjustment(Boolean balanceAdjustment) {
+    public void setBalanceAdjustment(boolean balanceAdjustment) {
         this.balanceAdjustment = balanceAdjustment;
     }
 
-    public Boolean getUseShiftTimes() {
+    public boolean isUseShiftTimes() {
         return useShiftTimes;
     }
 
-    public void setUseShiftTimes(Boolean useShiftTimes) {
+    public void setUseShiftTimes(boolean useShiftTimes) {
         this.useShiftTimes = useShiftTimes;
     }
 
@@ -266,7 +267,7 @@ public class WTABaseRuleTemplateDTO {
         this.fromTime = fromTime;
     }
 
-    public boolean getProportional() {
+    public boolean isProportional() {
         return proportional;
     }
 
@@ -338,11 +339,11 @@ public class WTABaseRuleTemplateDTO {
         this.shiftsLimit = shiftsLimit;
     }
 
-    public Boolean getOnlyCompositeShifts() {
+    public boolean isOnlyCompositeShifts() {
         return onlyCompositeShifts;
     }
 
-    public void setOnlyCompositeShifts(Boolean onlyCompositeShifts) {
+    public void setOnlyCompositeShifts(boolean onlyCompositeShifts) {
         this.onlyCompositeShifts = onlyCompositeShifts;
     }
 

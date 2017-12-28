@@ -1,6 +1,6 @@
 package com.kairos.controller.agreement.wta;
 
-import com.kairos.response.dto.web.WTADTO;
+import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.service.agreement.wta.WTAOrganizationService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.util.response.ResponseHandler;

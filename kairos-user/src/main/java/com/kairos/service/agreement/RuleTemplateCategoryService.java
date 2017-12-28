@@ -6,8 +6,8 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplateDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
@@ -180,12 +180,12 @@ public class RuleTemplateCategoryService extends UserBaseService {
         return response;
     }
 
-    private List<WTABaseRuleTemplateDTO> getJsonOfUpdatedTemplates(List<RuleTemplate> wtaBaseRuleTemplates, RuleTemplateCategory ruleTemplateCategory) {
+    private List<RuleTemplateCategoryDTO> getJsonOfUpdatedTemplates(List<RuleTemplate> wtaBaseRuleTemplates, RuleTemplateCategory ruleTemplateCategory) {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = new ArrayList<>(wtaBaseRuleTemplates.size());
+        List<RuleTemplateCategoryDTO> wtaBaseRuleTemplateDTOS = new ArrayList<>(wtaBaseRuleTemplates.size());
         wtaBaseRuleTemplates.forEach(wtaBaseRuleTemplate -> {
-            WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO = objectMapper.convertValue(wtaBaseRuleTemplate, WTABaseRuleTemplateDTO.class);
+            RuleTemplateCategoryDTO wtaBaseRuleTemplateDTO = objectMapper.convertValue(wtaBaseRuleTemplate, RuleTemplateCategoryDTO.class);
             wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplateCategory);
             wtaBaseRuleTemplateDTOS.add(wtaBaseRuleTemplateDTO);
         });

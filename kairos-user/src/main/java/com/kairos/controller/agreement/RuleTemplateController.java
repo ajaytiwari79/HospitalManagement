@@ -1,6 +1,6 @@
 package com.kairos.controller.agreement;
 
-import com.kairos.response.dto.web.WTARuleTemplateDTO;
+import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.RuleTemplateDTO;
 import com.kairos.service.agreement.RuleTemplateCategoryService;
 import com.kairos.service.agreement.RuleTemplateService;
@@ -40,7 +40,7 @@ public class RuleTemplateController {
     }
 
     @RequestMapping(value = "/rule_templates/{templateType}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @Valid @RequestBody WTARuleTemplateDTO templateDTO) {
+    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @Valid @RequestBody RuleTemplateCategoryDTO templateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.updateRuleTemplate(countryId,templateType, templateDTO));
     }
 

@@ -2,7 +2,6 @@ package com.kairos.persistence.model.user.agreement.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateWithCategoryDTO;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -23,13 +22,10 @@ public class WTAWithCountryAndOrganizationTypeDTO {
     private String name;
     private String description;
     private long id;
-
-
     private Expertise expertise;
-
     private OrganizationType organizationType;//
     private OrganizationType organizationSubType;//
-    private List<RuleTemplateWithCategoryDTO> ruleTemplates;
+    private List<RuleTemplateCategoryDTO> ruleTemplates;
     private List<Tag> tags;
 
     public Long getStartDateMillis() {
@@ -39,7 +35,6 @@ public class WTAWithCountryAndOrganizationTypeDTO {
     public void setStartDateMillis(Long startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
-
 
     public Long getEndDateMillis() {
         return endDateMillis;
@@ -81,6 +76,13 @@ public class WTAWithCountryAndOrganizationTypeDTO {
         this.id = id;
     }
 
+    public Expertise getExpertise() {
+        return expertise;
+    }
+
+    public void setExpertise(Expertise expertise) {
+        this.expertise = expertise;
+    }
 
     public OrganizationType getOrganizationType() {
         return organizationType;
@@ -88,14 +90,6 @@ public class WTAWithCountryAndOrganizationTypeDTO {
 
     public void setOrganizationType(OrganizationType organizationType) {
         this.organizationType = organizationType;
-    }
-
-    public Expertise getExpertise() {
-        return expertise;
-    }
-
-    public void setExpertise(Expertise expertise) {
-        this.expertise = expertise;
     }
 
     public OrganizationType getOrganizationSubType() {
@@ -106,15 +100,13 @@ public class WTAWithCountryAndOrganizationTypeDTO {
         this.organizationSubType = organizationSubType;
     }
 
-
-    public List<RuleTemplateWithCategoryDTO> getRuleTemplates() {
+    public List<RuleTemplateCategoryDTO> getRuleTemplates() {
         return ruleTemplates;
     }
 
-    public void setRuleTemplates(List<RuleTemplateWithCategoryDTO> ruleTemplates) {
+    public void setRuleTemplates(List<RuleTemplateCategoryDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
-
 
     public List<Tag> getTags() {
         return tags;
