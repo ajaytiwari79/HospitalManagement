@@ -1,5 +1,4 @@
 package com.kairos.persistence.model.user.agreement.wta;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -25,6 +24,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
+
 /**
  * @Author vipul
  *
@@ -32,7 +32,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 public class WorkingTimeAgreement extends UserBaseEntity {
 
-    @NotNull(message = "error.parentWTA.name.notnull")
+    @NotNull(message = "error.WorkingTimeAgreement.name.notnull")
     private String name;
 
     private String description;
