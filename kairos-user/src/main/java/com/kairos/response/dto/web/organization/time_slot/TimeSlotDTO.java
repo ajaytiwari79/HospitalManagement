@@ -16,7 +16,7 @@ public class TimeSlotDTO {
     private int startMinute;
     private int endHour;
     private int endMinute;
-    private boolean isShiftStartTime;
+    private boolean shiftStartTime;
     private Long id;
 
     public TimeSlotDTO() {
@@ -72,15 +72,11 @@ public class TimeSlotDTO {
     }
 
     public boolean isShiftStartTime() {
-        return isShiftStartTime;
-    }
-
-    public void setIsShiftStartTime(boolean shiftStartTime) {
-        isShiftStartTime = shiftStartTime;
+        return shiftStartTime;
     }
 
     public void setShiftStartTime(boolean shiftStartTime) {
-        isShiftStartTime = shiftStartTime;
+        this.shiftStartTime = shiftStartTime;
     }
 
     public void setId(Long id) {

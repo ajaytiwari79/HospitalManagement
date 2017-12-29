@@ -1236,7 +1236,7 @@ public class ClientService extends UserBaseService {
         taskAddress.setStreet(homeAddress.getStreet1());
         taskAddress.setHouseNumber(homeAddress.getHouseNumber());
 
-        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId());
+        Map<String, Object> timeSlotMap = timeSlotGraphRepository.getTimeSlotByUnitIdAndTimeSlotId(taskDemandWrapper.getUnitId(), taskDemandWrapper.getTimeSlotId(),new Date());
         Long countryId = countryGraphRepository.getCountryIdByUnitId(taskDemandWrapper.getUnitId());
 
         List<Long> publicHolidayList = countryGraphRepository.getAllCountryHolidaysBetweenDates(countryId, taskDemandWrapper.getStartDate().getTime(), taskDemandWrapper.getEndDate().getTime());
@@ -1653,7 +1653,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
             throw new InternalError("Invalid Organization id");
         }
 
-        List<Map<String, Object>> temporaryAddressList = clientGraphRepository.getClientTemporaryAddressById(clientId);
+        List<Map<String, Object>> temporaryAddressList = FormatUtil.formatNeoResponse(clientGraphRepository.getClientTemporaryAddressById(clientId));
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(organization.getId(),organization.getTimeSlotMode(),
                 new Date());
         List<ClientExceptionTypesDTO> clientExceptionTypesDTOS = clientExceptionRestClient.getClientExceptionTypes();

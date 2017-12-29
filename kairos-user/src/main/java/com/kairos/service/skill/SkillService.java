@@ -352,9 +352,9 @@ public class SkillService extends UserBaseService {
     }*/
 
     public boolean updateSkillOfOrganization(long unitId, long skillId, String type, OrganizationSkillDTO organizationSkillDTO) {
-        
+        Boolean skillUpdated = false;
         if(ORGANIZATION.equalsIgnoreCase(type)){
-            Boolean skillUpdated = false;
+
             if(organizationSkillDTO.getCustomName() == null || organizationSkillDTO.getCustomName() == ""){
                 skillUpdated =  skillGraphRepository.updateSkillOfOrganization(unitId, skillId, organizationSkillDTO.getVisitourId());
             } else {
@@ -366,7 +366,11 @@ public class SkillService extends UserBaseService {
             }
             return skillUpdated;
          } else if(TEAM.equalsIgnoreCase(type)) {
-            return skillGraphRepository.updateVisitourIdOfSkillInTeam(unitId,skillId,organizationSkillDTO.getVisitourId());
+            skillUpdated = skillGraphRepository.updateVisitourIdOfSkillInTeam(unitId,skillId,organizationSkillDTO.getVisitourId());
+            if(skillUpdated) {
+                tagService.updateOrganizationTagsOfSkill(skillId, teamGraphRepository.getOrganizationIdByTeam(unitId), organizationSkillDTO.getTags());
+            }
+            return skillUpdated;
         } else {
             throw new InternalError("Type incorrect");
         }

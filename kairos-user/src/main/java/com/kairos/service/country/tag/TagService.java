@@ -8,6 +8,7 @@ import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
@@ -41,6 +42,9 @@ public class TagService extends UserBaseService {
 
     @Inject
     private SkillGraphRepository skillGraphRepository;
+
+    @Inject
+    private TeamGraphRepository teamGraphRepository;
 
     public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId,0);
@@ -133,7 +137,10 @@ public class TagService extends UserBaseService {
         return tagGraphRepository.addOrganizationTag(tagDTO.getName(), organizationId, tagDTO.getMasterDataType(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime() );
     }*/
 
-    public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO) {
+    public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO, String type) {
+        if(type.equalsIgnoreCase("team")){
+            organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
+        }
         Organization organization = organizationGraphRepository.findOne(organizationId, 0);
         if (organization == null) {
             throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
@@ -145,7 +152,10 @@ public class TagService extends UserBaseService {
         return tagGraphRepository.createOrganizationTag(organizationId,tagDTO.getName(), tagDTO.getMasterDataType().toString(), DateUtil.getCurrentDate().getTime());
     }
 
-    public Tag  updateOrganizationTag(Long organizationId, Long tagId, TagDTO tagDTO) {
+    public Tag  updateOrganizationTag(Long organizationId, Long tagId, TagDTO tagDTO, String type) {
+        if(type.equalsIgnoreCase("team")){
+            organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
+        }
         Organization organization = organizationGraphRepository.findOne(organizationId, 0);
         if (organization == null) {
             throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);
@@ -160,7 +170,10 @@ public class TagService extends UserBaseService {
         return tagGraphRepository.updateOrganizationTag(tagId, organizationId, tagDTO.getName(), DateUtil.getCurrentDate().getTime());
     }
 
-    public Boolean deleteOrganizationTag(Long orgId, Long tagId){
+    public Boolean deleteOrganizationTag(Long orgId, Long tagId, String type){
+        if(type.equalsIgnoreCase("team")){
+            orgId = teamGraphRepository.getOrganizationIdByTeam(orgId);
+        }
         Organization organization = organizationGraphRepository.findOne(orgId, 0);
         if (organization == null) {
             throw new DataNotFoundByIdException("Incorrect Unit Id " + orgId);
@@ -174,7 +187,10 @@ public class TagService extends UserBaseService {
         return true;
     }
 
-    public HashMap<String, Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType){
+    public HashMap<String, Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType, String type){
+        if(type.equalsIgnoreCase("team")){
+            organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
+        }
         Organization organization = organizationGraphRepository.findOne(organizationId, 0);
         if (organization == null) {
             throw new DataNotFoundByIdException("Incorrect Unit Id " + organizationId);

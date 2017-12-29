@@ -24,4 +24,7 @@ public interface TimeTypeGraphRepository extends Neo4jBaseRepository <TimeType,L
 
     @Query("MATCH (timeType:TimeType{deleted:false}) where timeType.name =~ {0} AND timeType.type =~ {1} AND id(timeType)<> {2} return count(timeType)")
     int findByNameAndTypeAndIdIgnoreCase(String name ,String type,long Id);
+
+    @Query("MATCH (timeType:TimeType{deleted:false}) WHERE id(timeType) IN {0} return timeType")
+    List<TimeType> findTimeTypeByIds(List<Long> timeTypeIds);
 }

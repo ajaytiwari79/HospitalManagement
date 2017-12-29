@@ -19,6 +19,9 @@ public interface CountryHolidayCalenderGraphRepository extends Neo4jBaseReposito
     @Query("MATCH (ch:CountryHolidayCalender) WHERE id(ch) ={0}   SET ch.disabled = true return ch")
     CountryHolidayCalender safeDelete(Long id);
 
+    @Query("MATCH (ch:CountryHolidayCalender{{isEnable:true}}) WHERE id(ch) IN {0}  return ch")
+    List<CountryHolidayCalender> getCountryHolidayCalendarsById(List<Long> ids);
+
     @Query("MATCH (c:Country)-[:HAS_HOLIDAY]->(ch:CountryHolidayCalender{isEnable:true})  WHERE ch.googleCalId={0} AND  id(c)={1} return count(ch) ")
     int checkIfHolidayExist(String id, Long countryId);
 

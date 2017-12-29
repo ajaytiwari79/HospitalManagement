@@ -10,6 +10,7 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
@@ -172,6 +173,9 @@ public class Organization extends UserBaseEntity {
 
     @Relationship(type = HAS_WTA)
     private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
+
+    @Relationship(type = HAS_CTA)
+    private List<CostTimeAgreement> costTimeAgreements = new ArrayList<>();
 
     @Relationship(type = HAS_TIME_SLOT_SET)
     private List<TimeSlotSet> timeSlotSets = new ArrayList<>();
@@ -681,6 +685,15 @@ public class Organization extends UserBaseEntity {
 
     public void setWorkingTimeAgreements(List<WorkingTimeAgreement> workingTimeAgreements) {
         this.workingTimeAgreements = workingTimeAgreements;
+    }
+
+
+    public List<CostTimeAgreement> getCostTimeAgreements() {
+        return costTimeAgreements;
+    }
+
+    public void setCostTimeAgreements(List<CostTimeAgreement> costTimeAgreements) {
+        this.costTimeAgreements = costTimeAgreements;
     }
 
     public void addWorkingTimeAgreements(WorkingTimeAgreement workingTimeAgreement) {
