@@ -41,8 +41,8 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true}) \n" +
             "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]->(orgType:OrganizationType)\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orgSubType:OrganizationType) \n" +
-
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTempCatg:RuleTemplateCategory)\n" +
+            "with wta,expertise,orgType,orgSubType,ruleTemp,ruleTempCatg optional MATCH (wta)-[r:"+HAS_TAG+"]->(t:Tag)<-[:"+ COUNTRY_HAS_TAG +"]-(c) WHERE t.masterDataType='WTA' AND t.countryTag=true AND t.deleted =false\n"+
             "return wta.isEnabled as isEnabled," +
             "CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})   END as tags, \n"+
             "wta.startDateMillis as startDateMillis,CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,fromDayOfWeek:ruleTemp.fromDayOfWeek,minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts," +
