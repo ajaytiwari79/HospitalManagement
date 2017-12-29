@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
@@ -71,6 +72,8 @@ public class Staff extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
     User user;
+    @Relationship(type = BELONGS_TO)
+    Client client;
 
     EngineerType engineerType;
 
@@ -481,6 +484,14 @@ public class Staff extends UserBaseEntity {
         List<StaffFavouriteFilters> staffFavouriteFiltersList = Optional.ofNullable(this.staffFavouriteFiltersList).orElse(new ArrayList<>());
         staffFavouriteFiltersList.add(staffFavouriteFilters);
         this.staffFavouriteFiltersList = staffFavouriteFiltersList;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     @Override
