@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.agreement.wta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
@@ -353,5 +354,49 @@ public class RuleTemplateCategoryDTO {
 
     public void setActivityCode(String activityCode) {
         this.activityCode = activityCode;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("ruleTemplateCategory", ruleTemplateCategory)
+                .append("id", id)
+                .append("name", name)
+                .append("templateType", templateType)
+                .append("category", category)
+                .append("timeLimit", timeLimit)
+                .append("balanceType", balanceType)
+                .append("checkAgainstTimeRules", checkAgainstTimeRules)
+                .append("daysLimit", daysLimit)
+                .append("minimumRest", minimumRest)
+                .append("daysWorked", daysWorked)
+                .append("disabled", disabled)
+                .append("description", description)
+                .append("creationDate", creationDate)
+                .append("lastModificationDate", lastModificationDate)
+                .append("nightsWorked", nightsWorked)
+                .append("intervalLength", intervalLength)
+                .append("intervalUnit", intervalUnit)
+                .append("validationStartDateMillis", validationStartDateMillis)
+                .append("balanceAdjustment", balanceAdjustment)
+                .append("useShiftTimes", useShiftTimes)
+                .append("maximumAvgTime", maximumAvgTime)
+                .append("maximumVetoPercentage", maximumVetoPercentage)
+                .append("numberShiftsPerPeriod", numberShiftsPerPeriod)
+                .append("numberOfWeeks", numberOfWeeks)
+                .append("fromDayOfWeek", fromDayOfWeek)
+                .append("fromTime", fromTime)
+                .append("proportional", proportional)
+                .append("toTime", toTime)
+                .append("toDayOfWeek", toDayOfWeek)
+                .append("continuousDayRestHours", continuousDayRestHours)
+                .append("minimumDurationBetweenShifts", minimumDurationBetweenShifts)
+                .append("continuousWeekRest", continuousWeekRest)
+                .append("averageRest", averageRest)
+                .append("shiftAffiliation", shiftAffiliation)
+                .append("shiftsLimit", shiftsLimit)
+                .append("onlyCompositeShifts", onlyCompositeShifts)
+                .append("activityCode", activityCode)
+                .toString();
     }
 }
