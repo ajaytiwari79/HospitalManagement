@@ -426,34 +426,22 @@ public class WTAService extends UserBaseService {
         }
         if (checked) {
             WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
-            System.out.println(newWtaObject.hashCode());
-            newWtaObject=copyWta(wta, newWtaObject);
-
+            copyWta(wta, newWtaObject);
             newWtaObject.setOrganizationSubType(organizationSubType);
             List<RuleTemplate> ruleTemplateWithCategory = copyRuleTemplate(wta.getRuleTemplates());
             newWtaObject.setRuleTemplates(ruleTemplateWithCategory);
-            System.out.println(newWtaObject.toString());
-         /*   if (Optional.ofNullable(wta.getRuleTemplates()).isPresent() && wta.getRuleTemplates().size() > 0) {
-                WtaDTO wtaDTO = wta.buildwtaDTO();
-                List<Long> ruleTemplateIds = new ArrayList<>();
-                for (RuleTemplate wtaBRT : wta.getRuleTemplates()) {
-                    ruleTemplateIds.add(wtaBRT.getId());
-                }
-                wtaDTO.setRuleTemplates(ruleTemplateIds);
-                copyRuleTemplates(wtaDTO, wta.getRuleTemplates(), wtaRuleTemplateQueryResponseArrayList);
-            }
-           */
-            newWtaObject.setId(null);
             newWtaObject.setOrganizationSubType(organizationSubType);
-            //    save(newWtaObject);
+            save(newWtaObject);
+// setting basic propery for response
             newWtaObject.setOrganizationType(newWtaObject.getOrganizationType().basicDetails());
             newWtaObject.setOrganizationSubType(newWtaObject.getOrganizationSubType().basicDetails());
             newWtaObject.setExpertise(newWtaObject.getExpertise().retrieveBasicDetails());
+            newWtaObject.setCountry(null);
             map.put("wta", newWtaObject);
             map.put("ruleTemplate", ruleTemplateWithCategory);
         } else {
-            // wta.setDeleted(true);
-            //save(wta);
+            wta.setDeleted(true);
+            save(wta);
         }
         return map;
 
@@ -472,15 +460,14 @@ public class WTAService extends UserBaseService {
         return ruleTemplateCategory;
     }
 
-    private WorkingTimeAgreement copyWta(WorkingTimeAgreement oldWta, WorkingTimeAgreement updateDTO) {
-        WorkingTimeAgreement newWta = new WorkingTimeAgreement();
-        System.out.println(updateDTO.hashCode());
+    private WorkingTimeAgreement copyWta(WorkingTimeAgreement oldWta, WorkingTimeAgreement newWta) {
         newWta.setName(oldWta.getName());
         newWta.setDescription(oldWta.getDescription());
         newWta.setStartDateMillis(oldWta.getStartDateMillis());
         newWta.setEndDateMillis(oldWta.getEndDateMillis());
         newWta.setExpertise(oldWta.getExpertise());
         newWta.setOrganizationType(oldWta.getOrganizationType());
+        newWta.setCountry(oldWta.getCountry());
         newWta.setId(null);
         return newWta;
 
