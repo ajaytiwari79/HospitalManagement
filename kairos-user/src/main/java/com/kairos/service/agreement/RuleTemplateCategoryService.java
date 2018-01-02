@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -38,6 +40,8 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     @Inject
     WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
@@ -198,8 +202,8 @@ public class RuleTemplateCategoryService extends UserBaseService {
         RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory();
         Country country = countryGraphRepository.findOne(countryId);
         List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
-        Optional<RuleTemplateCategory> countryRuleTemplateCategory=ruleTemplateCategories.parallelStream().filter(ruleTemplateCategory1->"CTA".equalsIgnoreCase(ruleTemplateCategory1.getRuleTemplateCategoryType().toString())
-                &&ruleTemplateCategory1.getName().equalsIgnoreCase(ruleTemplateDTO.getCategoryName())).findFirst();
+        Optional<RuleTemplateCategory> countryRuleTemplateCategory = ruleTemplateCategories.parallelStream().filter(ruleTemplateCategory1 -> "CTA".equalsIgnoreCase(ruleTemplateCategory1.getRuleTemplateCategoryType().toString())
+                && ruleTemplateCategory1.getName().equalsIgnoreCase(ruleTemplateDTO.getCategoryName())).findFirst();
 
         if (!countryRuleTemplateCategory.isPresent()) {
             ruleTemplateCategory.setName(ruleTemplateDTO.getCategoryName());
@@ -220,5 +224,14 @@ public class RuleTemplateCategoryService extends UserBaseService {
         return response;
     }
 
+
+    public List<RuleTemplateCategory> getRulesTemplateCategoryByUnit(Long unitId, RuleTemplateCategoryType ruleTemplateCategoryType) {
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            throw new DataNotFoundByIdException("Organization does not exist");
+        }
+        return ruleTemplateCategoryGraphRepository.getRuleTemplateCategoryByCountry(organization.getCountry().getId(), ruleTemplateCategoryType);
+
+    }
 
 }

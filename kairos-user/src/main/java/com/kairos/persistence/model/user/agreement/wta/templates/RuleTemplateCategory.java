@@ -33,8 +33,6 @@ public class RuleTemplateCategory extends UserBaseEntity {
 
      @NotNull(message = "error.RuleTemplate.description.notnull")
     private String name;
-    //@NotEmpty(message = "error.RuleTemplate.description.notEmpty")
-    //@NotNull(message = "error.RuleTemplate.description.name.notnull")
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
     @JsonIgnore
