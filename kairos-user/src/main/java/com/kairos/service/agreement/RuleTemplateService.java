@@ -41,9 +41,6 @@ public class RuleTemplateService extends UserBaseService {
     private List<String> ruleTemplate = new ArrayList<String>();
     @Inject
     private TemplateCategoryRelationGraphRepository templateRelationShipGraphRepository;
-    /* Stream.of(RuleTemplate.values())
-            .map(RuleTemplate::name)
-            .collect(Collectors.toList());*/
     @Inject
     private WTABaseRuleTemplateGraphRepository wtaRuleTemplateGraphRepository;
     @Inject
@@ -62,11 +59,11 @@ public class RuleTemplateService extends UserBaseService {
         Country country = countryGraphRepository.findOne(countryId);
 
         if (country == null) {
-            throw new DataNotFoundByIdException("Invalid organisation");
+            throw new DataNotFoundByIdException("Invalid Country");
         }
 
 
-        RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("NONE");
+        RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("NONE",RuleTemplateCategoryType.WTA);
         ruleTemplateCategoryService.createRuleTemplateCategory(countryId, ruleTemplateCategory);
         ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
         String MONTHS = "MONTHS";

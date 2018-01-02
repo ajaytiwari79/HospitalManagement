@@ -136,7 +136,9 @@ public class RuleTemplateCategory extends UserBaseEntity {
         return mp;
     }
 
-
-
+    public RuleTemplateCategory(@NotNull(message = "error.RuleTemplate.description.notnull") String name, RuleTemplateCategoryType ruleTemplateCategoryType) {
+        this.name = name;
+        this.ruleTemplateCategoryType = ruleTemplateCategoryType;
+    }
 }
 

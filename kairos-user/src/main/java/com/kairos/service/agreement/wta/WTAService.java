@@ -432,7 +432,7 @@ public class WTAService extends UserBaseService {
             newWtaObject.setRuleTemplates(ruleTemplateWithCategory);
             newWtaObject.setOrganizationSubType(organizationSubType);
             save(newWtaObject);
-// setting basic propery for response
+        // setting basic propery for response
             newWtaObject.setOrganizationType(newWtaObject.getOrganizationType().basicDetails());
             newWtaObject.setOrganizationSubType(newWtaObject.getOrganizationSubType().basicDetails());
             newWtaObject.setExpertise(newWtaObject.getExpertise().retrieveBasicDetails());
