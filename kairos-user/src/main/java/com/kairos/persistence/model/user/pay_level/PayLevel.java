@@ -8,6 +8,7 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
+import javax.validation.constraints.Future;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

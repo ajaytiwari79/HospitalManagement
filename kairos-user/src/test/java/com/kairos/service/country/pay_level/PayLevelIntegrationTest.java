@@ -7,6 +7,7 @@ import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.pay_level.PayLevel;
 import com.kairos.persistence.model.user.pay_level.PayLevelDTO;
 import com.kairos.persistence.model.user.pay_level.PayLevelGlobalData;
+import com.kairos.persistence.model.user.pay_level.PayLevelUpdateDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,11 +20,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import static com.kairos.persistence.model.user.pay_level.PaymentUnit.PER_HOUR;
+import static com.kairos.util.DateUtil.ONLY_DATE;
 
 /**
  * Created by prabjot on 26/12/17.
@@ -38,6 +43,8 @@ public class PayLevelIntegrationTest {
     TestRestTemplate restTemplate;
 
     static Long payLevelId;
+
+    private static final DateFormat df = new SimpleDateFormat(ONLY_DATE);
 
     @Test
     @OrderTest(order = 1)
@@ -58,7 +65,14 @@ public class PayLevelIntegrationTest {
     @Test
     @OrderTest(order = 2)
     public void savePayLevel(){
-        PayLevelDTO payLevelDTO = new PayLevelDTO("Test pay level",86L,6959L, PER_HOUR,new Date());
+        Date startDate;
+        Date endDate;
+        try{
+            startDate = df.parse("2017-12-28");
+        } catch (ParseException e){
+            throw new RuntimeException(e.getMessage());
+        }
+        PayLevelDTO payLevelDTO = new PayLevelDTO("Test pay level",86L,6959L, PER_HOUR,startDate);
         String baseUrl= getBaseUrl(145L,53L,null);
         HttpEntity<PayLevelDTO> entity = new HttpEntity<>(payLevelDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PayLevel>> typeReference =
@@ -72,6 +86,32 @@ public class PayLevelIntegrationTest {
         Assert.assertEquals(201,response.getStatusCodeValue());
         Assert.assertNotNull(payLevelId);
         Assert.assertEquals(responseBody.getData().getName(),payLevelDTO.getName());
+    }
+
+    @Test
+    @OrderTest(order = 3)
+    public void updatePayLevel(){
+        Date startDate;
+        Date endDate;
+        try{
+            startDate = df.parse("2018-01-03");
+        } catch (ParseException e){
+            throw new RuntimeException(e.getMessage());
+        }
+        PayLevelUpdateDTO payLevelUpdateDTO = new PayLevelUpdateDTO("Test pay level",startDate,null);
+        String baseUrl= getBaseUrl(145L,53L,null);
+        HttpEntity<PayLevelUpdateDTO> entity = new HttpEntity<>(payLevelUpdateDTO);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<PayLevel>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayLevel>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<PayLevel>> response = restTemplate.exchange(
+                baseUrl+"/pay_level/" + payLevelId,
+                HttpMethod.PUT, entity, typeReference);
+        RestTemplateResponseEnvelope<PayLevel> responseBody = response.getBody();
+        payLevelId = responseBody.getData().getId();
+        Assert.assertEquals(200,response.getStatusCodeValue());
+        Assert.assertNotNull(payLevelId);
+        Assert.assertEquals(responseBody.getData().getStartDate(),startDate);
     }
 
 
