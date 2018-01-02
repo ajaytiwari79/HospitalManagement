@@ -212,13 +212,8 @@ public class WTAService extends UserBaseService {
             throw new DuplicateDataException("Duplicate WTA name " + updateDTO.getName());
         }
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
-        newWta = prepareWta(oldWta, updateDTO);
-        List<RuleTemplate> ruleTemplates = new ArrayList<>();
-        if (updateDTO.getRuleTemplates().size() > 0) {
-            ruleTemplates = wtaOrganizationService.copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "COUNTRY", countryId);
-            newWta.setRuleTemplates(ruleTemplates);
-        }
-        newWta.setParentWTA(oldWta);
+        newWta = prepareWta(oldWta, updateDTO,countryId);
+
         save(newWta);
         newWta.setOrganizationType(oldWta.getOrganizationType().basicDetails());
         newWta.setOrganizationSubType(oldWta.getOrganizationSubType().basicDetails());
@@ -232,7 +227,7 @@ public class WTAService extends UserBaseService {
         return newWta;
     }
 
-    private WorkingTimeAgreement prepareWta(WorkingTimeAgreement oldWta, WTADTO updateDTO) {
+    private WorkingTimeAgreement prepareWta(WorkingTimeAgreement oldWta, WTADTO updateDTO,Long countryId) {
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
         newWta.setName(updateDTO.getName());
         newWta.setDescription(updateDTO.getDescription());
@@ -268,6 +263,12 @@ public class WTAService extends UserBaseService {
         } else {
             newWta.setOrganizationSubType(oldWta.getOrganizationSubType());
         }
+        List<RuleTemplate> ruleTemplates = new ArrayList<>();
+        if (updateDTO.getRuleTemplates().size() > 0) {
+            ruleTemplates = wtaOrganizationService.copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "COUNTRY", countryId);
+            newWta.setRuleTemplates(ruleTemplates);
+        }
+        newWta.setParentWTA(oldWta);
         return newWta;
 
     }
@@ -369,7 +370,7 @@ public class WTAService extends UserBaseService {
 
     }
 
-    private List<RuleTemplate> copyRuleTemplate(List<RuleTemplate> ruleTemplates) {
+    public List<RuleTemplate> copyRuleTemplate(List<RuleTemplate> ruleTemplates) {
         List<RuleTemplate> ruleTemplateCategory = new ArrayList<>(ruleTemplates.size());
         ObjectMapper objectMapper = new ObjectMapper();
         ruleTemplates.forEach(ruleTemplate -> {
@@ -382,7 +383,7 @@ public class WTAService extends UserBaseService {
         return ruleTemplateCategory;
     }
 
-    private WorkingTimeAgreement copyWta(WorkingTimeAgreement oldWta, WorkingTimeAgreement newWta) {
+    public WorkingTimeAgreement copyWta(WorkingTimeAgreement oldWta, WorkingTimeAgreement newWta) {
         newWta.setName(oldWta.getName());
         newWta.setDescription(oldWta.getDescription());
         newWta.setStartDateMillis(oldWta.getStartDateMillis());

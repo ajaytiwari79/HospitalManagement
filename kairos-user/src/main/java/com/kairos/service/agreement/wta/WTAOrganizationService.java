@@ -166,9 +166,9 @@ public class WTAOrganizationService extends UserBaseService {
 
         for (RuleTemplateCategoryDTO ruleTemplate : ruleTemplatesWithNew) {
             RuleTemplateCategory ruleTemplateCategory = null;
-            if (source.equals("ORGANIZATION")) {
+            if (source.equalsIgnoreCase("ORGANIZATION")) {
                 ruleTemplateCategory = getCategory(ruleTemplates, ruleTemplate.getId(), ruleTemplate.getRuleTemplateCategory().getName());
-            } else if (source.equals("COUNTRY")) {
+            } else if (source.equalsIgnoreCase("COUNTRY")) {
                 ruleTemplateCategory = getCategoryForCountry(ruleTemplates, ruleTemplate.getId(), ruleTemplate.getRuleTemplateCategory().getName(), id);
             }
 
