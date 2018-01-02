@@ -40,8 +40,6 @@ public class WTAOrganizationService extends UserBaseService {
     @Inject
     private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
-    private WTAService wtaService;
-    @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
@@ -105,7 +103,7 @@ public class WTAOrganizationService extends UserBaseService {
         organization.addWorkingTimeAgreements(newWta);
 
         save(organization);
-        workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(),organization.getId());
+        workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId());
         newWta.setParentWTA(oldWta.basicDetails());
         newWta.getExpertise().setCountry(null);
 
@@ -115,12 +113,14 @@ public class WTAOrganizationService extends UserBaseService {
 
     private RuleTemplateCategory getCategory(List<RuleTemplate> ruleTemplates, Long id, String ruleTemplateCategoryName) {
         RuleTemplateCategory ruleTemplateCategory = null;
-        for (RuleTemplate ruletemplate : ruleTemplates) {
-            if (ruletemplate.getId().equals(id) && ruleTemplateCategoryName.equals(ruletemplate.getRuleTemplateCategory().getName())) { // if category is not changed so Assign from previous
-                ruleTemplateCategory = ruletemplate.getRuleTemplateCategory();
-                break;
-            }
+        if (ruleTemplates != null) {
+            for (RuleTemplate ruletemplate : ruleTemplates) {
+                if (ruletemplate.getId().equals(id) && ruleTemplateCategoryName.equals(ruletemplate.getRuleTemplateCategory().getName())) { // if category is not changed so Assign from previous
+                    ruleTemplateCategory = ruletemplate.getRuleTemplateCategory();
+                    break;
+                }
 
+            }
         }
         if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
             ruleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(ruleTemplateCategoryName, WTA);
