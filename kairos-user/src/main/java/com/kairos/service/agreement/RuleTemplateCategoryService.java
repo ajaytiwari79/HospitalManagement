@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType.CTA;
 
@@ -225,12 +226,24 @@ public class RuleTemplateCategoryService extends UserBaseService {
     }
 
 
-    public List<RuleTemplateCategory> getRulesTemplateCategoryByUnit(Long unitId, RuleTemplateCategoryType ruleTemplateCategoryType) {
+    public Map getRulesTemplateCategoryByUnit(Long unitId, RuleTemplateCategoryType ruleTemplateCategoryType) {
+
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new DataNotFoundByIdException("Organization does not exist");
         }
-        return ruleTemplateCategoryGraphRepository.getRuleTemplateCategoryByCountry(organization.getCountry().getId(), ruleTemplateCategoryType);
+
+        Country country = countryGraphRepository.findOne(organization.getCountry().getId());
+        List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
+        List<RuleTemplateCategory> categoryList = ruleTemplateCategories.parallelStream().filter(
+                ruleTemplateCategory -> RuleTemplateCategoryType.WTA.equals(ruleTemplateCategory.getRuleTemplateCategoryType()) && ruleTemplateCategory.isDeleted() == false)
+                .collect(Collectors.toList());
+
+        List<RuleTemplate> templateList = country.getWTABaseRuleTemplate();
+        Map response = new HashMap();
+        response.put("categoryList", categoryList);
+        response.put("templateList", templateList);
+        return response;
 
     }
 

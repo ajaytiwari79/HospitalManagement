@@ -91,7 +91,6 @@ public class WTAService extends UserBaseService {
             throw new DuplicateDataException("Duplicate WTA name" + wtaDTO.getName());
         }
         // Link tags to WTA
-        System.out.println(wtaDTO.getTags().size());
         if (wtaDTO.getTags().size() > 0) {
             List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA);
             wta.setTags(tags);
@@ -104,12 +103,20 @@ public class WTAService extends UserBaseService {
         wta.setCountry(country);
         save(wta);
         // Adding this wta to all organization type
+
+//        assignWTATOrganization(wta,wtaDTO.getOrganizationSubType());
         wtaRepository.linkWTAWithAllOrganizationOfThisSubType(wta.getId(), wta.getOrganizationSubType().getId());
         wta.setOrganizationType(wta.getOrganizationType().basicDetails());
         wta.setOrganizationSubType(wta.getOrganizationSubType().basicDetails());
         wta.getExpertise().setCountry(null);
         return wta;
     }
+
+//    @Async
+//    private void assignWTATOrganization(WorkingTimeAgreement wta,Long organizationSubTypeId) {
+//        List<Organization> organizations=organizationTypeRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+//        organizations.parallelStream().map()
+//    }
 
     private void checkUniquenessOfData(long countryId, long organizationSubTypeId, long organizationTypeId, long expertiseId) {
         WorkingTimeAgreement wta =
@@ -432,7 +439,7 @@ public class WTAService extends UserBaseService {
             newWtaObject.setRuleTemplates(ruleTemplateWithCategory);
             newWtaObject.setOrganizationSubType(organizationSubType);
             save(newWtaObject);
-        // setting basic propery for response
+            // setting basic propery for response
             newWtaObject.setOrganizationType(newWtaObject.getOrganizationType().basicDetails());
             newWtaObject.setOrganizationSubType(newWtaObject.getOrganizationSubType().basicDetails());
             newWtaObject.setExpertise(newWtaObject.getExpertise().retrieveBasicDetails());
