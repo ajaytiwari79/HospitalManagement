@@ -23,7 +23,7 @@ public class PositionQueryResult {
     private int workingDaysInWeek;
     private Long endDate;
     private Long lastModificationDate;
-    private int totalWeeklyHours;
+    private float totalWeeklyHours;
     private float avgDailyWorkingHours;
     private float hourlyWages;
     private long id;
@@ -73,11 +73,11 @@ public class PositionQueryResult {
         this.endDate = endDate;
     }
 
-    public int getTotalWeeklyHours() {
+    public float getTotalWeeklyHours() {
         return totalWeeklyHours;
     }
 
-    public void setTotalWeeklyHours(int totalWeeklyHours) {
+    public void setTotalWeeklyHours(float totalWeeklyHours) {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
