@@ -95,15 +95,13 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     List<Organization> getOrganizationsByOrganizationType(long orgTypeId);
 
 
-    @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
-            "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType) with organizationType,organization\n" +
-            "optional match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType)<-[:SUB_TYPE_OF]-(organization) with subType,organizationType,organization\n" +
+    @Query("Match (organization:Organization{isEnable:true}) where id(organization)={0} with organization\n" +
+            "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) with organizationType,organization\n" +
             "return id(organizationType)")
     List<Long> getOrganizationTypeIdsByUnitId(long unitId);
 
-    @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
-            "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType) with organizationType,organization\n" +
-            "optional match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType)<-[:SUB_TYPE_OF]-(organization) with subType,organizationType,organization\n" +
+    @Query("Match (organization:Organization{isEnable:true}) where id(organization)={0} with organization\n" +
+            "Match (organization)-[:SUB_TYPE_OF]->(subType:OrganizationType{isEnable:true}) with subType,organization\n" +
             "return id(subType)")
     List<Long> getOrganizationSubTypeIdsByUnitId(long unitId);
 
