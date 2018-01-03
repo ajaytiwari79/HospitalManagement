@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.user.pay_level;
 import com.kairos.persistence.model.user.pay_level.PayLevel;
 import com.kairos.persistence.model.user.pay_level.PayLevelDTO;
 import com.kairos.persistence.model.user.pay_level.PayLevelGlobalData;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 26/12/17.
  */
 @Repository
-public interface PayLevelGraphRepository extends Neo4jRepository<PayLevel, Long> {
+public interface PayLevelGraphRepository extends Neo4jBaseRepository<PayLevel, Long> {
 
     @Query("Match (organizationType:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(country:Country) where id(country)={0}\n" +
             "Optional Match (organizationType)-[:"+HAS_SUB_TYPE+"]->(subType:OrganizationType{isEnable:true}) with subType,organizationType\n" +
