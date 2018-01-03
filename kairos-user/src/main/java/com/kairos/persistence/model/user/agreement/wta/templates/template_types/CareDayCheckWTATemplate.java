@@ -55,7 +55,6 @@ public class CareDayCheckWTATemplate extends WTABaseRuleTemplate {
                                    String description, long intervalLength, long validationStartDateMillis, String intervalUnit, long daysLimit) {
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
         this.description = description;
         this.intervalLength =intervalLength;
         this.intervalUnit= intervalUnit;

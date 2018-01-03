@@ -5,7 +5,7 @@ import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 28/10/16.
  */
 @Repository
-public interface ExpertiseGraphRepository extends GraphRepository<Expertise> {
+public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,Long> {
 
    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) return expertise")
     List<Expertise> getAllExpertiseByCountry(long countryId);
@@ -59,4 +59,8 @@ public interface ExpertiseGraphRepository extends GraphRepository<Expertise> {
     @Query("match (e:Expertise{isEnabled:true}) where id(e) in {0} \n" +
             "return id(e) as id,e.name as name,e.description as description")
     List<ExpertiseDTO> getAllFreeExpertises(List<Long> ids);
+
+    @Query("match (e:Expertise{isEnabled:true})-[:"+BELONGS_TO+"]->(country:Country) where id(country) = {0} return e LIMIT 1")
+    Expertise getExpertiesByCountry(Long id);
+
 }

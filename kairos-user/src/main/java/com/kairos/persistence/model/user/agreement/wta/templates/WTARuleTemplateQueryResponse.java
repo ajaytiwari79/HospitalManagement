@@ -2,7 +2,6 @@ package com.kairos.persistence.model.user.agreement.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.user.country.tag.Tag;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public class WTARuleTemplateQueryResponse {
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
-    private Boolean isActive;
+    private Boolean disabled;
     private String description;
     private Long creationDate;
     private Long lastModificationDate;
@@ -262,13 +261,12 @@ public class WTARuleTemplateQueryResponse {
         this.name = name;
     }
 
-
-    public Boolean getActive() {
-        return isActive;
+    public Boolean getDisabled() {
+        return disabled;
     }
 
-    public void setActive(Boolean active) {
-        isActive = active;
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
     }
 
     public String getDescription() {

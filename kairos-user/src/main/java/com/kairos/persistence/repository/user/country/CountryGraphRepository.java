@@ -3,14 +3,15 @@ package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.RelationType;
 import com.kairos.persistence.model.user.resources.Vehicle;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,7 +24,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 
 @Repository
-public interface CountryGraphRepository extends GraphRepository<Country> {
+public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long> {
 
     List<Country> findAll();
 
@@ -92,9 +93,9 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
     List<Country> checkDuplicateCountry(String name, Long organizationId);
 
 
-    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"  ]-(l:RuleTemplateCategory) Where id(c)={0} AND  l.name=~{1}\n" +
+    @Query("match(c:Country{isEnabled:true})-[r:"+HAS_RULE_TEMPLATE_CATEGORY+"  ]-(l:RuleTemplateCategory) Where id(c)={0} AND l.ruleTemplateCategoryType={1} AND l.name=~{2}\n" +
             "return count(r) as number;")
-     int  checkDuplicateRuleTemplate(Long id, String name);
+     int checkDuplicateRuleTemplateCategory(Long id, RuleTemplateCategoryType ruleTemplateCategoryType, String name);
 
 
     @Query("MATCH (n:Country{isEnabled:true}) RETURN collect({name:n.name, code:n.code}) as list")
@@ -119,6 +120,13 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
     @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " +
             "where id(c) = {0}   AND ch.holidayDate >={1} AND  ch.holidayDate <={2}  " +
             "AND ch.isEnabled = true WITH  ch as ch  " +
+            "OPTIONAL MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
+            "return ch.holidayDate as result")
+    List<Long> getAllCountryHolidaysCalendarsByIds(Long countryId, Long start, Long end);
+
+    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " +
+            "where id(c) = {0}   AND ch.holidayDate >={1} AND  ch.holidayDate <={2}  " +
+            "AND ch.isEnabled = true WITH  ch as ch  " +
             "MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
             "return ch.holidayDate as holidayDate, dt as dayType ")
     List<CountryHolidayCalendarQueryResult> getCountryHolidayCalendarBetweenDates(Long countryId, Long start, Long end);
@@ -139,7 +147,7 @@ public interface CountryGraphRepository extends GraphRepository<Country> {
             "t.name as name ," +
             "t.templateType as templateType," +
             "r as ruleTemplateCategory," +
-            "t.isActive as isActive,"+
+            "t.isDisabled as isDisabled,"+
             "t.description as description," +
             "t.daysLimit as daysLimit,"+
             "t.creationDate as creationDate,"+

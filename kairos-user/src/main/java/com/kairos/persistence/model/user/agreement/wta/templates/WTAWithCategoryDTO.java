@@ -21,7 +21,7 @@ public class WTAWithCategoryDTO {
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
-    private Boolean isActive;
+    private  boolean disabled;
     private String description;
     private Long creationDate;
     private Long lastModificationDate;
@@ -122,12 +122,12 @@ public class WTAWithCategoryDTO {
         this.daysWorked = daysWorked;
     }
 
-    public Boolean getActive() {
-        return isActive;
+    public boolean isDisabled() {
+        return disabled;
     }
 
-    public void setActive(Boolean active) {
-        isActive = active;
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 
     public String getDescription() {

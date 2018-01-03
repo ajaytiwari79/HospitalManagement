@@ -1,16 +1,14 @@
 package com.kairos.persistence.model.user.agreement.wta;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.response.dto.web.WtaDTO;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.beans.BeanUtils;
@@ -23,42 +21,42 @@ import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
-/**
- * Created by pawanmandhan on 26/7/17.
- */
 
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
+
+/**
+ * @Author vipul
+ *
+ * @Modified added organization and staff for personal copy
+ */
 public class WorkingTimeAgreement extends UserBaseEntity {
 
-    @NotEmpty(message = "error.wta.name.notempty")
-    @NotNull(message = "error.wta.name.notnull")
+    @NotNull(message = "error.WorkingTimeAgreement.name.notnull")
     private String name;
 
     private String description;
 
     @Relationship(type = HAS_EXPERTISE_IN)
-    private Expertise expertise;//
+    private Expertise expertise;
 
     @Relationship(type = BELONGS_TO_ORG_TYPE)
-    private OrganizationType organizationType;//
+    private OrganizationType organizationType;
 
     @Relationship(type = BELONGS_TO_ORG_SUB_TYPE)
-    private OrganizationType organizationSubType;//
+    private OrganizationType organizationSubType;
 
     @JsonIgnore
     @Relationship(type = BELONGS_TO)
     private Country country;
 
     @Relationship(type = HAS_RULE_TEMPLATE)
-    private List<WTABaseRuleTemplate> ruleTemplates;//
-
+    private List<RuleTemplate> ruleTemplates = new ArrayList<RuleTemplate>();
 
     // to make a history
-    @Relationship(type = HAS_WTA)
-    private WorkingTimeAgreement wta;
+    @Relationship(type = HAS_PARENT_WTA)
+    private WorkingTimeAgreement parentWTA;
 
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
@@ -66,16 +64,6 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     private Long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
-    private boolean deleted;
-
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
 
     public String getName() {
         return name;
@@ -84,7 +72,6 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
-
 
     public String getDescription() {
         return description;
@@ -102,14 +89,6 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.expertise = expertise;
     }
 
-    public OrganizationType getOrganizationTypes() {
-        return organizationType;
-    }
-
-    public void setOrganizationTypes(OrganizationType organizationTypes) {
-        this.organizationType = organizationTypes;
-    }
-
     public Country getCountry() {
         return country;
     }
@@ -118,13 +97,22 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.country = country;
     }
 
-    public WorkingTimeAgreement getWta() {
-        return wta;
+    public List<RuleTemplate> getRuleTemplates() {
+        return ruleTemplates;
     }
 
-    public void setWta(WorkingTimeAgreement wta) {
-        this.wta = wta;
+    public void setRuleTemplates(List<RuleTemplate> ruleTemplates) {
+        this.ruleTemplates = ruleTemplates;
     }
+
+    public WorkingTimeAgreement getParentWTA() {
+        return parentWTA;
+    }
+
+    public void setParentWTA(WorkingTimeAgreement parentWTA) {
+        this.parentWTA = parentWTA;
+    }
+
 
     public Long getStartDateMillis() {
         return startDateMillis;
@@ -185,23 +173,20 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         return map;
     }
 
-    public List<WTABaseRuleTemplate> getRuleTemplates() {
-        return ruleTemplates;
-    }
-
-    public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
-    }
-
     public static WorkingTimeAgreement copyProperties(WorkingTimeAgreement source, WorkingTimeAgreement target) {
         BeanUtils.copyProperties(source, target);
         return target;
     }
+    public static WorkingTimeAgreement copyProperties(WorkingTimeAgreement source, WorkingTimeAgreement target,String... Ignore) {
+        BeanUtils.copyProperties(source, target,Ignore);
+        return target;
+    }
+    //"organizationTypes","id","organizationSubType"
 
     public WorkingTimeAgreement() {
     }
 
-    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, Country country, List<WTABaseRuleTemplate> ruleTemplates, WorkingTimeAgreement wta, Long startDateMillis, Long endDateMillis, Long expiryDate, boolean deleted) {
+    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, Country country, List<RuleTemplate> ruleTemplates, WorkingTimeAgreement parentWTA, Long startDateMillis, Long endDateMillis, Long expiryDate, boolean deleted) {
         this.name = name;
         this.description = description;
         this.expertise = expertise;
@@ -209,14 +194,14 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.organizationSubType = organizationSubType;
         this.country = country;
         this.ruleTemplates = ruleTemplates;
-        this.wta = wta;
+        this.parentWTA = parentWTA;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.expiryDate = expiryDate;
         this.deleted = deleted;
     }
 
-    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<WTABaseRuleTemplate> ruleTemplates, Long startDateMillis, Long endDateMillis, Long expiryDate) {
+    public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<RuleTemplate> ruleTemplates, Long startDateMillis, Long endDateMillis, Long expiryDate) {
         this.name = name;
         this.description = description;
         this.expertise = expertise;
@@ -228,8 +213,40 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.expiryDate = expiryDate;
     }
 
+
     public WtaDTO buildwtaDTO() {
+
         WtaDTO wtaDTO = new WtaDTO(this.name, this.description, this.expertise.getId(), this.organizationType.getId(), this.organizationSubType.getId(), this.startDateMillis, this.endDateMillis, this.expiryDate);
         return wtaDTO;
+    }
+
+    public  WorkingTimeAgreement(Long id,String name, String description, Long startDateMillis, Long endDateMillis, Long expiryDate) {
+        this.id=id;
+        this.name = name;
+        this.description = description;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.expiryDate = expiryDate;
+    }
+
+    public WorkingTimeAgreement basicDetails(){
+        WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement(this.id, this.name, this.description, this.startDateMillis, this.endDateMillis, this.expiryDate);
+        return workingTimeAgreement;
+    }
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("name", name)
+                .append("description", description)
+                .append("expertise", expertise)
+                .append("organizationType", organizationType)
+                .append("organizationSubType", organizationSubType)
+                .append("country", country)
+                .append("ruleTemplates", ruleTemplates)
+                .append("parentWTA", parentWTA)
+                .append("startDateMillis", startDateMillis)
+                .append("endDateMillis", endDateMillis)
+                .append("expiryDate", expiryDate)
+                .toString();
     }
 }

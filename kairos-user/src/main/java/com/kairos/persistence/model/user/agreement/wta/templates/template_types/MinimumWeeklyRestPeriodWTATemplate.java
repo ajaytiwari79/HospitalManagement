@@ -23,11 +23,11 @@ public class MinimumWeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
         this.continuousWeekRest = continuousWeekRest;
     }
 
-    public MinimumWeeklyRestPeriodWTATemplate(String name, String templateType, boolean isActive,
+    public MinimumWeeklyRestPeriodWTATemplate(String name, String templateType, boolean disabled,
                                               String description, long continuousWeekRest) {
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
 
         this.continuousWeekRest=continuousWeekRest;

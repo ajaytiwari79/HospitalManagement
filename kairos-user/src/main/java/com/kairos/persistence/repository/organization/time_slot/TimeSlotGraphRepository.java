@@ -5,7 +5,7 @@ import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 /**
  * Created by oodles on 17/11/16.
  */
-public interface TimeSlotGraphRepository extends GraphRepository<TimeSlot>{
+public interface TimeSlotGraphRepository extends Neo4jBaseRepository<TimeSlot,Long>{
 
     @Query("Match (org:Organization)-[:HAS_TIME_SLOT_SET]->(timeSlotSet:TimeSlotSet{timeSlotMode:{1}}) where id(org)={0} AND (timeSlotSet.endDate is null OR timeSlotSet.endDate>={2}) with timeSlotSet order by timeSlotSet.startDate limit 1\n" +
             "Match (timeSlotSet)-[r:HAS_TIME_SLOT]->(timeSlot:TimeSlot) with timeSlot order by timeSlot.startHour,r\n" +

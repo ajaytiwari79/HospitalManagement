@@ -1,6 +1,7 @@
 package com.kairos.controller.agreement.wta;
 
-import com.kairos.response.dto.web.WtaDTO;
+import com.kairos.response.dto.web.WTADTO;
+import com.kairos.service.agreement.wta.WTAOrganizationService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -20,24 +21,25 @@ import static com.kairos.constants.ApiConstants.*;
 
 @RestController
 @RequestMapping(API_V1 + PARENT_ORGANIZATION_URL)
-@Api(COUNTRY_URL)
+@Api(API_V1 + PARENT_ORGANIZATION_URL)
 public class WTAController {
 
 
     @Inject
     private WTAService wtaService;
-
+    @Inject
+    private WTAOrganizationService wtaOrganizationService;
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value = COUNTRY_URL + "/wta")
-    public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @RequestBody WtaDTO wta) {
+    public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @RequestBody WTADTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.createWta(countryId, wta));
     }
 
     @ApiOperation(value = "Update WTA")
     @PutMapping(value = COUNTRY_URL + "/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long countryId, @PathVariable long wtaId, @RequestBody WtaDTO wta) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWta(countryId, wtaId, wta));
+    public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long countryId, @PathVariable long wtaId, @RequestBody WTADTO wta) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfCountry(countryId, wtaId, wta));
     }
 
     @ApiOperation(value = "Get WTA")
@@ -107,10 +109,10 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAWithOrganization(countryId));
     }
 
-    /*
-    * vipul
-    * api to get all org and sub-org with selected wtaId
-    * */
+    /**
+     * @Author vipul
+     * api to get all org and sub-org with selected wtaId
+     */
     @ApiOperation(value = "Get All organization and sub organization based on wtaId")
     @RequestMapping(value = COUNTRY_URL + "/organization_type/{organizationTypeId}/wta/{wtaId}", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllWTAWithWTAId(@PathVariable long wtaId, @PathVariable long countryId) {
@@ -119,8 +121,34 @@ public class WTAController {
 
     @ApiOperation(value = "link unlink wta with org Type")
     @PutMapping(value = COUNTRY_URL + "/organization_type/{organizationSubTypeId}/wta/{wtaId}")
-    public ResponseEntity<Map<String, Object>> setWtaWithOrganizationType(@PathVariable long countryId,@PathVariable long wtaId, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setWtaWithOrganizationType(countryId,wtaId, organizationSubTypeId, checked));
+    public ResponseEntity<Map<String, Object>> setWtaWithOrganizationType(@PathVariable long countryId, @PathVariable long wtaId, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setWtaWithOrganizationType(countryId, wtaId, organizationSubTypeId, checked));
     }
+
+    /**
+     * get all WTA by organization Id
+     *
+     * @Author Vipul on 20 DEC
+     */
+
+    @ApiOperation(value = "Get WTA by Org subType")
+    @RequestMapping(value = UNIT_URL + "/wta/ByOrganization", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getWTAOfOrganization(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.getAllWTAByOrganization(unitId));
+    }
+
+
+    @ApiOperation(value = "Remove WTA from organization ")
+    @DeleteMapping(value = UNIT_URL + "/wta/{wtaId}")
+    public ResponseEntity<Map<String, Object>> deleteWtaFromOrganization(@PathVariable long wtaId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.removeWta(wtaId));
+    }
+
+    @ApiOperation(value = "Update WTA")
+    @PutMapping(value = UNIT_URL + "/wta/{wtaId}")
+    public ResponseEntity<Map<String, Object>> updateWtaOfOrganization(@PathVariable long unitId, @PathVariable long wtaId, @RequestBody WTADTO wta) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.updateWtaOfOrganization(unitId, wtaId, wta));
+    }
+
 
 }

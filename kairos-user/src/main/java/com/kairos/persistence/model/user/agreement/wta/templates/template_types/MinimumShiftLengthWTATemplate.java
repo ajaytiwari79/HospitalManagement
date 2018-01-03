@@ -22,13 +22,13 @@ public class MinimumShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
 
 
-    public MinimumShiftLengthWTATemplate(String name, String templateType, boolean isActive, String description, long timeLimit, List<String> balanceType, boolean checkAgainstTimeRules) {
+    public MinimumShiftLengthWTATemplate(String name, String templateType, boolean disabled, String description, long timeLimit, List<String> balanceType, boolean checkAgainstTimeRules) {
         this.timeLimit = timeLimit;
         this.balanceType = balanceType;
         this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.name=name;
         this.templateType=templateType;
-        this.isActive=isActive;
+        this.disabled=disabled;
         this.description=description;
 
     }

@@ -1,7 +1,6 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
@@ -20,7 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.AppConstants.*;
 
@@ -291,4 +293,7 @@ public class AccessGroupService extends UserBaseService {
 
     }
 
+    public List<AccessGroup> findAllAccessGroup(){
+      return accessGroupRepository.findAll();
+    }
 }

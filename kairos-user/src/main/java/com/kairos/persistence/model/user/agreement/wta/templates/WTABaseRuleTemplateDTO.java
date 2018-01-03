@@ -24,7 +24,7 @@ public class WTABaseRuleTemplateDTO {
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
-    private Boolean isActive;
+    private Boolean disabled;
     private String description;
     private Long creationDate;
     private Long lastModificationDate;
@@ -134,12 +134,16 @@ public class WTABaseRuleTemplateDTO {
         this.daysWorked = daysWorked;
     }
 
-    public Boolean getActive() {
-        return isActive;
+    public Boolean getDisabled() {
+        return disabled;
     }
 
-    public void setActive(Boolean active) {
-        isActive = active;
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public boolean isProportional() {
+        return proportional;
     }
 
     public String getDescription() {

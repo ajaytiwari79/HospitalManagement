@@ -68,7 +68,7 @@ public class MaximumAverageScheduledTimeWTATemplate extends WTABaseRuleTemplate 
         this.useShiftTimes = useShiftTimes;
     }
 
-    public MaximumAverageScheduledTimeWTATemplate(String name, String templateType, boolean isActive,
+    public MaximumAverageScheduledTimeWTATemplate(String name, String templateType, boolean disabled,
                                                   String description, List<String> balanceType, long intervalLength, long validationStartDateMillis
             , boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime, String intervalUnit) {
         this.intervalLength = intervalLength;
@@ -77,7 +77,7 @@ public class MaximumAverageScheduledTimeWTATemplate extends WTABaseRuleTemplate 
         this.validationStartDateMillis = validationStartDateMillis;
         this.name = name;
         this.templateType = templateType;
-       this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
         this.balanceAdjustment=balanceAdjustment;
         this.useShiftTimes =useShiftTimes;

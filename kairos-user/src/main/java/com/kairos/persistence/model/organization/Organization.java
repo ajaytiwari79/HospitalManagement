@@ -10,6 +10,7 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
@@ -28,14 +29,12 @@ import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
-
 import javax.validation.constraints.NotNull;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD;
 
@@ -175,6 +174,9 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = HAS_WTA)
     private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
 
+    @Relationship(type = HAS_CTA)
+    private List<CostTimeAgreement> costTimeAgreements = new ArrayList<>();
+
     @Relationship(type = HAS_TIME_SLOT_SET)
     private List<TimeSlotSet> timeSlotSets = new ArrayList<>();
 
@@ -201,6 +203,7 @@ public class Organization extends UserBaseEntity {
     private Boolean showCountryTags=true;
     @Convert(ZoneIdStringConverter.class)
     private ZoneId timeZone;
+
 
     public Organization(String name, List<Group> groupList, List<Organization> children) {
         this.name = name;
@@ -684,6 +687,21 @@ public class Organization extends UserBaseEntity {
         this.workingTimeAgreements = workingTimeAgreements;
     }
 
+
+    public List<CostTimeAgreement> getCostTimeAgreements() {
+        return costTimeAgreements;
+    }
+
+    public void setCostTimeAgreements(List<CostTimeAgreement> costTimeAgreements) {
+        this.costTimeAgreements = costTimeAgreements;
+    }
+
+    public void addWorkingTimeAgreements(WorkingTimeAgreement workingTimeAgreement) {
+        if (workingTimeAgreement == null)
+            throw new NullPointerException("Can't add null workingTimeAgreement");
+        workingTimeAgreements.add(workingTimeAgreement);
+    }
+
     public List<PositionName> getPositionNameList() {
         return positionNameList;
     }
@@ -700,7 +718,7 @@ public class Organization extends UserBaseEntity {
         this.phaseGenerated = phaseGenerated;
     }
 
-    public void addResource(Resource resource){
+    public void addResource(Resource resource) {
         List<Resource> resourceList = this.getResourceList();
         resourceList.add(resource);
         this.resourceList = resourceList;

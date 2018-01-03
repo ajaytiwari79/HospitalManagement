@@ -437,7 +437,6 @@ public class StaffService extends UserBaseService {
     }
 
 
-
     public StaffUploadBySheetQueryResult batchAddStaffToDatabase(long unitId, MultipartFile multipartFile, Long accessGroupId) {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
@@ -447,7 +446,7 @@ public class StaffService extends UserBaseService {
         }
         List<Staff> staffList = new ArrayList<>();
         List<Integer> staffErrorList = new ArrayList<>();
-        StaffUploadBySheetQueryResult  staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
+        StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
         staffUploadBySheetQueryResult.setStaffErrorList(staffErrorList);
         staffUploadBySheetQueryResult.setStaffList(staffList);
 
@@ -506,7 +505,7 @@ public class StaffService extends UserBaseService {
                 }
                 Cell cprHeaderValue = row.getCell(cprHeader);
                 if (cprHeaderValue == null || cprHeaderValue.getCellType() == Cell.CELL_TYPE_BLANK) {
-                    logger.info(" This row has no CRP Number so skipping this %s",row.getRowNum());
+                    logger.info(" This row has no CRP Number so skipping this %s", row.getRowNum());
                     staffErrorList.add(row.getRowNum());
 
                 } else {
@@ -555,7 +554,8 @@ public class StaffService extends UserBaseService {
                         cell = row.getCell(2);
                         if (Optional.ofNullable(cell).isPresent()) {
                             cell.setCellType(Cell.CELL_TYPE_STRING);
-                            User user = userGraphRepository.findByTimeCareExternalId(cell.getStringCellValue());
+                            User user = null;
+                            user = userGraphRepository.findByTimeCareExternalId(cell.getStringCellValue());
                             if (!Optional.ofNullable(user).isPresent()) {
                                 user = new User();
                                 user.setFirstName(row.getCell(20).toString());
@@ -572,7 +572,7 @@ public class StaffService extends UserBaseService {
                             staff.setClient(client);
                             staff.setUser(user);
                         }
-                        staffGraphRepository.save(staff);
+                        //  staffGraphRepository.save(staff);
                         staffList.add(staff);
                         if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
                             createEmployment(parent, unit, staff, accessGroupId, isEmploymentExist);
@@ -838,6 +838,7 @@ public class StaffService extends UserBaseService {
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), isEmploymentExist);
         staff.setUser(null); // removing user to send in FE
+
         return staff;
     }
 
@@ -895,9 +896,9 @@ public class StaffService extends UserBaseService {
 
     private Client createClientObject(Staff staff) {
         Client client = clientGraphRepository.findByCprNumber(staff.getCprNumber());
-        logger.debug("Staff cpr number",staff.getCprNumber());
+        logger.debug("Staff cpr number", staff.getCprNumber());
         if (!Optional.ofNullable(client).isPresent()) {
-            logger.debug("NO CITIZEN found by cpr : cpr number",staff.getCprNumber());
+            logger.debug("NO CITIZEN found by cpr : cpr number", staff.getCprNumber());
             client = new Client();
             client.setFirstName(staff.getFirstName());
             client.setLastName(staff.getLastName());
@@ -1045,7 +1046,7 @@ public class StaffService extends UserBaseService {
                     }
                 }
             }
-            staffGraphRepository.save(staffList);
+            staffGraphRepository.saveAll(staffList);
         } catch (Exception e) {
             e.printStackTrace();
         }

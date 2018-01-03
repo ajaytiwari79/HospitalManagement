@@ -69,12 +69,12 @@ public class MaximumShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
         this.onlyCompositeShifts = onlyCompositeShifts;
     }
 
-    public MaximumShiftsInIntervalWTATemplate(String name, String templateType, boolean isActive,
+    public MaximumShiftsInIntervalWTATemplate(String name, String templateType, boolean disabled,
                                               String description, List<String> balanceType, long intervalLength, String intervalUnit,
                                               long validationStartDateMillis, long shiftsLimit, boolean onlyCompositeShifts) {
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
         this.balanceType = balanceType;
         this.intervalLength =intervalLength;

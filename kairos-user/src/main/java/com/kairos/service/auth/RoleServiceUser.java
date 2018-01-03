@@ -61,7 +61,7 @@ public class RoleServiceUser extends UserBaseService {
      * @param id
      */
     public void deleteRole(Long id){
-        roleGraphRepository.delete(id);
+        roleGraphRepository.deleteById(id);
     }
 
 

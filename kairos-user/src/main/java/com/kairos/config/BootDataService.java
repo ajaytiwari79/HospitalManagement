@@ -10,6 +10,8 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
@@ -30,6 +32,7 @@ import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientLanguageRelationGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientOrganizationRelationGraphRepository;
@@ -53,6 +56,8 @@ import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository
 import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.agreement.RuleTemplateCategoryService;
+import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.auth.RoleServiceUser;
 import com.kairos.service.auth.UserRoleServiceUser;
 import com.kairos.service.auth.UserService;
@@ -67,6 +72,7 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -169,6 +175,13 @@ public class BootDataService {
     @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Inject
+
+    private RuleTemplateCategoryService ruleTemplateCategoryService;
+    @Inject
+    private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
+    @Inject
+    private CostTimeAgreementService costTimeAgreementService;
+    @Inject
     private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
 
     private List<Long> skillList;
@@ -256,6 +269,7 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
+         createCTARuleTemplateCategory();
             startRegisteredCronJobs();
             createEquipmentCategories();
 
@@ -280,7 +294,7 @@ public class BootDataService {
             timeSlot.setSystemGeneratedTimeSlots(true);
             standardTimeSlots.add(timeSlot);
         }
-        timeSlotGraphRepository.save(standardTimeSlots);
+        timeSlotGraphRepository.saveAll(standardTimeSlots);
     }
 
     private void createGeoGraphicalData() {
@@ -397,7 +411,7 @@ public class BootDataService {
         medicalCareService.setCreationDate(DateUtil.getCurrentDate().getTime());
         medicalCareService.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
-        organizationServiceRepository.save(Arrays.asList(homeCareService, medicalCareService));
+        organizationServiceRepository.saveAll(Arrays.asList(homeCareService, medicalCareService));
 
     }
 
@@ -492,7 +506,7 @@ public class BootDataService {
         registeredStatus.setDescription("Relationship of Citizen is registered formally");
         registeredStatus.setCountry(denmark);
 
-        citizenStatusGraphRepository.save(Arrays.asList(registeredStatus,livingPartnerStatus,disvorcedStatus,marriedStatus,singleStatus,deadStatus));
+        citizenStatusGraphRepository.saveAll(Arrays.asList(registeredStatus,livingPartnerStatus,disvorcedStatus,marriedStatus,singleStatus,deadStatus));
     }
 
     private void createCitizen() {
@@ -609,7 +623,7 @@ public class BootDataService {
         kairosCountryLevel.setEmail("kairos_denmark@kairos.com");
         kairosCountryLevel.setContactDetail(new ContactDetail("info@kairos.com", "kairos_denmark@kairos.com", "431311", "653322"));
 //        kairosCountryLevel.setContactAddress(new ContactAddress("Thorsgade", 2, 5000, "Odense", 4345, "Commercial"));
-//        kairosCountryLevel.setOrganizationTypes(privateOrganization);
+//        kairosCountryLevel.setOrganizationType(privateOrganization);
         kairosCountryLevel.setCostCenterCode("OD12");
         kairosCountryLevel.setOrganizationLevel(OrganizationLevel.COUNTRY);
         kairosCountryLevel.setCountry(denmark);
@@ -720,7 +734,7 @@ public class BootDataService {
         michalAsStaff.setFamilyName("Micky");
         michalAsStaff.setFirstName("Michael J");
         michalAsStaff.setLastName("John");
-        michalAsStaff.setActive(true);
+        michalAsStaff.setDisabled(true);
         michalAsStaff.getContactDetail().setPrivatePhone("9711588672");
         michalAsStaff.getContactDetail().setWorkPhone("9718420411");
         michalAsStaff.getContactDetail().setMobilePhone("7000000000");
@@ -740,7 +754,7 @@ public class BootDataService {
         livaAsStaff.setFamilyName("Liva");
         livaAsStaff.setFirstName("Liva J");
         livaAsStaff.setLastName("Rasmussen");
-        livaAsStaff.setActive(true);
+        livaAsStaff.setDisabled(true);
         livaAsStaff.setNationalInsuranceNumber("NIN44500981");
         livaAsStaff.setEmail("liva@oodlestechnologies.com");
         livaAsStaff.setLanguage(danish);
@@ -760,7 +774,7 @@ public class BootDataService {
         almaAsStaff.setFamilyName("Alma");
         almaAsStaff.setFirstName("Alma L");
         almaAsStaff.setLastName("Krogh");
-        almaAsStaff.setActive(true);
+        almaAsStaff.setDisabled(true);
         almaAsStaff.setEmail("alma@oodlestechnologies.com");
         almaAsStaff.setNationalInsuranceNumber("NIN44500331");
         almaAsStaff.setLanguage(danish);
@@ -796,7 +810,7 @@ public class BootDataService {
         nestingTeam.setName("Nesting Team");
         nestingTeam.setCreationDate(DateUtil.getCurrentDate().getTime());
         nestingTeam.setLastModificationDate(DateUtil.getCurrentDate().getTime());
-        teamGraphRepository.save(Arrays.asList(nestingTeam));
+        teamGraphRepository.saveAll(Arrays.asList(nestingTeam));
     }
 
     private void linkingOfStaffAndTeam() {
@@ -900,7 +914,7 @@ public class BootDataService {
         experiencedTeam.setName("Experienced Team");
         experiencedTeam.setCreationDate(DateUtil.getCurrentDate().getTime());
         experiencedTeam.setLastModificationDate(DateUtil.getCurrentDate().getTime());
-        teamGraphRepository.save(Arrays.asList(nestingTeam, experiencedTeam));
+        teamGraphRepository.saveAll(Arrays.asList(nestingTeam, experiencedTeam));
     }
 
     private void createGroupForCityLevel(){
@@ -977,7 +991,7 @@ public class BootDataService {
         paySafecard.setCreationDate(DateUtil.getCurrentDate().getTime());
         paySafecard.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         paySafecard.setCountry(denmark);
-        paymentTypeGraphRepository.save(Arrays.asList(creditCard,paySafecard));
+        paymentTypeGraphRepository.saveAll(Arrays.asList(creditCard,paySafecard));
     }
 
     private void createCurrency(){
@@ -988,7 +1002,19 @@ public class BootDataService {
         currency.setCountry(denmark);
         currencyGraphRepository.save(currency);
     }
+    private void createCTARuleTemplateCategory() {
+        RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
+                .findByName(53L, "NONE", RuleTemplateCategoryType.CTA);
 
+        if (category == null) {
+            category = new RuleTemplateCategory();
+            category.setName("NONE");
+            category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
+            ruleTemplateCategoryService.createRuleTemplateCategory(53L, category);
+        }
+        logger.info("creating CTA rule template");
+        costTimeAgreementService.createDefaultCtaRuleTemplate(53L);
+    }
     private void createEquipmentCategories(){
         if( ! equipmentCategoryGraphRepository.ifEquipmentCategoryExists()){
             EquipmentCategory equipmentCategorySmall = new EquipmentCategory();
@@ -1018,7 +1044,7 @@ public class BootDataService {
             equipmentCategoryLarge.setLengthInCm(100F);
             equipmentCategoryLarge.setVolumeInCm(100F);
 
-            equipmentCategoryGraphRepository.save(Arrays.asList(equipmentCategorySmall, equipmentCategoryMedium, equipmentCategoryLarge));
+            equipmentCategoryGraphRepository.saveAll(Arrays.asList(equipmentCategorySmall, equipmentCategoryMedium, equipmentCategoryLarge));
         }
     }
 }

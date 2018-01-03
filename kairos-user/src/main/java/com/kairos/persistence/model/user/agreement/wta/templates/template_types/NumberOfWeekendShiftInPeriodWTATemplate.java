@@ -79,12 +79,12 @@ public class NumberOfWeekendShiftInPeriodWTATemplate extends WTABaseRuleTemplate
         this.proportional = proportional;
     }
 
-    public NumberOfWeekendShiftInPeriodWTATemplate(String name, String templateType, boolean isActive,
+    public NumberOfWeekendShiftInPeriodWTATemplate(String name, String templateType, boolean disabled,
                                                    String description, long numberShiftsPerPeriod, long numberOfWeeks, String fromDayOfWeek, long fromTime, boolean proportional,
                                                    String toDayOfWeek, long toTime) {
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
 
         this.numberShiftsPerPeriod=numberShiftsPerPeriod;

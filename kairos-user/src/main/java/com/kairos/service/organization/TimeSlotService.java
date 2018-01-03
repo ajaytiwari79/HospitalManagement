@@ -150,7 +150,7 @@ public class TimeSlotService extends UserBaseService {
         timeSlotSet.setName(timeSlotSetDTO.getName());
         timeSlotSet.setEndDate(timeSlotSetDTO.getEndDate());
         timeSlotSetsToUpdate.add(timeSlotSet);
-        timeSlotSetRepository.save(timeSlotSetsToUpdate);
+        timeSlotSetRepository.saveAll(timeSlotSetsToUpdate);
         return timeSlotSetsToUpdate;
     }
 

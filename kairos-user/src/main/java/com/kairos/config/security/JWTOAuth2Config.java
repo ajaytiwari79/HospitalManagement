@@ -2,10 +2,14 @@ package com.kairos.config.security;
 
 import com.kairos.service.auth.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -24,7 +28,6 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     private AuthenticationManager authenticationManager;
     @Autowired
     UserService userService;
-
 
     private final int REFRESH_TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * 30; // default 30 days.
 
@@ -54,7 +57,7 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
 
         clients.inMemory()
                 .withClient("kairos")
-                .secret("kairos")
+                .secret("$2a$10$CA3JnlNGZpRIqvBe904d1eOBjoJXX0rLatl7kMQL9mGPyGVm6xYj.")
                 .authorizedGrantTypes("refresh_token","password","client_credentials")
                 .scopes("webclient", "mobileclient")
      			.and()
@@ -93,5 +96,10 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(final AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
         oauthServer.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
+        oauthServer.passwordEncoder(passwordEncoder());
+    }
+
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

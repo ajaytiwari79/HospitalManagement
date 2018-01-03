@@ -64,7 +64,7 @@ public class MaximumDaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public MaximumDaysOffInPeriodWTATemplate(String name, String templateType, boolean isActive,
+    public MaximumDaysOffInPeriodWTATemplate(String name, String templateType, boolean disabled,
                                              String description, List<String> balanceType, long intervalLength, long validationStartDateMillis, long minimumDaysOff, String intervalUnit) {
         this.intervalLength = intervalLength;
         this.balanceType = balanceType;
@@ -73,7 +73,7 @@ public class MaximumDaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
         this.intervalUnit = intervalUnit;
 

@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.client;
 import com.kairos.persistence.model.user.client.ClientLanguageRelation;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by oodles on 17/1/17.
  */
-public interface ClientLanguageRelationGraphRepository extends GraphRepository<ClientLanguageRelation> {
+public interface ClientLanguageRelationGraphRepository extends Neo4jBaseRepository<ClientLanguageRelation,Long> {
 
 
     @Query("MATCH (c:Client)-[:KNOWS]-(l:Language{isEnabled:true}) where id(c)={0} return DISTINCT id(l)")

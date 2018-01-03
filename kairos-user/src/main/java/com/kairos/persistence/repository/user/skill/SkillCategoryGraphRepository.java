@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.user.skill;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORGAN
  * Created by oodles on 15/9/16.
  */
 @Repository
-public interface SkillCategoryGraphRepository extends GraphRepository<SkillCategory>{
+public interface SkillCategoryGraphRepository extends Neo4jBaseRepository<SkillCategory,Long>{
 
     /**
      * @return List all SkillCategory

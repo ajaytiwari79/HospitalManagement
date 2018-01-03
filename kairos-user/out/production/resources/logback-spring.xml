@@ -1,39 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/base.xml" />
-    <springProfile name="development,devdeploy,test">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}/}spring.log}"/>
 
-        <appender name="VISITOUR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file> visitour_change.log</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <!-- daily rollover -->
-                <fileNamePattern>visitour_change.%d{yyyy-MM-dd-HH-mm}.log</fileNamePattern>
-                <maxHistory>30</maxHistory>
-            </rollingPolicy>
-
+    <springProfile name="default">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <appender name="ROLLING-FILE"
+                  class="ch.qos.logback.core.rolling.RollingFileAppender">
             <encoder>
-                <pattern>%relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
             </encoder>
+            <file>${LOG_FILE}</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            </rollingPolicy>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ROLLING-FILE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="development,test">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <appender name="ROLLING-FILE"
+                  class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+            <file>${LOG_FILE}</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            </rollingPolicy>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ROLLING-FILE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="production,qa">
+        <appender name="ROLLING-FILE"
+                  class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+            <file>${LOG_FILE}</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+                <timeBasedFileNamingAndTriggeringPolicy
+                        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>10MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+            </rollingPolicy>
         </appender>
 
-        <logger name="com.kairos" level="DEBUG" additivity="false">
-            <appender-ref ref="CONSOLE" />
-            <appender-ref ref="FILE" />
-        </logger>
-
-
-        <logger name="com.kairos.task.messaging.Receiver" level="DEBUG,INFO" additivity="false">
-            <appender-ref ref="VISITOUR_FILE" />
-        </logger>
-
-
+        <root level="INFO">
+            <appender-ref ref="ROLLING-FILE"/>
+        </root>
     </springProfile>
-    <springProfile name="production">
-        <logger name="com.kairos" level="WARN,INFO" additivity="false">
-            <appender-ref ref="CONSOLE" />
-            <appender-ref ref="FILE" />
-        </logger>
-    </springProfile>
+
 </configuration>
 
 

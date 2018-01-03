@@ -5,7 +5,7 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.Staff;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by oodles on 7/10/16.
  */
 @Repository
-public interface TeamGraphRepository extends GraphRepository<Team>{
+public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("MATCH (group:Group)-[:HAS_TEAM]->(team:Team) where id(group)={0} with team\n" +
             "optional match (team)-[:TEAM_HAS_LOCATION]->(contactAddress:ContactAddress) with contactAddress,team\n" +
