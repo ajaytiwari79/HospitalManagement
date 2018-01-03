@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.pay_level;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -22,9 +23,11 @@ public class PayLevelDTO {
     private Long expertiseId;
     private PaymentUnit paymentUnit;
     @NotNull(message = "Start date can't be null")
+    @DateLong
     @FutureDate
     private Date startDate;
     @FutureDate
+    @DateLong
     private Date endDate;
 
     public PayLevelDTO() {

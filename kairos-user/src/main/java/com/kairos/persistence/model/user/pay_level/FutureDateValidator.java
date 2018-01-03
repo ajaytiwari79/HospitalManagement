@@ -19,6 +19,8 @@ public class FutureDateValidator implements ConstraintValidator<FutureDate,Date>
     @Override
     public boolean isValid(Date value, ConstraintValidatorContext context) {
 
+
+
         DateTime requestedDate = new DateTime(value).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
         DateTime currentDate = new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
         int dateValue = requestedDate.compareTo(currentDate);

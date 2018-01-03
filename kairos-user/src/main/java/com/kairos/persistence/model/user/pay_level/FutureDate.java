@@ -3,10 +3,12 @@ package com.kairos.persistence.model.user.pay_level;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.constraints.Future;
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
@@ -27,7 +29,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Constraint(validatedBy = FutureDateValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD,ElementType.FIELD})
+@Target({FIELD, METHOD, PARAMETER, ANNOTATION_TYPE})
 public @interface FutureDate {
 
     String message() default "Date should be grater then or equal to current date";
@@ -36,15 +38,15 @@ public @interface FutureDate {
     Class<? extends Payload>[] payload() default { };
 
     /**
-     * Defines several {@link Future} annotations on the same element.
+     * Defines several {@link FutureDate} annotations on the same element.
      *
-     * @see Future
+     * @see FutureDate
      */
     @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
     @Retention(RUNTIME)
     @Documented
     @interface List {
 
-        Future[] value();
+        FutureDate[] value();
     }
 }

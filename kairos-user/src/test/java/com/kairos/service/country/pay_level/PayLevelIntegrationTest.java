@@ -68,7 +68,7 @@ public class PayLevelIntegrationTest {
         Date startDate;
         Date endDate;
         try{
-            startDate = df.parse("2017-12-28");
+            startDate = df.parse("2018-01-03");
         } catch (ParseException e){
             throw new RuntimeException(e.getMessage());
         }
