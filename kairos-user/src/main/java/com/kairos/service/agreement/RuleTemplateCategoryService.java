@@ -91,7 +91,6 @@ public class RuleTemplateCategoryService extends UserBaseService {
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
             throw new ActionNotPermittedException("Can't delete none template category " + templateCategoryId);
         }
-        System.out.print(ruleTemplateCategory.getRuleTemplateCategoryType().equals(CTA));
 
 
         if (ruleTemplateCategory.getRuleTemplateCategoryType().equals(CTA)) {
