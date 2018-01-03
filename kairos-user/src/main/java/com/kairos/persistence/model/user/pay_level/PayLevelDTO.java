@@ -4,7 +4,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -22,7 +24,9 @@ public class PayLevelDTO {
     private PaymentUnit paymentUnit;
     @NotNull(message = "Start date can't be null")
     @DateLong
+    @FutureDate
     private Date startDate;
+    @FutureDate
     @DateLong
     private Date endDate;
 
@@ -130,4 +134,6 @@ public class PayLevelDTO {
                 .append(paymentUnit)
                 .toHashCode();
     }
+
+
 }
