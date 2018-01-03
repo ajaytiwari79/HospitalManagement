@@ -73,5 +73,12 @@ public class PositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,positionService.getAllPositionByStaff(unitId,unitEmploymentId,staffId,type));
     }
 
+    @ApiOperation(value = "Get cta and wta by expertise for position creation")
+    @RequestMapping(value="/position/expertise/{expertiseId}/cta_wta")
+    ResponseEntity<Map<String,Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId,@PathVariable Long expertiseId){
+
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,positionService.getCtaAndWtaByExpertiseId(unitId,expertiseId));
+    }
+
 
 }

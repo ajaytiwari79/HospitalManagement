@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.position;
 
 import com.kairos.persistence.model.user.position.Position;
+import com.kairos.persistence.model.user.position.PositionCtaWtaQueryResult;
 import com.kairos.persistence.model.user.position.PositionQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -20,7 +21,8 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "match (p)-[:"+HAS_EMPLOYMENT_TYPE+"]->(et:EmploymentType)\n" +
             "match (p)-[:"+HAS_EXPERTISE_IN+"]->(e:Expertise)\n" +
             "optional match (p)-[:"+HAS_WTA+"]->(wta:WorkingTimeAgreement)\n" +
-            "return e as expertise,wta as workingTimeAgreement," +
+            "optional match (p)-[:"+HAS_CTA+"]->(cta:CostTimeAgreement)\n" +
+            "return e as expertise,wta as workingTimeAgreement,cta as costTimeAgreement," +
             "pn as positionName," +
             "p.totalWeeklyHours as totalWeeklyHours," +
             "p.startDate as startDate,"+
@@ -54,5 +56,16 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "p.avgDailyWorkingHours as avgDailyWorkingHours,"+
             "p.lastModificationDate as lastModificationDate")
     List<PositionQueryResult> getAllPositionByStaff(long unitId,long unitEmploymentId, long staffId);
+
+    @Query("Match (org:Organization) where id(org)={0}\n" +
+            "Match (e:Expertise) where id(e)={1}\n" +
+            "MATCH (org)-[:HAS_WTA]->(wta:WorkingTimeAgreement{isEnabled:true})-[:HAS_EXPERTISE_IN]->(e)\n" +
+            "Optional Match (org)-[:HAS_CTA]->(cta:CostTimeAgreement{isEnabled:true})-[:HAS_EXPERTISE_IN]->(e)\n" +
+            "return collect(wta) as wta,collect(cta) as cta")
+    PositionCtaWtaQueryResult getCtaAndWtaByExpertise(Long organizationId, Long expertiseId);
+
+
+
+
 
 }

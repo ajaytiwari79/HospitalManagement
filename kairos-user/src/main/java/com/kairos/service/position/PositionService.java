@@ -3,6 +3,7 @@ package com.kairos.service.position;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WTAWithRuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
@@ -12,7 +13,9 @@ import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplate
 import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position.Position;
+import com.kairos.persistence.model.user.position.PositionCtaWtaQueryResult;
 import com.kairos.persistence.model.user.position.PositionName;
 import com.kairos.persistence.model.user.position.PositionQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -33,14 +36,19 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.constants.AppConstants.*;
@@ -163,21 +171,40 @@ public class PositionService extends UserBaseService {
         Position position = new Position();
 
         //String name, String description, Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta
-        WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
+        /*WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
 
         if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getName()).isPresent()) {
             logger.info("Expertise Doesn't contains WTA.Please select different Expertise" + positionDTO.getExpertiseId());
             throw new DataNotFoundByIdException("Expertise Doesn't contains WTA.Please select different Expertise");
         }
-        WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
-        save(wta);
-        position.setWorkingTimeAgreement(wta);
 
 
-        if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
+
+        WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);*/
+
+        Optional<WorkingTimeAgreement> wta = workingTimeAgreementGraphRepository.findById(positionDTO.getWtaId());
+        if(!wta.isPresent()){
+            throw new DataNotFoundByIdException("Invalid wta id ");
         }
-        position.setExpertise(wtaWithRuleTemplateDTO.getExpertise());
+        position.setWorkingTimeAgreement(wta.get());
+
+
+        CostTimeAgreement cta = (positionDTO.getCtaId() == null)? null:
+                costTimeAgreementGraphRepository.findOne(positionDTO.getCtaId());
+        if(cta != null){
+            position.setCta(cta);
+        }
+
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(positionDTO.getExpertiseId());
+        if(!expertise.isPresent()){
+            throw new DataNotFoundByIdException("Invalid expertise id");
+        }
+
+
+       /* if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
+        }*/
+        position.setExpertise(expertise.get());
 
         EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(organization.getId(), positionDTO.getEmploymentTypeId(), false);
         if (employmentType == null) {
@@ -494,11 +521,8 @@ public class PositionService extends UserBaseService {
     }
 
     private void preparePosition(Position oldPosition, PositionDTO positionDTO) {
-        System.out.println("here ");
-        if (!oldPosition.getExpertise().getId().equals(positionDTO.getExpertiseId())) {
+       /* if (!oldPosition.getExpertise().getId().equals(positionDTO.getExpertiseId())) {
             WTAWithRuleTemplateDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
-            System.out.println(Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent());
-
             if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid Expertize" + positionDTO.getExpertiseId());
             }
@@ -513,7 +537,24 @@ public class PositionService extends UserBaseService {
                 save(wta);
                 workingTimeAgreementGraphRepository.breakRelationFromOldWTA(oldPosition.getId(), oldWta.getId());
             }
-            oldPosition.setExpertise(wtaWithRuleTemplateDTO.getExpertise());
+        }*/
+
+        Optional<WorkingTimeAgreement> wta = workingTimeAgreementGraphRepository.findById(positionDTO.getWtaId());
+        if(!wta.isPresent()){
+            throw new DataNotFoundByIdException("Invalid wta id ");
+        }
+        oldPosition.setWorkingTimeAgreement(wta.get());
+
+
+        CostTimeAgreement cta = (positionDTO.getCtaId() == null)? null:
+                costTimeAgreementGraphRepository.findOne(positionDTO.getCtaId());
+        if(cta != null){
+            oldPosition.setCta(cta);
+        }
+
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(positionDTO.getExpertiseId());
+        if(!expertise.isPresent()){
+            throw new DataNotFoundByIdException("Invalid expertise id");
         }
 
 
@@ -559,6 +600,10 @@ public class PositionService extends UserBaseService {
         }
 
         return positionGraphRepository.getAllPositionByStaff(unitId, unitEmploymentId, staffId);
+    }
+
+    public PositionCtaWtaQueryResult getCtaAndWtaByExpertiseId(Long unitId,Long expertiseId){
+        return positionGraphRepository.getCtaAndWtaByExpertise(unitId,expertiseId);
     }
 
 }
