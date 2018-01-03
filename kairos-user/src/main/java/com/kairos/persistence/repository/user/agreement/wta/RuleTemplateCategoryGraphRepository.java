@@ -54,7 +54,7 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
             "Match(WBRT:WTABaseRuleTemplate)<-[r:HAS_RULE_TEMPLATES]-(allRTC)  where Id(WBRT) IN {0}\n" +
             "delete r\n" +
             "MERGE(WBRT)<-[:HAS_RULE_TEMPLATES]-(newRTC)")
-    void updateCategoryOfRuleTemplate(List<Long> KPwtaBaseRuleTemplateId,String ruleTemplateCategoryName);
+    void updateCategoryOfRuleTemplate(List<Long> wtaBaseRuleTemplateId,String ruleTemplateCategoryName);
 
     // CTA PART
     @Query("match(newRTC:RuleTemplateCategory{ruleTemplateCategoryType:'CTA',deleted:false}) where newRTC.name={1} \n" +
