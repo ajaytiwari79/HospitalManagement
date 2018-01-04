@@ -47,7 +47,7 @@ public class PayLevelIntegrationTest {
     private static final DateFormat df = new SimpleDateFormat(ONLY_DATE);
 
     @Test
-    @OrderTest(order = 1)
+    @OrderTest(order = 2)
     public void getPayLevel(){
 
         String baseUrl= getBaseUrl(145L,53L,null);
@@ -63,12 +63,12 @@ public class PayLevelIntegrationTest {
     }
 
     @Test
-    @OrderTest(order = 2)
+    @OrderTest(order = 1)
     public void savePayLevel(){
         Date startDate;
         Date endDate;
         try{
-            startDate = df.parse("2018-01-04");
+            startDate = df.parse("2018-01-10");
         } catch (ParseException e){
             throw new RuntimeException(e.getMessage());
         }
@@ -94,7 +94,7 @@ public class PayLevelIntegrationTest {
         Date startDate;
         Date endDate;
         try{
-            startDate = df.parse("2018-01-03");
+            startDate = df.parse("2018-01-12");
         } catch (ParseException e){
             throw new RuntimeException(e.getMessage());
         }
