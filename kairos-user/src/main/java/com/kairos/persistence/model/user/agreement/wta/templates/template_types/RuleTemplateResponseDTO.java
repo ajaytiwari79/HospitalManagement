@@ -1,27 +1,31 @@
-package com.kairos.persistence.model.user.agreement.wta.templates;
+package com.kairos.persistence.model.user.agreement.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
 
 /**
- * Created by vipul on 12/10/17.
+ * Created by vipul on 4/1/18.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WTAWithCategoryDTO {
+@QueryResult
+public class RuleTemplateResponseDTO {
     private RuleTemplateCategory ruleTemplateCategory;
     private Long id;
     private String name;
     private String templateType;
+    private String category;
     private Long timeLimit;
     private List<String> balanceType;
     private Boolean checkAgainstTimeRules;
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
-    private  boolean disabled;
+    private  Boolean disabled;
     private String description;
     private Long creationDate;
     private Long lastModificationDate;
@@ -49,6 +53,14 @@ public class WTAWithCategoryDTO {
     private Boolean onlyCompositeShifts;
     private String activityCode;
 
+    public RuleTemplateCategory getRuleTemplateCategory() {
+        return ruleTemplateCategory;
+    }
+
+    public void setRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
+        this.ruleTemplateCategory = ruleTemplateCategory;
+    }
+
     public Long getId() {
         return id;
     }
@@ -73,6 +85,13 @@ public class WTAWithCategoryDTO {
         this.templateType = templateType;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
     public Long getTimeLimit() {
         return timeLimit;
@@ -122,11 +141,11 @@ public class WTAWithCategoryDTO {
         this.daysWorked = daysWorked;
     }
 
-    public boolean isDisabled() {
+    public Boolean getDisabled() {
         return disabled;
     }
 
-    public void setDisabled(boolean disabled) {
+    public void setDisabled(Boolean disabled) {
         this.disabled = disabled;
     }
 
@@ -160,6 +179,14 @@ public class WTAWithCategoryDTO {
 
     public void setNightsWorked(Long nightsWorked) {
         this.nightsWorked = nightsWorked;
+    }
+
+    public Long getIntervalLength() {
+        return intervalLength;
+    }
+
+    public void setIntervalLength(Long intervalLength) {
+        this.intervalLength = intervalLength;
     }
 
     public String getIntervalUnit() {
@@ -242,6 +269,13 @@ public class WTAWithCategoryDTO {
         this.fromTime = fromTime;
     }
 
+    public Boolean getProportional() {
+        return proportional;
+    }
+
+    public void setProportional(Boolean proportional) {
+        this.proportional = proportional;
+    }
 
     public Long getToTime() {
         return toTime;
@@ -321,29 +355,5 @@ public class WTAWithCategoryDTO {
 
     public void setActivityCode(String activityCode) {
         this.activityCode = activityCode;
-    }
-
-    public RuleTemplateCategory getRuleTemplateCategory() {
-        return ruleTemplateCategory;
-    }
-
-    public void setRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
-        this.ruleTemplateCategory = ruleTemplateCategory;
-    }
-
-    public Long getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(Long intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
-    public Boolean getProportional() {
-        return proportional;
-    }
-
-    public void setProportional(Boolean proportional) {
-        this.proportional = proportional;
     }
 }

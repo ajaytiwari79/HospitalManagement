@@ -9,6 +9,7 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
@@ -35,6 +36,7 @@ import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.client.ClientOrganizationRelationService;
 import com.kairos.service.client.ClientService;
@@ -169,6 +171,8 @@ public class OrganizationService extends UserBaseService {
     @Inject
     private AccessPageService accessPageService;
 
+    @Inject
+    private WTAService wtaService;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id, 0);
@@ -176,7 +180,7 @@ public class OrganizationService extends UserBaseService {
 
     public boolean showCountryTagForOrganization(long id) {
         Organization organization = organizationGraphRepository.findOne(id);
-        if(organization.isShowCountryTags()){
+        if (organization.isShowCountryTags()) {
             return true;
         } else {
             return false;
@@ -233,7 +237,17 @@ public class OrganizationService extends UserBaseService {
 
         OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
         organization.setOrganizationSetting(organizationSetting);
+        // @ modified by vipul for KSP-107
+        /**
+         * @Modified vipul
+         * when creating an organization linking all existing wta with this subtype to organization
+         */
+        List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
+        List<WorkingTimeAgreement> allWta = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
+        linkWTA(allWtaCopy, allWta);
+        organization.setWorkingTimeAgreements(allWtaCopy);
         save(organization);
+
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         accessGroupService.createDefaultAccessGroups(organization);
         timeSlotService.createDefaultTimeSlots(organization);
@@ -241,19 +255,26 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        phaseRestClient.createDefaultPhases(organization.getId());
-        // @ modified by vipul for KSP-107
-        /**
-         * @Modified vipul
-         * when creating an organization linking all existing wta with this subtype to organization
-         */
-        List<WorkingTimeAgreement> allWta = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
-        organization.setWorkingTimeAgreements(allWta);
+        //    phaseRestClient.createDefaultPhases(organization.getId());
+
 
         HashMap<String, Object> orgResponse = new HashMap<>();
         orgResponse.put("orgData", organizationResponse(organization, orgDetails));
         orgResponse.put("permissions", accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
         return orgResponse;
+    }
+
+
+    private void linkWTA(List<WorkingTimeAgreement> WTAList, List<WorkingTimeAgreement> allWta) {
+        allWta.forEach(workingTimeAgreement -> {
+            WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
+            wtaService.copyWta(workingTimeAgreement, newWtaObject);
+            List<RuleTemplate> ruleTemplateWithCategory = wtaService.copyRuleTemplate(workingTimeAgreement.getRuleTemplates());
+            newWtaObject.setRuleTemplates(ruleTemplateWithCategory);
+            newWtaObject.setParentWTA(workingTimeAgreement);
+            WTAList.add(newWtaObject);
+        });
+
     }
 
     public HashMap<String, Object> updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId, long countryId) {
@@ -491,7 +512,7 @@ public class OrganizationService extends UserBaseService {
                 contactAddress.setZipCode(zipCode);
                 contactAddress.setCity(zipCode.getName());
                 unit.setContactAddress(contactAddress);
-            } else{
+            } else {
                 return null;
             }
 
@@ -508,17 +529,20 @@ public class OrganizationService extends UserBaseService {
         logger.info("Now Setting Organization Setting from Parent Organization: " + parent.getName());
         OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
         unit.setOrganizationSetting(organizationSetting);
+        /**
+         * @Modified by vipul
+         *  Added all wta of from parent organization
+         */
+        List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
+        List<WorkingTimeAgreement> allWta = parent.getWorkingTimeAgreements();
+        linkWTA(allWtaCopy, allWta);
+        unit.setWorkingTimeAgreements(allWtaCopy);
+
         organizationGraphRepository.save(unit);
         phaseRestClient.createDefaultPhases(unit.getId());
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit);
-        /**
-         * @Modified by vipul
-         *  Added all wta of this subtype to organization.
-         */
-        List<WorkingTimeAgreement> allWta = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(organizationDTO.getOrganizationSubTypeId());
-        unit.setWorkingTimeAgreements(allWta);
 
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
@@ -601,7 +625,7 @@ public class OrganizationService extends UserBaseService {
             response.put("otherData", Collections.emptyMap());
         }
 
-       return response;
+        return response;
     }
 
 
@@ -1121,6 +1145,8 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.getOrganizationChildList(orgID);
     }
 
+
+
     public List<OrganizationType> getOrganizationTypeByCountryId(Long countryId){
         return organizationTypeGraphRepository.findOrganizationTypeByCountry(countryId);
     }
@@ -1144,15 +1170,15 @@ public class OrganizationService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
         }
 
-        timeZonesData.put("selectedTimeZone", unit.getTimeZone()!=null? unit.getTimeZone().getId() : null);
-        timeZonesData.put("allTimeZones",zoneList);
+        timeZonesData.put("selectedTimeZone", unit.getTimeZone() != null ? unit.getTimeZone().getId() : null);
+        timeZonesData.put("allTimeZones", zoneList);
         return timeZonesData;
     }
 
-    public boolean assignUnitTimeZone(Long unitId, String zoneIdString){
+    public boolean assignUnitTimeZone(Long unitId, String zoneIdString) {
         ZoneId zoneId = ZoneId.of(zoneIdString);
         if (!Optional.ofNullable(zoneId).isPresent()) {
-            throw new InternalError("Zone Id not found by "+zoneIdString);
+            throw new InternalError("Zone Id not found by " + zoneIdString);
         }
         Organization unit = organizationGraphRepository.findOne(unitId);
         unit.setTimeZone(zoneId);
@@ -1161,7 +1187,7 @@ public class OrganizationService extends UserBaseService {
     }
 
 
-    public Organization fetchParentOrganization(Long unitId){
+    public Organization fetchParentOrganization(Long unitId) {
         Organization parent = null;
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {

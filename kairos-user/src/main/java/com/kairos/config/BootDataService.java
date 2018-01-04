@@ -29,7 +29,10 @@ import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.staff.*;
-import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.organization.OpeningHourGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
@@ -72,16 +75,16 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
-
-import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by kairosCountryLevel on 8/12/16.
@@ -269,7 +272,7 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
-         createCTARuleTemplateCategory();
+      //   createCTARuleTemplateCategory();
             startRegisteredCronJobs();
             createEquipmentCategories();
 
