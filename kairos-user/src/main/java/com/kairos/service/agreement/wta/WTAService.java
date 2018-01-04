@@ -211,7 +211,7 @@ public class WTAService extends UserBaseService {
         }
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
         newWta = prepareWtaWhileUpdate(oldWta, updateDTO, countryId);
-
+        newWta.setCountry(oldWta.getCountry());
         save(newWta);
         newWta.setOrganizationType(oldWta.getOrganizationType().basicDetails());
         newWta.setOrganizationSubType(oldWta.getOrganizationSubType().basicDetails());
