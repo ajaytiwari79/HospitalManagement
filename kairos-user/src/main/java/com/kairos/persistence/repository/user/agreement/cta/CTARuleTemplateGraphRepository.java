@@ -12,7 +12,7 @@ import java.util.List;
 public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTARuleTemplate,Long> {
 
  @Query("MATCH (p:`CTARuleTemplate`)-[:`HAS_RULE_TEMPLATES`]-(m0:`RuleTemplateCategory`) " +
-         "WHERE NOT(p.`deleted` = true ) AND NOT(p.`disabled` = true )  and ID(m0) IN {0} "+
+         "WHERE NOT(p.`deleted` = true ) AND ID(m0) IN {0} "+
          " optional  MATCH (p)-[:`BELONGS_TO`]-(cTARuleTemplateDayTypes:`CTARuleTemplateDayType`)"+
          " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(dayType:`DayType`)"+
          " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(countryHolidayCalender:`CountryHolidayCalender`)"+
@@ -53,6 +53,10 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          "plannedTimeWithFactor as plannedTimeWithFactor ,"+
          "collect(distinct ID(timeType)) as timeTypes,"+
          "ID(p) as id")
-    List<CTARuleTemplateQueryResult>findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(List<Long> categoryList);
+    List<CTARuleTemplateQueryResult>findByRuleTemplateCategoryIdInAndDeletedFalse(List<Long> categoryList);
+
+
+    @Query("MATCH (ctaRT:CTARuleTemplate) WHERE ctaRT.deleted = false RETURN CASE WHEN COUNT(ctaRT) > 0 THEN true ELSE false END")
+    Boolean isDefaultCTARuleTemplateExists();
 
 }

@@ -72,6 +72,10 @@ public class CostTimeAgreementService extends UserBaseService {
     private @Autowired OrganizationGraphRepository organizationGraphRepository;
 
 
+    public boolean isDefaultCTARuleTemplateExists(){
+        return ctaRuleTemplateGraphRepository.isDefaultCTARuleTemplateExists();
+    }
+
     public void createDefaultCtaRuleTemplate(Long countryId) {
         RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
                 .findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
@@ -194,7 +198,7 @@ public class CostTimeAgreementService extends UserBaseService {
         List<Long> ruleTemplateCategoryIds = ctaRuleTemplateCategoryList.parallelStream().map(RuleTemplateCategory::getId)
                 .collect(Collectors.toList());
 
-        List<CTARuleTemplateQueryResult> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(ruleTemplateCategoryIds);
+        List<CTARuleTemplateQueryResult> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalse(ruleTemplateCategoryIds);
         CTARuleTemplateCategoryWrapper ctaRuleTemplateCategoryWrapper=new CTARuleTemplateCategoryWrapper();
         ctaRuleTemplateCategoryWrapper.getRuleTemplateCategories().addAll(ctaRuleTemplateCategoryList);
         ctaRuleTemplateCategoryWrapper.setRuleTemplates(ruleTemplates);
