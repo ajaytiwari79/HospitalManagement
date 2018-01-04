@@ -24,6 +24,10 @@ public class PositionDTO {
     private float hourlyWages;
     private float salary;
     private Long employmentTypeId;
+    @NotNull(message = "wta can't be null")
+    private Long wtaId;
+    private Long ctaId;
+
 //    private Position.EmploymentType employmentType;
 
     @NotNull(message = "staffId is missing")
@@ -136,6 +140,22 @@ public class PositionDTO {
         this.hourlyWages = hourlyWages;
     }
 
+    public Long getWtaId() {
+        return wtaId;
+    }
+
+    public void setWtaId(Long wtaId) {
+        this.wtaId = wtaId;
+    }
+
+    public Long getCtaId() {
+        return ctaId;
+    }
+
+    public void setCtaId(Long ctaId) {
+        this.ctaId = ctaId;
+    }
+
     public float getSalary() {
         return salary;
     }
@@ -167,4 +187,7 @@ public class PositionDTO {
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
+
+
+
 }
