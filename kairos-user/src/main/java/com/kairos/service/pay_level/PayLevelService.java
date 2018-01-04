@@ -1,7 +1,6 @@
 package com.kairos.service.pay_level;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
@@ -17,7 +16,10 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by prabjot on 26/12/17.
@@ -131,6 +133,7 @@ public class PayLevelService extends UserBaseService {
         if(payLevelDTO.getEndDate() != null){
             payLevel.setEndDate(payLevelDTO.getEndDate());
         }
+        payLevel.setName(payLevelDTO.getName());
         save(payLevel);
         return getPayLevelResponse(payLevel,payLevelDTO);
     }
