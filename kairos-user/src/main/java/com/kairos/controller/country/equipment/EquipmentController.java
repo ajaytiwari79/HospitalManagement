@@ -63,6 +63,15 @@ public class EquipmentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,equipmentService.getListOfEquipments(countryId,filterText));
     }
 
+    @ApiOperation(value = "Get list of Equipments by unit")
+    @RequestMapping(value = UNIT_URL + "/equipment", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllEquipmentsByUnit(@PathVariable long unitId,
+                                                                   @RequestParam(value = "filterText",required = false) String filterText) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,equipmentService.getListOfEquipmentsByUnitId(unitId,filterText));
+    }
+
+
     @ApiOperation(value = "Delete Equipment")
     @RequestMapping(value = COUNTRY_URL + "/equipment/{equipmentId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

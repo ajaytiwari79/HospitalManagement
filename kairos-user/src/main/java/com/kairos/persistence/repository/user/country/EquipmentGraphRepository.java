@@ -58,5 +58,7 @@ public interface EquipmentGraphRepository extends Neo4jBaseRepository<Equipment,
             "WHERE id(country)={0} AND equipment.deleted= {1} AND id(equipment) IN {2} return equipment")
     List<Equipment> getListOfEquipmentByIds(Long countryId , boolean deleted, List<Long> equipmentIds);
 
-
+    @Query("MATCH (resource:Resource)-[r:"+RESOURCE_HAS_EQUIPMENT+"]->(equipment:Equipment)\n"+
+            "DELETE r")
+    void detachResourceEquipments(long resourceId);
 }

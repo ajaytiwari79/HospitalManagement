@@ -16,6 +16,7 @@ import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.response.dto.web.equipment.EquipmentDTO;
 import com.kairos.response.dto.web.equipment.VehicleEquipmentDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,9 @@ public class EquipmentService extends UserBaseService {
 
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
+
+    @Inject
+    private OrganizationService organizationService;
 
     public List<EquipmentCategory> getListOfEquipmentCategories(Long countryId){
         return equipmentCategoryGraphRepository.getEquipmentCategories();
@@ -122,6 +126,23 @@ public class EquipmentService extends UserBaseService {
         return equipmentsData;
     }
 
+    public HashMap<String,Object> getListOfEquipmentsByUnitId(Long unitId, String filterText){
+        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        Country country = countryGraphRepository.findOne(countryId,0);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+
+        if(filterText == null){
+            filterText = "";
+        }
+
+        HashMap<String,Object> equipmentsData = new HashMap<>();
+        equipmentsData.put("equipments",equipmentGraphRepository.getListOfEquipment(countryId, false, filterText));
+
+        return equipmentsData;
+    }
+
     public EquipmentCategory getEquipmentCategoryByName(String name){
         return equipmentCategoryGraphRepository.getEquipmentCategoryByName(name);
     }
@@ -157,6 +178,7 @@ public class EquipmentService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect organization id " + organizationId);
         }
         List<Equipment> equipments = equipmentGraphRepository.getListOfEquipmentByIds(organization.getCountry().getId(), false, vehicleEquipmentDTO.getEquipments());
+        equipmentGraphRepository.detachResourceEquipments(resourceId);
         resource.setEquipments(equipments);
         resourceGraphRepository.save(resource);
         return resource;
