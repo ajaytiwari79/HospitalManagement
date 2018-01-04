@@ -185,8 +185,9 @@ public class OrganizationService extends UserBaseService {
     }
 
     public Long getCountryIdOfOrganization(long orgId) {
-        Organization organization = organizationGraphRepository.findOne(orgId, 1);
-        return organization.getCountry().getId();
+        Organization organization = fetchParentOrganization(orgId);
+        Country country = organizationGraphRepository.getCountry(organization.getId());
+        return country != null ? country.getId() : null;
     }
 
     /**

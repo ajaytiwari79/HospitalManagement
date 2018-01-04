@@ -139,4 +139,10 @@ import static com.kairos.constants.AppConstants.TEAM;
                     teamService.getUserStaffType(userId));
         }
 
+        @ApiOperation(value = "Get Organization Id by team")
+        @RequestMapping(value = "/team/organizationId", method = RequestMethod.GET)
+        // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+        public ResponseEntity<Map<String, Object>> getOrganizationIdByTeamId(@PathVariable Long unitId) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, teamService.getOrganizationIdByTeamId(unitId));
+        }
     }
