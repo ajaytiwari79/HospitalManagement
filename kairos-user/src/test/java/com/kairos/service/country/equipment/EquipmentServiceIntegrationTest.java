@@ -2,6 +2,8 @@ package com.kairos.service.country.equipment;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.config.OrderTest;
+import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.country.equipment.Equipment;
 import com.kairos.persistence.model.user.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.user.country.equipment.EquipmentQueryResult;
@@ -39,9 +41,8 @@ import static org.junit.Assert.*;
 /**
  * Created by prerna on 12/12/17.
  */
-@RunWith(SpringRunner.class)
+@RunWith(OrderTestRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EquipmentServiceIntegrationTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -61,7 +62,8 @@ public class EquipmentServiceIntegrationTest {
     static Long resourceId = 10644L;
 
     @Test
-    public void test1_getListOfEquipmentCategories() throws Exception {
+    @OrderTest(order = 1)
+    public void getListOfEquipmentCategories() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EquipmentCategory>>> resTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EquipmentCategory>>>() {
@@ -78,7 +80,8 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
-    public void test2_addCountryEquipment() throws Exception {
+    @OrderTest(order = 2)
+    public void addCountryEquipment() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         EquipmentCategory equipmentCategory = equipmentService.getEquipmentCategoryByName("Small");
         logger.info("Equipment name : "+equipmentCategory.getId());
@@ -102,7 +105,8 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
-    public void test3_updateEquipment() throws Exception {
+    @OrderTest(order = 3)
+    public void updateEquipment() throws Exception {
 
         if(createdEquipmentId == null){
             logger.info("Equipment Id is null");
@@ -135,7 +139,8 @@ public class EquipmentServiceIntegrationTest {
 
 
     @Test
-    public void test4_getListOfEquipments() throws Exception {
+    @OrderTest(order = 4)
+    public void getListOfEquipments() throws Exception {
         String baseUrl=getBaseUrl(orgId,countryId, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>> resTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>>() {
@@ -152,7 +157,8 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
-    public void test5_deleteEquipment() throws Exception {
+    @OrderTest(order = 5)
+    public void deleteEquipment() throws Exception {
         if(createdEquipmentId == null){
             logger.info("Equipment Id is null");
             Equipment equipment = equipmentService.getEquipmentByName(countryId, nameOfEquipment);
@@ -174,7 +180,8 @@ public class EquipmentServiceIntegrationTest {
 
 
     @Test
-    public void test6_updateEquipmentsOfReource() throws Exception {
+    @OrderTest(order = 6)
+    public void updateEquipmentsOfReource() throws Exception {
         if(createdEquipmentId == null){
             logger.info("Equipment Id is null");
             Equipment equipment = equipmentService.getEquipmentByName(countryId, nameOfEquipment);
@@ -202,7 +209,8 @@ public class EquipmentServiceIntegrationTest {
     }
 
     @Test
-    public void test7_getListOfEquipmentsOfResource() throws Exception {
+    @OrderTest(order = 7)
+    public void getListOfEquipmentsOfResource() throws Exception {
         String baseUrl=getBaseUrl(orgId,null, unitId);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,List<EquipmentQueryResult>>>> resTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,List<EquipmentQueryResult>>>>() {
@@ -210,6 +218,24 @@ public class EquipmentServiceIntegrationTest {
 
         ResponseEntity<RestTemplateResponseEnvelope<HashMap<String,List<EquipmentQueryResult>>>> response = restTemplate.exchange(
                 baseUrl+"/resource/"+resourceId+"/equipment",
+                HttpMethod.GET, null, resTypeReference);
+
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
+
+        logger.info("response.getBody().getData() : "+response.getBody().getData());
+    }
+
+    @Test
+    @OrderTest(order = 8)
+    public void getListOfEquipmentsOfUnit() throws Exception {
+        String baseUrl=getBaseUrl(orgId,null, unitId);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<HashMap<String,Object>>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<HashMap<String,Object>>> response = restTemplate.exchange(
+                baseUrl+"/equipment",
                 HttpMethod.GET, null, resTypeReference);
 
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
