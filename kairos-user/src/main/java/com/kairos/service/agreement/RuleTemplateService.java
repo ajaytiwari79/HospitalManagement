@@ -51,6 +51,8 @@ public class RuleTemplateService extends UserBaseService {
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryRepository;
     @Inject
     private TagService tagService;
+    @Inject
+    private WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
 
     public boolean createRuleTemplate(long countryId) {
 
@@ -63,7 +65,7 @@ public class RuleTemplateService extends UserBaseService {
         }
 
 
-        RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("NONE",RuleTemplateCategoryType.WTA);
+        RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.WTA);
         ruleTemplateCategoryService.createRuleTemplateCategory(countryId, ruleTemplateCategory);
         ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
         String MONTHS = "MONTHS";
@@ -177,7 +179,7 @@ public class RuleTemplateService extends UserBaseService {
             throw new DataNotFoundByIdException("Category List is null");
         }
 
-        List<RuleTemplate> templateList = country.getWTABaseRuleTemplate();
+        List<RuleTemplateResponseDTO> templateList = wtaBaseRuleTemplateGraphRepository.getWTABaseRuleTemplateByCountryId(countryId);
         if (templateList == null) {
             throw new DataNotFoundByIdException("Template List is null");
         }
