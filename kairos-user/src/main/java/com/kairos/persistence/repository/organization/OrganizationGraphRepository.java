@@ -410,7 +410,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "Match (unit)-[r:PROVIDE_SERVICE{isEnabled:true}]->(os) with distinct os,r,unit, organization\n" +
             "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with os,r,unit, organizationService, organization\n" +
             "OPTIONAL MATCH (unit)-[orgServiceCustomNameRelation:HAS_CUSTOM_SERVICE_NAME_FOR]-(organizationService:OrganizationService) \n" +
-            "with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,customName:r.customName,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,\n" +
+            "with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,\n"+
+            "customName:CASE WHEN r.customName IS null THEN os.name ELSE r.customName END,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,\n" +
             "customName: CASE WHEN orgServiceCustomNameRelation IS NULL THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END,\n" +
             "description:organizationService.description} as selectedServices return {selectedServices:collect(selectedServices)} as data")
     List<Map<String, Object>> getServicesForUnit(long organizationId, long unitId);
@@ -429,7 +430,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "Match (organization)-[r:PROVIDE_SERVICE{isEnabled:true}]->(os) with os, r, organization match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with os, r, organization, organizationService\n" +
             "OPTIONAL MATCH (organization)-[orgServiceCustomNameRelation:HAS_CUSTOM_SERVICE_NAME_FOR]-(organizationService:OrganizationService) \n" +
             "with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,\n" +
-            "customName:CASE WHEN r IS null THEN os.name ELSE r.customName END,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description,\n" +
+            "customName:CASE WHEN r.customName IS null THEN os.name ELSE r.customName END,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description,\n" +
             "customName:CASE WHEN orgServiceCustomNameRelation IS null THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END} as selectedServices return {selectedServices:collect(selectedServices)} as data")
     List<Map<String, Object>> getServicesForParent(long organizationId);
 

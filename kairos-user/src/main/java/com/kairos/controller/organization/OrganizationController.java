@@ -1222,14 +1222,16 @@ public class OrganizationController {
 
     @ApiOperation(value = "Add custom name for Organization Service")
     @RequestMapping(value = "/unit/{unitId}/organization_service/{serviceId}", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updateCustomNameOfService (@PathVariable Long unitId, @PathVariable Long serviceId, @RequestBody OrganizationServiceDTO organizationServiceDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfService(serviceId, unitId, organizationServiceDTO.getCustomName()));
+    public ResponseEntity<Map<String, Object>> updateCustomNameOfService (@PathVariable Long unitId, @PathVariable Long serviceId, @RequestBody OrganizationServiceDTO organizationServiceDTO,
+                                                                          @RequestParam("type") String type) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfService(serviceId, unitId, organizationServiceDTO.getCustomName(), type));
     }
 
     @ApiOperation(value = "Add custom name for Organization Sub Service")
     @RequestMapping(value = "/unit/{unitId}/organization_sub_service/{serviceId}", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updateCustomNameOfSubService (@PathVariable Long unitId, @PathVariable Long serviceId, @RequestBody OrganizationServiceDTO organizationServiceDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfSubService(serviceId, unitId, organizationServiceDTO.getCustomName()));
+    public ResponseEntity<Map<String, Object>> updateCustomNameOfSubService (@PathVariable Long unitId, @PathVariable Long serviceId, @RequestBody OrganizationServiceDTO organizationServiceDTO,
+                                                                             @RequestParam("type") String type) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfSubService(serviceId, unitId, organizationServiceDTO.getCustomName(), type));
     }
 
     //

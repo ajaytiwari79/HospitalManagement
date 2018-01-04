@@ -19,6 +19,7 @@ public class TeamOrganizationServiceRelationship extends UserBaseEntity {
     private Team team;
     @EndNode
     private OrganizationService organizationService;
+    private String customName;
     private boolean isEnabled = true;
 
     public Team getTeam() {
@@ -43,5 +44,13 @@ public class TeamOrganizationServiceRelationship extends UserBaseEntity {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
+    }
+
+    public String getCustomName() {
+        return customName;
+    }
+
+    public void setCustomName(String customName) {
+        this.customName = customName;
     }
 }
