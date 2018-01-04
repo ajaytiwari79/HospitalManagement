@@ -1,6 +1,7 @@
 package com.kairos.service.agreement.wta;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.InvalidRequestException;
@@ -98,17 +99,13 @@ public class WTAService extends UserBaseService {
             wta.setTags(tags);
         }
 
-
-        wta = prepareWta(countryId, wtaDTO);
-
-
+        wta = prepareWtaWhileCreate(countryId, wtaDTO);
         wta.setCountry(country);
-
-         //save(wta);
+        save(wta);
         // Adding this wta to all organization type
 
         assignWTAToOrganization(wta, wtaDTO);
-        //wtaRepository.linkWTAWithAllOrganizationOfThisSubType(wta.getId(), wta.getOrganizationSubType().getId());
+        // wtaRepository.linkWTAWithAllOrganizationOfThisSubType(wta.getId(), wta.getOrganizationSubType().getId());
         // setting basic details
         wta.setOrganizationType(wta.getOrganizationType().basicDetails());
         wta.setOrganizationSubType(wta.getOrganizationSubType().basicDetails());
@@ -123,9 +120,10 @@ public class WTAService extends UserBaseService {
             WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement();
             copyWta(wta, workingTimeAgreement);
             List<RuleTemplate> ruleTemplates = new ArrayList<>();
-            if (wtadto.getRuleTemplates().size() > 0) {
-                ruleTemplates = wtaOrganizationService.copyRuleTemplates(null, wtadto.getRuleTemplates(), "ORGANIZATION", organization.getId());
+            if (wta.getRuleTemplates().size() > 0) {
+                ruleTemplates = copyRuleTemplate(wta.getRuleTemplates());
                 workingTimeAgreement.setRuleTemplates(ruleTemplates);
+
             }
             organization.getWorkingTimeAgreements().add(workingTimeAgreement);
             save(organization);
@@ -142,7 +140,7 @@ public class WTAService extends UserBaseService {
         return;
     }
 
-    private WorkingTimeAgreement prepareWta(long countryId, WTADTO wtaDTO) {
+    private WorkingTimeAgreement prepareWtaWhileCreate(long countryId, WTADTO wtaDTO) {
 
         WorkingTimeAgreement wta = new WorkingTimeAgreement();
         wta.setDescription(wtaDTO.getDescription());
@@ -212,7 +210,7 @@ public class WTAService extends UserBaseService {
             throw new DuplicateDataException("Duplicate WTA name " + updateDTO.getName());
         }
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
-        newWta = prepareWta(oldWta, updateDTO,countryId);
+        newWta = prepareWtaWhileUpdate(oldWta, updateDTO, countryId);
 
         save(newWta);
         newWta.setOrganizationType(oldWta.getOrganizationType().basicDetails());
@@ -227,10 +225,14 @@ public class WTAService extends UserBaseService {
         return newWta;
     }
 
-    private WorkingTimeAgreement prepareWta(WorkingTimeAgreement oldWta, WTADTO updateDTO,Long countryId) {
+    private WorkingTimeAgreement prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO, Long countryId) {
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
         newWta.setName(updateDTO.getName());
         newWta.setDescription(updateDTO.getDescription());
+        if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
+            throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
+        }
+        oldWta.setEndDateMillis(updateDTO.getStartDateMillis());
         newWta.setStartDateMillis(updateDTO.getStartDateMillis());
         newWta.setEndDateMillis(updateDTO.getEndDateMillis());
         if (oldWta.getExpertise().getId() != updateDTO.getExpertiseId()) {
@@ -265,7 +267,7 @@ public class WTAService extends UserBaseService {
         }
         List<RuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
-            ruleTemplates = wtaOrganizationService.copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "COUNTRY", countryId);
+            ruleTemplates = wtaOrganizationService.copyRuleTemplates(null, updateDTO.getRuleTemplates(), "COUNTRY", countryId);
             newWta.setRuleTemplates(ruleTemplates);
         }
         newWta.setParentWTA(oldWta);
@@ -355,6 +357,7 @@ public class WTAService extends UserBaseService {
             newWtaObject.setRuleTemplates(ruleTemplateWithCategory);
 
             save(newWtaObject);
+            assignWTAToOrganization(newWtaObject, organizationSubTypeId);
             // setting basic propery for response
             newWtaObject.setOrganizationType(newWtaObject.getOrganizationType().basicDetails());
             newWtaObject.setOrganizationSubType(newWtaObject.getOrganizationSubType().basicDetails());
@@ -370,18 +373,43 @@ public class WTAService extends UserBaseService {
 
     }
 
+    @Async
+    private void assignWTAToOrganization(WorkingTimeAgreement wta, Long organizationSubTypeId) {
+        List<Organization> organizations = organizationTypeRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        organizations.forEach(organization -> {
+            WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement();
+            copyWta(wta, workingTimeAgreement);
+            List<RuleTemplate> ruleTemplates = copyRuleTemplate(wta.getRuleTemplates());
+            workingTimeAgreement.setRuleTemplates(ruleTemplates);
+            organization.getWorkingTimeAgreements().add(workingTimeAgreement);
+            save(organization);
+        });
+    }
+
     public List<RuleTemplate> copyRuleTemplate(List<RuleTemplate> ruleTemplates) {
-        List<RuleTemplate> ruleTemplateCategory = new ArrayList<>(ruleTemplates.size());
+        List<RuleTemplate> copiedRuleTemplate = new ArrayList<>(ruleTemplates.size());
         ObjectMapper objectMapper = new ObjectMapper();
         ruleTemplates.forEach(ruleTemplate -> {
             RuleTemplate wtaBaseRuleTemplateDTO = objectMapper.convertValue(ruleTemplate, RuleTemplate.class);
             wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
             wtaBaseRuleTemplateDTO.setId(null);
-            ruleTemplateCategory.add(wtaBaseRuleTemplateDTO);
-            ruleTemplateCategory.toString();
+            copiedRuleTemplate.add(wtaBaseRuleTemplateDTO);
         });
-        return ruleTemplateCategory;
+        return copiedRuleTemplate;
     }
+
+    public List<RuleTemplate> copyRuleTemplateViaDTO(List<RuleTemplateCategoryDTO> ruleTemplates) {
+        List<RuleTemplate> copiedRuleTemplate = new ArrayList<>(ruleTemplates.size());
+        ObjectMapper objectMapper = new ObjectMapper();
+        ruleTemplates.forEach(ruleTemplate -> {
+            RuleTemplate wtaBaseRuleTemplateDTO = objectMapper.convertValue(ruleTemplate, RuleTemplate.class);
+            wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
+            wtaBaseRuleTemplateDTO.setId(null);
+            copiedRuleTemplate.add(wtaBaseRuleTemplateDTO);
+        });
+        return copiedRuleTemplate;
+    }
+
 
     public WorkingTimeAgreement copyWta(WorkingTimeAgreement oldWta, WorkingTimeAgreement newWta) {
         newWta.setName(oldWta.getName());
@@ -390,6 +418,7 @@ public class WTAService extends UserBaseService {
         newWta.setEndDateMillis(oldWta.getEndDateMillis());
         newWta.setExpertise(oldWta.getExpertise());
         newWta.setId(null);
+        newWta.setParentWTA(oldWta);
         return newWta;
 
     }

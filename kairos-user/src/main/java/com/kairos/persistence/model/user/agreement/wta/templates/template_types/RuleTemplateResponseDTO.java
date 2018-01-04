@@ -1,20 +1,19 @@
-package com.kairos.persistence.model.user.agreement.wta;
+package com.kairos.persistence.model.user.agreement.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
 
 /**
- * Created by vipul on 12/10/17.
+ * Created by vipul on 4/1/18.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
-public class RuleTemplateCategoryDTO {
+public class RuleTemplateResponseDTO {
     private RuleTemplateCategory ruleTemplateCategory;
     private Long id;
     private String name;
@@ -22,11 +21,11 @@ public class RuleTemplateCategoryDTO {
     private String category;
     private Long timeLimit;
     private List<String> balanceType;
-    private boolean checkAgainstTimeRules;
+    private Boolean checkAgainstTimeRules;
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
-    private  boolean disabled;
+    private  Boolean disabled;
     private String description;
     private Long creationDate;
     private Long lastModificationDate;
@@ -34,15 +33,15 @@ public class RuleTemplateCategoryDTO {
     private Long intervalLength;
     private String intervalUnit;
     private Long validationStartDateMillis;
-    private boolean balanceAdjustment;
-    private boolean useShiftTimes;
+    private Boolean balanceAdjustment;
+    private Boolean useShiftTimes;
     private Long maximumAvgTime;
     private Double maximumVetoPercentage;
     private Long numberShiftsPerPeriod;
     private Long numberOfWeeks;
     private String fromDayOfWeek;
     private Long fromTime;
-    private boolean proportional;
+    private Boolean proportional;
     private Long toTime;
     private String toDayOfWeek;
     private Long continuousDayRestHours;
@@ -51,16 +50,8 @@ public class RuleTemplateCategoryDTO {
     private Long averageRest;
     private String shiftAffiliation;
     private Long shiftsLimit;
-    private boolean onlyCompositeShifts;
+    private Boolean onlyCompositeShifts;
     private String activityCode;
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
 
     public RuleTemplateCategory getRuleTemplateCategory() {
         return ruleTemplateCategory;
@@ -94,6 +85,14 @@ public class RuleTemplateCategoryDTO {
         this.templateType = templateType;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public Long getTimeLimit() {
         return timeLimit;
     }
@@ -110,11 +109,11 @@ public class RuleTemplateCategoryDTO {
         this.balanceType = balanceType;
     }
 
-    public boolean isCheckAgainstTimeRules() {
+    public Boolean getCheckAgainstTimeRules() {
         return checkAgainstTimeRules;
     }
 
-    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
+    public void setCheckAgainstTimeRules(Boolean checkAgainstTimeRules) {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
     }
 
@@ -142,11 +141,11 @@ public class RuleTemplateCategoryDTO {
         this.daysWorked = daysWorked;
     }
 
-    public boolean isDisabled() {
+    public Boolean getDisabled() {
         return disabled;
     }
 
-    public void setDisabled(boolean disabled) {
+    public void setDisabled(Boolean disabled) {
         this.disabled = disabled;
     }
 
@@ -206,19 +205,19 @@ public class RuleTemplateCategoryDTO {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public boolean isBalanceAdjustment() {
+    public Boolean getBalanceAdjustment() {
         return balanceAdjustment;
     }
 
-    public void setBalanceAdjustment(boolean balanceAdjustment) {
+    public void setBalanceAdjustment(Boolean balanceAdjustment) {
         this.balanceAdjustment = balanceAdjustment;
     }
 
-    public boolean isUseShiftTimes() {
+    public Boolean getUseShiftTimes() {
         return useShiftTimes;
     }
 
-    public void setUseShiftTimes(boolean useShiftTimes) {
+    public void setUseShiftTimes(Boolean useShiftTimes) {
         this.useShiftTimes = useShiftTimes;
     }
 
@@ -270,11 +269,11 @@ public class RuleTemplateCategoryDTO {
         this.fromTime = fromTime;
     }
 
-    public boolean isProportional() {
+    public Boolean getProportional() {
         return proportional;
     }
 
-    public void setProportional(boolean proportional) {
+    public void setProportional(Boolean proportional) {
         this.proportional = proportional;
     }
 
@@ -342,11 +341,11 @@ public class RuleTemplateCategoryDTO {
         this.shiftsLimit = shiftsLimit;
     }
 
-    public boolean isOnlyCompositeShifts() {
+    public Boolean getOnlyCompositeShifts() {
         return onlyCompositeShifts;
     }
 
-    public void setOnlyCompositeShifts(boolean onlyCompositeShifts) {
+    public void setOnlyCompositeShifts(Boolean onlyCompositeShifts) {
         this.onlyCompositeShifts = onlyCompositeShifts;
     }
 
@@ -356,53 +355,5 @@ public class RuleTemplateCategoryDTO {
 
     public void setActivityCode(String activityCode) {
         this.activityCode = activityCode;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("ruleTemplateCategory", ruleTemplateCategory)
-                .append("id", id)
-                .append("name", name)
-                .append("templateType", templateType)
-                .append("category", category)
-                .append("timeLimit", timeLimit)
-                .append("balanceType", balanceType)
-                .append("checkAgainstTimeRules", checkAgainstTimeRules)
-                .append("daysLimit", daysLimit)
-                .append("minimumRest", minimumRest)
-                .append("daysWorked", daysWorked)
-                .append("disabled", disabled)
-                .append("description", description)
-                .append("creationDate", creationDate)
-                .append("lastModificationDate", lastModificationDate)
-                .append("nightsWorked", nightsWorked)
-                .append("intervalLength", intervalLength)
-                .append("intervalUnit", intervalUnit)
-                .append("validationStartDateMillis", validationStartDateMillis)
-                .append("balanceAdjustment", balanceAdjustment)
-                .append("useShiftTimes", useShiftTimes)
-                .append("maximumAvgTime", maximumAvgTime)
-                .append("maximumVetoPercentage", maximumVetoPercentage)
-                .append("numberShiftsPerPeriod", numberShiftsPerPeriod)
-                .append("numberOfWeeks", numberOfWeeks)
-                .append("fromDayOfWeek", fromDayOfWeek)
-                .append("fromTime", fromTime)
-                .append("proportional", proportional)
-                .append("toTime", toTime)
-                .append("toDayOfWeek", toDayOfWeek)
-                .append("continuousDayRestHours", continuousDayRestHours)
-                .append("minimumDurationBetweenShifts", minimumDurationBetweenShifts)
-                .append("continuousWeekRest", continuousWeekRest)
-                .append("averageRest", averageRest)
-                .append("shiftAffiliation", shiftAffiliation)
-                .append("shiftsLimit", shiftsLimit)
-                .append("onlyCompositeShifts", onlyCompositeShifts)
-                .append("activityCode", activityCode)
-                .toString();
-    }
-
-    public RuleTemplateCategoryDTO() {
-        //default const
     }
 }

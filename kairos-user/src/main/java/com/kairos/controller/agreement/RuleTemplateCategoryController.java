@@ -16,7 +16,6 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.COUNTRY_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by vipul on 2/8/17.
@@ -58,8 +57,5 @@ public class RuleTemplateCategoryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, updatedRuleTemplate);
     }
 
-    @RequestMapping(value = UNIT_URL+"/template_category/{ruleTemplateCategoryType}", method = RequestMethod.GET)
-    ResponseEntity<Map<String, Object>> getRulesTemplateCategoryByUnit(@PathVariable Long unitId,@PathVariable RuleTemplateCategoryType ruleTemplateCategoryType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplateCategoryByUnit(unitId,ruleTemplateCategoryType));
-    }
+
 }
