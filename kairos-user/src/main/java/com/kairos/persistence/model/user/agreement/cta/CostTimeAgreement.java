@@ -27,7 +27,7 @@ public class CostTimeAgreement extends UserBaseEntity {
     private String description;
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
-    @Relationship(type = HAS_SUB_TYPE)
+    @Relationship(type = BELONGS_TO_ORG_TYPE)
     private OrganizationType organizationType;
     @Relationship(type = BELONGS_TO_ORG_SUB_TYPE)
     private OrganizationType organizationSubType;

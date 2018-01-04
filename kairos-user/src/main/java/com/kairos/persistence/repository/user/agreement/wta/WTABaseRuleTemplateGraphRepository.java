@@ -76,8 +76,8 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     List<Long> findAllWTABelongsByTemplateCategoryId(long ruleTemplateCategoryId);
 
     @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
-            "match (r:WTABaseRuleTemplate) where id(r) IN {1}\n" +
-            "match(rt)-[rel:" + HAS_RULE_TEMPLATES + "]->(r)\n" +
+            "optional match (r:WTABaseRuleTemplate) where id(r) IN {1}\n" +
+            "optional match(rt)-[rel:" + HAS_RULE_TEMPLATES + "]->(r)\n" +
             "delete rel set rt.deleted=true")
     void deleteRelationOfRuleTemplateCategoryAndWTA(long ruleTemplateId, List<Long> WTAIds);
 

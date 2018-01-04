@@ -120,6 +120,13 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " +
             "where id(c) = {0}   AND ch.holidayDate >={1} AND  ch.holidayDate <={2}  " +
             "AND ch.isEnabled = true WITH  ch as ch  " +
+            "OPTIONAL MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
+            "return ch.holidayDate as result")
+    List<Long> getAllCountryHolidaysCalendarsByIds(Long countryId, Long start, Long end);
+
+    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) " +
+            "where id(c) = {0}   AND ch.holidayDate >={1} AND  ch.holidayDate <={2}  " +
+            "AND ch.isEnabled = true WITH  ch as ch  " +
             "MATCH (ch)-[:DAY_TYPE]-(dt:DayType{isEnabled:true}) " +
             "return ch.holidayDate as holidayDate, dt as dayType ")
     List<CountryHolidayCalendarQueryResult> getCountryHolidayCalendarBetweenDates(Long countryId, Long start, Long end);
@@ -130,7 +137,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
 
     @Query("MATCH (n:Country{isEnabled:true}) where id(n)={0} with n " +
             "Match (n)-[:HAS_RULE_TEMPLATE]->(t:WTABaseRuleTemplate) with t " +
-            "Match (t)<-[:"+HAS_RULE_TEMPLATES+"]-(r:RuleTemplateCategory{deleted:false}) with t,r " +
+            "Match (t)<-[:"+HAS_RULE_TEMPLATES+"]-(r:RuleTemplateCategory{deleted:false,ruleTemplateCategoryType:'WTA'}) with t,r " +
             "Return id(t) as id ,"+
             "t.timeLimit as timeLimit,"+
             "t.balanceType as balanceType,"+

@@ -1,4 +1,5 @@
 package com.kairos.persistence.repository.organization;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -106,7 +107,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     @Query("Match (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) where id(team)={0} AND id(os)={1} SET r.isEnabled={2},r.lastModificationDate={3} return r")
     void updateOrganizationService(long teamId, long organizationServiceId, boolean isEnabled, long lastModificationDate);
 
-    @Query("Match (team:Team) where id(team)={0}\n" +
+    /*@Query("Match (team:Team) where id(team)={0}\n" +
             "Match (team)<-[:"+HAS_TEAM+"]-(group:Group)<-[:"+HAS_GROUP+"]-(organization:Organization) with organization\n" +
             "Match (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with subType,organization\n" +
             "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization\n" +
@@ -121,6 +122,26 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "Match (organization)-[:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,team\n"+
             "match (team)-[r:"+TEAM_HAS_SKILLS+"{isEnabled:true}]->(skill) with skill,r\n" +
             "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true})} as selectedSkills\n" +
+            "return {selectedSkills:collect(selectedSkills)} as data")*/
+    @Query("Match (team:Team) where id(team)={0}\n" +
+            "Match (team)<-[:"+HAS_TEAM+"]-(group:Group)<-[:"+HAS_GROUP+"]-(organization:Organization) with organization\n" +
+            "Match (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with subType,organization\n" +
+            "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:EXPERTISE_HAS_SKILLS{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization\n" +
+            "Match (organization)-[r:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags            \n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
+            "return {availableSkills:collect(availableSkills)} as data\n" +
+            "UNION\n" +
+            "Match (team:Team) where id(team)={0} with team\n" +
+            "Match (team)<-[:"+HAS_TEAM+"]-(group:Group)<-[:"+HAS_GROUP+"]-(organization:Organization) with organization,team\n" +
+            "Match (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with subType,organization,team\n" +
+            "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization,team\n" +
+            "Match (organization)-[:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,team,organization\n" +
+            "match (team)-[r:"+TEAM_HAS_SKILLS+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,organization,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true,tags:ctags+otags})} as selectedSkills\n" +
             "return {selectedSkills:collect(selectedSkills)} as data")
     List<Map<String,Object>> getSkillsOfTeam(long teamId);
 
@@ -148,4 +169,6 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "Match (region)-[:"+BELONGS_TO+"]->(country:Country) return id(country)")
     Long getCountryByTeamId(Long teamId);
 
+    @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team) where id(team)={0} return id(organization)")
+    Long getOrganizationIdByTeam(Long teamId);
 }

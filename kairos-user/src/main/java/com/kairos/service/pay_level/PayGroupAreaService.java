@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +38,6 @@ public class PayGroupAreaService extends UserBaseService{
         payGroupAreaDTO.setId(null);
         ObjectMapper objectMapper = new ObjectMapper();
         PayGroupArea payGroupArea = objectMapper.convertValue(payGroupAreaDTO,PayGroupArea.class);
-        payGroupArea.setCountry(country);
         save(payGroupArea);
         payGroupAreaDTO.setId(payGroupArea.getId());
         return payGroupAreaDTO;
@@ -46,7 +46,6 @@ public class PayGroupAreaService extends UserBaseService{
     public PayGroupAreaDTO updatePayGroupArea(Long payGroupAreaId,PayGroupAreaDTO payGroupAreaDTO){
         PayGroupArea payGroupArea = getPayGroupAreaById(payGroupAreaId);
         payGroupArea.setName(payGroupArea.getName());
-        payGroupArea.setDescription(payGroupArea.getDescription());
         save(payGroupArea);
         payGroupAreaDTO.setId(payGroupArea.getId());
         return payGroupAreaDTO;
@@ -54,7 +53,6 @@ public class PayGroupAreaService extends UserBaseService{
 
     public boolean deletePayGroupArea(Long payGroupAreaId){
        PayGroupArea payGroupArea = getPayGroupAreaById(payGroupAreaId);
-       payGroupArea.setDeleted(true);
        save(payGroupArea);
        return true;
     }
@@ -72,6 +70,6 @@ public class PayGroupAreaService extends UserBaseService{
         if(country == null){
             throw new InternalError("Invalid country id");
         }
-        return payGroupAreaGraphRepository.findByDeletedIsFalseAndCountry(country);
+        return new ArrayList<>();
     }
 }

@@ -1144,7 +1144,21 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.getOrganizationChildList(orgID);
     }
 
-    public Map<String, Object> getAvailableZoneIds(Long unitId) {
+
+
+    public List<OrganizationType> getOrganizationTypeByCountryId(Long countryId){
+        return organizationTypeGraphRepository.findOrganizationTypeByCountry(countryId);
+    }
+
+    public OrganizationType getOrganizationTypeByCountryAndId(Long countryId, Long orgTypeId){
+        return organizationTypeGraphRepository.getOrganizationTypeById(countryId, orgTypeId);
+    }
+
+    public List<OrganizationType> getOrganizationSubTypeById(Long orgTypeId) {
+        return organizationTypeGraphRepository.getOrganizationSubTypesByTypeId(orgTypeId);
+    }
+
+    public Map<String, Object> getAvailableZoneIds(Long unitId){
         Set<String> allZones = ZoneId.getAvailableZoneIds();
         List<String> zoneList = new ArrayList<>(allZones);
         Collections.sort(zoneList);

@@ -41,7 +41,7 @@ public class Position extends UserBaseEntity {
     private boolean isEnabled = true;
     private Long startDate;
     private Long endDate;
-    private int totalWeeklyHours;
+    private float totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
@@ -57,7 +57,7 @@ public class Position extends UserBaseEntity {
 
     public Position( Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement workingTimeAgreement,
                     PositionName positionName, String description, Long startDate, Long endDate, Long expiryDate
-                    ,int totalWeeklyHours ,float avgDailyWorkingHours,float hourlyWages,float salary,int workingDaysInWeek) {
+                    ,float totalWeeklyHours ,float avgDailyWorkingHours,float hourlyWages,float salary,int workingDaysInWeek) {
 
         this.expertise = expertise;
         this.cta = cta;
@@ -81,11 +81,11 @@ public class Position extends UserBaseEntity {
         this.workingDaysInWeek = workingDaysInWeek;
     }
 
-    public int getTotalWeeklyHours() {
+    public float getTotalWeeklyHours() {
         return totalWeeklyHours;
     }
 
-    public void setTotalWeeklyHours(int totalWeeklyHours) {
+    public void setTotalWeeklyHours(float totalWeeklyHours) {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 

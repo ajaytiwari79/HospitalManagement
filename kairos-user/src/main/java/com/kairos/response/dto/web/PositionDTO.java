@@ -18,7 +18,7 @@ public class PositionDTO {
 
     private Long startDate;
     private Long endDate;
-    private int totalWeeklyHours;
+    private float totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
@@ -112,11 +112,11 @@ public class PositionDTO {
         this.endDate = endDate;
     }
 
-    public int getTotalWeeklyHours() {
+    public float getTotalWeeklyHours() {
         return totalWeeklyHours;
     }
 
-    public void setTotalWeeklyHours(int totalWeeklyHours) {
+    public void setTotalWeeklyHours(float totalWeeklyHours) {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
