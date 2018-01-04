@@ -1,9 +1,11 @@
 package com.kairos.persistence.model.user.pay_level;
 
+import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -19,10 +21,12 @@ public class FutureDateValidator implements ConstraintValidator<FutureDate,Date>
     @Override
     public boolean isValid(Date value, ConstraintValidatorContext context) {
 
-
-
-        DateTime requestedDate = new DateTime(value).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-        DateTime currentDate = new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+        if(value == null){
+            return true;
+        }
+        DateTime dateAsUtc = new DateTime(value).plusHours(5).plusMinutes(30);
+        DateTime requestedDate = dateAsUtc.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+        DateTime currentDate = new DateTime(DateUtil.getCurrentDate()).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
         int dateValue = requestedDate.compareTo(currentDate);
         if(dateValue <0){
             return false;
