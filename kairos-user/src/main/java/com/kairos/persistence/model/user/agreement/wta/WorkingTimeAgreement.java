@@ -231,14 +231,6 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         return new ToStringBuilder(this)
                 .append("name", name)
                 .append("description", description)
-                .append("expertise", expertise)
-                .append("organizationType", organizationType)
-                .append("organizationSubType", organizationSubType)
-                .append("country", country)
-                .append("ruleTemplates", ruleTemplates)
-                .append("parentWTA", parentWTA)
-                .append("startDateMillis", startDateMillis)
-                .append("endDateMillis", endDateMillis)
                 .append("expiryDate", expiryDate)
                 .toString();
     }

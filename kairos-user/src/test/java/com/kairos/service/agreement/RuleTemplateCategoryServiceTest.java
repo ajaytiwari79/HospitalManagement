@@ -117,7 +117,7 @@ public class RuleTemplateCategoryServiceTest {
     @Test
     public void getRulesTemplateCategoryByUnit() throws Exception {
         String baseUrl = getBaseUrl(71L,null, 145L);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/timeType/"+RuleTemplateCategoryType.WTA);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/rule_templates");
         ResponseEntity<String> response = restTemplate.exchange(
                 builder.toUriString(),
                 HttpMethod.GET, null, String.class);

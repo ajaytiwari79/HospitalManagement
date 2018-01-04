@@ -104,7 +104,7 @@ public class WTAService extends UserBaseService {
         save(wta);
         // Adding this wta to all organization type
 
-        assignWTAToOrganization(wta, wtaDTO);
+        assignWTAToOrganization(wta, wtaDTO.getOrganizationSubType());
         // wtaRepository.linkWTAWithAllOrganizationOfThisSubType(wta.getId(), wta.getOrganizationSubType().getId());
         // setting basic details
         wta.setOrganizationType(wta.getOrganizationType().basicDetails());
@@ -114,8 +114,8 @@ public class WTAService extends UserBaseService {
     }
 
     @Async
-    private void assignWTAToOrganization(WorkingTimeAgreement wta, WTADTO wtadto) {
-        List<Organization> organizations = organizationTypeRepository.getOrganizationsByOrganizationType(wtadto.getOrganizationSubType());
+    private void assignWTAToOrganization(WorkingTimeAgreement wta, Long organizationSubTypeId) {
+        List<Organization> organizations = organizationTypeRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
         organizations.forEach(organization -> {
             WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement();
             copyWta(wta, workingTimeAgreement);
@@ -246,24 +246,11 @@ public class WTAService extends UserBaseService {
         }
 
         if (oldWta.getOrganizationType().getId() != updateDTO.getOrganizationType()) {
-            OrganizationType organizationType = organizationTypeRepository.findOne(updateDTO.getOrganizationType());
-            if (!Optional.ofNullable(organizationType).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid organization type " + updateDTO.getOrganizationType());
-            }
-            newWta.setOrganizationType(organizationType);
-        } else {
-            newWta.setOrganizationType(oldWta.getOrganizationType());
+                throw new ActionNotPermittedException("Organization  type cant be changed" + updateDTO.getOrganizationType());
         }
 
         if (oldWta.getOrganizationSubType().getId() != updateDTO.getOrganizationSubType()) {
-            OrganizationType organizationSubType = organizationTypeRepository.findOne(updateDTO.getOrganizationSubType());
-
-            if (!Optional.ofNullable(organizationSubType).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid organization sub type " + updateDTO.getOrganizationSubType());
-            }
-            newWta.setOrganizationSubType(organizationSubType);
-        } else {
-            newWta.setOrganizationSubType(oldWta.getOrganizationSubType());
+            throw new ActionNotPermittedException("Organization Sub type cant be changed" + updateDTO.getOrganizationSubType());
         }
         List<RuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
@@ -372,7 +359,7 @@ public class WTAService extends UserBaseService {
         return map;
 
     }
-
+/*
     @Async
     private void assignWTAToOrganization(WorkingTimeAgreement wta, Long organizationSubTypeId) {
         List<Organization> organizations = organizationTypeRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
@@ -385,7 +372,7 @@ public class WTAService extends UserBaseService {
             save(organization);
         });
     }
-
+*/
     public List<RuleTemplate> copyRuleTemplate(List<RuleTemplate> ruleTemplates) {
         List<RuleTemplate> copiedRuleTemplate = new ArrayList<>(ruleTemplates.size());
         ObjectMapper objectMapper = new ObjectMapper();
