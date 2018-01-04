@@ -348,9 +348,10 @@ public class CostTimeAgreementService extends UserBaseService {
                 CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate() ;
                 BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes,");
                 if(!doUpdate){
-//                    ctaRuleTemplate.cloneCTARuleTemplate();
+                    ctaRuleTemplate.cloneCTARuleTemplate();
                     ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
                 }
+                BeanUtils.copyProperties(ctaRuleTemplate,ctaRuleTemplateDTO);
                 ruleTemplates.add(ctaRuleTemplate);
             }
             return ruleTemplates;
@@ -381,8 +382,6 @@ public class CostTimeAgreementService extends UserBaseService {
         costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
         costTimeAgreement.setStartDate(collectiveTimeAgreementDTO.getStartDate());
         costTimeAgreement.setEndDate(collectiveTimeAgreementDTO.getEndDate());
-        logger.info("collectiveTimeAgreementDTO.getName() : "+collectiveTimeAgreementDTO.getName());
-        logger.info("collectiveTimeAgreementDTO.getDescription() : "+collectiveTimeAgreementDTO.getDescription());
 
         return CompletableFuture.completedFuture(true);
     }
@@ -399,6 +398,7 @@ public class CostTimeAgreementService extends UserBaseService {
         costTimeAgreement.setCountry(countryGraphRepository.findOne(countryId,0));
         this.save(costTimeAgreement);
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
+        BeanUtils.copyProperties(costTimeAgreement, collectiveTimeAgreementDTO);
         return collectiveTimeAgreementDTO;
     }
 
