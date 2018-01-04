@@ -4,16 +4,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplateDTO;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
+import com.kairos.persistence.model.user.agreement.wta.templates.template_types.RuleTemplateResponseDTO;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.AddRuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.RuleTemplateDTO;
+import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
 import com.kairos.util.ArrayUtil;
@@ -38,6 +43,8 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     @Inject
     WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
@@ -91,9 +98,6 @@ public class RuleTemplateCategoryService extends UserBaseService {
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
             throw new ActionNotPermittedException("Can't delete none template category " + templateCategoryId);
         }
-        System.out.print(ruleTemplateCategory.getRuleTemplateCategoryType().equals(CTA));
-
-
         if (ruleTemplateCategory.getRuleTemplateCategoryType().equals(CTA)) {
             List<Long> ctaRuleTemplates = ruleTemplateCategoryGraphRepository.findAllExistingCTARuleTemplateByCategory(ruleTemplateCategory.getName(), countryId);
             RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, "NONE", CTA);
@@ -180,12 +184,12 @@ public class RuleTemplateCategoryService extends UserBaseService {
         return response;
     }
 
-    private List<WTABaseRuleTemplateDTO> getJsonOfUpdatedTemplates(List<RuleTemplate> wtaBaseRuleTemplates, RuleTemplateCategory ruleTemplateCategory) {
+    private List<RuleTemplateCategoryDTO> getJsonOfUpdatedTemplates(List<RuleTemplate> wtaBaseRuleTemplates, RuleTemplateCategory ruleTemplateCategory) {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = new ArrayList<>(wtaBaseRuleTemplates.size());
+        List<RuleTemplateCategoryDTO> wtaBaseRuleTemplateDTOS = new ArrayList<>(wtaBaseRuleTemplates.size());
         wtaBaseRuleTemplates.forEach(wtaBaseRuleTemplate -> {
-            WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO = objectMapper.convertValue(wtaBaseRuleTemplate, WTABaseRuleTemplateDTO.class);
+            RuleTemplateCategoryDTO wtaBaseRuleTemplateDTO = objectMapper.convertValue(wtaBaseRuleTemplate, RuleTemplateCategoryDTO.class);
             wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplateCategory);
             wtaBaseRuleTemplateDTOS.add(wtaBaseRuleTemplateDTO);
         });
@@ -220,5 +224,20 @@ public class RuleTemplateCategoryService extends UserBaseService {
         return response;
     }
 
+
+    public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            throw new DataNotFoundByIdException("Organization does not exist");
+        }
+        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryRepository.getRuleTemplateCategoryByUnitId(unitId);
+        List<RuleTemplateResponseDTO> templateList = wtaBaseRuleTemplateGraphRepository.getWTABaseRuleTemplateByUnitId(unitId);
+        RuleTemplateWrapper ruleTemplateWrapper = new RuleTemplateWrapper();
+        ruleTemplateWrapper.setCategoryList(categoryList);
+        ruleTemplateWrapper.setTemplateList(templateList);
+
+        return ruleTemplateWrapper;
+
+    }
 
 }

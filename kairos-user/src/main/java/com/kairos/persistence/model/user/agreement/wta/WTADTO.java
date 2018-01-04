@@ -1,23 +1,30 @@
-package com.kairos.response.dto.web;
+package com.kairos.persistence.model.user.agreement.wta;
 
-import com.kairos.response.dto.web.tag.TagDTO;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 
 /**
- * Created by pawanmandhan on 2/8/17.
+ * Created by vipul on 21/12/17.
  */
-public class WtaDTO {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class WTADTO {
     private String name;
     private String description;
     private long expertiseId;
-    private Long organizationType;
-    private Long organizationSubType;
-    private List<Long> ruleTemplates;
     private long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
+    private List<RuleTemplateCategoryDTO> ruleTemplates;
+    private Long organizationType;
+    private Long organizationSubType;
     private List<Long> tags;
+
+    public WTADTO() {
+        //default cons
+    }
 
     public String getName() {
         return name;
@@ -41,15 +48,6 @@ public class WtaDTO {
 
     public void setExpertiseId(long expertiseId) {
         this.expertiseId = expertiseId;
-    }
-
-
-    public List<Long> getRuleTemplates() {
-        return ruleTemplates;
-    }
-
-    public void setRuleTemplates(List<Long> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
     }
 
     public long getStartDateMillis() {
@@ -76,6 +74,14 @@ public class WtaDTO {
         this.expiryDate = expiryDate;
     }
 
+    public List<RuleTemplateCategoryDTO> getRuleTemplates() {
+        return ruleTemplates;
+    }
+
+    public void setRuleTemplates(List<RuleTemplateCategoryDTO> ruleTemplates) {
+        this.ruleTemplates = ruleTemplates;
+    }
+
     public Long getOrganizationType() {
         return organizationType;
     }
@@ -100,17 +106,15 @@ public class WtaDTO {
         this.tags = tags;
     }
 
-    public WtaDTO() {
-    }
-
-    public WtaDTO(String name, String description, long expertiseId, Long organizationType, Long organizationSubType, long startDateMillis, Long endDateMillis, Long expiryDate) {
+    public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, Long expiryDate, List<RuleTemplateCategoryDTO> ruleTemplates, Long organizationType, Long organizationSubType) {
         this.name = name;
         this.description = description;
         this.expertiseId = expertiseId;
-        this.organizationType = organizationType;
-        this.organizationSubType = organizationSubType;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.expiryDate = expiryDate;
+        this.ruleTemplates = ruleTemplates;
+        this.organizationType = organizationType;
+        this.organizationSubType = organizationSubType;
     }
 }

@@ -1,5 +1,6 @@
 package com.kairos.service.pay_level;
 
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
@@ -12,13 +13,11 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.pay_level.PayLevelGraphRepository;
 import com.kairos.service.UserBaseService;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by prabjot on 26/12/17.
@@ -35,6 +34,19 @@ public class PayLevelService extends UserBaseService {
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
 
+    private PayLevel findById(Long payLevelId){
+        PayLevel payLevel = payLevelGraphRepository.findOne(payLevelId);
+        if(payLevel == null){
+            throw new DataNotFoundByIdException("Invalid pay level id");
+        }
+        return payLevel;
+    }
+
+    private PayLevelDTO getPayLevelResponse(PayLevel payLevel,PayLevelDTO payLevelDTO){
+        payLevelDTO.setId(payLevel.getId());
+        return payLevelDTO;
+    }
+
     public Map<String, Object> getPayLevels(Long countryId){
         List<PayLevelGlobalData> payLevelGlobalData = payLevelGraphRepository.getPayLevelGlobalData(countryId);
         List<PayLevelDTO> payLevelDTOS = payLevelGraphRepository.getPayLevels(countryId);
@@ -50,8 +62,7 @@ public class PayLevelService extends UserBaseService {
         validatePayLevel(countryId,payLevelDTO);
         PayLevel payLevel = validatePayLevelMetaData(countryId,payLevelDTO);
         save(payLevel);
-        payLevelDTO.setId(payLevel.getId());
-        return payLevelDTO;
+        return getPayLevelResponse(payLevel,payLevelDTO);
     }
 
     private void validatePayLevel(Long countryId,PayLevelDTO payLevelDTO){
@@ -81,8 +92,11 @@ public class PayLevelService extends UserBaseService {
             throw new InternalError("Invalid expertise id ");
         }
 
+        DateTime startDateAsJodaDate = new DateTime(payLevelDTO.getStartDate()).withHourOfDay(0).withMinuteOfHour(0).
+                withSecondOfMinute(0).withMillisOfSecond(0);
+
         PayLevel payLevel = new PayLevel(payLevelDTO.getName(),country,expertise,organizationType,payLevelDTO.getPaymentUnit(),
-                payLevelDTO.getStartDate());
+                startDateAsJodaDate.toDate());
 
         if(Optional.ofNullable(payLevelDTO.getLevelId()).isPresent()){
             Level level = organizationTypeGraphRepository.getLevel(payLevelDTO.getOrganizationTypeId(),payLevelDTO.getLevelId());
@@ -91,8 +105,33 @@ public class PayLevelService extends UserBaseService {
             }
             payLevel.setLevel(level);
         }
-        payLevel.setEndDate(payLevelDTO.getEndDate());
+
+        if(payLevelDTO.getEndDate() != null){
+            DateTime endDateAsJodaDate = new DateTime(payLevelDTO.getEndDate()).withHourOfDay(0).withMinuteOfHour(0).
+                    withSecondOfMinute(0).withMillisOfSecond(0);
+            payLevel.setEndDate(endDateAsJodaDate.toDate());
+        }
         return payLevel;
     }
 
+    public PayLevelDTO updatePayLevel(Long payLevelId,PayLevelDTO payLevelDTO){
+
+        PayLevel payLevel = findById(payLevelId);
+        DateTime startDateToUpdate = new DateTime(payLevelDTO.getStartDate()).withHourOfDay(0).withMinuteOfHour(0).
+                withSecondOfMinute(0).withMillisOfSecond(0);
+        DateTime payLevelDate = new DateTime(payLevel.getStartDate()).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+        DateTime currentDate = new DateTime().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+        if(startDateToUpdate.compareTo(payLevelDate) != 0  &&
+                payLevelDate.compareTo(currentDate) <0){
+            throw new InternalError("Start date can't be update");
+        }
+        DateTime startDateAsJodaDate = new DateTime(payLevelDTO.getStartDate()).withHourOfDay(0).withMinuteOfHour(0).
+                withSecondOfMinute(0).withMillisOfSecond(0);
+        payLevel.setStartDate(startDateAsJodaDate.toDate());
+        if(payLevelDTO.getEndDate() != null){
+            payLevel.setEndDate(payLevelDTO.getEndDate());
+        }
+        save(payLevel);
+        return getPayLevelResponse(payLevel,payLevelDTO);
+    }
 }

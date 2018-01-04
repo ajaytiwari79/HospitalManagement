@@ -7,7 +7,6 @@ import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.response.dto.web.WtaDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -213,12 +212,6 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.expiryDate = expiryDate;
     }
 
-
-    public WtaDTO buildwtaDTO() {
-
-        WtaDTO wtaDTO = new WtaDTO(this.name, this.description, this.expertise.getId(), this.organizationType.getId(), this.organizationSubType.getId(), this.startDateMillis, this.endDateMillis, this.expiryDate);
-        return wtaDTO;
-    }
 
     public  WorkingTimeAgreement(Long id,String name, String description, Long startDateMillis, Long endDateMillis, Long expiryDate) {
         this.id=id;

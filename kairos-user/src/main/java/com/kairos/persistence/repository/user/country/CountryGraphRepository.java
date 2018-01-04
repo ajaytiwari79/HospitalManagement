@@ -4,7 +4,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTARuleTemplateQueryResponse;
+import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.RelationType;
@@ -137,7 +137,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
 
     @Query("MATCH (n:Country{isEnabled:true}) where id(n)={0} with n " +
             "Match (n)-[:HAS_RULE_TEMPLATE]->(t:WTABaseRuleTemplate) with t " +
-            "Match (t)<-[:"+HAS_RULE_TEMPLATES+"]-(r:RuleTemplateCategory{deleted:false}) with t,r " +
+            "Match (t)<-[:"+HAS_RULE_TEMPLATES+"]-(r:RuleTemplateCategory{deleted:false,ruleTemplateCategoryType:'WTA'}) with t,r " +
             "Return id(t) as id ,"+
             "t.timeLimit as timeLimit,"+
             "t.balanceType as balanceType,"+
@@ -147,7 +147,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "t.name as name ," +
             "t.templateType as templateType," +
             "r as ruleTemplateCategory," +
-            "t.isDisabled as isDisabled,"+
+            "t.disabled as disabled,"+
             "t.description as description," +
             "t.daysLimit as daysLimit,"+
             "t.creationDate as creationDate,"+
@@ -175,7 +175,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "t.shiftsLimit as shiftsLimit,"+
             "t.activityCode as activityCode,"+
             "t.onlyCompositeShifts as onlyCompositeShifts")
-    List<WTARuleTemplateQueryResponse> getRuleTemplatesAndCategories (long countryId);
+    List<RuleTemplateCategoryDTO> getRuleTemplatesAndCategories (long countryId);
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level)={1} return level")
     Level getLevel(long countryId, long levelId);

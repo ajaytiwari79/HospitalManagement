@@ -160,16 +160,29 @@ public class OrganizationServiceService extends UserBaseService {
 
     }
 
-    public OrganizationServiceQueryResult updateCustomNameOfService(long serviceId, long organizationId, String customName){
-        return organizationGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
+    public OrganizationServiceQueryResult updateCustomNameOfService(long serviceId, long organizationId, String customName, String type){
+        if(type.equalsIgnoreCase("team")){
+            return teamGraphRepository.addCustomNameOfServiceForTeam(serviceId, organizationId, customName);
+        } else {
+            return organizationGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
+        }
+
     }
 
-    public OrganizationServiceQueryResult updateCustomNameOfSubService(long subServiceId,long organizationId, String customName){
-        return organizationGraphRepository.addCustomNameOfSubServiceForOrganization(subServiceId, organizationId, customName);
+    public OrganizationServiceQueryResult updateCustomNameOfSubService(long subServiceId,long organizationId, String customName, String type){
+        if(type.equalsIgnoreCase("team")){
+            return teamGraphRepository.addCustomNameOfSubServiceForTeam(organizationId, subServiceId, customName);
+        } else {
+            return organizationGraphRepository.addCustomNameOfSubServiceForOrganization(subServiceId, organizationId, customName);
+        }
     }
 
     public boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId){
         return organizationGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId,organizationId);
+    };
+
+    public boolean addDefaultCustomNameRelationShipOfServiceForTeam(long subOrganizationServiceId, long teamId){
+        return teamGraphRepository.addCustomNameOfServiceForTeam(subOrganizationServiceId,teamId);
     };
 
     public Map<String,Object> updateServiceToOrganization(long id, long organizationServiceId,boolean isSelected,String type) {
@@ -208,6 +221,7 @@ public class OrganizationServiceService extends UserBaseService {
                 }else {
                     teamGraphRepository.updateOrganizationService(id,organizationServiceId,true,DateUtil.getCurrentDate().getTime());
                 }
+                addDefaultCustomNameRelationShipOfServiceForTeam(id,organizationService.getId());
             } else {
                 teamGraphRepository.updateOrganizationService(id,organizationServiceId,false,DateUtil.getCurrentDate().getTime());
             }
