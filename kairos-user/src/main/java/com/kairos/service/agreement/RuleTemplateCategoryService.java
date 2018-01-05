@@ -160,6 +160,8 @@ public class RuleTemplateCategoryService extends UserBaseService {
         RuleTemplateCategory previousRuleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "(?i)" + ruleTemplateDTO.getCategoryName(), RuleTemplateCategoryType.WTA);
         if (!Optional.ofNullable(previousRuleTemplateCategory).isPresent()) {  // Rule Template Category does not exist So creating  a new one and adding in country
             previousRuleTemplateCategory = new RuleTemplateCategory(ruleTemplateDTO.getCategoryName());
+            previousRuleTemplateCategory.setRuleTemplateCategoryType(RuleTemplateCategoryType.WTA);
+            previousRuleTemplateCategory.setDeleted(false);
             Country country = countryGraphRepository.findOne(countryId);
             List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
             ruleTemplateCategories.add(previousRuleTemplateCategory);
