@@ -31,7 +31,7 @@ import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 @NodeEntity
 public class RuleTemplateCategory extends UserBaseEntity {
 
-     @NotNull(message = "error.RuleTemplate.description.notnull")
+     @NotNull(message = "error.RuleTemplateCategory.name.notnull")
     private String name;
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;

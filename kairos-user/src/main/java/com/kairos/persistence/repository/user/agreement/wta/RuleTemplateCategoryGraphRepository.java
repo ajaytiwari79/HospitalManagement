@@ -28,7 +28,7 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
             "id(c)=53 with l,t\n" +
             "RETURN id(l) as id, l.name as name, l.description as description, CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})  END as tags")*/
 
-    @Query("match(c:Country{isEnabled:true})-[r:HAS_RULE_TEMPLATE_CATEGORY]-(l:RuleTemplateCategory{deleted:false}) where  l.ruleTemplateCategoryType='WTA' with c,l\n" +
+    @Query("match(c:Country{isEnabled:true})-[r:HAS_RULE_TEMPLATE_CATEGORY]-(l:RuleTemplateCategory{deleted:false}) where  l.ruleTemplateCategoryType='WTA' AND exists(l.name) with c,l\n" +
             "OPTIONAL MATCH (l)-[:HAS_TAG]-(t:Tag)<-[:COUNTRY_HAS_TAG]-(c) WHERE t.deleted=false AND t.masterDataType='RULE_TEMPLATE_CATEGORY' AND\n" +
             "id(c)={0} with l,t\n" +
             "RETURN id(l) as id, l.name as name, l.description as description,CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})  END as tags")
