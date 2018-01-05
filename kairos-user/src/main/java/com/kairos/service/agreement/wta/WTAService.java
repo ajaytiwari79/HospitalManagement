@@ -245,13 +245,14 @@ public class WTAService extends UserBaseService {
             newWta.setExpertise(oldWta.getExpertise());
         }
 
-        if (oldWta.getOrganizationType().getId() != updateDTO.getOrganizationType()) {
+        if (!oldWta.getOrganizationType().getId().equals( updateDTO.getOrganizationType())) {
                 throw new ActionNotPermittedException("Organization  type cant be changed" + updateDTO.getOrganizationType());
         }
-
-        if (oldWta.getOrganizationSubType().getId() != updateDTO.getOrganizationSubType()) {
+        newWta.setOrganizationType(oldWta.getOrganizationType());
+        if (!oldWta.getOrganizationSubType().getId().equals(updateDTO.getOrganizationSubType())) {
             throw new ActionNotPermittedException("Organization Sub type cant be changed" + updateDTO.getOrganizationSubType());
         }
+        newWta.setOrganizationSubType(oldWta.getOrganizationSubType());
         List<RuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
             ruleTemplates = wtaOrganizationService.copyRuleTemplates(null, updateDTO.getRuleTemplates(), "COUNTRY", countryId);

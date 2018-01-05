@@ -5,6 +5,7 @@ import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Created by vipul on 14/12/17.
@@ -116,12 +116,20 @@ public class RuleTemplateCategoryServiceTest {
 
     @Test
     public void getRulesTemplateCategoryByUnit() throws Exception {
+
         String baseUrl = getBaseUrl(71L,null, 145L);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/rule_templates");
-        ResponseEntity<String> response = restTemplate.exchange(
-                builder.toUriString(),
-                HttpMethod.GET, null, String.class);
-        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<RuleTemplateWrapper>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<RuleTemplateWrapper>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<RuleTemplateWrapper>> response = restTemplate.exchange(
+                baseUrl+"/rule_templates",
+                HttpMethod.GET, null, typeReference);
+        System.out.println(response.toString());
+        RestTemplateResponseEnvelope<RuleTemplateWrapper> responseBody = response.getBody();
+        Assert.assertEquals(false,responseBody.getData());
+
     }
 
     @Test
