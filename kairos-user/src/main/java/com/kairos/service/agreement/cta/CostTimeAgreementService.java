@@ -169,7 +169,7 @@ public class CostTimeAgreementService extends UserBaseService {
         CompensationTable compensationTable = new CompensationTable(10, CompensationMeasurementType.MINUTES);
         ctaRuleTemplate.setCompensationTable(compensationTable);
         FixedValue fixedValue = new FixedValue(10, currency, FixedValue.Type.PER_ACTIVITY);
-        ctaRuleTemplate.setCalculateValueAgainst(new CalculateValueAgainst("abc", 10.5f, fixedValue));
+        ctaRuleTemplate.setCalculateValueAgainst(new CalculateValueAgainst(CalculateValueAgainst.CalculateValueType.FIXED_VALUE, 10.5f, fixedValue));
         ctaRuleTemplate.setApprovalWorkFlow(ApprovalWorkFlow.NO_APPROVAL_NEEDED);
         ctaRuleTemplate.setBudgetType(BudgetType.ACTIVITY_COST);
         ctaRuleTemplate.setActivityType(new ActivityType());
@@ -223,12 +223,33 @@ public class CostTimeAgreementService extends UserBaseService {
 
         ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategory);
 
-        if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue()!=null
+        /*if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue()!=null
                 && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId()!=null){
             Currency currency=currencyGraphRepository.findOne(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId());
             ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().setCurrency(currency);
-        }
+        }*/
+        if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue() !=null){
+            switch (ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue().toString()){
+                case "FIXED_VALUE" :{
+                    if(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId()!=null){
+                        Currency currency=currencyGraphRepository.findOne(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId());
+                        ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().setCurrency(currency);
+                    }
+                }
+                break;
+                case "WEEKLY_HOURS" :{
+                    ctaRuleTemplate.getCalculateValueAgainst().setScale(Math.round(ctaRuleTemplate.getCalculateValueAgainst().getScale()));
+                    break;
+                }
 
+                case "WEEKLY_SALARY":
+                    ctaRuleTemplate.getCalculateValueAgainst().setScale(Math.round(ctaRuleTemplate.getCalculateValueAgainst().getScale()));
+                    break;
+            }
+        }
+        ctaRuleTemplate.getCalculateValueAgainst().setCalculateValue(ctaRuleTemplateDTO.getCalculateValueAgainst().getCalculateValue());
+
+        logger.debug("ctaRuleTemplate.getCalculateValueAgainst() : {}",ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue());
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
 
