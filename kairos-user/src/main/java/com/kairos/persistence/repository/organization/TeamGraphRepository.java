@@ -135,7 +135,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "WHERE id(os)={0} WITH organizationService\n" +
             "MATCH (team:Team) WHERE id(team)={1} WITH team, organizationService\n" +
             "CREATE UNIQUE (team)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(organizationService) SET r.customName=organizationService.name return true")
-    boolean addCustomNameOfServiceForTeam(Long subServiceId, Long teamId);
+    Boolean addCustomNameOfServiceForTeam(Long subServiceId, Long teamId);
 
     /*@Query("Match (team:Team) where id(team)={0}\n" +
             "Match (team)<-[:"+HAS_TEAM+"]-(group:Group)<-[:"+HAS_GROUP+"]-(organization:Organization) with organization\n" +

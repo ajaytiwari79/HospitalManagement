@@ -635,7 +635,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "WHERE id(os)={0} WITH organizationService\n" +
             "MATCH (org:Organization) WHERE id(org)={1} WITH org, organizationService\n" +
             "CREATE UNIQUE (org)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(organizationService) SET r.customName=organizationService.name return true")
-    boolean addCustomNameOfServiceForOrganization(Long subServiceId, Long organizationId);
+    Boolean addCustomNameOfServiceForOrganization(Long subServiceId, Long organizationId);
 
     //    @Query("MATCH (o:Organization)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(os:OrganizationService) WHERE id(os)={0} AND id(o) ={1} SET r.customName={2} return os")
     @Query("Match (org:Organization),(os:OrganizationService) WHERE  id(org)={1} AND id(os)={0} WITH org,os\n" +
