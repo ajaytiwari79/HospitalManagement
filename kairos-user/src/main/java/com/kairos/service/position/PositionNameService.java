@@ -27,12 +27,10 @@ import java.util.Optional;
 
 @Transactional
 @Service
-<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionNameService.java
-public class PositionNameService extends UserBaseService {
-=======
+
 public class PositionCodeService extends UserBaseService {
-    transient private final Logger logger = LoggerFactory.getLogger(PositionCode.class);
->>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/PositionCodeService.java
+    transient private final Logger logger = LoggerFactory.getLogger(PositionCodeService.class);
+
 
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
@@ -43,7 +41,7 @@ public class PositionCodeService extends UserBaseService {
     private GroupService groupService;
     @Inject
     private TeamService teamService;
-<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionNameService.java
+
     @Inject private OrganizationService organizationService;
 
     public PositionName createPositionName(Long id, PositionName positionName, String type) {
@@ -55,10 +53,7 @@ public class PositionCodeService extends UserBaseService {
         if (position != null) {
             throw new DuplicateDataException("PositionName already exist");
         }
-=======
-    @Inject
-    private OrganizationService organizationService;
->>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/PositionCodeService.java
+
 
     public PositionCode createPositionCode(Long id, PositionCode positionCode, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);

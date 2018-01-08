@@ -1,6 +1,7 @@
 package com.kairos.controller.position;
 
 import com.kairos.persistence.model.user.position.PositionName;
+import com.kairos.service.position.PositionCodeService;
 import com.kairos.service.position.PositionNameService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -24,7 +25,7 @@ import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 public class PositionCodeController {
 
     @Inject
-    private PositionNameService positionNameService;
+    private PositionCodeService positionNameService;
 
 
 <<<<<<< HEAD
