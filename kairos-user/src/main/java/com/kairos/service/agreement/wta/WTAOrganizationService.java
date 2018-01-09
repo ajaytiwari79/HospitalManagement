@@ -89,6 +89,9 @@ public class WTAOrganizationService extends UserBaseService {
         newWta.setId(null);
         newWta.setName(updateDTO.getName());
         newWta.setDescription(updateDTO.getDescription());
+        if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
+            throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
+        }
         newWta.setStartDateMillis(updateDTO.getStartDateMillis());
         newWta.setEndDateMillis(updateDTO.getEndDateMillis());
         newWta.setExpertise(oldWta.getExpertise());
@@ -103,7 +106,7 @@ public class WTAOrganizationService extends UserBaseService {
         organization.addWorkingTimeAgreements(newWta);
 
         save(organization);
-        workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId());
+        workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(),updateDTO.getStartDateMillis());
         newWta.setParentWTA(oldWta.basicDetails());
         newWta.getExpertise().setCountry(null);
 
@@ -171,7 +174,6 @@ public class WTAOrganizationService extends UserBaseService {
             } else if (source.equalsIgnoreCase("COUNTRY")) {
                 ruleTemplateCategory = getCategoryForCountry(ruleTemplates, ruleTemplate.getId(),ruleTemplate.getRuleTemplateCategory().getName(), id);
             }
-
             switch (ruleTemplate.getTemplateType()) {
                 case TEMPLATE1:
                     MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = new MaximumShiftLengthWTATemplate();

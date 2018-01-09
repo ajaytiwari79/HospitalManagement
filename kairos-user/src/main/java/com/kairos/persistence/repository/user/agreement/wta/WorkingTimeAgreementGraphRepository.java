@@ -174,7 +174,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "merge(o)-[:HAS_WTA]->(wta)")
     void linkWTAWithAllOrganizationOfThisSubType(Long wtaId,Long organizationSubTypeId);
 
-    @Query("match(organization:Organization)-[r:" + HAS_WTA + "]->(w:WorkingTimeAgreement) where Id(organization)={1} AND ID(w)={0} delete r")
-    void removeOldWorkingTimeAgreement(Long wtaId, Long organizationId);
+    @Query("match(organization:Organization)-[r:" + HAS_WTA + "]->(w:WorkingTimeAgreement) where Id(organization)={1} AND ID(w)={0} delete r set w.endDateMillis={2}")
+    void removeOldWorkingTimeAgreement(Long wtaId, Long organizationId,Long endDateInMillis);
 
 }

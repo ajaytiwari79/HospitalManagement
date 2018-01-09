@@ -27,7 +27,7 @@ public class RuleTemplateCategoryDTO {
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
-    private  Boolean disabled=false;
+    private Boolean disabled = false;
     private String description;
     private Long creationDate;
     private Long lastModificationDate;
@@ -35,15 +35,15 @@ public class RuleTemplateCategoryDTO {
     private Long intervalLength;
     private String intervalUnit;
     private Long validationStartDateMillis;
-    private Boolean balanceAdjustment=false;
-    private Boolean useShiftTimes=false;
+    private Boolean balanceAdjustment = false;
+    private Boolean useShiftTimes = false;
     private Long maximumAvgTime;
     private Double maximumVetoPercentage;
     private Long numberShiftsPerPeriod;
     private Long numberOfWeeks;
     private String fromDayOfWeek;
     private Long fromTime;
-    private Boolean proportional=false;
+    private Boolean proportional = false;
     private Long toTime;
     private String toDayOfWeek;
     private Long continuousDayRestHours;
@@ -54,6 +54,10 @@ public class RuleTemplateCategoryDTO {
     private Long shiftsLimit;
     private Boolean onlyCompositeShifts;
     private String activityCode;
+
+
+    public RuleTemplateCategoryDTO(String template1Name, String template1, boolean disabled, String template1Description, long timeInMins, List<String> balanceTypes, boolean checkAgainstTimeRules) {
+    }
 
     public void setCheckAgainstTimeRules(Boolean checkAgainstTimeRules) {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
@@ -240,7 +244,6 @@ public class RuleTemplateCategoryDTO {
     }
 
 
-
     public Long getMaximumAvgTime() {
         return maximumAvgTime;
     }
@@ -409,4 +412,45 @@ public class RuleTemplateCategoryDTO {
     public RuleTemplateCategoryDTO() {
         //default const
     }
+
+    // Template 13 Cons
+    public RuleTemplateCategoryDTO(String name, String templateType, Boolean disabled, String description, Long numberShiftsPerPeriod, Long numberOfWeeks,
+                                   String fromDayOfWeek, Long fromTime, Boolean proportional,
+                                   String toDayOfWeek, Long toTime) {
+        this.name = name;
+        this.templateType = templateType;
+        this.disabled = disabled;
+        this.description = description;
+        this.numberShiftsPerPeriod = numberShiftsPerPeriod;
+        this.numberOfWeeks = numberOfWeeks;
+        this.proportional = proportional;
+        this.fromDayOfWeek = fromDayOfWeek;
+        this.fromTime = fromTime;
+        this.toDayOfWeek = toDayOfWeek;
+        this.toTime = toTime;
+
+
+    }
+
+    public RuleTemplateCategoryDTO(String name, String templateType, Boolean disabled,
+                                   String description, Long intervalLength, Long validationStartDateMillis, String intervalUnit, Long daysLimit) {
+        this.name = name;
+        this.templateType = templateType;
+        this.description = description;
+        this.intervalLength = intervalLength;
+        this.intervalUnit = intervalUnit;
+        this.disabled = disabled;
+        this.validationStartDateMillis = validationStartDateMillis;
+        this.daysLimit = daysLimit;
+    }
+
+    // MinimumDailyRestingTimeWTATemplate
+    public RuleTemplateCategoryDTO(String name, String templateType, Boolean disabled, String description, Long continuousDayRestHours) {
+        this.name = name;
+        this.templateType = templateType;
+        this.disabled = disabled;
+        this.description = description;
+        this.continuousDayRestHours = continuousDayRestHours;
+    }
+
 }

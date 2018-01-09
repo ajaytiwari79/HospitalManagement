@@ -194,6 +194,7 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     }
 
     public WorkingTimeAgreement() {
+        //default
     }
 
     public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, Country country, List<RuleTemplate> ruleTemplates, WorkingTimeAgreement parentWTA, Long startDateMillis, Long endDateMillis, Long expiryDate, boolean deleted) {

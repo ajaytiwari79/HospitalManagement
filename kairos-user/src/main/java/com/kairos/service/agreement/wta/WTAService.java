@@ -105,7 +105,6 @@ public class WTAService extends UserBaseService {
         // Adding this wta to all organization type
 
         assignWTAToOrganization(wta, wtaDTO.getOrganizationSubType());
-        // wtaRepository.linkWTAWithAllOrganizationOfThisSubType(wta.getId(), wta.getOrganizationSubType().getId());
         // setting basic details
         wta.setOrganizationType(wta.getOrganizationType().basicDetails());
         wta.setOrganizationSubType(wta.getOrganizationSubType().basicDetails());

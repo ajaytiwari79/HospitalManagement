@@ -117,4 +117,21 @@ public class WTADTO {
         this.organizationType = organizationType;
         this.organizationSubType = organizationSubType;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("WTADTO{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", expertiseId=").append(expertiseId);
+        sb.append(", startDateMillis=").append(startDateMillis);
+        sb.append(", endDateMillis=").append(endDateMillis);
+        sb.append(", expiryDate=").append(expiryDate);
+        sb.append(", ruleTemplates=").append(ruleTemplates);
+        sb.append(", organizationType=").append(organizationType);
+        sb.append(", organizationSubType=").append(organizationSubType);
+        sb.append(", tags=").append(tags);
+        sb.append('}');
+        return sb.toString();
+    }
 }

@@ -28,6 +28,10 @@ public class WTAWithCountryAndOrganizationTypeDTO {
     private List<RuleTemplateCategoryDTO> ruleTemplates;
     private List<Tag> tags;
 
+    public WTAWithCountryAndOrganizationTypeDTO() {
+        //default
+    }
+
     public Long getStartDateMillis() {
         return startDateMillis;
     }
