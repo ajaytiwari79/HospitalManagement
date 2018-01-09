@@ -25,8 +25,11 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={1} AND wta.name =~{0} return wta LIMIT 1")
     WorkingTimeAgreement getWtaByName(String wtaName, Long countryId);
 
-    @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={1} AND wta.name =~{0} AND id(wta) <> {2} return wta")
-    WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, Long wtaId);
+    @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={1} AND wta.name =~{0} AND id(wta) <> {2} " +
+            "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]->(orgType:OrganizationType) where id(orgType)={3}\n" +
+            "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orgSubType:OrganizationType) where id(orgSubType)={4} \n" +
+            "return wta")
+    WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, Long wtaId,Long organizationTypeId,Long subOrganizationTypeId);
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where id(o)={0}\n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertises:Expertise{isEnabled:true})\n" +
