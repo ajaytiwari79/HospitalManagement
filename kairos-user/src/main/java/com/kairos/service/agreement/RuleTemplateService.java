@@ -206,14 +206,12 @@ public class RuleTemplateService extends UserBaseService {
 
             case TEMPLATE1:
                 MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = (MaximumShiftLengthWTATemplate) oldTemplate;//oldTemplate;
-
                 maximumShiftLengthWTATemplate.setDescription(templateDTO.getDescription());
                 maximumShiftLengthWTATemplate.setTimeLimit(templateDTO.getTimeLimit());
                 maximumShiftLengthWTATemplate.setBalanceType(templateDTO.getBalanceType());
-                maximumShiftLengthWTATemplate.setCheckAgainstTimeRules(templateDTO.isCheckAgainstTimeRules());
-                maximumShiftLengthWTATemplate.setDisabled(templateDTO.isDisabled());
+                maximumShiftLengthWTATemplate.setCheckAgainstTimeRules(templateDTO.getCheckAgainstTimeRules());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(maximumShiftLengthWTATemplate);
-
                 break;
 
             case TEMPLATE2:
@@ -221,29 +219,27 @@ public class RuleTemplateService extends UserBaseService {
                 minimumShiftLengthWTATemplate.setDescription(templateDTO.getDescription());
                 minimumShiftLengthWTATemplate.setTimeLimit(templateDTO.getTimeLimit());
                 minimumShiftLengthWTATemplate.setBalanceType(templateDTO.getBalanceType());
-                minimumShiftLengthWTATemplate.setCheckAgainstTimeRules(templateDTO.isCheckAgainstTimeRules());
-                minimumShiftLengthWTATemplate.setDisabled(templateDTO.isDisabled());
+                minimumShiftLengthWTATemplate.setCheckAgainstTimeRules(templateDTO.getCheckAgainstTimeRules());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(minimumShiftLengthWTATemplate);
                 break;
 
             case TEMPLATE3:
                 MaximumConsecutiveWorkingDaysWTATemplate maximumConsecutiveWorkingDaysWTATemplate = (MaximumConsecutiveWorkingDaysWTATemplate) oldTemplate;
-                maximumConsecutiveWorkingDaysWTATemplate.setDisabled(templateDTO.isDisabled());
-
                 maximumConsecutiveWorkingDaysWTATemplate.setDescription(templateDTO.getDescription());
                 maximumConsecutiveWorkingDaysWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
                 maximumConsecutiveWorkingDaysWTATemplate.setBalanceType(templateDTO.getBalanceType());
-                maximumConsecutiveWorkingDaysWTATemplate.setCheckAgainstTimeRules(templateDTO.isCheckAgainstTimeRules());
+                maximumConsecutiveWorkingDaysWTATemplate.setCheckAgainstTimeRules(templateDTO.getCheckAgainstTimeRules());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(maximumConsecutiveWorkingDaysWTATemplate);
                 break;
 
             case TEMPLATE4:
                 MinimumRestInConsecutiveDaysWTATemplate minimumRestInConsecutiveDaysWTATemplate = (MinimumRestInConsecutiveDaysWTATemplate) oldTemplate;
-                minimumRestInConsecutiveDaysWTATemplate.setDisabled(templateDTO.isDisabled());
                 minimumRestInConsecutiveDaysWTATemplate.setDescription(templateDTO.getDescription());
                 minimumRestInConsecutiveDaysWTATemplate.setMinimumRest(templateDTO.getMinimumRest());
                 minimumRestInConsecutiveDaysWTATemplate.setDaysWorked(templateDTO.getDaysWorked());
-
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(minimumRestInConsecutiveDaysWTATemplate);
                 break;
 
@@ -252,83 +248,81 @@ public class RuleTemplateService extends UserBaseService {
                 maximumNightShiftLengthWTATemplate.setDescription(templateDTO.getDescription());
                 maximumNightShiftLengthWTATemplate.setTimeLimit(templateDTO.getTimeLimit());
                 maximumNightShiftLengthWTATemplate.setBalanceType(templateDTO.getBalanceType());
-                maximumNightShiftLengthWTATemplate.setCheckAgainstTimeRules(templateDTO.isCheckAgainstTimeRules());
-                maximumNightShiftLengthWTATemplate.setDisabled(templateDTO.isDisabled());
+                maximumNightShiftLengthWTATemplate.setCheckAgainstTimeRules(templateDTO.getCheckAgainstTimeRules());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(maximumNightShiftLengthWTATemplate);
                 break;
 
             case TEMPLATE6:
                 MinimumConsecutiveNightsWTATemplate minimumConsecutiveNightsWTATemplate = (MinimumConsecutiveNightsWTATemplate) oldTemplate;
-                minimumConsecutiveNightsWTATemplate.setDisabled(templateDTO.isDisabled());
                 minimumConsecutiveNightsWTATemplate.setDescription(templateDTO.getDescription());
                 minimumConsecutiveNightsWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(minimumConsecutiveNightsWTATemplate);
                 break;
 
             case TEMPLATE7:
                 MaximumConsecutiveWorkingNightsWTATemplate maximumConsecutiveWorkingNights = (MaximumConsecutiveWorkingNightsWTATemplate) oldTemplate;//oldTemplate;
-                maximumConsecutiveWorkingNights.setDisabled(templateDTO.isDisabled());
                 maximumConsecutiveWorkingNights.setDescription(templateDTO.getDescription());
                 maximumConsecutiveWorkingNights.setNightsWorked(templateDTO.getNightsWorked());
                 maximumConsecutiveWorkingNights.setBalanceType(templateDTO.getBalanceType());
-                maximumConsecutiveWorkingNights.setCheckAgainstTimeRules(templateDTO.isCheckAgainstTimeRules());
+                maximumConsecutiveWorkingNights.setCheckAgainstTimeRules(templateDTO.getCheckAgainstTimeRules());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(maximumConsecutiveWorkingNights);
                 break;
             case TEMPLATE8:
                 MinimumRestConsecutiveNightsWTATemplate minimumRestConsecutiveNightsWTATemplate = (MinimumRestConsecutiveNightsWTATemplate) oldTemplate;
-                minimumRestConsecutiveNightsWTATemplate.setDisabled(templateDTO.isDisabled());
                 minimumRestConsecutiveNightsWTATemplate.setDescription(templateDTO.getDescription());
                 minimumRestConsecutiveNightsWTATemplate.setNightsWorked(templateDTO.getNightsWorked());
                 minimumRestConsecutiveNightsWTATemplate.setBalanceType(templateDTO.getBalanceType());
                 minimumRestConsecutiveNightsWTATemplate.setMinimumRest(templateDTO.getMinimumRest());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(minimumRestConsecutiveNightsWTATemplate);
                 break;
             case TEMPLATE9:
                 MaximumNumberOfNightsWTATemplate maximumNumberOfNightsWTATemplate = (MaximumNumberOfNightsWTATemplate) oldTemplate;
-                maximumNumberOfNightsWTATemplate.setDisabled(templateDTO.isDisabled());
                 maximumNumberOfNightsWTATemplate.setDescription(templateDTO.getDescription());
                 maximumNumberOfNightsWTATemplate.setNightsWorked(templateDTO.getNightsWorked());
                 maximumNumberOfNightsWTATemplate.setBalanceType(templateDTO.getBalanceType());
                 maximumNumberOfNightsWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
                 maximumNumberOfNightsWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
                 maximumNumberOfNightsWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(maximumNumberOfNightsWTATemplate);
                 break;
             case TEMPLATE10:
                 MaximumDaysOffInPeriodWTATemplate maximumDaysOffInPeriodWTATemplate = (MaximumDaysOffInPeriodWTATemplate) oldTemplate;
-                maximumDaysOffInPeriodWTATemplate.setDisabled(templateDTO.isDisabled());
                 maximumDaysOffInPeriodWTATemplate.setDescription(templateDTO.getDescription());
                 maximumDaysOffInPeriodWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
                 maximumDaysOffInPeriodWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
                 maximumDaysOffInPeriodWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
                 maximumDaysOffInPeriodWTATemplate.setBalanceType(templateDTO.getBalanceType());
                 maximumDaysOffInPeriodWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(maximumDaysOffInPeriodWTATemplate);
                 break;
             case TEMPLATE11:
                 MaximumAverageScheduledTimeWTATemplate maximumAverageScheduledTimeWTATemplate = (MaximumAverageScheduledTimeWTATemplate) oldTemplate;
                 maximumAverageScheduledTimeWTATemplate.setDescription(templateDTO.getDescription());
-                maximumAverageScheduledTimeWTATemplate.setUseShiftTimes(templateDTO.isUseShiftTimes());
+                maximumAverageScheduledTimeWTATemplate.setUseShiftTimes(templateDTO.getUseShiftTimes());
                 maximumAverageScheduledTimeWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
                 maximumAverageScheduledTimeWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
                 maximumAverageScheduledTimeWTATemplate.setMaximumAvgTime(templateDTO.getMaximumAvgTime());
                 maximumAverageScheduledTimeWTATemplate.setBalanceType(templateDTO.getBalanceType());
                 maximumAverageScheduledTimeWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
-                maximumAverageScheduledTimeWTATemplate.setBalanceAdjustment(templateDTO.isBalanceAdjustment());
-                maximumAverageScheduledTimeWTATemplate.setDisabled(templateDTO.isDisabled());
-
+                maximumAverageScheduledTimeWTATemplate.setBalanceAdjustment(templateDTO.getBalanceAdjustment());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(maximumAverageScheduledTimeWTATemplate);
                 break;
             case TEMPLATE12:
                 MaximumVetoPerPeriodWTATemplate maximumVetoPerPeriodWTATemplate = (MaximumVetoPerPeriodWTATemplate) oldTemplate;
-                maximumVetoPerPeriodWTATemplate.setDisabled(templateDTO.isDisabled());
                 maximumVetoPerPeriodWTATemplate.setDescription(templateDTO.getDescription());
                 maximumVetoPerPeriodWTATemplate.setMaximumVetoPercentage(templateDTO.getMaximumVetoPercentage());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(maximumVetoPerPeriodWTATemplate);
                 break;
             case TEMPLATE13:
                 NumberOfWeekendShiftInPeriodWTATemplate numberOfWeekendShiftInPeriodWTATemplate = (NumberOfWeekendShiftInPeriodWTATemplate) oldTemplate;
-                numberOfWeekendShiftInPeriodWTATemplate.setDisabled(templateDTO.isDisabled());
                 numberOfWeekendShiftInPeriodWTATemplate.setDescription(templateDTO.getDescription());
                 numberOfWeekendShiftInPeriodWTATemplate.setNumberShiftsPerPeriod(templateDTO.getNumberShiftsPerPeriod());
                 numberOfWeekendShiftInPeriodWTATemplate.setNumberOfWeeks(templateDTO.getNumberOfWeeks());
@@ -336,46 +330,45 @@ public class RuleTemplateService extends UserBaseService {
                 numberOfWeekendShiftInPeriodWTATemplate.setFromTime(templateDTO.getFromTime());
                 numberOfWeekendShiftInPeriodWTATemplate.setToTime(templateDTO.getToTime());
                 numberOfWeekendShiftInPeriodWTATemplate.setToDayOfWeek(templateDTO.getToDayOfWeek());
-                numberOfWeekendShiftInPeriodWTATemplate.setProportional(templateDTO.isProportional());
+                numberOfWeekendShiftInPeriodWTATemplate.setProportional(templateDTO.getProportional());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(numberOfWeekendShiftInPeriodWTATemplate);
                 break;
             case TEMPLATE14:
                 CareDayCheckWTATemplate careDayCheckWTATemplate = (CareDayCheckWTATemplate) oldTemplate;
-                careDayCheckWTATemplate.setDisabled(templateDTO.isDisabled());
                 careDayCheckWTATemplate.setDescription(templateDTO.getDescription());
                 careDayCheckWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
                 careDayCheckWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
                 careDayCheckWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
                 careDayCheckWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(careDayCheckWTATemplate);
                 break;
             case TEMPLATE15:
                 MinimumDailyRestingTimeWTATemplate minimumDailyRestingTimeWTATemplate = (MinimumDailyRestingTimeWTATemplate) oldTemplate;
-                minimumDailyRestingTimeWTATemplate.setDisabled(templateDTO.isDisabled());
                 minimumDailyRestingTimeWTATemplate.setId(oldTemplate.getId());
                 minimumDailyRestingTimeWTATemplate.setDescription(templateDTO.getDescription());
                 minimumDailyRestingTimeWTATemplate.setContinuousDayRestHours(templateDTO.getContinuousDayRestHours());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(minimumDailyRestingTimeWTATemplate);
                 break;
             case TEMPLATE16:
                 MinimumDurationBetweenShiftWTATemplate minimumDurationBetweenShiftWTATemplate = (MinimumDurationBetweenShiftWTATemplate) oldTemplate;
                 minimumDurationBetweenShiftWTATemplate.setDescription(templateDTO.getDescription());
-                minimumDurationBetweenShiftWTATemplate.setDisabled(templateDTO.isDisabled());
-
                 minimumDurationBetweenShiftWTATemplate.setBalanceType(templateDTO.getBalanceType());
                 minimumDurationBetweenShiftWTATemplate.setMinimumDurationBetweenShifts(templateDTO.getMinimumDurationBetweenShifts());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(minimumDurationBetweenShiftWTATemplate);
                 break;
             case TEMPLATE17:
                 MinimumWeeklyRestPeriodWTATemplate minimumWeeklyRestPeriodWTATemplate = (MinimumWeeklyRestPeriodWTATemplate) oldTemplate;
-                minimumWeeklyRestPeriodWTATemplate.setDisabled(templateDTO.isDisabled());
                 minimumWeeklyRestPeriodWTATemplate.setDescription(templateDTO.getDescription());
                 minimumWeeklyRestPeriodWTATemplate.setContinuousWeekRest(templateDTO.getContinuousWeekRest());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(minimumWeeklyRestPeriodWTATemplate);
                 break;
             case TEMPLATE18:
                 ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = (ShortestAndAverageDailyRestWTATemplate) oldTemplate;
-                shortestAndAverageDailyRestWTATemplate.setDisabled(templateDTO.isDisabled());
                 shortestAndAverageDailyRestWTATemplate.setDescription(templateDTO.getDescription());
                 shortestAndAverageDailyRestWTATemplate.setBalanceType(templateDTO.getBalanceType());
                 shortestAndAverageDailyRestWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
@@ -384,36 +377,36 @@ public class RuleTemplateService extends UserBaseService {
                 shortestAndAverageDailyRestWTATemplate.setContinuousDayRestHours(templateDTO.getContinuousDayRestHours());
                 shortestAndAverageDailyRestWTATemplate.setAverageRest(templateDTO.getAverageRest());
                 shortestAndAverageDailyRestWTATemplate.setShiftAffiliation(templateDTO.getShiftAffiliation());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(shortestAndAverageDailyRestWTATemplate);
                 break;
             case TEMPLATE19:
                 MaximumShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = (MaximumShiftsInIntervalWTATemplate) oldTemplate;
-                maximumShiftsInIntervalWTATemplate.setDisabled(templateDTO.isDisabled());
                 maximumShiftsInIntervalWTATemplate.setDescription(templateDTO.getDescription());
                 maximumShiftsInIntervalWTATemplate.setBalanceType(templateDTO.getBalanceType());
                 maximumShiftsInIntervalWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
                 maximumShiftsInIntervalWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
                 maximumShiftsInIntervalWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
                 maximumShiftsInIntervalWTATemplate.setShiftsLimit(templateDTO.getShiftsLimit());
-                maximumShiftsInIntervalWTATemplate.setOnlyCompositeShifts(templateDTO.isOnlyCompositeShifts());
+                maximumShiftsInIntervalWTATemplate.setOnlyCompositeShifts(templateDTO.getOnlyCompositeShifts());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(maximumShiftsInIntervalWTATemplate);
                 break;
             case TEMPLATE20:
                 MaximumSeniorDaysInYearWTATemplate maximumSeniorDaysInYearWTATemplate = (MaximumSeniorDaysInYearWTATemplate) oldTemplate;
-                maximumSeniorDaysInYearWTATemplate.setDisabled(templateDTO.isDisabled());
                 maximumSeniorDaysInYearWTATemplate.setDescription(templateDTO.getDescription());
                 maximumSeniorDaysInYearWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
                 maximumSeniorDaysInYearWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
                 maximumSeniorDaysInYearWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
                 maximumSeniorDaysInYearWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
                 maximumSeniorDaysInYearWTATemplate.setActivityCode(templateDTO.getActivityCode());
+                oldTemplate.setDisabled(templateDTO.getDisabled());
                 oldTemplate = save(maximumSeniorDaysInYearWTATemplate);
                 break;
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
 
-        oldTemplate.setDisabled(templateDTO.isDisabled());
 
         wtaRuleTemplateGraphRepository.deleteCategoryFromTemplate(oldTemplate.getId());
 
