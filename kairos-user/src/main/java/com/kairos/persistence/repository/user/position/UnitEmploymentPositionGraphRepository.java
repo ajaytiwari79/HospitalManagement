@@ -26,7 +26,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
 
     @Query("MATCH (p:Position{isDeleted:true})<-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]-(u:UnitEmployment) where id(u)={0}\n" +
 
-            "match (p)-[:"+HAS_POSITION_NAME+"]->(pn:PositionName)\n" +
+            "match (p)-[:"+HAS_POSITION_NAME+"]->(pn:PositionCode)\n" +
             "match (p)-[:"+HAS_EMPLOYMENT_TYPE+"]->(et:EmploymentType)\n" +
             "match (p)-[:"+HAS_EXPERTISE_IN+"]->(e:Expertise)\n" +
             "optional match (p)-[:"+HAS_WTA+"]->(wta:WorkingTimeAgreement)\n" +
@@ -50,7 +50,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "match(uEmp)-[:"+ HAS_UNIT_EMPLOYMENT_POSITION +"]->(p:Position)<-[:"+BELONGS_TO_STAFF+"]-(s:Staff) where id(s)={2}\n" +
             "match(p)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) \n" +
             "match(p)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) \n" +
-            "match(p)-[:"+HAS_POSITION_NAME+"]->(positionName:PositionName)"+
+            "match(p)-[:"+HAS_POSITION_NAME+"]->(positionName:PositionCode)"+
             "return expertise as expertise," +
             "positionName as positionName," +
             "p.totalWeeklyHours as totalWeeklyHours," +

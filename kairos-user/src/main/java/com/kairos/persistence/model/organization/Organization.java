@@ -18,7 +18,7 @@ import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
-import com.kairos.persistence.model.user.position.PositionName;
+import com.kairos.persistence.model.user.position.PositionCode;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Resource;
@@ -169,7 +169,7 @@ public class Organization extends UserBaseEntity {
     private Level level;
 
     @Relationship(type = HAS_POSITION_NAME)
-    private List<PositionName> positionNameList = new ArrayList<>();
+    private List<PositionCode> positionCodeList = new ArrayList<>();
 
     @Relationship(type = HAS_WTA)
     private List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
@@ -702,12 +702,12 @@ public class Organization extends UserBaseEntity {
         workingTimeAgreements.add(workingTimeAgreement);
     }
 
-    public List<PositionName> getPositionNameList() {
-        return positionNameList;
+    public List<PositionCode> getPositionCodeList() {
+        return positionCodeList;
     }
 
-    public void setPositionNameList(List<PositionName> positionNameList) {
-        this.positionNameList = positionNameList;
+    public void setPositionCodeList(List<PositionCode> positionCodeList) {
+        this.positionCodeList = positionCodeList;
     }
 
     public boolean isPhaseGenerated() {

@@ -1,6 +1,6 @@
 package com.kairos.controller.position;
 
-import com.kairos.persistence.model.user.position.PositionName;
+import com.kairos.persistence.model.user.position.PositionCode;
 import com.kairos.service.position.PositionCodeService;
 import com.kairos.service.position.PositionNameService;
 import com.kairos.util.response.ResponseHandler;
@@ -29,15 +29,15 @@ public class PositionCodeController {
 
 
 <<<<<<< HEAD
-    @ApiOperation("Create PositionName")
+    @ApiOperation("Create PositionCode")
     @PostMapping(value = "/position_name")
-    ResponseEntity<Map<String, Object>> createPositionName( @RequestParam("type") String type,@PathVariable Long unitId, @RequestBody PositionName positionName) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.createPositionName( unitId, positionName,type));
+    ResponseEntity<Map<String, Object>> createPositionName( @RequestParam("type") String type,@PathVariable Long unitId, @RequestBody PositionCode positionCode) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.createPositionName( unitId, positionCode,type));
     }
 
-    @ApiOperation("Update PositionName")
+    @ApiOperation("Update PositionCode")
     @PutMapping(value = "/position_name/{positionNameId}")
-    ResponseEntity<Map<String, Object>> updatePositionName(@RequestParam("type") String type, @PathVariable Long unitId, @PathVariable long positionNameId, @RequestBody PositionName positionName) {
+    ResponseEntity<Map<String, Object>> updatePositionName(@RequestParam("type") String type, @PathVariable Long unitId, @PathVariable long positionNameId, @RequestBody PositionCode positionName) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionNameService.updatePositionName(unitId, positionNameId, positionName,type));
 =======
     @ApiOperation("Create PositionCode")

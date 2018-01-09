@@ -1,23 +1,17 @@
 package com.kairos.service.position;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
-import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
-import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.persistence.model.user.country.EmploymentType;
 
 import com.kairos.persistence.model.user.expertise.Expertise;
 
+import com.kairos.persistence.model.user.position.PositionCode;
 import com.kairos.persistence.model.user.position.PositionCtaWtaQueryResult;
-import com.kairos.persistence.model.user.position.PositionName;
 
 import com.kairos.persistence.model.user.position.UnitEmploymentPosition;
 
@@ -34,7 +28,6 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 
 import com.kairos.persistence.repository.user.position.PositionNameGraphRepository;
 import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
-import com.kairos.persistence.repository.user.position.PositionCodeGraphRepository;
 
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
@@ -44,22 +37,12 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
-import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
-import static com.kairos.constants.AppConstants.*;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -310,18 +293,18 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
 
         if (!oldPosition.getPositionName().getId().equals(positionDTO.getPositionNameId())) {
-            PositionName positionName = positionNameGraphRepository.findOne(positionDTO.getPositionNameId());
-            if (!Optional.ofNullable(positionName).isPresent()) {
-                throw new DataNotFoundByIdException("PositionName Cannot be null" + positionDTO.getPositionNameId());
+            PositionCode positionCode = positionNameGraphRepository.findOne(positionDTO.getPositionNameId());
+            if (!Optional.ofNullable(positionCode).isPresent()) {
+                throw new DataNotFoundByIdException("PositionCode Cannot be null" + positionDTO.getPositionNameId());
             }
-            oldPosition.setPositionName(positionName);
+            oldPosition.setPositionName(positionCode);
         }
 
 
         if (!oldUnitEmploymentPosition.getPositionCode().getId().equals(unitEmploymentPositionDTO.getPositionNameId())) {
             PositionCode positionCode = positionCodeGraphRepository.findOne(unitEmploymentPositionDTO.getPositionNameId());
             if (!Optional.ofNullable(positionCode).isPresent()) {
-                throw new DataNotFoundByIdException("PositionName Cannot be null" + unitEmploymentPositionDTO.getPositionNameId());
+                throw new DataNotFoundByIdException("PositionCode Cannot be null" + unitEmploymentPositionDTO.getPositionNameId());
             }
             oldUnitEmploymentPosition.setPositionCode(positionCode);
 

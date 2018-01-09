@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 
-public class PositionName extends UserBaseEntity {
+public class PositionCode extends UserBaseEntity {
 
 
     @NotEmpty(message = "error.PositionCode.name.notempty")
@@ -29,15 +29,15 @@ public class PositionName extends UserBaseEntity {
     private boolean isEnabled = true;
 
 
-    public PositionName() {
+    public PositionCode() {
     }
 
-    public PositionName(String name) {
+    public PositionCode(String name) {
         this.name = name;
     }
 
 
-    public PositionName(String name, String description) {
+    public PositionCode(String name, String description) {
         this.name = name;
         this.description = description;
     }

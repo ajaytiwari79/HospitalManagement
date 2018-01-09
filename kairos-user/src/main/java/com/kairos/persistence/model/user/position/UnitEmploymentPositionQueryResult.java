@@ -31,7 +31,7 @@ public class UnitEmploymentPositionQueryResult {
     private EmploymentType employmentType;
     private float salary;
 
-    private PositionName positionName;
+    private PositionCode positionCode;
     private WorkingTimeAgreement workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
 
@@ -115,12 +115,12 @@ public class UnitEmploymentPositionQueryResult {
         this.salary = salary;
     }
 
-    public PositionName getPositionName() {
-        return positionName;
+    public PositionCode getPositionCode() {
+        return positionCode;
     }
 
-    public void setPositionName(PositionName positionName) {
-        this.positionName = positionName;
+    public void setPositionCode(PositionCode positionCode) {
+        this.positionCode = positionCode;
     }
 
     public long getId() {

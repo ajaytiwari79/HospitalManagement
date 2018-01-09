@@ -511,7 +511,7 @@ public class StaffService extends UserBaseService {
                 } else {
                     Cell cell = row.getCell(8);
                     cell.setCellType(Cell.CELL_TYPE_STRING);
-                    if ("14".equals(cell.getStringCellValue())) {
+
 
                         cell = row.getCell(2);
                         cell.setCellType(Cell.CELL_TYPE_STRING);
@@ -577,7 +577,7 @@ public class StaffService extends UserBaseService {
                         if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
                             createEmployment(parent, unit, staff, accessGroupId, isEmploymentExist);
                         }
-                    }
+
                 }
             }
             return staffUploadBySheetQueryResult;
