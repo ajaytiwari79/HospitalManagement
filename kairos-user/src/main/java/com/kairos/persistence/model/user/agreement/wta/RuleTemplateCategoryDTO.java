@@ -22,11 +22,12 @@ public class RuleTemplateCategoryDTO {
     private String category;
     private Long timeLimit;
     private List<String> balanceType;
-    private boolean checkAgainstTimeRules;
+    private Boolean checkAgainstTimeRules;
+
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
-    private  boolean disabled;
+    private  Boolean disabled=false;
     private String description;
     private Long creationDate;
     private Long lastModificationDate;
@@ -34,15 +35,15 @@ public class RuleTemplateCategoryDTO {
     private Long intervalLength;
     private String intervalUnit;
     private Long validationStartDateMillis;
-    private boolean balanceAdjustment;
-    private boolean useShiftTimes;
+    private Boolean balanceAdjustment=false;
+    private Boolean useShiftTimes=false;
     private Long maximumAvgTime;
     private Double maximumVetoPercentage;
     private Long numberShiftsPerPeriod;
     private Long numberOfWeeks;
     private String fromDayOfWeek;
     private Long fromTime;
-    private boolean proportional;
+    private Boolean proportional=false;
     private Long toTime;
     private String toDayOfWeek;
     private Long continuousDayRestHours;
@@ -51,8 +52,56 @@ public class RuleTemplateCategoryDTO {
     private Long averageRest;
     private String shiftAffiliation;
     private Long shiftsLimit;
-    private boolean onlyCompositeShifts;
+    private Boolean onlyCompositeShifts;
     private String activityCode;
+
+    public void setCheckAgainstTimeRules(Boolean checkAgainstTimeRules) {
+        this.checkAgainstTimeRules = checkAgainstTimeRules;
+    }
+
+    public Boolean getCheckAgainstTimeRules() {
+        return checkAgainstTimeRules;
+    }
+
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public Boolean getBalanceAdjustment() {
+        return balanceAdjustment;
+    }
+
+    public void setBalanceAdjustment(Boolean balanceAdjustment) {
+        this.balanceAdjustment = balanceAdjustment;
+    }
+
+    public Boolean getUseShiftTimes() {
+        return useShiftTimes;
+    }
+
+    public void setUseShiftTimes(Boolean useShiftTimes) {
+        this.useShiftTimes = useShiftTimes;
+    }
+
+    public Boolean getProportional() {
+        return proportional;
+    }
+
+    public void setProportional(Boolean proportional) {
+        this.proportional = proportional;
+    }
+
+    public Boolean getOnlyCompositeShifts() {
+        return onlyCompositeShifts;
+    }
+
+    public void setOnlyCompositeShifts(Boolean onlyCompositeShifts) {
+        this.onlyCompositeShifts = onlyCompositeShifts;
+    }
 
     public String getCategory() {
         return category;
@@ -110,14 +159,6 @@ public class RuleTemplateCategoryDTO {
         this.balanceType = balanceType;
     }
 
-    public boolean isCheckAgainstTimeRules() {
-        return checkAgainstTimeRules;
-    }
-
-    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-    }
-
     public Long getDaysLimit() {
         return daysLimit;
     }
@@ -140,14 +181,6 @@ public class RuleTemplateCategoryDTO {
 
     public void setDaysWorked(Long daysWorked) {
         this.daysWorked = daysWorked;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
     }
 
     public String getDescription() {
@@ -206,21 +239,7 @@ public class RuleTemplateCategoryDTO {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public boolean isBalanceAdjustment() {
-        return balanceAdjustment;
-    }
 
-    public void setBalanceAdjustment(boolean balanceAdjustment) {
-        this.balanceAdjustment = balanceAdjustment;
-    }
-
-    public boolean isUseShiftTimes() {
-        return useShiftTimes;
-    }
-
-    public void setUseShiftTimes(boolean useShiftTimes) {
-        this.useShiftTimes = useShiftTimes;
-    }
 
     public Long getMaximumAvgTime() {
         return maximumAvgTime;
@@ -270,13 +289,6 @@ public class RuleTemplateCategoryDTO {
         this.fromTime = fromTime;
     }
 
-    public boolean isProportional() {
-        return proportional;
-    }
-
-    public void setProportional(boolean proportional) {
-        this.proportional = proportional;
-    }
 
     public Long getToTime() {
         return toTime;
@@ -340,14 +352,6 @@ public class RuleTemplateCategoryDTO {
 
     public void setShiftsLimit(Long shiftsLimit) {
         this.shiftsLimit = shiftsLimit;
-    }
-
-    public boolean isOnlyCompositeShifts() {
-        return onlyCompositeShifts;
-    }
-
-    public void setOnlyCompositeShifts(boolean onlyCompositeShifts) {
-        this.onlyCompositeShifts = onlyCompositeShifts;
     }
 
     public String getActivityCode() {

@@ -177,11 +177,11 @@ public class OrganizationServiceService extends UserBaseService {
         }
     }
 
-    public boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId){
+    public Boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId){
         return organizationGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId,organizationId);
     };
 
-    public boolean addDefaultCustomNameRelationShipOfServiceForTeam(long subOrganizationServiceId, long teamId){
+    public Boolean addDefaultCustomNameRelationShipOfServiceForTeam(long subOrganizationServiceId, long teamId){
         return teamGraphRepository.addCustomNameOfServiceForTeam(subOrganizationServiceId,teamId);
     };
 
@@ -221,7 +221,7 @@ public class OrganizationServiceService extends UserBaseService {
                 }else {
                     teamGraphRepository.updateOrganizationService(id,organizationServiceId,true,DateUtil.getCurrentDate().getTime());
                 }
-                addDefaultCustomNameRelationShipOfServiceForTeam(id,organizationService.getId());
+                addDefaultCustomNameRelationShipOfServiceForTeam(organizationService.getId(),id);
             } else {
                 teamGraphRepository.updateOrganizationService(id,organizationServiceId,false,DateUtil.getCurrentDate().getTime());
             }

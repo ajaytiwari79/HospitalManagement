@@ -10,7 +10,6 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.springframework.beans.BeanUtils;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -56,6 +55,13 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     // to make a history
     @Relationship(type = HAS_PARENT_WTA)
     private WorkingTimeAgreement parentWTA;
+
+    @Relationship(type = HAS_COUNTRY_PARENT_WTA)
+    private WorkingTimeAgreement countryParentWTA;
+
+    @Relationship(type = HAS_ORGANIZATION_PARENT_WTA)
+    private WorkingTimeAgreement organizationParentWTA;
+
 
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
@@ -161,26 +167,31 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         this.tags = tags;
     }
 
+    public WorkingTimeAgreement getCountryParentWTA() {
+        return countryParentWTA;
+    }
+
+    public void setCountryParentWTA(WorkingTimeAgreement countryParentWTA) {
+        this.countryParentWTA = countryParentWTA;
+    }
+
+    public WorkingTimeAgreement getOrganizationParentWTA() {
+        return organizationParentWTA;
+    }
+
+    public void setOrganizationParentWTA(WorkingTimeAgreement organizationParentWTA) {
+        this.organizationParentWTA = organizationParentWTA;
+    }
+
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap();
         map.put("id", this.id);
         map.put("name", this.name);
         map.put("code", this.description);
-
         map.put("lastModificationDate", this.getLastModificationDate());
         map.put("creationDate", this.getCreationDate());
         return map;
     }
-
-    public static WorkingTimeAgreement copyProperties(WorkingTimeAgreement source, WorkingTimeAgreement target) {
-        BeanUtils.copyProperties(source, target);
-        return target;
-    }
-    public static WorkingTimeAgreement copyProperties(WorkingTimeAgreement source, WorkingTimeAgreement target,String... Ignore) {
-        BeanUtils.copyProperties(source, target,Ignore);
-        return target;
-    }
-    //"organizationTypes","id","organizationSubType"
 
     public WorkingTimeAgreement() {
     }
