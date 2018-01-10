@@ -206,6 +206,7 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate,CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
+
         BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes");
 
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
@@ -221,6 +222,10 @@ public class CostTimeAgreementService extends UserBaseService {
                     return countryHolidayCalenders.stream();
                 }).collect(Collectors.toList());
 
+        if( !ctaRuleTemplate.getRuleTemplateCategory().getId().equals(ctaRuleTemplateDTO.getRuleTemplateCategory())){
+            // Detach rule template from older category If category has been updated
+            ruleTemplateCategoryGraphRepository.detachRuleTemplateCategoryFromCTARuleTemplate(ctaRuleTemplate.getId(),ctaRuleTemplate.getRuleTemplateCategory().getId());
+        }
         ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategory);
 
         /*if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue()!=null
