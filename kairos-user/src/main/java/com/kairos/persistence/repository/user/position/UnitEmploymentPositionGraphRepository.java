@@ -21,7 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 
 
-public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseRepository<UnitEmploymentPosition> {
+public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseRepository<UnitEmploymentPosition,Long> {
 
 
     @Query("MATCH (p:Position{isDeleted:true})<-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]-(u:UnitEmployment) where id(u)={0}\n" +

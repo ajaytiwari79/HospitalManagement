@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.position.PositionCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.position.PositionNameGraphRepository;
+import com.kairos.persistence.repository.user.position.PositionCodeGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
@@ -20,6 +20,10 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.kairos.constants.AppConstants.GROUP;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
+import static com.kairos.constants.AppConstants.TEAM;
 
 /**
  * Created by pawanmandhan on 27/7/17.
@@ -36,7 +40,7 @@ public class PositionCodeService extends UserBaseService {
     private OrganizationGraphRepository organizationGraphRepository;
 
     @Inject
-    private PositionNameGraphRepository positionNameGraphRepository;
+    private PositionCodeGraphRepository positionCodeGraphRepository;
     @Inject
     private GroupService groupService;
     @Inject
@@ -45,18 +49,17 @@ public class PositionCodeService extends UserBaseService {
     @Inject private OrganizationService organizationService;
     @Inject private PositionCode positionCode;
 
-    public PositionCode createPositionName(Long id, PositionCode positionCode, String type) {
+    public PositionCode createPositionCode(Long id, PositionCode positionCode, String type) {
         Long unitId=organizationService.getOrganization(id,type);
         PositionCode position = null;
         String name = "(?i)" + positionCode.getName();
         //check if duplicate
-        position = positionNameGraphRepository.checkDuplicatePositionName(unitId, name);
+        position = positionCodeGraphRepository.checkDuplicatePositionCode(unitId, name);
         if (position != null) {
             throw new DuplicateDataException("PositionCode already exist");
         }
 
 
-    public PositionCode createPositionCode(Long id, PositionCode positionCode, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         if (!organization.isParentOrganization()) {
             throw new ActionNotPermittedException("Can only create PositionCode in Parent organization");
@@ -76,7 +79,7 @@ public class PositionCodeService extends UserBaseService {
 
     public PositionCode updatePositionName(Long id, Long positionNameId, PositionCode positionCode, String type) {
         Long unitId=organizationService.getOrganization(id,type);
-        PositionCode oldPositionCode = positionNameGraphRepository.findOne(positionNameId);
+        PositionCode oldPositionCode = positionCodeGraphRepository.findOne(positionNameId);
 
         if (oldPositionCode == null) {
             return null;
@@ -84,7 +87,7 @@ public class PositionCodeService extends UserBaseService {
 
         //check if new Name already exist
         if (!(oldPositionCode.getName().equalsIgnoreCase(positionCode.getName())) &&
-                (positionNameGraphRepository.checkDuplicatePositionName(unitId, positionCode.getName()) != null)) {
+                (positionCodeGraphRepository.checkDuplicatePositionCode(unitId, positionCode.getName()) != null)) {
             throw new DuplicateDataException("PositionCode can't be updated");
         }
         Organization organization = organizationGraphRepository.findOne(unitId);
@@ -105,30 +108,7 @@ public class PositionCodeService extends UserBaseService {
     }
 
 
-    public boolean deletePositionName(Long id, Long positionId, String type) {
-        Long unitId=organizationService.getOrganization(id,type);
-        PositionCode position = positionNameGraphRepository.findOne(positionId);
-        if (position == null) {
-            throw new DataNotFoundByIdException("position_name  not found " + positionId);
-        }
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
-            throw new DataNotFoundByIdException("Organization not found " + unitId);
 
-        String name = "(?i)" + positionCode.getName();
-        //check if duplicate
-        PositionCode positionCodeObj = positionCodeGraphRepository.checkDuplicatePositionName(organization.getId(), name);
-        if (!Optional.ofNullable(positionCodeObj).isPresent()) {
-            logger.info("positionCode already exist,{}", positionCode.getName());
-            throw new DuplicateDataException("PositionCode already exist");
-        }
-        List<PositionCode> positionCodeList = organization.getPositionCodeList();
-        positionCodeList = (positionCodeList == null) ? new ArrayList<PositionCode>() : positionCodeList;
-        positionCodeList.add(positionCode);
-        organization.setPositionCodeList(positionCodeList);
-        save(organization);
-        return positionCode;
-    }
 
 
     public PositionCode updatePositionCode(Long id, Long positionNameId, PositionCode positionCode, String type) {
@@ -145,7 +125,7 @@ public class PositionCodeService extends UserBaseService {
 
         //check if new Name already exist
         if (!(oldPositionCode.getName().equalsIgnoreCase(positionCode.getName())) &&
-                (positionCodeGraphRepository.checkDuplicatePositionName(organization.getId(), positionCode.getName()) != null)) {
+                (positionCodeGraphRepository.checkDuplicatePositionCode(organization.getId(), positionCode.getName()) != null)) {
             throw new DuplicateDataException("PositionCode can't be updated");
         }
 
@@ -173,18 +153,18 @@ public class PositionCodeService extends UserBaseService {
 
         positionCode.setDeleted(true);
         save(positionCode);
->>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/PositionCodeService.java
+
         return true;
     }
 
 
-<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionNameService.java
+
     public PositionCode getPositionName(Long positionId) {
-        return positionNameGraphRepository.findOne(positionId);
+        return positionCodeGraphRepository.findOne(positionId);
     }
 
     public PositionCode getPositionNameByUnitIdAndId(Long unitId, long  positionNameId){
-        return  positionNameGraphRepository.getPositionNameByUnitIdAndId(unitId,positionNameId);
+        return  positionCodeGraphRepository.getPositionCodeByUnitIdAndId(unitId,positionNameId);
     }
     public List<PositionCode> getAllPositionName(Long id, String type) {
         Long unitId;
@@ -208,10 +188,11 @@ public class PositionCodeService extends UserBaseService {
             //return parents(its own)
             positionCodes = organizationGraphRepository.getPositionNames(unitId);
         } else {
-            positionCodes = organizationGraphRepository.getPositionNamesOfParentOrganization(unitId);
+            positionCodes = organizationGraphRepository.getPositionCodesOfParentOrganization(unitId);
         }
         return positionCodes;
-=======
+    }
+
     public PositionCode getPositionCode(Long positionId) {
         return positionCodeGraphRepository.findOne(positionId);
     }
@@ -224,7 +205,7 @@ public class PositionCodeService extends UserBaseService {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         List<PositionCode> positionCodes = (organization.isParentOrganization()) ? organizationGraphRepository.getPositionNames(organization.getId()) : organizationGraphRepository.getPositionCodesOfParentOrganization(organization.getId());
         return positionCodes;
->>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/PositionCodeService.java
+
     }
 
 

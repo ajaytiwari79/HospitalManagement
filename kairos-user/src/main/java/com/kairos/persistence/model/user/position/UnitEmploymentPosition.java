@@ -55,15 +55,11 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     public UnitEmploymentPosition() {
     }
 
-<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/persistence/model/user/position/Position.java
-    public Position(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement workingTimeAgreement,
-                    PositionCode positionCode, String description, Long startDate, Long endDate, Long expiryDate
-                    , float totalWeeklyHours , float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
-=======
+
     public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
                                   PositionCode positionCode, String description, Long startDate, Long endDate, Long expiryDate
                     , int totalWeeklyHours , float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
->>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/persistence/model/user/position/UnitEmploymentPosition.java
+
 
         this.expertise = expertise;
         this.cta = cta;
@@ -191,11 +187,8 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.staff = staff;
     }
 
-<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/persistence/model/user/position/Position.java
-    public Position(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement workingTimeAgreement, PositionCode positionCode, Staff staff, boolean isEnabled, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
-=======
+
     public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
->>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/persistence/model/user/position/UnitEmploymentPosition.java
         this.expertise = expertise;
         this.cta = cta;
         this.workingTimeAgreement = workingTimeAgreement;
