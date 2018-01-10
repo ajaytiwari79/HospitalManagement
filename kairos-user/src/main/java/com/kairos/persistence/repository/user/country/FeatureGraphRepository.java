@@ -67,7 +67,7 @@ public interface FeatureGraphRepository extends Neo4jBaseRepository<Feature,Long
             "return feature")
     List<Feature> getAvailableFeaturesOfResourceByOrganizationAndIds(Long organizationId , Long resourceId, boolean deleted, List<Long> featureIds);
 
-    @Query("MATCH (resource:Resource)-[r:"+RESOURCE_HAS_FEATURE+"]->(feature:Feature)\n"+
+    @Query("MATCH (resource:Resource)-[r:"+RESOURCE_HAS_FEATURE+"]->(feature:Feature) WHERE id(resource)={0} \n"+
             "DELETE r")
     void detachResourceFeatures(long resourceId);
 }
