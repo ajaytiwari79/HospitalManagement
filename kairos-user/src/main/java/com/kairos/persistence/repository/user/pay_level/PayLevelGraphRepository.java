@@ -18,10 +18,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface PayLevelGraphRepository extends Neo4jBaseRepository<PayLevel, Long> {
 
-    @Query("Match (organizationType:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(country:Country) where id(country)={0}\n" +
+    @Query("Match (organizationType:OrganizationType{isEnable:true})-[:"+BELONGS_TO+"]->(country:Country{isEnabled:true}) where id(country)={0}\n" +
             "Optional Match (organizationType)-[:"+HAS_SUB_TYPE+"]->(subType:OrganizationType{isEnable:true}) with subType,organizationType\n" +
             "Optional Match (organizationType:OrganizationType)-[:"+HAS_LEVEL+"]->(level:Level{deleted:false}) with organizationType,level,subType\n" +
-            "Optional Match (subType)-[r:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise) with expertise,organizationType,level\n" +
+            "Optional Match (subType)-[r:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise{isEnabled:true}) with expertise,organizationType,level\n" +
             "return id(organizationType) as id ,organizationType.name as name, collect(distinct level) as levels,collect(distinct expertise) as expertise;")
     List<PayLevelGlobalData> getPayLevelGlobalData(Long countryId);
 
