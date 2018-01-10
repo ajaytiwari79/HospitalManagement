@@ -18,6 +18,7 @@ import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateG
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.AddRuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.RuleTemplateDTO;
+import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
@@ -114,7 +115,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     }
 
 
-    public Map<String, Object> updateRuleTemplateCategory(Long countryId, Long templateCategoryId, AddRuleTemplateCategoryDTO ruleTemplateCategory) {
+    public Map<String, Object> updateRuleTemplateCategory(Long countryId, Long templateCategoryId, UpdateRuleTemplateCategoryDTO ruleTemplateCategory) {
         if (countryService.getCountryById(countryId) == null) {
             throw new DataNotFoundByIdException("Country does not exist");
         }
