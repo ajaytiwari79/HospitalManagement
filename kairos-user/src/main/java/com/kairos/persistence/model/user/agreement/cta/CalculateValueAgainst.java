@@ -8,7 +8,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 
 @NodeEntity
 public class CalculateValueAgainst extends UserBaseEntity{
-    private  String calculateValue;
+    private CalculateValueType calculateValue;
     private float scale;
     @Relationship(type = BELONGS_TO)
     private FixedValue fixedValue;
@@ -17,18 +17,18 @@ public class CalculateValueAgainst extends UserBaseEntity{
         //default constractor
     }
 
-    public CalculateValueAgainst(String calculateValue, float scale, FixedValue fixedValue) {
-        this.calculateValue = calculateValue;
+    public CalculateValueAgainst(CalculateValueType calculateValueType, float scale, FixedValue fixedValue) {
+        this.calculateValue = calculateValueType;
         this.scale = scale;
         this.fixedValue = fixedValue;
     }
 
-    public String getCalculateValue() {
+    public CalculateValueType getCalculateValue() {
         return calculateValue;
     }
 
-    public void setCalculateValue(String calculateValue) {
-        this.calculateValue = calculateValue;
+    public void setCalculateValue(CalculateValueType calculateValueType) {
+        this.calculateValue = calculateValueType;
     }
 
     public float getScale() {
@@ -47,7 +47,10 @@ public class CalculateValueAgainst extends UserBaseEntity{
         this.fixedValue = fixedValue;
     }
 
-
+    public  enum CalculateValueType {
+        FIXED_VALUE,HOURLY_WAGE_IN_UNIT_EMPLOYMENT,KM_INPUT_IN_SELECTED_SHIFT
+        ,WEEKLY_HOURS ,WEEKLY_SALARY;
+    }
 
 
 }

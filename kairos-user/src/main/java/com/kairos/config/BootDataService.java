@@ -272,7 +272,7 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
-      //   createCTARuleTemplateCategory();
+         createCTARuleTemplateCategory();
             startRegisteredCronJobs();
             createEquipmentCategories();
 
@@ -1015,8 +1015,14 @@ public class BootDataService {
             category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
             ruleTemplateCategoryService.createRuleTemplateCategory(53L, category);
         }
-        logger.info("creating CTA rule template");
-        costTimeAgreementService.createDefaultCtaRuleTemplate(53L);
+
+        if(costTimeAgreementService.isDefaultCTARuleTemplateExists()){
+            logger.info("default CTA rule template already exist");
+        } else {
+            logger.info("creating CTA rule template");
+            costTimeAgreementService.createDefaultCtaRuleTemplate(53L);
+        }
+
     }
     private void createEquipmentCategories(){
         if( ! equipmentCategoryGraphRepository.ifEquipmentCategoryExists()){

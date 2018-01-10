@@ -33,7 +33,7 @@ public class ActivityTypesRestClient {
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityTypeDTO>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<ActivityTypeDTO>>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/country/{countryId}/activity_type",
+                            baseUrl + "/country/{countryId}/activity",
                             HttpMethod.GET,
                             null, typeReference,countryId);
 

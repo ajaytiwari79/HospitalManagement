@@ -2,6 +2,7 @@ package com.kairos.client;
 
 import com.kairos.client.dto.PhaseAndActivityTypeWrapper;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.response.dto.web.cta.PhaseDTO;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 /**
  * Created by vipul on 25/9/17.
@@ -77,6 +80,33 @@ public class PhaseRestClient {
             RestTemplateResponseEnvelope<PhaseAndActivityTypeWrapper> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+
+    }
+
+    public List<PhaseDTO> getPhases (Long countryId){
+
+        final String baseUrl=getBaseUrl(false);
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseDTO>>> typeReference =
+                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseDTO>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<PhaseDTO>>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/country/"+countryId+"/phase",
+                            HttpMethod.GET,
+                            null, typeReference,countryId);
+
+            RestTemplateResponseEnvelope<List<PhaseDTO>> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
             } else {
                 throw new RuntimeException(response.getMessage());
             }

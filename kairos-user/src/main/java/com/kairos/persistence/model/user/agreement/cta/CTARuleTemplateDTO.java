@@ -30,7 +30,7 @@ public class CTARuleTemplateDTO {
     private List<CTARuleTemplateDayTypeDTO>calculateOnDayTypes=new ArrayList<>();
     private List<CTARuleTemplatePhaseInfo> phaseInfo=new ArrayList<>();
     private BudgetType budgetType;
-    private List<Long> calculateValueIfPlanned =new ArrayList<>();
+    private List<CalculateValueIfPlanned> calculateValueIfPlanned =new ArrayList<>();
     private List<Long> employmentTypes =new ArrayList<>();
     private ActivityType activityType;
     private PlanningCategory planningCategory;
@@ -158,11 +158,11 @@ public class CTARuleTemplateDTO {
         this.budgetType = budgetType;
     }
 
-    public List<Long> getCalculateValueIfPlanned() {
+    public List<CalculateValueIfPlanned> getCalculateValueIfPlanned() {
         return calculateValueIfPlanned;
     }
 
-    public void setCalculateValueIfPlanned(List<Long> calculateValueIfPlanned) {
+    public void setCalculateValueIfPlanned(List<CalculateValueIfPlanned> calculateValueIfPlanned) {
         this.calculateValueIfPlanned = calculateValueIfPlanned;
     }
 
