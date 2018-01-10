@@ -238,18 +238,19 @@ public class CostTimeAgreementService extends UserBaseService {
                 }
                 break;
                 case "WEEKLY_HOURS" :{
-                    ctaRuleTemplate.getCalculateValueAgainst().setScale(Math.round(ctaRuleTemplate.getCalculateValueAgainst().getScale()));
+                    logger.info("WEEKLY HOURS : {}",Float.valueOf(ctaRuleTemplate.getCalculateValueAgainst().getScale()));
+                    ctaRuleTemplate.getCalculateValueAgainst().setScale(ctaRuleTemplate.getCalculateValueAgainst().getScale());
                     break;
                 }
 
                 case "WEEKLY_SALARY":
-                    ctaRuleTemplate.getCalculateValueAgainst().setScale(Math.round(ctaRuleTemplate.getCalculateValueAgainst().getScale()));
+                    ctaRuleTemplate.getCalculateValueAgainst().setScale(ctaRuleTemplate.getCalculateValueAgainst().getScale());
                     break;
             }
         }
         ctaRuleTemplate.getCalculateValueAgainst().setCalculateValue(ctaRuleTemplateDTO.getCalculateValueAgainst().getCalculateValue());
 
-        logger.debug("ctaRuleTemplate.getCalculateValueAgainst() : {}",ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue());
+        logger.info("ctaRuleTemplate.getCalculateValueAgainst().getScale : {}",ctaRuleTemplate.getCalculateValueAgainst().getScale());
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
 
@@ -275,16 +276,17 @@ public class CostTimeAgreementService extends UserBaseService {
 
         Future<List<EmploymentType>> employmentTypesFuture = asynchronousService.executeAsynchronously(employmentTypesTask);
 
-        Callable<List<AccessGroup>> accessGroupsTask = () -> {
+        /*Callable<List<AccessGroup>> accessGroupsTask = () -> {
             Iterable<AccessGroup> accessGroups = accessGroupRepository.findAllById(ctaRuleTemplateDTO.getCalculateValueIfPlanned(), 0);
             return StreamSupport.stream(accessGroups.spliterator(), true).collect(Collectors.toList());
 
         };
         Future<List<AccessGroup>> accessGroupsFuture = asynchronousService.executeAsynchronously(accessGroupsTask);
+        */
         //set data
         ctaRuleTemplate.setTimeTypes(timeTypesFuture.get());
         ctaRuleTemplate.setEmploymentTypes(employmentTypesFuture.get());
-        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupsFuture.get());
+//        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupsFuture.get());
         return CompletableFuture.completedFuture(true);
     }
 
@@ -335,8 +337,8 @@ public class CostTimeAgreementService extends UserBaseService {
         }
 
         // Fetch Access Group
-        List<Long> accessGroupIds = ctaRuleTemplateDTO.getCalculateValueIfPlanned();
-        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupRepository.getAccessGroupById(accessGroupIds));
+//        List<Long> accessGroupIds = ctaRuleTemplateDTO.getCalculateValueIfPlanned();
+//        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupRepository.getAccessGroupById(accessGroupIds));
 
         // Fetch Employment Type
         List<Long> employmentTypeIds = ctaRuleTemplateDTO.getEmploymentTypes();

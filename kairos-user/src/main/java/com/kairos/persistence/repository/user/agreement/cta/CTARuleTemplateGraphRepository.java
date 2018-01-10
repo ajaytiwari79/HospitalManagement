@@ -16,7 +16,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          " optional  MATCH (p)-[:`BELONGS_TO`]-(cTARuleTemplateDayTypes:`CTARuleTemplateDayType`)"+
          " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(dayType:`DayType`)"+
          " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(countryHolidayCalender:`CountryHolidayCalender`)"+
-         " optional  MATCH (p)-[:`HAS_ACCESS_GROUP`]-(accessGroup:`AccessGroup`) "+
+//         " optional  MATCH (p)-[:`HAS_ACCESS_GROUP`]-(accessGroup:`AccessGroup`) "+
          " optional  MATCH (p)-[:`HAS_EMPLOYMENT_TYPE`]-(employmentType:`EmploymentType`) "+
          " optional  MATCH (p)-[:`HAS_TIME_TYPES`]-(timeType:`TimeType`) "+
          " optional  MATCH (p)-[:`HAS_COMPENSATION_TABLE`]-(compensationTable:`CompensationTable`) "+
@@ -27,7 +27,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          " optional  MATCH (p)-[:`BELONGS_TO`]-(cTARuleTemplatePhaseInfo:`CTARuleTemplatePhaseInfo`) "+
          " optional  MATCH (p)-[:`BELONGS_TO`]-(activityType:`ActivityType`) "+
          " optional  MATCH (p)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`) "+
-         " with p,m0,cTARuleTemplateDayTypes,dayType,accessGroup,timeType,employmentType,countryHolidayCalender,"+
+         " with p,m0,cTARuleTemplateDayTypes,dayType,timeType,employmentType,countryHolidayCalender,"+
          "compensationTable,compensationTableInterval,calculateValueAgainst,fixedValue,currency,cTARuleTemplatePhaseInfo,activityType,plannedTimeWithFactor"+
          ", collect(distinct ID(countryHolidayCalender)) as holidaysIds"+
          " RETURN p.name as name ,"+
@@ -45,7 +45,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          "collect(distinct {dayType:ID(dayType),countryHolidayCalenders:holidaysIds}) as calculateOnDayTypes ,"+
          "collect(distinct cTARuleTemplatePhaseInfo) as phaseInfo ,"+
          "p.budgetType as budgetType ,"+
-         "collect(distinct ID(accessGroup)) as calculateValueIfPlanned ,"+
+         "p.calculateValueIfPlanned as calculateValueIfPlanned ,"+
          "collect(distinct ID(employmentType)) as employmentTypes ,"+
          "activityType as activityType ,"+
          "p.planningCategory as planningCategory ,"+
