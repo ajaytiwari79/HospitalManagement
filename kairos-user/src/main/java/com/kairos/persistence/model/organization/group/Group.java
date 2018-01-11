@@ -38,8 +38,6 @@ public class Group extends UserBaseEntity {
     @Relationship(type = GROUP_HAS_SERVICES)
     private List<OrganizationService> serviceList;
 
-    @Relationship(type = PROVIDE_TASK_TYPE)
-    private List<String> taskTypeList;
 
     public List<Skill> getSkillList() {
         return skillList;
@@ -49,13 +47,20 @@ public class Group extends UserBaseEntity {
         this.skillList = skillList;
     }
 
+
+    //@prabjot
+    //we can't map string as relationship, bothway mapping error will occur
+    //Need to fix
+    /*@Relationship(type = PROVIDE_TASK_TYPE)
+    private List<String> taskTypeList;
+
     public List<String> getTaskTypeList() {
         return taskTypeList;
     }
 
     public void setTaskTypeList(List<String> taskTypeList) {
         this.taskTypeList = taskTypeList;
-    }
+    }*/
 
     public List<OrganizationService> getServiceList() {
         return serviceList;
