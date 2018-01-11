@@ -31,6 +31,29 @@ public class StaffCreationPOJOData {
     private Date inactiveFrom;
     private boolean active;
     private String privatePhone;
+
+    @Override
+    public String toString() {
+        return "StaffCreationPOJOData{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", cprNumber='" + cprNumber + '\'' +
+                ", familyName='" + familyName + '\'' +
+                ", workPhone='" + workPhone + '\'' +
+                ", privateEmail='" + privateEmail + '\'' +
+                ", gender=" + gender +
+                ", engineerTypeId=" + engineerTypeId +
+                ", employedSince=" + employedSince +
+                ", inactiveFrom=" + inactiveFrom +
+                ", active=" + active +
+                ", privatePhone='" + privatePhone + '\'' +
+                ", workEmail='" + workEmail + '\'' +
+                ", userName='" + userName + '\'' +
+                ", externalId=" + externalId +
+                ", accessGroupId=" + accessGroupId +
+                '}';
+    }
+
     private String workEmail;
     private String userName;
     @NotNull(message = "error.staff.externalid.notnull")

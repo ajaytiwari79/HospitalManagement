@@ -72,7 +72,7 @@ public class Staff extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
     User user;
-    @Relationship(type = BELONGS_TO)
+    @Relationship(type = STAFF_BELONGS_TO)
     Client client;
 
     EngineerType engineerType;
