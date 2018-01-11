@@ -24,10 +24,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
-import com.kairos.response.dto.web.cta.ActivityTypeDTO;
-import com.kairos.response.dto.web.cta.CTARuleTemplateDefaultDataWrapper;
-import com.kairos.response.dto.web.cta.DayTypeDTO;
-import com.kairos.response.dto.web.cta.EmploymentTypeDTO;
+import com.kairos.response.dto.web.cta.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.google_calender.GoogleCalenderService;
@@ -449,11 +446,13 @@ public class CountryService extends UserBaseService {
      List<TimeTypeDTO> timeTypes=timeTypeService.getAllTimeTypes(countryId);
      List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
      List<ActivityTypeDTO> activityTypeDTOS=activityTypesRestClient.getActivityType(countryId);
+     List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
 
      //wrap data into wrapper class
      CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper=new CTARuleTemplateDefaultDataWrapper();
 
      ctaRuleTemplateDefaultDataWrapper.setCurrencies(currencies);
+     ctaRuleTemplateDefaultDataWrapper.setPhases(phases);
 
      List<EmploymentTypeDTO> employmentTypeDTOS =employmentTypes.stream().map(employmentType -> {
             EmploymentTypeDTO employmentTypeDTO=new EmploymentTypeDTO();

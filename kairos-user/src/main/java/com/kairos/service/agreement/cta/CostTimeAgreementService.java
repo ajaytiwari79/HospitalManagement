@@ -72,6 +72,10 @@ public class CostTimeAgreementService extends UserBaseService {
     private @Autowired OrganizationGraphRepository organizationGraphRepository;
 
 
+    public boolean isDefaultCTARuleTemplateExists(){
+        return ctaRuleTemplateGraphRepository.isDefaultCTARuleTemplateExists();
+    }
+
     public void createDefaultCtaRuleTemplate(Long countryId) {
         RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
                 .findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
@@ -165,7 +169,7 @@ public class CostTimeAgreementService extends UserBaseService {
         CompensationTable compensationTable = new CompensationTable(10, CompensationMeasurementType.MINUTES);
         ctaRuleTemplate.setCompensationTable(compensationTable);
         FixedValue fixedValue = new FixedValue(10, currency, FixedValue.Type.PER_ACTIVITY);
-        ctaRuleTemplate.setCalculateValueAgainst(new CalculateValueAgainst("abc", 10.5f, fixedValue));
+        ctaRuleTemplate.setCalculateValueAgainst(new CalculateValueAgainst(CalculateValueAgainst.CalculateValueType.FIXED_VALUE, 10.5f, fixedValue));
         ctaRuleTemplate.setApprovalWorkFlow(ApprovalWorkFlow.NO_APPROVAL_NEEDED);
         ctaRuleTemplate.setBudgetType(BudgetType.ACTIVITY_COST);
         ctaRuleTemplate.setActivityType(new ActivityType());
@@ -194,7 +198,7 @@ public class CostTimeAgreementService extends UserBaseService {
         List<Long> ruleTemplateCategoryIds = ctaRuleTemplateCategoryList.parallelStream().map(RuleTemplateCategory::getId)
                 .collect(Collectors.toList());
 
-        List<CTARuleTemplateQueryResult> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalseAndDisabledFalse(ruleTemplateCategoryIds);
+        List<CTARuleTemplateQueryResult> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalse(ruleTemplateCategoryIds);
         CTARuleTemplateCategoryWrapper ctaRuleTemplateCategoryWrapper=new CTARuleTemplateCategoryWrapper();
         ctaRuleTemplateCategoryWrapper.getRuleTemplateCategories().addAll(ctaRuleTemplateCategoryList);
         ctaRuleTemplateCategoryWrapper.setRuleTemplates(ruleTemplates);
@@ -202,6 +206,7 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate,CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
+
         BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes");
 
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
@@ -217,14 +222,40 @@ public class CostTimeAgreementService extends UserBaseService {
                     return countryHolidayCalenders.stream();
                 }).collect(Collectors.toList());
 
+        if( !ctaRuleTemplate.getRuleTemplateCategory().getId().equals(ctaRuleTemplateDTO.getRuleTemplateCategory())){
+            // Detach rule template from older category If category has been updated
+            ruleTemplateCategoryGraphRepository.detachRuleTemplateCategoryFromCTARuleTemplate(ctaRuleTemplate.getId(),ctaRuleTemplate.getRuleTemplateCategory().getId());
+        }
         ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategory);
 
-        if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue()!=null
+        /*if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue()!=null
                 && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId()!=null){
             Currency currency=currencyGraphRepository.findOne(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId());
             ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().setCurrency(currency);
-        }
+        }*/
+        if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue() !=null){
+            switch (ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue().toString()){
+                case "FIXED_VALUE" :{
+                    if(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId()!=null){
+                        Currency currency=currencyGraphRepository.findOne(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId());
+                        ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().setCurrency(currency);
+                    }
+                }
+                break;
+                case "WEEKLY_HOURS" :{
+                    logger.info("WEEKLY HOURS : {}",Float.valueOf(ctaRuleTemplate.getCalculateValueAgainst().getScale()));
+                    ctaRuleTemplate.getCalculateValueAgainst().setScale(ctaRuleTemplate.getCalculateValueAgainst().getScale());
+                    break;
+                }
 
+                case "WEEKLY_SALARY":
+                    ctaRuleTemplate.getCalculateValueAgainst().setScale(ctaRuleTemplate.getCalculateValueAgainst().getScale());
+                    break;
+            }
+        }
+        ctaRuleTemplate.getCalculateValueAgainst().setCalculateValue(ctaRuleTemplateDTO.getCalculateValueAgainst().getCalculateValue());
+
+        logger.info("ctaRuleTemplate.getCalculateValueAgainst().getScale : {}",ctaRuleTemplate.getCalculateValueAgainst().getScale());
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
 
@@ -250,16 +281,17 @@ public class CostTimeAgreementService extends UserBaseService {
 
         Future<List<EmploymentType>> employmentTypesFuture = asynchronousService.executeAsynchronously(employmentTypesTask);
 
-        Callable<List<AccessGroup>> accessGroupsTask = () -> {
+        /*Callable<List<AccessGroup>> accessGroupsTask = () -> {
             Iterable<AccessGroup> accessGroups = accessGroupRepository.findAllById(ctaRuleTemplateDTO.getCalculateValueIfPlanned(), 0);
             return StreamSupport.stream(accessGroups.spliterator(), true).collect(Collectors.toList());
 
         };
         Future<List<AccessGroup>> accessGroupsFuture = asynchronousService.executeAsynchronously(accessGroupsTask);
+        */
         //set data
         ctaRuleTemplate.setTimeTypes(timeTypesFuture.get());
         ctaRuleTemplate.setEmploymentTypes(employmentTypesFuture.get());
-        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupsFuture.get());
+//        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupsFuture.get());
         return CompletableFuture.completedFuture(true);
     }
 
@@ -310,8 +342,8 @@ public class CostTimeAgreementService extends UserBaseService {
         }
 
         // Fetch Access Group
-        List<Long> accessGroupIds = ctaRuleTemplateDTO.getCalculateValueIfPlanned();
-        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupRepository.getAccessGroupById(accessGroupIds));
+//        List<Long> accessGroupIds = ctaRuleTemplateDTO.getCalculateValueIfPlanned();
+//        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupRepository.getAccessGroupById(accessGroupIds));
 
         // Fetch Employment Type
         List<Long> employmentTypeIds = ctaRuleTemplateDTO.getEmploymentTypes();

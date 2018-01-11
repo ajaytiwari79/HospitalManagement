@@ -92,7 +92,7 @@ public class WTAOrganizationService extends UserBaseService {
         newWta.setEndDateMillis(updateDTO.getEndDateMillis());
         newWta.setExpertise(oldWta.getExpertise());
         newWta.setParentWTA(oldWta);
-
+        newWta.setDisabled(false);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
             ruleTemplates = copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "ORGANIZATION", unitId);

@@ -541,7 +541,9 @@ public class OrganizationService extends UserBaseService {
         unit.setWorkingTimeAgreements(allWtaCopy);
 
         organizationGraphRepository.save(unit);
+
     //    phaseRestClient.createDefaultPhases(unit.getId());
+
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit);

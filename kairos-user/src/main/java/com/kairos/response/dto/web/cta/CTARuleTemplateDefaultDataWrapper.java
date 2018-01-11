@@ -1,13 +1,14 @@
 package com.kairos.response.dto.web.cta;
 
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
+import com.kairos.persistence.model.user.agreement.cta.CalculateValueIfPlanned;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class CTARuleTemplateDefaultDataWrapper {
-    private List<AccessGroupDTO> accessGroups=new ArrayList<>();
+    private List<CalculateValueIfPlanned> calculateValueIfPlanned=new ArrayList<>();
     private List<DayTypeDTO> dayTypes=new ArrayList<>();
     private List<PhaseDTO> phases=new ArrayList<>();
     private List<TimeTypeDTO> timeTypes=new ArrayList<>();
@@ -21,12 +22,12 @@ public class CTARuleTemplateDefaultDataWrapper {
         //default
     }
 
-    public List<AccessGroupDTO> getAccessGroups() {
-        return accessGroups;
+    public List<CalculateValueIfPlanned> getCalculateValueIfPlanned() {
+        return calculateValueIfPlanned;
     }
 
-    public void setAccessGroups(List<AccessGroupDTO> accessGroups) {
-        this.accessGroups = accessGroups;
+    public void setCalculateValueIfPlanned(List<CalculateValueIfPlanned> calculateValueIfPlanned) {
+        this.calculateValueIfPlanned = calculateValueIfPlanned;
     }
 
     public List<DayTypeDTO> getDayTypes() {

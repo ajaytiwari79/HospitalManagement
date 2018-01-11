@@ -37,8 +37,10 @@ public class CTARuleTemplate extends RuleTemplate{
     @Relationship(type = BELONGS_TO)
     private List<CTARuleTemplatePhaseInfo>phaseInfo=new ArrayList<>();
     private BudgetType budgetType;
-    @Relationship(type = HAS_ACCESS_GROUP)
-    private List<AccessGroup> calculateValueIfPlanned=new ArrayList<>();
+    /*@Relationship(type = HAS_ACCESS_GROUP)
+    private List<AccessGroup> calculateValueIfPlanned=new ArrayList<>();*/
+
+    private List<CalculateValueIfPlanned> calculateValueIfPlanned=new ArrayList<>();
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private List<EmploymentType> employmentTypes=new ArrayList<>();
     @Relationship(type = BELONGS_TO)
@@ -179,11 +181,11 @@ public class CTARuleTemplate extends RuleTemplate{
         this.budgetType = budgetType;
     }
 
-    public List<AccessGroup> getCalculateValueIfPlanned() {
+    public List<CalculateValueIfPlanned> getCalculateValueIfPlanned() {
         return calculateValueIfPlanned;
     }
 
-    public void setCalculateValueIfPlanned(List<AccessGroup> calculateValueIfPlanned) {
+    public void setCalculateValueIfPlanned(List<CalculateValueIfPlanned> calculateValueIfPlanned) {
         this.calculateValueIfPlanned = calculateValueIfPlanned;
     }
 
