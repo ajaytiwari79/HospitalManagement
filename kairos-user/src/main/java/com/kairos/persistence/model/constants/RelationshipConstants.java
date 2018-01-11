@@ -113,7 +113,7 @@ public abstract class RelationshipConstants {
 
     public static final String RESOURCE_NOT_AVAILABLE_ON = "RESOURCE_NOT_AVAILABLE_ON";
     public static final String BELONGS_TO = "BELONGS_TO";
-    public static final String STAFF_BELONGS_TO = "STAFF_BELONGS_TO";
+    public static final String IS_A = "IS_A";
 
     public static final String HAS_EXPERTISE = "HAS_EXPERTISE";
     public static final String BELONGS_TO_ORG_SUB_TYPE = "BELONGS_TO_ORG_SUB_TYPE";
