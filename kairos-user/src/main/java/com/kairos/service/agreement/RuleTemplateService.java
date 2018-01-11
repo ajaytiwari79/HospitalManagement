@@ -400,21 +400,10 @@ public class RuleTemplateService extends UserBaseService {
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
 
-
-        wtaRuleTemplateGraphRepository.deleteCategoryFromTemplate(oldTemplate.getId());
-
-        RuleTemplateCategory templateCategory = null;
-        if (StringUtils.isEmpty(templateDTO.getCategory())) {
-            templateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
-        } else {
-            templateCategory = ruleTemplateCategoryRepository.findByName(countryId, templateDTO.getCategory(), RuleTemplateCategoryType.WTA);
+        if (!oldTemplate.getRuleTemplateCategory().getName().equalsIgnoreCase(templateDTO.getRuleTemplateCategory().getName())) {
+            wtaRuleTemplateGraphRepository.deleteCategoryFromTemplate(oldTemplate.getId(),oldTemplate.getRuleTemplateCategory().getId(),templateDTO.getRuleTemplateCategory().getName());
         }
-        if (!Optional.ofNullable(templateCategory).isPresent())
-            throw new InvalidRequestException("Incorrect category " + templateDTO.getCategory());
-        List<RuleTemplate> wtaBaseRuleTemplates = templateCategory.getRuleTemplates();
-        wtaBaseRuleTemplates.add(oldTemplate);
-        templateCategory.setRuleTemplates(wtaBaseRuleTemplates);
-        save(templateCategory);
+        save(oldTemplate);
         return templateDTO;
     }
 

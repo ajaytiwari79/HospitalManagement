@@ -68,8 +68,10 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     void deleteOldCategories(List<Long> ruleTemplateIds);
 
     @Query("MATCH (n:WTABaseRuleTemplate) where id(n)={0}\n" +
-            "Match (n)<-[r:" + HAS_RULE_TEMPLATES + "]-(category:RuleTemplateCategory) detach delete r")
-    void deleteCategoryFromTemplate(Long ruleTemplateId);
+            "Match (n)<-[r:" + HAS_RULE_TEMPLATES + "]-(category:RuleTemplateCategory) detach delete r with n" +
+            "match  (catg::RuleTemplateCategory{deleted:false}) where  catg.ruleTemplateCategoryType='WTA' catg.name={2}" +
+            "create (n)<-[:" + HAS_RULE_TEMPLATES + "]->(catg:RuleTemplateCategory) ")
+    void deleteCategoryFromTemplate(Long ruleTemplateId, Long previousRuleTemplateCategory, String newRuleTemplateCategory);
 
     @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
             "match (r:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(rt)\n" +
@@ -129,7 +131,7 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.onlyCompositeShifts as onlyCompositeShifts")
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByUnitId(Long unitId);
 
-    @Query("MATCH (c:Country{isEnabled:true})-[:"+HAS_RULE_TEMPLATE+"]-(t:WTABaseRuleTemplate) where id(c)={0} " +
+    @Query("MATCH (c:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE + "]-(t:WTABaseRuleTemplate) where id(c)={0} " +
             "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory)  " +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
