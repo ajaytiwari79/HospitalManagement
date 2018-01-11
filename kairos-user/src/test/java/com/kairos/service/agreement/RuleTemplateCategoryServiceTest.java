@@ -4,8 +4,10 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
+import com.kairos.util.DateUtil;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -20,6 +22,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.TEMPLATE2;
+import static com.kairos.constants.AppConstants.TEMPLATE2_DESCRIPTION;
+
 /**
  * Created by vipul on 14/12/17.
  */
@@ -31,12 +40,22 @@ public class RuleTemplateCategoryServiceTest {
     private String url;
     @Autowired
     TestRestTemplate restTemplate;
+    @Autowired
+    private RuleTemplateService ruleTemplateService;
     static Long createdId;
     static Long createdIdForDelete;
+    RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("Again", RuleTemplateCategoryType.WTA);
+    static RuleTemplateCategoryDTO maximumShiftLengthWTATemplate;
+    static RuleTemplateCategoryDTO minimumShiftLengthWTATemplate;
 
     @Before
     public void setUp() throws Exception {
-
+        long timeInMins = 10;
+        List<String> balanceTypes = new ArrayList<>(0);
+        maximumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE1_NAME, TEMPLATE1, false, TEMPLATE1_DESCRIPTION, timeInMins, balanceTypes, true);
+        maximumShiftLengthWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
+        minimumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE2_NAME, TEMPLATE2, false, TEMPLATE2_DESCRIPTION, timeInMins, balanceTypes, true);
+        minimumShiftLengthWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
     }
 
     @After
@@ -45,11 +64,16 @@ public class RuleTemplateCategoryServiceTest {
     }
 
     @Test
+    public void createRuleTemplate() throws Exception {
+        ruleTemplateService.createRuleTemplate(53);
+    }
+
+    @Test
     public void test1_createRuleTemplateCategory() throws Exception {
-        RuleTemplateCategory category=new RuleTemplateCategory();
+        RuleTemplateCategory category = new RuleTemplateCategory();
         category.setName("NONE1");
         category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
-        String baseUrl = getBaseUrl(71L, 53L,null);
+        String baseUrl = getBaseUrl(71L, 53L, null);
         HttpEntity<RuleTemplateCategory> requestBodyData = new HttpEntity<>(category);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<RuleTemplateCategory>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<RuleTemplateCategory>>() {
@@ -58,7 +82,7 @@ public class RuleTemplateCategoryServiceTest {
                 baseUrl + "/template_category",
                 HttpMethod.POST, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()));
-        createdIdForDelete= createdId = response.getBody().getData().getId();
+        createdIdForDelete = createdId = response.getBody().getData().getId();
     }
 
     @Test
@@ -75,14 +99,14 @@ public class RuleTemplateCategoryServiceTest {
 
     @Test
     public void test2_deleteRuleTemplateCategory() throws Exception {
-        String baseUrl = getBaseUrl(71L, 53L,null);
+        String baseUrl = getBaseUrl(71L, 53L, null);
         ResponseEntity<PresenceTypeDTO> response = restTemplate.exchange(
                 baseUrl + "/template_category/" + createdIdForDelete,
                 HttpMethod.DELETE, null, PresenceTypeDTO.class);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 
-    public final String getBaseUrl(Long organizationId, Long countryId,Long unitId) {
+    public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
                     .append("/country/").append(countryId).toString();
@@ -96,6 +120,7 @@ public class RuleTemplateCategoryServiceTest {
         }
 
     }
+
     @Test
     @Ignore
     public void updateRuleTemplateCategory() throws Exception {
@@ -116,19 +141,15 @@ public class RuleTemplateCategoryServiceTest {
 
     @Test
     public void getRulesTemplateCategoryByUnit() throws Exception {
-
-        String baseUrl = getBaseUrl(71L,null, 145L);
-
+        String baseUrl = getBaseUrl(71L, null, 145L);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<RuleTemplateWrapper>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<RuleTemplateWrapper>>() {
                 };
-
         ResponseEntity<RestTemplateResponseEnvelope<RuleTemplateWrapper>> response = restTemplate.exchange(
-                baseUrl+"/rule_templates",
+                baseUrl + "/rule_templates",
                 HttpMethod.GET, null, typeReference);
-        System.out.println(response.toString());
         RestTemplateResponseEnvelope<RuleTemplateWrapper> responseBody = response.getBody();
-        Assert.assertEquals(false,responseBody.getData());
+        Assert.assertEquals(false, responseBody.getData());
 
     }
 
