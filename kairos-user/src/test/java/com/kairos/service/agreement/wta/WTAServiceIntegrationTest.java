@@ -9,10 +9,7 @@ import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganiza
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.util.DateUtil;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
@@ -28,10 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
 
@@ -86,12 +80,12 @@ public class WTAServiceIntegrationTest {
 
         baseRuleTemplates.add(maximumShiftLengthWTATemplate);
         baseRuleTemplates.add(minimumShiftLengthWTATemplate);
-        wtadto.setName("VIPUL" + new Date());
+        wtadto.setName("TODAY" + new Date());
         wtadto.setDescription("test");
         wtadto.setStartDateMillis(currentMillis);
         wtadto.setEndDateMillis(currentMillis + (24 * 60 * 60 * 60 * 1000));
         wtadto.setOrganizationType(86L);
-        wtadto.setOrganizationSubType(93L);
+        wtadto.setOrganizationSubType(93L);   //  "name": "Aeldrepleje",
         wtadto.setRuleTemplates(Collections.emptyList());
         wtadto.setTags(Collections.emptyList());
         wtadto.setExpertiseId(6959L);
@@ -181,6 +175,29 @@ public class WTAServiceIntegrationTest {
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 
+    @Ignore
+    @Test
+    public void test6_setWtaWithOrganizationType() throws Exception {
+//
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<Map<String, Object>>> response = restTemplate.exchange(
+                baseUrlWithCountry + "/organization_type/" + 93 + "/wta/" + 14173 + "/checked=true",//wtaIdForUpdate,
+                HttpMethod.PUT, null, typeReference);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void test7_getWtaById() throws Exception {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAWithCountryAndOrganizationTypeDTO>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAWithCountryAndOrganizationTypeDTO>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<WTAWithCountryAndOrganizationTypeDTO>> response = restTemplate.exchange(
+                baseUrlWithCountry + "/wta/13997",
+                HttpMethod.GET, null, typeReference);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
 
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {
