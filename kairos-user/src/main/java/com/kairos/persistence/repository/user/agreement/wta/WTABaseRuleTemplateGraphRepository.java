@@ -64,11 +64,11 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     List<RuleTemplate> getWtaBaseRuleTemplateByIds(List<Long> templateIds);
 
     @Query("MATCH (n:WTABaseRuleTemplate) where id(n) in {0}\n" +
-            "Match (n)<-[r:" + HAS_RULE_TEMPLATES + "]-(category:RuleTemplateCategory) delete r")
+            "Match (n)<-[r:" + HAS_RULE_TEMPLATES + "]-(category:RuleTemplateCategory) detach  delete r")
     void deleteOldCategories(List<Long> ruleTemplateIds);
 
     @Query("MATCH (n:WTABaseRuleTemplate) where id(n)={0}\n" +
-            "Match (n)<-[r:" + HAS_RULE_TEMPLATES + "]-(category:RuleTemplateCategory) delete r")
+            "Match (n)<-[r:" + HAS_RULE_TEMPLATES + "]-(category:RuleTemplateCategory) detach delete r")
     void deleteCategoryFromTemplate(Long ruleTemplateId);
 
     @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +

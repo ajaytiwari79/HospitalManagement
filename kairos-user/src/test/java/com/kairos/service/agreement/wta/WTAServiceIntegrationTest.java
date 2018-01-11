@@ -49,7 +49,7 @@ public class WTAServiceIntegrationTest {
 
     static WTADTO wtadto = new WTADTO();
     static Long currentMillis = System.currentTimeMillis();
-    static Long createdId, createdIdDelete;
+    static Long createdId, createdIdDelete, wtaIdForUpdate;
     static RuleTemplateCategoryDTO maximumShiftLengthWTATemplate;
     static RuleTemplateCategoryDTO minimumShiftLengthWTATemplate;
     static RuleTemplateCategoryDTO numberOfWeekendShiftInPeriodWTATemplate;
@@ -72,6 +72,7 @@ public class WTAServiceIntegrationTest {
         RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.WTA);
 
         maximumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE1_NAME, TEMPLATE1, false, TEMPLATE1_DESCRIPTION, timeInMins, balanceTypes, true);
+
         minimumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE2_NAME, TEMPLATE2, false, TEMPLATE2_DESCRIPTION, timeInMins, balanceTypes, true);
         numberOfWeekendShiftInPeriodWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE13_NAME, TEMPLATE13, true, TEMPLATE13_DESCRIPTION, 12L, 12L, TUESDAY, 2L, true, TUESDAY, 1L);
         careDayCheckWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE14_NAME, TEMPLATE14, true, TEMPLATE14_DESCRIPTION, 2L, dateInMillis, MONTHS, 1L);
@@ -85,7 +86,7 @@ public class WTAServiceIntegrationTest {
 
         baseRuleTemplates.add(maximumShiftLengthWTATemplate);
         baseRuleTemplates.add(minimumShiftLengthWTATemplate);
-        wtadto.setName("Hello" + new Date());
+        wtadto.setName("VIPUL" + new Date());
         wtadto.setDescription("test");
         wtadto.setStartDateMillis(currentMillis);
         wtadto.setEndDateMillis(currentMillis + (24 * 60 * 60 * 60 * 1000));
@@ -114,6 +115,7 @@ public class WTAServiceIntegrationTest {
         createdId = createdIdDelete = response.getBody().getData().getId();
     }
 
+
     @Test
     public void test2_getWtaForCountry() throws Exception {
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAWithCountryAndOrganizationTypeDTO>>> typeReference =
@@ -123,6 +125,9 @@ public class WTAServiceIntegrationTest {
                 baseUrlWithCountry + "/wta/ByCountry",
                 HttpMethod.GET, null, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+        if (response.getBody().getData().size() > 0) {
+            wtaIdForUpdate = response.getBody().getData().get(0).getId();
+        }
     }
 
     @Test
@@ -139,7 +144,6 @@ public class WTAServiceIntegrationTest {
     //updateWtaOfCountry
     @Test
     public void test4_updateWtaForOrganization() throws Exception {
-
         wtadto.setDescription("Its updating description of wta of Organization");
         List<RuleTemplateCategoryDTO> baseRuleTemplates = new ArrayList<>(20);
         baseRuleTemplates.add(careDayCheckWTATemplate);

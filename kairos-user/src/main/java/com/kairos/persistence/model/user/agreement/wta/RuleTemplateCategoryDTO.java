@@ -56,8 +56,7 @@ public class RuleTemplateCategoryDTO {
     private String activityCode;
 
 
-    public RuleTemplateCategoryDTO(String template1Name, String template1, boolean disabled, String template1Description, long timeInMins, List<String> balanceTypes, boolean checkAgainstTimeRules) {
-    }
+
 
     public void setCheckAgainstTimeRules(Boolean checkAgainstTimeRules) {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
@@ -413,6 +412,16 @@ public class RuleTemplateCategoryDTO {
         //default const
     }
 
+    public RuleTemplateCategoryDTO(String name, String templateType, boolean disabled, String description, long timeInMins, List<String> balanceTypes, boolean checkAgainstTimeRules) {
+        this.name = name;
+        this.templateType = templateType;
+        this.disabled = disabled;
+        this.description = description;
+        this.timeLimit=timeInMins;
+        this.balanceType=balanceTypes;
+        this.checkAgainstTimeRules=checkAgainstTimeRules;
+
+    }
     // Template 13 Cons
     public RuleTemplateCategoryDTO(String name, String templateType, Boolean disabled, String description, Long numberShiftsPerPeriod, Long numberOfWeeks,
                                    String fromDayOfWeek, Long fromTime, Boolean proportional,

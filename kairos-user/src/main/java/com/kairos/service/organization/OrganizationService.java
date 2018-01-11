@@ -11,6 +11,7 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
@@ -244,7 +245,7 @@ public class OrganizationService extends UserBaseService {
          */
         List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
         List<WorkingTimeAgreement> allWta = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
-        linkWTA(allWtaCopy, allWta);
+        linkWTAToOrganization(allWtaCopy, allWta);
         organization.setWorkingTimeAgreements(allWtaCopy);
         save(organization);
 
@@ -265,11 +266,12 @@ public class OrganizationService extends UserBaseService {
     }
 
 
-    private void linkWTA(List<WorkingTimeAgreement> WTAList, List<WorkingTimeAgreement> allWta) {
+    private void linkWTAToOrganization(List<WorkingTimeAgreement> WTAList, List<WorkingTimeAgreement> allWta) {
         allWta.forEach(workingTimeAgreement -> {
             WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
             wtaService.copyWta(workingTimeAgreement, newWtaObject);
-            List<RuleTemplate> ruleTemplateWithCategory = wtaService.copyRuleTemplate(workingTimeAgreement.getRuleTemplates());
+            newWtaObject.setCountryParentWTA(workingTimeAgreement);
+            List<WTABaseRuleTemplate> ruleTemplateWithCategory = wtaService.copyRuleTemplate(workingTimeAgreement.getRuleTemplates());
             newWtaObject.setRuleTemplates(ruleTemplateWithCategory);
             newWtaObject.setParentWTA(workingTimeAgreement);
             WTAList.add(newWtaObject);
@@ -535,11 +537,11 @@ public class OrganizationService extends UserBaseService {
          */
         List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
         List<WorkingTimeAgreement> allWta = parent.getWorkingTimeAgreements();
-        linkWTA(allWtaCopy, allWta);
+        linkWTAToOrganization(allWtaCopy, allWta);
         unit.setWorkingTimeAgreements(allWtaCopy);
 
         organizationGraphRepository.save(unit);
-        phaseRestClient.createDefaultPhases(unit.getId());
+    //    phaseRestClient.createDefaultPhases(unit.getId());
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit);

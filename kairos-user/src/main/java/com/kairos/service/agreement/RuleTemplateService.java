@@ -24,6 +24,7 @@ import com.kairos.util.ArrayUtil;
 import com.kairos.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -33,7 +34,7 @@ import static com.kairos.constants.AppConstants.*;
 /**
  * Created by pawanmandhan on 5/8/17.
  */
-
+@Transactional
 @Service
 public class RuleTemplateService extends UserBaseService {
 
@@ -141,14 +142,6 @@ public class RuleTemplateService extends UserBaseService {
 
         ruleTemplateCategory.setRuleTemplates(baseRuleTemplates);
         ruleTemplateCategoryRepository.save(ruleTemplateCategory);
-        /*for (WTABaseRuleTemplate template : country.getWTABaseRuleTemplate()) {
-            template.setRuleTemplateCategory(ruleTemplateCategory);
-            //wtaRuleTemplateGraphRepository.findOne(template.getId());
-            //TemplateCategoryRelation rel = new TemplateCategoryRelation(template, ruleTemplateCategory);
-            //save(rel);
-        }*/
-
-        //wtaRuleTemplateGraphRepository.addCategoryInAllTemplate(ruleTemplateIdList, ruleTemplateCategory.getId());
 
         return true;
     }
@@ -422,7 +415,7 @@ public class RuleTemplateService extends UserBaseService {
         wtaBaseRuleTemplates.add(oldTemplate);
         templateCategory.setRuleTemplates(wtaBaseRuleTemplates);
         save(templateCategory);
-        return wtaRuleTemplateGraphRepository.getRuleTemplateAndCategoryById(oldTemplate.getId());
+        return templateDTO;
     }
 
 
