@@ -72,7 +72,7 @@ public class Staff extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
     User user;
-    @Relationship(type = BELONGS_TO)
+    @Relationship(type = IS_A)
     Client client;
 
     EngineerType engineerType;
@@ -494,41 +494,5 @@ public class Staff extends UserBaseEntity {
         this.client = client;
     }
 
-    @Override
-    public String toString() {
-        return "{Staff={" +
-                "generalNote='" + generalNote + '\'' +
-                ", reqFromPerson='" + reqFromPerson + '\'' +
-                ", employedSince=" + employedSince +
-                ", cardNumber='" + cardNumber + '\'' +
-                ", copyKariosMailToLogin=" + copyKariosMailToLogin +
-                ", sendNotificationBy='" + sendNotificationBy + '\'' +
-                ", profilePic='" + profilePic + '\'' +
-                ", email='" + email + '\'' +
-                ", badgeNumber='" + badgeNumber + '\'' +
-                ", userName='" + userName + '\'' +
-                ", externalId=" + externalId +
-                ", manacoId='" + manacoId + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", familyName='" + familyName + '\'' +
-                ", signature='" + signature + '\'' +
-                ", nationalInsuranceNumber='" + nationalInsuranceNumber + '\'' +
-                ", isDisabled=" + isActive +
-                ", inactiveFrom=" + inactiveFrom +
-                ", organizationId=" + organizationId +
-                ", visitourId=" + visitourId +
-                ", cprNumber='" + cprNumber + '\'' +
-                ", visitourTeamId='" + visitourTeamId + '\'' +
-                ", speedPercent=" + speedPercent +
-                ", workPercent=" + workPercent +
-                ", overtime=" + overtime +
-                ", costDay=" + costDay +
-                ", costCall=" + costCall +
-                ", costKm=" + costKm +
-                ", costHour=" + costHour +
-                ", costHourOvertime=" + costHourOvertime +
-                '}'+
-                '}';
-    }
+
 }
