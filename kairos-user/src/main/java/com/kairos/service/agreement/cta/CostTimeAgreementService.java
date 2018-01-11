@@ -240,10 +240,10 @@ public class CostTimeAgreementService extends UserBaseService {
                         Currency currency=currencyGraphRepository.findOne(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId());
                         ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().setCurrency(currency);
                     }
+                    break;
                 }
-                break;
+
                 case "WEEKLY_HOURS" :{
-                    logger.info("WEEKLY HOURS : {}",Float.valueOf(ctaRuleTemplate.getCalculateValueAgainst().getScale()));
                     ctaRuleTemplate.getCalculateValueAgainst().setScale(ctaRuleTemplate.getCalculateValueAgainst().getScale());
                     break;
                 }
