@@ -1,15 +1,19 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import org.neo4j.ogm.annotation.Relationship;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATES;
 import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
-
-public abstract class RuleTemplate extends UserBaseEntity {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public  abstract class RuleTemplate extends UserBaseEntity {
     protected String name;
     protected String description;
     protected boolean disabled;

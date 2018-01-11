@@ -10,6 +10,7 @@ import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -81,29 +82,27 @@ public class WTAOrganizationService extends UserBaseService {
             logger.info("Expertise cant be changed at unit level :", wtaId);
             throw new ActionNotPermittedException("Expertise can't be changed");
         }
-
-        if (oldWta.getRuleTemplates().size() != updateDTO.getRuleTemplates().size()) {
-            throw new ActionNotPermittedException("Missing rule templates");
-        }
-
         newWta.setId(null);
         newWta.setName(updateDTO.getName());
         newWta.setDescription(updateDTO.getDescription());
+        if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
+            throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
+        }
         newWta.setStartDateMillis(updateDTO.getStartDateMillis());
         newWta.setEndDateMillis(updateDTO.getEndDateMillis());
         newWta.setExpertise(oldWta.getExpertise());
         newWta.setParentWTA(oldWta);
-
-        List<RuleTemplate> ruleTemplates = new ArrayList<>();
+        newWta.setDisabled(false);
+        List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
             ruleTemplates = copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "ORGANIZATION", unitId);
             newWta.setRuleTemplates(ruleTemplates);
         }
+        newWta.setOrganization(organization);
+        //organization.addWorkingTimeAgreements(newWta);
 
-        organization.addWorkingTimeAgreements(newWta);
-
-        save(organization);
-        workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId());
+        save(newWta);
+        workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
         newWta.setParentWTA(oldWta.basicDetails());
         newWta.getExpertise().setCountry(null);
 
@@ -111,7 +110,7 @@ public class WTAOrganizationService extends UserBaseService {
     }
 
 
-    private RuleTemplateCategory getCategory(List<RuleTemplate> ruleTemplates, Long id, String ruleTemplateCategoryName) {
+    private RuleTemplateCategory getCategory(List<WTABaseRuleTemplate> ruleTemplates, Long id, String ruleTemplateCategoryName) {
         RuleTemplateCategory ruleTemplateCategory = null;
         if (ruleTemplates != null) {
             for (RuleTemplate ruletemplate : ruleTemplates) {
@@ -135,7 +134,7 @@ public class WTAOrganizationService extends UserBaseService {
     }
 
     // TODO for country
-    private RuleTemplateCategory getCategoryForCountry(List<RuleTemplate> ruleTemplates, Long id, String ruleTemplateCategoryName, Long countryId) {
+    private RuleTemplateCategory getCategoryForCountry(List<WTABaseRuleTemplate> ruleTemplates, Long id, String ruleTemplateCategoryName, Long countryId) {
         RuleTemplateCategory ruleTemplateCategory = null;
         if (ruleTemplates != null && ruleTemplates.size() > 0) {
             for (RuleTemplate ruletemplate : ruleTemplates) {
@@ -161,17 +160,16 @@ public class WTAOrganizationService extends UserBaseService {
         return ruleTemplateCategory;
     }
 
-    protected List<RuleTemplate> copyRuleTemplates(List<RuleTemplate> ruleTemplates, List<RuleTemplateCategoryDTO> ruleTemplatesWithNew, String source, Long id) {
-        List<RuleTemplate> wtaBaseRuleTemplates = new ArrayList<RuleTemplate>(20);
+    protected List<WTABaseRuleTemplate> copyRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates, List<RuleTemplateCategoryDTO> ruleTemplatesNewObjects, String source, Long id) {
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<WTABaseRuleTemplate>(20);
 
-        for (RuleTemplateCategoryDTO ruleTemplate : ruleTemplatesWithNew) {
+        for (RuleTemplateCategoryDTO ruleTemplate : ruleTemplatesNewObjects) {
             RuleTemplateCategory ruleTemplateCategory = null;
             if (source.equalsIgnoreCase("ORGANIZATION")) {
                 ruleTemplateCategory = getCategory(ruleTemplates, ruleTemplate.getId(), ruleTemplate.getRuleTemplateCategory().getName());
             } else if (source.equalsIgnoreCase("COUNTRY")) {
-                ruleTemplateCategory = getCategoryForCountry(ruleTemplates, ruleTemplate.getId(),ruleTemplate.getRuleTemplateCategory().getName(), id);
+                ruleTemplateCategory = getCategoryForCountry(ruleTemplates, ruleTemplate.getId(), ruleTemplate.getRuleTemplateCategory().getName(), id);
             }
-
             switch (ruleTemplate.getTemplateType()) {
                 case TEMPLATE1:
                     MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = new MaximumShiftLengthWTATemplate();

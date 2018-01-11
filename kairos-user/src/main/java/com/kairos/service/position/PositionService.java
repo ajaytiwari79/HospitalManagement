@@ -246,7 +246,7 @@ public class PositionService extends UserBaseService {
         wta.setEndDateMillis(wtaWithRuleTemplateDTO.getEndDateMillis());
         wtaWithRuleTemplateDTO.getRuleTemplates();
 
-        List<RuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
         for (int i = 0; i < wtaWithRuleTemplateDTO.getRuleTemplates().size(); i++) {
             ObjectMapper objectMapper = new ObjectMapper();
             RuleTemplateCategoryDTO response = objectMapper.convertValue(wtaWithRuleTemplateDTO.getRuleTemplates().get(i), RuleTemplateCategoryDTO.class);
@@ -256,7 +256,7 @@ public class PositionService extends UserBaseService {
         return wta;
     }
 
-    private RuleTemplate copyRuleTemplateAndLinkWithThisWTA(RuleTemplateCategoryDTO wtaRuleTemplateQueryResponse) {
+    private WTABaseRuleTemplate copyRuleTemplateAndLinkWithThisWTA(RuleTemplateCategoryDTO wtaRuleTemplateQueryResponse) {
         WTABaseRuleTemplate wtaBaseRuleTemplates = null;
         switch (wtaRuleTemplateQueryResponse.getTemplateType()) {
             case TEMPLATE1:
@@ -512,10 +512,8 @@ public class PositionService extends UserBaseService {
         }
         RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory(wtaRuleTemplateQueryResponse.getRuleTemplateCategory().getName(),
                 wtaRuleTemplateQueryResponse.getRuleTemplateCategory().getDescription(), false);
-        List<RuleTemplate> wtaBaseRuleTemplateList = new ArrayList<>();
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplateList = new ArrayList<>();
         wtaBaseRuleTemplateList.add(wtaBaseRuleTemplates);
-        ruleTemplateCategory.setRuleTemplates(wtaBaseRuleTemplateList);
-        save(ruleTemplateCategory);
         return wtaBaseRuleTemplateList.get(0);
     }
 
