@@ -321,7 +321,6 @@ public class StaffService extends UserBaseService {
         List<EngineerType> engineerTypes = null;
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             staff = getStaffWithBasicInfo(id);
-            logger.info(staff.toString());
             roles = accessGroupService.getAccessGroups(id);
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);

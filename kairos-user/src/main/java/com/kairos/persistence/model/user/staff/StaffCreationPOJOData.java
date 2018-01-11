@@ -31,9 +31,6 @@ public class StaffCreationPOJOData {
     private Date inactiveFrom;
     private boolean active;
     private String privatePhone;
-
-
-
     private String workEmail;
     private String userName;
     @NotNull(message = "error.staff.externalid.notnull")
