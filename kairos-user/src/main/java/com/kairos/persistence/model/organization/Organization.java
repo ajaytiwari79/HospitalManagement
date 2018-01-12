@@ -53,13 +53,12 @@ public class Organization extends UserBaseEntity {
     private String name;
     private String email;
 
-
     @Property(name = "organizationLevel")
     @EnumString(OrganizationLevel.class)
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
 
-
     private String childLevel;
+
     private String eanNumber;
     @NotNull(message = "error.Organization.formal.notnull")
     private String formalName;
@@ -70,7 +69,6 @@ public class Organization extends UserBaseEntity {
     private long clientSince;
     private String cvrNumber;
     private String pNumber;
-
 
     private boolean isKairosHub;
     @Relationship(type = KAIROS_STATUS)
