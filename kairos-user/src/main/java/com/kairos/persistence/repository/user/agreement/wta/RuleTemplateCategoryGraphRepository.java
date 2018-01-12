@@ -69,7 +69,7 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
     void updateCategoryOfCTARuleTemplate(List<Long> ctaRuleTemplateList, String ruleTemplateCategoryName);
 
     @Query("match (c:Country)-[:" + HAS_RULE_TEMPLATE_CATEGORY + "]-(n:RuleTemplateCategory{ruleTemplateCategoryType:'CTA',deleted:false})-[:" + HAS_RULE_TEMPLATES + "]-(ctaRuleTemplates:CTARuleTemplate)\n" +
-            "where n.name={0} AND Id(c)={1} return Id(ctaRuleTemplates)")
+            "where n.name={0} AND Id(c)={1} return DISTINCT Id(ctaRuleTemplates)")
     List<Long> findAllExistingCTARuleTemplateByCategory(String ruleTemplateCategoryName, long countryId);
 
 
