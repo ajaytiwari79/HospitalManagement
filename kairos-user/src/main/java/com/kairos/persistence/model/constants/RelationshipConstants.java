@@ -125,6 +125,7 @@ public abstract class RelationshipConstants {
     public static final String HAS_ORGANIZATION_PARENT_WTA = "HAS_ORGANIZATION_PARENT_WTA";
     public static final String HAS_PARENT_WTA = "HAS_PARENT_WTA";
     public static final String HAS_COUNTRY_PARENT_WTA = "HAS_COUNTRY_PARENT_WTA";
+    public static final String HAS_PARENT_COUNTRY_CTA = "HAS_PARENT_COUNTRY_CTA";
     public static final String HAS_WTA = "HAS_WTA";
     public static final String BELONGS_TO_ORGANIZATION = "BELONGS_TO_ORGANIZATION";
 

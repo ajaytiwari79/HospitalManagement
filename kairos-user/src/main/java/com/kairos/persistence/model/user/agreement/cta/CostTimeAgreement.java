@@ -35,6 +35,8 @@ public class CostTimeAgreement extends UserBaseEntity {
     private Country country;
     @Relationship(type = HAS_PARENT_CTA)
     private CostTimeAgreement parent;
+    @Relationship(type = HAS_PARENT_COUNTRY_CTA)
+    private CostTimeAgreement parentCountryCTA;
     @Relationship(type = HAS_RULE_TEMPLATE)
     private List<RuleTemplate> ruleTemplates=new ArrayList<>();
     @DateLong
@@ -125,6 +127,13 @@ public class CostTimeAgreement extends UserBaseEntity {
         this.endDate = endDate;
     }
 
+    public CostTimeAgreement getParentCountryCTA() {
+        return parentCountryCTA;
+    }
+
+    public void setParentCountryCTA(CostTimeAgreement parentCountryCTA) {
+        this.parentCountryCTA = parentCountryCTA;
+    }
 
     public void addRuleTemplate(RuleTemplate ruleTemplate) {
         if (ruleTemplate == null)
