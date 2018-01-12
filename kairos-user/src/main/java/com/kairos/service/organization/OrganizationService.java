@@ -270,10 +270,10 @@ public class OrganizationService extends UserBaseService {
         allWta.forEach(workingTimeAgreement -> {
             WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
             wtaService.copyWta(workingTimeAgreement, newWtaObject);
+            newWtaObject.setDisabled(false);
             newWtaObject.setCountryParentWTA(workingTimeAgreement);
             List<WTABaseRuleTemplate> ruleTemplateWithCategory = wtaService.copyRuleTemplate(workingTimeAgreement.getRuleTemplates());
             newWtaObject.setRuleTemplates(ruleTemplateWithCategory);
-            newWtaObject.setParentWTA(workingTimeAgreement);
             WTAList.add(newWtaObject);
         });
 

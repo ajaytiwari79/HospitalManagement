@@ -294,8 +294,8 @@ public class WTAService extends UserBaseService {
 
     }
 
-    public WorkingTimeAgreement getWta(long wtaId) {
-        return wtaRepository.getWta(wtaId);
+    public WTAWithCountryAndOrganizationTypeDTO getWta(long wtaId) {
+        return wtaRepository.getVersionOfWTA(wtaId);
     }
 
     public boolean removeWta(long wtaId) {
