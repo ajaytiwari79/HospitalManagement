@@ -108,7 +108,7 @@ public class CountryHolidayCalenderService extends UserBaseService {
      * @param id
      */
     public void deleteCountryCalender(Long id) {
-        countryHolidayCalenderGraphRepository.delete(id);
+        countryHolidayCalenderGraphRepository.deleteById(id);
     }
 
 

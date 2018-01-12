@@ -1,9 +1,9 @@
 package com.kairos.config.aop;
-
-import org.apache.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class NeoLoggingAspect {
 
-    private static final Logger LOGGER = Logger.getLogger(NeoLoggingAspect.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NeoLoggingAspect.class);
 
    /* @Inject
     private AppLogService appLogService;*/

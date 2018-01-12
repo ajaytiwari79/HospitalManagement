@@ -4,7 +4,7 @@ import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.staff.Staff;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 9/19/16.
  */
 @Repository
-public interface AccessGroupRepository extends GraphRepository<AccessGroup> {
+public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,Long> {
 
     @Query("Match(staff:Staff),(accessGroup:AccessGroup) where id(staff)={0} AND id(accessGroup) IN {1} CREATE UNIQUE (staff)-[:"+STAFF_HAS_ACCESS_GROUP+"]->(accessGroup) return staff")
     Staff assignGroupToStaff(long staffId, List<Long> accessGroupIds);
@@ -73,7 +73,7 @@ public interface AccessGroupRepository extends GraphRepository<AccessGroup> {
             "Match (unitEmp)-[:HAS_ACCESS_PERMISSION]->(ap:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) with ap,accessPage\n" +
             "Merge (ap)-[r:HAS_ACCESS_PAGE_PERMISSION]->(accessPage)\n" +
             "ON CREATE SET r.isRead={5},r.isWrite={6}\n" +
-            "ON MATCH SET  r.isRead={5},r.isWrite={6} return true")
+            "ON MATCH SET  r.isRead={5},r.isWrite={6} return distinct true")
     void setPermissionForTab(long organizationId, long staffId, long unitId, long accessGroupId, long accessPageId, boolean isRead, boolean isWrite);
 
     @Query("Match (employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with employment\n" +
@@ -92,4 +92,10 @@ public interface AccessGroupRepository extends GraphRepository<AccessGroup> {
 
     @Query("Match (accessGroup:AccessGroup)-[:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]->(accessPage:AccessPage) with accessPage where id(accessGroup)={0} return accessPage")
     List<AccessPage> getAccessPageByGroup(long accessGroupId);
+
+    @Query("MATCH (accessGroup:AccessGroup) WHERE id(accessGroup) IN {0} return accessGroup")
+    List<AccessGroup> getAccessGroupById(List<Long> accessGrpIds);
+
+    List<AccessGroup> findAll();
 }
+

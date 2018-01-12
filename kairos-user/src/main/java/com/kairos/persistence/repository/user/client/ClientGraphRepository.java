@@ -7,7 +7,7 @@ import com.kairos.persistence.model.user.client.*;
 import com.kairos.persistence.model.user.country.CitizenStatus;
 import org.springframework.data.neo4j.annotation.Depth;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,7 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 
 @Repository
-public interface ClientGraphRepository extends GraphRepository<Client>{
+public interface ClientGraphRepository extends Neo4jBaseRepository<Client,Long>{
 
 
     @Query("MATCH (client:Client)-[r:"+GET_SERVICE_FROM+"]->(org:Organization) where id(client)={0} and id(org)={1} return client")
@@ -142,7 +142,7 @@ public interface ClientGraphRepository extends GraphRepository<Client>{
             "             OPTIONAL MATCH (staff)-[r:STAFF_HAS_SKILLS{isEnabled:true}]-(s:Skill)\n" +
             "             with staff, served_by_staff, s as skill, r as r,user\n" +
             "             Match (unit:Organization)-[orgSkillRelation:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) WHERE id(unit) = {3} WITH staff, served_by_staff, skill, r,user, orgSkillRelation\n"+
-            "            return  DISTINCT { id:id(staff), staffType:served_by_staff.type, lastName:staff.lastName , firstName:staff.firstName, profilePic: {2} + staff.profilePic, gender:user.gender, isActive:staff.isActive,  skillList: collect ({name: orgSkillRelation.customName,level:r.skillLevel})  }as staffList" )
+            "            return  DISTINCT { id:id(staff), staffType:served_by_staff.type, lastName:staff.lastName , firstName:staff.firstName, profilePic: {2} + staff.profilePic, gender:user.gender, isDisabled:staff.isDisabled,  skillList: collect ({name: orgSkillRelation.customName,level:r.skillLevel})  }as staffList" )
     List<Map<String,Object>> getTeamMembers(Long teamID, Long clientId, String imageUrl, Long unitId);
 
 

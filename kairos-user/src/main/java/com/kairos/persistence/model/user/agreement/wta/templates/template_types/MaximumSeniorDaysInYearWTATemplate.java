@@ -59,12 +59,12 @@ public class MaximumSeniorDaysInYearWTATemplate extends WTABaseRuleTemplate {
         this.activityCode = activityCode;
     }
 
-    public MaximumSeniorDaysInYearWTATemplate(String name, String templateType, boolean isActive,
+    public MaximumSeniorDaysInYearWTATemplate(String name, String templateType, boolean disabled,
                                               String description, long intervalLength, String intervalUnit, long validationStartDateMillis,
                                               long daysLimit, String activityCode) {
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
         this.intervalLength =intervalLength;
         this.intervalUnit=intervalUnit;

@@ -18,12 +18,16 @@ public class PositionDTO {
 
     private Long startDate;
     private Long endDate;
-    private int totalWeeklyHours;
+    private float totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
     private float salary;
     private Long employmentTypeId;
+    @NotNull(message = "wta can't be null")
+    private Long wtaId;
+    private Long ctaId;
+
 //    private Position.EmploymentType employmentType;
 
     @NotNull(message = "staffId is missing")
@@ -112,11 +116,11 @@ public class PositionDTO {
         this.endDate = endDate;
     }
 
-    public int getTotalWeeklyHours() {
+    public float getTotalWeeklyHours() {
         return totalWeeklyHours;
     }
 
-    public void setTotalWeeklyHours(int totalWeeklyHours) {
+    public void setTotalWeeklyHours(float totalWeeklyHours) {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
@@ -134,6 +138,22 @@ public class PositionDTO {
 
     public void setHourlyWages(float hourlyWages) {
         this.hourlyWages = hourlyWages;
+    }
+
+    public Long getWtaId() {
+        return wtaId;
+    }
+
+    public void setWtaId(Long wtaId) {
+        this.wtaId = wtaId;
+    }
+
+    public Long getCtaId() {
+        return ctaId;
+    }
+
+    public void setCtaId(Long ctaId) {
+        this.ctaId = ctaId;
     }
 
     public float getSalary() {
@@ -167,4 +187,7 @@ public class PositionDTO {
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
+
+
+
 }

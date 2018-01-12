@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.user.country.LocationType;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by oodles on 9/1/17.
  */
 @Repository
-public interface LocationTypeGraphRepository extends GraphRepository<LocationType>{
+public interface LocationTypeGraphRepository extends Neo4jBaseRepository<LocationType,Long>{
 
     List<LocationType> findAll();
 

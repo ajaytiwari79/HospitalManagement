@@ -17,32 +17,32 @@ public class CountryTimeTypeService extends UserBaseService {
 
 
     @Inject
-    CountryTimeTypeGraphRepository graphRepository;
+    CountryTimeTypeGraphRepository Neo4jBaseRepository;
 
 
     public CountryTimeType addTimeType(CountryTimeType countryTimeType){
-        return graphRepository.save(countryTimeType);
+        return Neo4jBaseRepository.save(countryTimeType);
     }
 
     public CountryTimeType getTimeType(Long countryTimeTypeId){
-        return graphRepository.findOne(countryTimeTypeId);
+        return Neo4jBaseRepository.findOne(countryTimeTypeId);
     }
 
     public List<CountryTimeType> getAllTimeType(){
-        return graphRepository.findAll();
+        return Neo4jBaseRepository.findAll();
     }
 
     public CountryTimeType updateTimeType(CountryTimeType countryTimeType){
-        CountryTimeType timeType = graphRepository.findOne(countryTimeType.getId());
+        CountryTimeType timeType = Neo4jBaseRepository.findOne(countryTimeType.getId());
         timeType.setName(countryTimeType.getName());
         timeType.setDescription(countryTimeType.getDescription());
 
-        return graphRepository.save(timeType);
+        return Neo4jBaseRepository.save(timeType);
     }
 
     public boolean deleteTimeType(Long countryTimeTypeId){
-         graphRepository.delete(countryTimeTypeId);
+         Neo4jBaseRepository.deleteById(countryTimeTypeId);
 
-        return !graphRepository.exists(countryTimeTypeId);
+        return !Neo4jBaseRepository.existsById(countryTimeTypeId);
     }
 }

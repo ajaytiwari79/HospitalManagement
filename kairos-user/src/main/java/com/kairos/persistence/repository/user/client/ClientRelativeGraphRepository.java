@@ -1,11 +1,11 @@
 package com.kairos.persistence.repository.user.client;
 
 import com.kairos.persistence.model.user.client.ClientRelativeRelation;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
 /**
  * Created by oodles on 9/10/16.
  */
-public interface ClientRelativeGraphRepository extends GraphRepository<ClientRelativeRelation>{
+public interface ClientRelativeGraphRepository extends Neo4jBaseRepository<ClientRelativeRelation,Long>{
 
 }

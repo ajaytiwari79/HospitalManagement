@@ -1,32 +1,32 @@
 package com.kairos.persistence.repository.user.auth;
 
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
-import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.user.auth.TabPermission;
 import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENTS;
 
 
 /**
  * Interface for CRUD operation on User
  */
 @Repository
-public interface UserGraphRepository extends GraphRepository<User> {
+public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
 
     User findByUserNameIgnoreCase(String userName);
 
     User findOne(Long id);
 
+    @Query("MATCH (n:User) WHERE n.timeCareExternalId={0}  RETURN n LIMIT 1")
     User findByTimeCareExternalId(String timeCareExternalId);
 
     List<User> findAll();

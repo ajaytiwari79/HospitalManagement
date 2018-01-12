@@ -38,8 +38,8 @@ public class ContractService extends UserBaseService {
 
 
     public boolean deleteContract(Long id){
-         contractGraphRepository.delete(id);
-        return !contractGraphRepository.exists(id);
+         contractGraphRepository.deleteById(id);
+        return !contractGraphRepository.existsById(id);
     }
 
 

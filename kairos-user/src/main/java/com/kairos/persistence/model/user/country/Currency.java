@@ -26,8 +26,6 @@ public class Currency extends UserBaseEntity {
     @NotEmpty(message = "error.Currency.currencyCode.notEmpty") @NotNull(message = "error.Currency.currencyCode.notnull")
     private String currencyCode;
 
-    private boolean isEnabled = true;
-
     public String getDescription() {
         return description;
     }
@@ -52,9 +50,6 @@ public class Currency extends UserBaseEntity {
         this.country = country;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
-    }
 
 
     public String getCurrencyCode() {
@@ -65,7 +60,4 @@ public class Currency extends UserBaseEntity {
         this.currencyCode = currencyCode;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
 }

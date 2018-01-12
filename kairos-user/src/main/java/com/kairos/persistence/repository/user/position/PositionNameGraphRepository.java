@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.user.position;
 
 import com.kairos.persistence.model.user.position.PositionName;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_POSITION_NAME;
 
@@ -12,7 +12,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  */
 
 
-public interface PositionNameGraphRepository extends GraphRepository<PositionName> {
+public interface PositionNameGraphRepository extends Neo4jBaseRepository<PositionName,Long> {
 
 
     @Query("MATCH (o:Organization)-[:"+HAS_POSITION_NAME+"]->(pn:PositionName{ isEnabled:true }) WHERE id(o)={0} AND pn.name=~ {1} return pn ")

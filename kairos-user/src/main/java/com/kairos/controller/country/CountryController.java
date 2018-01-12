@@ -1,13 +1,12 @@
 package com.kairos.controller.country;
 
-import com.kairos.persistence.model.timetype.PresenceTypeDTO;
-import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrgTypeExpertiseDTO;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.ParentOrganizationDTO;
+import com.kairos.persistence.model.timetype.PresenceTypeDTO;
+import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.*;
-import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillDTO;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
@@ -15,10 +14,10 @@ import com.kairos.persistence.model.user.payment_type.PaymentType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
-import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
+import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
+import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.country.*;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.language.LanguageLevelService;
@@ -1134,10 +1133,14 @@ public class CountryController {
     public ResponseEntity<Map<String, Object>> getDayTypesById(@RequestBody List<Long> dayTypeIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
     }
-
+    @RequestMapping(value = COUNTRY_URL + "/cta/default-data", method = RequestMethod.GET)
+    @ApiOperation("get default data for cta rule template")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(countryId));
+    }
     @ApiOperation(value = "Get day types by id")
     @RequestMapping(value = COUNTRY_URL + "/time_slots", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getTimeSlotOfCountry(@PathVariable Long countryId){
+     public ResponseEntity<Map<String, Object>> getTimeSlotOfCountry(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry(countryId));
     }
 

@@ -1,10 +1,12 @@
 package com.kairos.persistence.repository.organization;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.Staff;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +19,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by oodles on 7/10/16.
  */
 @Repository
-public interface TeamGraphRepository extends GraphRepository<Team>{
+public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("MATCH (group:Group)-[:HAS_TEAM]->(team:Team) where id(group)={0} with team\n" +
             "optional match (team)-[:TEAM_HAS_LOCATION]->(contactAddress:ContactAddress) with contactAddress,team\n" +
@@ -84,7 +86,7 @@ public interface TeamGraphRepository extends GraphRepository<Team>{
             " return {id:id(contactAddress),houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,street1:contactAddress.street1,zipCodeId:id(zipCode),city:contactAddress.city,municipalityName:contactAddress.municipalityName,regionName:contactAddress.regionName,province:contactAddress.province,country:contactAddress.country,latitude:contactAddress.latitude,longitude:contactAddress.longitude,streetUrl:contactAddress.streetUrl,municipalityId:id(municipality)} as data")
     Map<String,Object> getContactAddressOfTeam(long teamId);
 
-    @Query("Match (team:Team) where id(team)={0}\n" +
+    /*@Query("Match (team:Team) where id(team)={0}\n" +
             "Match (team)<-[:HAS_TEAM]-(group:Group)<-[:"+HAS_GROUP+"]-(organization:Organization) with organization\n" +
             "Match (organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) with os,r\n" +
             "match (oranizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(oranizationService),name:oranizationService.name,description:oranizationService.description} as availableServices\n" +
@@ -93,20 +95,49 @@ public interface TeamGraphRepository extends GraphRepository<Team>{
             "Match (team:Team) where id(team)={0}\n" +
             "match (team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService{isEnabled:true}) with r,os \n" +
             "match (oranizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) with oranizationService,r,os\n" +
-            "with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(oranizationService),name:oranizationService.name,description:oranizationService.description} as selectedServices\n" +
+            "with {children: case when os is NULL then [] else collect({id:id(os),customName:r.customName,name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(oranizationService),name:oranizationService.name,description:oranizationService.description} as selectedServices\n" +
+            "return {selectedServices:collect(selectedServices)} as data")*/
+    @Query("Match (team:Team) where id(team)={0}\n" +
+            "Match (team)<-[:HAS_TEAM]-(group:Group)<-[:HAS_GROUP]-(organization:Organization) with organization\n" +
+            "Match (organization)-[r:PROVIDE_SERVICE{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) with os,r\n" +
+            "match (oranizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(oranizationService),name:oranizationService.name,description:oranizationService.description} as availableServices\n" +
+            "return {availableServices:collect(availableServices)} as data\n" +
+            "UNION\n" +
+            "Match (team:Team) where id(team)={0} with team\n" +
+            "match (team)-[r:TEAM_HAS_SERVICES]->(os:OrganizationService{isEnabled:true}) with r,os,team \n" +
+            "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with organizationService,r,os,team\n" +
+            "OPTIONAL MATCH (team)-[teamServiceCustomNameRelation:HAS_CUSTOM_SERVICE_NAME_FOR]-(organizationService:OrganizationService)\n" +
+            "with {children: case when os is NULL then [] else collect({id:id(os),name:os.name, customName:CASE WHEN r IS null THEN os.name ELSE r.customName END, description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),customName:CASE WHEN teamServiceCustomNameRelation IS NULL THEN organizationService.name ELSE teamServiceCustomNameRelation.customName END,name:organizationService.name,description:organizationService.description} as selectedServices\n" +
             "return {selectedServices:collect(selectedServices)} as data")
     List<Map<String,Object>> getOrganizationServicesOfTeam(long teamId);
 
     @Query("Match (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) where id(team)={0} AND id(os)={1} return count(r) as countOfRel")
     int countOfServices(long teamId, long organizationServiceId);
 
-    @Query("Match (team:Team),(organizationService:OrganizationService) where id(team)={0} AND id(organizationService) IN {1} create unique (team)-[r:"+TEAM_HAS_SERVICES+"{creationDate:{2},lastModificationDate:{3},isEnabled:true}]->(organizationService) return r")
+    @Query("Match (team:Team),(organizationService:OrganizationService) where id(team)={0} AND id(organizationService) IN {1} create unique (team)-[r:"+TEAM_HAS_SERVICES+"{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService) return r")
     void addServiceInTeam(long teamId, long organizationServiceId, long creationDate, long lastModificationDate);
 
-    @Query("Match (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) where id(team)={0} AND id(os)={1} SET r.isEnabled={2},r.lastModificationDate={3} return r")
+    @Query("Match (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) where id(team)={0} AND id(os)={1} SET r.isEnabled={2},r.lastModificationDate={3},r.customName=os.name return r")
     void updateOrganizationService(long teamId, long organizationServiceId, boolean isEnabled, long lastModificationDate);
 
-    @Query("Match (team:Team) where id(team)={0}\n" +
+    @Query("Match (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) where id(team)={0} AND id(os)={1} SET r.customName={2} \n"+
+            "return id(os) as id, os.name as name, r.customName as customName, os.description as description")
+    OrganizationServiceQueryResult addCustomNameOfSubServiceForTeam(Long teamId, Long organizationServiceId, String customName);
+
+    @Query("Match (team:Team),(os:OrganizationService) where id(team)={1} AND id(os)={0} WITH team,os\n" +
+            "MERGE (team)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(os) \n" +
+            "ON CREATE SET r.customName={2}\n" +
+            "ON MATCH SET r.customName={2}\n" +
+            " return id(os) as id, os.name as name, r.customName as customName, os.description as description")
+    OrganizationServiceQueryResult addCustomNameOfServiceForTeam(Long serviceId, Long teamId, String customName);
+
+    @Query("MATCH (organizationService:OrganizationService{isEnabled:true})-[:" + ORGANIZATION_SUB_SERVICE + "]->(os:OrganizationService)\n" +
+            "WHERE id(os)={0} WITH organizationService\n" +
+            "MATCH (team:Team) WHERE id(team)={1} WITH team, organizationService\n" +
+            "CREATE UNIQUE (team)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(organizationService) SET r.customName=organizationService.name return true")
+    Boolean addCustomNameOfServiceForTeam(Long subServiceId, Long teamId);
+
+    /*@Query("Match (team:Team) where id(team)={0}\n" +
             "Match (team)<-[:"+HAS_TEAM+"]-(group:Group)<-[:"+HAS_GROUP+"]-(organization:Organization) with organization\n" +
             "Match (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with subType,organization\n" +
             "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization\n" +
@@ -121,6 +152,26 @@ public interface TeamGraphRepository extends GraphRepository<Team>{
             "Match (organization)-[:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,team\n"+
             "match (team)-[r:"+TEAM_HAS_SKILLS+"{isEnabled:true}]->(skill) with skill,r\n" +
             "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true})} as selectedSkills\n" +
+            "return {selectedSkills:collect(selectedSkills)} as data")*/
+    @Query("Match (team:Team) where id(team)={0}\n" +
+            "Match (team)<-[:"+HAS_TEAM+"]-(group:Group)<-[:"+HAS_GROUP+"]-(organization:Organization) with organization\n" +
+            "Match (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with subType,organization\n" +
+            "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:EXPERTISE_HAS_SKILLS{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization\n" +
+            "Match (organization)-[r:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags            \n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
+            "return {availableSkills:collect(availableSkills)} as data\n" +
+            "UNION\n" +
+            "Match (team:Team) where id(team)={0} with team\n" +
+            "Match (team)<-[:"+HAS_TEAM+"]-(group:Group)<-[:"+HAS_GROUP+"]-(organization:Organization) with organization,team\n" +
+            "Match (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) with subType,organization,team\n" +
+            "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization,team\n" +
+            "Match (organization)-[:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,team,organization\n" +
+            "match (team)-[r:"+TEAM_HAS_SKILLS+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,organization,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true,tags:ctags+otags})} as selectedSkills\n" +
             "return {selectedSkills:collect(selectedSkills)} as data")
     List<Map<String,Object>> getSkillsOfTeam(long teamId);
 
@@ -148,4 +199,6 @@ public interface TeamGraphRepository extends GraphRepository<Team>{
             "Match (region)-[:"+BELONGS_TO+"]->(country:Country) return id(country)")
     Long getCountryByTeamId(Long teamId);
 
+    @Query("match (organization:Organization)-[:" + HAS_GROUP + "]->(group:Group)-[:" + HAS_TEAM + "]->(team:Team) where id(team)={0} return id(organization)")
+    Long getOrganizationIdByTeam(Long teamId);
 }

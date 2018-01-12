@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.user.control_panel;
 
 import com.kairos.persistence.model.user.control_panel.ControlPanel;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by oodles on 29/12/16.
  */
 @Repository
-public interface ControlPanelGraphRepository extends GraphRepository<ControlPanel> {
+public interface ControlPanelGraphRepository extends Neo4jBaseRepository<ControlPanel,Long> {
 
        // @Query("MATCH (cp:ControlPanel)-[:UNITS]->(o:Organization) where id(o)={0} return cp")
     @Query ("MATCH (cp:ControlPanel)-[:UNITS]->(o:Organization) where id(o)={0} AND cp.active=true \n" +

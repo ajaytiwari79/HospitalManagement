@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.position;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -23,7 +24,7 @@ public class PositionQueryResult {
     private int workingDaysInWeek;
     private Long endDate;
     private Long lastModificationDate;
-    private int totalWeeklyHours;
+    private float totalWeeklyHours;
     private float avgDailyWorkingHours;
     private float hourlyWages;
     private long id;
@@ -32,6 +33,7 @@ public class PositionQueryResult {
 
     private PositionName positionName;
     private WorkingTimeAgreement workingTimeAgreement;
+    private CostTimeAgreement costTimeAgreement;
 
     public int getWorkingDaysInWeek() {
         return workingDaysInWeek;
@@ -73,11 +75,11 @@ public class PositionQueryResult {
         this.endDate = endDate;
     }
 
-    public int getTotalWeeklyHours() {
+    public float getTotalWeeklyHours() {
         return totalWeeklyHours;
     }
 
-    public void setTotalWeeklyHours(int totalWeeklyHours) {
+    public void setTotalWeeklyHours(float totalWeeklyHours) {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
@@ -143,5 +145,13 @@ public class PositionQueryResult {
 
     public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
+    }
+
+    public CostTimeAgreement getCostTimeAgreement() {
+        return costTimeAgreement;
+    }
+
+    public void setCostTimeAgreement(CostTimeAgreement costTimeAgreement) {
+        this.costTimeAgreement = costTimeAgreement;
     }
 }

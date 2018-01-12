@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
@@ -71,6 +72,8 @@ public class Staff extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
     User user;
+    @Relationship(type = IS_A)
+    Client client;
 
     EngineerType engineerType;
 
@@ -483,41 +486,13 @@ public class Staff extends UserBaseEntity {
         this.staffFavouriteFiltersList = staffFavouriteFiltersList;
     }
 
-    @Override
-    public String toString() {
-        return "{Staff={" +
-                "generalNote='" + generalNote + '\'' +
-                ", reqFromPerson='" + reqFromPerson + '\'' +
-                ", employedSince=" + employedSince +
-                ", cardNumber='" + cardNumber + '\'' +
-                ", copyKariosMailToLogin=" + copyKariosMailToLogin +
-                ", sendNotificationBy='" + sendNotificationBy + '\'' +
-                ", profilePic='" + profilePic + '\'' +
-                ", email='" + email + '\'' +
-                ", badgeNumber='" + badgeNumber + '\'' +
-                ", userName='" + userName + '\'' +
-                ", externalId=" + externalId +
-                ", manacoId='" + manacoId + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", familyName='" + familyName + '\'' +
-                ", signature='" + signature + '\'' +
-                ", nationalInsuranceNumber='" + nationalInsuranceNumber + '\'' +
-                ", isActive=" + isActive +
-                ", inactiveFrom=" + inactiveFrom +
-                ", organizationId=" + organizationId +
-                ", visitourId=" + visitourId +
-                ", cprNumber='" + cprNumber + '\'' +
-                ", visitourTeamId='" + visitourTeamId + '\'' +
-                ", speedPercent=" + speedPercent +
-                ", workPercent=" + workPercent +
-                ", overtime=" + overtime +
-                ", costDay=" + costDay +
-                ", costCall=" + costCall +
-                ", costKm=" + costKm +
-                ", costHour=" + costHour +
-                ", costHourOvertime=" + costHourOvertime +
-                '}'+
-                '}';
+    public Client getClient() {
+        return client;
     }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+
 }

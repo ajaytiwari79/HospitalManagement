@@ -5,11 +5,10 @@ import com.kairos.persistence.model.organization.StaffRelationship;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientStaffRelation;
 import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,7 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 24/10/16.
  */
 @Repository
-public interface StaffGraphRepository extends GraphRepository<Staff> {
+public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
 
     @Override
     List<Staff> findAll();
@@ -35,7 +34,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     @Query("MATCH (group:Group)-[:"+HAS_TEAM+"]->(team:Team)-[:"+TEAM_HAS_MEMBER+"]->(staff:Staff) where id(group)={0} return {id:id(staff),firstName:staff.firstName,lastName:staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,visitourId:staff.visitourId,profilePic: {1} + staff.profilePic} as data order by data.firstName")
     List<Map<String,Object>> getStaffByGroupId(long groupId, String imageUrl);
 
-    @Query("MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment) where id(organization)={0} with employment\n" +
+    @Query(" MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment) where id(organization)={0} with employment\n" +
             "MATCH (organization:Organization)-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team)-[:TEAM_HAS_MEMBER]->(staff:Staff) where id(organization)={1} with staff\n " +
             "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff\n" +
             "OPTIONAL Match (staff)-[:"+ENGINEER_TYPE+"]->(engineerType:EngineerType) with engineerType, staff, user\n" +
@@ -312,7 +311,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
             "where id(organization)={0} with staff\n" +
             "optional match (staff)-[:"+HAS_CONTACT_ADDRESS+"]->(contactAddress:ContactAddress) with staff,contactAddress\n" +
             "optional match (staff)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) with staff,contactDetail,contactAddress\n" +
-            "return staff,id(contactAddress) as contactAddressId,id(contactDetail) as contactDetailId")
+            "return staff,id(contactAddress) as contactAddressId,id(contactDetail) as contactDetailId LIMIT 1")
     StaffQueryResult getStaffByExternalIdInOrganization(Long organizationId, Long externalId);
 
     @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments ,organization\n" +

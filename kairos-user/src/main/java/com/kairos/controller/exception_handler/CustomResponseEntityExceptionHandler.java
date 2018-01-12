@@ -31,8 +31,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
-
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -106,26 +104,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		return new ResponseEntity<Object>(errorMessage,HttpStatus.NOT_FOUND);
 	}
 
-	/**
-	 * Customize the response for NoSuchRequestHandlingMethodException.
-	 * <p>This method logs a warning and delegates to {@link #handleExceptionInternal}.
-	 * @param ex the exception
-	 * @param headers the headers to be written to the response
-	 * @param status the selected response status
-	 * @param request the current request
-	 * @return a {@code ResponseEntity} instance
-	 */
-	@Override
-	protected ResponseEntity<Object> handleNoSuchRequestHandlingMethod(NoSuchRequestHandlingMethodException ex,
-			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		logger.error("error in user service ",ex);
-		pageNotFoundLogger.warn(ex.getMessage());
-
-		ResponseEnvelope errorMessage=new ResponseEnvelope();
-		errorMessage.setSuccess(false);
-		errorMessage.setMessage(ex.getMessage());
-		return handleExceptionInternal(ex, errorMessage, headers, status, request);
-	}
 
 	/**
 	 * Customize the response for HttpRequestMethodNotSupportedException.

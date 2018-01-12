@@ -2,8 +2,8 @@ package com.kairos.persistence.repository.user.country;
 
 import com.kairos.persistence.model.user.country.equipment.Equipment;
 import com.kairos.persistence.model.user.country.equipment.EquipmentQueryResult;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prerna on 12/12/17.
  */
 @Repository
-public interface EquipmentGraphRepository extends GraphRepository<Equipment> {
+public interface EquipmentGraphRepository extends Neo4jBaseRepository<Equipment,Long> {
 
     @Query("Match (country:Country)-[r:"+COUNTRY_HAS_EQUIPMENT+"]->(equipment:Equipment)\n" +
             "WHERE equipment.name={0} AND id(country) = {1} AND equipment.deleted={2} \n" +
@@ -58,5 +58,7 @@ public interface EquipmentGraphRepository extends GraphRepository<Equipment> {
             "WHERE id(country)={0} AND equipment.deleted= {1} AND id(equipment) IN {2} return equipment")
     List<Equipment> getListOfEquipmentByIds(Long countryId , boolean deleted, List<Long> equipmentIds);
 
-
+    @Query("MATCH (resource:Resource)-[r:"+RESOURCE_HAS_EQUIPMENT+"]->(equipment:Equipment) WHERE id(resource)={0}\n"+
+            "DELETE r")
+    void detachResourceEquipments(long resourceId);
 }

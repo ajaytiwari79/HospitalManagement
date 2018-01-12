@@ -45,14 +45,14 @@ public class MaximumConsecutiveWorkingDaysWTATemplate extends WTABaseRuleTemplat
         this.daysLimit = daysLimit;
     }
 
-    public MaximumConsecutiveWorkingDaysWTATemplate(String name, String templateType, boolean isActive, String description,
+    public MaximumConsecutiveWorkingDaysWTATemplate(String name, String templateType, boolean disabled, String description,
                                                     List<String> balanceType, boolean checkAgainstTimeRules, long daysLimit) {
         this.daysLimit = daysLimit;
         this.balanceType = balanceType;
         this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
 
     }

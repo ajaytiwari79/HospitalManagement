@@ -11,7 +11,7 @@ public class Visitour  extends UserBaseEntity implements Cloneable {
     private String serverName;
     private String username;
     private String password;
-    private Long OrganizationId;
+    private Long organizationId;
 
     public String getServerName() {
         return serverName;
@@ -38,11 +38,11 @@ public class Visitour  extends UserBaseEntity implements Cloneable {
     }
 
     public Long getOrganizationId() {
-        return OrganizationId;
+        return organizationId;
     }
 
     public void setOrganizationId(Long organizationId) {
-        OrganizationId = organizationId;
+        this.organizationId = organizationId;
     }
 
     public Visitour() {

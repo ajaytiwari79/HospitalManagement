@@ -5,7 +5,7 @@ import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.user.skill.Skill;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORGAN
  * Created by oodles on 7/10/16.
  */
 @Repository
-public interface GroupGraphRepository extends GraphRepository<Group> {
+public interface GroupGraphRepository extends Neo4jBaseRepository<Group,Long> {
 
     @Query(" MATCH (o:Organization)-[:" + HAS_GROUP + "]->(g:Group) where id(g) = {0} with o as org " +
             " MATCH (org)-[:" + ORGANISATION_HAS_SKILL + "]->(s:Skill)  with s AS skill " +

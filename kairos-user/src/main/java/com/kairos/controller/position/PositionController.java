@@ -6,6 +6,7 @@ import com.kairos.service.position.PositionService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class PositionController {
     @Inject
     private PositionService positionService;
 
-    private final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @ApiOperation(value = "Create a New Position")
   //  http://dev.kairosplanning.com/api/v1/organization/71/unit/71/unitEmployment/82/position?moduleId=tab_23&type=Organization
@@ -70,6 +71,13 @@ public class PositionController {
     @RequestMapping(value="/unitEmployment/{unitEmploymentId}/staff/{staffId}/position")
     ResponseEntity<Map<String, Object>> getAllPositionByStaff(@PathVariable Long unitId,@RequestParam("type") String type,@PathVariable Long unitEmploymentId,@PathVariable Long staffId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,positionService.getAllPositionByStaff(unitId,unitEmploymentId,staffId,type));
+    }
+
+    @ApiOperation(value = "Get cta and wta by expertise for position creation")
+    @RequestMapping(value="/position/expertise/{expertiseId}/cta_wta")
+    ResponseEntity<Map<String,Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId,@PathVariable Long expertiseId){
+
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,positionService.getCtaAndWtaByExpertiseId(unitId,expertiseId));
     }
 
 

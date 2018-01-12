@@ -3,7 +3,7 @@ import com.kairos.persistence.model.enums.EmploymentStatus;
 import com.kairos.persistence.model.user.staff.AccessPermission;
 import com.kairos.persistence.model.user.staff.UnitEmployment;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 6/12/16.
  */
 @Repository
-public interface UnitEmploymentGraphRepository extends GraphRepository<UnitEmployment> {
+public interface UnitEmploymentGraphRepository extends Neo4jBaseRepository<UnitEmployment,Long> {
 
     List<UnitEmployment> findAll();
 

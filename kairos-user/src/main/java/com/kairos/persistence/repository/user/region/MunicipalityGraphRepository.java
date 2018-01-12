@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.user.region;
 
 import com.kairos.persistence.model.user.region.Municipality;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.MUNIC
  * Created by oodles on 22/12/16.
  */
 @Repository
-public interface MunicipalityGraphRepository extends GraphRepository<Municipality>{
+public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municipality,Long>{
 
     List<Municipality> findAll();
 

@@ -15,7 +15,8 @@ import com.kairos.service.mail.MailService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -51,7 +52,7 @@ public class ClientController {
     private ClientExtendedService clientExtendedService;
     @Inject
     private MailService mailService;
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     /**
