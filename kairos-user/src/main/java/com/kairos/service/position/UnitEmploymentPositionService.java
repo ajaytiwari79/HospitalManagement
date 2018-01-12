@@ -1,10 +1,16 @@
 package com.kairos.service.position;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
+import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
+import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.persistence.model.user.country.EmploymentType;
 
@@ -43,6 +49,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,8 +92,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
     private WTAService wtaService;
     @Inject
     private ClientGraphRepository clientGraphRepository;
-    @Inject
-    UnitEmploymentPosition unitEmploymentPosition;
+
 
     public UnitEmploymentPosition createUnitEmploymentPosition(Long id, long unitEmploymentId, UnitEmploymentPositionDTO unitEmploymentPositionDTO, String type) {
         UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
@@ -126,7 +132,6 @@ public class UnitEmploymentPositionService extends UserBaseService {
         return new PositionWrapper(oldUnitEmploymentPosition);
 
     }
-
 
     public boolean removePosition(long positionId) {
 
@@ -173,9 +178,6 @@ public class UnitEmploymentPositionService extends UserBaseService {
             logger.info("Expertise Doesn't contains WTA.Please select different Expertise" + positionDTO.getExpertiseId());
             throw new DataNotFoundByIdException("Expertise Doesn't contains WTA.Please select different Expertise");
         }
-
-
-
         WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);*/
 
         Optional<WorkingTimeAgreement> wta = workingTimeAgreementGraphRepository.findById(unitEmploymentPositionDTO.getWtaId());
@@ -214,9 +216,9 @@ public class UnitEmploymentPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("Employment Type does not exist in unit " + employmentType.getId() + " AND " + unitEmploymentPositionDTO.getEmploymentTypeId());
         }
         unitEmploymentPosition.setEmploymentType(employmentType);
-        PositionCode positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(organization.getId(), unitEmploymentPositionDTO.getPositionNameId());
+        PositionCode positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(organization.getId(), unitEmploymentPositionDTO.getPositionCodeId());
         if (!Optional.ofNullable(positionCode).isPresent()) {
-            throw new DataNotFoundByIdException("position Name does not exist in unit " + unitEmploymentPositionDTO.getPositionNameId());
+            throw new DataNotFoundByIdException("position Name does not exist in unit " + unitEmploymentPositionDTO.getPositionCodeId());
         }
         unitEmploymentPosition.setPositionCode(positionCode);
 
@@ -250,44 +252,17 @@ public class UnitEmploymentPositionService extends UserBaseService {
         if (!oldUnitEmploymentPosition.getExpertise().getId().equals(unitEmploymentPositionDTO.getExpertiseId())) {
             WTAWithCountryAndOrganizationTypeDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(unitEmploymentPositionDTO.getExpertiseId());
 
-
-        /*if (!oldPosition.getExpertise().getId().equals(positionDTO.getExpertiseId())) {
-            WTAWithCountryAndOrganizationTypeDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
-            System.out.println(Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent());
-            if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid Expertize" + unitEmploymentPositionDTO.getExpertiseId());
-            }
-            if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getName()).isPresent()) {
-                logger.info("Expertise Doesn't contains WTA.Please select different Expertise" + positionDTO.getExpertiseId());
-                throw new DataNotFoundByIdException("Expertise Doesn't contains WTA.Please select different Expertise");
-            } else {
-                WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);
-<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
-                WorkingTimeAgreement oldWta = oldPosition.getWorkingTimeAgreement();
-                oldPosition.setWorkingTimeAgreement(wta);
-                wta.setParentWTA(oldWta);
-=======
-                WorkingTimeAgreement oldWta = oldUnitEmploymentPosition.getWta();
-                oldUnitEmploymentPosition.setWta(wta);
-                wta.setWta(oldWta);
->>>>>>> b503068... changed position to UEP:kairos-user/src/main/java/com/kairos/service/position/UnitEmploymentPositionService.java
-                save(wta);
-                workingTimeAgreementGraphRepository.breakRelationFromOldWTA(oldUnitEmploymentPosition.getId(), oldWta.getId());
-            }
-<<<<<<< HEAD:kairos-user/src/main/java/com/kairos/service/position/PositionService.java
-        }*/
-
             Optional<WorkingTimeAgreement> wta = workingTimeAgreementGraphRepository.findById(unitEmploymentPositionDTO.getWtaId());
             if (!wta.isPresent()) {
                 throw new DataNotFoundByIdException("Invalid wta id ");
             }
-            unitEmploymentPosition.setWorkingTimeAgreement(wta.get());
+            oldUnitEmploymentPosition.setWorkingTimeAgreement(wta.get());
 
 
             CostTimeAgreement cta = (unitEmploymentPositionDTO.getCtaId() == null) ? null :
                     costTimeAgreementGraphRepository.findOne(unitEmploymentPositionDTO.getCtaId());
             if (cta != null) {
-                unitEmploymentPosition.setCta(cta);
+                oldUnitEmploymentPosition.setCta(cta);
             }
 
             Optional<Expertise> expertise = expertiseGraphRepository.findById(unitEmploymentPositionDTO.getExpertiseId());
@@ -296,19 +271,19 @@ public class UnitEmploymentPositionService extends UserBaseService {
             }
 
 
-            if (!oldUnitEmploymentPosition.getPositionCode().getId().equals(unitEmploymentPositionDTO.getPositionNameId())) {
-                PositionCode positionCode = positionCodeGraphRepository.findOne(unitEmploymentPositionDTO.getPositionNameId());
+            if (!oldUnitEmploymentPosition.getPositionCode().getId().equals(unitEmploymentPositionDTO.getPositionCodeId())) {
+                PositionCode positionCode = positionCodeGraphRepository.findOne(unitEmploymentPositionDTO.getPositionCodeId());
                 if (!Optional.ofNullable(positionCode).isPresent()) {
-                    throw new DataNotFoundByIdException("PositionCode Cannot be null" + unitEmploymentPositionDTO.getPositionNameId());
+                    throw new DataNotFoundByIdException("PositionCode Cannot be null" + unitEmploymentPositionDTO.getPositionCodeId());
                 }
                 oldUnitEmploymentPosition.setPositionCode(positionCode);
             }
 
 
-            if (!oldUnitEmploymentPosition.getPositionCode().getId().equals(unitEmploymentPositionDTO.getPositionNameId())) {
-                PositionCode positionCode = positionCodeGraphRepository.findOne(unitEmploymentPositionDTO.getPositionNameId());
+            if (!oldUnitEmploymentPosition.getPositionCode().getId().equals(unitEmploymentPositionDTO.getPositionCodeId())) {
+                PositionCode positionCode = positionCodeGraphRepository.findOne(unitEmploymentPositionDTO.getPositionCodeId());
                 if (!Optional.ofNullable(positionCode).isPresent()) {
-                    throw new DataNotFoundByIdException("PositionCode Cannot be null" + unitEmploymentPositionDTO.getPositionNameId());
+                    throw new DataNotFoundByIdException("PositionCode Cannot be null" + unitEmploymentPositionDTO.getPositionCodeId());
                 }
                 oldUnitEmploymentPosition.setPositionCode(positionCode);
 
@@ -353,6 +328,47 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
     public PositionCtaWtaQueryResult getCtaAndWtaByExpertiseId(Long unitId, Long expertiseId) {
         return unitEmploymentPositionGraphRepository.getCtaAndWtaByExpertise(unitId, expertiseId);
+    }
+
+    public WorkingTimeAgreement updateUnitEmploymentPositionWTA(Long unitId, Long unitEmploymentPositionId, Long wtaId, WTADTO updateDTO) {
+        UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
+        if (!Optional.ofNullable(unitEmploymentPosition).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitEmploymentPositionId);
+        }
+        WorkingTimeAgreement oldWta = workingTimeAgreementGraphRepository.findOne(wtaId, 2);
+        if (!Optional.ofNullable(oldWta).isPresent()) {
+            logger.info("wta not found while updating unit Employment Position for staff %d", unitEmploymentPositionId);
+            throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
+        }
+
+        WorkingTimeAgreement newWta = new WorkingTimeAgreement();
+
+        if (oldWta.getExpertise().getId() != updateDTO.getExpertiseId()) {
+            logger.info("Expertise cant be changed :", wtaId);
+            throw new ActionNotPermittedException("Expertise can't be changed");
+        }
+        newWta = wtaService.copyWta(oldWta, updateDTO);
+        newWta.setExpertise(oldWta.getExpertise());
+        newWta.setParentWTA(oldWta);
+        newWta.setDisabled(false);
+        List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
+        unitEmploymentPosition.setWorkingTimeAgreement(newWta);
+        save(unitEmploymentPosition);
+        newWta.setParentWTA(oldWta.basicDetails());
+        newWta.getExpertise().setCountry(null);
+        return newWta;
+    }
+
+    public List<WTABaseRuleTemplate> copyRuleTemplate(List<RuleTemplateCategoryDTO> ruleTemplates) {
+        List<WTABaseRuleTemplate> copiedRuleTemplate = new ArrayList<>(ruleTemplates.size());
+        ObjectMapper objectMapper = new ObjectMapper();
+        ruleTemplates.forEach(ruleTemplate -> {
+            WTABaseRuleTemplate wtaBaseRuleTemplateDTO = objectMapper.convertValue(ruleTemplate, WTABaseRuleTemplate.class);
+            wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
+            wtaBaseRuleTemplateDTO.setId(null);
+            copiedRuleTemplate.add(wtaBaseRuleTemplateDTO);
+        });
+        return copiedRuleTemplate;
     }
 
 }

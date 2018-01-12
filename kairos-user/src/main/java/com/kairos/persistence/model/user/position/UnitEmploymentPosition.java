@@ -29,7 +29,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     @Relationship(type = HAS_WTA)
     private WorkingTimeAgreement workingTimeAgreement;
 
-    @Relationship(type = HAS_POSITION_NAME)
+    @Relationship(type = HAS_POSITION_CODE)
     private PositionCode positionCode;
 
     @Relationship(type = BELONGS_TO_STAFF,direction = "INCOMING")

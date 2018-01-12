@@ -168,7 +168,7 @@ public class Organization extends UserBaseEntity {
     @Relationship(type = HAS_LEVEL)
     private Level level;
 
-    @Relationship(type = HAS_POSITION_NAME)
+    @Relationship(type = HAS_POSITION_CODE)
     private List<PositionCode> positionCodeList = new ArrayList<>();
 
     @Relationship(type = HAS_WTA)

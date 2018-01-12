@@ -48,8 +48,7 @@ public class PositionCodeService extends UserBaseService {
 
     @Inject
     private OrganizationService organizationService;
-    @Inject
-    private PositionCode positionCode;
+
 
     public PositionCode createPositionCode(Long id, PositionCode positionCode, String type) {
         Long unitId = organizationService.getOrganization(id, type);
@@ -77,19 +76,18 @@ public class PositionCodeService extends UserBaseService {
         return positionCode;
     }
 
-    public PositionCode updatePositionCode(Long id, Long positionNameId, PositionCode positionCode, String type) {
+    public PositionCode updatePositionCode(Long id, Long positionCodeId, PositionCode positionCode, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         if (!organization.isParentOrganization()) {
             throw new ActionNotPermittedException("Can only update PositionCode in Parent organization");
         }
 
-        PositionCode oldPositionCode = positionCodeGraphRepository.findOne(positionNameId);
+        PositionCode oldPositionCode = positionCodeGraphRepository.findOne(positionCodeId);
         if (!Optional.ofNullable(oldPositionCode).isPresent()) {
             logger.info("position code not found,{}", positionCode.getName());
             throw new DataNotFoundByIdException("PositionCode doesn't exist");
         }
 
-        //check if new Name already exist
         if (!(oldPositionCode.getName().equalsIgnoreCase(positionCode.getName())) &&
                 (positionCodeGraphRepository.checkDuplicatePositionCode(organization.getId(), positionCode.getName()) != null)) {
             throw new DuplicateDataException("PositionCode can't be updated");
@@ -121,7 +119,7 @@ public class PositionCodeService extends UserBaseService {
         return true;
     }
 
-    public List<PositionCode> getAllPositionName(Long id, String type) {
+    public List<PositionCode> getAllPositionCode(Long id, String type) {
         Long unitId;
         Organization organization = null;
         List<PositionCode> positionCodes = new ArrayList<PositionCode>();
@@ -141,7 +139,7 @@ public class PositionCodeService extends UserBaseService {
         unitId = organization.getId();
         if (organization.isParentOrganization()) {
             //return parents(its own)
-            positionCodes = organizationGraphRepository.getPositionNames(unitId);
+            positionCodes = organizationGraphRepository.getPositionCodes(unitId);
         } else {
             positionCodes = organizationGraphRepository.getPositionCodesOfParentOrganization(unitId);
         }
@@ -154,7 +152,7 @@ public class PositionCodeService extends UserBaseService {
 
     public List<PositionCode> getAllPositionCodes(Long id, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
-        List<PositionCode> positionCodes = (organization.isParentOrganization()) ? organizationGraphRepository.getPositionNames(organization.getId()) : organizationGraphRepository.getPositionCodesOfParentOrganization(organization.getId());
+        List<PositionCode> positionCodes = (organization.isParentOrganization()) ? organizationGraphRepository.getPositionCodes(organization.getId()) : organizationGraphRepository.getPositionCodesOfParentOrganization(organization.getId());
         return positionCodes;
 
     }

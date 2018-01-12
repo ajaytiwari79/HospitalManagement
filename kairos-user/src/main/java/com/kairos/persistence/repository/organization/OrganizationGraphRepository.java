@@ -524,12 +524,12 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("match (n:Organization) where id(n)={0} with n \n" +
             "match (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true})  where org.isKairosHub =false \n" +
 
-            "match (org)-[:" + HAS_POSITION_NAME + "]->(p:PositionCode {isDeleted:true}) return p")
+            "match (org)-[:" + HAS_POSITION_CODE + "]->(p:PositionCode {isDeleted:true}) return p")
     List<PositionCode> getPositionCodesOfParentOrganization(Long organizationId);
 
 
-    @Query("MATCH (o:Organization {isEnable:true} )-[:" + HAS_POSITION_NAME + "]->(p:PositionCode {isEnabled:true}) where id(o)={0} return p")
-    List<PositionCode> getPositionNames(Long organizationId);
+    @Query("MATCH (o:Organization {isEnable:true} )-[:" + HAS_POSITION_CODE + "]->(p:PositionCode {isEnabled:true}) where id(o)={0} return p")
+    List<PositionCode> getPositionCodes(Long organizationId);
 
     @Query(" Match (organization:Organization) where id(organization)={0} with organization\n" +
             "Match (organization)-[r:PROVIDE_SERVICE]->(os) where os.imported=true with distinct os,r\n" +

@@ -27,30 +27,30 @@ public class PositionCodeController {
 
     @ApiOperation("Create PositionCode")
     @PostMapping(value = "/position_code")
-    ResponseEntity<Map<String, Object>> createPositionName( @RequestParam("type") String type,@PathVariable Long unitId, @RequestBody PositionCode positionCode) {
+    ResponseEntity<Map<String, Object>> createPositionCode( @RequestParam("type") String type,@PathVariable Long unitId, @RequestBody PositionCode positionCode) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.createPositionCode( unitId, positionCode,type));
     }
 
     @ApiOperation("Update PositionCode")
-    @PutMapping(value = "/position_code/{positionNameId}")
-    ResponseEntity<Map<String, Object>> updatePositionName(@RequestParam("type") String type, @PathVariable Long unitId, @PathVariable long positionNameId, @RequestBody PositionCode positionCode) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.updatePositionCode(unitId, positionNameId, positionCode,type));
+    @PutMapping(value = "/position_code/{positionCodeId}")
+    ResponseEntity<Map<String, Object>> updatePositionCode(@RequestParam("type") String type, @PathVariable Long unitId, @PathVariable long positionCodeId, @RequestBody PositionCode positionCode) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.updatePositionCode(unitId, positionCodeId, positionCode,type));
 
     }
 
     @ApiOperation("Delete PositionCode")
-    @DeleteMapping(value = "/position_code/{positionNameId}")
-    ResponseEntity<Map<String, Object>> deletePositionName(@RequestParam("type") String type,@PathVariable Long unitId,  @PathVariable Long positionNameId) {
+    @DeleteMapping(value = "/position_code/{positionCodeId}")
+    ResponseEntity<Map<String, Object>> deletePositionCode(@RequestParam("type") String type,@PathVariable Long unitId,  @PathVariable Long positionCodeId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.deletePositionCode(unitId,positionNameId,type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.deletePositionCode(unitId,positionCodeId,type));
 
     }
 
     @ApiOperation("Get PositionCode")
-    @GetMapping(value = "/position_code/{positionNameId}")
-    ResponseEntity<Map<String, Object>> getPositionName(@RequestParam("type") String type,@PathVariable Long positionNameId) {
+    @GetMapping(value = "/position_code/{positionCodeId}")
+    ResponseEntity<Map<String, Object>> getPositionCode(@RequestParam("type") String type,@PathVariable Long positionCodeId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.getPositionCode(positionNameId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.getPositionCode(positionCodeId));
 
     }
 
@@ -58,7 +58,7 @@ public class PositionCodeController {
 
     @ApiOperation("Get All PositionCode")
     @GetMapping(value = "/position_code")
-    ResponseEntity<Map<String, Object>> getAllPositionName(@RequestParam("type") String type,@PathVariable Long unitId) {
+    ResponseEntity<Map<String, Object>> getAllPositionCode(@RequestParam("type") String type,@PathVariable Long unitId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.getAllPositionCodes(unitId,type));
 

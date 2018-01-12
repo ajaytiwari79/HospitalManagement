@@ -105,7 +105,6 @@ public class WTAOrganizationService extends UserBaseService {
         workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
         newWta.setParentWTA(oldWta.basicDetails());
         newWta.getExpertise().setCountry(null);
-
         return newWta;
     }
 

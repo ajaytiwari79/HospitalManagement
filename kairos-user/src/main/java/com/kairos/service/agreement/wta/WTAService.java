@@ -415,4 +415,23 @@ public class WTAService extends UserBaseService {
 
     }
 
+    public WorkingTimeAgreement copyWta(WorkingTimeAgreement oldWta, WTADTO updatedWta) {
+        WorkingTimeAgreement newWta = new WorkingTimeAgreement();
+        newWta.setName(oldWta.getName());
+        newWta.setDescription(oldWta.getDescription());
+        if (updatedWta.getStartDateMillis() < System.currentTimeMillis()) {
+            throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
+        }
+        newWta.setStartDateMillis(updatedWta.getStartDateMillis());
+        newWta.setEndDateMillis(updatedWta.getEndDateMillis());
+        newWta.setId(null);
+        List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
+        if (updatedWta.getRuleTemplates().size() > 0) {
+            ruleTemplates = copyRuleTemplate(updatedWta.getRuleTemplates());
+            newWta.setRuleTemplates(ruleTemplates);
+        }
+
+        return newWta;
+
+    }
 }

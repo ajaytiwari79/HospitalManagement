@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 public class UnitEmploymentPositionDTO {
 
     @NotNull(message = "Position code  is required for position") @Range(min = 0,message = "Position code is required for position")
-    private Long positionNameId;
+    private Long positionCodeId;
     @NotNull(message = "expertise is required for position")
     @Range(min = 0,message = "expertise is required for position")
     private Long expertiseId;
@@ -40,28 +40,28 @@ public class UnitEmploymentPositionDTO {
     }
 
 
-    public UnitEmploymentPositionDTO(Long positionNameId, Long expertiseId) {
-        this.positionNameId = positionNameId;
+    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId) {
+        this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
     }
 
 
 
-    public UnitEmploymentPositionDTO(String name, String description, Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours,
+    public UnitEmploymentPositionDTO(String name, String description, Long positionCodeId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours,
                                      float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
         this.salary=salary;
         this.avgDailyWorkingHours =avgDailyWorkingHours;
         this.totalWeeklyHours=totalWeeklyHours;
         this.hourlyWages=hourlyWages;
-        this.positionNameId = positionNameId;
+        this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.employmentTypeId=employmentTypeId;
     }
 
-    public UnitEmploymentPositionDTO(Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
-        this.positionNameId = positionNameId;
+    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
+        this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -82,12 +82,12 @@ public class UnitEmploymentPositionDTO {
         this.workingDaysInWeek = workingDaysInWeek;
     }
 
-    public Long getPositionNameId() {
-        return positionNameId;
+    public Long getPositionCodeId() {
+        return positionCodeId;
     }
 
-    public void setPositionNameId(Long positionNameId) {
-        this.positionNameId = positionNameId;
+    public void setPositionCodeId(Long positionCodeId) {
+        this.positionCodeId = positionCodeId;
     }
 
     public Long getExpertiseId() {

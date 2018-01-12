@@ -15,6 +15,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,22 +42,22 @@ import static org.junit.Assert.*;
 @SpringBootTest(classes = UserServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PositionCodeServiceIntegrationTest {
+    private final Logger logger = LoggerFactory.getLogger(PositionCodeServiceIntegrationTest.class);
     @Value("${server.host.http.url}")
     private String url;
     @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
-    private WTAServiceIntegrationTest wtaServiceIntegrationTest;
+    TestRestTemplate restTemplate;
+
     static private String baseUrlWithCountry;
     static private String baseUrlWithUnit;
     static Long createdId, createdIdDelete, wtaIdForUpdate;
-    static private PositionCode positionCode;
+    static private PositionCode positionCode = null;
     private static final DateFormat df = new SimpleDateFormat(ONLY_DATE);
 
     @Before
     public void setUp() throws Exception {
-        baseUrlWithCountry = wtaServiceIntegrationTest.getBaseUrl(71L, null, 95L);
-        baseUrlWithUnit = wtaServiceIntegrationTest.getBaseUrl(71L, 53L, null);
+        baseUrlWithCountry = getBaseUrl(71L, null, 95L);
+        baseUrlWithUnit = getBaseUrl(71L, 53L, null);
         positionCode = new PositionCode("Doctor" + Math.random(), "hey");
 
 
@@ -89,4 +91,17 @@ public class PositionCodeServiceIntegrationTest {
 
     }
 
+    public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
+        if (organizationId != null && countryId != null) {
+            String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
+                    .append("/country/").append(countryId).toString();
+            return baseUrl;
+        } else if (organizationId != null && unitId != null) {
+            String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
+                    .append("/unit/").append(unitId).toString();
+            return baseUrl;
+        } else {
+            throw new UnsupportedOperationException("organization ID must not be null");
+        }
+    }
 }
