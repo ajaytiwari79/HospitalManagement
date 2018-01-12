@@ -68,9 +68,9 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     void deleteOldCategories(List<Long> ruleTemplateIds);
 
     @Query("MATCH (n:WTABaseRuleTemplate) where id(n)={0}\n" +
-            "Match (n)<-[r:" + HAS_RULE_TEMPLATES + "]-(category:RuleTemplateCategory) detach delete r with n" +
-            "match  (catg::RuleTemplateCategory{deleted:false}) where  catg.ruleTemplateCategoryType='WTA' catg.name={2}" +
-            "create (n)<-[:" + HAS_RULE_TEMPLATES + "]->(catg:RuleTemplateCategory) ")
+            "Match (n)<-[r:" + HAS_RULE_TEMPLATES + "]-(category:RuleTemplateCategory) detach delete r with n \n" +
+            "match  (catg:RuleTemplateCategory{deleted:false}) where  catg.ruleTemplateCategoryType='WTA' AND catg.name=~{2} \n" +
+            "create (n)<-[:" + HAS_RULE_TEMPLATES + "]-(catg) ")
     void deleteCategoryFromTemplate(Long ruleTemplateId, Long previousRuleTemplateCategory, String newRuleTemplateCategory);
 
     @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
