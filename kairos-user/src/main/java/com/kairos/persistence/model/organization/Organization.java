@@ -57,7 +57,6 @@ public class Organization extends UserBaseEntity {
     @EnumString(OrganizationLevel.class)
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
 
-
     private String childLevel;
 
     private String eanNumber;
@@ -70,7 +69,6 @@ public class Organization extends UserBaseEntity {
     private long clientSince;
     private String cvrNumber;
     private String pNumber;
-
 
     private boolean isKairosHub;
     @Relationship(type = KAIROS_STATUS)
