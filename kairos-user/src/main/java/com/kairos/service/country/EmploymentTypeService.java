@@ -6,13 +6,19 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
+
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
+
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
+
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-import com.kairos.persistence.repository.user.position.PositionGraphRepository;
+import com.kairos.persistence.repository.user.position.PositionCodeGraphRepository;
+
+import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
+
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.region.RegionService;
@@ -23,10 +29,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import java.util.*;
+
 
 /**
  * Created by prerna on 2/11/17.
@@ -43,7 +53,7 @@ public class EmploymentTypeService extends UserBaseService {
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
-    private PositionGraphRepository positionGraphRepository;
+    private UnitEmploymentPositionGraphRepository unitEmploymentPositionGraphRepository;
     @Inject
     private RegionService regionService;
     @Inject

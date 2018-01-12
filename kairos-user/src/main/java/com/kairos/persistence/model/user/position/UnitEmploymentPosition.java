@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
-public class Position extends UserBaseEntity {
+public class UnitEmploymentPosition extends UserBaseEntity {
 
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
@@ -30,7 +30,7 @@ public class Position extends UserBaseEntity {
     private WorkingTimeAgreement workingTimeAgreement;
 
     @Relationship(type = HAS_POSITION_NAME)
-    private PositionName positionName;
+    private PositionCode positionCode;
 
     @Relationship(type = BELONGS_TO_STAFF,direction = "INCOMING")
     private Staff staff;
@@ -38,7 +38,7 @@ public class Position extends UserBaseEntity {
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private EmploymentType employmentType;
 
-    private boolean isEnabled = true;
+    private boolean deleted;
     private Long startDate;
     private Long endDate;
     private float totalWeeklyHours;
@@ -52,17 +52,19 @@ public class Position extends UserBaseEntity {
     private EmploymentType employmentType;*/
     private float salary;
 
-    public Position() {
+    public UnitEmploymentPosition() {
     }
 
-    public Position( Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement workingTimeAgreement,
-                    PositionName positionName, String description, Long startDate, Long endDate, Long expiryDate
-                    ,float totalWeeklyHours ,float avgDailyWorkingHours,float hourlyWages,float salary,int workingDaysInWeek) {
+
+    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
+                                  PositionCode positionCode, String description, Long startDate, Long endDate, Long expiryDate
+                    , int totalWeeklyHours , float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
+
 
         this.expertise = expertise;
         this.cta = cta;
         this.workingTimeAgreement = workingTimeAgreement;
-        this.positionName = positionName;
+        this.positionCode = positionCode;
         this.startDate = startDate;
         this.endDate = endDate;
         this.totalWeeklyHours=totalWeeklyHours;
@@ -113,20 +115,20 @@ public class Position extends UserBaseEntity {
         this.salary = salary;
     }
 
-    public PositionName getPositionName() {
-        return positionName;
+    public PositionCode getPositionCode() {
+        return positionCode;
     }
 
-    public void setPositionName(PositionName positionName) {
-        this.positionName = positionName;
+    public void setPositionCode(PositionCode positionCode) {
+        this.positionCode = positionCode;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Expertise getExpertise() {
@@ -185,13 +187,14 @@ public class Position extends UserBaseEntity {
         this.staff = staff;
     }
 
-    public Position(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement workingTimeAgreement, PositionName positionName, Staff staff, boolean isEnabled, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
+
+    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
         this.expertise = expertise;
         this.cta = cta;
         this.workingTimeAgreement = workingTimeAgreement;
-        this.positionName = positionName;
+        this.positionCode = positionCode;
         this.staff = staff;
-        this.isEnabled = isEnabled;
+        this.deleted = deleted;
         this.startDate = startDate;
         this.endDate = endDate;
         this.totalWeeklyHours = totalWeeklyHours;
