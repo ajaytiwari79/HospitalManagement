@@ -321,7 +321,6 @@ public class RuleTemplateService extends UserBaseService {
                 MinimumWeeklyRestPeriodWTATemplate minimumWeeklyRestPeriodWTATemplate = (MinimumWeeklyRestPeriodWTATemplate) oldTemplate;
                 minimumWeeklyRestPeriodWTATemplate.setDescription(templateDTO.getDescription());
                 minimumWeeklyRestPeriodWTATemplate.setContinuousWeekRest(templateDTO.getContinuousWeekRest());
-                oldTemplate.setDisabled(templateDTO.getDisabled());
                 break;
             case TEMPLATE18:
                 ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = (ShortestAndAverageDailyRestWTATemplate) oldTemplate;
@@ -343,7 +342,6 @@ public class RuleTemplateService extends UserBaseService {
                 maximumShiftsInIntervalWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
                 maximumShiftsInIntervalWTATemplate.setShiftsLimit(templateDTO.getShiftsLimit());
                 maximumShiftsInIntervalWTATemplate.setOnlyCompositeShifts(templateDTO.getOnlyCompositeShifts());
-                oldTemplate.setDisabled(templateDTO.getDisabled());
                 break;
             case TEMPLATE20:
                 MaximumSeniorDaysInYearWTATemplate maximumSeniorDaysInYearWTATemplate = (MaximumSeniorDaysInYearWTATemplate) oldTemplate;
