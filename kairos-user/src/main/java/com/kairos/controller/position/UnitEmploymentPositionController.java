@@ -65,8 +65,8 @@ public class UnitEmploymentPositionController {
     * */
     @ApiOperation(value = "Get all positions by organization and staff")
     @RequestMapping(value="/staff/{staffId}/position")
-    ResponseEntity<Map<String, Object>> getAlllUnitEmploymentPositionsOfStaff(@PathVariable Long unitId,@RequestParam("type") String type,@PathVariable Long unitEmploymentId,@PathVariable Long staffId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true, unitEmploymentPositionService.getAlllUnitEmploymentPositionsOfStaff(unitId,unitEmploymentId,staffId,type));
+    ResponseEntity<Map<String, Object>> getAllUnitEmploymentPositionsOfStaff(@PathVariable Long unitId,@RequestParam("type") String type,@PathVariable Long unitEmploymentId,@PathVariable Long staffId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true, unitEmploymentPositionService.getAllUnitEmploymentPositionsOfStaff(unitId,unitEmploymentId,staffId,type));
     }
 
 

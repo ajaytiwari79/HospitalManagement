@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.position;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -11,7 +12,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Created by pawanmandhan on 27/7/17.
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 
@@ -25,8 +26,6 @@ public class PositionCode extends UserBaseEntity {
 
     private String description;
 
-    @JsonIgnore
-    private boolean isEnabled = true;
 
 
     public PositionCode() {
@@ -58,11 +57,4 @@ public class PositionCode extends UserBaseEntity {
         this.description = description;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
 }

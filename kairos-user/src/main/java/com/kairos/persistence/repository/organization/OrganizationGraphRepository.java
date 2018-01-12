@@ -524,7 +524,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("match (n:Organization) where id(n)={0} with n \n" +
             "match (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true})  where org.isKairosHub =false \n" +
 
-            "match (org)-[:" + HAS_POSITION_NAME + "]->(p:PositionName {isDeleted:true}) return p")
+            "match (org)-[:" + HAS_POSITION_NAME + "]->(p:PositionCode {isDeleted:true}) return p")
     List<PositionCode> getPositionCodesOfParentOrganization(Long organizationId);
 
 

@@ -33,7 +33,7 @@ import static com.kairos.constants.AppConstants.TEAM;
 @Service
 
 public class PositionCodeService extends UserBaseService {
-    transient private final Logger logger = LoggerFactory.getLogger(PositionCodeService.class);
+     private final Logger logger = LoggerFactory.getLogger(PositionCodeService.class);
 
 
     @Inject
@@ -46,11 +46,13 @@ public class PositionCodeService extends UserBaseService {
     @Inject
     private TeamService teamService;
 
-    @Inject private OrganizationService organizationService;
-    @Inject private PositionCode positionCode;
+    @Inject
+    private OrganizationService organizationService;
+    @Inject
+    private PositionCode positionCode;
 
     public PositionCode createPositionCode(Long id, PositionCode positionCode, String type) {
-        Long unitId=organizationService.getOrganization(id,type);
+        Long unitId = organizationService.getOrganization(id, type);
         PositionCode position = null;
         String name = "(?i)" + positionCode.getName();
         //check if duplicate
@@ -66,7 +68,6 @@ public class PositionCodeService extends UserBaseService {
         }
 
 
-
         List<PositionCode> positionCodeList = organization.getPositionCodeList();
         positionCodeList = (positionCodeList == null) ? new ArrayList<PositionCode>() : positionCodeList;
         positionCodeList.add(positionCode);
@@ -75,41 +76,6 @@ public class PositionCodeService extends UserBaseService {
 
         return positionCode;
     }
-
-
-    public PositionCode updatePositionName(Long id, Long positionNameId, PositionCode positionCode, String type) {
-        Long unitId=organizationService.getOrganization(id,type);
-        PositionCode oldPositionCode = positionCodeGraphRepository.findOne(positionNameId);
-
-        if (oldPositionCode == null) {
-            return null;
-        }
-
-        //check if new Name already exist
-        if (!(oldPositionCode.getName().equalsIgnoreCase(positionCode.getName())) &&
-                (positionCodeGraphRepository.checkDuplicatePositionCode(unitId, positionCode.getName()) != null)) {
-            throw new DuplicateDataException("PositionCode can't be updated");
-        }
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
-            throw new DataNotFoundByIdException("Organization not found");
-        }
-        if (!organization.isParentOrganization()) {
-            throw new ActionNotPermittedException("Can only update PositionCode in Parent organization");
-        }
-
-        oldPositionCode.setName(positionCode.getName());
-        oldPositionCode.setDescription(positionCode.getDescription());
-        oldPositionCode.setEnabled(positionCode.isEnabled());
-
-        save(oldPositionCode);
-
-        return oldPositionCode;
-    }
-
-
-
-
 
     public PositionCode updatePositionCode(Long id, Long positionNameId, PositionCode positionCode, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
@@ -149,23 +115,12 @@ public class PositionCodeService extends UserBaseService {
         }
 
 
-
-
         positionCode.setDeleted(true);
         save(positionCode);
 
         return true;
     }
 
-
-
-    public PositionCode getPositionName(Long positionId) {
-        return positionCodeGraphRepository.findOne(positionId);
-    }
-
-    public PositionCode getPositionNameByUnitIdAndId(Long unitId, long  positionNameId){
-        return  positionCodeGraphRepository.getPositionCodeByUnitIdAndId(unitId,positionNameId);
-    }
     public List<PositionCode> getAllPositionName(Long id, String type) {
         Long unitId;
         Organization organization = null;
@@ -195,10 +150,6 @@ public class PositionCodeService extends UserBaseService {
 
     public PositionCode getPositionCode(Long positionId) {
         return positionCodeGraphRepository.findOne(positionId);
-    }
-
-    public PositionCode getPositionCodeByUnitIdAndId(Long unitId, long positionNameId) {
-        return positionCodeGraphRepository.getPositionCodeByUnitIdAndId(unitId, positionNameId);
     }
 
     public List<PositionCode> getAllPositionCodes(Long id, String type) {

@@ -38,18 +38,13 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private EmploymentType employmentType;
 
-    private boolean deleted;
     private Long startDate;
     private Long endDate;
     private float totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
-    /*public enum EmploymentType{
-        FULL_TIME,PART_TIME
-    };
 
-    private EmploymentType employmentType;*/
     private float salary;
 
     public UnitEmploymentPosition() {

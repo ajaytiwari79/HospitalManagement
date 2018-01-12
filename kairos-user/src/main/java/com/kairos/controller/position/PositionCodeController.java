@@ -1,5 +1,4 @@
 package com.kairos.controller.position;
-
 import com.kairos.persistence.model.user.position.PositionCode;
 import com.kairos.service.position.PositionCodeService;
 import com.kairos.util.response.ResponseHandler;
@@ -25,8 +24,6 @@ public class PositionCodeController {
 
     @Inject
     private PositionCodeService positionCodeService;
-
-
 
     @ApiOperation("Create PositionCode")
     @PostMapping(value = "/position_code")
