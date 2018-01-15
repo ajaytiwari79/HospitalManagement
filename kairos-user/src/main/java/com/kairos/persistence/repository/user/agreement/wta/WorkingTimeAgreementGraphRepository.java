@@ -48,7 +48,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "RETURN ruleTemplates as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
             "expertises as expertises,wta.creationDate as creationDate,wta.name as name,id(wta) as id"
     )
-    List<WTAWithCountryAndOrganizationTypeDTO> getAllWTAByOrganizationTypeId(long organizationId);
+    List<WTAResponseDTO> getAllWTAByOrganizationTypeId(long organizationId);
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={0} \n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true}) \n" +
@@ -73,7 +73,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "wta.description as description," +
             "wta.name as name," +
             "id(wta) as id")
-    List<WTAWithCountryAndOrganizationTypeDTO> getAllWTAByCountryId(long countryId);
+    List<WTAResponseDTO> getAllWTAByCountryId(long countryId);
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(o:OrganizationType) where id(o)={0} \n" +
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
@@ -88,7 +88,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
             "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id"
     )
-    List<WTAWithCountryAndOrganizationTypeDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId);
+    List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId);
 
     @Query("match(c:Country) where id(c)={0}\n" +
             "match(c)<-[:" + BELONGS_TO + "]-(or:OrganizationType{isEnable:true})\n" +
@@ -143,11 +143,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
             "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id LIMIT 1"
     )
-    WTAWithCountryAndOrganizationTypeDTO getWTAByExpertiseAndCountry(Long expertiseId);
-
-
-    @Query("match(p:Position)-[r:" + HAS_WTA + "]->(w:WorkingTimeAgreement) where Id(p)={0} AND ID(w)={1} delete r")
-    void breakRelationFromOldWTA(Long positionId, Long wtaId);
+    WTAResponseDTO getWTAByExpertiseAndCountry(Long expertiseId);
 
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false,disabled:false})-[:" + HAS_WTA + "]-(organization:Organization) where id(organization)={0}\n" +
@@ -163,16 +159,11 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
             "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id"
     )
-    List<WTAWithCountryAndOrganizationTypeDTO> getWtaByOrganization(Long organizationId);
+    List<WTAResponseDTO> getWtaByOrganization(Long organizationId);
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORGANIZATION + "]->(organization:Organization)" +
             " where id(organization)={1} AND wta.name =~{0} AND id(wta)<>{2} return CASE  WHEN count(wta) >0   THEN true else false end")
     boolean checkUniqueWTANameInOrganization(String name, Long unitId, Long wtaId);
-
-    @Query("match(wta:WorkingTimeAgreement{deleted:false}) where  id(wta)={0} \n" +
-            "match(o:Organization)-[:SUB_TYPE_OF]-(ost:OrganizationType) where id(ost)={1}\n" +
-            "merge(o)-[:HAS_WTA]->(wta)")
-    void linkWTAWithAllOrganizationOfThisSubType(Long wtaId, Long organizationSubTypeId);
 
     @Query("match(organization:Organization)-[r:" + HAS_WTA + "]->(w:WorkingTimeAgreement) where Id(organization)={1} AND ID(w)={0} delete r set w.endDateMillis={2}")
     void removeOldWorkingTimeAgreement(Long wtaId, Long organizationId, Long endDateInMillis);
@@ -194,6 +185,6 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
             "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id"
     )
-    WTAWithCountryAndOrganizationTypeDTO getVersionOfWTA(Long organizationId);
+    WTAResponseDTO getVersionOfWTA(Long organizationId);
 
 }

@@ -14,7 +14,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-public class WTAWithCountryAndOrganizationTypeDTO {
+public class WTAResponseDTO {
 
     private Long startDateMillis;
     private Long endDateMillis;
@@ -28,7 +28,7 @@ public class WTAWithCountryAndOrganizationTypeDTO {
     private List<RuleTemplateCategoryDTO> ruleTemplates;
     private List<Tag> tags;
 
-    public WTAWithCountryAndOrganizationTypeDTO() {
+    public WTAResponseDTO() {
         //default
     }
 

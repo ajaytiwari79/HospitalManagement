@@ -5,7 +5,7 @@ import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
-import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
+import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.util.DateUtil;
@@ -112,10 +112,10 @@ public class WTAServiceIntegrationTest {
 
     @Test
     public void test2_getWtaForCountry() throws Exception {
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAWithCountryAndOrganizationTypeDTO>>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAWithCountryAndOrganizationTypeDTO>>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<List<WTAWithCountryAndOrganizationTypeDTO>>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> response = restTemplate.exchange(
                 baseUrlWithCountry + "/wta/ByCountry",
                 HttpMethod.GET, null, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
@@ -126,10 +126,10 @@ public class WTAServiceIntegrationTest {
 
     @Test
     public void test3_getWtaForOrganization() throws Exception {
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAWithCountryAndOrganizationTypeDTO>>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAWithCountryAndOrganizationTypeDTO>>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<List<WTAWithCountryAndOrganizationTypeDTO>>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> response = restTemplate.exchange(
                 baseUrlWithUnit + "/wta/ByOrganization",
                 HttpMethod.GET, null, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
@@ -190,10 +190,10 @@ public class WTAServiceIntegrationTest {
 
     @Test
     public void test7_getWtaById() throws Exception {
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAWithCountryAndOrganizationTypeDTO>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAWithCountryAndOrganizationTypeDTO>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<WTAWithCountryAndOrganizationTypeDTO>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> response = restTemplate.exchange(
                 baseUrlWithCountry + "/wta/13997",
                 HttpMethod.GET, null, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));

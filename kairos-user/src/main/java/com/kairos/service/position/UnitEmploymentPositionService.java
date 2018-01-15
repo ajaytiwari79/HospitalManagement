@@ -1,16 +1,12 @@
 package com.kairos.service.position;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
-import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
+import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.persistence.model.user.country.EmploymentType;
 
@@ -49,7 +45,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -171,7 +166,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         UnitEmploymentPosition unitEmploymentPosition = new UnitEmploymentPosition();
 
         //String name, String description, Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta
-        /*WTAWithCountryAndOrganizationTypeDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
+        /*WTAResponseDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
 
 
         if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getName()).isPresent()) {
@@ -204,7 +199,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         }*/
         unitEmploymentPosition.setExpertise(expertise.get());
 
-        WTAWithCountryAndOrganizationTypeDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(unitEmploymentPositionDTO.getExpertiseId());
+        WTAResponseDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(unitEmploymentPositionDTO.getExpertiseId());
 
         if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getExpertise()).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Expertize" + unitEmploymentPositionDTO.getExpertiseId());
@@ -250,7 +245,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
     private void preparePosition(UnitEmploymentPosition oldUnitEmploymentPosition, UnitEmploymentPositionDTO unitEmploymentPositionDTO) {
         if (!oldUnitEmploymentPosition.getExpertise().getId().equals(unitEmploymentPositionDTO.getExpertiseId())) {
-            WTAWithCountryAndOrganizationTypeDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(unitEmploymentPositionDTO.getExpertiseId());
+            WTAResponseDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(unitEmploymentPositionDTO.getExpertiseId());
 
             Optional<WorkingTimeAgreement> wta = workingTimeAgreementGraphRepository.findById(unitEmploymentPositionDTO.getWtaId());
             if (!wta.isPresent()) {
@@ -351,7 +346,6 @@ public class UnitEmploymentPositionService extends UserBaseService {
         newWta.setExpertise(oldWta.getExpertise());
         newWta.setParentWTA(oldWta);
         newWta.setDisabled(false);
-        List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         unitEmploymentPosition.setWorkingTimeAgreement(newWta);
         save(unitEmploymentPosition);
         newWta.setParentWTA(oldWta.basicDetails());
@@ -359,16 +353,13 @@ public class UnitEmploymentPositionService extends UserBaseService {
         return newWta;
     }
 
-    public List<WTABaseRuleTemplate> copyRuleTemplate(List<RuleTemplateCategoryDTO> ruleTemplates) {
-        List<WTABaseRuleTemplate> copiedRuleTemplate = new ArrayList<>(ruleTemplates.size());
-        ObjectMapper objectMapper = new ObjectMapper();
-        ruleTemplates.forEach(ruleTemplate -> {
-            WTABaseRuleTemplate wtaBaseRuleTemplateDTO = objectMapper.convertValue(ruleTemplate, WTABaseRuleTemplate.class);
-            wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
-            wtaBaseRuleTemplateDTO.setId(null);
-            copiedRuleTemplate.add(wtaBaseRuleTemplateDTO);
-        });
-        return copiedRuleTemplate;
+    public WorkingTimeAgreement getUnitEmploymentPositionWTA(Long unitId, Long unitEmploymentPositionId) {
+        WorkingTimeAgreement newWta = null;
+        UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
+        if (!Optional.ofNullable(unitEmploymentPosition).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitEmploymentPositionId);
+        }
+        newWta = unitEmploymentPosition.getWorkingTimeAgreement();
+        return newWta;
     }
-
 }
