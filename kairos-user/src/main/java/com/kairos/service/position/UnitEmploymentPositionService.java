@@ -164,17 +164,6 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
     private UnitEmploymentPosition preparePosition(UnitEmploymentPositionDTO unitEmploymentPositionDTO, Organization organization, Long unitId) {
         UnitEmploymentPosition unitEmploymentPosition = new UnitEmploymentPosition();
-
-        //String name, String description, Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta
-        /*WTAResponseDTO wtaWithRuleTemplateDTO = workingTimeAgreementGraphRepository.getWTAByExpertiseAndCountry(positionDTO.getExpertiseId());
-
-
-        if (!Optional.ofNullable(wtaWithRuleTemplateDTO.getName()).isPresent()) {
-            logger.info("Expertise Doesn't contains WTA.Please select different Expertise" + positionDTO.getExpertiseId());
-            throw new DataNotFoundByIdException("Expertise Doesn't contains WTA.Please select different Expertise");
-        }
-        WorkingTimeAgreement wta = copyWTASettingAndRuleTemplateWithCategory(wtaWithRuleTemplateDTO);*/
-
         Optional<WorkingTimeAgreement> wta = workingTimeAgreementGraphRepository.findById(unitEmploymentPositionDTO.getWtaId());
         if (!wta.isPresent()) {
             throw new DataNotFoundByIdException("Invalid wta id ");
@@ -230,8 +219,15 @@ public class UnitEmploymentPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Staff Id" + unitEmploymentPositionDTO.getStaffId());
         }
         unitEmploymentPosition.setStaff(staff);
-        unitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDate());
-        unitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDate());
+
+        if (unitEmploymentPosition.getStartDateMillis() < System.currentTimeMillis()) {
+            throw new ActionNotPermittedException("Start date can't be less than current Date ");
+        }
+        unitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
+        if (unitEmploymentPosition.getStartDateMillis() < unitEmploymentPositionDTO.getEndDateMillis()) {
+            throw new ActionNotPermittedException("Start date can't be less than End Date ");
+        }
+        unitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
 
         unitEmploymentPosition.setTotalWeeklyHours(unitEmploymentPositionDTO.getTotalWeeklyHours());
         unitEmploymentPosition.setAvgDailyWorkingHours(unitEmploymentPositionDTO.getAvgDailyWorkingHours());
@@ -293,8 +289,8 @@ public class UnitEmploymentPositionService extends UserBaseService {
             }
 
 
-            oldUnitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDate());
-            oldUnitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDate());
+            oldUnitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
+            oldUnitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
             oldUnitEmploymentPosition.setWorkingDaysInWeek(unitEmploymentPositionDTO.getWorkingDaysInWeek());
             oldUnitEmploymentPosition.setTotalWeeklyHours(unitEmploymentPositionDTO.getTotalWeeklyHours());
             oldUnitEmploymentPosition.setAvgDailyWorkingHours(unitEmploymentPositionDTO.getAvgDailyWorkingHours());
