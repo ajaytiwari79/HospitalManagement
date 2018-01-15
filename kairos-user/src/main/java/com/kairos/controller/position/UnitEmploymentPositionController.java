@@ -50,7 +50,7 @@ public class UnitEmploymentPositionController {
     }
 
     @ApiOperation(value = "get Position's WTA")
-    @PutMapping(value = "/position/{unitEmploymentPositionId}/wta")
+    @GetMapping(value = "/position/{unitEmploymentPositionId}/wta")
     public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionWTA(@PathVariable Long unitEmploymentPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getUnitEmploymentPositionWTA(unitId, unitEmploymentPositionId));
     }

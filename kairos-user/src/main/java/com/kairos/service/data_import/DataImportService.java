@@ -147,7 +147,7 @@ public class DataImportService {
                                         LocalDateTime startDate = DateUtil.getMondayFromWeek(Integer.parseInt(firstRecoredValues[1]),Integer.parseInt(firstRecoredValues[0]));
                                         LocalDateTime endDate = DateUtil.getSundayFromWeek(Integer.parseInt(lastRecoredValues[1]),Integer.parseInt(lastRecoredValues[0]));
                                         taskDemand.setStartDateMillis(Date.from(startDate.atZone(ZoneId.systemDefault()).toInstant()));
-                                        taskDemand.setEndDate(Date.from(endDate.atZone(ZoneId.systemDefault()).toInstant()));
+                                        taskDemand.setEndDateMillis(Date.from(endDate.atZone(ZoneId.systemDefault()).toInstant()));
                                     }
                                     taskDemand.setUnitId(organization.getId());
                                     taskDemand.setWeekdayFrequency(TaskDemand.WeekFrequency.FOUR_WEEK);
@@ -739,7 +739,7 @@ public class DataImportService {
                         LocalDateTime startDate = DateUtil.getMondayFromWeek(Integer.parseInt(firstRecoredValues[1]),Integer.parseInt(firstRecoredValues[0]));
                         LocalDateTime endDate = DateUtil.getSundayFromWeek(Integer.parseInt(lastRecoredValues[1]),Integer.parseInt(lastRecoredValues[0]));
                         taskDemand.setStartDateMillis(Date.from(startDate.atZone(ZoneId.systemDefault()).toInstant()));
-                        taskDemand.setEndDate(Date.from(endDate.atZone(ZoneId.systemDefault()).toInstant()));
+                        taskDemand.setEndDateMillis(Date.from(endDate.atZone(ZoneId.systemDefault()).toInstant()));
                     }
                     taskDemand.setUnitId(organization.getId());
                     taskDemand.setWeekdayFrequency(TaskDemand.WeekFrequency.FOUR_WEEK);

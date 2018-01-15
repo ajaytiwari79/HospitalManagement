@@ -20,9 +20,9 @@ public class UnitEmploymentPositionQueryResult {
     private Expertise expertise;
     @JsonIgnore
     private boolean deleted;
-    private Long startDate;
+    private Long startDateMillis;
     private int workingDaysInWeek;
-    private Long endDate;
+    private Long endDateMillis;
     private Long lastModificationDate;
     private float totalWeeklyHours;
     private float avgDailyWorkingHours;
@@ -59,20 +59,20 @@ public class UnitEmploymentPositionQueryResult {
         this.deleted = deleted;
     }
 
-    public Long getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public float getTotalWeeklyHours() {
@@ -159,11 +159,11 @@ public class UnitEmploymentPositionQueryResult {
         //default cons
     }
 
-    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDate, int workingDaysInWeek, Long endDate, float totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
+    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, float totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
         this.expertise = expertise;
-        this.startDate = startDate;
+        this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;
-        this.endDate = endDate;
+        this.endDateMillis = endDateMillis;
         this.totalWeeklyHours = totalWeeklyHours;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.hourlyWages = hourlyWages;

@@ -230,8 +230,8 @@ public class UnitEmploymentPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Staff Id" + unitEmploymentPositionDTO.getStaffId());
         }
         unitEmploymentPosition.setStaff(staff);
-        unitEmploymentPosition.setStartDate(unitEmploymentPositionDTO.getStartDate());
-        unitEmploymentPosition.setEndDate(unitEmploymentPositionDTO.getEndDate());
+        unitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDate());
+        unitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDate());
 
         unitEmploymentPosition.setTotalWeeklyHours(unitEmploymentPositionDTO.getTotalWeeklyHours());
         unitEmploymentPosition.setAvgDailyWorkingHours(unitEmploymentPositionDTO.getAvgDailyWorkingHours());
@@ -293,8 +293,8 @@ public class UnitEmploymentPositionService extends UserBaseService {
             }
 
 
-            oldUnitEmploymentPosition.setStartDate(unitEmploymentPositionDTO.getStartDate());
-            oldUnitEmploymentPosition.setEndDate(unitEmploymentPositionDTO.getEndDate());
+            oldUnitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDate());
+            oldUnitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDate());
             oldUnitEmploymentPosition.setWorkingDaysInWeek(unitEmploymentPositionDTO.getWorkingDaysInWeek());
             oldUnitEmploymentPosition.setTotalWeeklyHours(unitEmploymentPositionDTO.getTotalWeeklyHours());
             oldUnitEmploymentPosition.setAvgDailyWorkingHours(unitEmploymentPositionDTO.getAvgDailyWorkingHours());
@@ -342,6 +342,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
             logger.info("Expertise cant be changed :", wtaId);
             throw new ActionNotPermittedException("Expertise can't be changed");
         }
+        logger.info(updateDTO.getName());
         newWta = wtaService.copyWta(oldWta, updateDTO);
         newWta.setExpertise(oldWta.getExpertise());
         newWta.setParentWTA(oldWta);
@@ -353,13 +354,12 @@ public class UnitEmploymentPositionService extends UserBaseService {
         return newWta;
     }
 
-    public WorkingTimeAgreement getUnitEmploymentPositionWTA(Long unitId, Long unitEmploymentPositionId) {
-        WorkingTimeAgreement newWta = null;
+    public WTAResponseDTO getUnitEmploymentPositionWTA(Long unitId, Long unitEmploymentPositionId) {
         UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
         if (!Optional.ofNullable(unitEmploymentPosition).isPresent()) {
             throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitEmploymentPositionId);
         }
-        newWta = unitEmploymentPosition.getWorkingTimeAgreement();
-        return newWta;
+        WTAResponseDTO workingTimeAgreement = workingTimeAgreementGraphRepository.findWtaByUnitEmploymentPosition(unitEmploymentPositionId);
+        return workingTimeAgreement;
     }
 }

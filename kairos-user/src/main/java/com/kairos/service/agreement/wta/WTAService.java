@@ -416,8 +416,8 @@ public class WTAService extends UserBaseService {
 
     public WorkingTimeAgreement copyWta(WorkingTimeAgreement oldWta, WTADTO updatedWta) {
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
-        newWta.setName(oldWta.getName());
-        newWta.setDescription(oldWta.getDescription());
+        newWta.setName(updatedWta.getName());
+        newWta.setDescription(updatedWta.getDescription());
         if (updatedWta.getStartDateMillis() < System.currentTimeMillis()) {
             throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
         }

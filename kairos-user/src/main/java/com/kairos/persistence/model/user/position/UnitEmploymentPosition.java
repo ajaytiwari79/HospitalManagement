@@ -38,8 +38,8 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private EmploymentType employmentType;
 
-    private Long startDate;
-    private Long endDate;
+    private Long startDateMillis;
+    private Long endDateMillis;
     private float totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
@@ -52,7 +52,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
 
 
     public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
-                                  PositionCode positionCode, String description, Long startDate, Long endDate, Long expiryDate
+                                  PositionCode positionCode, String description, Long startDateMillis, Long endDateMillis, Long expiryDate
             , int totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
 
 
@@ -60,8 +60,8 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.cta = cta;
         this.workingTimeAgreement = workingTimeAgreement;
         this.positionCode = positionCode;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
         this.totalWeeklyHours = totalWeeklyHours;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.salary = salary;
@@ -150,20 +150,20 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 
-    public Long getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public EmploymentType getEmploymentType() {
@@ -183,15 +183,15 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     }
 
 
-    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
+    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
         this.expertise = expertise;
         this.cta = cta;
         this.workingTimeAgreement = workingTimeAgreement;
         this.positionCode = positionCode;
         this.staff = staff;
         this.deleted = deleted;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
         this.totalWeeklyHours = totalWeeklyHours;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.workingDaysInWeek = workingDaysInWeek;
@@ -202,7 +202,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
 
 
     public UnitEmploymentPositionQueryResult getBasicDetails() {
-        UnitEmploymentPositionQueryResult result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDate, this.workingDaysInWeek, this.endDate, this.totalWeeklyHours,
+        UnitEmploymentPositionQueryResult result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek, this.endDateMillis, this.totalWeeklyHours,
                 this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode, this.workingTimeAgreement.basicDetails(), this.cta);
         return result;
     }
