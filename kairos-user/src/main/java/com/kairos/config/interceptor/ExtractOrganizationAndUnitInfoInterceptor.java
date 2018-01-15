@@ -29,14 +29,14 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
        final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-        String orgIdStirng=pathVariables.get("organizationId");
+        String orgIdString=pathVariables.get("organizationId");
         String unitIdString=pathVariables.get("unitId");
         log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI()+"[ orgainzationID ,Unit Id " +orgIdStirng+" ,"+unitIdString+" ]") ;
+                + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]") ;
 
 
-        if(orgIdStirng!=null){
-            final Long orgId = Long.valueOf(orgIdStirng);
+        if(orgIdString!=null){
+            final Long orgId = Long.valueOf(orgIdString);
             UserContext.setOrgId(orgId);
         }
         if(unitIdString!=null){

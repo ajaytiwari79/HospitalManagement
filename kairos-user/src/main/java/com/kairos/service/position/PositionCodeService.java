@@ -53,7 +53,7 @@ public class PositionCodeService extends UserBaseService {
     public PositionCode createPositionCode(Long id, PositionCode positionCode, String type) {
         Long unitId = organizationService.getOrganization(id, type);
         PositionCode position = null;
-        String name = "(?i)" + positionCode.getName();
+        String name = "(?i)" + positionCode.getName().trim();
         //check if duplicate
         position = positionCodeGraphRepository.checkDuplicatePositionCode(unitId, name);
         if (position != null) {

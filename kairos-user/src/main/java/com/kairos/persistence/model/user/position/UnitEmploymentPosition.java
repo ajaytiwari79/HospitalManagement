@@ -32,7 +32,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     @Relationship(type = HAS_POSITION_CODE)
     private PositionCode positionCode;
 
-    @Relationship(type = BELONGS_TO_STAFF,direction = "INCOMING")
+    @Relationship(type = BELONGS_TO_STAFF, direction = "INCOMING")
     private Staff staff;
 
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
@@ -53,7 +53,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
 
     public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
                                   PositionCode positionCode, String description, Long startDate, Long endDate, Long expiryDate
-                    , int totalWeeklyHours , float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
+            , int totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
 
 
         this.expertise = expertise;
@@ -62,11 +62,11 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.positionCode = positionCode;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.totalWeeklyHours=totalWeeklyHours;
-        this.avgDailyWorkingHours =avgDailyWorkingHours;
-        this.salary=salary;
-        this.hourlyWages=hourlyWages;
-        this.workingDaysInWeek=workingDaysInWeek;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.salary = salary;
+        this.hourlyWages = hourlyWages;
+        this.workingDaysInWeek = workingDaysInWeek;
     }
 
 
@@ -198,5 +198,12 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.hourlyWages = hourlyWages;
         this.employmentType = employmentType;
         this.salary = salary;
+    }
+
+
+    public UnitEmploymentPositionQueryResult getBasicDetails() {
+        UnitEmploymentPositionQueryResult result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDate, this.workingDaysInWeek, this.endDate, this.totalWeeklyHours,
+                this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode, this.workingTimeAgreement.basicDetails(), this.cta);
+        return result;
     }
 }

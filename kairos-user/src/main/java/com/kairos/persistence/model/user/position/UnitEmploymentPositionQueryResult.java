@@ -19,7 +19,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 public class UnitEmploymentPositionQueryResult {
     private Expertise expertise;
     @JsonIgnore
-    private boolean deleted ;
+    private boolean deleted;
     private Long startDate;
     private int workingDaysInWeek;
     private Long endDate;
@@ -152,6 +152,26 @@ public class UnitEmploymentPositionQueryResult {
     }
 
     public void setCostTimeAgreement(CostTimeAgreement costTimeAgreement) {
+        this.costTimeAgreement = costTimeAgreement;
+    }
+
+    public UnitEmploymentPositionQueryResult() {
+        //default cons
+    }
+
+    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDate, int workingDaysInWeek, Long endDate, float totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
+        this.expertise = expertise;
+        this.startDate = startDate;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.endDate = endDate;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.hourlyWages = hourlyWages;
+        this.id = id;
+        this.employmentType = employmentType;
+        this.salary = salary;
+        this.positionCode = positionCode;
+        this.workingTimeAgreement = workingTimeAgreement;
         this.costTimeAgreement = costTimeAgreement;
     }
 }

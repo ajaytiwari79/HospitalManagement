@@ -16,10 +16,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 public interface PositionCodeGraphRepository extends Neo4jBaseRepository<PositionCode,Long> {
 
 
-    @Query("MATCH (o:Organization)-[:"+ HAS_POSITION_CODE +"]->(pn:PositionCode{ isDeleted:true }) WHERE id(o)={0} AND pn.name=~ {1} return pn ")
+    @Query("MATCH (o:Organization)-[:"+ HAS_POSITION_CODE +"]->(pn:PositionCode{deleted:false}) WHERE id(o)={0} AND pn.name=~{1} return pn ")
     PositionCode checkDuplicatePositionCode(long orgId, String positionCode);
 
-    @Query("MATCH (o:Organization)-[:"+ HAS_POSITION_CODE +"]->(pn:PositionCode{ isDeleted:true }) WHERE id(o)={0} AND id(pn)= {1} return pn ")
+    @Query("MATCH (o:Organization)-[:"+ HAS_POSITION_CODE +"]->(pn:PositionCode{deleted:false}) WHERE id(o)={0} AND id(pn)= {1} return pn ")
     PositionCode getPositionCodeByUnitIdAndId(long orgId, long positionCodeId);
 
 

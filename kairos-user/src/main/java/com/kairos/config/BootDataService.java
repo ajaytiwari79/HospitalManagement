@@ -274,7 +274,7 @@ public class BootDataService {
         }
          createCTARuleTemplateCategory();
             startRegisteredCronJobs();
-            createEquipmentCategories();
+         //   createEquipmentCategories();
 
     }
 

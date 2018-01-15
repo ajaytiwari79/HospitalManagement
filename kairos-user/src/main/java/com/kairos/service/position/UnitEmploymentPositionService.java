@@ -89,7 +89,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
     private ClientGraphRepository clientGraphRepository;
 
 
-    public UnitEmploymentPosition createUnitEmploymentPosition(Long id, long unitEmploymentId, UnitEmploymentPositionDTO unitEmploymentPositionDTO, String type) {
+    public UnitEmploymentPositionQueryResult createUnitEmploymentPosition(Long id, long unitEmploymentId, UnitEmploymentPositionDTO unitEmploymentPositionDTO, String type) {
         UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
         if (!Optional.ofNullable(unitEmployment).isPresent()) {
             throw new DataNotFoundByIdException("Invalid UnitEmployment id" + unitEmploymentId);
@@ -106,8 +106,8 @@ public class UnitEmploymentPositionService extends UserBaseService {
         unitEmploymentPositions.add(unitEmploymentPosition);
         unitEmployment.setUnitEmploymentPositions(unitEmploymentPositions);
         save(unitEmployment);
-        unitEmploymentPosition.setStaff(null);
-        return unitEmploymentPosition;
+        UnitEmploymentPositionQueryResult unitEmploymentPositionQueryResult = unitEmploymentPosition.getBasicDetails();
+        return unitEmploymentPositionQueryResult;
     }
 
 

@@ -86,6 +86,7 @@ public class PositionCodeServiceIntegrationTest {
 
     }
 
+
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
