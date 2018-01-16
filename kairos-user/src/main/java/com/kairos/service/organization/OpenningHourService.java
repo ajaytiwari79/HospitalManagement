@@ -1,6 +1,8 @@
 package com.kairos.service.organization;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.organization.OpeningHours;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationSetting;
 import com.kairos.persistence.repository.organization.OpeningHourGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -9,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by prabjot on 6/4/17.
@@ -82,5 +81,17 @@ public class OpenningHourService {
         return null;
     }
 
+
+    public boolean setDefaultOpeningHours(long unitId) {
+        Organization unit = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new DataNotFoundByIdException("Incorrect unit id ");
+        }
+        OrganizationSetting organizationSetting = getDefaultSettings();
+        unit.setOrganizationSetting(organizationSetting);
+
+        organizationGraphRepository.save(unit);
+        return true;
+    }
 
 }
