@@ -82,12 +82,16 @@ public class CostTimeAgreementService extends UserBaseService {
         RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
                 .findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
         Currency currency = currencyService.getCurrencyByCountryId(countryId);
+        List<CTARuleTemplate> ctaRuleTemplates = new ArrayList<>();
         if (category != null) {
             Arrays.stream(CTARuleTemplateType.values()).forEach(cTARuleTemplate -> {
                 CTARuleTemplate ctaRuleTemplate = createRuleTemplate(cTARuleTemplate, currency);
                 category.addRuleTemplate(ctaRuleTemplate);
+                ctaRuleTemplates.add(ctaRuleTemplate);
             });
-
+            Country country = countryGraphRepository.findOne(countryId);
+            country.setCtaRuleTemplates(ctaRuleTemplates);
+            countryGraphRepository.save(country);
             this.save(category);
         } else {
             logger.info("default CTARuleTemplateCategory is not exist");
@@ -176,7 +180,6 @@ public class CostTimeAgreementService extends UserBaseService {
         ctaRuleTemplate.setBudgetType(BudgetType.ACTIVITY_COST);
         ctaRuleTemplate.setActivityType(new ActivityType());
         ctaRuleTemplate.setPlanningCategory(PlanningCategory.DEVIATION_FROM_PLANNED);
-
         ctaRuleTemplate.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
         ctaRuleTemplate.setPlannedTimeWithFactor(PlannedTimeWithFactor.buildPlannedTimeWithFactor(10,true,AccountType.DUTYTIME_ACCOUNT));
         return ctaRuleTemplate;
@@ -193,7 +196,7 @@ public class CostTimeAgreementService extends UserBaseService {
         List<Long> ruleTemplateCategoryIds = ctaRuleTemplateCategoryList.parallelStream().map(RuleTemplateCategory::getId)
                 .collect(Collectors.toList());
 
-        List<CTARuleTemplateQueryResult> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndDeletedFalse(ruleTemplateCategoryIds);
+        List<CTARuleTemplateQueryResult> ruleTemplates=ctaRuleTemplateGraphRepository.findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(ruleTemplateCategoryIds,countryId);
         CTARuleTemplateCategoryWrapper ctaRuleTemplateCategoryWrapper=new CTARuleTemplateCategoryWrapper();
         ctaRuleTemplateCategoryWrapper.getRuleTemplateCategories().addAll(ctaRuleTemplateCategoryList);
         ctaRuleTemplateCategoryWrapper.setRuleTemplates(ruleTemplates);
@@ -325,7 +328,7 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO){
-        for (CTARuleTemplateDayType ctaRuleTemplateDayType : ctaRuleTemplate.getCalculateOnDayTypes()) {
+        /*for (CTARuleTemplateDayType ctaRuleTemplateDayType : ctaRuleTemplate.getCalculateOnDayTypes()) {
 
             DayType dayType = dayTypeGraphRepository.findOne(ctaRuleTemplateDayType.getDayType().getId());
             List<Long> countryHolidayCalendarIds = new ArrayList<>();
@@ -335,7 +338,7 @@ public class CostTimeAgreementService extends UserBaseService {
             List<CountryHolidayCalender> countryHolidayCalenders = countryHolidayCalenderGraphRepository.getCountryHolidayCalendarsById(countryHolidayCalendarIds);
             ctaRuleTemplateDayType.setDayType(dayTypeGraphRepository.findOne(ctaRuleTemplateDayType.getDayType().getId()));
             ctaRuleTemplateDayType.setCountryHolidayCalenders(countryHolidayCalenders);
-        }
+        }*/
 
         // Fetch Access Group
 //        List<Long> accessGroupIds = ctaRuleTemplateDTO.getCalculateValueIfPlanned();
@@ -396,7 +399,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
         // Get Organization Sub Type
         Callable<Optional<OrganizationType>> OrganizationSubTypesListCallable=()->{
-            Optional<OrganizationType> organizationType=organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationSubType(),0);
+            Optional<OrganizationType> organizationType=organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationSubType());
             return  organizationType;
         };
         Future<Optional<OrganizationType>>organizationSubTypesFuture=asynchronousService.executeAsynchronously(OrganizationSubTypesListCallable);

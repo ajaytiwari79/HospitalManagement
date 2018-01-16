@@ -24,27 +24,28 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class CTARuleTemplate extends RuleTemplate{
 
     private CTARuleTemplateType ruleTemplateType;
-    private String payrollType;
-    private String payrollSystem;
-    private CalculationUnit calculationUnit;
+    private String payrollType; //Ok
+    private String payrollSystem; //Ok
+    private CalculationUnit calculationUnit; //OK
     @Relationship(type = HAS_COMPENSATION_TABLE)
-    private CompensationTable compensationTable;
+    private CompensationTable compensationTable; // Its clear need to save array to fetch value index based
     @Relationship(type = BELONGS_TO)
     private CalculateValueAgainst calculateValueAgainst;
-    private ApprovalWorkFlow approvalWorkFlow;
+    private ApprovalWorkFlow approvalWorkFlow; // Why needs to get approval
     @Relationship(type = BELONGS_TO)
-    List<CTARuleTemplateDayType>calculateOnDayTypes=new ArrayList<>();
+    List<CTARuleTemplateDayType>calculateOnDayTypes=new ArrayList<>(); // Need to confirm, Can have different values for dayType and countryHoliday
     @Relationship(type = BELONGS_TO)
-    private List<CTARuleTemplatePhaseInfo>phaseInfo=new ArrayList<>();
+    private List<CTARuleTemplatePhaseInfo>phaseInfo=new ArrayList<>(); //Query beforeStart
     private BudgetType budgetType;
     /*@Relationship(type = HAS_ACCESS_GROUP)
     private List<AccessGroup> calculateValueIfPlanned=new ArrayList<>();*/
 
     private List<CalculateValueIfPlanned> calculateValueIfPlanned=new ArrayList<>();
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
-    private List<EmploymentType> employmentTypes=new ArrayList<>();
+
+    private List<EmploymentType> employmentTypes=new ArrayList<>(); //OK
     @Relationship(type = BELONGS_TO)
-    private ActivityType activityType;
+    private ActivityType activityType;  // Remove it, No need to configure activity/activityType when we are having time type
     private PlanningCategory planningCategory;
     private List<StaffFunction> staffFunctions=new ArrayList<>();
     @Relationship(type = BELONGS_TO)
@@ -252,7 +253,7 @@ public class CTARuleTemplate extends RuleTemplate{
 
     public void setCreatedBy(User createdBy) {
         if(this.getId()!=null)
-        throw new UnsupportedOperationException("can't modified this property");
+            throw new UnsupportedOperationException("can't modified this property");
         this.createdBy = createdBy;
     }
 
