@@ -176,7 +176,7 @@ public class OrganizationService extends UserBaseService {
     private WTAService wtaService;
 
     public Organization getOrganizationById(long id) {
-        return organizationGraphRepository.findOne(id, 0);
+        return organizationGraphRepository.findOne(id);
     }
 
     public boolean showCountryTagForOrganization(long id) {
