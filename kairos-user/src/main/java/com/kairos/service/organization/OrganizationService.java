@@ -540,6 +540,9 @@ public class OrganizationService extends UserBaseService {
         linkWTAToOrganization(allWtaCopy, allWta);
         unit.setWorkingTimeAgreements(allWtaCopy);
 
+        //Assign Parent Organization's level to unit
+        unit.setLevel(parent.getLevel());
+
         organizationGraphRepository.save(unit);
 
     //    phaseRestClient.createDefaultPhases(unit.getId());
