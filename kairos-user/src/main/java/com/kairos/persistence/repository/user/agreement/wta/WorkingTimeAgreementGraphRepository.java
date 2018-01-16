@@ -165,7 +165,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             " where id(organization)={1} AND wta.name =~{0} AND id(wta)<>{2} return CASE  WHEN count(wta) >0   THEN true else false end")
     boolean checkUniqueWTANameInOrganization(String name, Long unitId, Long wtaId);
 
-    @Query("match(organization:Organization)-[r:" + HAS_WTA + "]->(w:WorkingTimeAgreement) where Id(organization)={1} AND ID(w)={0} delete r set w.endDateMillis={2}")
+    @Query("match(organization:Organization)-[r:" + HAS_WTA + "]-(w:WorkingTimeAgreement) where Id(organization)={1} AND ID(w)={0} detach delete r set w.endDateMillis={2}")
     void removeOldWorkingTimeAgreement(Long wtaId, Long organizationId, Long endDateInMillis);
 
     @Query("match (countryWta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(countryWta)={1} \n" +

@@ -27,6 +27,7 @@ public class WTAResponseDTO {
     private OrganizationType organizationSubType;//
     private List<RuleTemplateCategoryDTO> ruleTemplates;
     private List<Tag> tags;
+    private WTAResponseDTO parentWTA;
 
     public WTAResponseDTO() {
         //default
@@ -117,6 +118,25 @@ public class WTAResponseDTO {
     }
 
     public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public WTAResponseDTO getParentWTA() {
+        return parentWTA;
+    }
+
+    public void setParentWTA(WTAResponseDTO parentWTA) {
+        this.parentWTA = parentWTA;
+    }
+
+    public WTAResponseDTO(Long startDateMillis, Long endDateMillis, String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<Tag> tags) {
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.name = name;
+        this.description = description;
+        this.expertise = expertise;
+        this.organizationType = organizationType;
+        this.organizationSubType = organizationSubType;
         this.tags = tags;
     }
 }

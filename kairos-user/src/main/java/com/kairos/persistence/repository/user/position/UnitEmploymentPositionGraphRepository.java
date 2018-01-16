@@ -31,8 +31,8 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "return e as expertise,wta as workingTimeAgreement,cta as costTimeAgreement," +
             "pn as positionCode," +
             "unitEmpPosition.totalWeeklyHours as totalWeeklyHours," +
-            "unitEmpPosition.startDate as startDate," +
-            "unitEmpPosition.endDate as endDate," +
+            "unitEmpPosition.startDateMillis as startDateMillis," +
+            "unitEmpPosition.endDateMillis as endDateMillis," +
             "unitEmpPosition.salary as salary," +
             "unitEmpPosition.workingDaysInWeek as workingDaysInWeek," +
             "et as employmentType," +
@@ -51,8 +51,8 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "return expertise as expertise," +
             "positionCode as positionCode," +
             "unitEmpPosition.totalWeeklyHours as totalWeeklyHours," +
-            "unitEmpPosition.startDate as startDate," +
-            "unitEmpPosition.endDate as endDate," +
+            "unitEmpPosition.startDateMillis as startDateMillis," +
+            "unitEmpPosition.endDateMillis as endDateMillis," +
             "unitEmpPosition.salary as salary," +
             "unitEmpPosition.workingDaysInWeek as workingDaysInWeek," +
             "employmentType as employmentType," +

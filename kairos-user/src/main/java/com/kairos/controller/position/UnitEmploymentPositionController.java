@@ -49,6 +49,13 @@ public class UnitEmploymentPositionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.updateUnitEmploymentPositionWTA(unitId, unitEmploymentPositionId, wtaId, wtadto));
     }
 
+    @ApiOperation(value = "Get cta and wta by expertise for position creation")
+    @RequestMapping(value="/position/expertise/{expertiseId}/cta_wta")
+    ResponseEntity<Map<String,Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId,@PathVariable Long expertiseId){
+
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,unitEmploymentPositionService.getCtaAndWtaByExpertiseId(unitId,expertiseId));
+    }
+
     @ApiOperation(value = "get Position's WTA")
     @GetMapping(value = "/position/{unitEmploymentPositionId}/wta")
     public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionWTA(@PathVariable Long unitEmploymentPositionId, @PathVariable Long unitId) {

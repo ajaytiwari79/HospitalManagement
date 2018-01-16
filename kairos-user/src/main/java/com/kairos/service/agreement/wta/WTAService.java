@@ -82,7 +82,7 @@ public class WTAService extends UserBaseService {
      * @return
      * @Author Vipul
      */
-    public WorkingTimeAgreement createWta(long countryId, WTADTO wtaDTO) {
+    public WTAResponseDTO createWta(long countryId, WTADTO wtaDTO) {
         Country country = countryRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country id " + countryId);
@@ -102,14 +102,14 @@ public class WTAService extends UserBaseService {
         wta = prepareWtaWhileCreate(countryId, wtaDTO);
         wta.setCountry(country);
         save(wta);
+        WTAResponseDTO wtaResponseDTO = wta.retriveBasicResponse();
+        wtaResponseDTO.setId(wta.getId());
         // Adding this wta to all organization type
 
         assignWTAToOrganization(wta, wtaDTO.getOrganizationSubType());
         // setting basic details
-        wta.setOrganizationType(wta.getOrganizationType().basicDetails());
-        wta.setOrganizationSubType(wta.getOrganizationSubType().basicDetails());
-        wta.getExpertise().setCountry(null);
-        return wta;
+
+        return wtaResponseDTO;
     }
 
     @Async
@@ -203,11 +203,9 @@ public class WTAService extends UserBaseService {
         Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? DateUtil.getCurrentDate().getTime() : wtaDTO.getStartDateMillis();
         wta.setStartDateMillis(dateInMillies);
 
-        wta.setStartDateMillis(dateInMillies);
         if (wtaDTO.getEndDateMillis() != null && wtaDTO.getEndDateMillis() > 0) {
             if (dateInMillies > wtaDTO.getEndDateMillis()) {
                 throw new InvalidRequestException("End Date must not be greater than start date");
-
             }
             wta.setEndDateMillis(wtaDTO.getEndDateMillis());
         }
@@ -226,7 +224,7 @@ public class WTAService extends UserBaseService {
     }
 
     // FOR COUNTRY
-    public WorkingTimeAgreement updateWtaOfCountry(Long countryId, Long wtaId, WTADTO updateDTO) {
+    public WTAResponseDTO updateWtaOfCountry(Long countryId, Long wtaId, WTADTO updateDTO) {
         WorkingTimeAgreement oldWta = wtaRepository.findOne(wtaId, 2);
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating at unit %d", wtaId);
@@ -242,17 +240,16 @@ public class WTAService extends UserBaseService {
         newWta = prepareWtaWhileUpdate(oldWta, updateDTO, countryId);
         newWta.setCountry(oldWta.getCountry());
         save(newWta);
+        WTAResponseDTO wtaResponseDTO = newWta.retriveBasicResponse();
+        wtaResponseDTO.setId(newWta.getId());
+        wtaResponseDTO.setParentWTA(oldWta.retriveBasicResponse());
         assignUpdatedWTAToOrganization(newWta, updateDTO.getOrganizationSubType(), oldWta.getId());
-        newWta.setOrganizationType(oldWta.getOrganizationType().basicDetails());
-        newWta.setOrganizationSubType(oldWta.getOrganizationSubType().basicDetails());
-        newWta.getExpertise().setCountry(null);
-
         oldWta.setCountry(null);
         oldWta.setOrganizationType(null);
         oldWta.setOrganizationSubType(null);
         save(oldWta);
 
-        return newWta;
+        return wtaResponseDTO;
     }
 
     private WorkingTimeAgreement prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO, Long countryId) {
@@ -265,7 +262,7 @@ public class WTAService extends UserBaseService {
         oldWta.setEndDateMillis(updateDTO.getStartDateMillis());
         newWta.setStartDateMillis(updateDTO.getStartDateMillis());
         newWta.setEndDateMillis(updateDTO.getEndDateMillis());
-        if (oldWta.getExpertise().getId() != updateDTO.getExpertiseId()) {
+        if (!oldWta.getExpertise().getId().equals(updateDTO.getExpertiseId())) {
             Expertise expertise = expertiseRepository.findOne(updateDTO.getExpertiseId());
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Expertize not found by Id" + updateDTO.getExpertiseId());

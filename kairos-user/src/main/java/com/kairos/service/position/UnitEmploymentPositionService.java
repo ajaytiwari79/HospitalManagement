@@ -220,11 +220,11 @@ public class UnitEmploymentPositionService extends UserBaseService {
         }
         unitEmploymentPosition.setStaff(staff);
 
-        if (unitEmploymentPosition.getStartDateMillis() < System.currentTimeMillis()) {
+        if (unitEmploymentPositionDTO.getStartDateMillis() < System.currentTimeMillis()) {
             throw new ActionNotPermittedException("Start date can't be less than current Date ");
         }
         unitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
-        if (unitEmploymentPosition.getStartDateMillis() < unitEmploymentPositionDTO.getEndDateMillis()) {
+        if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
             throw new ActionNotPermittedException("Start date can't be less than End Date ");
         }
         unitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
@@ -289,8 +289,14 @@ public class UnitEmploymentPositionService extends UserBaseService {
             }
 
 
-            oldUnitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
+            if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
+                throw new ActionNotPermittedException("Start date can't be less than End Date ");
+            }
             oldUnitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
+
+
+            oldUnitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
+
             oldUnitEmploymentPosition.setWorkingDaysInWeek(unitEmploymentPositionDTO.getWorkingDaysInWeek());
             oldUnitEmploymentPosition.setTotalWeeklyHours(unitEmploymentPositionDTO.getTotalWeeklyHours());
             oldUnitEmploymentPosition.setAvgDailyWorkingHours(unitEmploymentPositionDTO.getAvgDailyWorkingHours());
