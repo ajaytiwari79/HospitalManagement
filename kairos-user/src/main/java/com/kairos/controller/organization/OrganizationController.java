@@ -1256,6 +1256,13 @@ public class OrganizationController {
         String zoneId = (String) data.get("zoneId");
         return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.assignUnitTimeZone(unitId, zoneId));
     }
+
+    @ApiOperation(value = "Assign Default Opening Hours to Unit")
+    @RequestMapping(value =UNIT_URL+"/setDefaultOpeningHours", method = RequestMethod.POST)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> setDefaultOpeningHours(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,openningHourService.setDefaultOpeningHours(unitId));
+    }
 }
 
 
