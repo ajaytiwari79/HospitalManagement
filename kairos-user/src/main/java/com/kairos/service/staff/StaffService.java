@@ -509,9 +509,9 @@ public class StaffService extends UserBaseService {
                     staffErrorList.add(row.getRowNum());
 
                 } else {
+
                         Cell cell = row.getCell(8);
                         cell.setCellType(Cell.CELL_TYPE_STRING);
-
 
                         cell = row.getCell(2);
                         cell.setCellType(Cell.CELL_TYPE_STRING);

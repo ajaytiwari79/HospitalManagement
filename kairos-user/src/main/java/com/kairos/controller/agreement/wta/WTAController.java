@@ -43,6 +43,7 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfCountry(countryId, wtaId, wta));
     }
 
+
     @ApiOperation(value = "Get WTA")
     @GetMapping(value = COUNTRY_URL + "/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> getWta(@PathVariable long wtaId) {

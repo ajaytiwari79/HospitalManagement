@@ -242,20 +242,20 @@ public class BootDataService {
 
     Province copenhagenCity;
     Municipality copenhagen;
-    Municipality  frederiksberg;
+    Municipality frederiksberg;
 
     Province bornholm;
     Municipality ertholmene;
 
 
     Province Fyn;
-    Municipality  Odense;
+    Municipality Odense;
 
     ZipCode kobenhavn;
     ZipCode allegade;
 
-    public void createData()  {
-        if(countryGraphRepository.findAll().isEmpty()){
+    public void createData() {
+        if (countryGraphRepository.findAll().isEmpty()) {
             createStandardTimeSlots();
             //createMasterSkills();
             //createOrganizationServices();
@@ -272,15 +272,15 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
-         createCTARuleTemplateCategory();
-            startRegisteredCronJobs();
-            createEquipmentCategories();
+        createCTARuleTemplateCategory();
+        startRegisteredCronJobs();
+        createEquipmentCategories();
 
     }
 
-    private void startRegisteredCronJobs()  {
+    private void startRegisteredCronJobs() {
         List<ControlPanel> controlPanels = controlPanelService.getAllControlPanels();
-        if(controlPanels.size() != 0) {
+        if (controlPanels.size() != 0) {
             for (ControlPanel controlPanel : controlPanels) {
                 logger.info("Register Cron Job of process name " + controlPanel.getName());
                 dynamicCronScheduler.setCronScheduling(controlPanel);
@@ -288,10 +288,10 @@ public class BootDataService {
         }
     }
 
-    private void createStandardTimeSlots(){
-        String timeSlotsNames[] = new String[]{"Day","Evening","Night"};
+    private void createStandardTimeSlots() {
+        String timeSlotsNames[] = new String[]{"Day", "Evening", "Night"};
         List<TimeSlot> standardTimeSlots = new ArrayList<>();
-        for(String timeSlotName : timeSlotsNames){
+        for (String timeSlotName : timeSlotsNames) {
             TimeSlot timeSlot = new TimeSlot();
             timeSlot.setName(timeSlotName);
             timeSlot.setSystemGeneratedTimeSlots(true);
@@ -324,7 +324,7 @@ public class BootDataService {
         bornholm = provinceGraphRepository.save(bornholm);
 
 
-        ertholmene= new Municipality();
+        ertholmene = new Municipality();
         ertholmene.setName("Ertholmene");
         ertholmene.setProvince(bornholm);
         ertholmene = municipalityGraphRepository.save(ertholmene);
@@ -332,7 +332,7 @@ public class BootDataService {
 
         Fyn = new Province();
         Fyn.setName("Fyn");
-        Fyn  = provinceGraphRepository.save(Fyn);
+        Fyn = provinceGraphRepository.save(Fyn);
 
         Odense = new Municipality();
         Odense.setName("Odense");
@@ -392,7 +392,7 @@ public class BootDataService {
             skillList.add(skill.getId());
         }
 
-        danish =new Language("Danish", false);
+        danish = new Language("Danish", false);
         danish.setCountry(denmark);
         danish = languageGraphRepository.save(danish);
     }
@@ -419,12 +419,12 @@ public class BootDataService {
     }
 
     private void createOrganizationTypes() {
-        publicOrganization = new OrganizationType(OrganizationType.OrganizationTypeEnum.PUBLIC.value,homeCareService.getOrganizationSubService());
+        publicOrganization = new OrganizationType(OrganizationType.OrganizationTypeEnum.PUBLIC.value, homeCareService.getOrganizationSubService());
         publicOrganization.setCreationDate(DateUtil.getCurrentDate().getTime());
         publicOrganization.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         publicOrganization.setCountry(denmark);
 
-        privateOrganization = new OrganizationType(OrganizationType.OrganizationTypeEnum.PRIVATE.value,medicalCareService.getOrganizationSubService());
+        privateOrganization = new OrganizationType(OrganizationType.OrganizationTypeEnum.PRIVATE.value, medicalCareService.getOrganizationSubService());
         privateOrganization.setCreationDate(DateUtil.getCurrentDate().getTime());
         privateOrganization.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         privateOrganization.setCountry(denmark);
@@ -455,9 +455,9 @@ public class BootDataService {
 
         germany = new Country();
         germany.setName("Germany");
-        Long d = new DateTime().withTime(9,20,0,0).getMillis();
-        Long e = new DateTime().withTime(15,20,0,0).getMillis();
-        logger.info("Half day Leave timing: "+d+" and :   "+e);
+        Long d = new DateTime().withTime(9, 20, 0, 0).getMillis();
+        Long e = new DateTime().withTime(15, 20, 0, 0).getMillis();
+        logger.info("Half day Leave timing: " + d + " and :   " + e);
         // germany.setCountryHolidayCalenderList(Arrays.asList(new CountryHolidayCalender("Halloween", DateUtil.getCurrentDate().getTime() ,d,e), new CountryHolidayCalender("Christmas",  1474696870000L)));
         // germany.setOrganizationServices(Arrays.asList(homeCareService, medicalCareService));
         countryGraphRepository.save(germany);
@@ -472,44 +472,44 @@ public class BootDataService {
         Syddanmark.setCountry(denmark);
 
         Hovedstaden = regionGraphRepository.save(Hovedstaden);
-        Syddanmark  = regionGraphRepository.save(Syddanmark);
+        Syddanmark = regionGraphRepository.save(Syddanmark);
         //  createCitizenStatus();
 
 
     }
 
     private void createCitizenStatus() {
-        CitizenStatus deadStatus  = new CitizenStatus();
+        CitizenStatus deadStatus = new CitizenStatus();
         deadStatus.setName("Dead");
         deadStatus.setDescription("When pulse stops , patient is declared dead");
 
 
-        CitizenStatus singleStatus  = new CitizenStatus();
+        CitizenStatus singleStatus = new CitizenStatus();
         singleStatus.setDescription("Single");
         singleStatus.setDescription("A Citizen is not married ");
         singleStatus.setCountry(denmark);
 
-        CitizenStatus marriedStatus  = new CitizenStatus();
+        CitizenStatus marriedStatus = new CitizenStatus();
         marriedStatus.setName("Married");
         marriedStatus.setDescription("A Citizen is have a wife");
         marriedStatus.setCountry(denmark);
 
-        CitizenStatus disvorcedStatus  = new CitizenStatus();
+        CitizenStatus disvorcedStatus = new CitizenStatus();
         disvorcedStatus.setName("Divorced");
         disvorcedStatus.setDescription("A Citizen was married ,but now divorced ");
         disvorcedStatus.setCountry(denmark);
 
-        CitizenStatus livingPartnerStatus  = new CitizenStatus();
+        CitizenStatus livingPartnerStatus = new CitizenStatus();
         livingPartnerStatus.setName("Longest living partner");
         livingPartnerStatus.setDescription("A Citizen is living Partner");
         livingPartnerStatus.setCountry(denmark);
 
-        CitizenStatus registeredStatus  = new CitizenStatus();
+        CitizenStatus registeredStatus = new CitizenStatus();
         registeredStatus.setName("Registered partnership");
         registeredStatus.setDescription("Relationship of Citizen is registered formally");
         registeredStatus.setCountry(denmark);
 
-        citizenStatusGraphRepository.saveAll(Arrays.asList(registeredStatus,livingPartnerStatus,disvorcedStatus,marriedStatus,singleStatus,deadStatus));
+        citizenStatusGraphRepository.saveAll(Arrays.asList(registeredStatus, livingPartnerStatus, disvorcedStatus, marriedStatus, singleStatus, deadStatus));
     }
 
     private void createCitizen() {
@@ -524,7 +524,7 @@ public class BootDataService {
         johnOliver.setGender(Gender.MALE);
         johnOliver.setCitizenship(ClientEnum.CitizenShip.DANISH);
 
-        List<Map<String,Object>> zipCodeMapList = zipCodeGraphRepository.getAllZipCodeByCountryId(denmark.getId());
+        List<Map<String, Object>> zipCodeMapList = zipCodeGraphRepository.getAllZipCodeByCountryId(denmark.getId());
 
         AccessToLocation accessToLocation = new AccessToLocation("AlphaNumeric", "21", "412398", "Cellular phone", "UYTRE7654321", "Unlocking the door",
                 "Simple keySystem with password security", true, "Checking purpose", "Enter the passcode and press unlock", "Must lock the door after serving purpose");
@@ -591,7 +591,7 @@ public class BootDataService {
         minimumDTO.setFirstName("Kin");
         minimumDTO.setLastName("yong");
         minimumDTO.setCprnumber("1106513681");
-        Client nextKin = clientService.createCitizen(minimumDTO,oodlesCityLevel.getId());
+        Client nextKin = clientService.createCitizen(minimumDTO, oodlesCityLevel.getId());
 
         ContactDetail contactDetail = new ContactDetail();
         contactDetail.setMobilePhone("4566353");
@@ -605,7 +605,7 @@ public class BootDataService {
                 new ClientAllergies("type1 ", "Allergy1", true, new String[]{"Avoid1", "Avoid2", "Avoid3"}
                 )));
         Client client = clientService.createCitizen(johnOliver);
-        ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(client, oodlesCityLevel,new DateTime().getMillis());
+        ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(client, oodlesCityLevel, new DateTime().getMillis());
         relationService.createRelation(clientOrganizationRelation);
 
         ClientLanguageRelation clientLanguageRelation = new ClientLanguageRelation();
@@ -829,19 +829,19 @@ public class BootDataService {
         kairosCountryLevel = organizationGraphRepository.save(kairosCountryLevel);
     }
 
-    private void createEmployment(){
-        employmentForAdmin = new Employment("working as country admin",adminAsStaff);
+    private void createEmployment() {
+        employmentForAdmin = new Employment("working as country admin", adminAsStaff);
         kairosCountryLevel.getEmployments().add(employmentForAdmin);
         organizationGraphRepository.save(kairosCountryLevel);
     }
 
-    private void createUnitEmploymentForCountryLevel(){
+    private void createUnitEmploymentForCountryLevel() {
         accessGroup = accessGroupRepository.findAccessGroupByName(kairosCountryLevel.getId(), AppConstants.COUNTRY_ADMIN);
         UnitEmployment unitEmployment = new UnitEmployment();
         unitEmployment.setOrganization(kairosCountryLevel);
         AccessPermission accessPermission = new AccessPermission(accessGroup);
         unitEmploymentGraphRepository.save(unitEmployment);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
         unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
         accessPageService.setPagePermissionToAdmin(accessPermission);
         employmentForAdmin.getUnitEmployments().add(unitEmployment);
@@ -899,7 +899,7 @@ public class BootDataService {
     }
 
 
-    private void createPublicPhoneNumberForCityLevel(){
+    private void createPublicPhoneNumberForCityLevel() {
         PublicPhoneNumber publicPhoneNumber = new PublicPhoneNumber("7100000000");
         List<PublicPhoneNumber> publicPhoneNumberList = new ArrayList<PublicPhoneNumber>();
         publicPhoneNumberList.add(publicPhoneNumber);
@@ -907,7 +907,7 @@ public class BootDataService {
         organizationGraphRepository.save(oodlesCityLevel);
     }
 
-    private void createTeamsForCityLevel(){
+    private void createTeamsForCityLevel() {
         nestingTeam = new Team();
         nestingTeam.setName("Nesting Team");
         nestingTeam.setCreationDate(DateUtil.getCurrentDate().getTime());
@@ -920,7 +920,7 @@ public class BootDataService {
         teamGraphRepository.saveAll(Arrays.asList(nestingTeam, experiencedTeam));
     }
 
-    private void createGroupForCityLevel(){
+    private void createGroupForCityLevel() {
         operationsGroup = new Group();
         operationsGroup.setName("oodles-operations Group");
         operationsGroup.setTeamList(Arrays.asList(nestingTeam));
@@ -928,7 +928,7 @@ public class BootDataService {
         serviceGroup = new Group();
         serviceGroup.setName("oodles-Service Group");
         serviceGroup.setTeamList(Arrays.asList(experiencedTeam));
-        oodlesCityLevel.setGroupList(Arrays.asList(operationsGroup,serviceGroup));
+        oodlesCityLevel.setGroupList(Arrays.asList(operationsGroup, serviceGroup));
         organizationGraphRepository.save(oodlesCityLevel);
     }
 
@@ -938,10 +938,10 @@ public class BootDataService {
         organizationService.save(new StaffRelationship(nestingTeam, michalAsStaff));
     }
 
-    private void createEmploymentForCityLevel(){
-        employmentForMichal = new Employment("working as visitator",michalAsStaff);
-        employmentForLiva = new Employment("working as planner",livaAsStaff);
-        employmentForAlma = new Employment("working as task giver",almaAsStaff);
+    private void createEmploymentForCityLevel() {
+        employmentForMichal = new Employment("working as visitator", michalAsStaff);
+        employmentForLiva = new Employment("working as planner", livaAsStaff);
+        employmentForAlma = new Employment("working as task giver", almaAsStaff);
         oodlesCityLevel.getEmployments().add(employmentForMichal);
         oodlesCityLevel.getEmployments().add(employmentForLiva);
         oodlesCityLevel.getEmployments().add(employmentForAlma);
@@ -949,14 +949,14 @@ public class BootDataService {
 
     }
 
-    private void createUnitEmploymentForCityLevel(){
+    private void createUnitEmploymentForCityLevel() {
         accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.VISITATOR);
         UnitEmployment unitEmployment = new UnitEmployment();
         unitEmployment.setOrganization(oodlesCityLevel);
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
         unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
-        accessPageService.setPagePermissionToStaff(accessPermission,accessGroup.getId());
+        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
         employmentForMichal.getUnitEmployments().add(unitEmployment);
         oodlesCityLevel.getEmployments().add(employmentForMichal);
 
@@ -964,9 +964,9 @@ public class BootDataService {
         unitEmployment = new UnitEmployment();
         unitEmployment.setOrganization(oodlesCityLevel);
         accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship taskGiverAccess = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        UnitEmpAccessRelationship taskGiverAccess = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
         unitEmpAccessGraphRepository.save(taskGiverAccess);
-        accessPageService.setPagePermissionToStaff(accessPermission,accessGroup.getId());
+        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
         employmentForAlma.getUnitEmployments().add(unitEmployment);
         oodlesCityLevel.getEmployments().add(employmentForAlma);
 
@@ -974,15 +974,15 @@ public class BootDataService {
         unitEmployment = new UnitEmployment();
         unitEmployment.setOrganization(oodlesCityLevel);
         accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship plannerAccess = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        UnitEmpAccessRelationship plannerAccess = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
         unitEmpAccessGraphRepository.save(plannerAccess);
-        accessPageService.setPagePermissionToStaff(accessPermission,accessGroup.getId());
+        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
         employmentForLiva.getUnitEmployments().add(unitEmployment);
         oodlesCityLevel.getEmployments().add(employmentForLiva);
         organizationGraphRepository.save(oodlesCityLevel);
     }
 
-    private void createPaymentTypes(){
+    private void createPaymentTypes() {
         PaymentType creditCard = new PaymentType();
         creditCard.setName("Credit Cards");
         creditCard.setCreationDate(DateUtil.getCurrentDate().getTime());
@@ -994,10 +994,10 @@ public class BootDataService {
         paySafecard.setCreationDate(DateUtil.getCurrentDate().getTime());
         paySafecard.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         paySafecard.setCountry(denmark);
-        paymentTypeGraphRepository.saveAll(Arrays.asList(creditCard,paySafecard));
+        paymentTypeGraphRepository.saveAll(Arrays.asList(creditCard, paySafecard));
     }
 
-    private void createCurrency(){
+    private void createCurrency() {
         com.kairos.persistence.model.user.country.Currency currency = new com.kairos.persistence.model.user.country.Currency();
         currency.setName("krone");
         currency.setCreationDate(DateUtil.getCurrentDate().getTime());
@@ -1005,6 +1005,7 @@ public class BootDataService {
         currency.setCountry(denmark);
         currencyGraphRepository.save(currency);
     }
+
     private void createCTARuleTemplateCategory() {
         RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
                 .findByName(53L, "NONE", RuleTemplateCategoryType.CTA);
@@ -1016,7 +1017,7 @@ public class BootDataService {
             ruleTemplateCategoryService.createRuleTemplateCategory(53L, category);
         }
 
-        if(costTimeAgreementService.isDefaultCTARuleTemplateExists()){
+        if (costTimeAgreementService.isDefaultCTARuleTemplateExists()) {
             logger.info("default CTA rule template already exist");
         } else {
             logger.info("creating CTA rule template");
@@ -1024,8 +1025,9 @@ public class BootDataService {
         }
 
     }
-    private void createEquipmentCategories(){
-        if( ! equipmentCategoryGraphRepository.ifEquipmentCategoryExists()){
+
+    private void createEquipmentCategories() {
+        if (!equipmentCategoryGraphRepository.ifEquipmentCategoryExists()) {
             EquipmentCategory equipmentCategorySmall = new EquipmentCategory();
             equipmentCategorySmall.setName("Small");
             equipmentCategorySmall.setDescription("Small");

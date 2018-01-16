@@ -16,13 +16,13 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PositionQueryResult {
+public class UnitEmploymentPositionQueryResult {
     private Expertise expertise;
     @JsonIgnore
-    private boolean isEnabled = true;
-    private Long startDate;
+    private boolean deleted;
+    private Long startDateMillis;
     private int workingDaysInWeek;
-    private Long endDate;
+    private Long endDateMillis;
     private Long lastModificationDate;
     private float totalWeeklyHours;
     private float avgDailyWorkingHours;
@@ -31,7 +31,7 @@ public class PositionQueryResult {
     private EmploymentType employmentType;
     private float salary;
 
-    private PositionName positionName;
+    private PositionCode positionCode;
     private WorkingTimeAgreement workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
 
@@ -51,28 +51,28 @@ public class PositionQueryResult {
         this.expertise = expertise;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
-    public Long getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public float getTotalWeeklyHours() {
@@ -115,12 +115,12 @@ public class PositionQueryResult {
         this.salary = salary;
     }
 
-    public PositionName getPositionName() {
-        return positionName;
+    public PositionCode getPositionCode() {
+        return positionCode;
     }
 
-    public void setPositionName(PositionName positionName) {
-        this.positionName = positionName;
+    public void setPositionCode(PositionCode positionCode) {
+        this.positionCode = positionCode;
     }
 
     public long getId() {
@@ -152,6 +152,26 @@ public class PositionQueryResult {
     }
 
     public void setCostTimeAgreement(CostTimeAgreement costTimeAgreement) {
+        this.costTimeAgreement = costTimeAgreement;
+    }
+
+    public UnitEmploymentPositionQueryResult() {
+        //default cons
+    }
+
+    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, float totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
+        this.expertise = expertise;
+        this.startDateMillis = startDateMillis;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.hourlyWages = hourlyWages;
+        this.id = id;
+        this.employmentType = employmentType;
+        this.salary = salary;
+        this.positionCode = positionCode;
+        this.workingTimeAgreement = workingTimeAgreement;
         this.costTimeAgreement = costTimeAgreement;
     }
 }

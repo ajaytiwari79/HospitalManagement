@@ -2,7 +2,7 @@ package com.kairos.persistence.model.user.staff;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.EmploymentStatus;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.position.Position;
+import com.kairos.persistence.model.user.position.UnitEmploymentPosition;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -43,8 +43,8 @@ public class UnitEmployment extends UserBaseEntity {
     private Organization organization;
 
 
-    @Relationship(type = HAS_POSITION)
-    private List<Position> positions;
+    @Relationship(type = HAS_UNIT_EMPLOYMENT_POSITION)
+    private List<UnitEmploymentPosition> unitEmploymentPositions;
 
     @Relationship(type = HAS_WAGES)
     private List<Wage> wages = new ArrayList<>();
@@ -155,11 +155,11 @@ public class UnitEmployment extends UserBaseEntity {
         return employmentNumber;
     }
 
-    public List<Position> getPositions() {
-        return Optional.ofNullable(positions).orElse(new ArrayList<Position>());
+    public List<UnitEmploymentPosition> getUnitEmploymentPositions() {
+        return Optional.ofNullable(unitEmploymentPositions).orElse(new ArrayList<UnitEmploymentPosition>());
     }
 
-    public void setPositions(List<Position> positions) {
-        this.positions = positions;
+    public void setUnitEmploymentPositions(List<UnitEmploymentPosition> unitEmploymentPositions) {
+        this.unitEmploymentPositions = unitEmploymentPositions;
     }
 }

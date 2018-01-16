@@ -7,12 +7,11 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
-import com.kairos.persistence.model.user.agreement.wta.WTAWithCountryAndOrganizationTypeDTO;
+import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
-import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
@@ -48,12 +47,12 @@ public class WTAOrganizationService extends UserBaseService {
     private CountryService countryService;
     private final Logger logger = LoggerFactory.getLogger(WTAOrganizationService.class);
 
-    public List<WTAWithCountryAndOrganizationTypeDTO> getAllWTAByOrganization(Long unitId) {
+    public List<WTAResponseDTO> getAllWTAByOrganization(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new DataNotFoundByIdException("Invalid unit  " + unitId);
         }
-        List<WTAWithCountryAndOrganizationTypeDTO> workingTimeAgreements = workingTimeAgreementGraphRepository.getWtaByOrganization(unitId);
+        List<WTAResponseDTO> workingTimeAgreements = workingTimeAgreementGraphRepository.getWtaByOrganization(unitId);
         return workingTimeAgreements;
     }
 
@@ -95,7 +94,7 @@ public class WTAOrganizationService extends UserBaseService {
         newWta.setDisabled(false);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
-            ruleTemplates = copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates(), "ORGANIZATION", unitId);
+            ruleTemplates = copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates());
             newWta.setRuleTemplates(ruleTemplates);
         }
         newWta.setOrganization(organization);
@@ -105,7 +104,6 @@ public class WTAOrganizationService extends UserBaseService {
         workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
         newWta.setParentWTA(oldWta.basicDetails());
         newWta.getExpertise().setCountry(null);
-
         return newWta;
     }
 
@@ -114,62 +112,29 @@ public class WTAOrganizationService extends UserBaseService {
         RuleTemplateCategory ruleTemplateCategory = null;
         if (ruleTemplates != null) {
             for (RuleTemplate ruletemplate : ruleTemplates) {
-                if (ruletemplate.getId().equals(id) && ruleTemplateCategoryName.equals(ruletemplate.getRuleTemplateCategory().getName())) { // if category is not changed so Assign from previous
+                if (ruletemplate.getId().equals(id) && ruleTemplateCategoryName.equalsIgnoreCase(ruletemplate.getRuleTemplateCategory().getName())) { // if category is not changed so Assign from previous
                     ruleTemplateCategory = ruletemplate.getRuleTemplateCategory();
                     break;
                 }
-
             }
         }
         if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
             ruleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(ruleTemplateCategoryName, WTA);
-            // if rule template is still null so this category does not exist and unit cant create a new category.
+            // if rule template is still null so this category does not exist.
             if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
                 logger.info("category does not exist in when updating wta's rule template  :", ruleTemplateCategoryName);
                 throw new DataNotFoundByIdException("category : " + ruleTemplateCategoryName + " does not exist in when updating wta's rule template  :" + id);
             }
         }
-
         return ruleTemplateCategory;
     }
 
-    // TODO for country
-    private RuleTemplateCategory getCategoryForCountry(List<WTABaseRuleTemplate> ruleTemplates, Long id, String ruleTemplateCategoryName, Long countryId) {
-        RuleTemplateCategory ruleTemplateCategory = null;
-        if (ruleTemplates != null && ruleTemplates.size() > 0) {
-            for (RuleTemplate ruletemplate : ruleTemplates) {
-                if (ruletemplate.getId().equals(id) && ruleTemplateCategoryName.equals(ruletemplate.getRuleTemplateCategory().getName())) {
-                    ruleTemplateCategory = ruletemplate.getRuleTemplateCategory();
-                    break;
-                }
-
-            }
-        }
-        // finding this in repository for existence of category
-        if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
-            ruleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, ruleTemplateCategoryName, WTA);
-        }
-        // if rule template is still null so this category does not exist and country needs to  create a new category.
-        if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
-            Country country = countryService.getCountryById(countryId);
-            ruleTemplateCategory = new RuleTemplateCategory(ruleTemplateCategoryName, null, false);
-            ruleTemplateCategory.setRuleTemplateCategoryType(WTA);
-            country.addRuleTemplateCategory(ruleTemplateCategory);
-            save(country);
-        }
-        return ruleTemplateCategory;
-    }
-
-    protected List<WTABaseRuleTemplate> copyRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates, List<RuleTemplateCategoryDTO> ruleTemplatesNewObjects, String source, Long id) {
+    protected List<WTABaseRuleTemplate> copyRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates, List<RuleTemplateCategoryDTO> ruleTemplatesNewObjects) {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<WTABaseRuleTemplate>(20);
-
         for (RuleTemplateCategoryDTO ruleTemplate : ruleTemplatesNewObjects) {
             RuleTemplateCategory ruleTemplateCategory = null;
-            if (source.equalsIgnoreCase("ORGANIZATION")) {
-                ruleTemplateCategory = getCategory(ruleTemplates, ruleTemplate.getId(), ruleTemplate.getRuleTemplateCategory().getName());
-            } else if (source.equalsIgnoreCase("COUNTRY")) {
-                ruleTemplateCategory = getCategoryForCountry(ruleTemplates, ruleTemplate.getId(), ruleTemplate.getRuleTemplateCategory().getName(), id);
-            }
+            ruleTemplateCategory = getCategory(ruleTemplates, ruleTemplate.getId(), ruleTemplate.getRuleTemplateCategory().getName());
+
             switch (ruleTemplate.getTemplateType()) {
                 case TEMPLATE1:
                     MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = new MaximumShiftLengthWTATemplate();

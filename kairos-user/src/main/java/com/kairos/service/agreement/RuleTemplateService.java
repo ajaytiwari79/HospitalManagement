@@ -356,8 +356,18 @@ public class RuleTemplateService extends UserBaseService {
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
         RuleTemplateCategory ruleTemplateCategory = null;
+        ruleTemplateCategory = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
+        oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
+        oldTemplate.setDisabled(templateDTO.getDisabled());
+        oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
+        save(oldTemplate);
+        return templateDTO;
+    }
+
+    protected RuleTemplateCategory checkAndAssignRuleTemplateCategory(WTABaseRuleTemplate oldTemplate, RuleTemplateCategoryDTO templateDTO) {
+        RuleTemplateCategory ruleTemplateCategory = null;
         if (!oldTemplate.getRuleTemplateCategory().getName().equalsIgnoreCase(templateDTO.getRuleTemplateCategory().getName())) {
-            ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, templateDTO.getRuleTemplateCategory().getName(), RuleTemplateCategoryType.WTA);
+            ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(templateDTO.getRuleTemplateCategory().getName(), RuleTemplateCategoryType.WTA);
             if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid ruleTemplateCategory name " + templateDTO.getRuleTemplateCategory().getName());
             }
@@ -366,12 +376,8 @@ public class RuleTemplateService extends UserBaseService {
         } else {
             ruleTemplateCategory = oldTemplate.getRuleTemplateCategory();
         }
-        oldTemplate.setDisabled(templateDTO.getDisabled());
-        oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
-        save(oldTemplate);
-        return templateDTO;
+        return ruleTemplateCategory;
     }
-
 
     /*
     *

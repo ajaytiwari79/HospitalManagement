@@ -1,6 +1,5 @@
 package com.kairos.response.dto.web;
 
-import com.kairos.persistence.model.user.position.Position;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
@@ -8,16 +7,16 @@ import javax.validation.constraints.NotNull;
 /**
  * Created by pawanmandhan on 27/7/17.
  */
-public class PositionDTO {
+public class UnitEmploymentPositionDTO {
 
-    @NotNull(message = "Position Name  is required for position") @Range(min = 0,message = "Position Name is required for position")
-    private Long positionNameId;
+    @NotNull(message = "Position code  is required for position") @Range(min = 0,message = "Position code is required for position")
+    private Long positionCodeId;
     @NotNull(message = "expertise is required for position")
     @Range(min = 0,message = "expertise is required for position")
     private Long expertiseId;
 
-    private Long startDate;
-    private Long endDate;
+    private Long startDateMillis;
+    private Long endDateMillis;
     private float totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
@@ -36,36 +35,36 @@ public class PositionDTO {
     // private Long expiryDate;
 
 
-    public PositionDTO() {
+    public UnitEmploymentPositionDTO() {
         //default cons
     }
 
 
-    public PositionDTO(Long positionNameId, Long expertiseId) {
-        this.positionNameId = positionNameId;
+    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId) {
+        this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
     }
 
 
 
-    public PositionDTO(String name, String description, Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours,
-                       float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
+    public UnitEmploymentPositionDTO(String name, String description, Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours,
+                                     float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
         this.salary=salary;
         this.avgDailyWorkingHours =avgDailyWorkingHours;
         this.totalWeeklyHours=totalWeeklyHours;
         this.hourlyWages=hourlyWages;
-        this.positionNameId = positionNameId;
+        this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
         this.employmentTypeId=employmentTypeId;
     }
 
-    public PositionDTO(Long positionNameId, Long expertiseId, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
-        this.positionNameId = positionNameId;
+    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
+        this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
         this.totalWeeklyHours = totalWeeklyHours;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.workingDaysInWeek = workingDaysInWeek;
@@ -83,12 +82,12 @@ public class PositionDTO {
         this.workingDaysInWeek = workingDaysInWeek;
     }
 
-    public Long getPositionNameId() {
-        return positionNameId;
+    public Long getPositionCodeId() {
+        return positionCodeId;
     }
 
-    public void setPositionNameId(Long positionNameId) {
-        this.positionNameId = positionNameId;
+    public void setPositionCodeId(Long positionCodeId) {
+        this.positionCodeId = positionCodeId;
     }
 
     public Long getExpertiseId() {
@@ -100,20 +99,20 @@ public class PositionDTO {
     }
 
 
-    public Long getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public float getTotalWeeklyHours() {

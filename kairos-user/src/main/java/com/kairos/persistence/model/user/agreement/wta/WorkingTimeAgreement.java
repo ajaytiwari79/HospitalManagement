@@ -222,6 +222,25 @@ public class WorkingTimeAgreement extends UserBaseEntity {
         //default
     }
 
+    public WorkingTimeAgreement(@NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description, Boolean disabled, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, Country country, Organization organization, List<WTABaseRuleTemplate> ruleTemplates, WorkingTimeAgreement parentWTA, WorkingTimeAgreement countryParentWTA, WorkingTimeAgreement organizationParentWTA, List<Tag> tags, Long startDateMillis, Long endDateMillis, Long expiryDate) {
+        this.name = name;
+        this.description = description;
+        this.disabled = disabled;
+        this.expertise = expertise;
+        this.organizationType = organizationType;
+        this.organizationSubType = organizationSubType;
+        this.country = country;
+        this.organization = organization;
+        this.ruleTemplates = ruleTemplates;
+        this.parentWTA = parentWTA;
+        this.countryParentWTA = countryParentWTA;
+        this.organizationParentWTA = organizationParentWTA;
+        this.tags = tags;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.expiryDate = expiryDate;
+    }
+
     public WorkingTimeAgreement(String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, Country country, List<WTABaseRuleTemplate> ruleTemplates, WorkingTimeAgreement parentWTA, Long startDateMillis, Long endDateMillis, Long expiryDate, boolean deleted) {
         this.name = name;
         this.description = description;
@@ -262,6 +281,12 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     public WorkingTimeAgreement basicDetails() {
         WorkingTimeAgreement workingTimeAgreement = new WorkingTimeAgreement(this.id, this.name, this.description, this.startDateMillis, this.endDateMillis, this.expiryDate);
         return workingTimeAgreement;
+    }
+
+    public WTAResponseDTO retriveBasicResponse() {
+        WTAResponseDTO responseDTO = new WTAResponseDTO(this.startDateMillis, this.endDateMillis, this.name, this.description, this.expertise.retrieveBasicDetails(), this.organizationType.basicDetails(), this.organizationSubType.basicDetails(), this.tags);
+        return responseDTO;
+
     }
 
     @Override

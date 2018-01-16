@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
-public class Position extends UserBaseEntity {
+public class UnitEmploymentPosition extends UserBaseEntity {
 
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
@@ -29,47 +29,44 @@ public class Position extends UserBaseEntity {
     @Relationship(type = HAS_WTA)
     private WorkingTimeAgreement workingTimeAgreement;
 
-    @Relationship(type = HAS_POSITION_NAME)
-    private PositionName positionName;
+    @Relationship(type = HAS_POSITION_CODE)
+    private PositionCode positionCode;
 
-    @Relationship(type = BELONGS_TO_STAFF,direction = "INCOMING")
+    @Relationship(type = BELONGS_TO_STAFF, direction = "INCOMING")
     private Staff staff;
 
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private EmploymentType employmentType;
 
-    private boolean isEnabled = true;
-    private Long startDate;
-    private Long endDate;
+    private Long startDateMillis;
+    private Long endDateMillis;
     private float totalWeeklyHours;
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
-    /*public enum EmploymentType{
-        FULL_TIME,PART_TIME
-    };
 
-    private EmploymentType employmentType;*/
     private float salary;
 
-    public Position() {
+    public UnitEmploymentPosition() {
     }
 
-    public Position( Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement workingTimeAgreement,
-                    PositionName positionName, String description, Long startDate, Long endDate, Long expiryDate
-                    ,float totalWeeklyHours ,float avgDailyWorkingHours,float hourlyWages,float salary,int workingDaysInWeek) {
+
+    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
+                                  PositionCode positionCode, String description, Long startDateMillis, Long endDateMillis, Long expiryDate
+            , int totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
+
 
         this.expertise = expertise;
         this.cta = cta;
         this.workingTimeAgreement = workingTimeAgreement;
-        this.positionName = positionName;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.totalWeeklyHours=totalWeeklyHours;
-        this.avgDailyWorkingHours =avgDailyWorkingHours;
-        this.salary=salary;
-        this.hourlyWages=hourlyWages;
-        this.workingDaysInWeek=workingDaysInWeek;
+        this.positionCode = positionCode;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.salary = salary;
+        this.hourlyWages = hourlyWages;
+        this.workingDaysInWeek = workingDaysInWeek;
     }
 
 
@@ -113,20 +110,20 @@ public class Position extends UserBaseEntity {
         this.salary = salary;
     }
 
-    public PositionName getPositionName() {
-        return positionName;
+    public PositionCode getPositionCode() {
+        return positionCode;
     }
 
-    public void setPositionName(PositionName positionName) {
-        this.positionName = positionName;
+    public void setPositionCode(PositionCode positionCode) {
+        this.positionCode = positionCode;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Expertise getExpertise() {
@@ -153,20 +150,20 @@ public class Position extends UserBaseEntity {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 
-    public Long getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public EmploymentType getEmploymentType() {
@@ -185,20 +182,28 @@ public class Position extends UserBaseEntity {
         this.staff = staff;
     }
 
-    public Position(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement workingTimeAgreement, PositionName positionName, Staff staff, boolean isEnabled, Long startDate, Long endDate, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
+
+    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
         this.expertise = expertise;
         this.cta = cta;
         this.workingTimeAgreement = workingTimeAgreement;
-        this.positionName = positionName;
+        this.positionCode = positionCode;
         this.staff = staff;
-        this.isEnabled = isEnabled;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.deleted = deleted;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
         this.totalWeeklyHours = totalWeeklyHours;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.workingDaysInWeek = workingDaysInWeek;
         this.hourlyWages = hourlyWages;
         this.employmentType = employmentType;
         this.salary = salary;
+    }
+
+
+    public UnitEmploymentPositionQueryResult getBasicDetails() {
+        UnitEmploymentPositionQueryResult result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek, this.endDateMillis, this.totalWeeklyHours,
+                this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode, this.workingTimeAgreement.basicDetails(), this.cta);
+        return result;
     }
 }
