@@ -1,4 +1,5 @@
 package com.kairos.persistence.model.user.skill;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.user.auth.User;
@@ -21,6 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Skill Domain extends UserBaseEntity
  * SKill has relationship with SkillLevel Domain
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class Skill extends UserBaseEntity {
     @NotEmpty(message = "error.Skill.name.notEmpty") @NotNull(message = "error.Skill.name.notnull")
@@ -46,6 +48,9 @@ public class Skill extends UserBaseEntity {
 
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
+
+    //time care id
+    private String externalId;
 
     public Skill(String name, SkillCategory skillCategory) {
         this.name = name;
@@ -159,6 +164,14 @@ public class Skill extends UserBaseEntity {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     public enum SkillStatus {
