@@ -1091,7 +1091,7 @@ public class OrganizationController {
     @RequestMapping(value = UNIT_URL+"/organizationTypeAndSubTypes", method = RequestMethod.GET)
     @ApiOperation("get All organization types and  and Sub org by unitId")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getorganizationTypeAndSubTypes( @RequestParam("type") String type,@PathVariable long unitId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationTypeAndSubTypes( @RequestParam("type") String type,@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationTypeAndSubTypes(unitId,type));
     }

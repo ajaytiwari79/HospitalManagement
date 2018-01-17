@@ -545,7 +545,7 @@ public class OrganizationService extends UserBaseService {
 
         organizationGraphRepository.save(unit);
 
-    //    phaseRestClient.createDefaultPhases(unit.getId());
+        //    phaseRestClient.createDefaultPhases(unit.getId());
 
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
@@ -1016,14 +1016,26 @@ public class OrganizationService extends UserBaseService {
     }
 
     public OrganizationTypeAndSubTypeDTO getOrganizationTypeAndSubTypes(Long id, String type) {
-        Long unitId = getOrganization(id, type);
-
+        Organization organization = getOrganizationDetail(id, type);
         OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = new OrganizationTypeAndSubTypeDTO();
-        List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(unitId);
-        List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(unitId);
-        organizationTypeAndSubTypeDTO.setUnitId(unitId);
-        organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
-        organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
+
+        if (!organization.isParentOrganization()) {
+            Organization parentOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
+            organizationTypeAndSubTypeDTO.setParentOrganizationId(parentOrganization.getId());
+            organizationTypeAndSubTypeDTO.setParent(false);
+            organizationTypeAndSubTypeDTO.setUnitId(organization.getId());
+            return organizationTypeAndSubTypeDTO;
+        } else {
+
+            List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(organization.getId());
+            List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(organization.getId());
+            organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
+            organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
+            organizationTypeAndSubTypeDTO.setParent(true);
+
+        }
+        organizationTypeAndSubTypeDTO.setUnitId(organization.getId());
+
         return organizationTypeAndSubTypeDTO;
     }
 
@@ -1153,12 +1165,11 @@ public class OrganizationService extends UserBaseService {
     }
 
 
-
-    public List<OrganizationType> getOrganizationTypeByCountryId(Long countryId){
+    public List<OrganizationType> getOrganizationTypeByCountryId(Long countryId) {
         return organizationTypeGraphRepository.findOrganizationTypeByCountry(countryId);
     }
 
-    public OrganizationType getOrganizationTypeByCountryAndId(Long countryId, Long orgTypeId){
+    public OrganizationType getOrganizationTypeByCountryAndId(Long countryId, Long orgTypeId) {
         return organizationTypeGraphRepository.getOrganizationTypeById(countryId, orgTypeId);
     }
 
@@ -1166,7 +1177,7 @@ public class OrganizationService extends UserBaseService {
         return organizationTypeGraphRepository.getOrganizationSubTypesByTypeId(orgTypeId);
     }
 
-    public Map<String, Object> getAvailableZoneIds(Long unitId){
+    public Map<String, Object> getAvailableZoneIds(Long unitId) {
         Set<String> allZones = ZoneId.getAvailableZoneIds();
         List<String> zoneList = new ArrayList<>(allZones);
         Collections.sort(zoneList);
