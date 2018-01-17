@@ -9,6 +9,26 @@ public class OrganizationTypeAndSubTypeDTO {
     private List<Long> organizationTypes;
     private List<Long> organizationSubTypes;
     private Long unitId;
+    boolean isParent=false;
+    private Long parentOrganizationId;
+
+    public Long getParentOrganizationId() {
+        return parentOrganizationId;
+    }
+
+    public void setParentOrganizationId(Long parentOrganizationId) {
+        this.parentOrganizationId = parentOrganizationId;
+    }
+
+    public boolean isParent() {
+
+        return isParent;
+    }
+
+    public void setParent(boolean parent) {
+        isParent = parent;
+    }
+
     public List<Long> getOrganizationTypes() {
         return organizationTypes;
     }
