@@ -9,15 +9,21 @@ import javax.validation.constraints.NotNull;
  */
 public class UnitEmploymentPositionDTO {
 
-    @NotNull(message = "Position code  is required for position") @Range(min = 0,message = "Position code is required for position")
+    @NotNull(message = "Position code  is required for position")
+    @Range(min = 0, message = "Position code is required for position")
     private Long positionCodeId;
     @NotNull(message = "expertise is required for position")
-    @Range(min = 0,message = "expertise is required for position")
+    @Range(min = 0, message = "expertise is required for position")
     private Long expertiseId;
 
     private Long startDateMillis;
     private Long endDateMillis;
-    private float totalWeeklyHours;
+
+    @Range(min = 0, max = 60, message = "Incorrect Weekly minute")
+    private int totalWeeklyMinutes;
+    @Range(min = 0, max = 23, message = "Incorrect Weekly Hours")
+    private int totalWeeklyHours;
+
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
@@ -46,32 +52,47 @@ public class UnitEmploymentPositionDTO {
     }
 
 
-
-    public UnitEmploymentPositionDTO(String name, String description, Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours,
+    public UnitEmploymentPositionDTO(String name, String description, Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
                                      float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
-        this.salary=salary;
-        this.avgDailyWorkingHours =avgDailyWorkingHours;
-        this.totalWeeklyHours=totalWeeklyHours;
-        this.hourlyWages=hourlyWages;
+        this.salary = salary;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.hourlyWages = hourlyWages;
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
-        this.employmentTypeId=employmentTypeId;
+        this.employmentTypeId = employmentTypeId;
     }
 
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
+    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
-        this.totalWeeklyHours = totalWeeklyHours;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.workingDaysInWeek = workingDaysInWeek;
         this.hourlyWages = hourlyWages;
         this.salary = salary;
         this.employmentTypeId = employmentTypeId;
         this.staffId = staffId;
+    }
+
+    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+    }
+
+    public int getTotalWeeklyHours() {
+        return totalWeeklyHours;
+    }
+
+    public void setTotalWeeklyHours(int totalWeeklyHours) {
+        this.totalWeeklyHours = totalWeeklyHours;
+    }
+
+    public void setEmploymentTypeId(Long employmentTypeId) {
+        this.employmentTypeId = employmentTypeId;
     }
 
     public int getWorkingDaysInWeek() {
@@ -115,12 +136,12 @@ public class UnitEmploymentPositionDTO {
         this.endDateMillis = endDateMillis;
     }
 
-    public float getTotalWeeklyHours() {
-        return totalWeeklyHours;
+    public Integer getTotalWeeklyMinutes() {
+        return totalWeeklyMinutes;
     }
 
-    public void setTotalWeeklyHours(float totalWeeklyHours) {
-        this.totalWeeklyHours = totalWeeklyHours;
+    public void setTotalWeeklyMinutes(Integer totalWeeklyMinutes) {
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
     }
 
     public float getAvgDailyWorkingHours() {
@@ -186,7 +207,5 @@ public class UnitEmploymentPositionDTO {
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
-
-
 
 }

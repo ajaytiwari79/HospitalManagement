@@ -43,14 +43,14 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "unitEmpPosition.lastModificationDate as lastModificationDate")
     List<UnitEmploymentPositionQueryResult> findAllUnitEmploymentPositions(long unitEmploymentId);
 
-    @Query("match(organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + HAS_UNIT_EMPLOYMENTS + "]->(uEmp:UnitEmployment)  where  Id(organization)={0} And Id(uEmp)={1}\n" +
-            "match(uEmp)-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]->(unitEmpPosition:UnitEmploymentPosition{deleted:false})<-[:" + BELONGS_TO_STAFF + "]-(s:Staff) where id(s)={2}\n" +
+    @Query("match (uEmp:UnitEmployment)  where  Id(uEmp)={0} \n" +
+            "match(uEmp)-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]->(unitEmpPosition:UnitEmploymentPosition{deleted:false})" +
             "match(unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
             "match(unitEmpPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "match(unitEmpPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode)" +
             "return expertise as expertise," +
             "positionCode as positionCode," +
-            "unitEmpPosition.totalWeeklyHours as totalWeeklyHours," +
+            "unitEmpPosition.totalWeeklyMinutes as totalWeeklyMinutes,unitEmpPosition.totalWeeklyHours as totalWeeklyHours," +
             "unitEmpPosition.startDateMillis as startDateMillis," +
             "unitEmpPosition.endDateMillis as endDateMillis," +
             "unitEmpPosition.salary as salary," +
@@ -61,7 +61,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "id(unitEmpPosition)   as id," +
             "unitEmpPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
             "unitEmpPosition.lastModificationDate as lastModificationDate")
-    List<UnitEmploymentPositionQueryResult> getAllUnitEmploymentPositionByStaff(long unitId, long unitEmploymentId, long staffId);
+    List<UnitEmploymentPositionQueryResult> getAllUnitEmploymentPositionByStaff(Long unitEmploymentId, Long staffId);
 
     @Query("Match (org:Organization) where id(org)={0}\n" +
             "Match (e:Expertise) where id(e)={1}\n" +
