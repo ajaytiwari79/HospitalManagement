@@ -319,7 +319,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         return unitEmploymentPositionGraphRepository.getCtaAndWtaByExpertise(unitId, expertiseId);
     }
 
-    public UnitEmploymentPosition updateUnitEmploymentPositionWTA(Long unitId, Long unitEmploymentPositionId, Long wtaId, WTADTO updateDTO) {
+    public UnitEmploymentPositionQueryResult updateUnitEmploymentPositionWTA(Long unitId, Long unitEmploymentPositionId, Long wtaId, WTADTO updateDTO) {
         UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
         if (!Optional.ofNullable(unitEmploymentPosition).isPresent()) {
             throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitEmploymentPositionId);
@@ -343,10 +343,12 @@ public class UnitEmploymentPositionService extends UserBaseService {
         newWta.setDisabled(false);
         unitEmploymentPosition.setWorkingTimeAgreement(newWta);
         save(unitEmploymentPosition);
-        // setting basic details for unit employment position response
+        UnitEmploymentPositionQueryResult unitEmploymentPositionQueryResult = unitEmploymentPosition.getBasicDetails();
         newWta.setParentWTA(oldWta.basicDetails());
+
         newWta.setExpertise(newWta.getExpertise().retrieveBasicDetails());
-        return unitEmploymentPosition;
+        unitEmploymentPositionQueryResult.setWorkingTimeAgreement(newWta);
+        return unitEmploymentPositionQueryResult;
     }
 
     public WTAResponseDTO getUnitEmploymentPositionWTA(Long unitId, Long unitEmploymentPositionId) {
