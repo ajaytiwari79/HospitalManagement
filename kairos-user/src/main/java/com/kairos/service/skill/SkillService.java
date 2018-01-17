@@ -1,5 +1,6 @@
 package com.kairos.service.skill;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.client.SkillServiceTemplateClient;
 import com.kairos.client.TaskDemandRestClient;
 import com.kairos.config.env.EnvConfig;
@@ -7,6 +8,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -44,6 +46,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 
@@ -595,5 +598,41 @@ public class SkillService extends UserBaseService {
 
     public List<Map<String,Object>> getSkillsForTaskType(@PathVariable long countryId){
         return skillGraphRepository.getSkillsByCountryForTaskType(countryId);
+    }
+
+    public List<Skill> importSkillsFromTimeCare(List<TimeCareSkill> timeCareSkills,Long countryId){
+
+        Country country = countryGraphRepository.findOne(countryId);
+        if(country == null){
+            throw new InternalError("Invalid country id ");
+        }
+        SkillCategory skillCategory = new SkillCategory("Skills From TimeCare");
+        skillCategory.setCountry(country);
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<Skill> skillsToCreate = new ArrayList<>();
+        for(TimeCareSkill timeCareSkill : timeCareSkills){
+            Skill skill = objectMapper.convertValue(timeCareSkill,Skill.class);
+            skill.setSkillCategory(skillCategory);
+            skill.setExternalId(String.valueOf(timeCareSkill.getId()));
+            skillsToCreate.add(skill);
+        }
+        return save(skillsToCreate);
+    }
+
+    public List<Skill> getSkillsByName(Set<String> skillNames){
+        int sizeOfSkillNames = skillNames.size();
+        int skip = 0;
+        List<Skill> skills = new ArrayList<>();
+        if(sizeOfSkillNames > 100){
+            do {
+                List<String> skillsToFind = skillNames.stream().skip(skip).limit(100).collect(Collectors.toList());
+                skills.addAll(skillGraphRepository.findSkillByNameIn(skillsToFind));
+                skip+= sizeOfSkillNames;
+            } while (skip <= sizeOfSkillNames);
+        } else {
+            List<String> skillsToFind = skillNames.stream().skip(skip).limit(100).collect(Collectors.toList());
+            skills.addAll(skillGraphRepository.findSkillByNameIn(skillsToFind));
+        }
+        return skills;
     }
 }

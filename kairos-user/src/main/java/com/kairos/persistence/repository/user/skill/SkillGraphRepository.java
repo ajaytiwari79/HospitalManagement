@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.skill;
 
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -86,6 +87,9 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
     @Query("Match (org:Organization)-[r:"+ORGANIZATION_HAS_TAG+"]->(tag:Tag) WHERE id(org)={0} with tag \n"+
             "Match (skill:Skill)-[skillTagRel:"+HAS_TAG+"]-(tag) WHERE id(skill) = {1} DELETE  skillTagRel ")
     void removeAllOrganizationTags(long orgId, long skillId);
+
+
+    List<Skill> findSkillByNameIn(List<String> skillNames);
 
 
 
