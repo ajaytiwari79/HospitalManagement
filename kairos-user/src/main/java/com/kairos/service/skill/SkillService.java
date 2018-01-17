@@ -618,4 +618,21 @@ public class SkillService extends UserBaseService {
         }
         return save(skillsToCreate);
     }
+
+    public List<Skill> getSkillsByName(Set<String> skillNames){
+        int sizeOfSkillNames = skillNames.size();
+        int skip = 0;
+        List<Skill> skills = new ArrayList<>();
+        if(sizeOfSkillNames > 100){
+            do {
+                List<String> skillsToFind = skillNames.stream().skip(skip).limit(100).collect(Collectors.toList());
+                skills.addAll(skillGraphRepository.findSkillByNameIn(skillsToFind));
+                skip+= sizeOfSkillNames;
+            } while (skip <= sizeOfSkillNames);
+        } else {
+            List<String> skillsToFind = skillNames.stream().skip(skip).limit(100).collect(Collectors.toList());
+            skills.addAll(skillGraphRepository.findSkillByNameIn(skillsToFind));
+        }
+        return skills;
+    }
 }
