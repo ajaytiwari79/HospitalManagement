@@ -21,7 +21,7 @@ public class UnitEmploymentPositionDTO {
 
     @Range(min = 0, max = 60, message = "Incorrect Weekly minute")
     private int totalWeeklyMinutes;
-    @Range(min = 0, max = 23, message = "Incorrect Weekly Hours")
+    @Range(min = 0,  message = "Incorrect Weekly Hours")
     private int totalWeeklyHours;
 
     private float avgDailyWorkingHours;

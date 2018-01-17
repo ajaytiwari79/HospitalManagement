@@ -48,9 +48,11 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "match(unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
             "match(unitEmpPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "match(unitEmpPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode)" +
-            "return expertise as expertise," +
+            "optional match (unitEmpPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement)\n" +
+            "optional match (unitEmpPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
+            "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement," +
             "positionCode as positionCode," +
-            "unitEmpPosition.totalWeeklyMinutes as totalWeeklyMinutes,unitEmpPosition.totalWeeklyHours as totalWeeklyHours," +
+            "unitEmpPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
             "unitEmpPosition.startDateMillis as startDateMillis," +
             "unitEmpPosition.endDateMillis as endDateMillis," +
             "unitEmpPosition.salary as salary," +
