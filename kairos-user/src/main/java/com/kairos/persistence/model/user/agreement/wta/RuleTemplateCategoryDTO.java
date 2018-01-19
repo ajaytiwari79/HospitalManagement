@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.agreement.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -15,6 +16,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
 public class RuleTemplateCategoryDTO {
+    private List<PhaseTemplateValue> phaseTemplateValues;
     private RuleTemplateCategory ruleTemplateCategory;
     private Long id;
     private String name;
@@ -36,6 +38,24 @@ public class RuleTemplateCategoryDTO {
     private String intervalUnit;
     private Long validationStartDateMillis;
     private Boolean balanceAdjustment = false;
+    private int recommendedValue;
+
+    public int getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(int recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    public List<PhaseTemplateValue> getPhaseTemplateValues() {
+        return phaseTemplateValues;
+    }
+
+    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
+        this.phaseTemplateValues = phaseTemplateValues;
+    }
+
     private Boolean useShiftTimes = false;
     private Long maximumAvgTime;
     private Double maximumVetoPercentage;
@@ -78,6 +98,7 @@ public class RuleTemplateCategoryDTO {
         return balanceAdjustment;
     }
 
+
     public void setBalanceAdjustment(Boolean balanceAdjustment) {
         this.balanceAdjustment = balanceAdjustment;
     }
@@ -105,6 +126,9 @@ public class RuleTemplateCategoryDTO {
     public void setOnlyCompositeShifts(Boolean onlyCompositeShifts) {
         this.onlyCompositeShifts = onlyCompositeShifts;
     }
+
+
+
 
     public String getCategory() {
         return category;
