@@ -91,6 +91,8 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
 
     List<Skill> findSkillByNameIn(List<String> skillNames);
 
+    List<Skill> findByExternalIdIn(List<String> timecareIds);
+
 
 
 }
