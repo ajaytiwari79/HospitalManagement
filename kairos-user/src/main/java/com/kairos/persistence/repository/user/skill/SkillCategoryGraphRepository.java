@@ -74,4 +74,6 @@ public interface SkillCategoryGraphRepository extends Neo4jBaseRepository<SkillC
     @Query("MATCH (sc:SkillCategory {isEnabled:true})-[:BELONGS_TO]->(c:Country) WHERE id(c)={0} AND sc.name=~ {1} return sc")
     List<SkillCategory> checkDuplicateSkillCategory(long countryId, String name);
 
+    SkillCategory findByName(String name);
+
 }
