@@ -40,7 +40,8 @@ public class UnitEmploymentPosition extends UserBaseEntity {
 
     private Long startDateMillis;
     private Long endDateMillis;
-    private float totalWeeklyHours;
+    private int totalWeeklyMinutes;
+
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
@@ -53,7 +54,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
 
     public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
                                   PositionCode positionCode, String description, Long startDateMillis, Long endDateMillis, Long expiryDate
-            , int totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
+            , int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
 
 
         this.expertise = expertise;
@@ -62,7 +63,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.positionCode = positionCode;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
-        this.totalWeeklyHours = totalWeeklyHours;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.salary = salary;
         this.hourlyWages = hourlyWages;
@@ -70,20 +71,12 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     }
 
 
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
+    public int getTotalWeeklyMinutes() {
+        return totalWeeklyMinutes;
     }
 
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
-    }
-
-    public float getTotalWeeklyHours() {
-        return totalWeeklyHours;
-    }
-
-    public void setTotalWeeklyHours(float totalWeeklyHours) {
-        this.totalWeeklyHours = totalWeeklyHours;
+    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
     }
 
     public float getAvgDailyWorkingHours() {
@@ -92,6 +85,14 @@ public class UnitEmploymentPosition extends UserBaseEntity {
 
     public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
         this.avgDailyWorkingHours = avgDailyWorkingHours;
+    }
+
+    public int getWorkingDaysInWeek() {
+        return workingDaysInWeek;
+    }
+
+    public void setWorkingDaysInWeek(int workingDaysInWeek) {
+        this.workingDaysInWeek = workingDaysInWeek;
     }
 
     public float getHourlyWages() {
@@ -182,8 +183,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.staff = staff;
     }
 
-
-    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
+    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
         this.expertise = expertise;
         this.cta = cta;
         this.workingTimeAgreement = workingTimeAgreement;
@@ -192,7 +192,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.deleted = deleted;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
-        this.totalWeeklyHours = totalWeeklyHours;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.workingDaysInWeek = workingDaysInWeek;
         this.hourlyWages = hourlyWages;
@@ -202,8 +202,11 @@ public class UnitEmploymentPosition extends UserBaseEntity {
 
 
     public UnitEmploymentPositionQueryResult getBasicDetails() {
-        UnitEmploymentPositionQueryResult result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek, this.endDateMillis, this.totalWeeklyHours,
+        UnitEmploymentPositionQueryResult result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek,
+                this.endDateMillis, this.totalWeeklyMinutes,
                 this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode, this.workingTimeAgreement.basicDetails(), this.cta);
         return result;
     }
+
+
 }
