@@ -634,14 +634,14 @@ public class SkillService extends UserBaseService {
         int sizeOfSkillNames = skillNames.size();
         int skip = 0;
         List<Skill> skills = new ArrayList<>();
-        if (sizeOfSkillNames > 100) {
+        if (sizeOfSkillNames > DB_RECORD_LIMIT) {
             do {
-                List<String> skillsToFind = skillNames.stream().skip(skip).limit(100).collect(Collectors.toList());
+                List<String> skillsToFind = skillNames.stream().skip(skip).limit(DB_RECORD_LIMIT).collect(Collectors.toList());
                 skills.addAll(skillGraphRepository.findSkillByNameIn(skillsToFind));
-                skip += sizeOfSkillNames;
+                skip += DB_RECORD_LIMIT;
             } while (skip <= sizeOfSkillNames);
         } else {
-            List<String> skillsToFind = skillNames.stream().skip(skip).limit(100).collect(Collectors.toList());
+            List<String> skillsToFind = skillNames.stream().skip(skip).limit(DB_RECORD_LIMIT).collect(Collectors.toList());
             skills.addAll(skillGraphRepository.findSkillByNameIn(skillsToFind));
         }
         return skills;
