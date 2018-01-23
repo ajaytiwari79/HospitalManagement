@@ -13,7 +13,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
 
  @Query("MATCH (p:`CTARuleTemplate`)-[:`HAS_RULE_TEMPLATES`]-(m0:`RuleTemplateCategory`) " +
          "WHERE NOT(p.`deleted` = true ) AND ID(m0) IN {0} "+
-         "MATCH (p)-[:HAS_RULE_TEMPLATE]-(country:Country) "+
+         "MATCH (p)-[:HAS_CTA_RULE_TEMPLATE]-(country:Country) "+
          " optional  MATCH (p)-[:`BELONGS_TO`]-(cTARuleTemplateDayTypes:`CTARuleTemplateDayType`)"+
          " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(dayType:`DayType`)"+
          " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(countryHolidayCalender:`CountryHolidayCalender`)"+

@@ -182,6 +182,7 @@ public abstract class RelationshipConstants {
 
     // RULE Template
     public final static String HAS_RULE_TEMPLATE = "HAS_RULE_TEMPLATE";
+    public final static String HAS_CTA_RULE_TEMPLATE = "HAS_CTA_RULE_TEMPLATE";
     public final static String HAS_RULE_TEMPLATE_CATEGORY = "HAS_RULE_TEMPLATE_CATEGORY";
     public final static String HAS_RULE_TEMPLATES = "HAS_RULE_TEMPLATES";
     public final static String HAS_TIME_TYPES = "HAS_TIME_TYPES";

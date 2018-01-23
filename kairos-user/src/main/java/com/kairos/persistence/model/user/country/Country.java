@@ -63,8 +63,8 @@ public class Country extends UserBaseEntity {
     @Relationship(type = HAS_RULE_TEMPLATE)
     private List<RuleTemplate> WTABaseRuleTemplate;
 
-    @Relationship(type = HAS_RULE_TEMPLATE)
-    private List<CTARuleTemplate> ctaRuleTemplates;
+    @Relationship(type = HAS_CTA_RULE_TEMPLATE)
+    private List<RuleTemplate> ctaRuleTemplates;
 
 
     @Relationship(type = COUNTRY_HAS_TAG)
@@ -112,11 +112,11 @@ public class Country extends UserBaseEntity {
         this.WTABaseRuleTemplate = WTABaseRuleTemplate;
     }
 
-    public List<CTARuleTemplate> getCtaRuleTemplates() {
+    public List<RuleTemplate> getCtaRuleTemplates() {
         return ctaRuleTemplates;
     }
 
-    public void setCtaRuleTemplates(List<CTARuleTemplate> ctaRuleTemplates) {
+    public void setCtaRuleTemplates(List<RuleTemplate> ctaRuleTemplates) {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
 

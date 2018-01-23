@@ -73,9 +73,9 @@ public class CTARuleTemplate extends RuleTemplate{
 
     public  void cloneCTARuleTemplate(){
         this.setId(null);
-        if(this.getCompensationTable() != null){
+        if(this.getCompensationTable() != null && this.getCompensationTable().getCompensationTableInterval() != null){
             for (CompensationTableInterval compensationTableInterval : this.getCompensationTable().getCompensationTableInterval()) {
-                compensationTableInterval.setId(null);
+               compensationTableInterval.setId(null);
             }
             this.getCompensationTable().setId(null);
         }
