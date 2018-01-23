@@ -42,10 +42,11 @@ public class RuleTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.getRuleTemplate(countryId));
     }
 
-    @RequestMapping(value = COUNTRY_URL+"/rule_templates", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId,  @Valid @RequestBody RuleTemplateCategoryDTO templateDTO) {
+    @RequestMapping(value = COUNTRY_URL+"/rule_templates/{templateType}", method = RequestMethod.PUT)
+    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @Valid @RequestBody RuleTemplateCategoryDTO templateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.updateRuleTemplate(countryId, templateDTO));
     }
+
 
     @RequestMapping(value = COUNTRY_URL+"/rule_templates/category", method = RequestMethod.POST)
     ResponseEntity<Map<String,Object>> updateRuleTemplateCategory(@Valid @RequestBody RuleTemplateDTO ruleTemplateDTO, @PathVariable long countryId){

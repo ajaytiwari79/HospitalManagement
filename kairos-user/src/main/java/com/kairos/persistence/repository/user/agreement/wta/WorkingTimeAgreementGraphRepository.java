@@ -146,10 +146,10 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     WTAResponseDTO getWTAByExpertiseAndCountry(Long expertiseId);
 
 
-    @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:" + HAS_WTA + "]-(organization:Organization) where id(organization)={0}\n" +
+    @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + HAS_WTA + "]-(organization:Organization) where id(organization)={0}\n" +
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
-            "Optional Match (ruleTemp)-[: " + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
+            "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
             "with expertise,wta,ruleTemp,organization,ruleTemplateCatg, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
