@@ -27,10 +27,8 @@ public class CTAListQueryResult {
     private Long organizationType;
     private Long organizationSubType;
     private List<CTARuleTemplateQueryResult> ruleTemplates = new ArrayList<>();
-    @DateLong
-    private Date startDate;
-    @DateLong
-    private Date endDate;
+    private Long startDateMillis;
+    private Long endDateMillis;
     public CTAListQueryResult(){
         // default constructor
     }
@@ -91,19 +89,19 @@ public class CTAListQueryResult {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 }

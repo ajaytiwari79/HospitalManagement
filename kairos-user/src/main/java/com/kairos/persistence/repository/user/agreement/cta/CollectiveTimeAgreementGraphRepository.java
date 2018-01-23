@@ -12,6 +12,7 @@ import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO_ORG_SUB_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PARENT_CTA;
 
 @Repository
 public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseRepository<CostTimeAgreement,Long> {
@@ -31,7 +32,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             ",CASE WHEN accessGroup IS NULL THEN [] ELSE collect(distinct ID(accessGroup)) END as calculateValueIfPlanned,ruleTemplCat \n" +
             "optional  MATCH (ruleTemp)-[:`HAS_EMPLOYMENT_TYPE`]-(employmentType:`EmploymentType`)  WITH cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,calculateValueIfPlanned,CASE WHEN employmentType IS NULL THEN [] ELSE  collect(distinct ID(employmentType)) END as employmentTypes,ruleTemplCat\n" +
             "optional  MATCH (ruleTemp)-[:`HAS_TIME_TYPES`]-(timeType:`TimeType`) WITH cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,calculateValueIfPlanned,employmentTypes, CASE WHEN timeType IS NULL THEN [] ELSE collect(distinct ID(timeType)) END as timeTypes,ruleTemplCat\n" +
-            "optional  MATCH (ruleTemp)-[:`HAS_COMPENSATION_TABLE`]-(compensationTable:`CompensationTanameble`) WITH cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,calculateValueIfPlanned,employmentTypes, timeTypes,compensationTable,ruleTemplCat\n" +
+            "optional  MATCH (ruleTemp)-[:`HAS_COMPENSATION_TABLE`]-(compensationTable:`CompensationTable`) WITH cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,calculateValueIfPlanned,employmentTypes, timeTypes,compensationTable,ruleTemplCat\n" +
             "optional  MATCH (compensationTable)-[:`HAS_COMPENSATION_TABLE_INTERVAL`]-(compensationTableInterval:`CompensationTableInterval`)  \n" +
             "WITH cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,calculateValueIfPlanned,employmentTypes, timeTypes,CASE WHEN compensationTableInterval IS NOT NULL THEN collect(distinct{id:ID(compensationTableInterval),to:compensationTableInterval.to,from:compensationTableInterval.from,value:compensationTableInterval.value}) ELSE [] END as compensationTableInterval,\n" +
             "CASE WHEN compensationTable IS NULL THEN NULL ELSE {id:ID(compensationTable),granularityLevel:compensationTable.granularityLevel,compensationMeasurementType:compensationTable.compensationMeasurementType,compensationTableInterval:compensationTableInterval} END as compensationTable,ruleTemplCat\n" +
@@ -45,7 +46,9 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "CASE WHEN cTARuleTemplatePhaseInfo IS NULL THEN [] ELSE collect(distinct cTARuleTemplatePhaseInfo) END  as phaseInfo,ruleTemplCat\n" +
             "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(activityType:`ActivityType`)  WITH \n" +
             "cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,calculateValueIfPlanned,employmentTypes, timeTypes,compensationTableInterval,compensationTable,calculateValueAgainst,phaseInfo,activityType ,ruleTemplCat\n" +
-            "RETURN id(cta) as id,cta.startDate as startDate, cta.endDate as endDate, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,timeTypes:timeTypes,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo,activityType:activityType,calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates")
+            "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`)  WITH \n" +
+            "cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,calculateValueIfPlanned,employmentTypes, timeTypes,compensationTableInterval,compensationTable,calculateValueAgainst,phaseInfo,activityType, plannedTimeWithFactor ,ruleTemplCat\n" +
+            "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,timeTypes:timeTypes,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo,activityType:{id:id(activityType),onlyForActivityThatPartOfCostCalculation:activityType.onlyForActivityThatPartOfCostCalculation,activityTypes:activityType.activityTypes },plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType},calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates")
     List<CTAListQueryResult> findCTAByCountryId(Long countryId);
 
     @Query("MATCH (cta:CostTimeAgreement)-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0} AND id(cta) = {1} AND cta.deleted={2} return cta")
@@ -67,4 +70,10 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     @Query("Match (cta:CostTimeAgreement)-[r:"+BELONGS_TO+"]-(country:Country) WHERE id(cta) = {0}\n" +
             "RETURN CASE WHEN r IS NULL THEN false ELSE true END")
     Boolean isCTALinkedWithCountry(Long ctaId);
+
+    @Query("MATCH (cta:CostTimeAgreement)<-[r:"+HAS_PARENT_CTA+"]-(chiltCTA:CostTimeAgreement) WHERE id(cta) = {0} return chiltCTA")
+    CostTimeAgreement fetchChildCTA(Long ctaId);
+
+    @Query("MATCH (cta:CostTimeAgreement)<-[r:"+HAS_PARENT_CTA+"]-(chiltCTA:CostTimeAgreement) WHERE id(chiltCTA) = {0} DELETE r")
+    void detachParentCTA(Long ctaId);
 }
