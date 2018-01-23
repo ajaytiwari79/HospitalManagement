@@ -257,6 +257,9 @@ public class AppConstants {
     public static final String SUCCESS = "success";
     public static final String TIME_SLOT_SET_NAME = "Time slot 1";
 
+    public static final String SKILL_CATEGORY_FOR_TIME_CARE = "Skills From TimeCare";
+    public static final int DB_RECORD_LIMIT = 100;
+
 
 
 

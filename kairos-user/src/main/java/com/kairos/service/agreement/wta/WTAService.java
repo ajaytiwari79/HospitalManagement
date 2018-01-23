@@ -242,6 +242,7 @@ public class WTAService extends UserBaseService {
         save(newWta);
         WTAResponseDTO wtaResponseDTO = newWta.retriveBasicResponse();
         wtaResponseDTO.setId(newWta.getId());
+        wtaResponseDTO.setRuleTemplates(retrieveRuleTemplateResponse(newWta.getRuleTemplates()));
         wtaResponseDTO.setParentWTA(oldWta.retriveBasicResponse());
         assignUpdatedWTAToOrganization(newWta, updateDTO.getOrganizationSubType(), oldWta.getId());
         oldWta.setCountry(null);
@@ -395,6 +396,18 @@ public class WTAService extends UserBaseService {
             WTABaseRuleTemplate wtaBaseRuleTemplateDTO = objectMapper.convertValue(ruleTemplate, WTABaseRuleTemplate.class);
             wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
             wtaBaseRuleTemplateDTO.setId(null);
+            copiedRuleTemplate.add(wtaBaseRuleTemplateDTO);
+        });
+        return copiedRuleTemplate;
+    }
+
+    public List<RuleTemplateCategoryDTO> retrieveRuleTemplateResponse(List<WTABaseRuleTemplate> ruleTemplates) {
+        List<RuleTemplateCategoryDTO> copiedRuleTemplate = new ArrayList<>(ruleTemplates.size());
+        ObjectMapper objectMapper = new ObjectMapper();
+        ruleTemplates.forEach(ruleTemplate -> {
+            RuleTemplateCategoryDTO wtaBaseRuleTemplateDTO = objectMapper.convertValue(ruleTemplate, RuleTemplateCategoryDTO.class);
+            wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
+
             copiedRuleTemplate.add(wtaBaseRuleTemplateDTO);
         });
         return copiedRuleTemplate;

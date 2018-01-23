@@ -24,13 +24,13 @@ public class UnitEmploymentPositionQueryResult {
     private int workingDaysInWeek;
     private Long endDateMillis;
     private Long lastModificationDate;
-    private float totalWeeklyHours;
+    private int totalWeeklyHours;
     private float avgDailyWorkingHours;
     private float hourlyWages;
     private long id;
     private EmploymentType employmentType;
     private float salary;
-
+    private int totalWeeklyMinutes;
     private PositionCode positionCode;
     private WorkingTimeAgreement workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
@@ -75,13 +75,6 @@ public class UnitEmploymentPositionQueryResult {
         this.endDateMillis = endDateMillis;
     }
 
-    public float getTotalWeeklyHours() {
-        return totalWeeklyHours;
-    }
-
-    public void setTotalWeeklyHours(float totalWeeklyHours) {
-        this.totalWeeklyHours = totalWeeklyHours;
-    }
 
     public float getAvgDailyWorkingHours() {
         return avgDailyWorkingHours;
@@ -155,21 +148,61 @@ public class UnitEmploymentPositionQueryResult {
         this.costTimeAgreement = costTimeAgreement;
     }
 
+    public int getTotalWeeklyMinutes() {
+        this.totalWeeklyMinutes = this.totalWeeklyMinutes % 60;
+        return totalWeeklyMinutes;
+
+    }
+
+    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
+
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+
+    }
+
+    public int getTotalWeeklyHours() {
+        this.totalWeeklyHours = this.totalWeeklyMinutes / 60;
+        return totalWeeklyHours;
+    }
+
+    public void setTotalWeeklyHours(int totalWeeklyHours) {
+        this.totalWeeklyHours = totalWeeklyHours;
+    }
+
     public UnitEmploymentPositionQueryResult() {
         //default cons
     }
 
-    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, float totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
+    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;
         this.endDateMillis = endDateMillis;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.hourlyWages = hourlyWages;
+        this.id = id;
+        this.employmentType = employmentType;
+        this.salary = salary;
+        this.positionCode = positionCode;
+        this.workingTimeAgreement = workingTimeAgreement;
+        this.costTimeAgreement = costTimeAgreement;
+    }
+
+    public UnitEmploymentPositionQueryResult(Expertise expertise, boolean deleted, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, Long lastModificationDate, int totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, int totalWeeklyMinutes, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
+        this.expertise = expertise;
+        this.deleted = deleted;
+        this.startDateMillis = startDateMillis;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.endDateMillis = endDateMillis;
+        this.lastModificationDate = lastModificationDate;
         this.totalWeeklyHours = totalWeeklyHours;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.hourlyWages = hourlyWages;
         this.id = id;
         this.employmentType = employmentType;
         this.salary = salary;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
         this.positionCode = positionCode;
         this.workingTimeAgreement = workingTimeAgreement;
         this.costTimeAgreement = costTimeAgreement;
