@@ -55,6 +55,15 @@ public class RuleTemplateResponseDTO {
     private Boolean onlyCompositeShifts;
     private String activityCode;
     private int recommendedValue;
+    private String lastUpdatedBy;
+
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
 
     public int getRecommendedValue() {
         return recommendedValue;

@@ -19,9 +19,20 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_T
 public class WTABaseRuleTemplate extends RuleTemplate{
 
     protected String templateType;
+
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
     @Relationship(type = HAS_TEMPLATE_MATRIX)
+
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected int recommendedValue;
+    protected String lastUpdatedBy;
 
     public int getRecommendedValue() {
         return recommendedValue;

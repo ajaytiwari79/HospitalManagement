@@ -146,9 +146,11 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     WTAResponseDTO getWTAByExpertiseAndCountry(Long expertiseId);
 
 
-    @Query("match(wta:WorkingTimeAgreement{deleted:false,disabled:false})-[:" + HAS_WTA + "]-(organization:Organization) where id(organization)={0}\n" +
+    @Query("match(wta:WorkingTimeAgreement{isEnabled:true})-[:" + HAS_WTA + "]-(organization:Organization) where id(organization)={0}\n" +
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
+            "Optional Match (ruleTemp)-[: " + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
+            "with expertise,wta,ruleTemp,organization,ruleTemplateCatg, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
             "shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional," +
@@ -156,8 +158,9 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "timeLimit:ruleTemp.timeLimit,balanceType:ruleTemp.balanceType,templateType:ruleTemp.templateType,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description," +
             " numberShiftsPerPeriod:ruleTemp.numberShiftsPerPeriod,numberOfWeeks:ruleTemp.numberOfWeeks,maximumVetoPercentage:ruleTemp.maximumVetoPercentage,maximumAvgTime:ruleTemp.maximumAvgTime," +
             "useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,intervalLength:ruleTemp.intervalLength,intervalUnit:ruleTemp.intervalUnit,validationStartDateMillis:ruleTemp.validationStartDateMillis," +
-            "daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates, wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
-            "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id"
+            "daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description,checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates, " +
+            "wta.endDateMillis as endDateMillis,wta.startDateMillis as startDateMillis,wta.expiryDate as expiryDate,wta.description as description," +
+            "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id,phaseTemplateValues as phaseTemplateValues"
     )
     List<WTAResponseDTO> getWtaByOrganization(Long organizationId);
 

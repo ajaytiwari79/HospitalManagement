@@ -3,16 +3,39 @@ package com.kairos.persistence.model.user.agreement.wta.templates;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import java.math.BigInteger;
+
 /**
  * Created by pavan on 18/1/18.
  */
 
 @NodeEntity
 public class PhaseTemplateValue extends UserBaseEntity {
+    private int phaseId;
     private String phaseName;
-    private short staffValue;
-    private short managementValue;
-    private boolean disabled;
+    private short staffValue=0;
+    private short managementValue=0;
+    private boolean disabled=true;
+    private int optionalFrequency=0;
+
+    public int getOptionalFrequency() {
+        return optionalFrequency;
+    }
+
+    public void setOptionalFrequency(int optionalFrequency) {
+        this.optionalFrequency = optionalFrequency;
+    }
+
+
+
+    public int getPhaseId() {
+        return phaseId;
+    }
+
+    public void setPhaseId(int phaseId) {
+        this.phaseId = phaseId;
+    }
+
     private boolean optional;
 
 

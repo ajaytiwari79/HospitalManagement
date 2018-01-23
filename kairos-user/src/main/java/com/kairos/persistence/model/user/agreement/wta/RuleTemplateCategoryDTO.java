@@ -40,6 +40,7 @@ public class RuleTemplateCategoryDTO {
     private Boolean balanceAdjustment = false;
     private int recommendedValue;
 
+
     public int getRecommendedValue() {
         return recommendedValue;
     }

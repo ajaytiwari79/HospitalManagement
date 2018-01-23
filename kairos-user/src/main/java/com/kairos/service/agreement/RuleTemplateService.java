@@ -2,6 +2,7 @@ package com.kairos.service.agreement;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
@@ -21,6 +22,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.util.ArrayUtil;
 import com.kairos.util.DateUtil;
+import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +54,7 @@ public class RuleTemplateService extends UserBaseService {
     private TagService tagService;
     @Inject
     private WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
+
 
     public boolean createRuleTemplate(long countryId) {
 
@@ -344,12 +347,15 @@ public class RuleTemplateService extends UserBaseService {
         RuleTemplateCategory ruleTemplateCategory = null;
         ruleTemplateCategory = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
         oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
-
+        CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         oldTemplate.setPhaseTemplateValues(templateDTO.getPhaseTemplateValues());
 
         oldTemplate.setDisabled(templateDTO.getDisabled());
         oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
         oldTemplate.setRecommendedValue(templateDTO.getRecommendedValue());
+
+        oldTemplate.setLastUpdatedBy(currentUserDetails.getFirstName());
+
         save(oldTemplate);
         return templateDTO;
     }
