@@ -70,6 +70,8 @@ import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
@@ -1369,6 +1371,85 @@ public class StaffService extends UserBaseService {
      */
     public Staff getStaffByUserId(Long userId) {
         return staffGraphRepository.getByUser(userId);
+    }
+
+    public boolean importStaffFromTimeCare(List<TimeCareStaffDTO> timeCareStaffDTOS,String externalId){
+
+        Organization organization = organizationGraphRepository.findByExternalId(externalId);
+        if(organization == null){
+            throw new InternalError("Invalid external id");
+        }
+
+        List<TimeCareStaffDTO> timeCareStaffByWorkPlace = timeCareStaffDTOS.stream().filter(timeCareStaffDTO -> timeCareStaffDTO.getId().equals(externalId)).
+                collect(Collectors.toList());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        for(TimeCareStaffDTO timeCareStaffDTO : timeCareStaffByWorkPlace){
+
+            String email = (timeCareStaffDTO.getEmail() == null)?timeCareStaffDTO.getFirstName() + KAIROS_EMAIL:timeCareStaffDTO.getEmail();
+            User user = Optional.ofNullable(userGraphRepository.findByEmail(email.trim())).orElse(new User());
+            if (staffGraphRepository.staffAlreadyInUnit(Long.valueOf(timeCareStaffDTO.getId()), organization.getId())) {
+                throw new DuplicateDataException("Staff already exist in organization");
+            }
+            StaffCreationPOJOData payload = objectMapper.convertValue(timeCareStaffDTO,StaffCreationPOJOData.class);
+            payload.setPrivateEmail(email);
+            setBasicDetailsOfUser(user, payload);
+            Staff staff = mapDataInStaffObject(timeCareStaffDTO,organization,email);
+            boolean isEmploymentExist = (staff.getId()) != null;
+            staff.setUser(user);
+            staffGraphRepository.save(staff);
+            createEmployment(organization, organization, staff, payload.getAccessGroupId(), isEmploymentExist);
+        }
+        return true;
+    }
+
+    private Staff mapDataInStaffObject(TimeCareStaffDTO timeCareStaffDTO,Organization organization,String email){
+
+        StaffQueryResult staffQueryResult = staffGraphRepository.getStaffByExternalIdInOrganization(organization.getId(), Long.valueOf(timeCareStaffDTO.getId()));
+
+        Staff staff = (Optional.ofNullable(staffQueryResult).isPresent())?staffQueryResult.getStaff():new Staff();
+        ContactAddress contactAddress;
+        if(timeCareStaffDTO.getZipCode() == null){
+            contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(organization);
+            if(staffQueryResult != null){
+                contactAddress.setId(staffQueryResult.getContactAddressId());
+            }
+        } else {
+            contactAddress = new ContactAddress();
+            contactAddress.setId(staffQueryResult.getContactAddressId());
+            contactAddress.setStreet1(timeCareStaffDTO.getAddress());
+            Pattern pattern = Pattern.compile("(\\d+)");
+            Matcher matcher = pattern.matcher(timeCareStaffDTO.getZipCode());
+            if(matcher.find()){
+                ZipCode zipCode = zipCodeGraphRepository.findByZipCode(Integer.valueOf(matcher.group(0)));
+                contactAddress.setZipCode(zipCode);
+            }
+            if(staffQueryResult != null){
+                contactAddress.setId(staffQueryResult.getContactAddressId());
+            }
+            matcher = pattern.matcher(timeCareStaffDTO.getAddress());
+            if(matcher.find()){
+                contactAddress.setHouseNumber(matcher.group(0));
+            }
+        }
+        staff.setContactAddress(contactAddress);
+
+        ContactDetail contactDetail = new ContactDetail();
+        contactDetail.setPrivatePhone(timeCareStaffDTO.getCellPhoneNumber());
+        contactDetail.setLandLinePhone(timeCareStaffDTO.getTelephoneNumber());
+        contactDetail.setPrivateEmail(email);
+        if(staffQueryResult != null){
+            contactDetail.setId(staffQueryResult.getContactDetailId());
+        }
+        staff.setContactDetail(contactDetail);
+        staff.setEmail(email);
+        staff.setExternalId(Long.valueOf(timeCareStaffDTO.getId()));
+        staff.setFirstName(timeCareStaffDTO.getFirstName());
+        staff.setLastName(timeCareStaffDTO.getLastName());
+        return staff;
+
+
     }
 
 }
