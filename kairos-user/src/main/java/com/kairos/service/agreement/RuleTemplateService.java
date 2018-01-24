@@ -149,6 +149,19 @@ public class RuleTemplateService extends UserBaseService {
 
     public Map getRuleTemplate(long countryId) {
 
+        List<RuleTemplateCategoryDTO> wtaResponse = null;
+
+        if (countryGraphRepository == null) {
+            System.out.println("country is " + countryGraphRepository);
+        }
+        try {
+            wtaResponse
+                    = countryGraphRepository.getRuleTemplatesAndCategories(countryId);
+        } catch (Exception e) {
+            System.out.println(e);
+
+
+        }
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             throw new DataNotFoundByIdException("Invalid Country");

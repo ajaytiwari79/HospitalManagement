@@ -7,6 +7,7 @@ import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCat
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -17,6 +18,7 @@ import java.util.List;
 @QueryResult
 public class RuleTemplateCategoryDTO {
     private List<PhaseTemplateValue> phaseTemplateValues;
+    private List<HashMap<String, Object>> phaseTemplateValue;
     private RuleTemplateCategory ruleTemplateCategory;
     private Long id;
     private String name;
@@ -77,8 +79,6 @@ public class RuleTemplateCategoryDTO {
     private String activityCode;
 
 
-
-
     public void setCheckAgainstTimeRules(Boolean checkAgainstTimeRules) {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
     }
@@ -127,8 +127,6 @@ public class RuleTemplateCategoryDTO {
     public void setOnlyCompositeShifts(Boolean onlyCompositeShifts) {
         this.onlyCompositeShifts = onlyCompositeShifts;
     }
-
-
 
 
     public String getCategory() {
@@ -389,6 +387,14 @@ public class RuleTemplateCategoryDTO {
         this.activityCode = activityCode;
     }
 
+    public List<HashMap<String, Object>> getPhaseTemplateValue() {
+        return phaseTemplateValue;
+    }
+
+    public void setPhaseTemplateValue(List<HashMap<String, Object>> phaseTemplateValue) {
+        this.phaseTemplateValue = phaseTemplateValue;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -442,11 +448,12 @@ public class RuleTemplateCategoryDTO {
         this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
-        this.timeLimit=timeInMins;
-        this.balanceType=balanceTypes;
-        this.checkAgainstTimeRules=checkAgainstTimeRules;
+        this.timeLimit = timeInMins;
+        this.balanceType = balanceTypes;
+        this.checkAgainstTimeRules = checkAgainstTimeRules;
 
     }
+
     // Template 13 Cons
     public RuleTemplateCategoryDTO(String name, String templateType, Boolean disabled, String description, Long numberShiftsPerPeriod, Long numberOfWeeks,
                                    String fromDayOfWeek, Long fromTime, Boolean proportional,
