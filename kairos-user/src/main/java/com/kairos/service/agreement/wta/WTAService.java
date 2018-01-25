@@ -136,7 +136,7 @@ public class WTAService extends UserBaseService {
         });
     }
 
-    @Async
+    // @Async
     private void assignUpdatedWTAToOrganization(WorkingTimeAgreement wta, Long organizationSubTypeId, Long oldWTAId) {
         List<Organization> organizations = organizationTypeRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
         organizations.forEach(organization ->
@@ -228,7 +228,7 @@ public class WTAService extends UserBaseService {
     // FOR COUNTRY
     public WTAResponseDTO updateWtaOfCountry(Long countryId, Long wtaId, WTADTO updateDTO) {
         WorkingTimeAgreement oldWta = wtaRepository.findOne(wtaId, 2);
-        if (!Optional.ofNullable(oldWta).isPresent()) {
+        if (!Optional.ofNullable(oldWta).isPresent() || oldWta.getCountry() == null) {
             logger.info("wta not found while updating at unit %d", wtaId);
             throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
         }
@@ -246,7 +246,7 @@ public class WTAService extends UserBaseService {
         wtaResponseDTO.setId(newWta.getId());
         wtaResponseDTO.setRuleTemplates(retrieveRuleTemplateResponse(newWta.getRuleTemplates()));
         wtaResponseDTO.setParentWTA(oldWta.retriveBasicResponse());
-        assignUpdatedWTAToOrganization(newWta, updateDTO.getOrganizationSubType(), oldWta.getId());
+        //assignUpdatedWTAToOrganization(newWta, updateDTO.getOrganizationSubType(), oldWta.getId());
         oldWta.setCountry(null);
         oldWta.setOrganizationType(null);
         oldWta.setOrganizationSubType(null);

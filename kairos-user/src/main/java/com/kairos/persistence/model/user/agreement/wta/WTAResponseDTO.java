@@ -133,8 +133,9 @@ public class WTAResponseDTO {
         this.parentWTA = parentWTA;
     }
 
-    public WTAResponseDTO(Long startDateMillis, Long endDateMillis, String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<Tag> tags) {
+    public WTAResponseDTO(Long id, Long startDateMillis, Long endDateMillis, String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<Tag> tags) {
         this.startDateMillis = startDateMillis;
+        this.id = id;
         this.endDateMillis = endDateMillis;
         this.name = name;
         this.description = description;
