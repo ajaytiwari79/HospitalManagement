@@ -34,9 +34,9 @@ public class TimeCareController {
     }
 
     @RequestMapping(value = "/organization/{organizationExternalId}/staff",method = RequestMethod.POST)
-    public ResponseEntity<Map<String,Object>> importStaffFromTimeCare(@RequestBody List<TimeCareStaffDTO> timeCareStaffDTOS,@PathVariable String externalId){
+    public ResponseEntity<Map<String,Object>> importStaffFromTimeCare(@RequestBody List<TimeCareStaffDTO> timeCareStaffDTOS,@PathVariable String organizationExternalId){
 
-        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,staffService.importStaffFromTimeCare(timeCareStaffDTOS,externalId));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,staffService.importStaffFromTimeCare(timeCareStaffDTOS,organizationExternalId));
     }
 
 

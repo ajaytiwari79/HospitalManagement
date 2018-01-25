@@ -8,6 +8,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.FlsCredentialException;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -1380,10 +1381,15 @@ public class StaffService extends UserBaseService {
             throw new InternalError("Invalid external id");
         }
 
-        List<TimeCareStaffDTO> timeCareStaffByWorkPlace = timeCareStaffDTOS.stream().filter(timeCareStaffDTO -> timeCareStaffDTO.getId().equals(externalId)).
+        List<TimeCareStaffDTO> timeCareStaffByWorkPlace = timeCareStaffDTOS.stream().filter(timeCareStaffDTO -> timeCareStaffDTO.getParentWorkPlaceId().equals(externalId)).
                 collect(Collectors.toList());
 
         ObjectMapper objectMapper = new ObjectMapper();
+
+        AccessGroup accessGroup = accessGroupRepository.findTaskGiverAccessGroup(organization.getId());
+        if(accessGroup == null){
+            throw new InternalError("Task giver access group is not present");
+        }
 
         for(TimeCareStaffDTO timeCareStaffDTO : timeCareStaffByWorkPlace){
 
@@ -1392,7 +1398,16 @@ public class StaffService extends UserBaseService {
             if (staffGraphRepository.staffAlreadyInUnit(Long.valueOf(timeCareStaffDTO.getId()), organization.getId())) {
                 throw new DuplicateDataException("Staff already exist in organization");
             }
+
+            if(timeCareStaffDTO.getGender().equalsIgnoreCase("m")){
+                timeCareStaffDTO.setGender(Gender.MALE.toString());
+            } else  if(timeCareStaffDTO.getGender().equalsIgnoreCase("f")){
+                timeCareStaffDTO.setGender(Gender.FEMALE.toString());
+            } else {
+                timeCareStaffDTO.setGender(null);
+            }
             StaffCreationPOJOData payload = objectMapper.convertValue(timeCareStaffDTO,StaffCreationPOJOData.class);
+            payload.setAccessGroupId(accessGroup.getId());
             payload.setPrivateEmail(email);
             setBasicDetailsOfUser(user, payload);
             Staff staff = mapDataInStaffObject(timeCareStaffDTO,organization,email);
@@ -1417,7 +1432,6 @@ public class StaffService extends UserBaseService {
             }
         } else {
             contactAddress = new ContactAddress();
-            contactAddress.setId(staffQueryResult.getContactAddressId());
             contactAddress.setStreet1(timeCareStaffDTO.getAddress());
             Pattern pattern = Pattern.compile("(\\d+)");
             Matcher matcher = pattern.matcher(timeCareStaffDTO.getZipCode());
