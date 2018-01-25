@@ -16,6 +16,10 @@ import java.util.List;
 @QueryResult
 public class WTAResponseDTO {
 
+    private List<RuleTemplateCategoryDTO> ruleTemplates;
+
+    private WTAResponseDTO parentWTA;
+
     private Long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
@@ -23,11 +27,11 @@ public class WTAResponseDTO {
     private String description;
     private long id;
     private Expertise expertise;
-    private OrganizationType organizationType;//
-    private OrganizationType organizationSubType;//
-    private List<RuleTemplateCategoryDTO> ruleTemplates;
+    private OrganizationType organizationType;
+    private OrganizationType organizationSubType;
+
     private List<Tag> tags;
-    private WTAResponseDTO parentWTA;
+
 
     public WTAResponseDTO() {
         //default

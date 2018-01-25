@@ -7,9 +7,9 @@ import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCat
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * Created by vipul on 12/10/17.
@@ -19,17 +19,9 @@ import java.util.Map;
 @QueryResult
 public class RuleTemplateCategoryDTO {
     private List<PhaseTemplateValue> phaseTemplateValues;
-    //private List<Map> phaseTemplateValue;
-
-    public List<PhaseTemplateValue> getPhaseTemplateValues() {
-        return phaseTemplateValues;
-    }
-
-    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
-        this.phaseTemplateValues = phaseTemplateValues;
-    }
 
     private RuleTemplateCategory ruleTemplateCategory;
+
     private Long id;
     private String name;
     private String templateType;
@@ -37,7 +29,6 @@ public class RuleTemplateCategoryDTO {
     private Long timeLimit;
     private List<String> balanceType;
     private Boolean checkAgainstTimeRules;
-
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
@@ -51,24 +42,6 @@ public class RuleTemplateCategoryDTO {
     private Long validationStartDateMillis;
     private Boolean balanceAdjustment = false;
     private int recommendedValue;
-
-
-    public int getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(int recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-//    public List<PhaseTemplateValue> getPhaseTemplateValues() {
-//        return phaseTemplateValues;
-//    }
-//
-//    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
-//        this.phaseTemplateValues = phaseTemplateValues;
-//    }
-
     private Boolean useShiftTimes = false;
     private Long maximumAvgTime;
     private Double maximumVetoPercentage;
@@ -88,6 +61,13 @@ public class RuleTemplateCategoryDTO {
     private Boolean onlyCompositeShifts;
     private String activityCode;
 
+    public int getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(int recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
 
     public void setCheckAgainstTimeRules(Boolean checkAgainstTimeRules) {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
@@ -396,14 +376,15 @@ public class RuleTemplateCategoryDTO {
     public void setActivityCode(String activityCode) {
         this.activityCode = activityCode;
     }
+    public List<PhaseTemplateValue> getPhaseTemplateValues() {
+        return phaseTemplateValues;
+    }
 
-//    public List<Map> getPhaseTemplateValue() {
-//        return phaseTemplateValues;
-//    }
-//
-//    public void setPhaseTemplateValue(List<Map> phaseTemplateValue) {
-//        this.phaseTemplateValues = phaseTemplateValues;
-//    }
+    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
+        this.phaseTemplateValues = phaseTemplateValues;
+    }
+
+
 
     @Override
     public String toString() {
