@@ -102,7 +102,9 @@ public class WTAService extends UserBaseService {
         wta = prepareWtaWhileCreate(countryId, wtaDTO);
         wta.setCountry(country);
         save(wta);
+
         WTAResponseDTO wtaResponseDTO = wta.retriveBasicResponse();
+        wtaResponseDTO.setRuleTemplates(retrieveRuleTemplateResponse(wta.getRuleTemplates()));
         wtaResponseDTO.setId(wta.getId());
         // Adding this wta to all organization type
 
