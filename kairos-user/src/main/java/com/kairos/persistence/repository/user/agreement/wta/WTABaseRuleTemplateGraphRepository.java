@@ -132,7 +132,7 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByUnitId(Long unitId);
 
     @Query("MATCH (c:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE + "]-(t:WTABaseRuleTemplate) where id(c)={0} " +
-            "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory)  " +
+            "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory{ruleTemplateCategoryType:'WTA'}) " +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
             "t.balanceType as balanceType," +
