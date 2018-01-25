@@ -159,4 +159,17 @@ public class RuleTemplateCategoryServiceTest {
 
     }
 
+    @Test
+    public void getRuleTemplatesByCountry(){
+        String baseUrl=getBaseUrl(71L,53L,null);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<RuleTemplateWrapper>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<RuleTemplateWrapper>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<RuleTemplateWrapper>> response = restTemplate.exchange(
+                baseUrl + "/rule_templates",
+                HttpMethod.GET, null, typeReference);
+        RestTemplateResponseEnvelope<RuleTemplateWrapper> responseBody = response.getBody();
+        Assert.assertEquals(false, responseBody.getData());
+    }
+
 }

@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.agreement.wta.templates.template_types
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @QueryResult
 public class RuleTemplateResponseDTO {
     private RuleTemplateCategory ruleTemplateCategory;
+    private List<PhaseTemplateValue> phaseTemplateValues;
     private Long id;
     private String name;
     private String templateType;
@@ -25,7 +27,7 @@ public class RuleTemplateResponseDTO {
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
-    private  Boolean disabled;
+    private Boolean disabled;
     private String description;
     private Long creationDate;
     private Long lastModificationDate;
@@ -52,6 +54,24 @@ public class RuleTemplateResponseDTO {
     private Long shiftsLimit;
     private Boolean onlyCompositeShifts;
     private String activityCode;
+    private int recommendedValue;
+    private String lastUpdatedBy;
+
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public int getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(int recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
 
     public RuleTemplateCategory getRuleTemplateCategory() {
         return ruleTemplateCategory;
@@ -61,8 +81,17 @@ public class RuleTemplateResponseDTO {
         this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
+
     public Long getId() {
         return id;
+    }
+
+    public List<PhaseTemplateValue> getPhaseTemplateValues() {
+        return phaseTemplateValues;
+    }
+
+    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
+        this.phaseTemplateValues = phaseTemplateValues;
     }
 
     public void setId(Long id) {
