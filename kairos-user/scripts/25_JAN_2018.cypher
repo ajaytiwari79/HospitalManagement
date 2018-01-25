@@ -1,4 +1,6 @@
 //db.phases.find({countryId:NumberLong(53)},{_id:1,name:1}).pretty();
+
+
 //Sample Response of mongo Phases
 
 //{ "_id" : "244", "name" : "REQUEST" }
@@ -7,7 +9,8 @@
 //{ "_id" : "248", "name" : "CONSTRUCTION" }
 
 
-//Please Change phaseId from  value of _id above Query
+//Please Change phaseId below from  value of _id above Mongo Query
+
 
 
 match wd= (w:WTABaseRuleTemplate)

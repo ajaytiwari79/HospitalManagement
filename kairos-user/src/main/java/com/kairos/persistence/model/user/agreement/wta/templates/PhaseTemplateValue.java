@@ -18,6 +18,7 @@ public class PhaseTemplateValue extends UserBaseEntity {
     private short managementValue=0;
     private boolean disabled=true;
     private int optionalFrequency=0;
+    private boolean optional=false;
 
     public int getOptionalFrequency() {
         return optionalFrequency;
@@ -37,7 +38,7 @@ public class PhaseTemplateValue extends UserBaseEntity {
         this.phaseId = phaseId;
     }
 
-    private boolean optional=false;
+
 
 
     public PhaseTemplateValue() {
