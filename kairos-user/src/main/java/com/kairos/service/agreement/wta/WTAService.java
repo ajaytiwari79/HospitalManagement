@@ -31,6 +31,7 @@ import com.kairos.service.agreement.RuleTemplateService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.util.DateUtil;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -238,9 +239,10 @@ public class WTAService extends UserBaseService {
         if (Optional.ofNullable(workingTimeAgreement).isPresent()) {
             throw new DuplicateDataException("Duplicate WTA name " + updateDTO.getName());
         }
-        WorkingTimeAgreement newWta = new WorkingTimeAgreement();
+        WorkingTimeAgreement newWta;
+
         newWta = prepareWtaWhileUpdate(oldWta, updateDTO, countryId);
-        newWta.setCountry(oldWta.getCountry());
+
         save(newWta);
         WTAResponseDTO wtaResponseDTO = newWta.retriveBasicResponse();
         wtaResponseDTO.setId(newWta.getId());
@@ -256,40 +258,44 @@ public class WTAService extends UserBaseService {
     }
 
     private WorkingTimeAgreement prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO, Long countryId) {
-        WorkingTimeAgreement newWta = new WorkingTimeAgreement();
-        newWta.setName(updateDTO.getName());
-        newWta.setDescription(updateDTO.getDescription());
+        WorkingTimeAgreement versionWTA = new WorkingTimeAgreement();
+        versionWTA.setName(oldWta.getName());
+        versionWTA.setDescription(oldWta.getDescription());
         if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
             throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
         }
-        oldWta.setEndDateMillis(updateDTO.getStartDateMillis());
-        newWta.setStartDateMillis(updateDTO.getStartDateMillis());
-        newWta.setEndDateMillis(updateDTO.getEndDateMillis());
+
+        versionWTA.setStartDateMillis(oldWta.getStartDateMillis());
+        versionWTA.setEndDateMillis(updateDTO.getStartDateMillis());
+
+        oldWta.setStartDateMillis(updateDTO.getStartDateMillis());
+        oldWta.setEndDateMillis(updateDTO.getEndDateMillis());
+
         if (!oldWta.getExpertise().getId().equals(updateDTO.getExpertiseId())) {
             Expertise expertise = expertiseRepository.findOne(updateDTO.getExpertiseId());
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Expertize not found by Id" + updateDTO.getExpertiseId());
             }
-            newWta.setExpertise(expertise);
+            versionWTA.setExpertise(expertise);
         } else {
-            newWta.setExpertise(oldWta.getExpertise());
+            versionWTA.setExpertise(oldWta.getExpertise());
         }
 
         if (!oldWta.getOrganizationType().getId().equals(updateDTO.getOrganizationType())) {
             throw new ActionNotPermittedException("Organization  type cant be changed" + updateDTO.getOrganizationType());
         }
-        newWta.setOrganizationType(oldWta.getOrganizationType());
+        versionWTA.setOrganizationType(oldWta.getOrganizationType());
         if (!oldWta.getOrganizationSubType().getId().equals(updateDTO.getOrganizationSubType())) {
             throw new ActionNotPermittedException("Organization Sub type cant be changed" + updateDTO.getOrganizationSubType());
         }
-        newWta.setOrganizationSubType(oldWta.getOrganizationSubType());
+        versionWTA.setOrganizationSubType(oldWta.getOrganizationSubType());
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
             ruleTemplates = wtaOrganizationService.copyRuleTemplates(null, updateDTO.getRuleTemplates());
-            newWta.setRuleTemplates(ruleTemplates);
+            versionWTA.setRuleTemplates(ruleTemplates);
         }
-        newWta.setParentWTA(oldWta);
-        return newWta;
+        versionWTA.setParentWTA(oldWta);
+        return versionWTA;
 
     }
 
