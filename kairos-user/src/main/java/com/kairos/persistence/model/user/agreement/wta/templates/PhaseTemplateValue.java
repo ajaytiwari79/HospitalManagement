@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.agreement.wta.templates;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigInteger;
 
@@ -36,7 +37,7 @@ public class PhaseTemplateValue extends UserBaseEntity {
         this.phaseId = phaseId;
     }
 
-    private boolean optional;
+    private boolean optional=false;
 
 
     public PhaseTemplateValue() {

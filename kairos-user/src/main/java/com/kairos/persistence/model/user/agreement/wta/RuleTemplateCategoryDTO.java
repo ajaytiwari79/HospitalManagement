@@ -9,6 +9,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by vipul on 12/10/17.
@@ -18,7 +19,16 @@ import java.util.List;
 @QueryResult
 public class RuleTemplateCategoryDTO {
     private List<PhaseTemplateValue> phaseTemplateValues;
-    private List<HashMap<String, Object>> phaseTemplateValue;
+    //private List<Map> phaseTemplateValue;
+
+    public List<PhaseTemplateValue> getPhaseTemplateValues() {
+        return phaseTemplateValues;
+    }
+
+    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
+        this.phaseTemplateValues = phaseTemplateValues;
+    }
+
     private RuleTemplateCategory ruleTemplateCategory;
     private Long id;
     private String name;
@@ -51,13 +61,13 @@ public class RuleTemplateCategoryDTO {
         this.recommendedValue = recommendedValue;
     }
 
-    public List<PhaseTemplateValue> getPhaseTemplateValues() {
-        return phaseTemplateValues;
-    }
-
-    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
-        this.phaseTemplateValues = phaseTemplateValues;
-    }
+//    public List<PhaseTemplateValue> getPhaseTemplateValues() {
+//        return phaseTemplateValues;
+//    }
+//
+//    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
+//        this.phaseTemplateValues = phaseTemplateValues;
+//    }
 
     private Boolean useShiftTimes = false;
     private Long maximumAvgTime;
@@ -387,13 +397,13 @@ public class RuleTemplateCategoryDTO {
         this.activityCode = activityCode;
     }
 
-    public List<HashMap<String, Object>> getPhaseTemplateValue() {
-        return phaseTemplateValue;
-    }
-
-    public void setPhaseTemplateValue(List<HashMap<String, Object>> phaseTemplateValue) {
-        this.phaseTemplateValue = phaseTemplateValue;
-    }
+//    public List<Map> getPhaseTemplateValue() {
+//        return phaseTemplateValues;
+//    }
+//
+//    public void setPhaseTemplateValue(List<Map> phaseTemplateValue) {
+//        this.phaseTemplateValues = phaseTemplateValues;
+//    }
 
     @Override
     public String toString() {
