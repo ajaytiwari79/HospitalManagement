@@ -77,7 +77,7 @@ public class OrganizationHierarchyService {
             queryResult.setPreKairos(organization.isPrekairos());
             queryResult.setEnabled(organization.isEnable());
             queryResult.setParentOrganization(organization.isParentOrganization());
-            queryResult.setTimeZone(organization.getTimeZone().getId());
+            queryResult.setTimeZone(organization.getTimeZone()!=null? organization.getTimeZone().getId():null);
             return queryResult;
         }
 
