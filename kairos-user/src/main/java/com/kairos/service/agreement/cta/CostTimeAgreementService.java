@@ -2,6 +2,7 @@ package com.kairos.service.agreement.cta;
 
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
@@ -331,7 +332,7 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     @Async
-    public CompletableFuture<Boolean> buildCTAToCopy(CostTimeAgreement costTimeAgreement, CostTimeAgreement oldCTA)
+    public CompletableFuture<Boolean> buildCTAToCopy(CostTimeAgreement costTimeAgreementToBeCreated, CostTimeAgreement oldCTA)
             throws InterruptedException, ExecutionException {
 
         // Get Experties
@@ -350,7 +351,7 @@ public class CostTimeAgreementService extends UserBaseService {
                 CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate() ;
                 BeanUtils.copyProperties(ruleTemplate,ctaRuleTemplate);
                 ctaRuleTemplate.cloneCTARuleTemplate();
-                BeanUtils.copyProperties(ctaRuleTemplate,ruleTemplate);
+                BeanUtils.copyProperties(ctaRuleTemplate,ruleTemplate,"createdBy");
                 ruleTemplates.add(ctaRuleTemplate);
             }
             return ruleTemplates;
@@ -375,42 +376,50 @@ public class CostTimeAgreementService extends UserBaseService {
 
         //set data
         if(expertiseFuture.get().isPresent())
-            costTimeAgreement.setExpertise(expertiseFuture.get().get());
-        costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
-        costTimeAgreement.setOrganizationType(organizationTypesFuture.get().get());
-        costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
-        costTimeAgreement.setStartDateMillis(oldCTA.getStartDateMillis());
-        costTimeAgreement.setEndDateMillis(oldCTA.getEndDateMillis());
+            costTimeAgreementToBeCreated.setExpertise(expertiseFuture.get().get());
+        costTimeAgreementToBeCreated.setRuleTemplates(ctaRuleTemplatesFuture.get());
+        costTimeAgreementToBeCreated.setOrganizationType(organizationTypesFuture.get().get());
+        costTimeAgreementToBeCreated.setOrganizationSubType(organizationSubTypesFuture.get().get());
+        costTimeAgreementToBeCreated.setStartDateMillis(oldCTA.getStartDateMillis());
+        costTimeAgreementToBeCreated.setEndDateMillis(oldCTA.getEndDateMillis());
 
         return CompletableFuture.completedFuture(true);
     }
 
     public CostTimeAgreement createCopyOfCTA(Long ctaId) throws InterruptedException,ExecutionException{
-        CostTimeAgreement costTimeAgreement=collectiveTimeAgreementGraphRepository.findOne(ctaId);
+        CostTimeAgreement costTimeAgreement=collectiveTimeAgreementGraphRepository.findOne(ctaId, 2);
         CostTimeAgreement newCostTimeAgreement = new CostTimeAgreement();
-        BeanUtils.copyProperties(costTimeAgreement, newCostTimeAgreement);
+        BeanUtils.copyProperties(costTimeAgreement, newCostTimeAgreement, "createdBy");
         // In case of copy CTA need to remove ID of CTA
-        costTimeAgreement.setId(null);
+        newCostTimeAgreement.setId(null);
         CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
                 .buildCTAToCopy(newCostTimeAgreement, costTimeAgreement);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
-        costTimeAgreement.setCountry(countryGraphRepository.findOne(costTimeAgreement.getCountry().getId(),0));
+//        newCostTimeAgreement.setCountry(null);
         this.save(newCostTimeAgreement);
         return newCostTimeAgreement;
     }
 
     public CollectiveTimeAgreementDTO updateCostTimeAgreement(Long countryId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+        if( countryId != null && collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName(), ctaId)){
+            throw new DuplicateDataException("CTA already exists with same name " +collectiveTimeAgreementDTO.getName() );
+        }
         CostTimeAgreement costTimeAgreement=collectiveTimeAgreementGraphRepository.findOne(ctaId,2);
 
+        List<Long> ruleTemplateIds = new ArrayList<>();
+        logger.info("costTimeAgreement.getRuleTemplates() : {}",costTimeAgreement.getRuleTemplates().size());
+        for(RuleTemplate ruleTemplate : costTimeAgreement.getRuleTemplates()){
+            ruleTemplateIds.add(ruleTemplate.getId());
+        }
 //        CostTimeAgreement newCostTimeAgreement = createCopyOfCTA(costTimeAgreement.getId());
 
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
         costTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
         costTimeAgreement.setDescription(collectiveTimeAgreementDTO.getDescription());
         CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, true);
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, true, ruleTemplateIds);
         CompletableFuture.allOf(hasUpdated).join();
 
 
@@ -420,8 +429,11 @@ public class CostTimeAgreementService extends UserBaseService {
             // detach old parent CTA and assign new one
             collectiveTimeAgreementGraphRepository.detachParentCTA(childCTA.getId());
             childCTA.setParent(newCostTimeAgreement);
+            this.save(childCTA);
         }
-        newCostTimeAgreement.setParent(costTimeAgreement);*/
+        newCostTimeAgreement.setParent(costTimeAgreement);
+        this.save(newCostTimeAgreement);*/
+
         this.save(costTimeAgreement);
         return collectiveTimeAgreementDTO;
     }
@@ -448,6 +460,11 @@ public class CostTimeAgreementService extends UserBaseService {
 //        List<Long> accessGroupIds = ctaRuleTemplateDTO.getCalculateValueIfPlanned();
 //        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupRepository.getAccessGroupById(accessGroupIds));
 
+        if(ctaRuleTemplate.getId() != null){
+            ctaRuleTemplateGraphRepository.detachAllTimeTypesFromCTARuleTemplate(ctaRuleTemplate.getId());
+            ctaRuleTemplateGraphRepository.detachAllTimeTypesFromCTARuleTemplate(ctaRuleTemplate.getId());
+        }
+
         // Fetch Employment Type
         List<Long> employmentTypeIds = ctaRuleTemplateDTO.getEmploymentTypes();
         ctaRuleTemplate.setEmploymentTypes(employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds, false));
@@ -464,8 +481,9 @@ public class CostTimeAgreementService extends UserBaseService {
         return ctaRuleTemplate;
     }
 
+
     @Async
-    public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, Boolean doUpdate)
+    public CompletableFuture<Boolean> buildCTA(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, Boolean doUpdate, List<Long> ruleTemplateIds)
             throws InterruptedException, ExecutionException {
 
         // Get Experties
@@ -481,12 +499,14 @@ public class CostTimeAgreementService extends UserBaseService {
             List<RuleTemplate> ruleTemplates = new ArrayList<>();
             for(CTARuleTemplateDTO ctaRuleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()){
                 CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate() ;
-                BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes,");
-                if(!doUpdate){
+                BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate);
+                // Check if cta exists with same rule template Id
+                if(!doUpdate || (doUpdate && !ruleTemplateIds.contains(ctaRuleTemplate.getId()))){
                     ctaRuleTemplate.cloneCTARuleTemplate();
-                    ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
+//                    ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
                 }
-                BeanUtils.copyProperties(ctaRuleTemplate,ctaRuleTemplateDTO);
+                ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
+//                BeanUtils.copyProperties(ctaRuleTemplate,ctaRuleTemplateDTO,"timeTypes");
                 ruleTemplates.add(ctaRuleTemplate);
             }
             return ruleTemplates;
@@ -523,12 +543,15 @@ public class CostTimeAgreementService extends UserBaseService {
 
     public CollectiveTimeAgreementDTO createCostTimeAgreement(Long countryId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
         logger.info("saving CostTimeAgreement country {}",countryId);
+        if( collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName())){
+            throw new DuplicateDataException("CTA already exists with same name " +collectiveTimeAgreementDTO.getName() );
+        }
         CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
         // In case of copy CTA need to remove ID of CTA
         costTimeAgreement.setId(null);
         CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, false);
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, false, null);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
@@ -537,7 +560,10 @@ public class CostTimeAgreementService extends UserBaseService {
         // TO create CTA for organizations too which are linked with same sub type
 //        publishNewCountryCTAToOrganizationByOrgSubType(costTimeAgreement, collectiveTimeAgreementDTO, costTimeAgreement.getOrganizationSubType().getId());
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
-        BeanUtils.copyProperties(costTimeAgreement, collectiveTimeAgreementDTO);
+        /*BeanUtils.copyProperties(costTimeAgreement, collectiveTimeAgreementDTO);
+        for(CTARuleTemplateDTO templateDTO : collectiveTimeAgreementDTO.getRuleTemplates()){
+            templateDTO.setRuleTemplateCategory();
+        }*/
         return collectiveTimeAgreementDTO;
     }
 
@@ -560,14 +586,14 @@ public class CostTimeAgreementService extends UserBaseService {
 
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, newCostTimeAgreement);
         CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, true);
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, true, null);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
         // Set Parent CTA in new CTA
         newCostTimeAgreement.setParent(costTimeAgreement);
         this.save(newCostTimeAgreement);
-        BeanUtils.copyProperties(costTimeAgreement,collectiveTimeAgreementDTO);
+        BeanUtils.copyProperties(costTimeAgreement,collectiveTimeAgreementDTO,"timeTypes");
         return collectiveTimeAgreementDTO;
     }
 
@@ -596,12 +622,25 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
 
-    public CostTimeAgreement createCostTimeAgreement(CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+    public CostTimeAgreement updateCostTimeAgreementForOrganization(CostTimeAgreement countryCTA, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
 
         CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
         CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, false);
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, false, null);
+
+        // Wait until they are all done
+        CompletableFuture.allOf(hasUpdated).join();
+        this.save(costTimeAgreement);
+        return costTimeAgreement;
+    }
+
+    public CostTimeAgreement createCostTimeAgreementForOrganization(CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+
+        CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
+        BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
+        CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, false, null);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
@@ -614,7 +653,7 @@ public class CostTimeAgreementService extends UserBaseService {
         organizations.forEach(organization ->
         {
            try{
-               CostTimeAgreement newCostTimeAgreement =  createCostTimeAgreement(collectiveTimeAgreementDTO);
+               CostTimeAgreement newCostTimeAgreement =  createCostTimeAgreementForOrganization(collectiveTimeAgreementDTO);
                organization.getCostTimeAgreements().add(newCostTimeAgreement);
                newCostTimeAgreement.setParentCountryCTA(costTimeAgreement);
                save(organization);
@@ -622,6 +661,25 @@ public class CostTimeAgreementService extends UserBaseService {
                // Exception occured
                logger.info("Exception occured on setting cta to organization");
            }
+
+        });
+        return true;
+    }
+
+    public Boolean publishUpdatedCountryCTAToOrganization(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException{
+        List<CostTimeAgreement> organizationCTAs = collectiveTimeAgreementGraphRepository.getListOfOrganizationCTAByParentCountryCTA(costTimeAgreement.getId());
+        organizationCTAs.forEach(organizationCTA ->
+        {
+            try{
+                CostTimeAgreement newCostTimeAgreement =  createCopyOfCTA(costTimeAgreement.getId());
+                updateCostTimeAgreement(null, organizationCTA.getId(), collectiveTimeAgreementDTO);
+                /*organization.getCostTimeAgreements().add(newCostTimeAgreement);
+                newCostTimeAgreement.setParentCountryCTA(costTimeAgreement);
+                save(organization);*/
+            } catch (Exception e){
+                // Exception occured
+                logger.info("Exception occured on setting cta to organization");
+            }
 
         });
         return true;
