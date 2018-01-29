@@ -22,5 +22,8 @@ public interface UserBaseRepository extends Neo4jBaseRepository<UserBaseEntity,L
     @Query("MATCH (s:UserBaseEntity) where id(s)={0} AND s.isEnabled= true return s")
     UserBaseEntity findOne(Long id);
 
+    @Query("CREATE (n:First_DB_NODE)")
+    void createFirstDBNode();
+
 
 }
