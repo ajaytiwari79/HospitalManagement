@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.ArrayList;
@@ -18,6 +19,10 @@ public class StaffAdditionalInfoQueryResult {
     private List<Long> skills;
     private String profilePic;
     private Long unitId;
+    private UnitEmploymentPositionQueryResult unitEmploymentPosition;
+
+    public StaffAdditionalInfoQueryResult() {
+    }
 
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
@@ -67,5 +72,13 @@ public class StaffAdditionalInfoQueryResult {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public UnitEmploymentPositionQueryResult getUnitEmploymentPosition() {
+        return unitEmploymentPosition;
+    }
+
+    public void setUnitEmploymentPosition(UnitEmploymentPositionQueryResult unitEmploymentPosition) {
+        this.unitEmploymentPosition = unitEmploymentPosition;
     }
 }

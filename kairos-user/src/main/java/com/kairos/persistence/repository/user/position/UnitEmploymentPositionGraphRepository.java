@@ -22,14 +22,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseRepository<UnitEmploymentPosition, Long> {
-    @Query("MATCH (unitEmpPosition:UnitEmploymentPosition{deleted:false})<-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]-(u:UnitEmployment) where id(u)={0}\n" +
-            "match (unitEmpPosition)-[:" + HAS_POSITION_CODE + "]->(pn:PositionCode{deleted:false})\n" +
+    @Query("MATCH (unitEmpPosition:UnitEmploymentPosition{deleted:false}) where id(unitEmpPosition)={0}\n" +
             "match (unitEmpPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             "match (unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
             "optional match (unitEmpPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement)\n" +
             "optional match (unitEmpPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
             "return e as expertise,wta as workingTimeAgreement,cta as costTimeAgreement," +
-            "pn as positionCode," +
             "unitEmpPosition.totalWeeklyHours as totalWeeklyHours," +
             "unitEmpPosition.startDateMillis as startDateMillis," +
             "unitEmpPosition.endDateMillis as endDateMillis," +
@@ -41,7 +39,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "id(unitEmpPosition)   as id," +
             "unitEmpPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
             "unitEmpPosition.lastModificationDate as lastModificationDate")
-    List<UnitEmploymentPositionQueryResult> findAllUnitEmploymentPositions(long unitEmploymentId);
+    UnitEmploymentPositionQueryResult getUnitEmploymentPositionById(long unitEmploymentId);
 
     @Query("match (uEmp:UnitEmployment)  where  Id(uEmp)={0} \n" +
             "match(uEmp)-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]->(unitEmpPosition:UnitEmploymentPosition{deleted:false})" +
