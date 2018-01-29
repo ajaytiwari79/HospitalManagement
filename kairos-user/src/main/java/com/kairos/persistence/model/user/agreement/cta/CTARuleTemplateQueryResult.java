@@ -27,8 +27,7 @@ public class CTARuleTemplateQueryResult {
     private String payrollType;
     private String payrollSystem;
     private CalculationUnit calculationUnit;
-//    private Map<String,Object> compensationTable;
-    private CompensationTable compensationTable;
+    private Map<String,Object> compensationTable;
     private Map<String,Object> calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
     private List<CTARuleTemplateDayTypeDTO> calculateOnDayTypes=new ArrayList<>();
@@ -116,21 +115,13 @@ public class CTARuleTemplateQueryResult {
         this.calculationUnit = calculationUnit;
     }
 
-    public CompensationTable getCompensationTable() {
-        return compensationTable;
-    }
-
-    public void setCompensationTable(CompensationTable compensationTable) {
-        this.compensationTable = compensationTable;
-    }
-
-    /*public Map<String,Object> getCompensationTable() {
+    public Map<String,Object> getCompensationTable() {
         return compensationTable;
     }
 
     public void setCompensationTable(Map<String,Object> compensationTable) {
         this.compensationTable = compensationTable;
-    }*/
+    }
 
     public Map<String, Object> getCalculateValueAgainst() {
         return calculateValueAgainst;
