@@ -396,7 +396,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
-        newCostTimeAgreement.setCountry(null);
+//        newCostTimeAgreement.setCountry(null);
         this.save(newCostTimeAgreement);
         return newCostTimeAgreement;
     }
@@ -409,7 +409,7 @@ public class CostTimeAgreementService extends UserBaseService {
         for(RuleTemplate ruleTemplate : costTimeAgreement.getRuleTemplates()){
             ruleTemplateIds.add(ruleTemplate.getId());
         }
-        CostTimeAgreement newCostTimeAgreement = createCopyOfCTA(costTimeAgreement.getId());
+//        CostTimeAgreement newCostTimeAgreement = createCopyOfCTA(costTimeAgreement.getId());
 
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
         costTimeAgreement.setName(collectiveTimeAgreementDTO.getName());
@@ -420,7 +420,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
 
         // Check for child CTA
-        CostTimeAgreement childCTA = collectiveTimeAgreementGraphRepository.fetchChildCTA(ctaId);
+        /*CostTimeAgreement childCTA = collectiveTimeAgreementGraphRepository.fetchChildCTA(ctaId);
         if(childCTA != null){
             // detach old parent CTA and assign new one
             collectiveTimeAgreementGraphRepository.detachParentCTA(childCTA.getId());
@@ -428,7 +428,8 @@ public class CostTimeAgreementService extends UserBaseService {
             this.save(childCTA);
         }
         newCostTimeAgreement.setParent(costTimeAgreement);
-        this.save(newCostTimeAgreement);
+        this.save(newCostTimeAgreement);*/
+
         this.save(costTimeAgreement);
         return collectiveTimeAgreementDTO;
     }
@@ -454,6 +455,11 @@ public class CostTimeAgreementService extends UserBaseService {
         // Fetch Access Group
 //        List<Long> accessGroupIds = ctaRuleTemplateDTO.getCalculateValueIfPlanned();
 //        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupRepository.getAccessGroupById(accessGroupIds));
+
+        if(ctaRuleTemplate.getId() != null){
+            ctaRuleTemplateGraphRepository.detachAllTimeTypesFromCTARuleTemplate(ctaRuleTemplate.getId());
+            ctaRuleTemplateGraphRepository.detachAllTimeTypesFromCTARuleTemplate(ctaRuleTemplate.getId());
+        }
 
         // Fetch Employment Type
         List<Long> employmentTypeIds = ctaRuleTemplateDTO.getEmploymentTypes();
@@ -496,7 +502,7 @@ public class CostTimeAgreementService extends UserBaseService {
 //                    ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
                 }
                 ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
-                BeanUtils.copyProperties(ctaRuleTemplate,ctaRuleTemplateDTO);
+//                BeanUtils.copyProperties(ctaRuleTemplate,ctaRuleTemplateDTO,"timeTypes");
                 ruleTemplates.add(ctaRuleTemplate);
             }
             return ruleTemplates;
@@ -580,7 +586,7 @@ public class CostTimeAgreementService extends UserBaseService {
         // Set Parent CTA in new CTA
         newCostTimeAgreement.setParent(costTimeAgreement);
         this.save(newCostTimeAgreement);
-        BeanUtils.copyProperties(costTimeAgreement,collectiveTimeAgreementDTO);
+        BeanUtils.copyProperties(costTimeAgreement,collectiveTimeAgreementDTO,"timeTypes");
         return collectiveTimeAgreementDTO;
     }
 
