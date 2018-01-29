@@ -34,6 +34,7 @@ import com.kairos.util.DateUtil;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -241,26 +242,29 @@ public class WTAService extends UserBaseService {
         }
         WorkingTimeAgreement newWta;
 
-        newWta = prepareWtaWhileUpdate(oldWta, updateDTO, countryId);
+        oldWta = prepareWtaWhileUpdate(oldWta, updateDTO, countryId);
 
-        save(newWta);
-        WTAResponseDTO wtaResponseDTO = newWta.retriveBasicResponse();
-        wtaResponseDTO.setId(newWta.getId());
-        wtaResponseDTO.setRuleTemplates(retrieveRuleTemplateResponse(newWta.getRuleTemplates()));
-        wtaResponseDTO.setParentWTA(oldWta.retriveBasicResponse());
-        //assignUpdatedWTAToOrganization(newWta, updateDTO.getOrganizationSubType(), oldWta.getId());
-        oldWta.setCountry(null);
-        oldWta.setOrganizationType(null);
-        oldWta.setOrganizationSubType(null);
         save(oldWta);
+        WTAResponseDTO wtaResponseDTO = oldWta.retriveBasicResponse();
+
+        wtaResponseDTO.setRuleTemplates(retrieveRuleTemplateResponse(oldWta.getRuleTemplates()));
+        wtaResponseDTO.setParentWTA(oldWta.getParentWTA().retriveBasicResponse());
+        //assignUpdatedWTAToOrganization(newWta, updateDTO.getOrganizationSubType(), oldWta.getId());
+//        oldWta.setCountry(null);
+//        oldWta.setOrganizationType(null);
+//        oldWta.setOrganizationSubType(null);
+//        save(oldWta);
 
         return wtaResponseDTO;
     }
 
     private WorkingTimeAgreement prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO, Long countryId) {
         WorkingTimeAgreement versionWTA = new WorkingTimeAgreement();
-        versionWTA.setName(oldWta.getName());
-        versionWTA.setDescription(oldWta.getDescription());
+
+        BeanUtils.copyProperties(oldWta, versionWTA);
+        versionWTA.setId(null);
+        versionWTA.setDeleted(true);
+        save(versionWTA);
         if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
             throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
         }
@@ -276,9 +280,9 @@ public class WTAService extends UserBaseService {
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Expertize not found by Id" + updateDTO.getExpertiseId());
             }
-            versionWTA.setExpertise(expertise);
+            oldWta.setExpertise(expertise);
         } else {
-            versionWTA.setExpertise(oldWta.getExpertise());
+            oldWta.setExpertise(oldWta.getExpertise());
         }
 
         if (!oldWta.getOrganizationType().getId().equals(updateDTO.getOrganizationType())) {
@@ -292,10 +296,10 @@ public class WTAService extends UserBaseService {
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
             ruleTemplates = wtaOrganizationService.copyRuleTemplates(null, updateDTO.getRuleTemplates());
-            versionWTA.setRuleTemplates(ruleTemplates);
+            oldWta.setRuleTemplates(ruleTemplates);
         }
-        versionWTA.setParentWTA(oldWta);
-        return versionWTA;
+        oldWta.setParentWTA(versionWTA);
+        return oldWta;
 
     }
 
