@@ -40,7 +40,7 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> updateCTA(@PathVariable Long countryId, @PathVariable Long ctaId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                costTimeAgreementService.updateCostTimeAgreement(countryId, ctaId, collectiveTimeAgreementDTO));
+                costTimeAgreementService.updateCostTimeAgreement(ctaId, collectiveTimeAgreementDTO));
     }
 
     @RequestMapping(value = "/country/{countryId}/cta/{ctaId}", method = RequestMethod.DELETE)

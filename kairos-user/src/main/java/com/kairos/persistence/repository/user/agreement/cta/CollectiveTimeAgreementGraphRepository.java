@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.agreement.cta;
 
 import com.kairos.persistence.model.constants.RelationshipConstants;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CTAListQueryResult;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
@@ -10,9 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO_ORG_SUB_TYPE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PARENT_CTA;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseRepository<CostTimeAgreement,Long> {
@@ -76,4 +75,8 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
 
     @Query("MATCH (cta:CostTimeAgreement)<-[r:"+HAS_PARENT_CTA+"]-(chiltCTA:CostTimeAgreement) WHERE id(chiltCTA) = {0} DELETE r")
     void detachParentCTA(Long ctaId);
+
+    @Query("Match (o:Organization{isEnable:true})-[:"+HAS_CTA+"]-(orgCta:CostTimeAgreement)-[:"+HAS_PARENT_COUNTRY_CTA+"]->(countryCta:CostTimeAgreement)\n"+
+            "WHERE id(countryCta)={0} return orgCta")
+    List<CostTimeAgreement> getListOfOrganizationCTAByParentCountryCTA(Long countryCTAId);
 }
