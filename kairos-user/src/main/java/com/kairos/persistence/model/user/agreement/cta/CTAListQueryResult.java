@@ -16,7 +16,7 @@ import java.util.List;
  * Created by prerna on 26/12/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
 public class CTAListQueryResult {
     @NotNull

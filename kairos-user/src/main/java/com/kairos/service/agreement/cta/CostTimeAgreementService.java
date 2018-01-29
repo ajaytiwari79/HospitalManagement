@@ -2,6 +2,7 @@ package com.kairos.service.agreement.cta;
 
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
@@ -401,7 +402,10 @@ public class CostTimeAgreementService extends UserBaseService {
         return newCostTimeAgreement;
     }
 
-    public CollectiveTimeAgreementDTO updateCostTimeAgreement(Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+    public CollectiveTimeAgreementDTO updateCostTimeAgreement(Long countryId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+        if( countryId != null && collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName(), ctaId)){
+            throw new DuplicateDataException("CTA already exists with same name " +collectiveTimeAgreementDTO.getName() );
+        }
         CostTimeAgreement costTimeAgreement=collectiveTimeAgreementGraphRepository.findOne(ctaId,2);
 
         List<Long> ruleTemplateIds = new ArrayList<>();
@@ -539,6 +543,9 @@ public class CostTimeAgreementService extends UserBaseService {
 
     public CollectiveTimeAgreementDTO createCostTimeAgreement(Long countryId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
         logger.info("saving CostTimeAgreement country {}",countryId);
+        if( collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInCountry(countryId, collectiveTimeAgreementDTO.getName())){
+            throw new DuplicateDataException("CTA already exists with same name " +collectiveTimeAgreementDTO.getName() );
+        }
         CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
         // In case of copy CTA need to remove ID of CTA
@@ -665,7 +672,7 @@ public class CostTimeAgreementService extends UserBaseService {
         {
             try{
                 CostTimeAgreement newCostTimeAgreement =  createCopyOfCTA(costTimeAgreement.getId());
-                updateCostTimeAgreement(organizationCTA.getId(), collectiveTimeAgreementDTO);
+                updateCostTimeAgreement(null, organizationCTA.getId(), collectiveTimeAgreementDTO);
                 /*organization.getCostTimeAgreements().add(newCostTimeAgreement);
                 newCostTimeAgreement.setParentCountryCTA(costTimeAgreement);
                 save(organization);*/

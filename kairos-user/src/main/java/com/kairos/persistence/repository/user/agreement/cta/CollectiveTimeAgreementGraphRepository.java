@@ -49,7 +49,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,calculateValueIfPlanned,employmentTypes, timeTypes,compensationTableInterval,compensationTable,calculateValueAgainst,phaseInfo,activityType, plannedTimeWithFactor ,ruleTemplCat\n" +
             "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,timeTypes:timeTypes,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo,activityType:{id:id(activityType),onlyForActivityThatPartOfCostCalculation:activityType.onlyForActivityThatPartOfCostCalculation,activityTypes:activityType.activityTypes },plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType},calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates")
     */
-    @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= 53  WITH cta\n" +
+    @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0}  WITH cta\n" +
             "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{isEnabled:true}) WITH cta,expertise\n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType\n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType\n" +
@@ -111,4 +111,10 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     @Query("Match (o:Organization{isEnable:true})-[:"+HAS_CTA+"]-(orgCta:CostTimeAgreement)-[:"+HAS_PARENT_COUNTRY_CTA+"]->(countryCta:CostTimeAgreement)\n"+
             "WHERE id(countryCta)={0} return orgCta")
     List<CostTimeAgreement> getListOfOrganizationCTAByParentCountryCTA(Long countryCTAId);
+
+    @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0} AND  lower(cta.name)=lower({1}) RETURN CASE WHEN COUNT(cta)>0 THEN true ELSE false END")
+    Boolean isCTAExistWithSameNameInCountry(Long countryId, String name);
+
+    @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0} AND  lower(cta.name)=lower({1}) AND NOT id(cta)={2} RETURN CASE WHEN COUNT(cta)>0 THEN true ELSE false END")
+    Boolean isCTAExistWithSameNameInCountry(Long countryId, String name, Long ctaId);
 }
