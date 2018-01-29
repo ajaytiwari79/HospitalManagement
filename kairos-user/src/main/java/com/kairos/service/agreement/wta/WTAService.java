@@ -230,7 +230,7 @@ public class WTAService extends UserBaseService {
         WorkingTimeAgreement oldWta = wtaRepository.findOne(wtaId, 2);
         if (!Optional.ofNullable(oldWta).isPresent() || oldWta.getCountry() == null) {
             logger.info("wta not found while updating at unit %d", wtaId);
-            throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
+            throw new DataNotFoundByIdException(" Invalid wtaId  " + wtaId);
         }
         // TODO may be again changed in future.
 
