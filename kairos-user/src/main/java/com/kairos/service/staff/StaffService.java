@@ -21,6 +21,7 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.language.Language;
+import com.kairos.persistence.model.user.position.StaffUnitEmploymentDetails;
 import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -1291,19 +1292,23 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public StaffAdditionalInfoQueryResult verifyStaffBelongsToUnit(long staffId, Long unitEmploymentId, long id, String type) {
+    public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitEmploymentId, long id, String type) {
         Long unitId = -1L;
         unitId = organizationService.getOrganization(id, type);
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = new StaffAdditionalInfoQueryResult();
         staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
-        /*Staff staff = staffGraphRepository.getStaffByUnitId(unitId, staffId);
-        if (!Optional.ofNullable(staff).isPresent()) {
-            unitId = -1L;
-        }*/
-        UnitEmploymentPositionQueryResult unitEmploymentPosition = unitEmploymentPositionGraphRepository.getUnitEmploymentPositionById(unitEmploymentId);
+        StaffUnitEmploymentDetails unitEmploymentPosition = unitEmploymentPositionGraphRepository.getUnitEmploymentPositionById(unitEmploymentId);
         if (Optional.ofNullable(unitEmploymentPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitEmploymentPosition(unitEmploymentPosition);
         }
+        return staffAdditionalInfoQueryResult;
+    }
+
+    public StaffAdditionalInfoQueryResult verifyStaffBelongsToUnit(long staffId, long id, String type) {
+        Long unitId = -1L;
+        unitId = organizationService.getOrganization(id, type);
+        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = new StaffAdditionalInfoQueryResult();
+        staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
         return staffAdditionalInfoQueryResult;
     }
 
