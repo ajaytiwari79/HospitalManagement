@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENT_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TIME_TYPES;
+
 @Repository
 public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTARuleTemplate,Long> {
 
@@ -59,5 +62,11 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
 
     @Query("MATCH (ctaRT:CTARuleTemplate) WHERE ctaRT.deleted = false RETURN CASE WHEN COUNT(ctaRT) > 0 THEN true ELSE false END")
     Boolean isDefaultCTARuleTemplateExists();
+
+    @Query("MATCH (ctaRT:CTARuleTemplate)-[r:"+HAS_TIME_TYPES+"]-(t:TimeType) WHERE id(ctaRT)={0} DELETE r")
+    void detachAllTimeTypesFromCTARuleTemplate(Long ctaRuleTemplateId);
+
+    @Query("MATCH (ctaRT:CTARuleTemplate)-[r:"+HAS_EMPLOYMENT_TYPE+"]-(et:EmploymentType) WHERE id(ctaRT)={0} DELETE r ")
+    void detachAllEmploymentTypesFromCTARuleTemplate(Long ctaRuleTemplateId);
 
 }
