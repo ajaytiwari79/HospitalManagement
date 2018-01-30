@@ -2,47 +2,34 @@ package com.kairos;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.gateway.discovery.DiscoveryClientRouteDefinitionLocator;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.reactive.config.CorsRegistry;
+import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 @SpringBootApplication
-@EnableZuulProxy
-public class KairosGatewayApplication {
+@EnableWebFlux
+public class KairosGatewayApplication implements WebFluxConfigurer{
 
     public static void main(String[] args) {
         SpringApplication.run(KairosGatewayApplication.class, args);
     }
 
-    @LoadBalanced
     @Bean
-    public RestTemplate getRestTemplate() {
-        return new RestTemplate();
+    public DiscoveryClientRouteDefinitionLocator discoveryRouts(DiscoveryClient ds){
+        return new DiscoveryClientRouteDefinitionLocator(ds);
+    }
+  @Override
+   public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedHeaders("*")
+                .allowedMethods("OPTIONS","HEAD","GET","PUT","POST","DELETE","PATCH")
+                .allowCredentials(true)
+                .allowedOrigins("*");
     }
 
-    @Bean
-    @Primary
-    public CorsFilter corsFilter() {
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        final CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("HEAD");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("PATCH");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
 
 }
 
