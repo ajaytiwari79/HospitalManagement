@@ -12,6 +12,7 @@ import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
@@ -408,6 +409,13 @@ public class WTAService extends UserBaseService {
             WTABaseRuleTemplate wtaBaseRuleTemplateDTO = objectMapper.convertValue(ruleTemplate, WTABaseRuleTemplate.class);
             wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
             wtaBaseRuleTemplateDTO.setId(null);
+
+            if (Optional.ofNullable(wtaBaseRuleTemplateDTO.getPhaseTemplateValues()).isPresent()) {
+                wtaBaseRuleTemplateDTO.getPhaseTemplateValues().forEach(PhaseTemplateValue->{
+                    PhaseTemplateValue.setId(null);
+                });
+            }
+
             copiedRuleTemplate.add(wtaBaseRuleTemplateDTO);
         });
         return copiedRuleTemplate;

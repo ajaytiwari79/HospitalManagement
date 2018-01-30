@@ -9,6 +9,7 @@ import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
@@ -19,6 +20,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -81,30 +83,37 @@ public class WTAOrganizationService extends UserBaseService {
             logger.info("Expertise cant be changed at unit level :", wtaId);
             throw new ActionNotPermittedException("Expertise can't be changed");
         }
+
+        //Copying Properties
+        BeanUtils.copyProperties(oldWta,newWta);
         newWta.setId(null);
-        newWta.setName(updateDTO.getName());
-        newWta.setDescription(updateDTO.getDescription());
+        newWta.setDeleted(true);
+        newWta.setStartDateMillis(oldWta.getStartDateMillis());
+        newWta.setEndDateMillis(updateDTO.getStartDateMillis());
+        save(newWta);
+        oldWta.setName(updateDTO.getName());
+        oldWta.setDescription(updateDTO.getDescription());
         if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
             throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
         }
-        newWta.setStartDateMillis(updateDTO.getStartDateMillis());
-        newWta.setEndDateMillis(updateDTO.getEndDateMillis());
-        newWta.setExpertise(oldWta.getExpertise());
-        newWta.setParentWTA(oldWta);
-        newWta.setDisabled(false);
+        oldWta.setStartDateMillis(updateDTO.getStartDateMillis());
+        oldWta.setEndDateMillis(updateDTO.getEndDateMillis());
+        oldWta.setExpertise(oldWta.getExpertise());
+        oldWta.setParentWTA(newWta);
+        oldWta.setDisabled(false);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
-            ruleTemplates = copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates());
-            newWta.setRuleTemplates(ruleTemplates);
+            ruleTemplates = copyRuleTemplates(null, updateDTO.getRuleTemplates());
+            oldWta.setRuleTemplates(ruleTemplates);
         }
-        newWta.setOrganization(organization);
+        oldWta.setOrganization(organization);
         //organization.addWorkingTimeAgreements(newWta);
 
-        save(newWta);
-        workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
-        newWta.setParentWTA(oldWta.basicDetails());
-        newWta.getExpertise().setCountry(null);
-        return newWta;
+        save(oldWta);
+        //workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
+        oldWta.setParentWTA(newWta);
+        oldWta.getExpertise().setCountry(null);
+        return oldWta;
     }
 
 
@@ -132,6 +141,10 @@ public class WTAOrganizationService extends UserBaseService {
     protected List<WTABaseRuleTemplate> copyRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates, List<RuleTemplateCategoryDTO> ruleTemplatesNewObjects) {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<WTABaseRuleTemplate>(20);
         for (RuleTemplateCategoryDTO ruleTemplate : ruleTemplatesNewObjects) {
+//            if(Optional.ofNullable(ruleTemplate.getPhaseTemplateValues()).isPresent()){
+//                ruleTemplate.getPhaseTemplateValues().forEach(PhaseTemplateValue->{PhaseTemplateValue.setId(null);});
+//            }
+
             RuleTemplateCategory ruleTemplateCategory = null;
             ruleTemplateCategory = getCategory(ruleTemplates, ruleTemplate.getId(), ruleTemplate.getRuleTemplateCategory().getName());
 
