@@ -265,6 +265,17 @@ public class WTAService extends UserBaseService {
         BeanUtils.copyProperties(oldWta, versionWTA);
         versionWTA.setId(null);
         versionWTA.setDeleted(true);
+        versionWTA.getRuleTemplates().forEach(ruleTemplate -> {
+            ruleTemplate.setId(null);
+
+            if (Optional.ofNullable(ruleTemplate.getPhaseTemplateValues()).isPresent()) {
+                ruleTemplate.getPhaseTemplateValues().forEach(PhaseTemplateValue->{
+                    PhaseTemplateValue.setId(null);
+                });
+            }
+
+
+        });
         save(versionWTA);
         if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
             throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
