@@ -1136,7 +1136,7 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/cta/default-data", method = RequestMethod.GET)
     @ApiOperation("get default data for cta rule template")
     public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(countryId, null));
     }
     @ApiOperation(value = "Get day types by id")
     @RequestMapping(value = COUNTRY_URL + "/time_slots", method = RequestMethod.GET)
