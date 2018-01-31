@@ -1166,7 +1166,7 @@ public class OrganizationController {
     @RequestMapping(value =UNIT_URL+"/dayTypebydate", method = RequestMethod.GET)
     @ApiOperation("get dayType in country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String,Object>> getDayType(@PathVariable Long organizationId, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)Date date){
+    public ResponseEntity<Map<String,Object>> getDayType(@PathVariable Long organizationId, @RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd") Date date){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getDayType(organizationId,date));
 
     }
