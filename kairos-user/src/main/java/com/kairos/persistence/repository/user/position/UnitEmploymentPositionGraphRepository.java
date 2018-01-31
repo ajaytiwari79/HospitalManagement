@@ -77,8 +77,8 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
 
     @Query("Match (org:Organization) where id(org)={0}\n" +
             "Match (e:Expertise) where id(e)={1}\n" +
-            "MATCH (org)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
-            "Optional Match (org)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement{isEnabled:true})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
+            "OPTIONAL Match (org)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
             "return collect(wta) as wta,collect(cta) as cta")
     PositionCtaWtaQueryResult getCtaAndWtaByExpertise(Long organizationId, Long expertiseId);
 

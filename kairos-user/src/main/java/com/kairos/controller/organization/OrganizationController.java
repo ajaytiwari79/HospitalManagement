@@ -19,6 +19,7 @@ import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.*;
@@ -104,6 +105,8 @@ public class OrganizationController {
     private ClientBatchService clientBatchService;
     @Inject
     private PresenceTypeService presenceTypeService;
+    @Inject
+    private CountryService countryService;
 
 
     /**
@@ -1263,6 +1266,13 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> setDefaultOpeningHours(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,openningHourService.setDefaultOpeningHours(unitId));
     }
+
+    @RequestMapping(value = UNIT_URL + "/cta/default-data", method = RequestMethod.GET)
+    @ApiOperation("get default data for cta rule template")
+    public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(null, unitId));
+    }
+
 }
 
 
