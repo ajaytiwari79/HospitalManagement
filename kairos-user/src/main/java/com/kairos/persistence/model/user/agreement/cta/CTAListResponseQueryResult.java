@@ -1,24 +1,20 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.expertise.Expertise;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
- * Created by prerna on 26/12/17.
+ * Created by prerna on 30/1/18.
  */
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-public class CTAListQueryResult {
+public class CTAListResponseQueryResult {
     @NotNull
     private Long id;
     private String name;
@@ -29,7 +25,7 @@ public class CTAListQueryResult {
     private List<CTARuleTemplateQueryResult> ruleTemplates = new ArrayList<>();
     private Long startDateMillis;
     private Long endDateMillis;
-    public CTAListQueryResult(){
+    public CTAListResponseQueryResult(){
         // default constructor
     }
 
