@@ -256,7 +256,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        //    phaseRestClient.createDefaultPhases(organization.getId());
+            phaseRestClient.createDefaultPhases(organization.getId());
 
 
         HashMap<String, Object> orgResponse = new HashMap<>();
@@ -545,7 +545,7 @@ public class OrganizationService extends UserBaseService {
 
         organizationGraphRepository.save(unit);
 
-        //    phaseRestClient.createDefaultPhases(unit.getId());
+            phaseRestClient.createDefaultPhases(unit.getId());
 
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
