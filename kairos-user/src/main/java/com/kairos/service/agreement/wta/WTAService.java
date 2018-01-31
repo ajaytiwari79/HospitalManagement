@@ -246,8 +246,6 @@ public class WTAService extends UserBaseService {
         if (Optional.ofNullable(workingTimeAgreement).isPresent()) {
             throw new DuplicateDataException("Duplicate WTA name " + updateDTO.getName());
         }
-        WorkingTimeAgreement newWta;
-
         oldWta = prepareWtaWhileUpdate(oldWta, updateDTO, countryId);
 
         save(oldWta);
@@ -265,6 +263,9 @@ public class WTAService extends UserBaseService {
     }
 
     private WorkingTimeAgreement prepareWtaWhileUpdate(WorkingTimeAgreement oldWta, WTADTO updateDTO, Long countryId) {
+        if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
+            throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
+        }
         WorkingTimeAgreement versionWTA = new WorkingTimeAgreement();
 
         BeanUtils.copyProperties(oldWta, versionWTA);
@@ -272,25 +273,24 @@ public class WTAService extends UserBaseService {
         versionWTA.setDeleted(true);
         versionWTA.getRuleTemplates().forEach(ruleTemplate -> {
             ruleTemplate.setId(null);
-
             if (Optional.ofNullable(ruleTemplate.getPhaseTemplateValues()).isPresent()) {
-                ruleTemplate.getPhaseTemplateValues().forEach(PhaseTemplateValue -> {
-                    PhaseTemplateValue.setId(null);
+                ruleTemplate.getPhaseTemplateValues().forEach(phaseTemplateValue -> {
+                    phaseTemplateValue.setId(null);
                 });
             }
-
-
         });
-        save(versionWTA);
-        if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
-            throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
-        }
-
         versionWTA.setStartDateMillis(oldWta.getStartDateMillis());
         versionWTA.setEndDateMillis(updateDTO.getStartDateMillis());
+        save(versionWTA);
+
+
+
 
         oldWta.setStartDateMillis(updateDTO.getStartDateMillis());
-        oldWta.setEndDateMillis(updateDTO.getEndDateMillis());
+        if (oldWta.getEndDateMillis() !=null ) {
+            oldWta.setEndDateMillis(updateDTO.getEndDateMillis());
+        }
+
 
         if (!oldWta.getExpertise().getId().equals(updateDTO.getExpertiseId())) {
             Expertise expertise = expertiseRepository.findOne(updateDTO.getExpertiseId());
