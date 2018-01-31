@@ -4,6 +4,7 @@ package com.kairos.controller.position;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.response.dto.web.UnitEmploymentPositionDTO;
 import com.kairos.service.position.UnitEmploymentPositionService;
+import com.kairos.service.timeBank.TimeBankService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +29,7 @@ public class UnitEmploymentPositionController {
 
     @Inject
     private UnitEmploymentPositionService unitEmploymentPositionService;
+    @Inject private TimeBankService timeBankService;
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unitEmploymentPosition")
@@ -83,6 +85,11 @@ public class UnitEmploymentPositionController {
 //    ResponseEntity<Map<String, Object>> getAllUnitEmploymentPositions(@PathVariable Long unitEmploymentId) {
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getAllUnitEmploymentPositions(unitEmploymentId));
 //    }
+
+    @GetMapping(value = "/getCTAbyUnitEmployementPosition/{unitEmploymentPositionId}")
+    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitEmploymentPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getCostTimeAgreement(unitEmploymentPositionId));
+    }
 
 
 }

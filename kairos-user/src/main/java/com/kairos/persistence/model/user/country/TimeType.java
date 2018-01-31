@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeType extends UserBaseEntity {
 
-    private String name;
+    /*private String name;
     private String type;
     private boolean includeInTimeBank = true;
     @Relationship(type = BELONGS_TO , direction=Relationship.OUTGOING)
@@ -132,6 +132,6 @@ public class TimeType extends UserBaseEntity {
                 .append(name, that.name)
                 .append(this.getId(), that.getId())
                 .isEquals();
-    }
+    }*/
 
 }

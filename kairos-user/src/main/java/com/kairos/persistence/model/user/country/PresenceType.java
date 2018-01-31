@@ -14,7 +14,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PresenceType extends UserBaseEntity {
-    private String name;
+  /*  private String name;
     @Relationship(type = BELONGS_TO , direction=Relationship.OUTGOING)
     private Country country;
     private boolean deleted;
@@ -57,5 +57,5 @@ public class PresenceType extends UserBaseEntity {
                 "name='" + name + '\'' +
                 ", deleted=" + deleted +
                 '}';
-    }
+    }*/
 }

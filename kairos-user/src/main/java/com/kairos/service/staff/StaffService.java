@@ -31,6 +31,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
+import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
@@ -45,6 +46,7 @@ import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
+import com.kairos.service.position.UnitEmploymentPositionService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
@@ -136,6 +138,8 @@ public class StaffService extends UserBaseService {
     TaskServiceRestClient taskServiceRestClient;
     @Inject
     private OrganizationService organizationService;
+
+    @Inject private UnitEmploymentPositionGraphRepository unitEmploymentPositionGraphRepository;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -1369,6 +1373,12 @@ public class StaffService extends UserBaseService {
      */
     public Staff getStaffByUserId(Long userId) {
         return staffGraphRepository.getByUser(userId);
+    }
+
+    public Long getUnitEmploymentPositionId(Long staffId,List<Long> expertiseIds){
+       // Long staffExpertiseId = staffGraphRepository.getExpertiseId(staffId);
+        Long unitEmployeementPositionId = staffGraphRepository.getUnitEmploymentIdByStaffExpertise(staffId,expertiseIds);
+        return unitEmployeementPositionId;
     }
 
 }

@@ -1,7 +1,6 @@
 package com.kairos.client.dto;
 
 import com.kairos.response.dto.web.cta.PhaseDTO;
-import com.kairos.response.dto.web.cta.TimeTypeDTO;
 
 public class PhaseAndActivityTypeWrapper {
     private PhaseDTO phaseDTO;
