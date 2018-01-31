@@ -1023,17 +1023,18 @@ public class OrganizationService extends UserBaseService {
             Organization parentOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
             organizationTypeAndSubTypeDTO.setParentOrganizationId(parentOrganization.getId());
             organizationTypeAndSubTypeDTO.setParent(false);
-            organizationTypeAndSubTypeDTO.setUnitId(organization.getId());
-            return organizationTypeAndSubTypeDTO;
+            //organizationTypeAndSubTypeDTO.setUnitId(organization.getId());
+            //return organizationTypeAndSubTypeDTO;
         } else {
 
-            List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(organization.getId());
-            List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(organization.getId());
-            organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
-            organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
             organizationTypeAndSubTypeDTO.setParent(true);
-
         }
+
+        List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(organization.getId());
+        List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(organization.getId());
+        organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
+        organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
+
         organizationTypeAndSubTypeDTO.setUnitId(organization.getId());
 
         return organizationTypeAndSubTypeDTO;
