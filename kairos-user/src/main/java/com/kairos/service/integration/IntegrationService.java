@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -70,12 +67,23 @@ public class IntegrationService {
     }
 
     public Visitour saveVisitourIntegrationData(Long unitId, Visitour visitour){
-        Visitour visitour1 = visitourGraphRepository.findByOrganizationId(unitId);
-        if (visitour1 == null) visitour1 = new Visitour();
-        visitour1 = Visitour.copyProperties(visitour,Visitour.getInstance());
-        visitour1.setOrganizationId(unitId);
-        visitourGraphRepository.save(visitour1);
-        return visitour1;
+        if( ! Optional.ofNullable(visitour.getUsername()).isPresent() ||
+                ! Optional.ofNullable(visitour.getServerName()).isPresent() ||
+                ! Optional.ofNullable(visitour.getPassword()).isPresent()){
+            throw new InternalError("Either Username, Server name or password  is empty.");
+        }
+
+        Visitour visitourCredential = visitourGraphRepository.findByOrganizationId(unitId);
+        if(! Optional.ofNullable(visitourCredential).isPresent()){
+            visitourCredential = Visitour.getInstance();
+        }
+
+        visitourCredential.setServerName(visitour.getServerName());
+        visitourCredential.setUsername(visitour.getUsername());
+        visitourCredential.setPassword(visitour.getPassword());
+        visitourCredential.setOrganizationId(unitId);
+        visitourGraphRepository.save(visitourCredential);
+        return visitourCredential;
     }
 
     public Visitour fetchVisitourIntegrationData(Long unitId){

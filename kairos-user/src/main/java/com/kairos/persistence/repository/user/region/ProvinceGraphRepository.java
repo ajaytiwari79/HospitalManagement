@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.region;
 import com.kairos.persistence.model.user.region.Province;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by oodles on 7/1/17.
  */
 @Repository
-public interface ProvinceGraphRepository extends GraphRepository<Province>{
+public interface ProvinceGraphRepository extends Neo4jBaseRepository<Province,Long>{
     List<Province> findAll();
 
 

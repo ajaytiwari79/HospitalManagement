@@ -57,7 +57,7 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(0 != payload.getFunctionCode()){ /// function code must be zero
-                throw new FlsCallException("Not A Valid Function code, Should be 0");
+                throw new FlsCallException("Not A Valid StaffFunction code, Should be 0");
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
@@ -86,7 +86,7 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(1 != payload.getFunctionCode()){ /// function code must be one
-                throw new FlsCallException("Not A Valid Function code, Should be 1");
+                throw new FlsCallException("Not A Valid StaffFunction code, Should be 1");
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
@@ -104,7 +104,7 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(2 != payload.getFunctionCode()){ /// function code must be 2
-                throw new FlsCallException("Not A Valid Function code, Should be 2");
+                throw new FlsCallException("Not A Valid StaffFunction code, Should be 2");
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
@@ -122,7 +122,7 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(3 != payload.getFunctionCode() &&  4 != payload.getFunctionCode() ){ /// function code must be 3, 4
-                throw new FlsCallException("Not A Valid Function code, Should be 3 or 4");
+                throw new FlsCallException("Not A Valid StaffFunction code, Should be 3 or 4");
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){
@@ -140,7 +140,7 @@ public class FlsClientImpl implements  FlsClient{
 
         try {
             if(5 != payload.getFunctionCode()){ /// function code must be 5
-                throw new FlsCallException("Not A Valid Function code, Should be 5");
+                throw new FlsCallException("Not A Valid StaffFunction code, Should be 5");
             }
             return sendCallRquest(payload, flsCredentials);
         } catch (Exception ex){

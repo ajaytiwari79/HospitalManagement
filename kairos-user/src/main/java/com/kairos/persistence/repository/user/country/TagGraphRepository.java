@@ -3,11 +3,10 @@ package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.country.tag.TagQueryResult;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -16,7 +15,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prerna on 10/11/17.
  */
 @Repository
-public interface TagGraphRepository extends GraphRepository<Tag> {
+public interface TagGraphRepository extends Neo4jBaseRepository<Tag,Long> {
 
     List<Tag> findAll();
 

@@ -5,11 +5,10 @@ import com.kairos.persistence.model.organization.StaffRelationship;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientStaffRelation;
 import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.model.user.position.Position;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,7 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 24/10/16.
  */
 @Repository
-public interface StaffGraphRepository extends GraphRepository<Staff> {
+public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
 
     @Override
     List<Staff> findAll();
@@ -35,7 +34,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     @Query("MATCH (group:Group)-[:"+HAS_TEAM+"]->(team:Team)-[:"+TEAM_HAS_MEMBER+"]->(staff:Staff) where id(group)={0} return {id:id(staff),firstName:staff.firstName,lastName:staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,visitourId:staff.visitourId,profilePic: {1} + staff.profilePic} as data order by data.firstName")
     List<Map<String,Object>> getStaffByGroupId(long groupId, String imageUrl);
 
-    @Query("MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment) where id(organization)={0} with employment\n" +
+    @Query(" MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment) where id(organization)={0} with employment\n" +
             "MATCH (organization:Organization)-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team)-[:TEAM_HAS_MEMBER]->(staff:Staff) where id(organization)={1} with staff\n " +
             "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff\n" +
             "OPTIONAL Match (staff)-[:"+ENGINEER_TYPE+"]->(engineerType:EngineerType) with engineerType, staff, user\n" +
@@ -82,10 +81,12 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
     Staff editStaffWorkPlaces(long staffId, List<Long> staffIds);
 
     @Query("Match (unit:Organization),(staff:Staff) where id(staff)={0} AND id(unit)={1} with staff,unit\n" +
-            "Match (unit)-[orgSkillRelation:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with skill,staff, orgSkillRelation\n" +
-            "OPTIONAL MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill{isEnabled:true}) with skill,r,orgSkillRelation\n" +
-            "Match (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with skill,skillCategory,r,orgSkillRelation\n" +
-            "return {children:collect({id:id(skill),name:orgSkillRelation.customName,isSelected:r.isEnabled}),id:id(skillCategory),name:skillCategory.name} as data")
+            "Match (unit)-[orgSkillRelation:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with skill,staff, orgSkillRelation,unit\n" +
+            "OPTIONAL MATCH (skill)-[:"+HAS_TAG+"]-(tag:Tag)<-[:"+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=unit.showCountryTags with DISTINCT  skill,staff, orgSkillRelation,unit,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-[:"+ORGANIZATION_HAS_TAG+"]-(unit) with  skill,staff, orgSkillRelation,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "OPTIONAL MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill{isEnabled:true}) with skill,r,orgSkillRelation, ctags,otags\n" +
+            "Match (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with skill,skillCategory,r,orgSkillRelation,ctags,otags\n" +
+            "return {children:collect({id:id(skill),name:orgSkillRelation.customName,isSelected:r.isEnabled, tags:ctags+otags}),id:id(skillCategory),name:skillCategory.name} as data")
     List<Map<String,Object>> getSkills(long staffId, long unitId);
 
     @Query("Match (staff:Staff),(skill:Skill) where id(staff)={0} AND id(skill) IN {1} match (staff)-[r:STAFF_HAS_SKILLS]->(skill) set r.isEnabled=false,r.lastModificationDate={2} return r")
@@ -312,7 +313,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
             "where id(organization)={0} with staff\n" +
             "optional match (staff)-[:"+HAS_CONTACT_ADDRESS+"]->(contactAddress:ContactAddress) with staff,contactAddress\n" +
             "optional match (staff)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) with staff,contactDetail,contactAddress\n" +
-            "return staff,id(contactAddress) as contactAddressId,id(contactDetail) as contactDetailId")
+            "return staff,id(contactAddress) as contactAddressId,id(contactDetail) as contactDetailId LIMIT 1")
     StaffQueryResult getStaffByExternalIdInOrganization(Long organizationId, Long externalId);
 
     @Query("MATCH (unitEmployments:UnitEmployment)-[:PROVIDED_BY]->(organization:Organization) where id(organization)={0} with unitEmployments ,organization\n" +
@@ -329,7 +330,7 @@ public interface StaffGraphRepository extends GraphRepository<Staff> {
             "(x IN employmentTypeSettings WHERE x.allowedForContactPerson=true) as filteredEmploymentType with extract(n IN filteredEmploymentType| n.id) AS extractedEmploymentTypeId \n"+
 
             "MATCH (staff:Staff)<-[:BELONGS_TO]-(employment:Employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployments)\n" +
-            "match (unitEmployments)-[:HAS_POSITION]->(p:Position)-[:"+HAS_EMPLOYMENT_TYPE+"]->(et:EmploymentType) WHERE id(et) IN extractedEmploymentTypeId\n" +
+            "match (unitEmployments)-[:HAS_UNIT_EMPLOYMENT_POSITION]->(p:Position)-[:"+HAS_EMPLOYMENT_TYPE+"]->(et:EmploymentType) WHERE id(et) IN extractedEmploymentTypeId\n" +
             "return distinct id(staff) as id, staff.firstName as firstName,staff.lastName as lastName")
     List<StaffPersonalDetailDTO> getAllMainEmploymentStaffDetailByUnitId(long unitId);
 

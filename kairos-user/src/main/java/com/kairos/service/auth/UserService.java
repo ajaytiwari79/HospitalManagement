@@ -91,7 +91,7 @@ public class UserService extends UserBaseService {
      * @param id
      */
     public void deleteUserById(Long id) {
-        userGraphRepository.delete(id);
+        userGraphRepository.deleteById(id);
     }
 
 

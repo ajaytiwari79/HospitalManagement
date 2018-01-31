@@ -2,12 +2,12 @@ package com.kairos.persistence.model.user.country;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplate;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.country.equipment.Equipment;
 import com.kairos.persistence.model.user.country.feature.Feature;
 import com.kairos.persistence.model.user.country.tag.Tag;
@@ -20,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 
 
 /**
@@ -32,16 +33,17 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
     * 2 august 2017
     */
 @NodeEntity
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Country extends UserBaseEntity {
 
-    @NotEmpty(message = "error.Country.name.notEmpty") @NotNull(message = "error.Country.name.notnull")
+    @NotEmpty(message = "error.Country.name.notEmpty")
+    @NotNull(message = "error.Country.name.notnull")
     private String name;
 
     private boolean isEnabled = true;
 
-    @NotEmpty(message = "error.Country.code.notEmpty") @NotNull(message = "error.Country.code.notnull")
+    @NotEmpty(message = "error.Country.code.notEmpty")
+    @NotNull(message = "error.Country.code.notnull")
     private String code;
 
     public String getCode() {
@@ -53,13 +55,17 @@ public class Country extends UserBaseEntity {
     }
 
     @Relationship(type = HAS_HOLIDAY)
-    private List< CountryHolidayCalender> countryHolidayCalenderList;
+    private List<CountryHolidayCalender> countryHolidayCalenderList;
 
-    @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY)
-    private List <RuleTemplateCategory> ruleTemplateCategories;
+    @Relationship(type = HAS_RULE_TEMPLATE_CATEGORY, direction = UNDIRECTED)
+    private List<RuleTemplateCategory> ruleTemplateCategories = new ArrayList<>();
 
     @Relationship(type = HAS_RULE_TEMPLATE)
-    private List <WTABaseRuleTemplate> WTABaseRuleTemplate;
+    private List<RuleTemplate> WTABaseRuleTemplate;
+
+    @Relationship(type = HAS_CTA_RULE_TEMPLATE)
+    private List<RuleTemplate> ctaRuleTemplates;
+
 
     @Relationship(type = COUNTRY_HAS_TAG)
     private List<Tag> tags;
@@ -69,7 +75,6 @@ public class Country extends UserBaseEntity {
 
     @Relationship(type = COUNTRY_HAS_EQUIPMENT )
     private List<Equipment> equipments;
-
     @JsonIgnore
     @Relationship(type = HAS_ORGANIZATION_SERVICES)
     private List<OrganizationService> organizationServices;
@@ -99,19 +104,20 @@ public class Country extends UserBaseEntity {
         this.name = name;
     }
 
-    public Map<String, Object> retrieveGeneralDetails() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", this.id);
-        map.put("name", this.name);
-        return map;
-    }
-
-    public List<WTABaseRuleTemplate> getWTABaseRuleTemplate() {
+    public List<RuleTemplate> getWTABaseRuleTemplate() {
         return WTABaseRuleTemplate;
     }
 
-    public void setWTABaseRuleTemplate(List<WTABaseRuleTemplate> WTABaseRuleTemplate) {
+    public void setWTABaseRuleTemplate(List<RuleTemplate> WTABaseRuleTemplate) {
         this.WTABaseRuleTemplate = WTABaseRuleTemplate;
+    }
+
+    public List<RuleTemplate> getCtaRuleTemplates() {
+        return ctaRuleTemplates;
+    }
+
+    public void setCtaRuleTemplates(List<RuleTemplate> ctaRuleTemplates) {
+        this.ctaRuleTemplates = ctaRuleTemplates;
     }
 
     public String getGoogleCalendarCode() {
@@ -133,11 +139,11 @@ public class Country extends UserBaseEntity {
         this.countryHolidayCalenderList = countryHolidayCalenderList;
     }
 
-//    public List<OrganizationType> getOrganizationTypes() {
+//    public List<OrganizationType> getOrganizationType() {
 //        return organizationTypeList;
 //    }
 //
-//    public void setOrganizationTypes(List<OrganizationType> organizationTypeList) {
+//    public void setOrganizationType(List<OrganizationType> organizationTypeList) {
 //        this.organizationTypeList = organizationTypeList;
 //    }
 
@@ -169,7 +175,7 @@ public class Country extends UserBaseEntity {
         this.employmentTypeList = employmentTypeList;
     }
 
-    public void addEmploymentType(EmploymentType employmentType){
+    public void addEmploymentType(EmploymentType employmentType) {
         List<EmploymentType> employmentTypeList = Optional.ofNullable(this.employmentTypeList).orElse(new ArrayList<>());
         employmentTypeList.add(employmentType);
         this.employmentTypeList = employmentTypeList;
@@ -183,22 +189,55 @@ public class Country extends UserBaseEntity {
         return Optional.ofNullable(ruleTemplateCategories).orElse(new ArrayList<>());
     }
 
-    public void setRuleTemplateCategories(List<RuleTemplateCategory> ruleTemplateCategories) {
+
+    public void addLevel(Level level) {
+        List<Level> levels = Optional.ofNullable(this.levels).orElse(new ArrayList<>());
+        levels.add(level);
+        this.levels = levels;
+    }
+
+    public void addResources(Vehicle vehicle) {
+        List<Vehicle> resourceList = Optional.ofNullable(this.resources).orElse(new ArrayList<>());
+        resourceList.add(vehicle);
+        this.resources = resourceList;
+    }
+
+
+       public void setRuleTemplateCategories(List<RuleTemplateCategory> ruleTemplateCategories) {
         this.ruleTemplateCategories = ruleTemplateCategories;
     }
 
-    public enum Designation {
-        HOME_CARE, NURSING_HOME, HOSPITAL
+    public void addRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
+        if (ruleTemplateCategory == null)
+            throw new NullPointerException("Can't add null ruleTemplateCategory");
+        if (ruleTemplateCategory.getCountry() != null)
+            throw new IllegalStateException("country is already assigned to ruleTemplateCategory");
+        getRuleTemplateCategories().add(ruleTemplateCategory);
+        ruleTemplateCategory.setCountry(this);
+    }
+
+    public void removeRuleTemplateCategory(RuleTemplateCategory ruleTemplateCategory) {
+        if (ruleTemplateCategory == null)
+            getRuleTemplateCategories().remove(ruleTemplateCategory);
+        ruleTemplateCategory.setCountry(null);
+
+    }
+
+    public Map<String, Object> retrieveGeneralDetails() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", this.id);
+        map.put("name", this.name);
+        return map;
     }
 
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("code",this.code);
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        map.put("googleCalendarCode",this.getGoogleCalendarCode());
+        map.put("id", this.id);
+        map.put("name", this.name);
+        map.put("code", this.code);
+        map.put("lastModificationDate", this.getLastModificationDate());
+        map.put("creationDate", this.getCreationDate());
+        map.put("googleCalendarCode", this.getGoogleCalendarCode());
         return map;
     }
 
@@ -208,20 +247,8 @@ public class Country extends UserBaseEntity {
                 "name='" + name + '\'' +
                 ", isEnabled=" + isEnabled +
                 ", code='" + code + '\'' +
-                '}'+
+                '}' +
                 '}';
-    }
-
-    public void addLevel(Level level){
-        List<Level> levels = Optional.ofNullable(this.levels).orElse(new ArrayList<>());
-        levels.add(level);
-        this.levels = levels;
-    }
-
-    public void addResources(Vehicle vehicle){
-        List<Vehicle> resourceList = Optional.ofNullable(this.resources).orElse(new ArrayList<>());
-        resourceList.add(vehicle);
-        this.resources = resourceList;
     }
 
 

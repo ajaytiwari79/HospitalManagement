@@ -1,5 +1,7 @@
 package com.kairos.controller.expertise;
+
 import com.kairos.service.expertise.ExpertiseService;
+import com.kairos.service.position.UnitEmploymentPositionService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,27 +12,28 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.*;
 
 /**
  * Created by prabjot on 28/10/16.
  */
 @RestController
-@RequestMapping(API_V1 )
-@Api(value = API_V1 )
+@RequestMapping(API_V1)
+@Api(value = API_V1)
 public class ExpertiseController {
 
     @Inject
     private ExpertiseService expertiseService;
-
+    @Inject
+    private UnitEmploymentPositionService unitEmploymentPositionService;
 
 
     @ApiOperation(value = "Assign Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> setExpertiseToStaff(@PathVariable Long staffId, @RequestBody  Map<String, Object> expertise) {
+    public ResponseEntity<Map<String, Object>> setExpertiseToStaff(@PathVariable Long staffId, @RequestBody Map<String, Object> expertise) {
         Long expertiseId = Long.valueOf(expertise.get("id").toString());
-        Map<String, Object> expertiseObj = expertiseService.setExpertiseToStaff(staffId,expertiseId);
+        Map<String, Object> expertiseObj = expertiseService.setExpertiseToStaff(staffId, expertiseId);
         if (expertiseObj == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, expertiseObj);
         }
@@ -48,6 +51,11 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertise);
     }
 
+    @ApiOperation(value = "Get cta and wta by expertise")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/expertise/{expertiseId}/cta_wta")
+    ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getCtaAndWtaByExpertiseId(unitId, expertiseId));
+    }
 
 
 }

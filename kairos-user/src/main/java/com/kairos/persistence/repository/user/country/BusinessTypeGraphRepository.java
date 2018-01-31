@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.user.country.BusinessType;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by oodles on 9/1/17.
  */
 @Repository
-public interface BusinessTypeGraphRepository extends GraphRepository<BusinessType>{
+public interface BusinessTypeGraphRepository extends Neo4jBaseRepository<BusinessType,Long>{
 
     List<BusinessType> findAll();
 

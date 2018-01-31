@@ -35,11 +35,11 @@ public class MinimumDurationBetweenShiftWTATemplate extends WTABaseRuleTemplate 
         this.minimumDurationBetweenShifts = minimumDurationBetweenShifts;
     }
 
-    public MinimumDurationBetweenShiftWTATemplate(String name, String templateType, boolean isActive,
+    public MinimumDurationBetweenShiftWTATemplate(String name, String templateType, boolean disabled,
                                                   String description, List<String> balanceType, long minimumDurationBetweenShifts) {
         this.name = name;
         this.templateType = templateType;
-        this.isActive = isActive;
+        this.disabled = disabled;
         this.description = description;
         this.balanceType= balanceType;
         this.minimumDurationBetweenShifts=minimumDurationBetweenShifts;

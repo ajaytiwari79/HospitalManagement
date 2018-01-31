@@ -34,10 +34,10 @@ public class MinimumRestInConsecutiveDaysWTATemplate extends WTABaseRuleTemplate
     }
 
 
-    public MinimumRestInConsecutiveDaysWTATemplate(String name, String templateType, boolean isActive, String description, long minimumRest, long daysWorked) {
+    public MinimumRestInConsecutiveDaysWTATemplate(String name, String templateType, boolean disabled, String description, long minimumRest, long daysWorked) {
         this.name=name;
         this.templateType=templateType;
-        this.isActive=isActive;
+        this.disabled=disabled;
         this.description=description;
 
         this.minimumRest = minimumRest;

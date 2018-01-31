@@ -6,14 +6,21 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
+
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
+
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
+
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-import com.kairos.persistence.repository.user.position.PositionGraphRepository;
+import com.kairos.persistence.repository.user.position.PositionCodeGraphRepository;
+
+import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
+
 import com.kairos.service.UserBaseService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.region.RegionService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
@@ -22,10 +29,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import java.util.*;
+
 
 /**
  * Created by prerna on 2/11/17.
@@ -42,7 +53,7 @@ public class EmploymentTypeService extends UserBaseService {
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
-    private PositionGraphRepository positionGraphRepository;
+    private UnitEmploymentPositionGraphRepository unitEmploymentPositionGraphRepository;
     @Inject
     private RegionService regionService;
     @Inject
@@ -51,6 +62,8 @@ public class EmploymentTypeService extends UserBaseService {
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    @Inject
+    private OrganizationService organizationService;
 
     public EmploymentType addEmploymentType(Long countryId, EmploymentTypeDTO employmentTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -108,7 +121,8 @@ public class EmploymentTypeService extends UserBaseService {
             logger.error("Incorrect unit id " + unitId);
             throw new DataNotFoundByIdException("Incorrect unit id ");
         }
-        return organizationGraphRepository.getEmploymentTypeByOrganization(unitId, isDeleted);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        return organizationGraphRepository.getEmploymentTypeByOrganization(parent.getId(), isDeleted);
     }
 
     public OrganizationEmploymentTypeDTO setEmploymentTypeSettingsOfOrganization(Long unitId, Long employmentTypeId, OrganizationEmploymentTypeDTO organizationEmploymentTypeDTO) {
@@ -141,7 +155,8 @@ public class EmploymentTypeService extends UserBaseService {
             logger.error("Incorrect unit id " + unitId);
             throw new DataNotFoundByIdException("Incorrect unit id ");
         }
-        return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(unitId, false);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(parent.getId(), false);
     }
 
     public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId) {

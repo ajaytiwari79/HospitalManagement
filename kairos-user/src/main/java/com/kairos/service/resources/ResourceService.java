@@ -223,7 +223,7 @@ public class ResourceService extends UserBaseService {
                 throw new InternalError("Incorrect resource date ");
             }
         }
-        unavailabilityRelationshipRepository.save(resourceUnavailabilityRelationships);
+        unavailabilityRelationshipRepository.saveAll(resourceUnavailabilityRelationships);
         return resourceUnAvailabilities;
     }
 

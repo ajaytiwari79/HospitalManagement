@@ -1,5 +1,7 @@
 package com.kairos.service.mail;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ import java.io.File;
 
 @Service
 public class MailService {
-    final static Logger logger = Logger.getLogger(MailService.class);
+    final static Logger logger = LoggerFactory.getLogger(MailService.class);
     final static boolean isSSL = true;
 
     @Inject
@@ -49,11 +51,11 @@ public class MailService {
             javaMailSender.send(mimeMessage);
             logger.info("Email sent");
         } catch (MessagingException e) {
-            logger.info(e);
+            logger.info("{}",e);
             return false;
         }
         catch (Exception e){
-            logger.info(e);
+            logger.info("{}",e);
             return false;
         }
         return false;
@@ -87,12 +89,12 @@ public class MailService {
 
 
             } catch (MessagingException e) {
-            logger.info(e);
+            logger.info("{}",e);
             return false;
             }
 
             catch (Exception e) {
-             logger.info(e);
+             logger.info("{}",e);
              return false;
             }
 
@@ -139,12 +141,12 @@ public class MailService {
 
 
         } catch (MessagingException e) {
-            logger.info(e);
+            logger.info("{}",e);
             return false;
         }
 
         catch (Exception e) {
-            logger.info(e);
+            logger.info("{}",e);
             return false;
         }
 

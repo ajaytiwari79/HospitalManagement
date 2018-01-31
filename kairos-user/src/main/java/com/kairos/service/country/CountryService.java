@@ -7,14 +7,15 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
+import com.kairos.client.PhaseRestClient;
+import com.kairos.client.activity_types.ActivityTypesRestClient;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.CountryHolidayCalender;
-import com.kairos.persistence.model.user.country.RelationType;
+import com.kairos.persistence.model.timetype.TimeTypeDTO;
+import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -23,6 +24,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
+import com.kairos.response.dto.web.cta.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.google_calender.GoogleCalenderService;
@@ -30,12 +32,14 @@ import com.kairos.util.FormatUtil;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by oodles on 16/9/16.
@@ -89,6 +93,13 @@ public class CountryService extends UserBaseService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Autowired
     OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    private @Autowired CurrencyService currencyService;
+    private @Autowired EmploymentTypeService employmentTypeService;
+    private @Autowired TimeTypeService timeTypeService;
+    private @Autowired DayTypeService dayTypeService;
+    private @Autowired PhaseRestClient phaseRestClient;
+    private @Autowired ActivityTypesRestClient activityTypesRestClient;
+
 
     /**
      * @param country
@@ -422,4 +433,48 @@ public class CountryService extends UserBaseService {
         vehicleToUpdate.setIcon(vehicle.getIcon());
         return save(vehicleToUpdate);
     }
+
+    /**
+     *  @auther anil maurya
+     *
+     * @param countryId
+     * @return
+     */
+    public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTATemplate(Long countryId){
+        List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
+     List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
+     List<TimeTypeDTO> timeTypes=timeTypeService.getAllTimeTypes(countryId);
+     List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
+     List<ActivityTypeDTO> activityTypeDTOS=activityTypesRestClient.getActivityType(countryId);
+     List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
+
+     //wrap data into wrapper class
+     CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper=new CTARuleTemplateDefaultDataWrapper();
+
+     ctaRuleTemplateDefaultDataWrapper.setCurrencies(currencies);
+     ctaRuleTemplateDefaultDataWrapper.setPhases(phases);
+
+     List<EmploymentTypeDTO> employmentTypeDTOS =employmentTypes.stream().map(employmentType -> {
+            EmploymentTypeDTO employmentTypeDTO=new EmploymentTypeDTO();
+            BeanUtils.copyProperties(employmentType,employmentTypeDTO);
+            return employmentTypeDTO;
+        }).collect(Collectors.toList());
+        ctaRuleTemplateDefaultDataWrapper.setEmploymentTypes(employmentTypeDTOS);
+        ctaRuleTemplateDefaultDataWrapper.setTimeTypes(timeTypes);
+
+        List<DayTypeDTO> dayTypeDTOS =dayTypes.stream().map(dayType -> {
+            DayTypeDTO dayTypeDTO=new DayTypeDTO();
+            BeanUtils.copyProperties(dayType,dayTypeDTO);
+            return dayTypeDTO;
+        }).collect(Collectors.toList());
+        ctaRuleTemplateDefaultDataWrapper.setDayTypes(dayTypeDTOS);
+
+        ctaRuleTemplateDefaultDataWrapper.setActivityTypes(activityTypeDTOS);
+
+        ctaRuleTemplateDefaultDataWrapper.setHolidayMapList(this.getAllCountryAllHolidaysByCountryId(countryId));
+     return ctaRuleTemplateDefaultDataWrapper;
+    }
+
+
+
 }

@@ -46,6 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
@@ -1090,7 +1091,7 @@ public class OrganizationController {
     @RequestMapping(value = UNIT_URL+"/organizationTypeAndSubTypes", method = RequestMethod.GET)
     @ApiOperation("get All organization types and  and Sub org by unitId")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getorganizationTypeAndSubTypes( @RequestParam("type") String type,@PathVariable long unitId) {
+    public ResponseEntity<Map<String, Object>> getOrganizationTypeAndSubTypes( @RequestParam("type") String type,@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getOrganizationTypeAndSubTypes(unitId,type));
     }
@@ -1221,14 +1222,16 @@ public class OrganizationController {
 
     @ApiOperation(value = "Add custom name for Organization Service")
     @RequestMapping(value = "/unit/{unitId}/organization_service/{serviceId}", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updateCustomNameOfService (@PathVariable Long unitId, @PathVariable Long serviceId, @RequestBody OrganizationServiceDTO organizationServiceDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfService(serviceId, unitId, organizationServiceDTO.getCustomName()));
+    public ResponseEntity<Map<String, Object>> updateCustomNameOfService (@PathVariable Long unitId, @PathVariable Long serviceId, @RequestBody OrganizationServiceDTO organizationServiceDTO,
+                                                                          @RequestParam("type") String type) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfService(serviceId, unitId, organizationServiceDTO.getCustomName(), type));
     }
 
     @ApiOperation(value = "Add custom name for Organization Sub Service")
     @RequestMapping(value = "/unit/{unitId}/organization_sub_service/{serviceId}", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updateCustomNameOfSubService (@PathVariable Long unitId, @PathVariable Long serviceId, @RequestBody OrganizationServiceDTO organizationServiceDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfSubService(serviceId, unitId, organizationServiceDTO.getCustomName()));
+    public ResponseEntity<Map<String, Object>> updateCustomNameOfSubService (@PathVariable Long unitId, @PathVariable Long serviceId, @RequestBody OrganizationServiceDTO organizationServiceDTO,
+                                                                             @RequestParam("type") String type) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationServiceService.updateCustomNameOfSubService(serviceId, unitId, organizationServiceDTO.getCustomName(), type));
     }
 
     //
@@ -1237,6 +1240,28 @@ public class OrganizationController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,presenceTypeService.getAllPresenceTypeAndTimeTypesByUnitId(unitId));
+    }
+
+    @ApiOperation(value = "Get available time zones")
+    @RequestMapping(value =UNIT_URL+"/timeZones", method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllTimeZones(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.getAvailableZoneIds(unitId));
+    }
+
+    @ApiOperation(value = "Assign time zone to unit")
+    @RequestMapping(value =UNIT_URL+"/timeZone", method = RequestMethod.POST)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> assignUnitTimeZone(@PathVariable Long unitId,  @RequestBody Map<String, Object> data) {
+        String zoneId = (String) data.get("zoneId");
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,organizationService.assignUnitTimeZone(unitId, zoneId));
+    }
+
+    @ApiOperation(value = "Assign Default Opening Hours to Unit")
+    @RequestMapping(value =UNIT_URL+"/setDefaultOpeningHours", method = RequestMethod.POST)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> setDefaultOpeningHours(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,openningHourService.setDefaultOpeningHours(unitId));
     }
 }
 

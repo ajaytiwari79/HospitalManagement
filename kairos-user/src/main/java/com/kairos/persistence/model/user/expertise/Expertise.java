@@ -88,6 +88,16 @@ public class Expertise extends UserBaseEntity {
         return name;
     }
 
+    public Expertise(Long id,@NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description) {
+        this.name = name;
+        this.id=id;
+        this.description = description;
+    }
+
+    public Expertise retrieveBasicDetails() {
+       Expertise expertise = new Expertise(this.id,this.name,this.description);
+       return expertise;
+    }
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap();
         map.put("id",this.id);
@@ -98,4 +108,6 @@ public class Expertise extends UserBaseEntity {
         map.put("creationDate",this.getCreationDate());
         return map;
     }
+
+
 }

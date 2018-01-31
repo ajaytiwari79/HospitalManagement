@@ -83,13 +83,13 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
                 Skill skill1 = new Skill("Assist with feeding", skillCategory);
                 Skill skill2 = new Skill("Radial Pulse Rate", skillCategory);
                 Skill skill3 = new Skill("Bathing Partial", skillCategory);
-                skillGraphRepository.save(Arrays.asList(skill1, skill2, skill3));
+                skillGraphRepository.saveAll(Arrays.asList(skill1, skill2, skill3));
             } else {
                 skillCategory = new SkillCategory(value);
                 skillCategoryGraphRepository.save(skillCategory);
                 Skill skill1 = new Skill("Cultural Assessment", skillCategory);
                 Skill skill2 = new Skill("Develop care plan", skillCategory);
-                skillGraphRepository.save(Arrays.asList(skill1, skill2));
+                skillGraphRepository.saveAll(Arrays.asList(skill1, skill2));
             }
         }
     }
@@ -206,7 +206,7 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
             AccessPage planning = new AccessPage("planning",environment.getProperty("planning"));
             planning.setModule(true);
 
-            accessPageRepository.save(Arrays.asList(dashBoard, citizen, taskType, country, organization, visitator,planning));
+            accessPageRepository.saveAll(Arrays.asList(dashBoard, citizen, taskType, country, organization, visitator,planning));
         }
     }
 

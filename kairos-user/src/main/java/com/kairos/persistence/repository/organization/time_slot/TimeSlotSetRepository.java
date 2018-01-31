@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.organization.time_slot;
 
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -14,7 +14,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_T
  * Created by prabjot on 6/12/17.
  */
 @Repository
-public interface TimeSlotSetRepository extends GraphRepository<TimeSlotSet> {
+public interface TimeSlotSetRepository extends Neo4jBaseRepository<TimeSlotSet,Long> {
 
 
     @Query("Match (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} and timeSlotSet.startDate>{1} " +

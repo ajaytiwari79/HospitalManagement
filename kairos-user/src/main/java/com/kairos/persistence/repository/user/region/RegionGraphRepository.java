@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.user.region;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.Region;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 12/12/16.
  */
 @Repository
-public interface RegionGraphRepository extends GraphRepository<Region> {
+public interface RegionGraphRepository extends Neo4jBaseRepository<Region,Long> {
 
     @Query("Match (region:Region{isEnable:true}) return region")
     List<Region> findAll();

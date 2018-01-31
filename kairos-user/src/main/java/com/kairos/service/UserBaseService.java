@@ -1,19 +1,16 @@
 package com.kairos.service;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.inject.Inject;
-
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.repository.user.UserBaseRepository;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.neo4j.ogm.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.repository.user.UserBaseRepository;
+import javax.inject.Inject;
+import java.util.Date;
+import java.util.List;
 
 /**
  * UserBaseService
@@ -25,8 +22,6 @@ public class UserBaseService {
     @Inject
     UserBaseRepository userBaseRepository;
 
-    @Inject
-    Session session;
 
 
     /**
@@ -59,7 +54,7 @@ public class UserBaseService {
             }
             entity.setLastModificationDate(dateTime);
         });
-        userBaseRepository.save(entities);
+        userBaseRepository.saveAll(entities);
         return entities;
     }
 

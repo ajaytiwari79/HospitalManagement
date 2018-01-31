@@ -9,7 +9,6 @@ import java.util.List;
 
 /**
  * Created by pawanmandhan on 4/8/17.
- * Modified by vipul
  * to add method and constructors with property
  * TEMPLATE1
  */
@@ -22,13 +21,13 @@ public class MaximumShiftLengthWTATemplate extends WTABaseRuleTemplate {
     private List<String> balanceType;//multiple check boxes
     private boolean checkAgainstTimeRules;
 
-    public MaximumShiftLengthWTATemplate(String name, String templateType, boolean isActive, String description, long timeLimit, List<String> balanceType, boolean checkAgainstTimeRules) {
+    public MaximumShiftLengthWTATemplate(String name, String templateType, boolean disabled, String description, long timeLimit, List<String> balanceType, boolean checkAgainstTimeRules) {
         this.timeLimit = timeLimit;
         this.balanceType = balanceType;
         this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.name=name;
         this.templateType=templateType;
-        this.isActive=isActive;
+        this.disabled=disabled;
         this.description=description;
 
     }

@@ -128,6 +128,7 @@ public class AppConstants {
     public static final int EVENING_END_HOUR = 23;
     public static final int NIGHT_START_HOUR = 23;
     public static final int NIGHT_END_HOUR = 7;
+    public static final String CPR_NUMBER="cprNumber";
 
     //KMD Nexus
     public static final String KMD_NEXUS_CLIENT_ID = "third_party_vendor";
@@ -255,6 +256,10 @@ public class AppConstants {
     public static final String UNIT = "unit";
     public static final String SUCCESS = "success";
     public static final String TIME_SLOT_SET_NAME = "Time slot 1";
+
+    public static final String SKILL_CATEGORY_FOR_TIME_CARE = "Skills From TimeCare";
+    public static final int DB_RECORD_LIMIT = 100;
+    public static final String KAIROS_EMAIL = "@kairos.com";
 
 
 

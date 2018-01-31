@@ -1,21 +1,27 @@
 package com.kairos.persistence.model.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.neo4j.ogm.annotation.GraphId;
 
+import java.io.Serializable;
+
 /**
- * Contains common fields of an entitiy
+ * Contains common fields of an entity
  *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserBaseEntity {
 
+public abstract class UserBaseEntity implements Serializable {
+
+    //@GeneratedValue
     @GraphId protected Long id;
-
+    @JsonIgnore
+    protected boolean deleted;
+    @JsonIgnore
     private Long creationDate;
+    @JsonIgnore
     private Long lastModificationDate;
-
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -23,7 +29,6 @@ public class UserBaseEntity {
     public Long getId() {
         return id;
     }
-
 
     public Long getCreationDate() {
         return creationDate;
@@ -41,8 +46,11 @@ public class UserBaseEntity {
         this.lastModificationDate = lastModificationDate;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
 
-
-
-
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }

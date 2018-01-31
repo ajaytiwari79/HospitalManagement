@@ -150,7 +150,7 @@ public class TimeSlotService extends UserBaseService {
         timeSlotSet.setName(timeSlotSetDTO.getName());
         timeSlotSet.setEndDate(timeSlotSetDTO.getEndDate());
         timeSlotSetsToUpdate.add(timeSlotSet);
-        timeSlotSetRepository.save(timeSlotSetsToUpdate);
+        timeSlotSetRepository.saveAll(timeSlotSetsToUpdate);
         return timeSlotSetsToUpdate;
     }
 
@@ -241,6 +241,7 @@ public class TimeSlotService extends UserBaseService {
         Map<String, Object> response = new HashMap<>();
         response.put("timeSlots", timeSlotWrappers);
         response.put("standardTimeSlot", STANDARD.equals(unit.getTimeSlotMode()) ? true : false);
+        response.put("timeZone", unit.getTimeZone()!=null? unit.getTimeZone().getId() : null);
         return response;
     }
 

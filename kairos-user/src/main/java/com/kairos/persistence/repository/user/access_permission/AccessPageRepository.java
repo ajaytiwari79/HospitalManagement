@@ -5,7 +5,7 @@ import com.kairos.persistence.model.user.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.user.auth.StaffPermissionQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,14 +19,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 
 @Repository
-public interface AccessPageRepository extends GraphRepository<AccessPage> {
-
-    @Override
-    List<AccessPage> findAll();
-
-    @Override
-    List<AccessPage> findAll(Iterable<Long> accessPageIds);
-
+public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Long> {
     @Query("Match (org:Organization) where id(org)={0}\n" +
             "match (org)-[:"+HAS_SUB_ORGANIZATION+"*]->(n)\n" +
             "Match (n)-[:HAS_GROUP]->(group:Group)-[:"+HAS_TEAM+"]->(team:Team)-[:"+TEAM_HAS_MEMBER+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={1} with staff\n" +

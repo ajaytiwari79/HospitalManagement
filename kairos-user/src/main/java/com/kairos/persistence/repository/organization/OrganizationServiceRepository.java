@@ -4,7 +4,7 @@ import com.kairos.persistence.model.organization.OrganizationExternalServiceRela
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.organization.OrganizationServiceQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by oodles on 16/9/16.
  */
 @Repository
-public interface OrganizationServiceRepository extends GraphRepository<OrganizationService>{
+public interface OrganizationServiceRepository extends Neo4jBaseRepository<OrganizationService,Long>{
     List<OrganizationService> findAll();
 
     @Query("MATCH (c:Country),(n:OrganizationService{isEnabled:true}) where id(c)={0} match (c)-[:HAS_ORGANIZATION_SERVICES]->(n) OPTIONAL MATCH (n)-[:ORGANIZATION_SUB_SERVICE]->(s:OrganizationService{isEnabled:true})" +

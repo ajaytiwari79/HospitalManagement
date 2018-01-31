@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.client;
 import com.kairos.persistence.model.user.client.ClientOrganizationRelation;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.GET_SERVICE_FROM;
@@ -10,7 +10,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.GET_S
  * Created by oodles on 15/11/16.
  */
 @Repository
-public interface ClientOrganizationRelationGraphRepository extends GraphRepository<ClientOrganizationRelation>{
+public interface ClientOrganizationRelationGraphRepository extends Neo4jBaseRepository<ClientOrganizationRelation,Long>{
 
     ClientOrganizationRelation findByClient();
 

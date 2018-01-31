@@ -1,7 +1,8 @@
 package com.kairos.config.interceptor;
 
 import com.kairos.util.userContext.UserContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
@@ -16,7 +17,7 @@ import java.util.Optional;
  * Created by anil on 10/8/17.
  */
 public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapter {
-    private static final Logger log = Logger.getLogger(ExtractOrganizationAndUnitInfoInterceptor.class);
+    private static final Logger log = LoggerFactory.getLogger(ExtractOrganizationAndUnitInfoInterceptor.class);
 
     @Override
     public boolean preHandle(
@@ -25,17 +26,17 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             Object handler) throws Exception {
 
 
-        final Map<String, String> pathVariables = (Map<String, String>) request
+       final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-        String orgIdStirng=pathVariables.get("organizationId");
+        String orgIdString=pathVariables.get("organizationId");
         String unitIdString=pathVariables.get("unitId");
         log.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI()+"[ orgainzationID ,Unit Id " +orgIdStirng+" ,"+unitIdString+" ]") ;
+                + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]") ;
 
 
-        if(orgIdStirng!=null){
-            final Long orgId = Long.valueOf(orgIdStirng);
+        if(orgIdString!=null){
+            final Long orgId = Long.valueOf(orgIdString);
             UserContext.setOrgId(orgId);
         }
         if(unitIdString!=null){
@@ -50,7 +51,6 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(Optional.ofNullable(tabId).isPresent()){
             UserContext.setTabId(tabId);
         }
-
 
         return true;
     }

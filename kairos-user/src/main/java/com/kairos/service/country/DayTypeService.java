@@ -88,7 +88,7 @@ public class DayTypeService extends UserBaseService {
      * @return
      */
     public List<DayType> getDayTypeByDate(Long countryId,Date date){
-        Calendar calendar=Calendar.getInstance();
+        Calendar calendar= Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);

@@ -3,7 +3,7 @@ package com.kairos.persistence.repository.user.staff;
 import com.kairos.persistence.model.user.staff.Employment;
 import com.kairos.persistence.model.user.staff.UnitEmployment;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 3/12/16.
  */
 @Repository
-public interface EmploymentGraphRepository extends GraphRepository<Employment> {
+public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employment,Long> {
 
     @Query("Match (organization:Organization),(staff:Staff) where id(organization)={0} AND id(staff)={1}\n" +
             "Match (organization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[BELONGS_TO]->(staff) return employment")

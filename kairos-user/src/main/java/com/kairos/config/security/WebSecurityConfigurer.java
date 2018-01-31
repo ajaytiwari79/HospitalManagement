@@ -6,31 +6,29 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 
 import static com.kairos.constants.AppConstants.*;
 
 
 @Configuration
-@EnableAuthorizationServer
-@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+@EnableWebSecurity( debug = true )
+@Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserOauth2Service userDetailsService;
     
-
-
-    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -43,12 +41,12 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
         auth.authenticationProvider(authenticationProvider());
-
-        //auth.inMemoryAuthentication()
-               // .withUser("john").password("123").roles("USER");
-
     }
+
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -74,6 +72,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/api/v1/organization/{organizationId}/ids");
         web.ignoring().antMatchers("/api/v1/organization/{organizationId}/unit/{unitId}/WithoutAuth");
         web.ignoring().antMatchers("/api/v1/organizationwithoutphases");
+        web.ignoring().antMatchers("/api/v1/time_care/**");
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN_GRANTS);
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN);
         web.ignoring().antMatchers(API_KMD_CARE_CITIZEN_RELATIVE_DATA);
@@ -98,8 +97,9 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
                    .and()
                   .authorizeRequests()
                   .antMatchers("/oauth/*").permitAll()
+                   .antMatchers(HttpMethod.OPTIONS).permitAll()
                    .anyRequest().authenticated()
                    .and()
-                   .formLogin().permitAll();
+                 .formLogin();
     }
 }

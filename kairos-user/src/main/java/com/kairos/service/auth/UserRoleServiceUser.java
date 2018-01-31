@@ -39,7 +39,7 @@ public class UserRoleServiceUser extends UserBaseService {
      * @param id
      */
     public void deleteUserRoleById(Long id){
-        userRoleGraphRepository.delete(id);
+        userRoleGraphRepository.deleteById(id);
     }
 
 

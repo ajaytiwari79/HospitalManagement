@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.resources;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.constants.RelationshipConstants;
+import com.kairos.persistence.model.user.country.equipment.Equipment;
 import com.kairos.persistence.model.user.country.feature.Feature;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -10,6 +11,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.RESOURCE_HAS_EQUIPMENT;
 import static com.kairos.persistence.model.constants.RelationshipConstants.RESOURCE_HAS_FEATURE;
 
 /**
@@ -32,6 +34,9 @@ public class Resource extends UserBaseEntity {
 
     @Relationship(type = RESOURCE_HAS_FEATURE)
     private List<Feature> features = new ArrayList<>();
+
+    @Relationship(type = RESOURCE_HAS_EQUIPMENT)
+    private List<Equipment> equipments = new ArrayList<>();
 
     public Resource(Vehicle vehicleType, String registrationNumber, String number, String modelDescription,
                     float costPerKM,FuelType fuelType) {
@@ -127,6 +132,14 @@ public class Resource extends UserBaseEntity {
 
     public void setFeatures(List<Feature> features) {
         this.features = features;
+    }
+
+    public List<Equipment> getEquipments() {
+        return equipments;
+    }
+
+    public void setEquipments(List<Equipment> equipments) {
+        this.equipments = equipments;
     }
 }
 
