@@ -278,9 +278,11 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
+
         /*createCTARuleTemplateCategory();
         startRegisteredCronJobs();
         createEquipmentCategories();*/
+        createCTARuleTemplateCategory("Denmark");
 
     }
 
@@ -1012,22 +1014,26 @@ public class BootDataService {
         currencyGraphRepository.save(currency);
     }
 
-    private void createCTARuleTemplateCategory() {
+    private void createCTARuleTemplateCategory(String countryName) {
+        Long countryId = countryGraphRepository.findCountryIdByName(countryName);
+        if(countryId == null){
+            return;
+        }
         RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
-                .findByName(53L, "NONE", RuleTemplateCategoryType.CTA);
+                .findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
 
         if (category == null) {
             category = new RuleTemplateCategory();
             category.setName("NONE");
             category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
-            ruleTemplateCategoryService.createRuleTemplateCategory(53L, category);
+            ruleTemplateCategoryService.createRuleTemplateCategory(countryId, category);
         }
 
         if (costTimeAgreementService.isDefaultCTARuleTemplateExists()) {
             logger.info("default CTA rule template already exist");
         } else {
             logger.info("creating CTA rule template");
-            costTimeAgreementService.createDefaultCtaRuleTemplate(53L);
+            costTimeAgreementService.createDefaultCtaRuleTemplate(countryId);
         }
 
     }
