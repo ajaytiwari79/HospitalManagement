@@ -8,12 +8,15 @@ import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
+import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -42,6 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+
+import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.TEMPLATE20;
 
 
 /**
@@ -105,21 +111,21 @@ public class WTAService extends UserBaseService {
         wta = prepareWtaWhileCreate(countryId, wtaDTO);
         wta.setCountry(country);
         save(wta);
-
+        assignWTAToOrganization(wta, wtaDTO);
         WTAResponseDTO wtaResponseDTO = wta.retriveBasicResponse();
         wtaResponseDTO.setRuleTemplates(retrieveRuleTemplateResponse(wta.getRuleTemplates()));
         wtaResponseDTO.setId(wta.getId());
         // Adding this wta to all organization type
 
-        assignWTAToOrganization(wta, wtaDTO.getOrganizationSubType());
+
         // setting basic details
 
         return wtaResponseDTO;
     }
 
-    @Async
-    private void assignWTAToOrganization(WorkingTimeAgreement wta, Long organizationSubTypeId) {
-        List<Organization> organizations = organizationTypeRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+
+    private void assignWTAToOrganization(WorkingTimeAgreement wta, WTADTO wtadto) {
+        List<Organization> organizations = organizationTypeRepository.getOrganizationsByOrganizationType(wtadto.getOrganizationSubType());
         organizations.forEach(organization ->
         {
             if (!organization.isKairosHub()) {
@@ -128,11 +134,11 @@ public class WTAService extends UserBaseService {
                 workingTimeAgreement.setCountryParentWTA(wta);
                 workingTimeAgreement.setDisabled(false);
                 List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
-                if (wta.getRuleTemplates().size() > 0) {
-                    ruleTemplates = copyRuleTemplate(wta.getRuleTemplates());
-                    workingTimeAgreement.setRuleTemplates(ruleTemplates);
 
+                if (wtadto.getRuleTemplates().size() > 0) {
+                    ruleTemplates = wtaOrganizationService.copyRuleTemplates(null, wtadto.getRuleTemplates());
                 }
+                workingTimeAgreement.setRuleTemplates(ruleTemplates);
                 organization.getWorkingTimeAgreements().add(workingTimeAgreement);
                 save(organization);
             }
@@ -202,7 +208,6 @@ public class WTAService extends UserBaseService {
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (wtaDTO.getRuleTemplates().size() > 0) {
             ruleTemplates = wtaOrganizationService.copyRuleTemplates(null, wtaDTO.getRuleTemplates());
-            wta.setRuleTemplates(ruleTemplates);
         }
         wta.setRuleTemplates(ruleTemplates);
         Long dateInMillies = (wtaDTO.getStartDateMillis() == 0) ? DateUtil.getCurrentDate().getTime() : wtaDTO.getStartDateMillis();
@@ -269,7 +274,7 @@ public class WTAService extends UserBaseService {
             ruleTemplate.setId(null);
 
             if (Optional.ofNullable(ruleTemplate.getPhaseTemplateValues()).isPresent()) {
-                ruleTemplate.getPhaseTemplateValues().forEach(PhaseTemplateValue->{
+                ruleTemplate.getPhaseTemplateValues().forEach(PhaseTemplateValue -> {
                     PhaseTemplateValue.setId(null);
                 });
             }
@@ -397,7 +402,8 @@ public class WTAService extends UserBaseService {
             newWtaObject.setRuleTemplates(ruleTemplateWithCategory);
 
             save(newWtaObject);
-            assignWTAToOrganization(newWtaObject, organizationSubTypeId);
+            // TODO
+           // assignWTAToOrganization(newWtaObject, organizationSubTypeId);
             // setting basic propery for response
             newWtaObject.setOrganizationType(newWtaObject.getOrganizationType().basicDetails());
             newWtaObject.setOrganizationSubType(newWtaObject.getOrganizationSubType().basicDetails());
@@ -417,26 +423,29 @@ public class WTAService extends UserBaseService {
         List<WTABaseRuleTemplate> copiedRuleTemplate = new ArrayList<>(ruleTemplates.size());
         ObjectMapper objectMapper = new ObjectMapper();
         ruleTemplates.forEach(ruleTemplate -> {
-            WTABaseRuleTemplate wtaBaseRuleTemplateDTO = objectMapper.convertValue(ruleTemplate, WTABaseRuleTemplate.class);
-            wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
-            wtaBaseRuleTemplateDTO.setId(null);
+            WTABaseRuleTemplate wtaBaseRuleTemplate = new WTABaseRuleTemplate();
+            wtaBaseRuleTemplate = objectMapper.convertValue(ruleTemplate, WTABaseRuleTemplate.class);
+            wtaBaseRuleTemplate.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
+            wtaBaseRuleTemplate.setId(null);
 
-            if (Optional.ofNullable(wtaBaseRuleTemplateDTO.getPhaseTemplateValues()).isPresent()) {
-                wtaBaseRuleTemplateDTO.getPhaseTemplateValues().forEach(PhaseTemplateValue->{
+            if (Optional.ofNullable(wtaBaseRuleTemplate.getPhaseTemplateValues()).isPresent()) {
+                wtaBaseRuleTemplate.getPhaseTemplateValues().forEach(PhaseTemplateValue -> {
                     PhaseTemplateValue.setId(null);
                 });
             }
 
-            copiedRuleTemplate.add(wtaBaseRuleTemplateDTO);
+            copiedRuleTemplate.add(wtaBaseRuleTemplate);
         });
         return copiedRuleTemplate;
     }
+
 
     public List<RuleTemplateCategoryDTO> retrieveRuleTemplateResponse(List<WTABaseRuleTemplate> ruleTemplates) {
         List<RuleTemplateCategoryDTO> copiedRuleTemplate = new ArrayList<>(ruleTemplates.size());
         ObjectMapper objectMapper = new ObjectMapper();
         ruleTemplates.forEach(ruleTemplate -> {
             RuleTemplateCategoryDTO wtaBaseRuleTemplateDTO = objectMapper.convertValue(ruleTemplate, RuleTemplateCategoryDTO.class);
+            ruleTemplate.setId(null);
             wtaBaseRuleTemplateDTO.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
 
             copiedRuleTemplate.add(wtaBaseRuleTemplateDTO);
@@ -451,6 +460,7 @@ public class WTAService extends UserBaseService {
         newWta.setEndDateMillis(oldWta.getEndDateMillis());
         newWta.setExpertise(oldWta.getExpertise());
         newWta.setId(null);
+
         return newWta;
 
     }
