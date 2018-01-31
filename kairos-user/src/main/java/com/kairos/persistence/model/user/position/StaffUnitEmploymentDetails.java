@@ -35,7 +35,7 @@ public class StaffUnitEmploymentDetails {
     private float salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
-    private List<WorkingTimeAgreement> workingTimeAgreement;
+    private Map<String,Object> workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
 
     public StaffUnitEmploymentDetails() {
@@ -153,11 +153,11 @@ public class StaffUnitEmploymentDetails {
         this.positionCode = positionCode;
     }
 
-    public List<WorkingTimeAgreement>  getWorkingTimeAgreement() {
+    public Map<String,Object>  getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 
-    public void setWorkingTimeAgreement(List<WorkingTimeAgreement>  workingTimeAgreement) {
+    public void setWorkingTimeAgreement(Map<String,Object>  workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 

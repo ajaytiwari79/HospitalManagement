@@ -38,8 +38,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "balanceAdjustment:ruleTemp.balanceAdjustment,intervalLength:ruleTemp.intervalLength,intervalUnit:ruleTemp.intervalUnit,\n" +
             "validationStartDateMillis:ruleTemp.validationStartDateMillis,daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description, \n" +
             "checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates\n" +
-            "with cta,et,e,unitEmpPosition,collect({name:wta.name,id:id(wta),endDateMillis:wta.endDateMillis ,startDateMillis:wta.startDateMillis ,ruleTemplates:ruleTemplates}) as wtas \n" +
-            "return e as expertise,wtas as workingTimeAgreement,cta as costTimeAgreement," +
+            "return e as expertise,{name:wta.name,id:id(wta),endDateMillis:wta.endDateMillis ,startDateMillis:wta.startDateMillis ,ruleTemplates:ruleTemplates} as workingTimeAgreement,cta as costTimeAgreement," +
             "unitEmpPosition.totalWeeklyHours as totalWeeklyHours," +
             "unitEmpPosition.startDateMillis as startDateMillis," +
             "unitEmpPosition.endDateMillis as endDateMillis," +
@@ -51,7 +50,9 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "unitEmpPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
             "unitEmpPosition.lastModificationDate as lastModificationDate")
     StaffUnitEmploymentDetails getUnitEmploymentPositionById(long unitEmploymentId);
-
+/* Error while binding to WTA
+* java.lang.IllegalArgumentException: Can not set com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO field com.kairos.persistence.model.user.position.StaffUnitEmploymentDetails.workingTimeAgreement to java.util.Collections$UnmodifiableMap
+* */
     @Query("match (uEmp:UnitEmployment)  where  Id(uEmp)={0} \n" +
             "match(uEmp)-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]->(unitEmpPosition:UnitEmploymentPosition{deleted:false})" +
             "match(unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
