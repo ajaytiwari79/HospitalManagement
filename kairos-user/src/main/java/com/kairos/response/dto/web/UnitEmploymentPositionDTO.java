@@ -52,7 +52,7 @@ public class UnitEmploymentPositionDTO {
     }
 
 
-    public UnitEmploymentPositionDTO(String name, String description, Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
+    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
                                      float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;

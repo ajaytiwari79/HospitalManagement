@@ -39,6 +39,8 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -110,6 +112,8 @@ public class UnitEmploymentPositionService extends UserBaseService {
         if (!Optional.ofNullable(positionCode).isPresent()) {
             throw new DataNotFoundByIdException("position Name does not exist in unit " + unitEmploymentPositionDTO.getPositionCodeId());
         }
+        List<UnitEmploymentPosition> oldUnitEmploymentPositions = unitEmploymentPositionGraphRepository.getAllUEPByExpertise(unitEmploymentPositionDTO.getExpertiseId(), unitEmployment.getId());
+        validateUnitEmploymentPositionWithExpertise(oldUnitEmploymentPositions, unitEmploymentPositionDTO);
         UnitEmploymentPosition unitEmploymentPosition = preparePosition(unitEmploymentPositionDTO, organization, id);
 
         unitEmploymentPosition.setPositionCode(positionCode);
@@ -121,6 +125,42 @@ public class UnitEmploymentPositionService extends UserBaseService {
         save(unitEmployment);
         UnitEmploymentPositionQueryResult unitEmploymentPositionQueryResult = unitEmploymentPosition.getBasicDetails();
         return unitEmploymentPositionQueryResult;
+    }
+
+    public boolean validateUnitEmploymentPositionWithExpertise(List<UnitEmploymentPosition> unitEmploymentPositions, UnitEmploymentPositionDTO unitEmploymentPositionDTO) {
+
+        Long currentStartDateMillis = unitEmploymentPositionDTO.getStartDateMillis();
+        Long currentEndDateMillis = (unitEmploymentPositionDTO.getEndDateMillis() != null) ? unitEmploymentPositionDTO.getEndDateMillis() : null;
+        unitEmploymentPositions.forEach(unitEmploymentPosition -> {
+            // if null date is set
+            if (unitEmploymentPosition.getEndDateMillis() != null) {
+                if (currentEndDateMillis != null) {
+                    Interval previousInterval = new Interval(unitEmploymentPosition.getStartDateMillis(), unitEmploymentPosition.getEndDateMillis());
+                    Interval interval = new Interval(currentStartDateMillis, currentEndDateMillis);
+                    System.out.println("Previous Dates " + new DateTime(unitEmploymentPosition.getStartDateMillis()) + "  " + new DateTime(unitEmploymentPosition.getEndDateMillis()));
+                    System.out.println("New Dates " + new DateTime(currentStartDateMillis) + "  " + new DateTime(currentEndDateMillis));
+                    if (previousInterval.overlaps(interval))
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date).");
+
+                } else {
+                    if (new DateTime(currentEndDateMillis).isBefore(new DateTime(unitEmploymentPosition.getEndDateMillis()))) {
+                        System.out.println("Previous start Date  " + new DateTime(unitEmploymentPosition.getStartDateMillis()));
+                        System.out.println("New Dates " + new DateTime(currentStartDateMillis) + "  " + new DateTime(currentEndDateMillis));
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)." + new DateTime(currentEndDateMillis) + " --> " + new DateTime(currentEndDateMillis));
+                    }
+                }
+            } else {
+                // unitEmploymentEnd date is null
+                if (currentEndDateMillis != null) {
+                    if (new DateTime(currentEndDateMillis).isAfter(new DateTime(unitEmploymentPosition.getStartDateMillis()))) {
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date).");
+                    }
+                } else {
+                    throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period.");
+                }
+            }
+        });
+        return true;
     }
 
 
@@ -226,11 +266,13 @@ public class UnitEmploymentPositionService extends UserBaseService {
             throw new ActionNotPermittedException("Start date can't be less than current Date ");
         }
         unitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
-        if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
-            throw new ActionNotPermittedException("Start date can't be less than End Date ");
-        }
-        unitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
 
+
+        if (Optional.ofNullable(unitEmploymentPositionDTO.getEndDateMillis()).isPresent() && unitEmploymentPositionDTO.getEndDateMillis() > 0) {
+            if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
+                unitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
+            }
+        }
         unitEmploymentPosition.setTotalWeeklyMinutes(unitEmploymentPositionDTO.getTotalWeeklyMinutes() + (unitEmploymentPositionDTO.getTotalWeeklyHours() * 60));
         unitEmploymentPosition.setAvgDailyWorkingHours(unitEmploymentPositionDTO.getAvgDailyWorkingHours());
         unitEmploymentPosition.setHourlyWages(unitEmploymentPositionDTO.getHourlyWages());
@@ -276,7 +318,10 @@ public class UnitEmploymentPositionService extends UserBaseService {
         if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
             throw new ActionNotPermittedException("Start date can't be less than End Date ");
         }
-        oldUnitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
+        if (Optional.ofNullable(unitEmploymentPositionDTO.getEndDateMillis()).isPresent()) {
+            oldUnitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
+        }
+
         oldUnitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
 
         oldUnitEmploymentPosition.setWorkingDaysInWeek(unitEmploymentPositionDTO.getWorkingDaysInWeek());
