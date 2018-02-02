@@ -70,7 +70,7 @@ public class CountryEmploymentTypeController {
     }
     /*
     * By Vipul
-    * API to get expertise level region employment Type organizationType for activity type
+    * API to get expertise level region employment Type organizationType for activity type MASTER DATA
     */
     @RequestMapping(value = COUNTRY_URL + "/employment_type_with_organizationType", method = RequestMethod.GET)
     @ApiOperation("get  expertise level region employment Type organizationType  of country")
