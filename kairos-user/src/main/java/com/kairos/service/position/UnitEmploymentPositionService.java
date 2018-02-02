@@ -137,23 +137,19 @@ public class UnitEmploymentPositionService extends UserBaseService {
                 if (currentEndDateMillis != null) {
                     Interval previousInterval = new Interval(unitEmploymentPosition.getStartDateMillis(), unitEmploymentPosition.getEndDateMillis());
                     Interval interval = new Interval(currentStartDateMillis, currentEndDateMillis);
-                    System.out.println("Previous Dates " + new DateTime(unitEmploymentPosition.getStartDateMillis()) + "  " + new DateTime(unitEmploymentPosition.getEndDateMillis()));
-                    System.out.println("New Dates " + new DateTime(currentStartDateMillis) + "  " + new DateTime(currentEndDateMillis));
                     if (previousInterval.overlaps(interval))
-                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date).");
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)");
 
                 } else {
                     if (new DateTime(currentEndDateMillis).isBefore(new DateTime(unitEmploymentPosition.getEndDateMillis()))) {
-                        System.out.println("Previous start Date  " + new DateTime(unitEmploymentPosition.getStartDateMillis()));
-                        System.out.println("New Dates " + new DateTime(currentStartDateMillis) + "  " + new DateTime(currentEndDateMillis));
-                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)." + new DateTime(currentEndDateMillis) + " --> " + new DateTime(currentEndDateMillis));
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)." + new DateTime(currentEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getEndDateMillis()).toDate());
                     }
                 }
             } else {
                 // unitEmploymentEnd date is null
                 if (currentEndDateMillis != null) {
                     if (new DateTime(currentEndDateMillis).isAfter(new DateTime(unitEmploymentPosition.getStartDateMillis()))) {
-                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date).");
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)"+ new DateTime(currentEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getStartDateMillis()).toDate());
                     }
                 } else {
                     throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period.");
