@@ -1,5 +1,6 @@
 package com.kairos.service.agreement.wta;
 
+import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
@@ -9,16 +10,21 @@ import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
+import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
+import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
+import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -45,6 +51,9 @@ public class WTAOrganizationService extends UserBaseService {
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
     @Inject
     private CountryService countryService;
+    @Inject
+    private WTABaseRuleTemplateGraphRepository wtaRuleTemplateGraphRepository;
+
     private final Logger logger = LoggerFactory.getLogger(WTAOrganizationService.class);
 
     public List<WTAResponseDTO> getAllWTAByOrganization(Long unitId) {
@@ -81,30 +90,55 @@ public class WTAOrganizationService extends UserBaseService {
             logger.info("Expertise cant be changed at unit level :", wtaId);
             throw new ActionNotPermittedException("Expertise can't be changed");
         }
+
+        //Copying Properties
+        BeanUtils.copyProperties(oldWta, newWta);
         newWta.setId(null);
-        newWta.setName(updateDTO.getName());
-        newWta.setDescription(updateDTO.getDescription());
+        newWta.setDeleted(true);
+        newWta.setStartDateMillis(oldWta.getStartDateMillis());
+        newWta.setEndDateMillis(updateDTO.getStartDateMillis());
+        newWta.setCountryParentWTA(null);
+        newWta.getRuleTemplates().forEach(ruleTemplate -> {
+            if (Optional.ofNullable(ruleTemplate.getPhaseTemplateValues()).isPresent()) {
+                ruleTemplate.getPhaseTemplateValues().forEach(phaseTemplateValue -> {
+                });
+            }
+        });
+
+        ruleTemplateCategoryGraphRepository.detachPreviousRuleTemplates(oldWta.getId());
+        save(newWta);
+        if (Optional.ofNullable(oldWta.getParentWTA()).isPresent()) {
+            workingTimeAgreementGraphRepository.removeOldParentWTAMapping(oldWta.getParentWTA().getId());
+        }
+
+        oldWta.setName(updateDTO.getName());
+        oldWta.setDescription(updateDTO.getDescription());
         if (updateDTO.getStartDateMillis() < System.currentTimeMillis()) {
             throw new ActionNotPermittedException("Start date cant be less than current Date " + oldWta.getId());
         }
-        newWta.setStartDateMillis(updateDTO.getStartDateMillis());
-        newWta.setEndDateMillis(updateDTO.getEndDateMillis());
-        newWta.setExpertise(oldWta.getExpertise());
-        newWta.setParentWTA(oldWta);
-        newWta.setDisabled(false);
+        oldWta.setStartDateMillis(updateDTO.getStartDateMillis());
+        oldWta.setEndDateMillis(updateDTO.getEndDateMillis());
+        oldWta.setExpertise(oldWta.getExpertise());
+        oldWta.setParentWTA(newWta);
+        oldWta.setDisabled(false);
+
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
+
             ruleTemplates = copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates());
-            newWta.setRuleTemplates(ruleTemplates);
+            oldWta.setRuleTemplates(ruleTemplates);
         }
-        newWta.setOrganization(organization);
+        //oldWta.setOrganization(organization);
         //organization.addWorkingTimeAgreements(newWta);
 
-        save(newWta);
-        workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
-        newWta.setParentWTA(oldWta.basicDetails());
-        newWta.getExpertise().setCountry(null);
-        return newWta;
+
+        save(oldWta);
+        //Preparing Response for frontend
+        //workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
+        oldWta.setParentWTA(newWta.getParentWTA());
+
+        oldWta.getExpertise().setCountry(null);
+        return oldWta;
     }
 
 
@@ -129,12 +163,30 @@ public class WTAOrganizationService extends UserBaseService {
         return ruleTemplateCategory;
     }
 
+    protected List<PhaseTemplateValue> copyPhaseTemplateValue(List<PhaseTemplateValue> phaseTemplateValues) {
+
+        List<PhaseTemplateValue> phases = new ArrayList<>(4);
+        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+            PhaseTemplateValue newPhaseTemplateValue = new PhaseTemplateValue();
+            newPhaseTemplateValue.setDisabled(phaseTemplateValue.isDisabled());
+            newPhaseTemplateValue.setManagementValue(phaseTemplateValue.getManagementValue());
+            newPhaseTemplateValue.setOptional(phaseTemplateValue.isOptional());
+            newPhaseTemplateValue.setStaffValue(phaseTemplateValue.getStaffValue());
+            newPhaseTemplateValue.setOptionalFrequency(phaseTemplateValue.getOptionalFrequency());
+            newPhaseTemplateValue.setPhaseId(phaseTemplateValue.getPhaseId());
+            newPhaseTemplateValue.setDeleted(false);
+            newPhaseTemplateValue.setPhaseName(phaseTemplateValue.getPhaseName());
+            phases.add(newPhaseTemplateValue);
+        }
+        return phases;
+    }
+
     protected List<WTABaseRuleTemplate> copyRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates, List<RuleTemplateCategoryDTO> ruleTemplatesNewObjects) {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<WTABaseRuleTemplate>(20);
         for (RuleTemplateCategoryDTO ruleTemplate : ruleTemplatesNewObjects) {
             RuleTemplateCategory ruleTemplateCategory = null;
             ruleTemplateCategory = getCategory(ruleTemplates, ruleTemplate.getId(), ruleTemplate.getRuleTemplateCategory().getName());
-
+            List<PhaseTemplateValue> phaseTemplateValues = copyPhaseTemplateValue(ruleTemplate.getPhaseTemplateValues());
             switch (ruleTemplate.getTemplateType()) {
                 case TEMPLATE1:
                     MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = new MaximumShiftLengthWTATemplate();
@@ -146,7 +198,9 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumShiftLengthWTATemplate.setTemplateType(ruleTemplate.getTemplateType());
                     maximumShiftLengthWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     maximumShiftLengthWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    maximumShiftLengthWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    maximumShiftLengthWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    maximumShiftLengthWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
+
                     wtaBaseRuleTemplates.add(maximumShiftLengthWTATemplate);
                     break;
 
@@ -160,8 +214,10 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumShiftLengthWTATemplate.setTemplateType(ruleTemplate.getTemplateType());
                     minimumShiftLengthWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     minimumShiftLengthWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    minimumShiftLengthWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    minimumShiftLengthWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    minimumShiftLengthWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(minimumShiftLengthWTATemplate);
+
                     break;
 
                 case TEMPLATE3:
@@ -173,9 +229,9 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumConsecutiveWorkingDaysWTATemplate.setCheckAgainstTimeRules(ruleTemplate.getCheckAgainstTimeRules());
                     maximumConsecutiveWorkingDaysWTATemplate.setTemplateType(ruleTemplate.getTemplateType());
                     maximumConsecutiveWorkingDaysWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
-                    maximumConsecutiveWorkingDaysWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    maximumConsecutiveWorkingDaysWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
                     maximumConsecutiveWorkingDaysWTATemplate.setDisabled(ruleTemplate.getDisabled());
-
+                    maximumConsecutiveWorkingDaysWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(maximumConsecutiveWorkingDaysWTATemplate);
                     break;
 
@@ -187,8 +243,9 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumRestInConsecutiveDaysWTATemplate.setDaysWorked(ruleTemplate.getDaysWorked());
                     minimumRestInConsecutiveDaysWTATemplate.setTemplateType(ruleTemplate.getTemplateType());
                     minimumRestInConsecutiveDaysWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
-                    minimumRestInConsecutiveDaysWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    minimumRestInConsecutiveDaysWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
                     minimumRestInConsecutiveDaysWTATemplate.setDisabled(ruleTemplate.getDisabled());
+                    minimumRestInConsecutiveDaysWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
 
                     wtaBaseRuleTemplates.add(minimumRestInConsecutiveDaysWTATemplate);
                     break;
@@ -203,7 +260,8 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumNightShiftLengthWTATemplate.setTemplateType(ruleTemplate.getTemplateType());
                     maximumNightShiftLengthWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     maximumNightShiftLengthWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    maximumNightShiftLengthWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    maximumNightShiftLengthWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
+                    maximumNightShiftLengthWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
 
                     wtaBaseRuleTemplates.add(maximumNightShiftLengthWTATemplate);
                     break;
@@ -216,7 +274,8 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumConsecutiveNightsWTATemplate.setTemplateType(ruleTemplate.getTemplateType());
                     minimumConsecutiveNightsWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     minimumConsecutiveNightsWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    minimumConsecutiveNightsWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    minimumConsecutiveNightsWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    minimumConsecutiveNightsWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
 
                     wtaBaseRuleTemplates.add(minimumConsecutiveNightsWTATemplate);
                     break;
@@ -231,7 +290,8 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumConsecutiveWorkingNights.setCheckAgainstTimeRules(ruleTemplate.getCheckAgainstTimeRules());
                     maximumConsecutiveWorkingNights.setRuleTemplateCategory(ruleTemplateCategory);
                     maximumConsecutiveWorkingNights.setDisabled(ruleTemplate.getDisabled());
-                    maximumConsecutiveWorkingNights.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    maximumConsecutiveWorkingNights.setPhaseTemplateValues(phaseTemplateValues);
+                    maximumConsecutiveWorkingNights.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(maximumConsecutiveWorkingNights);
                     break;
                 case TEMPLATE8:
@@ -244,7 +304,8 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumRestConsecutiveNightsWTATemplate.setMinimumRest(ruleTemplate.getMinimumRest());
                     minimumRestConsecutiveNightsWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     minimumRestConsecutiveNightsWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    minimumRestConsecutiveNightsWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    minimumRestConsecutiveNightsWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    minimumRestConsecutiveNightsWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(minimumRestConsecutiveNightsWTATemplate);
                     break;
                 case TEMPLATE9:
@@ -259,7 +320,8 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumNumberOfNightsWTATemplate.setValidationStartDateMillis(ruleTemplate.getValidationStartDateMillis());
                     maximumNumberOfNightsWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     maximumNumberOfNightsWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    maximumNumberOfNightsWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    maximumNumberOfNightsWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
+                    maximumNumberOfNightsWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
 
                     wtaBaseRuleTemplates.add(maximumNumberOfNightsWTATemplate);
                     break;
@@ -274,8 +336,9 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumDaysOffInPeriodWTATemplate.setBalanceType(ruleTemplate.getBalanceType());
                     maximumDaysOffInPeriodWTATemplate.setDisabled(ruleTemplate.getDisabled());
                     maximumDaysOffInPeriodWTATemplate.setDaysLimit(ruleTemplate.getDaysLimit());
-                    maximumDaysOffInPeriodWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
-
+                    maximumDaysOffInPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    maximumDaysOffInPeriodWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
+                    maximumDaysOffInPeriodWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(maximumDaysOffInPeriodWTATemplate);
                     break;
                 case TEMPLATE11:
@@ -292,7 +355,8 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumAverageScheduledTimeWTATemplate.setName(ruleTemplate.getName());
                     maximumAverageScheduledTimeWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     maximumAverageScheduledTimeWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    maximumAverageScheduledTimeWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    maximumAverageScheduledTimeWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
+                    maximumAverageScheduledTimeWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
 
 
                     wtaBaseRuleTemplates.add(maximumAverageScheduledTimeWTATemplate);
@@ -305,7 +369,8 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumVetoPerPeriodWTATemplate.setMaximumVetoPercentage(ruleTemplate.getMaximumVetoPercentage());
                     maximumVetoPerPeriodWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     maximumVetoPerPeriodWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    maximumVetoPerPeriodWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    maximumVetoPerPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    maximumVetoPerPeriodWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(maximumVetoPerPeriodWTATemplate);
                     break;
                 case TEMPLATE13:
@@ -322,7 +387,8 @@ public class WTAOrganizationService extends UserBaseService {
                     numberOfWeekendShiftInPeriodWTATemplate.setProportional(ruleTemplate.getProportional());
                     numberOfWeekendShiftInPeriodWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     numberOfWeekendShiftInPeriodWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    numberOfWeekendShiftInPeriodWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    numberOfWeekendShiftInPeriodWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
+                    numberOfWeekendShiftInPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
                     wtaBaseRuleTemplates.add(numberOfWeekendShiftInPeriodWTATemplate);
                     break;
                 case TEMPLATE14:
@@ -336,7 +402,8 @@ public class WTAOrganizationService extends UserBaseService {
                     careDayCheckWTATemplate.setValidationStartDateMillis(ruleTemplate.getValidationStartDateMillis());
                     careDayCheckWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     careDayCheckWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    careDayCheckWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    careDayCheckWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    careDayCheckWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(careDayCheckWTATemplate);
                     break;
                 case TEMPLATE15:
@@ -347,7 +414,8 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumDailyRestingTimeWTATemplate.setContinuousDayRestHours(ruleTemplate.getContinuousDayRestHours());
                     minimumDailyRestingTimeWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     minimumDailyRestingTimeWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    minimumDailyRestingTimeWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    minimumDailyRestingTimeWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    minimumDailyRestingTimeWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(minimumDailyRestingTimeWTATemplate);
                     break;
                 case TEMPLATE16:
@@ -359,7 +427,8 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumDurationBetweenShiftWTATemplate.setMinimumDurationBetweenShifts(ruleTemplate.getMinimumDurationBetweenShifts());
                     minimumDurationBetweenShiftWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     minimumDurationBetweenShiftWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    minimumDurationBetweenShiftWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    minimumDurationBetweenShiftWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    minimumDurationBetweenShiftWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(minimumDurationBetweenShiftWTATemplate);
                     break;
                 case TEMPLATE17:
@@ -370,7 +439,8 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumWeeklyRestPeriodWTATemplate.setContinuousWeekRest(ruleTemplate.getContinuousWeekRest());
                     minimumWeeklyRestPeriodWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     minimumWeeklyRestPeriodWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    minimumWeeklyRestPeriodWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    minimumWeeklyRestPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    minimumWeeklyRestPeriodWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(minimumWeeklyRestPeriodWTATemplate);
                     break;
                 case TEMPLATE18:
@@ -387,7 +457,8 @@ public class WTAOrganizationService extends UserBaseService {
                     shortestAndAverageDailyRestWTATemplate.setShiftAffiliation(ruleTemplate.getShiftAffiliation());
                     shortestAndAverageDailyRestWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     shortestAndAverageDailyRestWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    shortestAndAverageDailyRestWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    shortestAndAverageDailyRestWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    shortestAndAverageDailyRestWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(shortestAndAverageDailyRestWTATemplate);
                     break;
                 case TEMPLATE19:
@@ -403,7 +474,8 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumShiftsInIntervalWTATemplate.setOnlyCompositeShifts(ruleTemplate.getOnlyCompositeShifts());
                     maximumShiftsInIntervalWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     maximumShiftsInIntervalWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    maximumShiftsInIntervalWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    maximumShiftsInIntervalWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+                    maximumShiftsInIntervalWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     wtaBaseRuleTemplates.add(maximumShiftsInIntervalWTATemplate);
                     break;
                 case TEMPLATE20:
@@ -418,7 +490,8 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumSeniorDaysInYearWTATemplate.setActivityCode(ruleTemplate.getActivityCode());
                     maximumSeniorDaysInYearWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
                     maximumSeniorDaysInYearWTATemplate.setDisabled(ruleTemplate.getDisabled());
-                    maximumSeniorDaysInYearWTATemplate.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    maximumSeniorDaysInYearWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
+                    maximumSeniorDaysInYearWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
                     wtaBaseRuleTemplates.add(maximumSeniorDaysInYearWTATemplate);
                     break;
                 default:
@@ -428,4 +501,6 @@ public class WTAOrganizationService extends UserBaseService {
         }
         return wtaBaseRuleTemplates;
     }
+
+
 }
