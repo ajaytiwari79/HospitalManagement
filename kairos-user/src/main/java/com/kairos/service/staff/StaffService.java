@@ -477,7 +477,7 @@ public class StaffService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 positionCode");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 position");
             }
             Row header = sheet.getRow(0);
             int NumberOfColumnsInSheet = header.getLastCellNum();
@@ -1023,7 +1023,7 @@ public class StaffService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 positionCode");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 position");
             }
 
             Staff staff;
