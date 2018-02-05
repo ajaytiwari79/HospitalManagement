@@ -17,7 +17,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_U
  * Created by prabjot on 3/12/16.
  */
 @NodeEntity
-@QueryResult
 public class Employment extends UserBaseEntity {
 
     private String name;
