@@ -45,7 +45,7 @@ public class UnitEmploymentPositionServiceTest {
     }
 
     @Test
-    public void validateUnitEmploymentPositionWithExpertise() throws Exception {
+    public void validateUnitEmploymentPositionWithExpertiseWithoutEndDate() throws Exception {
         //  unitEmploymentPositionService.validateUnitEmploymentPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO);
         /*Timestamp in milliseconds: 1549092502000
          Human time (GMT): Saturday, 2 February 2019 07:28:22*/
@@ -59,7 +59,7 @@ public class UnitEmploymentPositionServiceTest {
         unitEmploymentPositionDTO.setStartDateMillis(1486020502000L);
         unitEmploymentPositionDTO.setEndDateMillis(1488439702000L);
         unitEmploymentPositionService.validateUnitEmploymentPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO);
-        when(unitEmploymentPositionService.validateUnitEmploymentPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO)).thenThrow(new ActionNotPermittedException(""));
+        when(unitEmploymentPositionService.validateUnitEmploymentPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO)).thenThrow(new ActionNotPermittedException("Already a unit employment positionCode is active with same expertise on this period."));
         /*Epoch timestamp: 1549092502
           Timestamp in milliseconds: 1549092502000
           Human time (GMT): Saturday, 2 February 2019 07:28:22
@@ -72,7 +72,7 @@ public class UnitEmploymentPositionServiceTest {
     }
 
     @Test
-    public void validateUnitEmploymentPositionWithExpertise1() throws Exception {
+    public void validateUnitEmploymentPositionWithExpertiseWithEndDate() throws Exception {
 
         unitEmploymentPositionDTO.setStartDateMillis(1486020502000L); //GMT: Thursday, 2 February 2017 07:28:22
         unitEmploymentPositionDTO.setEndDateMillis(1517556502000L);  // GMT: Thursday, 2 March 2017 07:28:22
@@ -89,7 +89,7 @@ public class UnitEmploymentPositionServiceTest {
     }
 
     @Test
-    public void validateUnitEmploymentPositionWithExpertise2() throws Exception {
+    public void validateUnitEmploymentPositionWithExpertiseOverLapCase() throws Exception {
         unitEmploymentPositions.clear();
         //  1517556502000L    GMT: Friday, 2 February 2018 07:28:22
         // 1549092502000L   2019-02-02T12:58:22.000+05:30
@@ -103,7 +103,7 @@ public class UnitEmploymentPositionServiceTest {
 
 
     @Test
-    public void validateUnitEmploymentPositionWithExpertise3() throws Exception {
+    public void validateUnitEmploymentPositionWithExpertiseWithoutOverLap() throws Exception {
         unitEmploymentPositions.clear();
         //  1517556502000L    GMT: Friday, 2 February 2018 07:28:22
         // 1549092502000L   2019-02-02T12:58:22.000+05:30
