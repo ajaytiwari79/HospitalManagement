@@ -1,8 +1,9 @@
-package com.kairos.service.position;
+package com.kairos.service.positionCode;
 
 import com.kairos.custom_exception.ActionNotPermittedException;
-import com.kairos.persistence.model.user.position.UnitEmploymentPosition;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPosition;
 import com.kairos.response.dto.web.UnitEmploymentPositionDTO;
+import com.kairos.service.unitEmploymentPosition.UnitEmploymentPositionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +13,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -50,7 +50,7 @@ public class UnitEmploymentPositionServiceTest {
         /*Timestamp in milliseconds: 1549092502000
          Human time (GMT): Saturday, 2 February 2019 07:28:22*/
         when(unitEmploymentPositionService.validateUnitEmploymentPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO))
-                .thenThrow(new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period."));
+                .thenThrow(new ActionNotPermittedException("Already a unit employment positionCode is active with same expertise on this period."));
           /*Timestamp in milliseconds: 1486020502000
           Human time (GMT): Thursday, 2 February 2017 07:28:22
           Timestamp in milliseconds: 1488439702000

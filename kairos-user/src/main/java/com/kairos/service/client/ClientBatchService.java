@@ -79,7 +79,7 @@ public class ClientBatchService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 position");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 positionCode");
             }
 
             Client client;
@@ -138,7 +138,7 @@ public class ClientBatchService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 position");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 positionCode");
             }
 
             Client client;

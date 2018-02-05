@@ -177,7 +177,7 @@ public class RegionService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if(!rowIterator.hasNext()){
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 1 position");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 1 positionCode");
             }
 
             Region region;

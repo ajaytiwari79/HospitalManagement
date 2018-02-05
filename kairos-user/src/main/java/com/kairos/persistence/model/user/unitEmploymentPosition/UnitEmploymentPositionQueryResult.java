@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.position;
+package com.kairos.persistence.model.user.unitEmploymentPosition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -7,6 +7,7 @@ import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.position.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**

@@ -21,8 +21,7 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.language.Language;
-import com.kairos.persistence.model.user.position.StaffUnitEmploymentDetails;
-import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
+import com.kairos.persistence.model.user.unitEmploymentPosition.StaffUnitEmploymentDetails;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
@@ -34,7 +33,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
-import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
+import com.kairos.persistence.repository.user.unitEmploymentPosition.UnitEmploymentPositionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
@@ -478,7 +477,7 @@ public class StaffService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 position");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 positionCode");
             }
             Row header = sheet.getRow(0);
             int NumberOfColumnsInSheet = header.getLastCellNum();
@@ -1024,7 +1023,7 @@ public class StaffService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 position");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 positionCode");
             }
 
             Staff staff;

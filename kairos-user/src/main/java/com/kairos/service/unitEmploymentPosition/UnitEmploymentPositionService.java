@@ -1,4 +1,4 @@
-package com.kairos.service.position;
+package com.kairos.service.unitEmploymentPosition;
 
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -13,13 +13,12 @@ import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
 import com.kairos.persistence.model.user.position.PositionCode;
-import com.kairos.persistence.model.user.position.PositionCtaWtaQueryResult;
+import com.kairos.persistence.model.user.unitEmploymentPosition.PositionCtaWtaQueryResult;
 
-import com.kairos.persistence.model.user.position.UnitEmploymentPosition;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPosition;
 
-import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPositionQueryResult;
 
-import com.kairos.persistence.model.user.staff.Employment;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.UnitEmployment;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -29,8 +28,8 @@ import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 
-import com.kairos.persistence.repository.user.position.PositionCodeGraphRepository;
-import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
+import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepository;
+import com.kairos.persistence.repository.user.unitEmploymentPosition.UnitEmploymentPositionGraphRepository;
 
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
@@ -39,6 +38,7 @@ import com.kairos.response.dto.web.PositionWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.positionCode.PositionCodeService;
 import com.kairos.service.staff.StaffService;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -107,11 +107,11 @@ public class UnitEmploymentPositionService extends UserBaseService {
         }
         if (!Optional.ofNullable(unitEmployment).isPresent()) {
             logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", unitEmploymentPositionDTO.getStaffId(), organization.getId());
-            throw new DataNotFoundByIdException("unable to create position of staff");
+            throw new DataNotFoundByIdException("unable to create positionCode of staff");
         }
 
         if (!Optional.ofNullable(positionCode).isPresent()) {
-            throw new DataNotFoundByIdException("position Name does not exist in unit " + unitEmploymentPositionDTO.getPositionCodeId());
+            throw new DataNotFoundByIdException("positionCode Name does not exist in unit " + unitEmploymentPositionDTO.getPositionCodeId());
         }
         List<UnitEmploymentPosition> oldUnitEmploymentPositions = unitEmploymentPositionGraphRepository.getAllUEPByExpertise(unitEmploymentPositionDTO.getExpertiseId(), unitEmployment.getId());
         validateUnitEmploymentPositionWithExpertise(oldUnitEmploymentPositions, unitEmploymentPositionDTO);
@@ -139,21 +139,21 @@ public class UnitEmploymentPositionService extends UserBaseService {
                     Interval previousInterval = new Interval(unitEmploymentPosition.getStartDateMillis(), unitEmploymentPosition.getEndDateMillis());
                     Interval interval = new Interval(currentStartDateMillis, currentEndDateMillis);
                     if (previousInterval.overlaps(interval))
-                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)");
+                        throw new ActionNotPermittedException("Already a unit employment positionCode is active with same expertise on this period(End date overlap with start Date)");
 
                 } else {
                     if (new DateTime(currentEndDateMillis).isBefore(new DateTime(unitEmploymentPosition.getEndDateMillis()))) {
-                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)." + new DateTime(currentEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getEndDateMillis()).toDate());
+                        throw new ActionNotPermittedException("Already a unit employment positionCode is active with same expertise on this period(End date overlap with start Date)." + new DateTime(currentEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getEndDateMillis()).toDate());
                     }
                 }
             } else {
                 // unitEmploymentEnd date is null
                 if (currentEndDateMillis != null) {
                     if (new DateTime(currentEndDateMillis).isAfter(new DateTime(unitEmploymentPosition.getStartDateMillis()))) {
-                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)" + new DateTime(currentEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getStartDateMillis()).toDate());
+                        throw new ActionNotPermittedException("Already a unit employment positionCode is active with same expertise on this period(End date overlap with start Date)" + new DateTime(currentEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getStartDateMillis()).toDate());
                     }
                 } else {
-                    throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period.");
+                    throw new ActionNotPermittedException("Already a unit employment positionCode is active with same expertise on this period.");
                 }
             }
         });
@@ -170,7 +170,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
         UnitEmploymentPosition oldUnitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
         if (!Optional.ofNullable(oldUnitEmploymentPosition).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid positionId id " + unitEmploymentPositionId + " while updating the position");
+            throw new DataNotFoundByIdException("Invalid positionId id " + unitEmploymentPositionId + " while updating the positionCode");
         }
         // findEmployment by UnitEmployment Id
         Long unitEmploymentId = unitEmploymentPositionGraphRepository.findEmploymentByUnitEmploymentPosition(unitEmploymentPositionId);
@@ -221,7 +221,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         }
         if (!Optional.ofNullable(unitEmployment).isPresent()) {
             logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", unitEmploymentPositionDTO.getStaffId(), organization.getId());
-            throw new DataNotFoundByIdException("unable to create position of staff");
+            throw new DataNotFoundByIdException("unable to create positionCode of staff");
         }
 
 
@@ -362,7 +362,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         }
         if (!Optional.ofNullable(unitEmployment).isPresent()) {
             logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", staffId, organization.getId());
-            throw new DataNotFoundByIdException("unable to create position of staff");
+            throw new DataNotFoundByIdException("unable to create positionCode of staff");
         }
 
         return unitEmploymentPositionGraphRepository.getAllUnitEmploymentPositionByStaff(unitEmployment.getId(), staffId);
