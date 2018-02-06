@@ -10,15 +10,16 @@ import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.tpa_services.IntegrationConfiguration;
+import com.kairos.response.dto.web.client.ClientFilterDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
-import com.kairos.response.dto.web.client.ClientFilterDTO;
 import com.kairos.response.dto.web.organization.OrganizationServiceDTO;
 import com.kairos.response.dto.web.organization.OrganizationSkillDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
+import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.*;
 import com.kairos.service.organization.OrganizationService;
@@ -45,10 +46,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.ZoneId;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
@@ -103,8 +102,8 @@ public class OrganizationController {
     private LanguageService languageService;
     @Inject
     private ClientBatchService clientBatchService;
-   /* @Inject
-    private PresenceTypeService presenceTypeService;*/
+    @Inject
+    private PresenceTypeService presenceTypeService;
 
 
     /**
@@ -1236,12 +1235,12 @@ public class OrganizationController {
     }
 
     //
-  /*  @ApiOperation(value = "Get timetype_presencetype by unitID")
+    @ApiOperation(value = "Get timetype_presencetype by unitID")
     @RequestMapping(value =UNIT_URL+"/timetype_presencetype", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllPresenceTypeAndTimeTypesByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,presenceTypeService.getAllPresenceTypeAndTimeTypesByUnitId(unitId));
-    }*/
+    }
 
     @ApiOperation(value = "Get available time zones")
     @RequestMapping(value =UNIT_URL+"/timeZones", method = RequestMethod.GET)

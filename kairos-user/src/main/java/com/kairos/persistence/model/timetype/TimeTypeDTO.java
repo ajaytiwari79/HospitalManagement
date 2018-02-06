@@ -107,9 +107,9 @@ public class TimeTypeDTO extends UserBaseEntity {
         this.onCallTime = onCallTime;
     }
 
-    /*public TimeType buildTimeType() {
+    public TimeType buildTimeType() {
         TimeType timeType = new TimeType(this.name, this.type, this.includeInTimeBank, this.deleted, this.negativeDayBalancePresent, this.onCallTime);
         return timeType;
-    }*/
+    }
 
 }

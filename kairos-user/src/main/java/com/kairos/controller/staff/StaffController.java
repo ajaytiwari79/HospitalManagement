@@ -570,10 +570,5 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByUserId(userId));
     }
 
-    @ApiOperation("fetch unitEmployeementPositionId by staff and Expertise of Activity")
-    @RequestMapping(value = "/{staffId}/getUnitEmploymentPositionId", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> getUnitEmploymentPositionId(@PathVariable long staffId, @RequestBody List<Long> expertiseIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getUnitEmploymentPositionId(staffId,expertiseIds));
-    }
 
 }

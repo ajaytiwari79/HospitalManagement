@@ -1,6 +1,6 @@
 package com.kairos.response.dto.web.cta;
 
-import com.kairos.client.dto.TimeTypeDTO;
+import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.agreement.cta.CalculateValueIfPlanned;
 
 import java.util.ArrayList;

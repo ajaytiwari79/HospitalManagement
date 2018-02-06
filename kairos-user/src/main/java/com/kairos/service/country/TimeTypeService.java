@@ -24,7 +24,7 @@ import java.util.Optional;
 @Service
 @Transactional
 public class TimeTypeService extends UserBaseService {
-    /*private Logger logger = LoggerFactory.getLogger(TimeTypeService.class);
+    private Logger logger = LoggerFactory.getLogger(TimeTypeService.class);
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
@@ -83,7 +83,7 @@ public class TimeTypeService extends UserBaseService {
         timeType.setOnCallTime(timeTypeDTO.isOnCallTime());
         save(timeType);
         return timeTypeDTO;
-    }*/
+    }
 
 
 }

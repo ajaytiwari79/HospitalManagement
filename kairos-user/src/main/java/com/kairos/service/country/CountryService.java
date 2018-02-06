@@ -8,14 +8,13 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.client.PhaseRestClient;
-import com.kairos.client.TimeTypeRestClient;
 import com.kairos.client.activity_types.ActivityTypesRestClient;
-import com.kairos.client.dto.TimeTypeDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
@@ -96,12 +95,10 @@ public class CountryService extends UserBaseService {
     OrganizationTypeGraphRepository organizationTypeGraphRepository;
     private @Autowired CurrencyService currencyService;
     private @Autowired EmploymentTypeService employmentTypeService;
-    /*private @Autowired TimeTypeService timeTypeService;*/
+    private @Autowired TimeTypeService timeTypeService;
     private @Autowired DayTypeService dayTypeService;
     private @Autowired PhaseRestClient phaseRestClient;
     private @Autowired ActivityTypesRestClient activityTypesRestClient;
-    private @Autowired
-    TimeTypeRestClient timeTypeRestClient;
 
 
     /**
@@ -446,7 +443,7 @@ public class CountryService extends UserBaseService {
     public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTATemplate(Long countryId){
         List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
      List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
-     List<TimeTypeDTO> timeTypes=timeTypeRestClient.getTaskTypes(countryId);
+     List<TimeTypeDTO> timeTypes=timeTypeService.getAllTimeTypes(countryId);
      List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
      List<ActivityTypeDTO> activityTypeDTOS=activityTypesRestClient.getActivityType(countryId);
      List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
