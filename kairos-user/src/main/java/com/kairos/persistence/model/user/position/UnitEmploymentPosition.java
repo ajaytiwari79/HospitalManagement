@@ -208,5 +208,24 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         return result;
     }
 
+    public UnitEmploymentPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary) {
 
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.hourlyWages = hourlyWages;
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("UnitEmploymentPosition{");
+        sb.append("startDateMillis=").append(startDateMillis);
+        sb.append(", endDateMillis=").append(endDateMillis);
+        sb.append(", totalWeeklyMinutes=").append(totalWeeklyMinutes);
+        sb.append('}');
+        return sb.toString();
+    }
 }
