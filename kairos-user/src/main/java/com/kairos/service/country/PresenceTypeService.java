@@ -31,7 +31,7 @@ public class PresenceTypeService extends UserBaseService {
     @Inject
     private PresenceTypeRepository presenceTypeRepository;
     @Inject
-    private TimeTypeService timeTypeService;
+    private TimeTypeRestClient timeTypeRestClient;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     public PresenceTypeDTO addPresenceType(PresenceTypeDTO presenceTypeDTO, Long countryId) {
@@ -101,7 +101,7 @@ public class PresenceTypeService extends UserBaseService {
         }
         PresenceTypeWithTimeTypeDTO presenceTypeWithTimeTypes = new PresenceTypeWithTimeTypeDTO();
         presenceTypeWithTimeTypes.setPresenceTypes(presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false));
-        presenceTypeWithTimeTypes.setTimeTypes(timeTypeService.getAllTimeTypes(countryId));
+        presenceTypeWithTimeTypes.setTimeTypes(timeTypeRestClient.getAllTimeTypes(countryId));
         return presenceTypeWithTimeTypes;
     }
 
@@ -113,7 +113,7 @@ public class PresenceTypeService extends UserBaseService {
         }
         PresenceTypeWithTimeTypeDTO presenceTypeWithTimeTypes = new PresenceTypeWithTimeTypeDTO();
         presenceTypeWithTimeTypes.setPresenceTypes(presenceTypeRepository.getAllPresenceTypeByCountryId(country.getId(), false));
-        presenceTypeWithTimeTypes.setTimeTypes(timeTypeService.getAllTimeTypes(country.getId()));
+        presenceTypeWithTimeTypes.setTimeTypes(timeTypeRestClient.getAllTimeTypes(country.getId()));
         return presenceTypeWithTimeTypes;
     }
 

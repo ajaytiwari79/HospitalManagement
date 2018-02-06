@@ -5,7 +5,6 @@ import com.kairos.persistence.model.organization.OrgTypeExpertiseDTO;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.ParentOrganizationDTO;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
-import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillDTO;
 import com.kairos.persistence.model.user.language.Language;
@@ -111,7 +110,7 @@ public class CountryController {
     @Inject
     private ExpertiseService expertiseService;
     @Inject
-    private TimeTypeService timeTypeService;
+    private TimeTypeRestClient timeTypeRestClient;
     @Inject
     private PresenceTypeService presenceTypeService;
     @Inject
@@ -1057,37 +1056,37 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.updateVehicle(countryId, vehicleId, vehicle));
     }
 
-    @ApiOperation(value = "Add timeType by countryId")
+    /*@ApiOperation(value = "Add timeType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/timeType", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addTimeType(@PathVariable Long countryId, @Validated @RequestBody TimeTypeDTO timeType) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, timeTypeService.addTimeType(timeType, countryId));
-    }
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, timeTypeRestClient.addTimeType(timeType, countryId));
+    }*/
 
 
     // timeType
-    @ApiOperation(value = "Get timeType by countryId")
+   /* @ApiOperation(value = "Get timeType by countryId")
     @RequestMapping(value = COUNTRY_URL + "/timeType", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllTimeTypes(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.getAllTimeTypes(countryId));
-    }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeRestClient.getAllTimeTypes(countryId));
+    }*/
 
     // timeType
-    @ApiOperation(value = "delete a  timeType by Id")
+    /*@ApiOperation(value = "delete a  timeType by Id")
     @RequestMapping(value = COUNTRY_URL + "/timeType/{timeTypeId}", method = RequestMethod.DELETE)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteTimeType(@PathVariable Long timeTypeId) {
-        timeTypeService.deleteTimeType(timeTypeId);
+        timeTypeRestClient.deleteTimeType(timeTypeId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
-    }
+    }*/
 
-    @ApiOperation(value = "Update timeType")
+  /*  @ApiOperation(value = "Update timeType")
     @RequestMapping(value = COUNTRY_URL + "/timeType/{timeTypeId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateTimeType(@PathVariable Long timeTypeId, @Validated @RequestBody TimeTypeDTO timeType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updateTimeType(timeType, timeTypeId));
-    }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeRestClient.updateTimeType(timeType, timeTypeId));
+    }*/
 
 
     @ApiOperation(value = "Add presenceType by countryId")

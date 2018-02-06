@@ -30,7 +30,7 @@ import java.util.Date;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TimeTypeServiceIntegrationTest {
+public class TimeTypeRestClientIntegrationTest {
     @Value("${server.host.http.url}")
     private String url;
     @Autowired
@@ -40,7 +40,7 @@ public class TimeTypeServiceIntegrationTest {
     static Long createdIdForDelete;
     String name = "ABC" + DateUtil.getCurrentDate().toString();
 
-    @Test
+    /*@Test
     public void test1_addTimeType() throws Exception {
         String baseUrl = getBaseUrl(71L, 53L);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/timeType/");
@@ -58,9 +58,9 @@ public class TimeTypeServiceIntegrationTest {
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()));
         createdIdForDelete = createdId = response.getBody().getData().getId();
 
-    }
+    }*/
 
-    @Test
+/*    @Test
     public void test2_getAllTimeTypes() throws Exception {
         String baseUrl = getBaseUrl(71L, 53L);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/timeType/");
@@ -80,8 +80,9 @@ public class TimeTypeServiceIntegrationTest {
                 HttpMethod.DELETE, null, String.class);
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
 
-    }
+    }*/
 
+/*
     @Test
     public void test3_updateTimeType() throws Exception {
         String baseUrl = getBaseUrl(71L, 53L);
@@ -95,6 +96,7 @@ public class TimeTypeServiceIntegrationTest {
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
 
     }
+*/
 
     public final String getBaseUrl(Long organizationId, Long countryId) {
         if (organizationId != null && countryId != null) {

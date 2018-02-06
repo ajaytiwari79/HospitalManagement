@@ -13,6 +13,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 /**
  * Created by vipul on 18/10/17.
  */
+
+//It is used by CostTimeAgreementService prerna working on it, but it should be removed
 @Repository
 public interface TimeTypeGraphRepository extends Neo4jBaseRepository <TimeType,Long>{
     @Query("MATCH (timeType:TimeType{deleted:false})-[:"+BELONGS_TO+"]->(c:Country) where id(c)={0} return id(timeType) as id,timeType.name as name ,timeType.type as type,timeType.negativeDayBalancePresent as negativeDayBalancePresent,timeType.onCallTime as onCallTime,timeType.includeInTimeBank as includeInTimeBank")
