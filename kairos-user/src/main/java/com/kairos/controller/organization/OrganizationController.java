@@ -1048,8 +1048,9 @@ public class OrganizationController {
      */
     @ApiOperation("get organization by external id ")
     @RequestMapping(value = "/external/{externalId}", method = RequestMethod.GET)
-    ResponseEntity<Map<String, Object>> getOrganizationByExternalId(@PathVariable String externalId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationByExternalId(externalId));
+    ResponseEntity<Map<String, Object>> getOrganizationByExternalId(@PathVariable String externalId, @RequestParam("staffTimeCareId") Long staffTimeCareId) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getOrganizationAndStaffByExternalId(externalId,staffTimeCareId));
     }
 
     @RequestMapping(value = "/timecare_task/prerequisites", method = RequestMethod.POST)
