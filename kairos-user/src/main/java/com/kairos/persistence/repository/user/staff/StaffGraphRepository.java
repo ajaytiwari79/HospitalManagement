@@ -28,7 +28,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
 
     Staff findByExternalId(Long externalId);
 
-
     @Query("MATCH (team:Team)-[:"+TEAM_HAS_MEMBER+"{isEnabled:true}]->(staff:Staff) where id(team)={0} return {id:id(staff),firstName:staff.firstName,lastName:staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,visitourId:staff.visitourId, userName:staff.userName,profilePic: {1} + staff.profilePic } as data order by data.firstName")
     List<Map<String,Object>> getStaffByTeamId(long teamId, String imageUrl);
 
@@ -352,6 +351,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
     Staff getStaffByUserId(Long userId,Long parentOrganizationId);
 
 
+    @Query("match(s:Staff)-[:BELONGS_TO]-(u:Employment)-[:HAS_EMPLOYMENTS]-(o:Organization) where id(o)={1} AND s.externalId={0} return s")
+    Staff findStaffByExternalId(Long externalId,Long organizationId);
 
 
 }
