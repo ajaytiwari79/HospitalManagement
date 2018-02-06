@@ -259,6 +259,7 @@ public class AppConstants {
 
     public static final String SKILL_CATEGORY_FOR_TIME_CARE = "Skills From TimeCare";
     public static final int DB_RECORD_LIMIT = 100;
+    public static final String KAIROS_EMAIL = "@kairos.com";
 
 
 

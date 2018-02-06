@@ -9,9 +9,7 @@ import org.springframework.data.neo4j.annotation.Query;
 
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATE;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_RULE_TEMPLATES;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -92,6 +90,8 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
 
     @Query("MATCH (o:Organization)-[:" + BELONGS_TO + "]-(c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE]-(t:WTABaseRuleTemplate) where id(o)={0} " +
             "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory)  " +
+            "Optional Match (t)-[: " + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
+            "with t,c,r, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
             "t.balanceType as balanceType," +
@@ -128,11 +128,16 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.shiftAffiliation as shiftAffiliation," +
             "t.shiftsLimit as shiftsLimit," +
             "t.activityCode as activityCode," +
-            "t.onlyCompositeShifts as onlyCompositeShifts")
+            "t.onlyCompositeShifts as onlyCompositeShifts," +
+            "t.recommendedValue as recommendedValue," +
+            "t.lastUpdatedBy as lastUpdatedBy," +
+            "phaseTemplateValues as phaseTemplateValues")
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByUnitId(Long unitId);
 
     @Query("MATCH (c:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE + "]-(t:WTABaseRuleTemplate) where id(c)={0} " +
-            "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory)  " +
+            "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory{ruleTemplateCategoryType:'WTA'})  " +
+            "Optional Match (t)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
+            "with t,c,r, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
             "t.balanceType as balanceType," +
@@ -169,7 +174,11 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.shiftAffiliation as shiftAffiliation," +
             "t.shiftsLimit as shiftsLimit," +
             "t.activityCode as activityCode," +
-            "t.onlyCompositeShifts as onlyCompositeShifts")
+            "t.onlyCompositeShifts as onlyCompositeShifts," +
+            "t.recommendedValue as recommendedValue," +
+            "t.lastUpdatedBy as lastUpdatedBy," +
+            "phaseTemplateValues as phaseTemplateValues"
+    )
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByCountryId(Long countryId);
 
 }

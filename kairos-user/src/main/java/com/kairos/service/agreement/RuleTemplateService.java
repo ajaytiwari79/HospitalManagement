@@ -2,8 +2,8 @@ package com.kairos.service.agreement;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
@@ -22,7 +22,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.util.ArrayUtil;
 import com.kairos.util.DateUtil;
-import org.apache.commons.lang.StringUtils;
+import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +54,7 @@ public class RuleTemplateService extends UserBaseService {
     private TagService tagService;
     @Inject
     private WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
+
 
     public boolean createRuleTemplate(long countryId) {
 
@@ -185,7 +186,8 @@ public class RuleTemplateService extends UserBaseService {
         return response;
     }
 
-    public RuleTemplateCategoryDTO updateRuleTemplate(long countryId, String templateType, RuleTemplateCategoryDTO templateDTO) {
+    public RuleTemplateCategoryDTO updateRuleTemplate(long countryId,  RuleTemplateCategoryDTO templateDTO) {
+
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country");
@@ -358,8 +360,15 @@ public class RuleTemplateService extends UserBaseService {
         RuleTemplateCategory ruleTemplateCategory = null;
         ruleTemplateCategory = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
         oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
+        CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
+        oldTemplate.setPhaseTemplateValues(templateDTO.getPhaseTemplateValues());
+
         oldTemplate.setDisabled(templateDTO.getDisabled());
         oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
+        oldTemplate.setRecommendedValue(templateDTO.getRecommendedValue());
+
+        oldTemplate.setLastUpdatedBy(currentUserDetails.getFirstName());
+
         save(oldTemplate);
         return templateDTO;
     }

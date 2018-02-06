@@ -18,8 +18,8 @@ public class CollectiveTimeAgreementDTO {
     private Long organizationType;
     private Long organizationSubType;
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
-    private Date startDate;
-    private Date endDate;
+    private Long startDateMillis;
+    private Long endDateMillis;
     private boolean disabled;
     public CollectiveTimeAgreementDTO() {
 
@@ -73,29 +73,21 @@ public class CollectiveTimeAgreementDTO {
         this.organizationSubType = organizationSubType;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
-
-/*public List<Long> getRuleTemplates() {
-        return ruleTemplates;
-    }
-
-    public void setRuleTemplates(List<Long> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
-    }*/
 
     public List<CTARuleTemplateDTO> getRuleTemplates() {
         return ruleTemplates;

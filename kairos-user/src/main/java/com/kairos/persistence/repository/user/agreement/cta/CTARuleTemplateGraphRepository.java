@@ -8,11 +8,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENT_TYPE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TIME_TYPES;
+
 @Repository
 public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTARuleTemplate,Long> {
 
  @Query("MATCH (p:`CTARuleTemplate`)-[:`HAS_RULE_TEMPLATES`]-(m0:`RuleTemplateCategory`) " +
          "WHERE NOT(p.`deleted` = true ) AND ID(m0) IN {0} "+
+         "MATCH (p)-[:HAS_CTA_RULE_TEMPLATE]-(country:Country) "+
          " optional  MATCH (p)-[:`BELONGS_TO`]-(cTARuleTemplateDayTypes:`CTARuleTemplateDayType`)"+
          " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(dayType:`DayType`)"+
          " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(countryHolidayCalender:`CountryHolidayCalender`)"+
@@ -53,10 +57,16 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
          "plannedTimeWithFactor as plannedTimeWithFactor ,"+
          "collect(distinct ID(timeType)) as timeTypes,"+
          "ID(p) as id")
-    List<CTARuleTemplateQueryResult>findByRuleTemplateCategoryIdInAndDeletedFalse(List<Long> categoryList);
+    List<CTARuleTemplateQueryResult>findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(List<Long> categoryList, Long countryId);
 
 
     @Query("MATCH (ctaRT:CTARuleTemplate) WHERE ctaRT.deleted = false RETURN CASE WHEN COUNT(ctaRT) > 0 THEN true ELSE false END")
     Boolean isDefaultCTARuleTemplateExists();
+
+    @Query("MATCH (ctaRT:CTARuleTemplate)-[r:"+HAS_TIME_TYPES+"]-(t:TimeType) WHERE id(ctaRT)={0} DELETE r")
+    void detachAllTimeTypesFromCTARuleTemplate(Long ctaRuleTemplateId);
+
+    @Query("MATCH (ctaRT:CTARuleTemplate)-[r:"+HAS_EMPLOYMENT_TYPE+"]-(et:EmploymentType) WHERE id(ctaRT)={0} DELETE r ")
+    void detachAllEmploymentTypesFromCTARuleTemplate(Long ctaRuleTemplateId);
 
 }

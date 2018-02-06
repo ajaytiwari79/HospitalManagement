@@ -10,6 +10,10 @@ public class ActivityType extends UserBaseEntity{
     boolean onlyForActivityThatPartOfCostCalculation;
     private List<Long> activityTypes=new ArrayList<>();
 
+    public ActivityType(){
+        // default constructor
+    }
+
     public boolean isOnlyForActivityThatPartOfCostCalculation() {
         return onlyForActivityThatPartOfCostCalculation;
     }
@@ -25,4 +29,6 @@ public class ActivityType extends UserBaseEntity{
     public void setActivityTypes(List<Long> activityTypes) {
         this.activityTypes = activityTypes;
     }
+
+
 }

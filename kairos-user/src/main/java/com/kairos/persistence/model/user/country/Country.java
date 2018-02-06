@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationService;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.country.equipment.Equipment;
@@ -62,6 +63,9 @@ public class Country extends UserBaseEntity {
     @Relationship(type = HAS_RULE_TEMPLATE)
     private List<RuleTemplate> WTABaseRuleTemplate;
 
+    @Relationship(type = HAS_CTA_RULE_TEMPLATE)
+    private List<RuleTemplate> ctaRuleTemplates;
+
 
     @Relationship(type = COUNTRY_HAS_TAG)
     private List<Tag> tags;
@@ -106,6 +110,14 @@ public class Country extends UserBaseEntity {
 
     public void setWTABaseRuleTemplate(List<RuleTemplate> WTABaseRuleTemplate) {
         this.WTABaseRuleTemplate = WTABaseRuleTemplate;
+    }
+
+    public List<RuleTemplate> getCtaRuleTemplates() {
+        return ctaRuleTemplates;
+    }
+
+    public void setCtaRuleTemplates(List<RuleTemplate> ctaRuleTemplates) {
+        this.ctaRuleTemplates = ctaRuleTemplates;
     }
 
     public String getGoogleCalendarCode() {

@@ -40,7 +40,15 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> updateCTA(@PathVariable Long countryId, @PathVariable Long ctaId
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                costTimeAgreementService.updateCostTimeAgreement(countryId, ctaId, collectiveTimeAgreementDTO));
+                costTimeAgreementService.updateCostTimeAgreement(countryId, null, ctaId, collectiveTimeAgreementDTO));
+    }
+
+    @RequestMapping(value = "/unit/{unitId}/cta/{ctaId}", method = RequestMethod.PUT)
+    @ApiOperation("Update CTA Of Unit")
+    public ResponseEntity<Map<String, Object>> updateUnitCTA(@PathVariable Long unitId, @PathVariable Long ctaId
+            , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                costTimeAgreementService.updateCostTimeAgreement(null, unitId, ctaId, collectiveTimeAgreementDTO));
     }
 
     @RequestMapping(value = "/country/{countryId}/cta/{ctaId}", method = RequestMethod.DELETE)
@@ -57,6 +65,13 @@ public class CostTimeAgreementController {
                 costTimeAgreementService.loadAllCTAByCountry(countryId));
     }
 
+    @RequestMapping(value = "/unit/{unitId}/cta", method = RequestMethod.GET)
+    @ApiOperation("GET CTA Of Unit")
+    public ResponseEntity<Map<String, Object>> getCTAOfUnit(@PathVariable Long unitId) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                costTimeAgreementService.loadAllCTAByUnit(unitId));
+    }
+
     @RequestMapping(value = "/country/{countryId}/cta_rule_template/{templateId}", method = RequestMethod.PUT)
     @ApiOperation("Update CTA Rule Template")
     public ResponseEntity<Map<String, Object>> updateCTARuleTemplate(@PathVariable Long countryId,@PathVariable Long templateId
@@ -65,4 +80,9 @@ public class CostTimeAgreementController {
                 costTimeAgreementService.updateCTARuleTemplate(countryId,templateId, ctaRuleTemplateDTO));
     }
 
+    @RequestMapping(value = "/unit/{unitId}/cta/expertise", method = RequestMethod.GET)
+    @ApiOperation("get expertise for cta rule template")
+    public ResponseEntity<Map<String, Object>> getExpertiseForCTA(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getExpertiseForOrgCTA(unitId));
+    }
 }

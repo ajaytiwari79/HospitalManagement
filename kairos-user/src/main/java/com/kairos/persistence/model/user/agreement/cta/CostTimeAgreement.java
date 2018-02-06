@@ -35,12 +35,12 @@ public class CostTimeAgreement extends UserBaseEntity {
     private Country country;
     @Relationship(type = HAS_PARENT_CTA)
     private CostTimeAgreement parent;
+    @Relationship(type = HAS_PARENT_COUNTRY_CTA)
+    private CostTimeAgreement parentCountryCTA;
     @Relationship(type = HAS_RULE_TEMPLATE)
     private List<RuleTemplate> ruleTemplates=new ArrayList<>();
-    @DateLong
-    private Date startDate;
-    @DateLong
-    private Date endDate;
+    private Long startDateMillis;
+    private Long endDateMillis;
     private boolean disabled;
     @Relationship(type = BELONGS_TO)
     private User createdBy;
@@ -109,22 +109,29 @@ public class CostTimeAgreement extends UserBaseEntity {
         return true;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
+    public CostTimeAgreement getParentCountryCTA() {
+        return parentCountryCTA;
+    }
+
+    public void setParentCountryCTA(CostTimeAgreement parentCountryCTA) {
+        this.parentCountryCTA = parentCountryCTA;
+    }
 
     public void addRuleTemplate(RuleTemplate ruleTemplate) {
         if (ruleTemplate == null)
@@ -191,8 +198,8 @@ public class CostTimeAgreement extends UserBaseEntity {
                 .append(country, that.country)
                 .append(parent, that.parent)
                 .append(ruleTemplates, that.ruleTemplates)
-                .append(startDate, that.startDate)
-                .append(endDate, that.endDate)
+                .append(startDateMillis, that.startDateMillis)
+                .append(endDateMillis, that.endDateMillis)
                 .isEquals();
     }
 
@@ -207,8 +214,8 @@ public class CostTimeAgreement extends UserBaseEntity {
                 .append(country)
                 .append(parent)
                 .append(ruleTemplates)
-                .append(startDate)
-                .append(endDate)
+                .append(startDateMillis)
+                .append(endDateMillis)
                 .append(disabled)
                 .toHashCode();
     }

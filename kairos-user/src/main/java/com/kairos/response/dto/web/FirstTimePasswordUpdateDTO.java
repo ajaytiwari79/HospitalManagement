@@ -12,9 +12,9 @@ import java.util.Arrays;
  */
 public class FirstTimePasswordUpdateDTO {
 
-    @Size(min = 6,max = 10)
+    @Size(min = 6)
     private char[] password1;
-    @Size(min = 6,max = 10)
+    @Size(min = 6)
     private char[] password2;
     @Email
     String email;

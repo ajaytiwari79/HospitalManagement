@@ -34,6 +34,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
+import com.kairos.persistence.repository.user.UserBaseRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -186,6 +187,8 @@ public class BootDataService {
     private CostTimeAgreementService costTimeAgreementService;
     @Inject
     private EquipmentCategoryGraphRepository equipmentCategoryGraphRepository;
+    @Inject
+    private UserBaseRepository userBaseRepository;
 
     private List<Long> skillList;
     private com.kairos.persistence.model.organization.OrganizationService homeCareService;
@@ -256,6 +259,9 @@ public class BootDataService {
 
     public void createData() {
         if (countryGraphRepository.findAll().isEmpty()) {
+
+            userBaseRepository.createFirstDBNode();
+
             createStandardTimeSlots();
             //createMasterSkills();
             //createOrganizationServices();
@@ -272,9 +278,11 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
-        createCTARuleTemplateCategory();
+
+        /*createCTARuleTemplateCategory();
         startRegisteredCronJobs();
-        createEquipmentCategories();
+        createEquipmentCategories();*/
+        createCTARuleTemplateCategory("Denmark");
 
     }
 
@@ -878,7 +886,7 @@ public class BootDataService {
         kairosRegionLevel.setCostCenterCode("OD12");
         kairosRegionLevel.setOrganizationLevel(OrganizationLevel.REGION);
         kairosRegionLevel.setCountry(denmark);
-        kairosRegionLevel.setKairosHub(true);
+        kairosRegionLevel.setKairosHub(false);
         ContactAddress contactAddress = new ContactAddress();
         contactAddress.setZipCode(allegade);
         contactAddress.setFloorNumber(10);
@@ -1006,22 +1014,26 @@ public class BootDataService {
         currencyGraphRepository.save(currency);
     }
 
-    private void createCTARuleTemplateCategory() {
+    private void createCTARuleTemplateCategory(String countryName) {
+        Long countryId = countryGraphRepository.findCountryIdByName(countryName);
+        if(countryId == null){
+            return;
+        }
         RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
-                .findByName(53L, "NONE", RuleTemplateCategoryType.CTA);
+                .findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
 
         if (category == null) {
             category = new RuleTemplateCategory();
             category.setName("NONE");
             category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
-            ruleTemplateCategoryService.createRuleTemplateCategory(53L, category);
+            ruleTemplateCategoryService.createRuleTemplateCategory(countryId, category);
         }
 
         if (costTimeAgreementService.isDefaultCTARuleTemplateExists()) {
             logger.info("default CTA rule template already exist");
         } else {
             logger.info("creating CTA rule template");
-            costTimeAgreementService.createDefaultCtaRuleTemplate(53L);
+            costTimeAgreementService.createDefaultCtaRuleTemplate(countryId);
         }
 
     }
