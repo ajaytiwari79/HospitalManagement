@@ -1,0 +1,1 @@
+CREATE CONSTRAINT ON (staff:Staff) ASSERT staff.externalId IS UNIQUE;
