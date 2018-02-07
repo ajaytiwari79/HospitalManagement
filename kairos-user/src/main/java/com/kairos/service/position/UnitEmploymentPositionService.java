@@ -311,15 +311,15 @@ public class UnitEmploymentPositionService extends UserBaseService {
             oldUnitEmploymentPosition.setEmploymentType(employmentType);
         }
 
-
-        if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
-            throw new ActionNotPermittedException("Start date can't be less than End Date ");
-        }
         if (Optional.ofNullable(unitEmploymentPositionDTO.getEndDateMillis()).isPresent()) {
+
+            if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
+                throw new ActionNotPermittedException("Start date can't be less than End Date ");
+            }
             oldUnitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
         }
-
         oldUnitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
+
 
         oldUnitEmploymentPosition.setWorkingDaysInWeek(unitEmploymentPositionDTO.getWorkingDaysInWeek());
         oldUnitEmploymentPosition.setTotalWeeklyMinutes(unitEmploymentPositionDTO.getTotalWeeklyMinutes() + (unitEmploymentPositionDTO.getTotalWeeklyHours() * 60));
