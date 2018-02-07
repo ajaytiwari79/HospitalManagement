@@ -12,7 +12,16 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PresenceTypeWithTimeTypeDTO {
     private List<PresenceTypeDTO> presenceTypes;
-    private List<TimeTypeDTO> timeTypes;
+   /* private List<TimeTypeDTO> timeTypes;*/
+    private Long countryId;
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 
     public List<PresenceTypeDTO> getPresenceTypes() {
         return presenceTypes;
@@ -22,11 +31,11 @@ public class PresenceTypeWithTimeTypeDTO {
         this.presenceTypes = presenceTypes;
     }
 
-    public List<TimeTypeDTO> getTimeTypes() {
+    /*public List<TimeTypeDTO> getTimeTypes() {
         return timeTypes;
     }
 
     public void setTimeTypes(List<TimeTypeDTO> timeTypes) {
         this.timeTypes = timeTypes;
-    }
+    }*/
 }
