@@ -9,11 +9,11 @@ import javax.validation.constraints.NotNull;
  */
 public class UnitEmploymentPositionDTO {
 
-    @NotNull(message = "Position code  is required for position")
-    @Range(min = 0, message = "Position code is required for position")
+    @NotNull(message = "Position code  is required for positionCode")
+    @Range(min = 0, message = "Position code is required for positionCode")
     private Long positionCodeId;
-    @NotNull(message = "expertise is required for position")
-    @Range(min = 0, message = "expertise is required for position")
+    @NotNull(message = "expertise is required for positionCode")
+    @Range(min = 0, message = "expertise is required for positionCode")
     private Long expertiseId;
 
     private Long startDateMillis;

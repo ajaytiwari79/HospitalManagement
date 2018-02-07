@@ -1,6 +1,6 @@
-package com.kairos.controller.position;
+package com.kairos.controller.positionCode;
 import com.kairos.persistence.model.user.position.PositionCode;
-import com.kairos.service.position.PositionCodeService;
+import com.kairos.service.positionCode.PositionCodeService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

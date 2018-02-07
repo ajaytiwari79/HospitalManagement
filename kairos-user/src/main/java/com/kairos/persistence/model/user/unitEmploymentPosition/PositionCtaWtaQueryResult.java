@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.position;
+package com.kairos.persistence.model.user.unitEmploymentPosition;
 
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
