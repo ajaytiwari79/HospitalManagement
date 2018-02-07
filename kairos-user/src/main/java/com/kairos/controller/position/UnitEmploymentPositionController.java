@@ -84,5 +84,10 @@ public class UnitEmploymentPositionController {
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getAllUnitEmploymentPositions(unitEmploymentId));
 //    }
 
+    @ApiOperation(value = "get unitEmploymentPosition's CTA")
+    @GetMapping(value = "/unitEmploymentPosition/{unitEmploymentPositionId}")
+    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitEmploymentPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getUnitEmploymentPositionCTA( unitEmploymentPositionId));
+    }
 
 }

@@ -14,6 +14,9 @@ public class CostTimeAgreementDTO {
         this.unitEmploymentPositionId = unitEmploymentPositionId;
     }
 
+    public CostTimeAgreementDTO() {
+    }
+
     public Long getStaffId() {
         return staffId;
     }

@@ -14,13 +14,13 @@ public class CTARuleTemplateDTO {
     private List<LocalDate> publicHolidays;
     private int granularity;
     private List<BigInteger> activityIds;
-    private List<String> timeTypes;
+    private List<BigInteger> timeTypes;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
 
     public CTARuleTemplateDTO() {
     }
 
-    public CTARuleTemplateDTO(int granularity, List<String> timeTypes) {
+    public CTARuleTemplateDTO(int granularity, List<BigInteger> timeTypes) {
         this.granularity = granularity;
         this.timeTypes = timeTypes;
     }
@@ -73,11 +73,11 @@ public class CTARuleTemplateDTO {
         this.activityIds = activityIds;
     }
 
-    public List<String> getTimeTypes() {
+    public List<BigInteger> getTimeTypes() {
         return timeTypes;
     }
 
-    public void setTimeTypes(List<String> timeTypes) {
+    public void setTimeTypes(List<BigInteger> timeTypes) {
         this.timeTypes = timeTypes;
     }
 
