@@ -368,7 +368,10 @@ public class UnitEmploymentPositionService extends UserBaseService {
     }
 
     public PositionCtaWtaQueryResult getCtaAndWtaByExpertiseId(Long unitId, Long expertiseId) {
-        return unitEmploymentPositionGraphRepository.getCtaAndWtaByExpertise(unitId, expertiseId);
+        PositionCtaWtaQueryResult positionCtaWtaQueryResult = new PositionCtaWtaQueryResult();
+        positionCtaWtaQueryResult.setCta(unitEmploymentPositionGraphRepository.getCtaByExpertise(unitId, expertiseId));
+        positionCtaWtaQueryResult.setWta(unitEmploymentPositionGraphRepository.getWtaByExpertise(unitId, expertiseId));
+        return positionCtaWtaQueryResult;
     }
 
     public UnitEmploymentPositionQueryResult updateUnitEmploymentPositionWTA(Long unitId, Long unitEmploymentPositionId, Long wtaId, WTADTO updateDTO) {
