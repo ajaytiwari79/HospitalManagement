@@ -20,6 +20,7 @@ import com.kairos.persistence.model.user.position.UnitEmploymentPosition;
 import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
 
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.user.staff.UnitEmployment;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
@@ -39,6 +40,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
+import org.apache.commons.collections.list.SetUniqueList;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -47,8 +49,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -401,4 +403,72 @@ public class UnitEmploymentPositionService extends UserBaseService {
         WTAResponseDTO workingTimeAgreement = workingTimeAgreementGraphRepository.findWtaByUnitEmploymentPosition(unitEmploymentPositionId);
         return workingTimeAgreement;
     }
+
+    /*public boolean addEmploymentToUnitByExternalId(List<TimeCareEmploymentDTO> timeCareStaffDTOs, String unitExternalId ){
+        Organization organization = organizationGraphRepository.findByExternalId(unitExternalId);
+        for (:
+             ) {
+
+        }
+        Staff staff = staffGraphRepository.findByExternalId()
+        return true;
+    }*/
+
+    /*public boolean importAllEmploymentsFromTimeCare(List<TimeCareEmploymentDTO> timeCareEmploymentsDTOs) {
+
+        // To prepare list of
+        Set<String> listOfWorkPlaceIds = new HashSet<>();
+        for (TimeCareEmploymentDTO timeCareStaffDTO : timeCareEmploymentsDTOs) {
+            listOfWorkPlaceIds.add(timeCareStaffDTO.getWorkPlaceID());
+        }
+
+        for ( String workPlaceId : listOfWorkPlaceIds) {
+
+            List<TimeCareEmploymentDTO> timeCareEmploymentsByWorkPlace = timeCareEmploymentsDTOs.stream().filter(timeCareEmploymentDTO -> timeCareEmploymentDTO.getWorkPlaceID().equals(workPlaceId)).
+                    collect(Collectors.toList());
+            addEmploymentToUnitByExternalId(timeCareEmploymentsByWorkPlace, workPlaceId);
+        }
+
+        Organization organization = organizationGraphRepository.findByExternalId(externalId);
+        if (organization == null) {
+            throw new InternalError("Invalid external id");
+        }
+
+        List<TimeCareStaffDTO> timeCareStaffByWorkPlace = timeCareStaffDTOS.stream().filter(timeCareStaffDTO -> timeCareStaffDTO.getParentWorkPlaceId().equals(externalId)).
+                collect(Collectors.toList());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        AccessGroup accessGroup = accessGroupRepository.findTaskGiverAccessGroup(organization.getId());
+        if (accessGroup == null) {
+            throw new InternalError("Task giver access group is not present");
+        }
+
+        for (TimeCareStaffDTO timeCareStaffDTO : timeCareStaffByWorkPlace) {
+
+            String email = (timeCareStaffDTO.getEmail() == null) ? timeCareStaffDTO.getFirstName() + KAIROS_EMAIL : timeCareStaffDTO.getEmail();
+            User user = Optional.ofNullable(userGraphRepository.findByEmail(email.trim())).orElse(new User());
+            if (staffGraphRepository.staffAlreadyInUnit(Long.valueOf(timeCareStaffDTO.getId()), organization.getId())) {
+                throw new DuplicateDataException("Staff already exist in organization");
+            }
+
+            if (timeCareStaffDTO.getGender().equalsIgnoreCase("m")) {
+                timeCareStaffDTO.setGender(Gender.MALE.toString());
+            } else if (timeCareStaffDTO.getGender().equalsIgnoreCase("f")) {
+                timeCareStaffDTO.setGender(Gender.FEMALE.toString());
+            } else {
+                timeCareStaffDTO.setGender(null);
+            }
+            StaffCreationPOJOData payload = objectMapper.convertValue(timeCareStaffDTO, StaffCreationPOJOData.class);
+            payload.setAccessGroupId(accessGroup.getId());
+            payload.setPrivateEmail(email);
+            setBasicDetailsOfUser(user, payload);
+            Staff staff = mapDataInStaffObject(timeCareStaffDTO, organization, email);
+            boolean isEmploymentExist = (staff.getId()) != null;
+            staff.setUser(user);
+            staffGraphRepository.save(staff);
+            createEmployment(organization, organization, staff, payload.getAccessGroupId(), isEmploymentExist);
+        }
+        return true;
+    }*/
 }

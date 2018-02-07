@@ -1,0 +1,153 @@
+package com.kairos.persistence.model.user.staff;
+
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ * Created by prerna on 6/2/18.
+ */
+public class TimeCareEmploymentDTO{
+
+    @JacksonXmlProperty
+    private String Id;
+    @JacksonXmlProperty
+    private Date UpdateDate;
+    @JacksonXmlProperty
+    private Date StartDate;
+    @JacksonXmlProperty
+    private String UpdateTypeFlag;
+    @JacksonXmlProperty
+    private BigDecimal WeeklyHours;
+    @JacksonXmlProperty
+    private BigDecimal FullTimeHours;
+    @JacksonXmlProperty
+    private String WorkPlaceID;
+    @JacksonXmlProperty
+    private String PersonID;
+    @JacksonXmlProperty
+    private String DutyCalcTypeID;
+    @JacksonXmlProperty
+    private Boolean UseBreak;
+    @JacksonXmlProperty
+    private BigDecimal MonthlyHours;
+    @JacksonXmlProperty
+    private String PositionId;
+    @JacksonXmlProperty
+    private String EmpNo;
+
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        Id = id;
+    }
+
+    public Date getUpdateDate() {
+        return UpdateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        UpdateDate = updateDate;
+    }
+
+    public Date getStartDate() {
+        return StartDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        StartDate = startDate;
+    }
+
+    public String getUpdateTypeFlag() {
+        return UpdateTypeFlag;
+    }
+
+    public void setUpdateTypeFlag(String updateTypeFlag) {
+        UpdateTypeFlag = updateTypeFlag;
+    }
+
+    public BigDecimal getWeeklyHours() {
+        return WeeklyHours;
+    }
+
+    public void setWeeklyHours(BigDecimal weeklyHours) {
+        WeeklyHours = weeklyHours;
+    }
+
+    public BigDecimal getFullTimeHours() {
+        return FullTimeHours;
+    }
+
+    public void setFullTimeHours(BigDecimal fullTimeHours) {
+        FullTimeHours = fullTimeHours;
+    }
+
+    public String getWorkPlaceID() {
+        return WorkPlaceID;
+    }
+
+    public void setWorkPlaceID(String workPlaceID) {
+        WorkPlaceID = workPlaceID;
+    }
+
+    public String getPersonID() {
+        return PersonID;
+    }
+
+    public void setPersonID(String personID) {
+        PersonID = personID;
+    }
+
+    public String getDutyCalcTypeID() {
+        return DutyCalcTypeID;
+    }
+
+    public void setDutyCalcTypeID(String dutyCalcTypeID) {
+        DutyCalcTypeID = dutyCalcTypeID;
+    }
+
+    public Boolean getUseBreak() {
+        return UseBreak;
+    }
+
+    public void setUseBreak(Boolean useBreak) {
+        UseBreak = useBreak;
+    }
+
+    public BigDecimal getMonthlyHours() {
+        return MonthlyHours;
+    }
+
+    public void setMonthlyHours(BigDecimal monthlyHours) {
+        MonthlyHours = monthlyHours;
+    }
+
+    public String getPositionId() {
+        return PositionId;
+    }
+
+    public void setPositionId(String positionId) {
+        PositionId = positionId;
+    }
+
+    public String getEmpNo() {
+        return EmpNo;
+    }
+
+    public void setEmpNo(String empNo) {
+        EmpNo = empNo;
+    }
+
+    /*@Override
+    public int compareTo(TimeCareEmploymentDTO dto) {
+        int workPlaceId=((TimeCareEmploymentDTO)dto).getWorkPlaceID();
+        *//* For Ascending order*//*
+        return this.studentage-compareage;
+
+        *//* For Descending order do like this *//*
+        //return compareage-this.studentage;
+    }*/
+}
