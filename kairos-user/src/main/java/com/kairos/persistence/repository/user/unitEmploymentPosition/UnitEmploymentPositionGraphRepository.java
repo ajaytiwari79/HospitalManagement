@@ -1,14 +1,14 @@
-package com.kairos.persistence.repository.user.position;
+package com.kairos.persistence.repository.user.unitEmploymentPosition;
 
-import com.kairos.persistence.model.user.position.StaffUnitEmploymentDetails;
+import com.kairos.persistence.model.user.unitEmploymentPosition.StaffUnitEmploymentDetails;
 import org.springframework.data.neo4j.annotation.Query;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CTA;
 
-import com.kairos.persistence.model.user.position.PositionCtaWtaQueryResult;
+import com.kairos.persistence.model.user.unitEmploymentPosition.PositionCtaWtaQueryResult;
 
-import com.kairos.persistence.model.user.position.UnitEmploymentPosition;
-import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPosition;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPositionQueryResult;
 
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -86,4 +86,13 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "match(uep)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={0}\n" +
             "return uep")
     List<UnitEmploymentPosition> getAllUEPByExpertise(Long expertiseId, Long unitEmploymentId);
+
+    @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(uep)={0} return Id(u)")
+    Long findEmploymentByUnitEmploymentPosition(Long unitEmploymentPositionId);
+
+    @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(u)={1} AND Id(uep)<>{2}\n" +
+            "match(uep)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={0}\n" +
+            "return uep")
+    List<UnitEmploymentPosition> getAllUEPByExpertiseExcludingCurrent(Long expertiseId, Long unitEmploymentId,Long currentUnitEmploymentPositionId);
+
 }

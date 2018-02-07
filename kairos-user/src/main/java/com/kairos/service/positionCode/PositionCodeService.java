@@ -1,4 +1,4 @@
-package com.kairos.service.position;
+package com.kairos.service.positionCode;
 
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -6,7 +6,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.position.PositionCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.position.PositionCodeGraphRepository;
+import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
@@ -84,7 +84,7 @@ public class PositionCodeService extends UserBaseService {
 
         PositionCode oldPositionCode = positionCodeGraphRepository.findOne(positionCodeId);
         if (!Optional.ofNullable(oldPositionCode).isPresent()) {
-            logger.info("position code not found,{}", positionCode.getName());
+            logger.info("positionCode code not found,{}", positionCode.getName());
             throw new DataNotFoundByIdException("PositionCode doesn't exist");
         }
 
@@ -105,11 +105,11 @@ public class PositionCodeService extends UserBaseService {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         PositionCode positionCode = positionCodeGraphRepository.findOne(positionId);
         if (!Optional.ofNullable(positionCode).isPresent()) {
-            throw new DataNotFoundByIdException("position code  not found " + positionId);
+            throw new DataNotFoundByIdException("positionCode code  not found " + positionId);
 
         }
         if (!organization.isParentOrganization()) {
-            throw new ActionNotPermittedException("Only parent Organization can remove/edit position names.");
+            throw new ActionNotPermittedException("Only parent Organization can remove/edit positionCode names.");
         }
 
 
