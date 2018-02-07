@@ -96,7 +96,8 @@ public class CountryService extends UserBaseService {
     OrganizationTypeGraphRepository organizationTypeGraphRepository;
     private @Autowired CurrencyService currencyService;
     private @Autowired EmploymentTypeService employmentTypeService;
-    private @Autowired TimeTypeService timeTypeService;
+    private @Autowired
+    TimeTypeRestClient timeTypeRestClient;
     private @Autowired DayTypeService dayTypeService;
     private @Autowired PhaseRestClient phaseRestClient;
     private @Autowired ActivityTypesRestClient activityTypesRestClient;
@@ -449,7 +450,7 @@ public class CountryService extends UserBaseService {
         }
         List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
      List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
-     List<TimeTypeDTO> timeTypes=timeTypeService.getAllTimeTypes(countryId);
+     List<TimeTypeDTO> timeTypes= timeTypeRestClient.getAllTimeTypes(countryId);
      List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
      List<ActivityTypeDTO> activityTypeDTOS=activityTypesRestClient.getActivityType(countryId);
      List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);

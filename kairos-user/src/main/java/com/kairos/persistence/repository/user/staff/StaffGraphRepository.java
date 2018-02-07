@@ -351,6 +351,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
     Staff getStaffByUserId(Long userId,Long parentOrganizationId);
 
 
+    @Query("match(s:Staff)-[:BELONGS_TO]-(u:Employment)-[:HAS_EMPLOYMENTS]-(o:Organization) where id(o)={1} AND s.externalId={0} return s")
+    Staff findStaffByExternalId(Long externalId,Long organizationId);
 
 
 }

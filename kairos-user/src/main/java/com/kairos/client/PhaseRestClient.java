@@ -3,6 +3,7 @@ package com.kairos.client;
 import com.kairos.client.dto.PhaseAndActivityTypeWrapper;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.response.dto.web.cta.PhaseDTO;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -26,6 +28,9 @@ public class PhaseRestClient {
     @Autowired
     RestTemplate restTemplate;
 
+    @Inject
+    private OrganizationService organizationService;
+
     /**
      * @auther Vipul Pandey
      * used to create the phases in default
@@ -37,11 +42,12 @@ public class PhaseRestClient {
         final String baseUrl=getBaseUrl(false);
 
         try {
+            Long countryId = organizationService.getCountryIdOfOrganization(unitId);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference =
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/unit/{unitId}/phase/default",
+                            baseUrl + "/unit/{unitId}/phase/default?countryId="+countryId,
                             HttpMethod.POST,
                             null, typeReference, unitId);
 
