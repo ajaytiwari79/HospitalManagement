@@ -2,6 +2,7 @@ package com.kairos.config;
 
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.constants.AppConstants;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.ClientEnum;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.*;
@@ -82,10 +83,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by kairosCountryLevel on 8/12/16.
@@ -1015,25 +1013,27 @@ public class BootDataService {
     }
 
     private void createCTARuleTemplateCategory(String countryName) {
-        Long countryId = countryGraphRepository.findCountryIdByName(countryName);
-        if(countryId == null){
-            return;
-        }
-        RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
-                .findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
+        Country country = countryGraphRepository.findCountryIdByName(countryName);
 
-        if (category == null) {
-            category = new RuleTemplateCategory();
-            category.setName("NONE");
-            category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
-            ruleTemplateCategoryService.createRuleTemplateCategory(countryId, category);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Invalid Country");
+        }
+
+        RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
+                .findByName(country.getId(), "NONE", RuleTemplateCategoryType.CTA);
+
+
+        if (!Optional.ofNullable(category).isPresent()) {
+            category = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.CTA);
+            category.setCountry(country);
+            ruleTemplateCategoryService.createDefaultRuleTemplateCategory( category);
         }
 
         if (costTimeAgreementService.isDefaultCTARuleTemplateExists()) {
             logger.info("default CTA rule template already exist");
         } else {
             logger.info("creating CTA rule template");
-            costTimeAgreementService.createDefaultCtaRuleTemplate(countryId);
+            costTimeAgreementService.createDefaultCtaRuleTemplate(country.getId());
         }
 
     }
