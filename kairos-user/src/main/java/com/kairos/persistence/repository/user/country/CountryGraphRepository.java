@@ -86,8 +86,8 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
 
     List<Country> findByName(String name);
 
-    @Query("MATCH (c:Country{isEnabled:true}) WHERE LOWER(c.name)=LOWER({0}) return id(c)")
-    Long findCountryIdByName(String name);
+    @Query("MATCH (c:Country{isEnabled:true}) WHERE LOWER(c.name)=LOWER({0}) return c")
+    Country findCountryIdByName(String name);
 
     @Query("MATCH (c:Country{isEnabled:true}) WHERE c.name=~ {0} return c")
     List<Country> checkDuplicateCountry(String name);

@@ -68,7 +68,7 @@ public class RuleTemplateService extends UserBaseService {
 
 
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
-        if (Optional.ofNullable(ruleTemplateCategory).isPresent()) {
+        if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
             ruleTemplateCategory = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.WTA);
             ruleTemplateCategory.setCountry(country);
             save(ruleTemplateCategory);
