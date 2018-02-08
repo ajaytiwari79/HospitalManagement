@@ -28,6 +28,7 @@ import com.kairos.response.dto.web.cta.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.google_calender.GoogleCalenderService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.util.FormatUtil;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -95,10 +96,12 @@ public class CountryService extends UserBaseService {
     OrganizationTypeGraphRepository organizationTypeGraphRepository;
     private @Autowired CurrencyService currencyService;
     private @Autowired EmploymentTypeService employmentTypeService;
-    private @Autowired TimeTypeService timeTypeService;
+    private @Autowired
+    TimeTypeRestClient timeTypeRestClient;
     private @Autowired DayTypeService dayTypeService;
     private @Autowired PhaseRestClient phaseRestClient;
     private @Autowired ActivityTypesRestClient activityTypesRestClient;
+    private @Inject OrganizationService organizationService;
 
 
     /**
@@ -440,10 +443,14 @@ public class CountryService extends UserBaseService {
      * @param countryId
      * @return
      */
-    public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTATemplate(Long countryId){
+    public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTATemplate(Long countryId, Long unitId){
+
+        if(unitId != null){
+            countryId = organizationService.getCountryIdOfOrganization(unitId);
+        }
         List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
      List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
-     List<TimeTypeDTO> timeTypes=timeTypeService.getAllTimeTypes(countryId);
+     List<TimeTypeDTO> timeTypes= timeTypeRestClient.getAllTimeTypes(countryId);
      List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
      List<ActivityTypeDTO> activityTypeDTOS=activityTypesRestClient.getActivityType(countryId);
      List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);

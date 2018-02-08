@@ -77,7 +77,7 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
 
     @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
             "optional match (r:CTARuleTemplate) where id(r) IN {1}\n" +
-            "optional match(rt)-[rel:"+HAS_RULE_TEMPLATES+"]->(r)\n" +
+            "optional match(rt)-[rel:" + HAS_RULE_TEMPLATES + "]->(r)\n" +
             "delete rel set rt.deleted=true")
     void deleteRelationOfRuleTemplateCategoryAndCTA(long ruleTemplateId, List<Long> ctaRuleTemplateIds);
 
@@ -86,7 +86,11 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
             "create (rt)-[rq:" + HAS_RULE_TEMPLATES + "]->(r)")
     void setAllCTAWithCategoryNone(long ruleTemplateId, List<Long> ctaRuleTemplateIds);
 
-    @Query("match (rt:RuleTemplateCategory)-[r:"+HAS_RULE_TEMPLATES+"]-(ctaRT:CTARuleTemplate)\n"+
+    @Query("match (rt:RuleTemplateCategory)-[r:" + HAS_RULE_TEMPLATES + "]-(ctaRT:CTARuleTemplate)\n" +
             "WHERE id(ctaRT)={0} AND id(rt)={1} DELETE r")
     void detachRuleTemplateCategoryFromCTARuleTemplate(long ctaRuleTemplateId, long ruleTemplateCategoryId);
+
+    @Query("match (wta:WorkingTimeAgreement) where id(wta)={0}\n" +
+            "optional match(wta)-[r:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)  detach DELETE r")
+    void detachPreviousRuleTemplates(Long wtaId);
 }

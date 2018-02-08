@@ -1,4 +1,4 @@
-package com.kairos.service.position;
+package com.kairos.service.positionCode;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;

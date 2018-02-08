@@ -284,7 +284,7 @@ public class WorkingTimeAgreement extends UserBaseEntity {
     }
 
     public WTAResponseDTO retriveBasicResponse() {
-        WTAResponseDTO responseDTO = new WTAResponseDTO(this.startDateMillis, this.endDateMillis, this.name, this.description, this.expertise.retrieveBasicDetails(), this.organizationType.basicDetails(), this.organizationSubType.basicDetails(), this.tags);
+        WTAResponseDTO responseDTO = new WTAResponseDTO(this.id,this.startDateMillis, this.endDateMillis, this.name, this.description, this.expertise.retrieveBasicDetails(), this.organizationType.basicDetails(), this.organizationSubType.basicDetails(), this.tags);
         return responseDTO;
 
     }

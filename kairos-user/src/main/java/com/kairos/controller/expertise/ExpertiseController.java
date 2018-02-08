@@ -1,7 +1,7 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.service.expertise.ExpertiseService;
-import com.kairos.service.position.UnitEmploymentPositionService;
+import com.kairos.service.unitEmploymentPosition.UnitEmploymentPositionService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

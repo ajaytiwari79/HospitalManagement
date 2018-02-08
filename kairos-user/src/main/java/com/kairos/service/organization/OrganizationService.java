@@ -9,6 +9,7 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
+import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
@@ -256,7 +257,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        //    phaseRestClient.createDefaultPhases(organization.getId());
+        phaseRestClient.createDefaultPhases(organization.getId());
 
 
         HashMap<String, Object> orgResponse = new HashMap<>();
@@ -545,7 +546,7 @@ public class OrganizationService extends UserBaseService {
 
         organizationGraphRepository.save(unit);
 
-        //    phaseRestClient.createDefaultPhases(unit.getId());
+        phaseRestClient.createDefaultPhases(unit.getId());
 
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
@@ -730,6 +731,13 @@ public class OrganizationService extends UserBaseService {
     public Organization getOrganizationByExternalId(String externalId) {
         return organizationGraphRepository.findByExternalId(externalId);
 
+    }
+
+    public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, Long timeCareStaffId) {
+        OrganizationStaffWrapper organizationStaffWrapper = new OrganizationStaffWrapper();
+        organizationStaffWrapper.setOrganization(organizationGraphRepository.findByExternalId(externalId));
+        organizationStaffWrapper.setStaff(staffGraphRepository.findStaffByExternalId(timeCareStaffId, organizationStaffWrapper.getOrganization().getId()));
+        return organizationStaffWrapper;
     }
 
     public boolean deleteOrganizationById(long parentOrganizationId, long childOrganizationId) {

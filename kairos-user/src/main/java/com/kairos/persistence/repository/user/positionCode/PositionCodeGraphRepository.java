@@ -1,4 +1,4 @@
-package com.kairos.persistence.repository.user.position;
+package com.kairos.persistence.repository.user.positionCode;
 
 
 import com.kairos.persistence.model.user.position.PositionCode;

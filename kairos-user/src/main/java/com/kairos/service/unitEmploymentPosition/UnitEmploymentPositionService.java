@@ -1,4 +1,4 @@
-package com.kairos.service.position;
+package com.kairos.service.unitEmploymentPosition;
 
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -13,11 +13,11 @@ import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
 import com.kairos.persistence.model.user.position.PositionCode;
-import com.kairos.persistence.model.user.position.PositionCtaWtaQueryResult;
+import com.kairos.persistence.model.user.unitEmploymentPosition.PositionCtaWtaQueryResult;
 
-import com.kairos.persistence.model.user.position.UnitEmploymentPosition;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPosition;
 
-import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPositionQueryResult;
 
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.UnitEmployment;
@@ -28,8 +28,8 @@ import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 
-import com.kairos.persistence.repository.user.position.PositionCodeGraphRepository;
-import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
+import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepository;
+import com.kairos.persistence.repository.user.unitEmploymentPosition.UnitEmploymentPositionGraphRepository;
 
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
@@ -38,7 +38,10 @@ import com.kairos.response.dto.web.PositionWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.positionCode.PositionCodeService;
 import com.kairos.service.staff.StaffService;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -110,6 +113,8 @@ public class UnitEmploymentPositionService extends UserBaseService {
         if (!Optional.ofNullable(positionCode).isPresent()) {
             throw new DataNotFoundByIdException("position Name does not exist in unit " + unitEmploymentPositionDTO.getPositionCodeId());
         }
+        List<UnitEmploymentPosition> oldUnitEmploymentPositions = unitEmploymentPositionGraphRepository.getAllUEPByExpertise(unitEmploymentPositionDTO.getExpertiseId(), unitEmployment.getId());
+        validateUnitEmploymentPositionWithExpertise(oldUnitEmploymentPositions, unitEmploymentPositionDTO);
         UnitEmploymentPosition unitEmploymentPosition = preparePosition(unitEmploymentPositionDTO, organization, id);
 
         unitEmploymentPosition.setPositionCode(positionCode);
@@ -121,6 +126,39 @@ public class UnitEmploymentPositionService extends UserBaseService {
         save(unitEmployment);
         UnitEmploymentPositionQueryResult unitEmploymentPositionQueryResult = unitEmploymentPosition.getBasicDetails();
         return unitEmploymentPositionQueryResult;
+    }
+
+    public boolean validateUnitEmploymentPositionWithExpertise(List<UnitEmploymentPosition> unitEmploymentPositions, UnitEmploymentPositionDTO unitEmploymentPositionDTO) {
+
+        Long currentStartDateMillis = unitEmploymentPositionDTO.getStartDateMillis();
+        Long currentEndDateMillis = (unitEmploymentPositionDTO.getEndDateMillis() != null) ? unitEmploymentPositionDTO.getEndDateMillis() : null;
+        unitEmploymentPositions.forEach(unitEmploymentPosition -> {
+            // if null date is set
+            if (unitEmploymentPosition.getEndDateMillis() != null) {
+                if (currentEndDateMillis != null) {
+                    Interval previousInterval = new Interval(unitEmploymentPosition.getStartDateMillis(), unitEmploymentPosition.getEndDateMillis());
+                    Interval interval = new Interval(currentStartDateMillis, currentEndDateMillis);
+                    if (previousInterval.overlaps(interval))
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)");
+
+                } else {
+                    if (new DateTime(currentEndDateMillis).isBefore(new DateTime(unitEmploymentPosition.getEndDateMillis()))) {
+
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)." + new DateTime(currentEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getEndDateMillis()).toDate());
+                    }
+                }
+            } else {
+                // unitEmploymentEnd date is null
+                if (currentEndDateMillis != null) {
+                    if (new DateTime(currentEndDateMillis).isAfter(new DateTime(unitEmploymentPosition.getStartDateMillis()))) {
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)" + new DateTime(currentEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getStartDateMillis()).toDate());
+                    }
+                } else {
+                    throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period.");
+                }
+            }
+        });
+        return true;
     }
 
 
@@ -135,6 +173,13 @@ public class UnitEmploymentPositionService extends UserBaseService {
         if (!Optional.ofNullable(oldUnitEmploymentPosition).isPresent()) {
             throw new DataNotFoundByIdException("Invalid positionId id " + unitEmploymentPositionId + " while updating the position");
         }
+        // findEmployment by UnitEmployment Id
+        Long unitEmploymentId = unitEmploymentPositionGraphRepository.findEmploymentByUnitEmploymentPosition(unitEmploymentPositionId);
+
+        List<UnitEmploymentPosition> oldUnitEmploymentPositions;
+        oldUnitEmploymentPositions = unitEmploymentPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitEmploymentPositionDTO.getExpertiseId(),unitEmploymentId, unitEmploymentPositionId);
+        validateUnitEmploymentPositionWithExpertise(oldUnitEmploymentPositions, unitEmploymentPositionDTO);
+
         preparePosition(oldUnitEmploymentPosition, unitEmploymentPositionDTO);
         save(oldUnitEmploymentPosition);
         return new PositionWrapper(oldUnitEmploymentPosition);
@@ -177,7 +222,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         }
         if (!Optional.ofNullable(unitEmployment).isPresent()) {
             logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", unitEmploymentPositionDTO.getStaffId(), organization.getId());
-            throw new DataNotFoundByIdException("unable to create position of staff");
+            throw new DataNotFoundByIdException("unable to create positionCode of staff");
         }
 
 
@@ -226,11 +271,15 @@ public class UnitEmploymentPositionService extends UserBaseService {
             throw new ActionNotPermittedException("Start date can't be less than current Date ");
         }
         unitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
-        if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
-            throw new ActionNotPermittedException("Start date can't be less than End Date ");
-        }
-        unitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
 
+
+        if (Optional.ofNullable(unitEmploymentPositionDTO.getEndDateMillis()).isPresent()) {
+            if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
+                throw new ActionNotPermittedException("Start date can't be less than End Date ");
+
+            }
+            unitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
+        }
         unitEmploymentPosition.setTotalWeeklyMinutes(unitEmploymentPositionDTO.getTotalWeeklyMinutes() + (unitEmploymentPositionDTO.getTotalWeeklyHours() * 60));
         unitEmploymentPosition.setAvgDailyWorkingHours(unitEmploymentPositionDTO.getAvgDailyWorkingHours());
         unitEmploymentPosition.setHourlyWages(unitEmploymentPositionDTO.getHourlyWages());
@@ -272,12 +321,15 @@ public class UnitEmploymentPositionService extends UserBaseService {
             oldUnitEmploymentPosition.setEmploymentType(employmentType);
         }
 
+        if (Optional.ofNullable(unitEmploymentPositionDTO.getEndDateMillis()).isPresent()) {
 
-        if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
-            throw new ActionNotPermittedException("Start date can't be less than End Date ");
+            if (unitEmploymentPositionDTO.getStartDateMillis() > unitEmploymentPositionDTO.getEndDateMillis()) {
+                throw new ActionNotPermittedException("Start date can't be less than End Date ");
+            }
+            oldUnitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
         }
-        oldUnitEmploymentPosition.setEndDateMillis(unitEmploymentPositionDTO.getEndDateMillis());
         oldUnitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
+
 
         oldUnitEmploymentPosition.setWorkingDaysInWeek(unitEmploymentPositionDTO.getWorkingDaysInWeek());
         oldUnitEmploymentPosition.setTotalWeeklyMinutes(unitEmploymentPositionDTO.getTotalWeeklyMinutes() + (unitEmploymentPositionDTO.getTotalWeeklyHours() * 60));
@@ -316,7 +368,10 @@ public class UnitEmploymentPositionService extends UserBaseService {
     }
 
     public PositionCtaWtaQueryResult getCtaAndWtaByExpertiseId(Long unitId, Long expertiseId) {
-        return unitEmploymentPositionGraphRepository.getCtaAndWtaByExpertise(unitId, expertiseId);
+        PositionCtaWtaQueryResult positionCtaWtaQueryResult = new PositionCtaWtaQueryResult();
+        positionCtaWtaQueryResult.setCta(unitEmploymentPositionGraphRepository.getCtaByExpertise(unitId, expertiseId));
+        positionCtaWtaQueryResult.setWta(unitEmploymentPositionGraphRepository.getWtaByExpertise(unitId, expertiseId));
+        return positionCtaWtaQueryResult;
     }
 
     public UnitEmploymentPositionQueryResult updateUnitEmploymentPositionWTA(Long unitId, Long unitEmploymentPositionId, Long wtaId, WTADTO updateDTO) {
