@@ -414,71 +414,41 @@ public class UnitEmploymentPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    /*public boolean addEmploymentToUnitByExternalId(List<TimeCareEmploymentDTO> timeCareStaffDTOs, String unitExternalId ){
-        Organization organization = organizationGraphRepository.findByExternalId(unitExternalId);
-        for (:
-             ) {
+    public UnitEmploymentPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO,  Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId){
+        UnitEmploymentPositionDTO unitEmploymentPositionDTO = new UnitEmploymentPositionDTO(positionCodeId, expertiseId, 0l, 0l, 0, employmentTypeId, staffId);
+        return unitEmploymentPositionDTO;
+    }
 
+    public boolean addEmploymentToUnitByExternalId(List<TimeCareEmploymentDTO> timeCareEmploymentDTOs, String unitExternalId ){
+        Organization organization = organizationGraphRepository.findByExternalId(unitExternalId);if (organization == null) {
+            throw new InternalError("Invalid external id");
         }
-        Staff staff = staffGraphRepository.findByExternalId()
-        return true;
-    }*/
+        Long countryId = organizationService.getCountryIdOfOrganization(organization.getId());
+        EmploymentType employmentType = employmentTypeGraphRepository.getOneEmploymentTypeByCountryId(countryId, false);
 
-    /*public boolean importAllEmploymentsFromTimeCare(List<TimeCareEmploymentDTO> timeCareEmploymentsDTOs) {
+        Expertise expertise = expertiseGraphRepository.getOneDefaultExpertiseByCountry(countryId);
+        PositionCode positionCode = positionCodeGraphRepository.getOneDefaultPositionCodeByUnitId(organization.getId());
+        for ( TimeCareEmploymentDTO timeCareEmploymentDTO : timeCareEmploymentDTOs) {
+            Staff staff = staffGraphRepository.findByExternalId(timeCareEmploymentDTO.getPersonID());
+            UnitEmploymentPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId());
+            createUnitEmploymentPosition(organization.getId(), "Organization", unitEmploymentPosition);
+        }
+        return true;
+    }
+
+    public boolean importAllEmploymentsFromTimeCare(List<TimeCareEmploymentDTO> timeCareEmploymentsDTOs) {
 
         // To prepare list of
         Set<String> listOfWorkPlaceIds = new HashSet<>();
         for (TimeCareEmploymentDTO timeCareStaffDTO : timeCareEmploymentsDTOs) {
             listOfWorkPlaceIds.add(timeCareStaffDTO.getWorkPlaceID());
         }
-
         for ( String workPlaceId : listOfWorkPlaceIds) {
-
             List<TimeCareEmploymentDTO> timeCareEmploymentsByWorkPlace = timeCareEmploymentsDTOs.stream().filter(timeCareEmploymentDTO -> timeCareEmploymentDTO.getWorkPlaceID().equals(workPlaceId)).
                     collect(Collectors.toList());
             addEmploymentToUnitByExternalId(timeCareEmploymentsByWorkPlace, workPlaceId);
         }
 
-        Organization organization = organizationGraphRepository.findByExternalId(externalId);
-        if (organization == null) {
-            throw new InternalError("Invalid external id");
-        }
-
-        List<TimeCareStaffDTO> timeCareStaffByWorkPlace = timeCareStaffDTOS.stream().filter(timeCareStaffDTO -> timeCareStaffDTO.getParentWorkPlaceId().equals(externalId)).
-                collect(Collectors.toList());
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        AccessGroup accessGroup = accessGroupRepository.findTaskGiverAccessGroup(organization.getId());
-        if (accessGroup == null) {
-            throw new InternalError("Task giver access group is not present");
-        }
-
-        for (TimeCareStaffDTO timeCareStaffDTO : timeCareStaffByWorkPlace) {
-
-            String email = (timeCareStaffDTO.getEmail() == null) ? timeCareStaffDTO.getFirstName() + KAIROS_EMAIL : timeCareStaffDTO.getEmail();
-            User user = Optional.ofNullable(userGraphRepository.findByEmail(email.trim())).orElse(new User());
-            if (staffGraphRepository.staffAlreadyInUnit(Long.valueOf(timeCareStaffDTO.getId()), organization.getId())) {
-                throw new DuplicateDataException("Staff already exist in organization");
-            }
-
-            if (timeCareStaffDTO.getGender().equalsIgnoreCase("m")) {
-                timeCareStaffDTO.setGender(Gender.MALE.toString());
-            } else if (timeCareStaffDTO.getGender().equalsIgnoreCase("f")) {
-                timeCareStaffDTO.setGender(Gender.FEMALE.toString());
-            } else {
-                timeCareStaffDTO.setGender(null);
-            }
-            StaffCreationPOJOData payload = objectMapper.convertValue(timeCareStaffDTO, StaffCreationPOJOData.class);
-            payload.setAccessGroupId(accessGroup.getId());
-            payload.setPrivateEmail(email);
-            setBasicDetailsOfUser(user, payload);
-            Staff staff = mapDataInStaffObject(timeCareStaffDTO, organization, email);
-            boolean isEmploymentExist = (staff.getId()) != null;
-            staff.setUser(user);
-            staffGraphRepository.save(staff);
-            createEmployment(organization, organization, staff, payload.getAccessGroupId(), isEmploymentExist);
-        }
         return true;
-    }*/
+    }
 }

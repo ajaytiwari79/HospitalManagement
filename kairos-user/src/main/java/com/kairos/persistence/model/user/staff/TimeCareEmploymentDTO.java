@@ -25,7 +25,7 @@ public class TimeCareEmploymentDTO{
     @JacksonXmlProperty
     private String WorkPlaceID;
     @JacksonXmlProperty
-    private String PersonID;
+    private Long PersonID;
     @JacksonXmlProperty
     private String DutyCalcTypeID;
     @JacksonXmlProperty
@@ -93,11 +93,11 @@ public class TimeCareEmploymentDTO{
         WorkPlaceID = workPlaceID;
     }
 
-    public String getPersonID() {
+    public Long getPersonID() {
         return PersonID;
     }
 
-    public void setPersonID(String personID) {
+    public void setPersonID(Long personID) {
         PersonID = personID;
     }
 

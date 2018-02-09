@@ -79,6 +79,25 @@ public class UnitEmploymentPositionDTO {
         this.staffId = staffId;
     }
 
+    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId) {
+        this.positionCodeId = positionCodeId;
+        this.expertiseId = expertiseId;
+        this.employmentTypeId = employmentTypeId;
+        this.staffId = staffId;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = 60;
+        this.hourlyWages = 10;
+        this.salary = 500;
+        /*
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+
+        this.workingDaysInWeek = workingDaysInWeek;
+        */
+
+    }
+
     public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
         this.totalWeeklyMinutes = totalWeeklyMinutes;
     }
