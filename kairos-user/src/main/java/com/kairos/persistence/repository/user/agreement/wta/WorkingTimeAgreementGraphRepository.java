@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.agreement.wta;
 
 import com.kairos.persistence.model.user.agreement.wta.*;
+import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.expertise.ExpertiseIdListDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -56,10 +57,10 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orgSubType:OrganizationType) \n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTempCatg:RuleTemplateCategory)\n" +
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "optional MATCH (wta)-[r:" + HAS_TAG + "]->(t:Tag)<-[:" + COUNTRY_HAS_TAG + "]-(c) WHERE t.masterDataType='WTA' AND t.countryTag=true AND t.deleted =false "+
+            "optional MATCH (wta)-[r:" + HAS_TAG + "]->(t:Tag)<-[:" + COUNTRY_HAS_TAG + "]-(c) WHERE t.masterDataType='WTA' AND t.countryTag=true AND t.deleted =false " +
             "with wta,expertise,orgType,orgSubType,ruleTemp,ruleTempCatg,t, \n" +
             "CASE WHEN tempValue IS NOT NULL THEN collect({id:id(tempValue),phaseName:tempValue.phaseName,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
-            "managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency}) else [] END as phaseTempValues "+
+            "managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency}) else [] END as phaseTempValues " +
             "return wta.isEnabled as isEnabled, " +
             "CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})   END as tags, \n" +
             "wta.startDateMillis as startDateMillis,CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit," +
@@ -86,7 +87,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue) \n" +
             "with wta,o,expertise,ruleTemp,ruleTemplateCatg, \n" +
             "CASE WHEN tempValue IS NOT NULL THEN collect({phaseName:tempValue.phaseName,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
-            "managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency}) else [] END as phaseTempValues "+
+            "managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency}) else [] END as phaseTempValues " +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,isDisabled:ruleTemp.isDisabled,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
             "shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional," +
@@ -223,5 +224,27 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "expertise as expertise,wta.creationDate as creationDate, wta.endDate as endDate,wta.name as name,id(wta) as id"
     )
     WTAResponseDTO findWtaByUnitEmploymentPosition(Long unitEmploymentPositionId);
+
+    @Query("match (n:UnitEmploymentPosition)-[:" + HAS_WTA + "]-(wta:WorkingTimeAgreement{deleted:false}) where id(n)={0}\n" +
+            "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)\n" +
+            "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
+            "with wta,ruleTemp, \n" +
+            "CASE WHEN tempValue IS NOT NULL THEN collect({id:id(tempValue),phaseName:tempValue.phaseName,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
+            "managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency}) else [] END as phaseTempValues " +
+            "return  " +
+            "wta.startDateMillis as startDateMillis,CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit," +
+            "fromDayOfWeek:ruleTemp.fromDayOfWeek,minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts," +
+            "fromTime:ruleTemp.fromTime,phaseTemplateValues:phaseTempValues,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts,shiftsLimit:ruleTemp.shiftsLimit, " +
+            "shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest,continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional," +
+            "toTime:ruleTemp.toTime,toDayOfWeek:ruleTemp.toDayOfWeek,continuousDayRestHours:ruleTemp.continuousDayRestHours,name:ruleTemp.name,id:Id(ruleTemp)," +
+            "minimumRest:ruleTemp.minimumRest,timeLimit:ruleTemp.timeLimit,balanceType:ruleTemp.balanceType,templateType:ruleTemp.templateType,nightsWorked:ruleTemp.nightsWorked," +
+            "description:ruleTemp.description, numberShiftsPerPeriod:ruleTemp.numberShiftsPerPeriod,numberOfWeeks:ruleTemp.numberOfWeeks,maximumVetoPercentage:ruleTemp.maximumVetoPercentage," +
+            "maximumAvgTime:ruleTemp.maximumAvgTime,useShiftTimes:ruleTemp.useShiftTimes,balanceAdjustment:ruleTemp.balanceAdjustment,intervalLength:ruleTemp.intervalLength," +
+            "intervalUnit:ruleTemp.intervalUnit,validationStartDateMillis:ruleTemp.validationStartDateMillis,daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked," +
+            "description:ruleTemp.description,recommendedValue:ruleTemp.recommendedValue," +
+            "checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates," +
+            "wta.endDateMillis as endDateMillis,wta.expiryDate as expiryDate," +
+            "wta.description as description, wta.name as name,id(wta) as id")
+    WTAResponseDTO findRuleTemplateByWTAId(Long wtaId);
 
 }

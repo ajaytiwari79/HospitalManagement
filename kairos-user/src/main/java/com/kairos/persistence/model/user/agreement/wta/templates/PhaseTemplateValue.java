@@ -11,6 +11,7 @@ import java.math.BigInteger;
  */
 
 @NodeEntity
+@QueryResult
 public class PhaseTemplateValue extends UserBaseEntity {
     private int phaseId;
     private String phaseName;

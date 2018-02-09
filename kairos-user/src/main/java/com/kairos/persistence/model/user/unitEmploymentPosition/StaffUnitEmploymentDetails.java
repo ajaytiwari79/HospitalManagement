@@ -36,7 +36,7 @@ public class StaffUnitEmploymentDetails {
     private float salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
-    private Map<String,Object> workingTimeAgreement;
+    private WTAResponseDTO workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
 
     public StaffUnitEmploymentDetails() {
@@ -154,11 +154,11 @@ public class StaffUnitEmploymentDetails {
         this.positionCode = positionCode;
     }
 
-    public Map<String,Object>  getWorkingTimeAgreement() {
+    public WTAResponseDTO getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 
-    public void setWorkingTimeAgreement(Map<String,Object>  workingTimeAgreement) {
+    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 
@@ -169,4 +169,6 @@ public class StaffUnitEmploymentDetails {
     public void setCostTimeAgreement(CostTimeAgreement costTimeAgreement) {
         this.costTimeAgreement = costTimeAgreement;
     }
+
+
 }
