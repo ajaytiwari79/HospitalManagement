@@ -15,11 +15,13 @@ public class TimeCareEmploymentDTO{
     @JacksonXmlProperty
     private Date UpdateDate;
     @JacksonXmlProperty
-    private Date StartDate;
+    private String StartDate;
+    @JacksonXmlProperty
+    private String EndDate;
     @JacksonXmlProperty
     private String UpdateTypeFlag;
     @JacksonXmlProperty
-    private BigDecimal WeeklyHours;
+    private String WeeklyHours;
     @JacksonXmlProperty
     private BigDecimal FullTimeHours;
     @JacksonXmlProperty
@@ -53,12 +55,20 @@ public class TimeCareEmploymentDTO{
         UpdateDate = updateDate;
     }
 
-    public Date getStartDate() {
+    public String getStartDate() {
         return StartDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(String startDate) {
         StartDate = startDate;
+    }
+
+    public String getEndDate() {
+        return EndDate;
+    }
+
+    public void setEndDate(String endDate) {
+        EndDate = endDate;
     }
 
     public String getUpdateTypeFlag() {
@@ -69,11 +79,11 @@ public class TimeCareEmploymentDTO{
         UpdateTypeFlag = updateTypeFlag;
     }
 
-    public BigDecimal getWeeklyHours() {
+    public String getWeeklyHours() {
         return WeeklyHours;
     }
 
-    public void setWeeklyHours(BigDecimal weeklyHours) {
+    public void setWeeklyHours(String weeklyHours) {
         WeeklyHours = weeklyHours;
     }
 

@@ -41,6 +41,7 @@ import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.positionCode.PositionCodeService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.util.DateConverter;
 import org.apache.commons.collections.list.SetUniqueList;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -415,7 +416,12 @@ public class UnitEmploymentPositionService extends UserBaseService {
     }
 
     public UnitEmploymentPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO,  Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId){
-        UnitEmploymentPositionDTO unitEmploymentPositionDTO = new UnitEmploymentPositionDTO(positionCodeId, expertiseId, 0l, 0l, 0, employmentTypeId, staffId);
+        Long startDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getStartDate());
+        Long endDateMillis = null;
+        if(!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")){
+            endDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getEndDate());
+        }
+        UnitEmploymentPositionDTO unitEmploymentPositionDTO = new UnitEmploymentPositionDTO(positionCodeId, expertiseId, startDateMillis, endDateMillis, Integer.parseInt(timeCareEmploymentDTO.getWeeklyHours()), employmentTypeId, staffId);
         return unitEmploymentPositionDTO;
     }
 
