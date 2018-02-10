@@ -3,7 +3,9 @@ package com.kairos.persistence.model.user.staff;
 import com.kairos.persistence.model.user.unitEmploymentPosition.StaffUnitEmploymentDetails;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +22,8 @@ public class StaffAdditionalInfoQueryResult {
     private String profilePic;
     private Long unitId;
     private StaffUnitEmploymentDetails unitEmploymentPosition;
+    private long organizationNightStartTimeFrom;
+    private long organizationNightEndTimeTo;
 
     public StaffAdditionalInfoQueryResult() {
     }
@@ -80,5 +84,21 @@ public class StaffAdditionalInfoQueryResult {
 
     public void setUnitEmploymentPosition(StaffUnitEmploymentDetails unitEmploymentPosition) {
         this.unitEmploymentPosition = unitEmploymentPosition;
+    }
+
+    public long getOrganizationNightStartTimeFrom() {
+        return organizationNightStartTimeFrom;
+    }
+
+    public void setOrganizationNightStartTimeFrom(long organizationNightStartTimeFrom) {
+        this.organizationNightStartTimeFrom = organizationNightStartTimeFrom;
+    }
+
+    public long getOrganizationNightEndTimeTo() {
+        return organizationNightEndTimeTo;
+    }
+
+    public void setOrganizationNightEndTimeTo(long organizationNightEndTimeTo) {
+        this.organizationNightEndTimeTo = organizationNightEndTimeTo;
     }
 }
