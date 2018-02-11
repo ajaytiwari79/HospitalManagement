@@ -11,6 +11,8 @@ import java.util.List;
  * Created by oodles on 3/2/17.
  */
 public class StaffDTO {
+
+    private Long id;
     @NotEmpty(message = "error.StaffDTO.firstName.notEmpty") @NotNull(message = "error.StaffDTO.firstName.notnull")
     private String firstName;
     @NotEmpty(message = "error.StaffDTO.lastName.notEmpty") @NotNull(message = "error.StaffDTO.lastName.notnull")
@@ -30,6 +32,15 @@ public class StaffDTO {
 
     @NotNull(message = "error.StaffDTO.teamId.notnull")
     private Long teamId;
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     private List<Long> skills;
 

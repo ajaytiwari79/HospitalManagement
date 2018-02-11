@@ -1,6 +1,7 @@
 package com.kairos.client.dto.timeBank;
 
-import com.kairos.activity.util.TimeInterval;
+
+import com.kairos.util.TimeInterval;
 
 public class CTAIntervalDTO {
 
