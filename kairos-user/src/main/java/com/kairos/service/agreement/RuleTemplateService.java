@@ -67,9 +67,16 @@ public class RuleTemplateService extends UserBaseService {
         }
 
 
-        RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.WTA);
-        ruleTemplateCategoryService.createRuleTemplateCategory(countryId, ruleTemplateCategory);
-        ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
+        RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
+        if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
+            ruleTemplateCategory = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.WTA);
+            ruleTemplateCategory.setCountry(country);
+            save(ruleTemplateCategory);
+        }
+        if (!country.getWTABaseRuleTemplate().isEmpty()){
+            throw new DataNotFoundByIdException("WTA Rule Template already exists");
+        }
+
         String MONTHS = "MONTHS";
         String TUESDAY = "TUESDAY";
         long timeInMins = 10;

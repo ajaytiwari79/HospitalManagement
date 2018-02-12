@@ -74,7 +74,6 @@ public class RuleTemplateCategoryService extends UserBaseService {
         save(country);
         return ruleTemplateCategory;
 
-
     }
 
     public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
@@ -236,6 +235,11 @@ public class RuleTemplateCategoryService extends UserBaseService {
         ruleTemplateWrapper.setTemplateList(templateList);
 
         return ruleTemplateWrapper;
+
+    }
+    // creating default rule template category NONE
+    public void createDefaultRuleTemplateCategory( RuleTemplateCategory ruleTemplateCategory) {
+        save(ruleTemplateCategory);
 
     }
 
