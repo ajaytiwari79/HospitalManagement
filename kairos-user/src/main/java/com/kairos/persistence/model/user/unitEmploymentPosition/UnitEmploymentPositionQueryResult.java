@@ -190,6 +190,20 @@ public class UnitEmploymentPositionQueryResult {
         this.costTimeAgreement = costTimeAgreement;
     }
 
+    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode) {
+        this.expertise = expertise;
+        this.startDateMillis = startDateMillis;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.hourlyWages = hourlyWages;
+        this.id = id;
+        this.employmentType = employmentType;
+        this.salary = salary;
+        this.positionCode = positionCode;
+    }
+
     public UnitEmploymentPositionQueryResult(Expertise expertise, boolean deleted, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, Long lastModificationDate, int totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, int totalWeeklyMinutes, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
         this.expertise = expertise;
         this.deleted = deleted;

@@ -1,5 +1,7 @@
 package com.kairos.persistence.repository.user.unitEmploymentPosition;
 
+import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
+import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.unitEmploymentPosition.StaffUnitEmploymentDetails;
 import org.springframework.data.neo4j.annotation.Query;
 
@@ -94,5 +96,17 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "match(uep)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={0}\n" +
             "return uep")
     List<UnitEmploymentPosition> getAllUEPByExpertiseExcludingCurrent(Long expertiseId, Long unitEmploymentId,Long currentUnitEmploymentPositionId);
+
+    @Query("Match (org:Organization) where id(org)={0}\n" +
+            "Match (e:Expertise) where id(e)={1}\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
+            "return wta LIMIT 1")
+    WorkingTimeAgreement getOneDefaultWTA(Long organizationId, Long expertiseId);
+
+    @Query("Match (org:Organization) where id(org)={0}\n" +
+            "Match (e:Expertise) where id(e)={1}\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
+            "return cta LIMIT 1")
+    CostTimeAgreement getOneDefaultCTA(Long organizationId, Long expertiseId);
 
 }

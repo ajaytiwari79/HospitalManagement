@@ -66,4 +66,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("match (e:Expertise{isEnabled:true})-[:"+BELONGS_TO+"]->(country:Country) where id(country) = {0} return e LIMIT 1")
     Expertise getExpertiesByCountry(Long id);
 
+   @Query("match (e:Expertise{isEnabled:true})-[:"+BELONGS_TO+"]->(country:Country) where id(country) = {0} AND id(e) = {1} return e")
+   Expertise getExpertiesOfCountry(Long countryId, Long expertiseId);
 }

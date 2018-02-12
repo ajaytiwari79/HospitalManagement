@@ -44,9 +44,10 @@ public class TimeCareController {
     }
 
     @RequestMapping(value = "/staff/employments",method = RequestMethod.POST)
-    public ResponseEntity<Map<String,Object>> importEmploymentsFromTimeCare(@RequestBody List<TimeCareEmploymentDTO> timeCareEmploymentDTOS){
+    public ResponseEntity<Map<String,Object>> importEmploymentsFromTimeCare(@RequestBody List<TimeCareEmploymentDTO> timeCareEmploymentDTOS,
+                                                                            @RequestParam(value = "expertiseId",required = false) Long expertiseId){
 
-        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,unitEmploymentPositionService.importAllEmploymentsFromTimeCare(timeCareEmploymentDTOS));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,unitEmploymentPositionService.importAllEmploymentsFromTimeCare(timeCareEmploymentDTOS, expertiseId));
     }
 
 }
