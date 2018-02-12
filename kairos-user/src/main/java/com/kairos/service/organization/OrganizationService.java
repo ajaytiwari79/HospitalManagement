@@ -736,7 +736,7 @@ public class OrganizationService extends UserBaseService {
     public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, Long timeCareStaffId) {
         OrganizationStaffWrapper organizationStaffWrapper = new OrganizationStaffWrapper();
         organizationStaffWrapper.setOrganization(organizationGraphRepository.findByExternalId(externalId));
-        organizationStaffWrapper.setStaff(staffGraphRepository.findStaffByExternalId(timeCareStaffId, organizationStaffWrapper.getOrganization().getId()));
+        organizationStaffWrapper.setStaff(staffGraphRepository.findByExternalId(timeCareStaffId));
         return organizationStaffWrapper;
     }
 
