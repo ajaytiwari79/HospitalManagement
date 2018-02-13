@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.client.PhaseRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.organization.*;
@@ -202,7 +203,7 @@ public class OrganizationService extends UserBaseService {
 
     /**
      * Calls OrganizationGraphRepository ,creates a new Organization
-     * and return newly created User.
+     * and return newly created Organization.
      *
      * @param organization
      * @return Organization
@@ -261,7 +262,7 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        phaseRestClient.createDefaultPhases(organization.getId());
+//        phaseRestClient.createDefaultPhases(organization.getId());
 
 
         HashMap<String, Object> orgResponse = new HashMap<>();
@@ -339,6 +340,10 @@ public class OrganizationService extends UserBaseService {
 
     private Organization saveOrganizationDetails(Organization organization, ParentOrganizationDTO orgDetails, boolean isUpdateOperation, long countryId) {
         organization.setName(orgDetails.getName());
+        if (!Optional.ofNullable(orgDetails.getUnion()).isPresent()) {
+            throw new ActionNotPermittedException("Please specify this is union or organization");
+        }
+        organization.setUnion(orgDetails.getUnion());
         List<OrganizationType> organizationTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getTypeId());
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getSubTypeId());
 
