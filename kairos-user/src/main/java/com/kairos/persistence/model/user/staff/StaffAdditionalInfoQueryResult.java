@@ -22,8 +22,8 @@ public class StaffAdditionalInfoQueryResult {
     private String profilePic;
     private Long unitId;
     private StaffUnitEmploymentDetails unitEmploymentPosition;
-    private long organizationNightStartTimeFrom;
-    private long organizationNightEndTimeTo;
+    private Date organizationNightStartTimeFrom;
+    private Date organizationNightEndTimeTo;
 
     public StaffAdditionalInfoQueryResult() {
     }
@@ -86,19 +86,19 @@ public class StaffAdditionalInfoQueryResult {
         this.unitEmploymentPosition = unitEmploymentPosition;
     }
 
-    public long getOrganizationNightStartTimeFrom() {
+    public Date getOrganizationNightStartTimeFrom() {
         return organizationNightStartTimeFrom;
     }
 
-    public void setOrganizationNightStartTimeFrom(long organizationNightStartTimeFrom) {
+    public void setOrganizationNightStartTimeFrom(Date organizationNightStartTimeFrom) {
         this.organizationNightStartTimeFrom = organizationNightStartTimeFrom;
     }
 
-    public long getOrganizationNightEndTimeTo() {
+    public Date getOrganizationNightEndTimeTo() {
         return organizationNightEndTimeTo;
     }
 
-    public void setOrganizationNightEndTimeTo(long organizationNightEndTimeTo) {
+    public void setOrganizationNightEndTimeTo(Date organizationNightEndTimeTo) {
         this.organizationNightEndTimeTo = organizationNightEndTimeTo;
     }
 }

@@ -1305,8 +1305,8 @@ public class StaffService extends UserBaseService {
         staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
         StaffUnitEmploymentDetails unitEmploymentPosition = unitEmploymentPositionGraphRepository.getUnitEmploymentPositionById(unitEmploymentId);
         staffAdditionalInfoQueryResult.setUnitId(organization.getId());
-        staffAdditionalInfoQueryResult.setOrganizationNightEndTimeTo(new DateTime(organization.getNightEndTimeTo()).getMinuteOfDay());
-        staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(new DateTime(organization.getNightStartTimeFrom()).getMinuteOfDay());
+        staffAdditionalInfoQueryResult.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
+        staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
         if (Optional.ofNullable(unitEmploymentPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitEmploymentPosition(unitEmploymentPosition);
 
