@@ -462,9 +462,9 @@ public class UnitEmploymentPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("NO Position code exist in organization : "+parentOrganization.getId());
         }
         for ( TimeCareEmploymentDTO timeCareEmploymentDTO : timeCareEmploymentDTOs) {
-            Staff staff = staffGraphRepository.findByExternalId(timeCareEmploymentDTO.getPersonID());
+            Staff staff = staffGraphRepository.findStaffByExternalId(timeCareEmploymentDTO.getPersonID(), organization.getId());
             if(staff == null){
-                throw new DataNotFoundByIdException("NO staff exist with External Id" + timeCareEmploymentDTO.getPersonID());
+                throw new DataNotFoundByIdException("NO staff exist with External Id : " + timeCareEmploymentDTO.getPersonID());
             }
             UnitEmploymentPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId(), wta.getId(), cta.getId());
             createUnitEmploymentPosition(organization.getId(), "Organization", unitEmploymentPosition, true);
