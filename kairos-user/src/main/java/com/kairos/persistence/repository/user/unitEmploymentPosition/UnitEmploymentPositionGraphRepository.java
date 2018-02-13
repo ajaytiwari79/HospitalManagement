@@ -104,4 +104,16 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "return uep")
     List<UnitEmploymentPosition> getAllUEPByExpertiseExcludingCurrent(Long expertiseId, Long unitEmploymentId,Long currentUnitEmploymentPositionId);
 
+    @Query("Match (org:Organization) where id(org)={0}\n" +
+            "Match (e:Expertise) where id(e)={1}\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
+            "return wta LIMIT 1")
+    WorkingTimeAgreement getOneDefaultWTA(Long organizationId, Long expertiseId);
+
+    @Query("Match (org:Organization) where id(org)={0}\n" +
+            "Match (e:Expertise) where id(e)={1}\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
+            "return cta LIMIT 1")
+    CostTimeAgreement getOneDefaultCTA(Long organizationId, Long expertiseId);
+
 }
