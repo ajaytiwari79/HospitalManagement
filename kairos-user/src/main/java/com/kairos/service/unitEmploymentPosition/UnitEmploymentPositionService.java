@@ -152,8 +152,8 @@ public class UnitEmploymentPositionService extends UserBaseService {
                         throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)");
 
                 } else {
-                    logger.info("new UEP EndDate {}", new DateTime(newUEPEndDateMillis) + " unitEmployment End date " + (new DateTime(unitEmploymentPosition.getEndDateMillis())));
-                    if (new DateTime(newUEPEndDateMillis).isBefore(new DateTime(unitEmploymentPosition.getEndDateMillis()))) {
+                    logger.info("new UEP EndDate {}", new DateTime(newUEPStartDateMillis) + " unitEmployment End date " + (new DateTime(unitEmploymentPosition.getEndDateMillis())));
+                    if (new DateTime(newUEPStartDateMillis).isBefore(new DateTime(unitEmploymentPosition.getEndDateMillis()))) {
                         throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)." + new DateTime(newUEPEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getEndDateMillis()).toDate());
                     }
                 }
