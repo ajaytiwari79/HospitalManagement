@@ -43,4 +43,17 @@ public class DateConverter {
            return null;
        }
     }
+
+    public static Long convertInUTCTimestamp(String utc){
+        try {
+
+            SimpleDateFormat dateFormatGmt = new SimpleDateFormat(ISO_FORMAT);
+            dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+            SimpleDateFormat dateFormatLocal = new SimpleDateFormat(ISO_FORMAT);
+            return dateFormatLocal.parse( dateFormatGmt.format(dateFormatGmt.parse(utc)) ).getTime();
+
+        }catch (Exception ex){
+            return null;
+        }
+    }
 }

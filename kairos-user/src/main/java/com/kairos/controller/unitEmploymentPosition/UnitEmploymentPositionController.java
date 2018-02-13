@@ -32,7 +32,7 @@ public class UnitEmploymentPositionController {
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unitEmploymentPosition")
     public ResponseEntity<Map<String, Object>> createUnitEmploymentPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitEmploymentPositionDTO position) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.createUnitEmploymentPosition(unitId, type, position));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.createUnitEmploymentPosition(unitId, type, position, false));
     }
 
     /*
