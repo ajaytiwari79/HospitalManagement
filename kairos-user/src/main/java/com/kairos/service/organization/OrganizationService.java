@@ -16,6 +16,7 @@ import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemp
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
@@ -45,6 +46,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
+import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
@@ -175,6 +177,8 @@ public class OrganizationService extends UserBaseService {
 
     @Inject
     private WTAService wtaService;
+    @Inject
+    private EmploymentTypeGraphRepository employmentTypeGraphRepository;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -1002,7 +1006,7 @@ public class OrganizationService extends UserBaseService {
     public Boolean verifyOrganizationExpertise(OrganizationMappingActivityTypeDTO organizationMappingActivityTypeDTO) {
         Long matchedExpertise = expertiseGraphRepository.findAllExpertiseCountMatchedByIds(organizationMappingActivityTypeDTO.getExpertises());
         if (matchedExpertise != organizationMappingActivityTypeDTO.getExpertises().size()) {
-            throw new DataNotMatchedException("Mismatched Expertises while updating organizationMapping ");
+            throw new DataNotMatchedException("Mismatched Expertise while updating organizationMapping ");
         }
         Long matchedRegion = regionGraphRepository.findAllRegionCountMatchedByIds(organizationMappingActivityTypeDTO.getRegions());
         if (matchedRegion != organizationMappingActivityTypeDTO.getRegions().size()) {
@@ -1227,6 +1231,14 @@ public class OrganizationService extends UserBaseService {
         return parent;
     }
 
+    public OrganizationMappingDTO getEmploymentTypeWithExpertise(Long unitId) {
+        OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
+        // Set employment type
+        organizationMappingDTO.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
+        // set Expertise
+        organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByOrganizationId(unitId));
+        return organizationMappingDTO;
+    }
 }
 
 

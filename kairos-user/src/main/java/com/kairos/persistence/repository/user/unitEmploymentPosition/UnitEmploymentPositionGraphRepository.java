@@ -29,19 +29,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "match (unitEmpPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             "match (unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
             "optional match (unitEmpPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
-            "optional match (unitEmpPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement)-[:HAS_RULE_TEMPLATE]-(ruleTemp:WTABaseRuleTemplate)\n" +
-            "with cta,et,e,unitEmpPosition,wta,CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,fromDayOfWeek:ruleTemp.fromDayOfWeek, \n" +
-            "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode, \n" +
-            "onlyCompositeShifts:ruleTemp.onlyCompositeShifts,shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest, \n" +
-            "continuousWeekRest:ruleTemp.continuousWeekRest,proportional:ruleTemp.proportional,toTime:ruleTemp.toTime,toDayOfWeek:ruleTemp.toDayOfWeek, \n" +
-            "continuousDayRestHours:ruleTemp.continuousDayRestHours,name:ruleTemp.name,id:Id(ruleTemp),minimumRest:ruleTemp.minimumRest,timeLimit:ruleTemp.timeLimit,balanceType:ruleTemp.balanceType, \n" +
-            "templateType:ruleTemp.templateType,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description, numberShiftsPerPeriod:ruleTemp.numberShiftsPerPeriod, \n" +
-            "numberOfWeeks:ruleTemp.numberOfWeeks,maximumVetoPercentage:ruleTemp.maximumVetoPercentage,maximumAvgTime:ruleTemp.maximumAvgTime,useShiftTimes:ruleTemp.useShiftTimes, \n" +
-            "balanceAdjustment:ruleTemp.balanceAdjustment,intervalLength:ruleTemp.intervalLength,intervalUnit:ruleTemp.intervalUnit,\n" +
-            "validationStartDateMillis:ruleTemp.validationStartDateMillis,daysWorked:ruleTemp.daysWorked,nightsWorked:ruleTemp.nightsWorked,description:ruleTemp.description, \n" +
-            "checkAgainstTimeRules:ruleTemp.checkAgainstTimeRules}) else [] END as ruleTemplates\n" +
-            "with cta,et,e,unitEmpPosition,collect({name:wta.name,id:id(wta),endDateMillis:wta.endDateMillis ,startDateMillis:wta.startDateMillis ,ruleTemplates:ruleTemplates}) as wtas \n" +
-            "return e as expertise,wtas as workingTimeAgreement,cta as costTimeAgreement," +
+            "return e as expertise,cta as costTimeAgreement," +
             "unitEmpPosition.totalWeeklyHours as totalWeeklyHours," +
             "unitEmpPosition.startDateMillis as startDateMillis," +
             "unitEmpPosition.endDateMillis as endDateMillis," +
@@ -53,7 +41,9 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "unitEmpPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
             "unitEmpPosition.lastModificationDate as lastModificationDate")
     StaffUnitEmploymentDetails getUnitEmploymentPositionById(long unitEmploymentId);
-
+/* Error while binding to WTA
+* java.lang.IllegalArgumentException: Can not set com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO field com.kairos.persistence.model.user.position.StaffUnitEmploymentDetails.workingTimeAgreement to java.util.Collections$UnmodifiableMap
+* */
     @Query("match (uEmp:UnitEmployment)  where  Id(uEmp)={0} \n" +
             "match(uEmp)-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]->(unitEmpPosition:UnitEmploymentPosition{deleted:false})" +
             "match(unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
@@ -103,5 +93,17 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "match(uep)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={0}\n" +
             "return uep")
     List<UnitEmploymentPosition> getAllUEPByExpertiseExcludingCurrent(Long expertiseId, Long unitEmploymentId,Long currentUnitEmploymentPositionId);
+
+    @Query("Match (org:Organization) where id(org)={0}\n" +
+            "Match (e:Expertise) where id(e)={1}\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
+            "return wta LIMIT 1")
+    WorkingTimeAgreement getOneDefaultWTA(Long organizationId, Long expertiseId);
+
+    @Query("Match (org:Organization) where id(org)={0}\n" +
+            "Match (e:Expertise) where id(e)={1}\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
+            "return cta LIMIT 1")
+    CostTimeAgreement getOneDefaultCTA(Long organizationId, Long expertiseId);
 
 }

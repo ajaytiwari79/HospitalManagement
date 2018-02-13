@@ -17,10 +17,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 28/10/16.
  */
 @Repository
-public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,Long> {
+public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise, Long> {
 
-   @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) return expertise")
+    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) return expertise")
     List<Expertise> getAllExpertiseByCountry(long countryId);
+
+    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) return expertise LIMIT 1")
+    Expertise getOneDefaultExpertiseByCountry(long countryId);
 
     /*@Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) return expertise")*/
     @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) with expertise, country \n" +
@@ -32,23 +35,23 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH (expertise:Expertise{isEnabled:true}) return expertise")
     List<Expertise> findAll();
 
-    @Query("Match (expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"]->(skill:Skill) where id(expertise)={0} AND id(skill)={1} return count(r) as countOfRel")
+    @Query("Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill:Skill) where id(expertise)={0} AND id(skill)={1} return count(r) as countOfRel")
     int expertiseHasAlreadySkill(long expertiseId, long skillId);
 
-    @Query("Match (expertise:Expertise),(skill:Skill) where id (expertise)={0} AND id(skill)={1} create (expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{creationDate:{2},lastModificationDate:{3},isEnabled:true}]->(skill) return skill")
+    @Query("Match (expertise:Expertise),(skill:Skill) where id (expertise)={0} AND id(skill)={1} create (expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{creationDate:{2},lastModificationDate:{3},isEnabled:true}]->(skill) return skill")
     void addSkillInExpertise(long expertiseId, long skillId, long creationDate, long lastModificationDate);
 
-    @Query("Match (expertise:Expertise),(skill:Skill) where id (expertise)={0} AND id(skill) = {1} Match (expertise)-[r:"+EXPERTISE_HAS_SKILLS+"]->(skill) set r.lastModificationDate={2},r.isEnabled=true return skill")
+    @Query("Match (expertise:Expertise),(skill:Skill) where id (expertise)={0} AND id(skill) = {1} Match (expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill) set r.lastModificationDate={2},r.isEnabled=true return skill")
     void updateExpertiseSkill(long expertiseId, long skillId, long lastModificationDate);
 
-    @Query("Match (expertise:Expertise),(skill:Skill) where id(expertise)={0} AND id(skill) IN {1} match (expertise)-[r:"+EXPERTISE_HAS_SKILLS+"]->(skill) set r.isEnabled=false,r.lastModificationDate={2} return r")
+    @Query("Match (expertise:Expertise),(skill:Skill) where id(expertise)={0} AND id(skill) IN {1} match (expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill) set r.isEnabled=false,r.lastModificationDate={2} return r")
     void deleteExpertiseSkill(long expertiseId, List<Long> skillId, long lastModificationDate);
 
     @Query("Match (expertise:Expertise) where id(expertise)={0} with expertise\n" +
-            "Match (skillCategory:SkillCategory{isEnabled:true})-[:"+BELONGS_TO+"]->(country:Country) where id(country)={1} with skillCategory,expertise,country\n" +
-            "Match (skill:Skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory) with skill,skillCategory,expertise,country\n" +
-            "OPTIONAL MATCH (skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(country)  with skill,skillCategory,expertise, CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as tags\n" +
-            "optional Match (expertise)-[r:"+EXPERTISE_HAS_SKILLS+"]->(skill) with collect({id:id(skill),name:skill.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as skill,skillCategory\n" +
+            "Match (skillCategory:SkillCategory{isEnabled:true})-[:" + BELONGS_TO + "]->(country:Country) where id(country)={1} with skillCategory,expertise,country\n" +
+            "Match (skill:Skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory) with skill,skillCategory,expertise,country\n" +
+            "OPTIONAL MATCH (skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[" + COUNTRY_HAS_TAG + "]-(country)  with skill,skillCategory,expertise, CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as tags\n" +
+            "optional Match (expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill) with collect({id:id(skill),name:skill.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as skill,skillCategory\n" +
             "return collect({id:id(skillCategory),name:skillCategory.name,children:skill}) as skills")
     ExpertiseSkillQueryResult getExpertiseSkills(long expertiseId, long countryId);
 
@@ -60,7 +63,15 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "return id(e) as id,e.name as name,e.description as description")
     List<ExpertiseDTO> getAllFreeExpertises(List<Long> ids);
 
-    @Query("match (e:Expertise{isEnabled:true})-[:"+BELONGS_TO+"]->(country:Country) where id(country) = {0} return e LIMIT 1")
+    @Query("match (e:Expertise{isEnabled:true})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} return e LIMIT 1")
     Expertise getExpertiesByCountry(Long id);
+
+
+    @Query("MATCH (org:Organization) - [:" + BELONGS_TO + "] -> (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true})  where id(org)={0} return expertise")
+    List<Expertise> getAllExpertiseByOrganizationId(long unitId);
+
+
+    @Query("match (e:Expertise{isEnabled:true})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} AND id(e) = {1} return e")
+    Expertise getExpertiesOfCountry(Long countryId, Long expertiseId);
 
 }

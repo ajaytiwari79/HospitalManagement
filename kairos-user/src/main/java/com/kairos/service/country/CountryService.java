@@ -124,8 +124,10 @@ public class CountryService extends UserBaseService {
      * @return
      */
     public Country getCountryById(Long id) {
-        return (Country) super.findOne(id);
+//        return (Country) super.findOne(id);
+        return countryGraphRepository.findOne(id);
     }
+
 
 
     /**
