@@ -133,30 +133,38 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
     public boolean validateUnitEmploymentPositionWithExpertise(List<UnitEmploymentPosition> unitEmploymentPositions, UnitEmploymentPositionDTO unitEmploymentPositionDTO) {
 
-        Long currentStartDateMillis = unitEmploymentPositionDTO.getStartDateMillis();
-        Long currentEndDateMillis = (unitEmploymentPositionDTO.getEndDateMillis() != null) ? unitEmploymentPositionDTO.getEndDateMillis() : null;
+        Long newUEPStartDateMillis = unitEmploymentPositionDTO.getStartDateMillis();
+        Long newUEPEndDateMillis = (unitEmploymentPositionDTO.getEndDateMillis() != null) ? unitEmploymentPositionDTO.getEndDateMillis() : null;
         unitEmploymentPositions.forEach(unitEmploymentPosition -> {
             // if null date is set
             if (unitEmploymentPosition.getEndDateMillis() != null) {
-                if (currentEndDateMillis != null) {
+                logger.info("new UEP start {} " + new DateTime(newUEPStartDateMillis).toLocalDate() + " new UEP End date " + (new DateTime(newUEPEndDateMillis)).toLocalDate(),
+                        " current Employment  " + new DateTime(unitEmploymentPosition.getStartDateMillis()).toLocalDate() + " unitEmployment End date   " + (new DateTime(unitEmploymentPosition.getEndDateMillis())).toLocalDate());
+                if (new DateTime(newUEPStartDateMillis).isAfter(new DateTime(unitEmploymentPosition.getEndDateMillis()))) {
+                    throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)" + new DateTime(newUEPEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getStartDateMillis()).toDate());
+                }
+                if (newUEPEndDateMillis != null) {
                     Interval previousInterval = new Interval(unitEmploymentPosition.getStartDateMillis(), unitEmploymentPosition.getEndDateMillis());
-                    Interval interval = new Interval(currentStartDateMillis, currentEndDateMillis);
+                    Interval interval = new Interval(newUEPStartDateMillis, newUEPEndDateMillis);
+                    logger.info(" Interval of CURRENT UEP " + previousInterval + " Interval of going to create  " + interval);
                     if (previousInterval.overlaps(interval))
                         throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)");
 
                 } else {
-                    if (new DateTime(currentEndDateMillis).isBefore(new DateTime(unitEmploymentPosition.getEndDateMillis()))) {
-
-                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)." + new DateTime(currentEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getEndDateMillis()).toDate());
+                    logger.info("new UEP EndDate {}", new DateTime(newUEPEndDateMillis) + " unitEmployment End date " + (new DateTime(unitEmploymentPosition.getEndDateMillis())));
+                    if (new DateTime(newUEPEndDateMillis).isBefore(new DateTime(unitEmploymentPosition.getEndDateMillis()))) {
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)." + new DateTime(newUEPEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getEndDateMillis()).toDate());
                     }
                 }
             } else {
                 // unitEmploymentEnd date is null
-                if (currentEndDateMillis != null) {
-                    if (new DateTime(currentEndDateMillis).isAfter(new DateTime(unitEmploymentPosition.getStartDateMillis()))) {
-                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)" + new DateTime(currentEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getStartDateMillis()).toDate());
+                if (newUEPEndDateMillis != null) {
+                    logger.info("new UEP EndDate " + new DateTime(newUEPEndDateMillis) + " running  UEP Start date " + (new DateTime(unitEmploymentPosition.getStartDateMillis())));
+                    if (new DateTime(newUEPEndDateMillis).isAfter(new DateTime(unitEmploymentPosition.getStartDateMillis()))) {
+                        throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period(End date overlap with start Date)" + new DateTime(newUEPEndDateMillis).toDate() + " --> " + new DateTime(unitEmploymentPosition.getStartDateMillis()).toDate());
                     }
                 } else {
+                    logger.info("new UEP start date " + new DateTime(newUEPStartDateMillis) + " new UEP End date ", new DateTime(newUEPEndDateMillis));
                     throw new ActionNotPermittedException("Already a unit employment position is active with same expertise on this period.");
                 }
             }
@@ -180,7 +188,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         Long unitEmploymentId = unitEmploymentPositionGraphRepository.findEmploymentByUnitEmploymentPosition(unitEmploymentPositionId);
 
         List<UnitEmploymentPosition> oldUnitEmploymentPositions;
-        oldUnitEmploymentPositions = unitEmploymentPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitEmploymentPositionDTO.getExpertiseId(),unitEmploymentId, unitEmploymentPositionId);
+        oldUnitEmploymentPositions = unitEmploymentPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitEmploymentPositionDTO.getExpertiseId(), unitEmploymentId, unitEmploymentPositionId);
         validateUnitEmploymentPositionWithExpertise(oldUnitEmploymentPositions, unitEmploymentPositionDTO);
 
         preparePosition(oldUnitEmploymentPosition, unitEmploymentPositionDTO);

@@ -17,7 +17,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MaximumShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
-    private long timeLimit;
+    private long timeLimit;  // NO use
     private List<String> balanceType;//multiple check boxes
     private boolean checkAgainstTimeRules;
 
