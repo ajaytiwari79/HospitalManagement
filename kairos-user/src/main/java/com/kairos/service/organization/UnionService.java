@@ -4,6 +4,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationQueryResult;
 import com.kairos.persistence.model.organization.UnionQueryWrapper;
+import com.kairos.persistence.model.organization.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by vipul on 13/2/18.
@@ -52,15 +54,15 @@ public class UnionService {
         return unionQueryWrapper;
     }
 
-    public Organization getAllUnionByOrganization(Long unitId) {
+    public List<UnionResponseDTO> getAllUnionByOrganization(Long unitId) {
 
         Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
             throw new DataNotFoundByIdException("Can't find Organization with provided Id");
         }
-
-        //OrganizationQueryResult organizationQueryResult = organizationGraphRepository.getAllUnionOfCountry(countryId);
-        return organization
+        List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
+        List<UnionResponseDTO> organizationQueryResult = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
+        return organizationQueryResult;
 
     }
 

@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 /**
  * Created by vipul on 13/2/18.
@@ -40,8 +41,8 @@ public class UnionController {
                 unionService.getAllUnionOfCountry(countryId));
     }
 
-    @RequestMapping(value = "/parent_unions/{countryId}", method = RequestMethod.GET)
-    @ApiOperation("Get All Unions")
+    @RequestMapping(value = UNIT_URL + "/unions", method = RequestMethod.GET)
+    @ApiOperation("Get All Unions by organization ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllUnionByOrganization(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
