@@ -1,5 +1,7 @@
 package com.kairos.service.organization;
 
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationQueryResult;
 import com.kairos.persistence.model.organization.UnionQueryWrapper;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
@@ -48,6 +50,18 @@ public class UnionService {
         unionQueryWrapper.setUnions(orgData);
 
         return unionQueryWrapper;
+    }
+
+    public Organization getAllUnionByOrganization(Long unitId) {
+
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            throw new DataNotFoundByIdException("Can't find Organization with provided Id");
+        }
+
+        //OrganizationQueryResult organizationQueryResult = organizationGraphRepository.getAllUnionOfCountry(countryId);
+        return organization
+
     }
 
 

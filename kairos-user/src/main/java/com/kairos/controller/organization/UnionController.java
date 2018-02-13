@@ -32,11 +32,19 @@ public class UnionController {
     @Inject
     private UnionService unionService;
 
-    @RequestMapping(value = "/parent/{countryId}/unions", method = RequestMethod.GET)
+    @RequestMapping(value = "/parent_unions/{countryId}", method = RequestMethod.GET)
     @ApiOperation("Get All Unions")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getParentOrganization(@PathVariable long countryId) {
+    public ResponseEntity<Map<String, Object>> getAllUnionOfCountry(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 unionService.getAllUnionOfCountry(countryId));
+    }
+
+    @RequestMapping(value = "/parent_unions/{countryId}", method = RequestMethod.GET)
+    @ApiOperation("Get All Unions")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllUnionByOrganization(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                unionService.getAllUnionByOrganization(unitId));
     }
 }
