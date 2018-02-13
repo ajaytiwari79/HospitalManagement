@@ -6,6 +6,7 @@ import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -35,6 +36,16 @@ public class WTAResponseDTO {
 
     public WTAResponseDTO() {
         //default
+    }
+
+    public WTAResponseDTO(Long id, Long startDateMillis, Long endDateMillis, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description) {
+        this.id = id;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.name = name;
+        this.description = description;
+
+
     }
 
     public Long getStartDateMillis() {

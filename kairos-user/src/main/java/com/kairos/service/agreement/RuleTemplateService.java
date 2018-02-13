@@ -73,7 +73,7 @@ public class RuleTemplateService extends UserBaseService {
             ruleTemplateCategory.setCountry(country);
             save(ruleTemplateCategory);
         }
-        if (!country.getWTABaseRuleTemplate().isEmpty()){
+        if (Optional.ofNullable(country.getWTABaseRuleTemplate()).isPresent() && !country.getWTABaseRuleTemplate().isEmpty()) {
             throw new DataNotFoundByIdException("WTA Rule Template already exists");
         }
 
@@ -193,7 +193,7 @@ public class RuleTemplateService extends UserBaseService {
         return response;
     }
 
-    public RuleTemplateCategoryDTO updateRuleTemplate(long countryId,  RuleTemplateCategoryDTO templateDTO) {
+    public RuleTemplateCategoryDTO updateRuleTemplate(long countryId, RuleTemplateCategoryDTO templateDTO) {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {

@@ -20,6 +20,7 @@ import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.language.LanguageService;
 import com.kairos.service.organization.*;
@@ -107,7 +108,8 @@ public class OrganizationController {
     private PresenceTypeService presenceTypeService;
     @Inject
     private CountryService countryService;
-
+    @Inject
+    private EmploymentTypeService employmentTypeService;
 
     /**
      * @return List of Organization- All organization in db.
@@ -1275,6 +1277,17 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(null, unitId));
     }
 
+    /*
+        * By Vipul
+        * API to get expertise employment Type o for activity  MASTER DATA
+        */
+    @RequestMapping(value = UNIT_URL + "/activity-mapping-details", method = RequestMethod.GET)
+    @ApiOperation("get  expertise  employment Type  for organization")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getEmploymentTypeWithExpertise(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getEmploymentTypeWithExpertise(unitId));
+    }
 }
 
 
