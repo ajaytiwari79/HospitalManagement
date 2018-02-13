@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.position;
+package com.kairos.persistence.model.user.unitEmploymentPosition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -7,6 +7,7 @@ import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.position.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
@@ -187,6 +188,20 @@ public class UnitEmploymentPositionQueryResult {
         this.positionCode = positionCode;
         this.workingTimeAgreement = workingTimeAgreement;
         this.costTimeAgreement = costTimeAgreement;
+    }
+
+    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode) {
+        this.expertise = expertise;
+        this.startDateMillis = startDateMillis;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.hourlyWages = hourlyWages;
+        this.id = id;
+        this.employmentType = employmentType;
+        this.salary = salary;
+        this.positionCode = positionCode;
     }
 
     public UnitEmploymentPositionQueryResult(Expertise expertise, boolean deleted, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, Long lastModificationDate, int totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, int totalWeeklyMinutes, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {

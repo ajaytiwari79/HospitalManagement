@@ -9,11 +9,11 @@ import javax.validation.constraints.NotNull;
  */
 public class UnitEmploymentPositionDTO {
 
-    @NotNull(message = "Position code  is required for position")
-    @Range(min = 0, message = "Position code is required for position")
+    @NotNull(message = "Position code  is required for positionCode")
+    @Range(min = 0, message = "Position code is required for positionCode")
     private Long positionCodeId;
-    @NotNull(message = "expertise is required for position")
-    @Range(min = 0, message = "expertise is required for position")
+    @NotNull(message = "expertise is required for positionCode")
+    @Range(min = 0, message = "expertise is required for positionCode")
     private Long expertiseId;
 
     private Long startDateMillis;
@@ -77,6 +77,22 @@ public class UnitEmploymentPositionDTO {
         this.salary = salary;
         this.employmentTypeId = employmentTypeId;
         this.staffId = staffId;
+    }
+
+    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId) {
+        this.positionCodeId = positionCodeId;
+        this.expertiseId = expertiseId;
+        this.employmentTypeId = employmentTypeId;
+        this.staffId = staffId;
+        this.wtaId = wtaId;
+        this.ctaId = ctaId;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = 60;
+        this.hourlyWages = 10;
+        this.salary = 500;
+
     }
 
     public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {

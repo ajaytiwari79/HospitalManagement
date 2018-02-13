@@ -101,7 +101,7 @@ public class PresenceTypeService extends UserBaseService {
         }
         PresenceTypeWithTimeTypeDTO presenceTypeWithTimeTypes = new PresenceTypeWithTimeTypeDTO();
         presenceTypeWithTimeTypes.setPresenceTypes(presenceTypeRepository.getAllPresenceTypeByCountryId(countryId, false));
-        presenceTypeWithTimeTypes.setTimeTypes(timeTypeRestClient.getAllTimeTypes(countryId));
+      //  presenceTypeWithTimeTypes.setTimeTypes(timeTypeRestClient.getAllTimeTypes(countryId));
         return presenceTypeWithTimeTypes;
     }
 
@@ -113,7 +113,8 @@ public class PresenceTypeService extends UserBaseService {
         }
         PresenceTypeWithTimeTypeDTO presenceTypeWithTimeTypes = new PresenceTypeWithTimeTypeDTO();
         presenceTypeWithTimeTypes.setPresenceTypes(presenceTypeRepository.getAllPresenceTypeByCountryId(country.getId(), false));
-        presenceTypeWithTimeTypes.setTimeTypes(timeTypeRestClient.getAllTimeTypes(country.getId()));
+        //presenceTypeWithTimeTypes.setTimeTypes(timeTypeRestClient.getAllTimeTypes(country.getId()));
+        presenceTypeWithTimeTypes.setCountryId(country.getId());
         return presenceTypeWithTimeTypes;
     }
 

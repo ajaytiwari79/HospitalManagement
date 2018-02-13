@@ -28,13 +28,13 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
+import org.neo4j.ogm.annotation.typeconversion.DateString;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
+
 import javax.validation.constraints.NotNull;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD;
 
@@ -197,12 +197,16 @@ public class Organization extends UserBaseEntity {
     private int dayShiftTimeDeduction = 4; //in percentage
 
     private int nightShiftTimeDeduction = 7; //in percentage
-    private boolean phaseGenerated=true;
-    private Boolean showCountryTags=true;
+    private boolean phaseGenerated = true;
+    private Boolean showCountryTags = true;
     @Convert(ZoneIdStringConverter.class)
     private ZoneId timeZone;
+    @DateString("HH:MM")
+    private Date nightStartTimeFrom;
+    @DateString("HH:MM")
+    private Date nightEndTimeTo;
 
-
+    //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"
     public Organization(String name, List<Group> groupList, List<Organization> children) {
         this.name = name;
         this.groupList = groupList;
@@ -752,5 +756,25 @@ public class Organization extends UserBaseEntity {
 
     public void setTimeZone(ZoneId timeZone) {
         this.timeZone = timeZone;
+    }
+
+    public Boolean getShowCountryTags() {
+        return showCountryTags;
+    }
+
+    public Date getNightStartTimeFrom() {
+        return nightStartTimeFrom;
+    }
+
+    public void setNightStartTimeFrom(Date nightStartTimeFrom) {
+        this.nightStartTimeFrom = nightStartTimeFrom;
+    }
+
+    public Date getNightEndTimeTo() {
+        return nightEndTimeTo;
+    }
+
+    public void setNightEndTimeTo(Date nightEndTimeTo) {
+        this.nightEndTimeTo = nightEndTimeTo;
     }
 }

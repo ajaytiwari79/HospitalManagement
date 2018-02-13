@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.position;
+package com.kairos.persistence.model.user.unitEmploymentPosition;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -6,7 +6,9 @@ import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.position.PositionCode;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPositionQueryResult;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -202,9 +204,12 @@ public class UnitEmploymentPosition extends UserBaseEntity {
 
 
     public UnitEmploymentPositionQueryResult getBasicDetails() {
-        UnitEmploymentPositionQueryResult result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek,
-                this.endDateMillis, this.totalWeeklyMinutes,
-                this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode, this.workingTimeAgreement.basicDetails(), this.cta);
+        UnitEmploymentPositionQueryResult result = null;
+        result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek,
+                    this.endDateMillis, this.totalWeeklyMinutes,
+                    this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode);
+
+
         return result;
     }
 

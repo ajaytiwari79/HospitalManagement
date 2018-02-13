@@ -15,9 +15,8 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-import com.kairos.persistence.repository.user.position.PositionCodeGraphRepository;
 
-import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
+import com.kairos.persistence.repository.user.unitEmploymentPosition.UnitEmploymentPositionGraphRepository;
 
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.OrganizationService;
@@ -30,12 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import java.util.*;
 
 
 /**

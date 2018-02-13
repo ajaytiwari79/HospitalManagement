@@ -14,6 +14,7 @@ import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
+import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
@@ -21,20 +22,20 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.language.Language;
-import com.kairos.persistence.model.user.position.StaffUnitEmploymentDetails;
-import com.kairos.persistence.model.user.position.UnitEmploymentPositionQueryResult;
+import com.kairos.persistence.model.user.unitEmploymentPosition.StaffUnitEmploymentDetails;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
-import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
+import com.kairos.persistence.repository.user.unitEmploymentPosition.UnitEmploymentPositionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
@@ -61,6 +62,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,6 +148,8 @@ public class StaffService extends UserBaseService {
     private OrganizationService organizationService;
     @Autowired
     private UnitEmploymentPositionGraphRepository unitEmploymentPositionGraphRepository;
+    @Autowired
+    private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -1296,12 +1300,20 @@ public class StaffService extends UserBaseService {
 
     public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitEmploymentId, long id, String type) {
         Long unitId = -1L;
-        unitId = organizationService.getOrganization(id, type);
+        Organization organization=organizationService.getOrganizationDetail(id, type);
+        unitId = organization.getId();
+
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = new StaffAdditionalInfoQueryResult();
         staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
         StaffUnitEmploymentDetails unitEmploymentPosition = unitEmploymentPositionGraphRepository.getUnitEmploymentPositionById(unitEmploymentId);
+        staffAdditionalInfoQueryResult.setUnitId(organization.getId());
+        staffAdditionalInfoQueryResult.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
+        staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
         if (Optional.ofNullable(unitEmploymentPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitEmploymentPosition(unitEmploymentPosition);
+
+             WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitEmploymentId);
+             staffAdditionalInfoQueryResult.getUnitEmploymentPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
         return staffAdditionalInfoQueryResult;
     }

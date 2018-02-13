@@ -43,7 +43,7 @@ public interface SkillCategoryGraphRepository extends Neo4jBaseRepository<SkillC
             "id:id(sc),  " +
             "description:sc.description " +
             "}AS result")*/
-    @Query("MATCH (s:SkillCategory)-[:BELONGS_TO]->(c:Country) where id(c)=53 AND s.isEnabled=true  with s as sc,c  OPTIONAL MATCH (s:Skill)-[:HAS_CATEGORY]->(sc) WHERE s.isEnabled=true with c,sc,s \n" +
+    @Query("MATCH (s:SkillCategory)-[:BELONGS_TO]->(c:Country) where id(c)={0} AND s.isEnabled=true  with s as sc,c  OPTIONAL MATCH (s:Skill)-[:HAS_CATEGORY]->(sc) WHERE s.isEnabled=true with c,sc,s \n" +
             " OPTIONAL MATCH (s)-[r:HAS_TAG]->(t:Tag)<-[:COUNTRY_HAS_TAG]-(c) WHERE t.masterDataType='SKILL' AND t.countryTag=true AND t.deleted =false with CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})   END as tags,sc,s\n" +
             "return  { skillList: case when s is NULL then [] else collect({   \n" +
             "id:id(s),   \n" +

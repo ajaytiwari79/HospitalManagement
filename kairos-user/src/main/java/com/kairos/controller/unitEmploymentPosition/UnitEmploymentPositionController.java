@@ -1,9 +1,9 @@
-package com.kairos.controller.position;
+package com.kairos.controller.unitEmploymentPosition;
 
 
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.response.dto.web.UnitEmploymentPositionDTO;
-import com.kairos.service.position.UnitEmploymentPositionService;
+import com.kairos.service.unitEmploymentPosition.UnitEmploymentPositionService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +32,7 @@ public class UnitEmploymentPositionController {
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/unitEmploymentPosition")
     public ResponseEntity<Map<String, Object>> createUnitEmploymentPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitEmploymentPositionDTO position) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.createUnitEmploymentPosition(unitId, type, position));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.createUnitEmploymentPosition(unitId, type, position, false));
     }
 
     /*
@@ -79,7 +79,7 @@ public class UnitEmploymentPositionController {
 */
 
 //    @ApiOperation(value = "Get all positions by unit Employment")
-//    @RequestMapping(value = "/position")
+//    @RequestMapping(value = "/positionCode")
 //    ResponseEntity<Map<String, Object>> getAllUnitEmploymentPositions(@PathVariable Long unitEmploymentId) {
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getAllUnitEmploymentPositions(unitEmploymentId));
 //    }
