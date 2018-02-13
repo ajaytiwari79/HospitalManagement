@@ -262,7 +262,9 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-//        phaseRestClient.createDefaultPhases(organization.getId());
+        // DO NOT CREATE PHASE for UNION
+        if (!orgDetails.getUnion())
+            phaseRestClient.createDefaultPhases(organization.getId());
 
 
         HashMap<String, Object> orgResponse = new HashMap<>();

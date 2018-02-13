@@ -128,7 +128,7 @@ public class WTAOrganizationService extends UserBaseService {
             ruleTemplates = copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates());
             oldWta.setRuleTemplates(ruleTemplates);
         }
-        //oldWta.setOrganization(organization);
+        //oldWta.setUnions(organization);
         //organization.addWorkingTimeAgreements(newWta);
 
 

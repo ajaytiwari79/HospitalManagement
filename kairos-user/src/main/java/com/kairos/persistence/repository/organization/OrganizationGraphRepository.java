@@ -268,7 +268,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (o:Organization {isEnable:true})-[:HAS_SETTING]-(os:OrganizationSetting) where id(o)={0} WITH os as setting MATCH (setting)-[:OPENING_HOUR]-(oh:OpeningHours) return oh order by oh.index")
     List<OpeningHours> getOpeningHours(Long organizationId);
 
-    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[:" + BELONGS_TO + "]->(c:Country)  where id(c)={0} with org\n" +
+    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false})-[:" + BELONGS_TO + "]->(c:Country)  where id(c)={0} with org\n" +
             "Match (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) with collect(id(ot)) as organizationTypeIds,org\n" +
             "optional match (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with  collect(id(subType)) as organizationSubTypeIds,organizationTypeIds,org\n" +
             "MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode\n" +
@@ -669,5 +669,16 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "WHERE id(organization)={0}\n" +
             "return country")
     Country getCountry(Long organizationId);
+
+    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + BELONGS_TO + "]->(c:Country)  where id(c)={0} with org\n" +
+            "Match (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) with collect(id(ot)) as organizationTypeIds,org\n" +
+            "optional match (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with  collect(id(subType)) as organizationSubTypeIds,organizationTypeIds,org\n" +
+            "MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode\n" +
+            "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) with municipality,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode\n" +
+            "MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) with collect(id(businessType)) as businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality\n" +
+            "optional MATCH (org)-[:" + HAS_LEVEL + "]-(level:Level{isEnabled:true}) with level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality\n" +
+            "return collect({id:id(org),levelId:id(level),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,homeAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCode:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,municipalityId:id(municipality)}}) as organizations")
+    OrganizationQueryResult getAllUnionOfCountry(long countryId);
+
 
 }
