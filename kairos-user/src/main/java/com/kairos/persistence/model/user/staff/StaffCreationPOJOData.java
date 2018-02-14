@@ -4,6 +4,7 @@ package com.kairos.persistence.model.user.staff;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.enums.StaffStatusEnum;
 import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.NotNull;
@@ -29,7 +30,6 @@ public class StaffCreationPOJOData {
     private Long engineerTypeId;
     private Date employedSince;
     private Date inactiveFrom;
-    private boolean active;
     private String privatePhone;
     private String workEmail;
     private String userName;
@@ -38,6 +38,7 @@ public class StaffCreationPOJOData {
 
     @NotNull(message = "error.staff.accessGroup.id.notnull")
     private Long accessGroupId;
+    private StaffStatusEnum currentStatus;
 
     public Long getAccessGroupId() {
         return accessGroupId;
@@ -134,13 +135,6 @@ public class StaffCreationPOJOData {
         this.inactiveFrom = inactiveFrom;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
 
     public void setExternalId(Long externalId) {
         this.externalId = externalId;
@@ -172,5 +166,13 @@ public class StaffCreationPOJOData {
 
     public Long getExternalId() {
         return externalId;
+    }
+
+    public StaffStatusEnum getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(StaffStatusEnum currentStatus) {
+        this.currentStatus = currentStatus;
     }
 }
