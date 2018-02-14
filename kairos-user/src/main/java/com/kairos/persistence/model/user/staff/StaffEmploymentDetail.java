@@ -1,8 +1,10 @@
 package com.kairos.persistence.model.user.staff;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.neo4j.ogm.annotation.typeconversion.DateString;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * Created by prabjot on 10/1/17.
@@ -19,6 +21,8 @@ public class StaffEmploymentDetail {
     private long visitourId;
     private long engineerTypeId;
     private Long timeCareExternalId;
+    private Long dateOfBirth;
+
 
     public String getCardNumber() {
         return cardNumber;
@@ -82,5 +86,13 @@ public class StaffEmploymentDetail {
 
     public void setTimeCareExternalId(Long timeCareExternalId) {
         this.timeCareExternalId = timeCareExternalId;
+    }
+
+    public Long getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Long dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 }

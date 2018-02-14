@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.io.File;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
@@ -114,8 +115,11 @@ public class EmploymentService extends UserBaseService {
         map.put("visitourId", staff.getVisitourId());
         map.put("engineerTypeId", staffGraphRepository.getEngineerTypeId(staff.getId()));
         map.put("timeCareExternalId",staff.getExternalId());
+        LocalDate dateOfBirth=DateUtil.asLocalDate(staff.getDateOfBirth());
+        map.put("dateOfBirth",dateOfBirth);
         return map;
     }
+
 
 
 
