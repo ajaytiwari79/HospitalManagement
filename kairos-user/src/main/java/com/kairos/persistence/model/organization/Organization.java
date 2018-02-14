@@ -205,6 +205,7 @@ public class Organization extends UserBaseEntity {
     private Date nightStartTimeFrom;
     @DateString("HH:MM")
     private Date nightEndTimeTo;
+    private  boolean union;
 
     //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"
     public Organization(String name, List<Group> groupList, List<Organization> children) {
@@ -216,6 +217,13 @@ public class Organization extends UserBaseEntity {
     public Organization() {
     }
 
+    public boolean isUnion() {
+        return union;
+    }
+
+    public void setUnion(boolean union) {
+        this.union = union;
+    }
 
     public List<LocalAreaTag> getLocalAreaTags() {
         return localAreaTags;
