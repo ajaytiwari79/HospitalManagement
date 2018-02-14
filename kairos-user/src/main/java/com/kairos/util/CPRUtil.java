@@ -7,8 +7,7 @@ import java.time.LocalDate;
  */
 public class CPRUtil {
 
-    //Method for getting the DateOfBirth
-
+    //Method for getting the DateOfBirth From CPR Number
     public static LocalDate getDateOfBirthFromCPR(String cprNumber) {
         LocalDate birthday=null;
         if (cprNumber==null){

@@ -902,10 +902,8 @@ public class StaffService extends UserBaseService {
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
 
-        //method call for getting Date of Birth
-
-        LocalDate birthDay= CPRUtil.getDateOfBirthFromCPR(payload.getCprNumber());
-        Date dateOfBirth=DateUtil.asDate(birthDay);
+        //method call for getting Date of Birth From CPR Number
+        Date dateOfBirth=DateUtil.asDate(CPRUtil.getDateOfBirthFromCPR(payload.getCprNumber()));
         staff.setDateOfBirth(dateOfBirth);
         staff.setCurrentStatus(payload.getCurrentStatus());
         if (Optional.ofNullable(staffQueryResult).isPresent()) {
@@ -1504,7 +1502,4 @@ public class StaffService extends UserBaseService {
 
 
     }
-
-
-
 }

@@ -122,7 +122,6 @@ public class EmploymentService extends UserBaseService {
 
 
 
-
     public Map<String, Object> createEmployment(long unitId, long staffId, long accessGroupId, boolean created) {
 
         Organization unit = organizationGraphRepository.findOne(unitId);

@@ -23,7 +23,6 @@ public class StaffEmploymentDetail {
     private Long timeCareExternalId;
     private Long dateOfBirth;
 
-
     public String getCardNumber() {
         return cardNumber;
     }
