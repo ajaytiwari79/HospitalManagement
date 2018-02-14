@@ -379,7 +379,7 @@ public class TimeSlotService extends UserBaseService {
                 organizationTimeSlotRelationship.setEndHour(endDuration.getHour());
                 organizationTimeSlotRelationship.setEndMinute(endDuration.getMinute());
                 organizationTimeSlotRelationship.setTimeSlot(timeSlot);
-                organizationTimeSlotRelationship.setUnions(unit);
+                organizationTimeSlotRelationship.setOrganization(unit);
                 save(organizationTimeSlotRelationship);
 
             }

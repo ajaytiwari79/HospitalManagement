@@ -26,7 +26,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organization, Long>, CustomOrganizationGraphRepository {
 
-    @Query("MATCH (o:Organization) return {name:o.name, id:id(o)} as organization")
+    @Query("MATCH (o:Organization {isEnable:true}) return {name:o.name, id:id(o)} as organization")
     List<Map<String, Object>> findAllOrganizations();
 
     Organization findByName(String name);
