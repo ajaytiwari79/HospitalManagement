@@ -1186,6 +1186,10 @@ public class OrganizationService extends UserBaseService {
         return organizationTypeGraphRepository.getOrganizationTypeById(countryId, orgTypeId);
     }
 
+    public OrganizationType getOneDefaultOrganizationTypeByCountryId(Long countryId) {
+        return organizationTypeGraphRepository.getOneDefaultOrganizationTypeById(countryId);
+    }
+
     public List<OrganizationType> getOrganizationSubTypeById(Long orgTypeId) {
         return organizationTypeGraphRepository.getOrganizationSubTypesByTypeId(orgTypeId);
     }

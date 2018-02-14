@@ -12,7 +12,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_C
 @NodeEntity
 public class CompensationTable extends UserBaseEntity {
     private int granularityLevel;
-    private CompensationMeasurementType compensationMeasurementType;
+//    private CompensationMeasurementType compensationMeasurementType;
     @Relationship(type = HAS_COMPENSATION_TABLE_INTERVAL)
     private List<CompensationTableInterval>compensationTableInterval=new ArrayList<>();
 
@@ -20,9 +20,15 @@ public class CompensationTable extends UserBaseEntity {
         //default
     }
 
-    public CompensationTable(int granularityLevel, CompensationMeasurementType compensationMeasurementType) {
+    public CompensationTable(int granularityLevel) {
         this.granularityLevel = granularityLevel;
-        this.compensationMeasurementType = compensationMeasurementType;
+//        this.compensationMeasurementType = compensationMeasurementType;
+    }
+
+    public CompensationTable(int granularityLevel, List<CompensationTableInterval> compensationTableIntervals) {
+        this.granularityLevel = granularityLevel;
+        this.setCompensationTableInterval(compensationTableIntervals);
+//        this.compensationMeasurementType = compensationMeasurementType;
     }
 
     public int getGranularityLevel() {
@@ -33,13 +39,13 @@ public class CompensationTable extends UserBaseEntity {
         this.granularityLevel = granularityLevel;
     }
 
-    public CompensationMeasurementType getCompensationMeasurementType() {
+    /*public CompensationMeasurementType getCompensationMeasurementType() {
         return compensationMeasurementType;
-    }
+    }*/
 
-    public void setCompensationMeasurementType(CompensationMeasurementType compensationMeasurementType) {
+    /*public void setCompensationMeasurementType(CompensationMeasurementType compensationMeasurementType) {
         this.compensationMeasurementType = compensationMeasurementType;
-    }
+    }*/
 
     public List<CompensationTableInterval> getCompensationTableInterval() {
         return compensationTableInterval;

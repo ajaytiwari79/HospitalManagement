@@ -17,15 +17,17 @@ public class CompensationTableInterval extends UserBaseEntity {
     @Convert(LocalTimeStringConverter.class)
     private LocalTime to;
     private float value;
+    private CompensationMeasurementType compensationMeasurementType;
 
     public CompensationTableInterval() {
         //default constructor
     }
 
-    public CompensationTableInterval(LocalTime from, LocalTime to, float value) {
+    public CompensationTableInterval(LocalTime from, LocalTime to, float value, CompensationMeasurementType compensationMeasurementType) {
         this.from = from;
         this.to = to;
         this.value = value;
+        this.setCompensationMeasurementType(CompensationMeasurementType.MINUTES);
     }
 
     public LocalTime getFrom() {
@@ -50,6 +52,14 @@ public class CompensationTableInterval extends UserBaseEntity {
 
     public void setValue(float value) {
         this.value = value;
+    }
+
+    public CompensationMeasurementType getCompensationMeasurementType() {
+        return compensationMeasurementType;
+    }
+
+    public void setCompensationMeasurementType(CompensationMeasurementType compensationMeasurementType) {
+        this.compensationMeasurementType = compensationMeasurementType;
     }
 
     @Override

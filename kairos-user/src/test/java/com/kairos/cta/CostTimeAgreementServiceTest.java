@@ -3,10 +3,9 @@ package com.kairos.cta;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateType;
-import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
+import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -14,11 +13,13 @@ import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.agreement.RuleTemplateCategoryService;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.OrganizationService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +37,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,12 +53,24 @@ public class CostTimeAgreementServiceTest {
     @Autowired DayTypeService dayTypeService;
     @Autowired ExpertiseService expertiseService;
     @Autowired OrganizationService organizationService;
+    @Autowired CountryService countryService;
     @Value("${server.host.http.url}")
     private String url;
     @Autowired
     TestRestTemplate restTemplate;
     static Long createdCtaId = null;
-    static Long countryId = 53L;
+//    static Long countryId = 53L;
+    static Long countryId = null;
+    static Long organizationId = null;
+
+    @Before
+    public void setUp() throws Exception {
+        Country country = countryService.getCountryByName("Denmark");
+        countryId = country == null ? null : country.getId();
+        organizationId = 145l;
+    }
+
+
     @Test
     public void addCTARuleTemplateCategory(){
         RuleTemplateCategory category=new RuleTemplateCategory();
@@ -77,6 +91,7 @@ public class CostTimeAgreementServiceTest {
         List<DayType> dayTypes= dayTypeService.getDayTypeByDate(53L,date);
         System.out.println(dayTypes);
     }
+
     @Test
     public void getAllRuleTemplate(){
         CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS= costTimeAgreementService.loadAllCTARuleTemplateByCountry(53L);
@@ -103,18 +118,14 @@ public class CostTimeAgreementServiceTest {
                         " 50% overtime compensation”.", CTARuleTemplateType.RULE_TEMPLATE_7,
                 "230:50% overtime compensation", "xyz");
         List<CTARuleTemplateDTO> ctaRuleTemplates = new ArrayList<>();
+        ctaRuleTemplateDTO = prepareCTARuleTemplate(ctaRuleTemplateDTO);
         ctaRuleTemplates.add(ctaRuleTemplateDTO);
         Expertise expertise = expertiseService.getExpertiseByCountryId(countryId);
-        OrganizationType organizationType = organizationService.getOrganizationTypeByCountryAndId(countryId,86L);
+        OrganizationType organizationType = organizationService.getOneDefaultOrganizationTypeByCountryId(countryId);
         OrganizationType organizationSubType = organizationService.getOrganizationSubTypeById(organizationType.getId()).get(0);
         CollectiveTimeAgreementDTO collectiveTimeAgreementDTO = new CollectiveTimeAgreementDTO
-                ("CTA TEST", "Test description", expertise.getId(), organizationType.getId(), organizationSubType.getId(), ctaRuleTemplates);
-        /*try{
-            collectiveTimeAgreementDTO = costTimeAgreementService.createCostTimeAgreement(countryId, collectiveTimeAgreementDTO);
-        } catch (Exception e){
-            logger.info("Exception occured");
-        }*/
-        String baseUrl = getBaseUrl(71L, 53L);
+                ("CTA TEST", "Test description", expertise.getId(), organizationType.getId(), organizationSubType.getId(), new Date().getTime(), ctaRuleTemplates);
+        String baseUrl = getBaseUrl(organizationId, countryId);
         HttpEntity<CollectiveTimeAgreementDTO> requestBodyData = new HttpEntity<>(collectiveTimeAgreementDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
@@ -123,8 +134,11 @@ public class CostTimeAgreementServiceTest {
                 baseUrl + "/cta",
                 HttpMethod.POST, requestBodyData, typeReference);
         logger.info("Status Code : "+response.getStatusCode());
-        Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()));
-        createdCtaId=  response.getBody().getData().getId();
+        Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) ||  HttpStatus.UNPROCESSABLE_ENTITY.equals(response.getStatusCode()) ||
+                HttpStatus.CONFLICT.equals(response.getStatusCode()));
+        if(HttpStatus.CREATED.equals(response.getStatusCode())) {
+            createdCtaId = response.getBody().getData().getId();
+        }
     }
 
 
@@ -141,7 +155,7 @@ public class CostTimeAgreementServiceTest {
         OrganizationType organizationSubType = organizationService.getOrganizationSubTypeById(organizationType.getId()).get(0);
         CollectiveTimeAgreementDTO collectiveTimeAgreementDTO = new CollectiveTimeAgreementDTO
                 ("CTA TEST", "Test description", expertise.getId(), organizationType.getId(),
-                        organizationSubType.getId(), ctaRuleTemplates);
+                        organizationSubType.getId(), new Date().getTime(), ctaRuleTemplates);
 
         if(createdCtaId == null){
             // GET CTA with name  "New Test CTA"
@@ -188,7 +202,7 @@ public class CostTimeAgreementServiceTest {
         OrganizationType organizationSubType = organizationService.getOrganizationSubTypeById(organizationType.getId()).get(0);
         CollectiveTimeAgreementDTO collectiveTimeAgreementDTO = new CollectiveTimeAgreementDTO
                 ("CTA TEST", "Test description", expertise.getId(), organizationType.getId(),
-                        organizationSubType.getId(), ctaRuleTemplates);
+                        organizationSubType.getId(), new Date().getTime(), ctaRuleTemplates);
 
         if(createdCtaId == null){
             // GET CTA with name  "New Test CTA"
@@ -212,6 +226,21 @@ public class CostTimeAgreementServiceTest {
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdCtaId=  response.getBody().getData().getId();
 
+    }
+
+    public CTARuleTemplateDTO prepareCTARuleTemplate(CTARuleTemplateDTO ctaRuleTemplateDTO){
+//        ctaRuleTemplateDTO
+
+        // Prepare Compensation Table
+        CompensationTableInterval compensationTableInterval = new CompensationTableInterval(LocalTime.MIN, LocalTime.MAX,
+                10,CompensationMeasurementType.MINUTES);
+        List<CompensationTableInterval> compensationTableIntervals = new ArrayList<>();
+        compensationTableIntervals.add(compensationTableInterval);
+        CompensationTable compensationTable = new CompensationTable(10, compensationTableIntervals);
+        ctaRuleTemplateDTO.setCompensationTable(compensationTable);
+
+
+        return ctaRuleTemplateDTO;
     }
 
     public final String getBaseUrl(Long organizationId, Long countryId) {

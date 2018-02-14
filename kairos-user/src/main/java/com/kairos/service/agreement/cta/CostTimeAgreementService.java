@@ -176,7 +176,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
         }
         ctaRuleTemplate.setCalculationUnit(CalculationUnit.HOURS);
-        CompensationTable compensationTable = new CompensationTable(10, CompensationMeasurementType.MINUTES);
+        CompensationTable compensationTable = new CompensationTable(10);
         ctaRuleTemplate.setCompensationTable(compensationTable);
         FixedValue fixedValue = new FixedValue(10, currency, FixedValue.Type.PER_ACTIVITY);
         ctaRuleTemplate.setCalculateValueAgainst(new CalculateValueAgainst(CalculateValueAgainst.CalculateValueType.FIXED_VALUE, 10.5f, fixedValue));
@@ -543,13 +543,12 @@ public class CostTimeAgreementService extends UserBaseService {
         };
         Future<Optional<OrganizationType>>organizationSubTypesFuture=asynchronousService.executeAsynchronously(OrganizationSubTypesListCallable);
 
-
         //set data
          if(expertiseFuture.get().isPresent())
              costTimeAgreement.setExpertise(expertiseFuture.get().get());
-        costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
         costTimeAgreement.setOrganizationType(organizationTypesFuture.get().get());
         costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
+        costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
         costTimeAgreement.setStartDateMillis(collectiveTimeAgreementDTO.getStartDateMillis());
         costTimeAgreement.setEndDateMillis(collectiveTimeAgreementDTO.getEndDateMillis());
 
@@ -668,7 +667,8 @@ public class CostTimeAgreementService extends UserBaseService {
            try{
                CostTimeAgreement newCostTimeAgreement =  createCostTimeAgreementForOrganization(collectiveTimeAgreementDTO);
                organization.getCostTimeAgreements().add(newCostTimeAgreement);
-               newCostTimeAgreement.setParentCountryCTA(costTimeAgreement);
+//               newCostTimeAgreement.setParentCountryCTA(costTimeAgreement);
+               collectiveTimeAgreementGraphRepository.linkParentCountryCTAToOrganization(costTimeAgreement.getId(), newCostTimeAgreement.getId());
                save(organization);
            } catch (Exception e){
                // Exception occured

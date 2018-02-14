@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,10 +15,14 @@ public class CollectiveTimeAgreementDTO {
     private Long id;
     private String name;
     private String description;
+    @NotNull(message = "error.cta.expertise.notNull")
     private Long expertise;
+    @NotNull(message = "error.cta.organizationType.notNull")
     private Long organizationType;
+    @NotNull(message = "error.cta.organizationSubType.notNull")
     private Long organizationSubType;
     private List<CTARuleTemplateDTO> ruleTemplates = new ArrayList<>();
+    @NotNull(message = "error.cta.startDate.notNull")
     private Long startDateMillis;
     private Long endDateMillis;
     private boolean disabled;
@@ -105,13 +110,14 @@ public class CollectiveTimeAgreementDTO {
         this.disabled = disabled;
     }
 
-    public CollectiveTimeAgreementDTO(String name, String description, Long expertiseId, Long organizationTypeId, Long organizationSubTypeId, List<CTARuleTemplateDTO> ruleTemplates) {
+    public CollectiveTimeAgreementDTO(String name, String description, Long expertiseId, Long organizationTypeId, Long organizationSubTypeId,Long startDateMillis, List<CTARuleTemplateDTO> ruleTemplates) {
         this.setName(name);
         this.setDescription(description);
         this.setExpertise(expertiseId);
         this.setOrganizationType(organizationTypeId);
         this.setOrganizationSubType(organizationSubTypeId);
         this.setRuleTemplates(ruleTemplates);
+        this.setStartDateMillis(startDateMillis);
     }
 
     @Override
