@@ -1,4 +1,5 @@
 package com.kairos.service.staff;
+
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -21,13 +22,11 @@ import com.kairos.util.DistanceCalculator;
 import com.kairos.util.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
@@ -62,17 +61,22 @@ public class StaffAddressService extends UserBaseService {
     private OrganizationGraphRepository organizationGraphRepository;
 
     public ContactAddress saveAddress(long staffId, AddressDTO addressDTO, long unitId) {
-        ContactAddress contactAddress = null;
+        List<ContactAddress> contactAddresses = new ArrayList<>();
         Staff staff = staffGraphRepository.findOne(staffId);
 
         if (staff == null) {
             throw new DataNotFoundByIdException("Can't find Staff with provided Id");
 
         }
-
+        ContactAddress contactAddress=null;
         if (addressDTO.getId() != null) {
             contactAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
+
         }
+        else {
+            contactAddresses = staff.getContactAddress();
+        }
+        contactAddress= getCurrentAddress(contactAddresses,addressDTO);
         if (contactAddress == null) {
             logger.info("Creating new Address");
             contactAddress = new ContactAddress();
@@ -134,10 +138,13 @@ public class StaffAddressService extends UserBaseService {
             contactAddress.setZipCode(zipCode);
             contactAddress.setCity(zipCode.getName());
             contactAddress.setPrivateAddress(addressDTO.isAddressProtected());
-            staff.setContactAddress(contactAddress);
+            // Specify Primary or not
+            contactAddress.setPrimary(addressDTO.isPrimary());
+            contactAddresses.add(contactAddress);
+            staff.setContactAddress(contactAddresses);
             staffGraphRepository.save(staff);
             // save directly
-            return staff.getContactAddress();
+            return contactAddress;
 
 
         } else {
@@ -197,15 +204,18 @@ public class StaffAddressService extends UserBaseService {
                 contactAddress.setCity(zipCode.getName());
                 contactAddress.setPrivateAddress(addressDTO.isAddressProtected());
 
-
-                staff.setContactAddress(contactAddress);
+                // Specify Primary or not
+                contactAddress.setPrimary(addressDTO.isPrimary());
+                contactAddresses.add(contactAddress);
+                staff.setContactAddress(contactAddresses);
                 staffGraphRepository.save(staff);
                 // save directly
-                return staff.getContactAddress();
+                return contactAddress;
 
             }
             return null;
         }
+
 
     }
 
@@ -218,7 +228,7 @@ public class StaffAddressService extends UserBaseService {
             return null;
         }
         ContactAddress address;
-        ContactAddress staffAddress = staff.getContactAddress();
+        //ContactAddress staffAddress = staff.getContactAddress();
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization organization = organizationGraphRepository.findOne(unitId);
@@ -235,25 +245,44 @@ public class StaffAddressService extends UserBaseService {
         }
 
         double distance = 0;
-        if (address != null && staffAddress != null) {
-            distance = DistanceCalculator.distance(address.getLatitude(), address.getLongitude(), staffAddress.getLatitude(), staffAddress.getLongitude(), "K");
+        if (address != null) {
+            distance = DistanceCalculator.distance(address.getLatitude(), address.getLongitude(), address.getLatitude(), address.getLongitude(), "K");
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("address", staff.fetchContactAddressDetail());
+        response.put("address", staff.fetchContactAddressDetail(true));
+        Map<String,Object> secondaryAddress=staff.fetchContactAddressDetail(false);
+        response.put("secondaryAddress", (secondaryAddress==null)?initializeSecondaryAddress():secondaryAddress);
         response.put("distanceFromWork", distance);
 
         if (countryId != null) {
-            ZipCode zipCode = (staffAddress == null) ? null : staffAddress.getZipCode();
+            ZipCode zipCode = (address == null) ? null : address.getZipCode();
             response.put("municipalities", (zipCode == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(zipCode.getId())));
             response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         }
         return response;
     }
-
-    public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization){
+    public Map<String,Object> initializeSecondaryAddress(){
+        Map map = new HashMap<>();
+        map.put("houseNumber", null);
+        map.put("floorNumber", null);
+        map.put("street1", null);
+        map.put("zipCodeId", null);
+        map.put("city", null);
+        map.put("municipalityId", null);
+        map.put("regionName",null);
+        map.put("country", null);
+        map.put("latitude", null);
+        map.put("longitude", null);
+        map.put("province", null);
+        map.put("streetUrl", null);
+        map.put("addressProtected",null);
+        map.put("verifiedByVisitour", null);
+        return map;
+    }
+    public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
         ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
-        if(Optional.ofNullable(organizationAddress).isPresent()){
+        if (Optional.ofNullable(organizationAddress).isPresent()) {
             ContactAddress contactAddress = new ContactAddress();
             contactAddress.setCity(organizationAddress.getCity());
             contactAddress.setStreet1(organizationAddress.getStreet1());
@@ -271,4 +300,23 @@ public class StaffAddressService extends UserBaseService {
         }
         return null;
     }
+
+    public ContactAddress getCurrentAddress(List<ContactAddress> contactAddresses,AddressDTO addressDTO){
+        ContactAddress response=new ContactAddress();
+        boolean isContactAddressExist=false;
+        for(ContactAddress contactAddress:contactAddresses){
+            if(contactAddress.isPrimary()==addressDTO.isPrimary()){
+                response= contactAddress;
+                isContactAddressExist=true;
+                break;
+            }
+        }
+        if(!isContactAddressExist){
+            BeanUtils.copyProperties(addressDTO,response);
+            response.setPrimary(false);
+        }
+        return response;
+    }
+
+
 }

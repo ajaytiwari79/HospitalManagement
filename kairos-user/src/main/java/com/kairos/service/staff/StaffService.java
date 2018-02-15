@@ -568,7 +568,9 @@ public class StaffService extends UserBaseService {
                         }
                     }
                     staff.setContactDetail(contactDetail);
-                    staff.setContactAddress(contactAddress);
+                    List<ContactAddress> contactAddresses=new ArrayList<>();
+                    contactAddresses.add(contactAddress);
+                    staff.setContactAddress(contactAddresses);
                     cell = row.getCell(2);
                     if (Optional.ofNullable(cell).isPresent()) {
                         cell.setCellType(Cell.CELL_TYPE_STRING);
@@ -896,8 +898,12 @@ public class StaffService extends UserBaseService {
         staff.setLastName(payload.getLastName());
         staff.setFamilyName(payload.getFamilyName());
         staff.setCprNumber(payload.getCprNumber());
+
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
-        staff.setContactAddress(contactAddress);
+        contactAddress.setPrimary(true);
+        List<ContactAddress> contactAddresses=new ArrayList<>();
+        contactAddresses.add(contactAddress);
+        staff.setContactAddress(contactAddresses);
         ObjectMapper objectMapper = new ObjectMapper();
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
@@ -974,8 +980,11 @@ public class StaffService extends UserBaseService {
 
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
-        if (contactAddress != null)
-            staff.setContactAddress(contactAddress);
+        if (contactAddress != null) {
+            List<ContactAddress> contactAddresses=new ArrayList<>();
+            contactAddresses.add(contactAddress);
+            staff.setContactAddress(contactAddresses);
+        }
         if (engineerTypeId != null)
             staff.setEngineerType(engineerTypeGraphRepository.findOne(engineerTypeId));
         staff.setUser(user);
@@ -1484,7 +1493,9 @@ public class StaffService extends UserBaseService {
                 contactAddress.setHouseNumber(matcher.group(0));
             }
         }
-        staff.setContactAddress(contactAddress);
+        List<ContactAddress> contactAddresses=new ArrayList<>();
+        contactAddresses.add(contactAddress);
+        staff.setContactAddress(contactAddresses);
 
         ContactDetail contactDetail = new ContactDetail();
         contactDetail.setPrivatePhone(timeCareStaffDTO.getCellPhoneNumber());
