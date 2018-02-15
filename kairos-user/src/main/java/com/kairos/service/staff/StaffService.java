@@ -898,7 +898,6 @@ public class StaffService extends UserBaseService {
         staff.setLastName(payload.getLastName());
         staff.setFamilyName(payload.getFamilyName());
         staff.setCprNumber(payload.getCprNumber());
-
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
         contactAddress.setPrimary(true);
         List<ContactAddress> contactAddresses=new ArrayList<>();

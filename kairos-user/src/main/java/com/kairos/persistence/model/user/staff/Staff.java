@@ -363,7 +363,6 @@ public class Staff extends UserBaseEntity {
                 map.put("addressProtected", contactAddress.isAddressProtected());
                 map.put("verifiedByVisitour", contactAddress.isVerifiedByVisitour());
                 map.put("primary",contactAddress.isPrimary());
-
             }
         }
         return map;
@@ -481,7 +480,7 @@ public class Staff extends UserBaseEntity {
         this.kmdExternalId = kmdExternalId;
     }
 
-    public void addFavouriteFilters(StaffFavouriteFilters staffFavouriteFilters) {
+    public void addFavouriteFilters(StaffFavouriteFilters staffFavouriteFilters){
         List<StaffFavouriteFilters> staffFavouriteFiltersList = Optional.ofNullable(this.staffFavouriteFiltersList).orElse(new ArrayList<>());
         staffFavouriteFiltersList.add(staffFavouriteFilters);
         this.staffFavouriteFiltersList = staffFavouriteFiltersList;
@@ -495,7 +494,7 @@ public class Staff extends UserBaseEntity {
         this.client = client;
     }
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd")
     public Date getDateOfBirth() {
         return dateOfBirth;
     }

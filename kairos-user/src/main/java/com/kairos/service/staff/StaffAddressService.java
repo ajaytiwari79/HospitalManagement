@@ -71,7 +71,6 @@ public class StaffAddressService extends UserBaseService {
         ContactAddress contactAddress=null;
         if (addressDTO.getId() != null) {
             contactAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
-
         }
         else {
             contactAddresses = staff.getContactAddress();
@@ -215,8 +214,6 @@ public class StaffAddressService extends UserBaseService {
             }
             return null;
         }
-
-
     }
 
     public Map<String, Object> getAddress(long unitId, long staffId, String type) {
@@ -228,7 +225,7 @@ public class StaffAddressService extends UserBaseService {
             return null;
         }
         ContactAddress address;
-        //ContactAddress staffAddress = staff.getContactAddress();
+        List<ContactAddress> staffAddress = staff.getContactAddress();
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization organization = organizationGraphRepository.findOne(unitId);
@@ -245,14 +242,14 @@ public class StaffAddressService extends UserBaseService {
         }
 
         double distance = 0;
-        if (address != null) {
+        if (address != null && staffAddress != null) {
             distance = DistanceCalculator.distance(address.getLatitude(), address.getLongitude(), address.getLatitude(), address.getLongitude(), "K");
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("address", staff.fetchContactAddressDetail(true));
+        response.put("primaryStaffAddress", staff.fetchContactAddressDetail(true));
         Map<String,Object> secondaryAddress=staff.fetchContactAddressDetail(false);
-        response.put("secondaryAddress", (secondaryAddress==null)?initializeSecondaryAddress():secondaryAddress);
+        response.put("secondaryStaffAddress", (secondaryAddress==null)?initializeSecondaryAddress():secondaryAddress);
         response.put("distanceFromWork", distance);
 
         if (countryId != null) {
@@ -282,7 +279,7 @@ public class StaffAddressService extends UserBaseService {
     }
     public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
         ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
-        if (Optional.ofNullable(organizationAddress).isPresent()) {
+        if(Optional.ofNullable(organizationAddress).isPresent()) {
             ContactAddress contactAddress = new ContactAddress();
             contactAddress.setCity(organizationAddress.getCity());
             contactAddress.setStreet1(organizationAddress.getStreet1());
