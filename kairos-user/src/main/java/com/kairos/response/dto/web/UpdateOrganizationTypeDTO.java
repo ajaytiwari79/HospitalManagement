@@ -13,6 +13,7 @@ import java.util.Optional;
  */
 public class UpdateOrganizationTypeDTO {
 
+    private Long id;
     @NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull")
     private String name;
 
@@ -28,6 +29,14 @@ public class UpdateOrganizationTypeDTO {
         this.name = name;
         this.levelsToUpdate = levelsToUpdate;
         this.levelsToDelete = levelsToDelete;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
