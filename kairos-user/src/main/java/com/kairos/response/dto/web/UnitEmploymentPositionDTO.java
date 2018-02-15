@@ -40,7 +40,7 @@ public class UnitEmploymentPositionDTO {
     private Long staffId;
     // private Long expiryDate;
 
-    private Long union;
+    private Long unionId;
 
     public UnitEmploymentPositionDTO() {
         //default cons
@@ -218,11 +218,11 @@ public class UnitEmploymentPositionDTO {
         this.staffId = staffId;
     }
 
-    public Long getUnion() {
-        return union;
+    public Long getUnionId() {
+        return unionId;
     }
 
-    public void setUnion(Long union) {
-        this.union = union;
+    public void setUnionId(Long unionId) {
+        this.unionId = unionId;
     }
 }
