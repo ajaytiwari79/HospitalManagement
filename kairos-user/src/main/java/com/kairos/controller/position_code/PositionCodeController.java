@@ -1,6 +1,6 @@
-package com.kairos.controller.positionCode;
-import com.kairos.persistence.model.user.position.PositionCode;
-import com.kairos.service.positionCode.PositionCodeService;
+package com.kairos.controller.position_code;
+import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -62,6 +62,14 @@ public class PositionCodeController {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.getAllPositionCodes(unitId,type));
 
+    }
+
+    @RequestMapping(value =  "/unions_with_position_code", method = RequestMethod.GET)
+    @ApiOperation("Get All Unions and position_code code for unit employment  by organization ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnionsAndPositionCodes(@PathVariable Long unitId,@RequestParam("type") String type) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                positionCodeService.getUnionsAndPositionCodes(unitId,type));
     }
 
 

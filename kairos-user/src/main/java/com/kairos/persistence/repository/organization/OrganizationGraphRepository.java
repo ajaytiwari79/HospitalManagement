@@ -3,13 +3,14 @@ package com.kairos.persistence.repository.organization;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.department.Department;
-import com.kairos.persistence.model.user.position.PositionCode;
+import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -680,9 +681,26 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "return collect({id:id(org),levelId:id(level),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,homeAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCode:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,municipalityId:id(municipality)}}) as organizations")
     OrganizationQueryResult getAllUnionOfCountry(long countryId);
 
-    @Query("match (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) where id(subType) IN {0}" +
+    @Query("match (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) where id(subType) IN {0} " +
             "return  id(org) as id,org.name as name")
     List<UnionResponseDTO> getAllUnionsByOrganizationSubType(List<Long> organizationSubTypesId);
 
+    @Query("Match (o:Organization)-[rel:" + ORAGANIZATION_HAS_UNIONS + "]->(union:Organization{isEnable:true,union:true}) " +
+            "return  id(union) as id,union.name as name")
+    List<UnionResponseDTO> getAllJoinedUnionsByOrganizationId(Long organizationId);
+
+    @Query("Match (o:Organization)-[rel:" + ORAGANIZATION_HAS_UNIONS + "]->(union:Organization) where id(o)={0}  AND  id(union)={1} \n" +
+            "SET rel.disabled=true, rel.dateOfSeparation={2} return rel")
+    void removeUnionFromOrganization(long unitId, long unionId, long dateOfSeparation);
+
+    @Query("Match (unit:Organization),(union:Organization) where id (unit)={0} AND id(union) = {1} merge (unit)-[r:" + ORAGANIZATION_HAS_UNIONS + "{dateOfJoining:{2},disabled:false}]->(union) return r")
+    void addUnionInOrganization(long unitId, Long unionId, long dateOfJoining);
+
+    @Query("Match (o:Organization)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false})-[rel:" + ORAGANIZATION_HAS_UNIONS + "]->(union:Organization{isEnable:true,union:true}) " +
+            "return  id(union) as id,union.name as name")
+    List<UnionResponseDTO> getAllUnionsFromParentOrganization(Long organizationId);
+
+    @Query("Match (union:Organization{union:true,isEnable:true}) where id (union)={0}  return union")
+    Organization findByIdAndUnionTrueAndIsEnableTrue(Long unionId);
 
 }

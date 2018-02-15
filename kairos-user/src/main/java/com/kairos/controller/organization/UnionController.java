@@ -8,10 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -41,11 +38,19 @@ public class UnionController {
                 unionService.getAllUnionOfCountry(countryId));
     }
 
-    @RequestMapping(value = UNIT_URL + "/unions", method = RequestMethod.GET)
-    @ApiOperation("Get All Unions by organization ")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllUnionByOrganization(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                unionService.getAllUnionByOrganization(unitId));
-    }
+  // TODO NEED TO IMPLEMENT IN FUTURE
+//    @RequestMapping(value = UNIT_URL + "/unions", method = RequestMethod.GET)
+//    @ApiOperation("Get All Unions by organization ")
+//    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> getAllApplicableUnionsForOrganization(@PathVariable Long unitId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+//                unionService.getAllApplicableUnionsForOrganization(unitId));
+//    }
+//    @RequestMapping(value = UNIT_URL + "/unions/{unionId}", method = RequestMethod.GET)
+//    @ApiOperation("Get All Unions by organization ")
+//    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+//    public ResponseEntity<Map<String, Object>> addUnionInOrganization(@PathVariable Long unitId,@PathVariable Long unionId,@RequestParam("joined") boolean joined) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+//                unionService.addUnionInOrganization(unitId,unionId,joined));
+//    }
 }

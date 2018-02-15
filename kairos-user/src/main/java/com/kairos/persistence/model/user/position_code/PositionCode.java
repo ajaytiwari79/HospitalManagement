@@ -1,6 +1,5 @@
-package com.kairos.persistence.model.user.position;
+package com.kairos.persistence.model.user.position_code;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -20,7 +19,7 @@ public class PositionCode extends UserBaseEntity {
 
 
     @NotEmpty(message = "error.PositionCode.name.notempty")
-    @NotNull(message = "error.positionCode.name.notnull")
+    @NotNull(message = "error.position_code.name.notnull")
 
     private String name;
 

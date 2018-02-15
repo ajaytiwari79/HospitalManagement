@@ -5,7 +5,7 @@ import com.kairos.persistence.model.user.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.user.staff.TimeCareStaffDTO;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
-import com.kairos.service.unitEmploymentPosition.UnitEmploymentPositionService;
+import com.kairos.service.unit_employment_position.UnitEmploymentPositionService;
 import com.kairos.util.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
