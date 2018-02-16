@@ -16,7 +16,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
-
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -62,6 +61,7 @@ public class Staff extends UserBaseEntity {
     private String cprNumber;
     private String visitourTeamId;
     private Language language;
+
 
     @Relationship(type = HAS_EXPERTISE_IN)
     Expertise expertise;
@@ -339,33 +339,6 @@ public class Staff extends UserBaseEntity {
 
     public void setCprNumber(String cprNumber) {
         this.cprNumber = cprNumber;
-    }
-
-    public Map<String, Object> fetchContactAddressDetail(boolean primary) {
-
-        List<ContactAddress> contactAddresses = this.contactAddress;
-        Map<String, Object> map = null;
-        for (ContactAddress contactAddress : contactAddresses) {
-            if (contactAddress != null && contactAddress.isPrimary() == primary) {
-                map = new HashMap<>();
-                map.put("houseNumber", contactAddress.getHouseNumber());
-                map.put("floorNumber", contactAddress.getFloorNumber());
-                map.put("street1", contactAddress.getStreet1());
-                map.put("zipCodeId", contactAddress.getZipCode() != null ? contactAddress.getZipCode().getId() : null);
-                map.put("city", contactAddress.getCity() != null ? contactAddress.getCity() : "");
-                map.put("municipalityId", (contactAddress.getMunicipality() == null) ? null : contactAddress.getMunicipality().getId());
-                map.put("regionName", contactAddress.getRegionName());
-                map.put("country", contactAddress.getCountry());
-                map.put("latitude", contactAddress.getLatitude());
-                map.put("longitude", contactAddress.getLongitude());
-                map.put("province", contactAddress.getProvince());
-                map.put("streetUrl", contactAddress.getStreetUrl());
-                map.put("addressProtected", contactAddress.isAddressProtected());
-                map.put("verifiedByVisitour", contactAddress.isVerifiedByVisitour());
-                map.put("primary",contactAddress.isPrimary());
-            }
-        }
-        return map;
     }
 
     public EngineerType getEngineerType() {

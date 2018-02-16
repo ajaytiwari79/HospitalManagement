@@ -247,8 +247,8 @@ public class StaffAddressService extends UserBaseService {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("primaryStaffAddress", staff.fetchContactAddressDetail(true));
-        Map<String,Object> secondaryAddress=staff.fetchContactAddressDetail(false);
+        response.put("primaryStaffAddress", fetchContactAddressDetail(true,staffAddress));
+        Map<String,Object> secondaryAddress=fetchContactAddressDetail(false,staffAddress);
         response.put("secondaryStaffAddress", (secondaryAddress==null)?initializeSecondaryAddress():secondaryAddress);
         response.put("distanceFromWork", distance);
 
@@ -315,5 +315,32 @@ public class StaffAddressService extends UserBaseService {
         return response;
     }
 
+    public Map<String, Object> fetchContactAddressDetail(boolean primary, List<ContactAddress> contactAddresses) {
 
+        Map<String, Object> map = null;
+        for (ContactAddress contactAddress : contactAddresses) {
+            if (contactAddress != null && contactAddress.isPrimary() == primary) {
+
+                map = new HashMap<>();
+                map.put("houseNumber", contactAddress.getHouseNumber());
+                map.put("floorNumber", contactAddress.getFloorNumber());
+                map.put("street1", contactAddress.getStreet1());
+                map.put("zipCodeId", contactAddress.getZipCode() != null ? contactAddress.getZipCode().getId() : null);
+                map.put("city", contactAddress.getCity() != null ? contactAddress.getCity() : "");
+                map.put("municipalityId", (contactAddress.getMunicipality() == null) ? null : contactAddress.getMunicipality().getId());
+                map.put("regionName", contactAddress.getRegionName());
+                map.put("country", contactAddress.getCountry());
+                map.put("latitude", contactAddress.getLatitude());
+                map.put("longitude", contactAddress.getLongitude());
+                map.put("province", contactAddress.getProvince());
+                map.put("streetUrl", contactAddress.getStreetUrl());
+                map.put("addressProtected", contactAddress.isAddressProtected());
+                map.put("verifiedByVisitour", contactAddress.isVerifiedByVisitour());
+                map.put("primary",contactAddress.isPrimary());
+                map.put("municipalities", (contactAddress.getZipCode().getId() == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(contactAddress.getZipCode().getId())));
+
+            }
+        }
+        return map;
+    }
 }
