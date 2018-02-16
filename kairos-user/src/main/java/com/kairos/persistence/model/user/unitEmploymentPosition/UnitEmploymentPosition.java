@@ -2,13 +2,13 @@ package com.kairos.persistence.model.user.unitEmploymentPosition;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.position.PositionCode;
+import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPositionQueryResult;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -40,6 +40,9 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private EmploymentType employmentType;
 
+    @Relationship(type = STAFF_BELONGS_TO_UNION)
+    private Organization union;
+
     private Long startDateMillis;
     private Long endDateMillis;
     private int totalWeeklyMinutes;
@@ -57,8 +60,6 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
                                   PositionCode positionCode, String description, Long startDateMillis, Long endDateMillis, Long expiryDate
             , int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
-
-
         this.expertise = expertise;
         this.cta = cta;
         this.workingTimeAgreement = workingTimeAgreement;
@@ -206,10 +207,8 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     public UnitEmploymentPositionQueryResult getBasicDetails() {
         UnitEmploymentPositionQueryResult result = null;
         result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek,
-                    this.endDateMillis, this.totalWeeklyMinutes,
-                    this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode);
-
-
+                this.endDateMillis, this.totalWeeklyMinutes,
+                this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode,this.union);
         return result;
     }
 
@@ -222,6 +221,14 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.workingDaysInWeek = workingDaysInWeek;
         this.hourlyWages = hourlyWages;
         this.salary = salary;
+    }
+
+    public Organization getUnion() {
+        return union;
+    }
+
+    public void setUnion(Organization union) {
+        this.union = union;
     }
 
     @Override

@@ -1,12 +1,14 @@
-package com.kairos.service.positionCode;
+package com.kairos.service.position_code;
 
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.position.PositionCode;
+import com.kairos.persistence.model.organization.union.UnionResponseDTO;
+import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepository;
+import com.kairos.response.dto.web.PositionCodeUnionWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
@@ -20,6 +22,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.GROUP;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
@@ -33,7 +36,7 @@ import static com.kairos.constants.AppConstants.TEAM;
 @Service
 
 public class PositionCodeService extends UserBaseService {
-     private final Logger logger = LoggerFactory.getLogger(PositionCodeService.class);
+    private final Logger logger = LoggerFactory.getLogger(PositionCodeService.class);
 
 
     @Inject
@@ -84,7 +87,7 @@ public class PositionCodeService extends UserBaseService {
 
         PositionCode oldPositionCode = positionCodeGraphRepository.findOne(positionCodeId);
         if (!Optional.ofNullable(oldPositionCode).isPresent()) {
-            logger.info("positionCode code not found,{}", positionCode.getName());
+            logger.info("position_code code not found,{}", positionCode.getName());
             throw new DataNotFoundByIdException("PositionCode doesn't exist");
         }
 
@@ -105,11 +108,11 @@ public class PositionCodeService extends UserBaseService {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         PositionCode positionCode = positionCodeGraphRepository.findOne(positionId);
         if (!Optional.ofNullable(positionCode).isPresent()) {
-            throw new DataNotFoundByIdException("positionCode code  not found " + positionId);
+            throw new DataNotFoundByIdException("position_code code  not found " + positionId);
 
         }
         if (!organization.isParentOrganization()) {
-            throw new ActionNotPermittedException("Only parent Organization can remove/edit positionCode names.");
+            throw new ActionNotPermittedException("Only parent Organization can remove/edit position_code names.");
         }
 
 
@@ -155,6 +158,21 @@ public class PositionCodeService extends UserBaseService {
         List<PositionCode> positionCodes = (organization.isParentOrganization()) ? organizationGraphRepository.getPositionCodes(organization.getId()) : organizationGraphRepository.getPositionCodesOfParentOrganization(organization.getId());
         return positionCodes;
 
+    }
+
+    public PositionCodeUnionWrapper getUnionsAndPositionCodes(Long id, String type) {
+        PositionCodeUnionWrapper positionCodeUnionWrapper = new PositionCodeUnionWrapper();
+        Organization organization = organizationService.getOrganizationDetail(id, type);
+        if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
+            throw new DataNotFoundByIdException("Can't find Organization with provided Id");
+        }
+        List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
+        List<UnionResponseDTO> unions = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
+
+        List<PositionCode> positionCodes = (organization.isParentOrganization()) ? organizationGraphRepository.getPositionCodes(organization.getId()) : organizationGraphRepository.getPositionCodesOfParentOrganization(organization.getId());
+        positionCodeUnionWrapper.setPositionCodes(positionCodes);
+        positionCodeUnionWrapper.setUnions(unions);
+        return positionCodeUnionWrapper;
     }
 
 

@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.organization;
+package com.kairos.persistence.model.organization.union;
 
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 

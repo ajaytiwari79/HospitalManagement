@@ -5,14 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.position.PositionCode;
+import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by vipul on 29/1/18.

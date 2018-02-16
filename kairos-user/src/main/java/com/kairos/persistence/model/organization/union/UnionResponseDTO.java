@@ -1,9 +1,6 @@
-package com.kairos.persistence.model.organization;
+package com.kairos.persistence.model.organization.union;
 
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * Created by vipul on 13/2/18.
