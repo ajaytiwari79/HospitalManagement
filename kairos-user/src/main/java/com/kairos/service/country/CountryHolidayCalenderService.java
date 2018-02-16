@@ -20,10 +20,7 @@ import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by oodles on 20/9/16.
@@ -155,14 +152,10 @@ public class CountryHolidayCalenderService extends UserBaseService {
                     countryHolidayCalender.setStartTime(Long.valueOf(String.valueOf(data.get("startTime"))));
                     countryHolidayCalender.setEndTime(Long.valueOf(String.valueOf(data.get("endTime"))));
 
-                    if (country.getCountryHolidayCalenderList() == null) {
-                        country.setCountryHolidayCalenderList(Arrays.asList(countryHolidayCalender));
-                        countryGraphRepository.save(country);
-                        return countryHolidayCalender.retrieveDetails();
-                    }
-
-                    List<CountryHolidayCalender> calenderList = country.getCountryHolidayCalenderList();
+                    List<CountryHolidayCalender> calenderList = country.getCountryHolidayCalenderList() != null?
+                            country.getCountryHolidayCalenderList() : new ArrayList<>();
                     calenderList.add(countryHolidayCalender);
+                    country.setCountryHolidayCalenderList(calenderList);
                     countryGraphRepository.save(country);
                     return countryHolidayCalender.retrieveDetails();
                 }
