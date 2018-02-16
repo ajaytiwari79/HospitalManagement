@@ -208,9 +208,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         UnitEmploymentPositionQueryResult result = null;
         result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek,
                 this.endDateMillis, this.totalWeeklyMinutes,
-                this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode);
-
-
+                this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode,this.union);
         return result;
     }
 

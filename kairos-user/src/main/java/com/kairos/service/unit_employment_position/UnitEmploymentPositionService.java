@@ -126,8 +126,10 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
         unitEmploymentPositions.add(unitEmploymentPosition);
         unitEmployment.setUnitEmploymentPositions(unitEmploymentPositions);
-         save(unitEmployment);
+        save(unitEmployment);
         UnitEmploymentPositionQueryResult unitEmploymentPositionQueryResult = unitEmploymentPosition.getBasicDetails();
+
+        //unitEmploymentPositionQueryResult.setUnion();
         return unitEmploymentPositionQueryResult;
     }
 
@@ -312,15 +314,15 @@ public class UnitEmploymentPositionService extends UserBaseService {
     }
 
     private void prepareUnion(UnitEmploymentPosition oldUnitEmploymentPosition, UnitEmploymentPositionDTO unitEmploymentPositionDTO) {
-        // If already selected but now no value so we are removing
 
+        // If already selected but now no value so we are removing
         if (!Optional.ofNullable(unitEmploymentPositionDTO.getUnionId()).isPresent() && Optional.ofNullable(oldUnitEmploymentPosition.getUnion()).isPresent()) {
             oldUnitEmploymentPosition.setUnion(null);
 
         }
-// If already not present now its present    Previous its absent
 
-        if (Optional.ofNullable(unitEmploymentPositionDTO.getUnionId()).isPresent() && !Optional.ofNullable(oldUnitEmploymentPosition.getUnion()).isPresent()) {
+// If already not present now its present    Previous its absent
+       else if (Optional.ofNullable(unitEmploymentPositionDTO.getUnionId()).isPresent() && !Optional.ofNullable(oldUnitEmploymentPosition.getUnion()).isPresent()) {
             Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unitEmploymentPositionDTO.getUnionId());
             if (!Optional.ofNullable(union).isPresent()) {
                 throw new DataNotFoundByIdException(" union does not exist in unit " + unitEmploymentPositionDTO.getUnionId());
@@ -333,7 +335,6 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
         else if (Optional.ofNullable(unitEmploymentPositionDTO.getUnionId()).isPresent() && Optional.ofNullable(oldUnitEmploymentPosition.getUnion()).isPresent()) {
             if (!unitEmploymentPositionDTO.getUnionId().equals(oldUnitEmploymentPosition.getUnion())) {
-                // TODO CODE TO REMOVE OLDER
                 Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unitEmploymentPositionDTO.getUnionId());
                 if (!Optional.ofNullable(union).isPresent()) {
                     throw new DataNotFoundByIdException(" union does not exist in unit " + unitEmploymentPositionDTO.getUnionId());
@@ -417,7 +418,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         }
         if (!Optional.ofNullable(unitEmployment).isPresent()) {
             logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", staffId, organization.getId());
-            throw new DataNotFoundByIdException("unable to create position_code of staff");
+            throw new DataNotFoundByIdException("unable to get unit employment  of staff");
         }
 
         return unitEmploymentPositionGraphRepository.getAllUnitEmploymentPositionByStaff(unitEmployment.getId(), staffId);
