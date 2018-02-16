@@ -442,7 +442,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
     public boolean addEmploymentToUnitByExternalId(List<TimeCareEmploymentDTO> timeCareEmploymentDTOs, String unitExternalId , Long expertiseId){
         Organization organization = organizationGraphRepository.findByExternalId(unitExternalId);
         if (organization == null) {
-            throw new InternalError("Invalid external id");
+            throw new DataNotFoundByIdException("Invalid organization external id" + unitExternalId);
         }
         Organization parentOrganization = organizationService.fetchParentOrganization(organization.getId());
 
