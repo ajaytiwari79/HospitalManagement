@@ -30,7 +30,7 @@ public class UnitEmploymentPositionController {
     private UnitEmploymentPositionService unitEmploymentPositionService;
 
     @ApiOperation(value = "Create a New Position")
-    @PostMapping(value = "/unit_employment_position")
+    @PostMapping(value = "/unitEmploymentPosition")
     public ResponseEntity<Map<String, Object>> createUnitEmploymentPosition(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid UnitEmploymentPositionDTO position) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.createUnitEmploymentPosition(unitId, type, position, false));
     }
@@ -40,32 +40,32 @@ public class UnitEmploymentPositionController {
    * used to get all positions of organization n by organization and staff Id
    * */
     @ApiOperation(value = "Get all unit_employment_position by organization and staff")
-    @RequestMapping(value = "/unit_employment_position/staff/{staffId}")
+    @RequestMapping(value = "/unitEmploymentPosition/staff/{staffId}")
     ResponseEntity<Map<String, Object>> getAllUnitEmploymentPositionsOfStaff(@PathVariable Long unitId, @RequestParam("type") String type, @PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getAllUnitEmploymentPositionsOfStaff(unitId, staffId, type));
     }
 
     @ApiOperation(value = "Remove unit_employment_position")
-    @DeleteMapping(value = "/unit_employment_position/{unitEmploymentPositionId}")
+    @DeleteMapping(value = "/unitEmploymentPosition/{unitEmploymentPositionId}")
     public ResponseEntity<Map<String, Object>> deleteUnitEmploymentPosition(@PathVariable Long unitEmploymentPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.removePosition(unitEmploymentPositionId));
     }
 
 
     @ApiOperation(value = "Update unit_employment_position")
-    @PutMapping(value = "/unit_employment_position/{unitEmploymentPositionId}")
+    @PutMapping(value = "/unitEmploymentPosition/{unitEmploymentPositionId}")
     public ResponseEntity<Map<String, Object>> updateUnitEmploymentPosition(@PathVariable Long unitEmploymentPositionId, @RequestBody @Valid UnitEmploymentPositionDTO position) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.updateUnitEmploymentPosition(unitEmploymentPositionId, position));
     }
 
     @ApiOperation(value = "Update unit_employment_position's WTA")
-    @PutMapping(value = "/unit_employment_position/{unitEmploymentPositionId}/wta/{wtaId}")
+    @PutMapping(value = "/unitEmploymentPosition/{unitEmploymentPositionId}/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> updateUnitEmploymentPositionWTA(@PathVariable Long unitEmploymentPositionId, @PathVariable Long unitId, @PathVariable Long wtaId, @RequestBody @Valid WTADTO wtadto) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.updateUnitEmploymentPositionWTA(unitId, unitEmploymentPositionId, wtaId, wtadto));
     }
 
     @ApiOperation(value = "get unit_employment_position's WTA")
-    @GetMapping(value = "/unit_employment_position/{unitEmploymentPositionId}/wta")
+    @GetMapping(value = "/unitEmploymentPosition/{unitEmploymentPositionId}/wta")
     public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionWTA(@PathVariable Long unitEmploymentPositionId, @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getUnitEmploymentPositionWTA(unitId, unitEmploymentPositionId));
     }

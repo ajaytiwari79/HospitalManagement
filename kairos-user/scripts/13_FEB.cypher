@@ -1,1 +1,1 @@
-match(o:Organization)  set o.unionId=false  return count(o);
+match(o:Organization)  set o.union=false  return count(o);
