@@ -1,5 +1,6 @@
 package com.kairos.response.dto.web.cta;
 
+import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.agreement.cta.CalculateValueIfPlanned;
 
@@ -14,6 +15,7 @@ public class CTARuleTemplateDefaultDataWrapper {
     private List<TimeTypeDTO> timeTypes=new ArrayList<>();
     private List<ActivityTypeDTO> activityTypes=new ArrayList<>();
     private List<EmploymentTypeDTO> employmentTypes=new ArrayList<>();
+    private List<PresenceTypeDTO> plannedTime=new ArrayList<>();
     private List<Map<String, Object>>currencies=new ArrayList<>();
     private List<Map<String, Object>>holidayMapList=new ArrayList<>();
 
@@ -84,5 +86,13 @@ public class CTARuleTemplateDefaultDataWrapper {
 
     public void setHolidayMapList(List<Map<String, Object>> holidayMapList) {
         this.holidayMapList = holidayMapList;
+    }
+
+    public List<PresenceTypeDTO> getPlannedTime() {
+        return plannedTime;
+    }
+
+    public void setPlannedTime(List<PresenceTypeDTO> plannedTime) {
+        this.plannedTime = plannedTime;
     }
 }
