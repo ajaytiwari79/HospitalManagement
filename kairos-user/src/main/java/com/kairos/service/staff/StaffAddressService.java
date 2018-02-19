@@ -112,6 +112,9 @@ public class StaffAddressService extends UserBaseService {
 
 
             // Geography Data
+            if(contactAddress.getId()!=null){
+                staffGraphRepository.removeOldMuniciplities(contactAddress.getId());
+            }
             contactAddress.setMunicipality(municipality);
             contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
             contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
@@ -134,6 +137,9 @@ public class StaffAddressService extends UserBaseService {
             contactAddress.setStreet1(addressDTO.getStreet1());
             contactAddress.setHouseNumber(addressDTO.getHouseNumber());
             contactAddress.setFloorNumber(addressDTO.getFloorNumber());
+            if(contactAddress.getId()!=null){
+                staffGraphRepository.removeOldZips(contactAddress.getId());
+            }
             contactAddress.setZipCode(zipCode);
             contactAddress.setCity(zipCode.getName());
             contactAddress.setPrivateAddress(addressDTO.isAddressProtected());
@@ -186,11 +192,17 @@ public class StaffAddressService extends UserBaseService {
 
 
                 // Geography Data
+                if(contactAddress.getId()!=null) {
+                    staffGraphRepository.removeOldMuniciplities(contactAddress.getId());
+                }
                 contactAddress.setMunicipality(municipality);
                 contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
                 contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
                 contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
                 contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
+                if(contactAddress.getId()!=null) {
+                    staffGraphRepository.removeOldZips(contactAddress.getId());
+                }
                 contactAddress.setZipCode(zipCode);
                 contactAddress.setCity(zipCode.getName());
                 contactAddress.setVerifiedByVisitour(true);

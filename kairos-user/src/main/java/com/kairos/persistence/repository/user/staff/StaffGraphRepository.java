@@ -355,5 +355,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
     @Query("match(s:Staff)-[:BELONGS_TO]-(u:Employment)-[:HAS_EMPLOYMENTS]-(o:Organization) where id(o)={1} AND s.externalId={0} return s")
     Staff findStaffByExternalId(Long externalId,Long organizationId);
 
+    @Query("match(c:ContactAddress)-[z:ZIP_CODE]-(zip:ZipCode) where id(c)={0} DETACH delete z")
+    void removeOldZips(Long contactAddressId);
+
+    @Query("match(contactAddress:ContactAddress)-[m:MUNICIPALITY]-(municipality:Municipality) where id(contactAddress)={0} delete m")
+    void removeOldMuniciplities(Long contactAddressId);
 
 }
