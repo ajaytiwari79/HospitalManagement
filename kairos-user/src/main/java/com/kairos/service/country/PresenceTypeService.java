@@ -2,6 +2,7 @@ package com.kairos.service.country;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.PresenceTypeWithTimeTypeDTO;
 import com.kairos.persistence.model.user.country.Country;
@@ -10,6 +11,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.PresenceTypeRepository;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class PresenceTypeService extends UserBaseService {
     private TimeTypeRestClient timeTypeRestClient;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
+    @Inject private OrganizationService organizationService;
     public PresenceTypeDTO addPresenceType(PresenceTypeDTO presenceTypeDTO, Long countryId) {
 
         Country country = countryGraphRepository.findOne(countryId);
@@ -106,7 +109,8 @@ public class PresenceTypeService extends UserBaseService {
     }
 
     public PresenceTypeWithTimeTypeDTO getAllPresenceTypeAndTimeTypesByUnitId(Long unitId) {
-        Country country= organizationGraphRepository.getCountry(unitId);
+        Organization organization = organizationService.fetchParentOrganization(unitId);
+        Country country= organizationGraphRepository.getCountry(organization.getId());
         if (!Optional.ofNullable(country).isPresent()) {
             logger.error("Country not found by Id while getting Presence type  and Time type " + unitId);
             throw new DataNotFoundByIdException("Invalid UnitId");
