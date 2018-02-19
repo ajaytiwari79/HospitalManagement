@@ -26,6 +26,7 @@ import com.kairos.persistence.model.user.unitEmploymentPosition.StaffUnitEmploym
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
@@ -52,6 +53,7 @@ import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.unitEmploymentPosition.UnitEmploymentPositionService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FileUtil;
@@ -150,6 +152,7 @@ public class StaffService extends UserBaseService {
     private UnitEmploymentPositionGraphRepository unitEmploymentPositionGraphRepository;
     @Autowired
     private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
+    @Inject private UnitEmploymentPositionService unitEmploymentPositionService;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -1495,11 +1498,25 @@ public class StaffService extends UserBaseService {
     }
 
     public List<com.kairos.response.dto.web.StaffDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds){
-       List<Staff> staffs =  staffGraphRepository.getStaffByExperties(unitId,expertiesIds);
-       List<Skill> skills = staffGraphRepository.getSkillByStaffIds(staffs.stream().map(s->s.getId()).collect(Collectors.toList()));
-       List<com.kairos.response.dto.web.StaffDTO> staffDTOS = staffs.stream().map(s->new com.kairos.response.dto.web.StaffDTO(s.getId(),s.getFirstName(),getSkillSet(skills))).collect(Collectors.toList());
-       return staffDTOS;
+        List<Staff> staffs = staffGraphRepository.getStaffByExperties(unitId, expertiesIds);
+        List<Skill> skills = staffGraphRepository.getSkillByStaffIds(staffs.stream().map(s -> s.getId()).collect(Collectors.toList()));
+        List<com.kairos.response.dto.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
+        staffs.forEach(s -> {
+                com.kairos.response.dto.web.StaffDTO staffDTO = new com.kairos.response.dto.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
+                List<UnitEmploymentPositionQueryResult> ueps = unitEmploymentPositionService.getAllUnitEmploymentPositionsOfStaff(unitId, s.getId(), "Organization");
+                expertiesIds.forEach(e -> {
+                    ueps.forEach(uep -> {
+                        if (uep.getExpertise().getId().equals(e)) {
+                            staffDTO.setUnitEmploymentPositionId(uep.getId());
+                            staffDTOS.add(staffDTO);
+                        }
+                    });
+                });
+
+        });
+        return staffDTOS;
     }
+
 
     public Set<SkillDTO> getSkillSet(List<Skill> skills){
         return skills.stream().map(skill->new SkillDTO(skill.getId(),skill.getName(),skill.getDescription())).collect(Collectors.toSet());

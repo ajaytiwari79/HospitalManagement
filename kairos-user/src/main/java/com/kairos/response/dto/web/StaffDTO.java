@@ -48,6 +48,7 @@ public class StaffDTO {
 
     private String workTelephone;
 
+    private Long unitEmploymentPositionId;
     private CurrentAddress primaryAddress;
     private Set<SkillDTO> skillSet;
 
@@ -59,6 +60,15 @@ public class StaffDTO {
 
     public Set<SkillDTO> getSkillSet() {
         return skillSet;
+    }
+
+
+    public Long getUnitEmploymentPositionId() {
+        return unitEmploymentPositionId;
+    }
+
+    public void setUnitEmploymentPositionId(Long unitEmploymentPositionId) {
+        this.unitEmploymentPositionId = unitEmploymentPositionId;
     }
 
     public void setSkillSet(Set<SkillDTO> skillSet) {
