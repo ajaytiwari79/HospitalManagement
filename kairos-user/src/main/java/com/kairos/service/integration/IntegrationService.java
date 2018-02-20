@@ -1,4 +1,5 @@
 package com.kairos.service.integration;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.integration.TimeCare;
 import com.kairos.persistence.model.user.integration.Twillio;
 import com.kairos.persistence.model.user.integration.Visitour;
@@ -40,6 +41,7 @@ public class IntegrationService {
             timeCare1.setIntegrationId(timeCare.getIntegrationId());
             timeCare1.setTimeCareExternalId(timeCare.getTimeCareExternalId());
             timeCare1.setOrganizationId(unitId);
+
             timeCareGraphRepository.save(timeCare1);
             return timeCare1;
     }

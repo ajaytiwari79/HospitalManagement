@@ -9,6 +9,7 @@ import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.custom_exception.FlsCredentialException;
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -53,7 +54,9 @@ import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
-import com.kairos.service.unitEmploymentPosition.UnitEmploymentPositionService;
+import com.kairos.service.unit_employment_position.UnitEmploymentPositionService;
+
+import com.kairos.util.CPRUtil;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FileUtil;
@@ -79,6 +82,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -214,7 +219,7 @@ public class StaffService extends UserBaseService {
         objectToUpdate.setFirstName(staffPersonalDetail.getFirstName());
         objectToUpdate.setLastName(staffPersonalDetail.getLastName());
         objectToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());
-        objectToUpdate.setActive(staffPersonalDetail.getActive());
+        objectToUpdate.setCurrentStatus(staffPersonalDetail.getCurrentStatus());
         objectToUpdate.setCprNumber(staffPersonalDetail.getCprNumber());
         objectToUpdate.setSpeedPercent(staffPersonalDetail.getSpeedPercent());
         objectToUpdate.setWorkPercent(staffPersonalDetail.getWorkPercent());
@@ -225,12 +230,13 @@ public class StaffService extends UserBaseService {
         objectToUpdate.setCostHour(staffPersonalDetail.getCostHour());
         objectToUpdate.setCostHourOvertime(staffPersonalDetail.getCostHourOvertime());
         objectToUpdate.setCapacity(staffPersonalDetail.getCapacity());
+        objectToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
 
         int count = staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId);
         if (count != 0 && objectToUpdate.getVisitourId() != 0) {
             updateStaffPersonalInfoInFLS(objectToUpdate, unitId); // Update info to FLS
         }
-        if (!staffPersonalDetail.getActive()) {
+        if (staffPersonalDetail.getCurrentStatus()== StaffStatusEnum.INACTIVE) {
             objectToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
         }
         objectToUpdate.setSignature(staffPersonalDetail.getSignature());
@@ -289,13 +295,14 @@ public class StaffService extends UserBaseService {
         map.put("lastName", staff.getLastName());
         map.put("profilePic", envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
         map.put("familyName", staff.getFamilyName());
-        map.put("active", staff.isActive());
+        map.put("currentStatus", staff.getCurrentStatus());
         map.put("signature", staff.getSignature());
         map.put("inactiveFrom", DateConverter.getDate(staff.getInactiveFrom()));
         map.put("expertiseId", staffGraphRepository.getExpertiseId(staff.getId()));
         map.put("languageId", staffGraphRepository.getLanguageId(staff.getId()));
         map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));
         map.put("cprNumber", staff.getCprNumber());
+        map.put("careOfName",staff.getCareOfName());
 
         // Visitour Speed Profile
         map.put("speedPercent", staff.getSpeedPercent());
@@ -487,7 +494,7 @@ public class StaffService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 position");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 position_code");
             }
             Row header = sheet.getRow(0);
             int NumberOfColumnsInSheet = header.getLastCellNum();
@@ -737,7 +744,7 @@ public class StaffService extends UserBaseService {
         adminAsStaff.setUser(admin);
         adminAsStaff.setFirstName(admin.getFirstName());
         adminAsStaff.setLastName(admin.getLastName());
-        adminAsStaff.setActive(true);
+        adminAsStaff.setCurrentStatus(StaffStatusEnum.ACTIVE);
         adminAsStaff.setEmail(admin.getEmail());
         adminAsStaff.setUserName(admin.getEmail());
         staffGraphRepository.save(adminAsStaff);
@@ -780,7 +787,7 @@ public class StaffService extends UserBaseService {
         staff.setCprNumber(String.valueOf(data.getCprNumber()));
         staff.setFamilyName(data.getFamilyName());
         staff.setEmployedSince(data.getEmployedSince().getTime());
-        staff.setActive(data.getActive());
+        staff.setCurrentStatus(data.getCurrentStatus());
         staff = createStaff(staff);
         if (staff != null) {
             if (data.getTeamId() != null) {
@@ -900,6 +907,11 @@ public class StaffService extends UserBaseService {
         ObjectMapper objectMapper = new ObjectMapper();
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
+
+        //method call for getting Date of Birth From CPR Number
+        Date dateOfBirth=DateUtil.asDate(CPRUtil.getDateOfBirthFromCPR(payload.getCprNumber()));
+        staff.setDateOfBirth(dateOfBirth);
+        staff.setCurrentStatus(payload.getCurrentStatus());
         if (Optional.ofNullable(staffQueryResult).isPresent()) {
             contactAddress.setId(staffQueryResult.getContactAddressId());
             contactDetail.setId(staffQueryResult.getContactDetailId());
@@ -1033,7 +1045,7 @@ public class StaffService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 position");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 2 position_code");
             }
 
             Staff staff;

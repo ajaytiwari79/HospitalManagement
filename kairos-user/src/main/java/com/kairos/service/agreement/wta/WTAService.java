@@ -285,6 +285,8 @@ public class WTAService extends UserBaseService {
 
 
 
+        oldWta.setDescription(updateDTO.getDescription());
+        oldWta.setName(updateDTO.getName());
 
         oldWta.setStartDateMillis(updateDTO.getStartDateMillis());
         if (oldWta.getEndDateMillis() !=null ) {

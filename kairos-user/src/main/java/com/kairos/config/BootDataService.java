@@ -5,6 +5,7 @@ import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.ClientEnum;
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
@@ -801,7 +802,7 @@ public class BootDataService {
         adminAsStaff.setFamilyName("Ulrik");
         adminAsStaff.setFirstName("Ulrik");
         adminAsStaff.setLastName("Rasmussen");
-        adminAsStaff.setActive(true);
+        adminAsStaff.setCurrentStatus(StaffStatusEnum.ACTIVE);
         adminAsStaff.setEmail("ulrik@kairos.com");
         adminAsStaff.setNationalInsuranceNumber("NIN44500331");
         adminAsStaff.setLanguage(danish);

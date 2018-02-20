@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.kairos.persistence.model.enums.StaffStatusEnum;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,6 @@ public class StaffDTO {
     private Integer workPhone;
 
     private Date employedSince;
-    private Boolean active;
     private Long inactiveFrom;
 
     @NotNull(message = "error.StaffDTO.teamId.notnull")
@@ -46,6 +46,7 @@ public class StaffDTO {
 
     private  Long unit;
     private Long anonymousStaffId;
+    private StaffStatusEnum currentStatus;
 
     public String getFamilyName() {
         return familyName;
@@ -126,15 +127,6 @@ public class StaffDTO {
         this.employedSince = employedSince;
     }
 
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
     public long getInactiveFrom() {
         return inactiveFrom;
     }
@@ -173,5 +165,13 @@ public class StaffDTO {
 
     public void setAnonymousStaffId(Long anonymousStaffId) {
         this.anonymousStaffId = anonymousStaffId;
+    }
+
+    public StaffStatusEnum getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(StaffStatusEnum currentStatus) {
+        this.currentStatus = currentStatus;
     }
 }

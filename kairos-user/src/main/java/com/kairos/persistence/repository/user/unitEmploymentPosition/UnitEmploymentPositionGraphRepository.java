@@ -42,16 +42,17 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "unitEmpPosition.lastModificationDate as lastModificationDate")
     StaffUnitEmploymentDetails getUnitEmploymentPositionById(long unitEmploymentId);
 /* Error while binding to WTA
-* java.lang.IllegalArgumentException: Can not set com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO field com.kairos.persistence.model.user.position.StaffUnitEmploymentDetails.workingTimeAgreement to java.util.Collections$UnmodifiableMap
+* java.lang.IllegalArgumentException: Can not set com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO field com.kairos.persistence.model.user.position_code.StaffUnitEmploymentDetails.workingTimeAgreement to java.util.Collections$UnmodifiableMap
 * */
     @Query("match (uEmp:UnitEmployment)  where  Id(uEmp)={0} \n" +
             "match(uEmp)-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]->(unitEmpPosition:UnitEmploymentPosition{deleted:false})" +
             "match(unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
             "match(unitEmpPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
-            "match(unitEmpPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode)" +
+            "match(unitEmpPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false})" +
             "optional match (unitEmpPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement)\n" +
             "optional match (unitEmpPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
-            "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement," +
+            "optional match (unitEmpPosition)-[:" + STAFF_BELONGS_TO_UNION + "]->(unionData:Organization{isEnable:true,union:true})\n" +
+            "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union," +
             "positionCode as positionCode," +
             "unitEmpPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
             "unitEmpPosition.startDateMillis as startDateMillis," +
