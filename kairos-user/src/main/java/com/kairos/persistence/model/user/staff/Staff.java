@@ -62,7 +62,6 @@ public class Staff extends UserBaseEntity {
     private String visitourTeamId;
     private Language language;
 
-
     @Relationship(type = HAS_EXPERTISE_IN)
     Expertise expertise;
 
