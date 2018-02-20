@@ -1,9 +1,9 @@
-package com.kairos.service.positionCode;
+package com.kairos.service.position_code;
 
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPosition;
 import com.kairos.response.dto.web.UnitEmploymentPositionDTO;
-import com.kairos.service.unitEmploymentPosition.UnitEmploymentPositionService;
+import com.kairos.service.unit_employment_position.UnitEmploymentPositionService;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -46,7 +45,7 @@ public class UnitEmploymentPositionServiceTest {
     public void validateUnitEmploymentPositionWithExpertiseWithoutEndDate() throws Exception {
         unitEmploymentPositionDTO = new UnitEmploymentPositionDTO(14L, 733L, new DateTime("2018-02-10T00:00:00.000Z").getMillis(), null, 100, 10.2f, 10.2f, 10.2f, null);
         when(unitEmploymentPositionService.validateUnitEmploymentPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO))
-                .thenThrow(new ActionNotPermittedException("Already a unit employment positionCode is active with same expertise on this period."));
+                .thenThrow(new ActionNotPermittedException("Already a unit employment position_code is active with same expertise on this period."));
     }
 
     @Test
@@ -61,7 +60,7 @@ public class UnitEmploymentPositionServiceTest {
     /*        unitEmploymentPositionDTO.setStartDateMillis(1486020502000L);
         unitEmploymentPositionDTO.setEndDateMillis(1488439702000L);
         unitEmploymentPositionService.validateUnitEmploymentPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO);
-        when(unitEmploymentPositionService.validateUnitEmploymentPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO)).thenThrow(new ActionNotPermittedException("Already a unit employment positionCode is active with same expertise on this period."));
+        when(unitEmploymentPositionService.validateUnitEmploymentPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO)).thenThrow(new ActionNotPermittedException("Already a unit employment position_code is active with same expertise on this period."));
         /*Epoch timestamp: 1549092502
           Timestamp in milliseconds: 1549092502000
           Human time (GMT): Saturday, 2 February 2019 07:28:22
@@ -112,4 +111,5 @@ UnitEmploymentPosition uep5 = new UnitEmploymentPosition(new DateTime("2018-02-1
         unitEmploymentPositionService.validateUnitEmploymentPositionWithExpertise(unitEmploymentPositions, unitEmploymentPositionDTO);
 
     }
+
 }

@@ -22,6 +22,15 @@ public class SkillDTO {
 
     private List<Long> tags;
 
+    public SkillDTO() {
+    }
+
+    public SkillDTO(Long id, @NotEmpty(message = "error.SkillCategory.name.notEmpty") @NotNull(message = "error.SkillCategory.name.notnull") String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
+
     public String getName() {
         return name;
     }

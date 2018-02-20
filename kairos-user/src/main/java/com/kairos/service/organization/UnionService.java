@@ -3,12 +3,14 @@ package com.kairos.service.organization;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationQueryResult;
-import com.kairos.persistence.model.organization.UnionQueryWrapper;
-import com.kairos.persistence.model.organization.UnionResponseDTO;
+import com.kairos.persistence.model.organization.union.UnionQueryWrapper;
+import com.kairos.persistence.model.organization.union.UnionResponseDTO;
+import com.kairos.persistence.model.organization.union.UnionWrapper;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +56,8 @@ public class UnionService {
         return unionQueryWrapper;
     }
 
+    // TODO USED IN FUTURE
     public List<UnionResponseDTO> getAllUnionByOrganization(Long unitId) {
-
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
             throw new DataNotFoundByIdException("Can't find Organization with provided Id");
@@ -63,8 +65,38 @@ public class UnionService {
         List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
         List<UnionResponseDTO> organizationQueryResult = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
         return organizationQueryResult;
+    }
+
+
+
+    public List<UnionResponseDTO> getAllApplicableUnionsForOrganization(Long unitId) {
+        List<UnionResponseDTO> allUnions = new ArrayList<>();
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
+            throw new DataNotFoundByIdException("Can't find Organization with provided Id");
+        }
+        List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
+
+        allUnions = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
+        return allUnions;
 
     }
 
+    public boolean addUnionInOrganization(Long unionId, Long organizationId, boolean joined) {
+        Organization organization = organizationGraphRepository.findOne(organizationId);
+        if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
+            throw new DataNotFoundByIdException("Can't find Organization with provided Id");
+        }
+        Organization union = organizationGraphRepository.findOne(unionId);
+        if (!Optional.ofNullable(union).isPresent() || union.isUnion() == false || union.isEnable() == false) {
+            throw new DataNotFoundByIdException("Can't find union with provided Id");
+        }
+        if (joined)
+            organizationGraphRepository.addUnionInOrganization(organizationId, unionId, DateUtil.getCurrentDate().getTime());
+        else
+            organizationGraphRepository.removeUnionFromOrganization(organizationId, unionId, DateUtil.getCurrentDate().getTime());
+
+        return joined;
+    }
 
 }

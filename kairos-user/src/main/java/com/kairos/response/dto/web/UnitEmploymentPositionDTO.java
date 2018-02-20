@@ -9,11 +9,11 @@ import javax.validation.constraints.NotNull;
  */
 public class UnitEmploymentPositionDTO {
 
-    @NotNull(message = "Position code  is required for positionCode")
-    @Range(min = 0, message = "Position code is required for positionCode")
+    @NotNull(message = "Position code  is required for position_code")
+    @Range(min = 0, message = "Position code is required for position_code")
     private Long positionCodeId;
-    @NotNull(message = "expertise is required for positionCode")
-    @Range(min = 0, message = "expertise is required for positionCode")
+    @NotNull(message = "expertise is required for position_code")
+    @Range(min = 0, message = "expertise is required for position_code")
     private Long expertiseId;
 
     private Long startDateMillis;
@@ -21,7 +21,7 @@ public class UnitEmploymentPositionDTO {
 
     @Range(min = 0, max = 60, message = "Incorrect Weekly minute")
     private int totalWeeklyMinutes;
-    @Range(min = 0,  message = "Incorrect Weekly Hours")
+    @Range(min = 0, message = "Incorrect Weekly Hours")
     private int totalWeeklyHours;
 
     private float avgDailyWorkingHours;
@@ -40,6 +40,7 @@ public class UnitEmploymentPositionDTO {
     private Long staffId;
     // private Long expiryDate;
 
+    private Long unionId;
 
     public UnitEmploymentPositionDTO() {
         //default cons
@@ -200,13 +201,6 @@ public class UnitEmploymentPositionDTO {
         this.salary = salary;
     }
 
-    /*public Position.EmploymentType getEmploymentType() {
-        return employmentType;
-    }
-
-    public void setEmploymentType(Position.EmploymentType employmentType) {
-        this.employmentType = employmentType;
-    }*/
 
     public long getEmploymentTypeId() {
         return employmentTypeId;
@@ -224,4 +218,11 @@ public class UnitEmploymentPositionDTO {
         this.staffId = staffId;
     }
 
+    public Long getUnionId() {
+        return unionId;
+    }
+
+    public void setUnionId(Long unionId) {
+        this.unionId = unionId;
+    }
 }

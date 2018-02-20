@@ -70,6 +70,7 @@ public class OrganizationHierarchyService {
             }
             QueryResult queryResult = new QueryResult();
             queryResult.setId(organization.getId());
+            queryResult.setUnion(organization.isUnion());
             queryResult.setName(organization.getName());
             queryResult.setKairosHub(organization.isKairosHub());
             queryResult.setAccessable(true);
