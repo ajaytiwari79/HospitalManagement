@@ -1,9 +1,12 @@
 package com.kairos.service.unitEmploymentPosition;
 
+import com.kairos.client.dto.timeBank.CostTimeAgreementDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
@@ -500,4 +503,26 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
         return true;
     }
+
+    public CostTimeAgreementDTO getUnitEmploymentPositionCTA(Long unitEmploymentPositionId) {
+        UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
+        unitEmploymentPositionGraphRepository.getCtaByUnitEmploymentId(unitEmploymentPositionId);
+        CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitEmploymentPositionId);
+        costTimeAgreementDTO.setStaffId(unitEmploymentPosition.getStaff().getId());
+        costTimeAgreementDTO.setContractedMinByWeek(unitEmploymentPosition.getTotalWeeklyMinutes());
+        costTimeAgreementDTO.setWorkingDays(unitEmploymentPosition.getWorkingDaysInWeek());
+        costTimeAgreementDTO.setCtaRuleTemplateDTOS(getCtaRuleTemplateDtos(unitEmploymentPosition.getCta().getRuleTemplates()));
+        return costTimeAgreementDTO;
+    }
+
+    public List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> getCtaRuleTemplateDtos(List<RuleTemplate> ruleTemplates){
+        List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ruleTemplates.size());
+        ruleTemplates.forEach(rt->{
+            com.kairos.client.dto.timeBank.CTARuleTemplateDTO ctaRuleTemplateDTO = new com.kairos.client.dto.timeBank.CTARuleTemplateDTO();
+            ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
+
+        });
+        return ctaRuleTemplateDTOS;
+    }
+
 }
