@@ -1,6 +1,5 @@
 package com.kairos.client.dto.timeBank;
 
-import com.kairos.activity.util.TimeInterval;
 
 public class CTAIntervalDTO {
 
@@ -32,7 +31,4 @@ public class CTAIntervalDTO {
         this.compensationValue = compensationValue;
     }
 
-    public TimeInterval getInterval() {
-        return new TimeInterval(startTime,endTime);
-    }
 }
