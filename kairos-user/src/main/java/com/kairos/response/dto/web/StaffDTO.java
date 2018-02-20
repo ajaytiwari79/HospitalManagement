@@ -1,7 +1,11 @@
 package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.response.dto.web.skill.SkillDTO;
+
+import java.util.Set;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
+
 
 /**
  * Created by oodles on 20/7/17.
@@ -44,7 +48,33 @@ public class StaffDTO {
 
     private String workTelephone;
 
+    private Long unitEmploymentPositionId;
     private CurrentAddress primaryAddress;
+    private Set<SkillDTO> skillSet;
+
+    public StaffDTO(Long id, String firstName, Set<SkillDTO> skillSet) {
+        this.id = id;
+        this.firstName = firstName;
+        this.skillSet = skillSet;
+    }
+
+    public Set<SkillDTO> getSkillSet() {
+        return skillSet;
+    }
+
+
+    public Long getUnitEmploymentPositionId() {
+        return unitEmploymentPositionId;
+    }
+
+    public void setUnitEmploymentPositionId(Long unitEmploymentPositionId) {
+        this.unitEmploymentPositionId = unitEmploymentPositionId;
+    }
+
+    public void setSkillSet(Set<SkillDTO> skillSet) {
+        this.skillSet = skillSet;
+    }
+
 
     private StaffStatusEnum currentStatus;
 

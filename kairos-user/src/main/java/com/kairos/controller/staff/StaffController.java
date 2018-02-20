@@ -579,5 +579,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByUserId(userId));
     }
 
+    @RequestMapping(value = "/getStaffByExperties", method = RequestMethod.POST)
+    @ApiOperation("getStaffByExperties")
+    public ResponseEntity<Map<String, Object>> getStaffByExperties(@PathVariable Long unitId, @RequestBody List<Long> expertiesIds) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByExperties(unitId, expertiesIds));
+    }
+
 
 }
