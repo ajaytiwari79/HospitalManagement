@@ -113,7 +113,7 @@ public class StaffAddressService extends UserBaseService {
 
             // Geography Data
             if(contactAddress.getId()!=null){
-                staffGraphRepository.removeOldMuniciplities(contactAddress.getId());
+                staffGraphRepository.removeMunicipalityRelationship(contactAddress.getId());
             }
             contactAddress.setMunicipality(municipality);
             contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
@@ -138,7 +138,7 @@ public class StaffAddressService extends UserBaseService {
             contactAddress.setHouseNumber(addressDTO.getHouseNumber());
             contactAddress.setFloorNumber(addressDTO.getFloorNumber());
             if(contactAddress.getId()!=null){
-                staffGraphRepository.removeOldZips(contactAddress.getId());
+                staffGraphRepository.removeZipCodeRelationship(contactAddress.getId());
             }
             contactAddress.setZipCode(zipCode);
             contactAddress.setCity(zipCode.getName());
@@ -193,7 +193,7 @@ public class StaffAddressService extends UserBaseService {
 
                 // Geography Data
                 if(contactAddress.getId()!=null) {
-                    staffGraphRepository.removeOldMuniciplities(contactAddress.getId());
+                    staffGraphRepository.removeMunicipalityRelationship(contactAddress.getId());
                 }
                 contactAddress.setMunicipality(municipality);
                 contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
@@ -201,7 +201,7 @@ public class StaffAddressService extends UserBaseService {
                 contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
                 contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
                 if(contactAddress.getId()!=null) {
-                    staffGraphRepository.removeOldZips(contactAddress.getId());
+                    staffGraphRepository.removeZipCodeRelationship(contactAddress.getId());
                 }
                 contactAddress.setZipCode(zipCode);
                 contactAddress.setCity(zipCode.getName());
