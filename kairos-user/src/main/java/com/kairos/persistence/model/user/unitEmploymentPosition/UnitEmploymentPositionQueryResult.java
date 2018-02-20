@@ -3,11 +3,12 @@ package com.kairos.persistence.model.user.unitEmploymentPosition;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.position.PositionCode;
+import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
@@ -35,6 +36,7 @@ public class UnitEmploymentPositionQueryResult {
     private PositionCode positionCode;
     private WorkingTimeAgreement workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
+    private Organization union;
 
     public int getWorkingDaysInWeek() {
         return workingDaysInWeek;
@@ -170,6 +172,14 @@ public class UnitEmploymentPositionQueryResult {
         this.totalWeeklyHours = totalWeeklyHours;
     }
 
+    public Organization getUnion() {
+        return union;
+    }
+
+    public void setUnion(Organization union) {
+        this.union = union;
+    }
+
     public UnitEmploymentPositionQueryResult() {
         //default cons
     }
@@ -190,7 +200,7 @@ public class UnitEmploymentPositionQueryResult {
         this.costTimeAgreement = costTimeAgreement;
     }
 
-    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode) {
+    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode,Organization union) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;
@@ -202,24 +212,8 @@ public class UnitEmploymentPositionQueryResult {
         this.employmentType = employmentType;
         this.salary = salary;
         this.positionCode = positionCode;
+        this.union=union;
     }
 
-    public UnitEmploymentPositionQueryResult(Expertise expertise, boolean deleted, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, Long lastModificationDate, int totalWeeklyHours, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, int totalWeeklyMinutes, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
-        this.expertise = expertise;
-        this.deleted = deleted;
-        this.startDateMillis = startDateMillis;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.endDateMillis = endDateMillis;
-        this.lastModificationDate = lastModificationDate;
-        this.totalWeeklyHours = totalWeeklyHours;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.hourlyWages = hourlyWages;
-        this.id = id;
-        this.employmentType = employmentType;
-        this.salary = salary;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.positionCode = positionCode;
-        this.workingTimeAgreement = workingTimeAgreement;
-        this.costTimeAgreement = costTimeAgreement;
-    }
 }
+

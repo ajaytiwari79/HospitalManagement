@@ -210,6 +210,8 @@ public abstract class RelationshipConstants {
     public final static String RESOURCE_HAS_EQUIPMENT = "RESOURCE_HAS_EQUIPMENT";
     public final static String LOCATED_IN = "LOCATED_IN";
     public final static String HAS_PAY_LEVEL_MATRIX = "HAS_PAY_LEVEL_MATRIX";
+    public final static String ORAGANIZATION_HAS_UNIONS = "ORAGANIZATION_HAS_UNIONS";
+    public final static String STAFF_BELONGS_TO_UNION = "STAFF_BELONGS_TO_UNION";
 
 
     /**

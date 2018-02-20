@@ -18,7 +18,7 @@ import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.department.Department;
 import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
-import com.kairos.persistence.model.user.position.PositionCode;
+import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Resource;
@@ -205,6 +205,7 @@ public class Organization extends UserBaseEntity {
     private Date nightStartTimeFrom;
     @DateString("HH:MM")
     private Date nightEndTimeTo;
+    private boolean union;
 
     //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"
     public Organization(String name, List<Group> groupList, List<Organization> children) {
@@ -216,6 +217,13 @@ public class Organization extends UserBaseEntity {
     public Organization() {
     }
 
+    public boolean isUnion() {
+        return union;
+    }
+
+    public void setUnion(boolean union) {
+        this.union = union;
+    }
 
     public List<LocalAreaTag> getLocalAreaTags() {
         return localAreaTags;
@@ -777,4 +785,5 @@ public class Organization extends UserBaseEntity {
     public void setNightEndTimeTo(Date nightEndTimeTo) {
         this.nightEndTimeTo = nightEndTimeTo;
     }
+
 }
