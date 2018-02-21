@@ -28,7 +28,7 @@ public class ParentOrganizationDTO {
     private boolean prekairos;
     AddressDTO homeAddress;
     Long levelId;
-
+    private  Boolean union;
     public ParentOrganizationDTO() {
         //default constructor
     }
@@ -147,5 +147,13 @@ public class ParentOrganizationDTO {
         this.levelId = levelId;
         this.typeId = typeId;
         this.subTypeId = subTypeId;
+    }
+
+    public Boolean getUnion() {
+        return union;
+    }
+
+    public void setUnion(Boolean union) {
+        this.union = union;
     }
 }

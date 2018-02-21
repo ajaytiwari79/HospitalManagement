@@ -32,11 +32,16 @@ public class CTARuleTemplateDTO {
     private BudgetType budgetType;
     private List<CalculateValueIfPlanned> calculateValueIfPlanned =new ArrayList<>();
     private List<Long> employmentTypes =new ArrayList<>();
-    private ActivityType activityType;
+//    private ActivityType activityType;
     private PlanningCategory planningCategory;
     private List<StaffFunction> staffFunctions=new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private List<Long> timeTypes =new ArrayList<>();
+
+    private ActivityTypeForCostCalculation activityTypeForCostCalculation;
+    private List<Long> activityIds;
+    private Long timeTypeId;
+    private Long plannedTimeId;
 
     public CTARuleTemplateDTO() {
     }
@@ -174,13 +179,13 @@ public class CTARuleTemplateDTO {
         this.employmentTypes = employmentTypes;
     }
 
-    public ActivityType getActivityType() {
+    /*public ActivityType getActivityType() {
         return activityType;
     }
 
     public void setActivityType(ActivityType activityType) {
         this.activityType = activityType;
-    }
+    }*/
 
     public PlanningCategory getPlanningCategory() {
         return planningCategory;
@@ -214,6 +219,38 @@ public class CTARuleTemplateDTO {
         this.timeTypes = timeTypes;
     }
 
+    public ActivityTypeForCostCalculation getActivityTypeForCostCalculation() {
+        return activityTypeForCostCalculation;
+    }
+
+    public void setActivityTypeForCostCalculation(ActivityTypeForCostCalculation activityTypeForCostCalculation) {
+        this.activityTypeForCostCalculation = activityTypeForCostCalculation;
+    }
+
+    public List<Long> getActivityIds() {
+        return activityIds;
+    }
+
+    public void setActivityIds(List<Long> activityIds) {
+        this.activityIds = activityIds;
+    }
+
+    public Long getTimeTypeId() {
+        return timeTypeId;
+    }
+
+    public void setTimeTypeId(Long timeTypeId) {
+        this.timeTypeId = timeTypeId;
+    }
+
+    public Long getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(Long plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
+    }
+
     public CTARuleTemplateDTO cloneNew(){
         this.setId(null);
         for (CompensationTableInterval compensationTableInterval : this.getCompensationTable().getCompensationTableInterval()) {
@@ -230,7 +267,7 @@ public class CTARuleTemplateDTO {
             ctaRuleTemplatePhaseInfo.setId(null);
         }
 
-        this.getActivityType().setId(null);
+//        this.getActivityType().setId(null);
         this.getPlannedTimeWithFactor().setId(null);
 
         return this;
@@ -266,7 +303,7 @@ public class CTARuleTemplateDTO {
                 .append("budgetType", budgetType)
                 .append("calculateValueIfPlanned", calculateValueIfPlanned)
                 .append("employmentTypes", employmentTypes)
-                .append("activityType", activityType)
+//                .append("activityType", activityType)
                 .append("planningCategory", planningCategory)
                 .append("staffFunctions", staffFunctions)
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)

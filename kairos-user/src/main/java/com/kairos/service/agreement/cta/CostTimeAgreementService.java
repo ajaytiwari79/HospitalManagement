@@ -176,13 +176,13 @@ public class CostTimeAgreementService extends UserBaseService {
 
         }
         ctaRuleTemplate.setCalculationUnit(CalculationUnit.HOURS);
-        CompensationTable compensationTable = new CompensationTable(10, CompensationMeasurementType.MINUTES);
+        CompensationTable compensationTable = new CompensationTable(10);
         ctaRuleTemplate.setCompensationTable(compensationTable);
         FixedValue fixedValue = new FixedValue(10, currency, FixedValue.Type.PER_ACTIVITY);
         ctaRuleTemplate.setCalculateValueAgainst(new CalculateValueAgainst(CalculateValueAgainst.CalculateValueType.FIXED_VALUE, 10.5f, fixedValue));
         ctaRuleTemplate.setApprovalWorkFlow(ApprovalWorkFlow.NO_APPROVAL_NEEDED);
         ctaRuleTemplate.setBudgetType(BudgetType.ACTIVITY_COST);
-        ctaRuleTemplate.setActivityType(new ActivityType());
+        ctaRuleTemplate.setActivityTypeForCostCalculation(ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE);
         ctaRuleTemplate.setPlanningCategory(PlanningCategory.DEVIATION_FROM_PLANNED);
         ctaRuleTemplate.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
         ctaRuleTemplate.setPlannedTimeWithFactor(PlannedTimeWithFactor.buildPlannedTimeWithFactor(10,true,AccountType.DUTYTIME_ACCOUNT));
@@ -240,6 +240,7 @@ public class CostTimeAgreementService extends UserBaseService {
             Currency currency=currencyGraphRepository.findOne(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId());
             ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().setCurrency(currency);
         }*/
+        setActivityBasesCostCalculationSettings(ctaRuleTemplate);
         if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue() !=null){
             switch (ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue().toString()){
                 case "FIXED_VALUE" :{
@@ -359,6 +360,7 @@ public class CostTimeAgreementService extends UserBaseService {
                 CTARuleTemplate ctaRuleTemplate = new CTARuleTemplate() ;
                 BeanUtils.copyProperties(ruleTemplate,ctaRuleTemplate);
                 ctaRuleTemplate.cloneCTARuleTemplate();
+                setActivityBasesCostCalculationSettings(ctaRuleTemplate);
                 BeanUtils.copyProperties(ctaRuleTemplate,ruleTemplate,"createdBy");
                 ruleTemplates.add(ctaRuleTemplate);
             }
@@ -520,6 +522,7 @@ public class CostTimeAgreementService extends UserBaseService {
                     ctaRuleTemplate.cloneCTARuleTemplate();
 //                    ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
                 }
+                setActivityBasesCostCalculationSettings(ctaRuleTemplate);
                 ctaRuleTemplate = saveEmbeddedEntitiesOfCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
 //                BeanUtils.copyProperties(ctaRuleTemplate,ctaRuleTemplateDTO,"timeTypes");
                 ruleTemplates.add(ctaRuleTemplate);
@@ -543,17 +546,29 @@ public class CostTimeAgreementService extends UserBaseService {
         };
         Future<Optional<OrganizationType>>organizationSubTypesFuture=asynchronousService.executeAsynchronously(OrganizationSubTypesListCallable);
 
-
         //set data
          if(expertiseFuture.get().isPresent())
              costTimeAgreement.setExpertise(expertiseFuture.get().get());
-        costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
         costTimeAgreement.setOrganizationType(organizationTypesFuture.get().get());
         costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
+        costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
         costTimeAgreement.setStartDateMillis(collectiveTimeAgreementDTO.getStartDateMillis());
         costTimeAgreement.setEndDateMillis(collectiveTimeAgreementDTO.getEndDateMillis());
 
         return CompletableFuture.completedFuture(true);
+    }
+
+    public void setActivityBasesCostCalculationSettings(CTARuleTemplate ctaRuleTemplate){
+
+        switch (ctaRuleTemplate.getActivityTypeForCostCalculation().toString()) {
+            case "TIME_TYPE_ACTIVITY":
+                ctaRuleTemplate.setActivityIds(new ArrayList<>());
+                break;
+            default:
+                ctaRuleTemplate.setPlannedTimeId(null);
+                ctaRuleTemplate.setTimeTypeId(null);
+                break;
+        }
     }
 
     public CollectiveTimeAgreementDTO createCostTimeAgreement(Long countryId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
@@ -668,7 +683,8 @@ public class CostTimeAgreementService extends UserBaseService {
            try{
                CostTimeAgreement newCostTimeAgreement =  createCostTimeAgreementForOrganization(collectiveTimeAgreementDTO);
                organization.getCostTimeAgreements().add(newCostTimeAgreement);
-               newCostTimeAgreement.setParentCountryCTA(costTimeAgreement);
+//               newCostTimeAgreement.setParentCountryCTA(costTimeAgreement);
+               collectiveTimeAgreementGraphRepository.linkParentCountryCTAToOrganization(costTimeAgreement.getId(), newCostTimeAgreement.getId());
                save(organization);
            } catch (Exception e){
                // Exception occured
@@ -702,5 +718,10 @@ public class CostTimeAgreementService extends UserBaseService {
     public List<ExpertiseTagDTO> getExpertiseForOrgCTA(long unitId) {
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
+    }
+
+    public Long getCTAIdByNameAndCountry(String name, Long countryId){
+        CostTimeAgreement cta = collectiveTimeAgreementGraphRepository.getCTAIdByCountryAndName(countryId, name);
+        return  (Optional.ofNullable(cta).isPresent()) ? null : cta.getId();
     }
 }

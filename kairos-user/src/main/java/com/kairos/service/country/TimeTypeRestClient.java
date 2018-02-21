@@ -3,6 +3,7 @@ package com.kairos.service.country;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

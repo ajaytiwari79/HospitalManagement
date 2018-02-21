@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.enums.StaffStatusEnum;
 
 /**
  * Created by oodles on 20/7/17.
@@ -37,8 +38,6 @@ public class StaffDTO {
 
     private String unitName;
 
-    private boolean active;
-
     private String fullName;
 
     private String firstName;
@@ -46,6 +45,8 @@ public class StaffDTO {
     private String workTelephone;
 
     private CurrentAddress primaryAddress;
+
+    private StaffStatusEnum currentStatus;
 
     public String getMiddleName ()
     {
@@ -141,14 +142,6 @@ public class StaffDTO {
         this.unitName = unitName;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
     public String getFullName ()
     {
         return fullName;
@@ -235,9 +228,17 @@ public class StaffDTO {
         this.primaryAddress = primaryAddress;
     }
 
+    public StaffStatusEnum getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(StaffStatusEnum currentStatus) {
+        this.currentStatus = currentStatus;
+    }
+
     @Override
     public String toString()
     {
-        return "ClassPojo [middleName = "+middleName+", mobileTelephone = "+mobileTelephone+", autosignatureId = "+autosignatureId+", lastName = "+lastName+", secondaryEmailAddress = "+secondaryEmailAddress+", organizationName = "+organizationName+", primaryEmailAddress = "+primaryEmailAddress+", departmentName = "+departmentName+", version = "+version+", id = "+id+", homeTelephone = "+homeTelephone+", primaryIdentifier = "+primaryIdentifier+", secondaryAddress = "+secondaryAddress+", initials = "+initials+", unitName = "+unitName+", active = "+active+", fullName = "+fullName+", firstName = "+firstName+", workTelephone = "+workTelephone+", primaryAddress = "+primaryAddress+"]";
+        return "ClassPojo [middleName = "+middleName+", mobileTelephone = "+mobileTelephone+", autosignatureId = "+autosignatureId+", lastName = "+lastName+", secondaryEmailAddress = "+secondaryEmailAddress+", organizationName = "+organizationName+", primaryEmailAddress = "+primaryEmailAddress+", departmentName = "+departmentName+", version = "+version+", id = "+id+", homeTelephone = "+homeTelephone+", primaryIdentifier = "+primaryIdentifier+", secondaryAddress = "+secondaryAddress+", initials = "+initials+", unitName = "+unitName+", currentStatus = "+currentStatus+", fullName = "+fullName+", firstName = "+firstName+", workTelephone = "+workTelephone+", primaryAddress = "+primaryAddress+"]";
     }
 }
