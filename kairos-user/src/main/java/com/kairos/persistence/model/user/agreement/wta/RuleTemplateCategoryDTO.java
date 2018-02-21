@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.agreement.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -60,6 +61,11 @@ public class RuleTemplateCategoryDTO {
     private Long shiftsLimit;
     private Boolean onlyCompositeShifts;
     private String activityCode;
+    private TimeBankTypeEnum frequency;
+    private int yellowZone;
+    private boolean forbid;
+    private boolean allowExtraActivity;
+
 
     public int getRecommendedValue() {
         return recommendedValue;
@@ -384,7 +390,37 @@ public class RuleTemplateCategoryDTO {
         this.phaseTemplateValues = phaseTemplateValues;
     }
 
+    public TimeBankTypeEnum getFrequency() {
+        return frequency;
+    }
 
+    public void setFrequency(TimeBankTypeEnum frequency) {
+        this.frequency = frequency;
+    }
+
+    public int getYellowZone() {
+        return yellowZone;
+    }
+
+    public void setYellowZone(int yellowZone) {
+        this.yellowZone = yellowZone;
+    }
+
+    public boolean isForbid() {
+        return forbid;
+    }
+
+    public void setForbid(boolean forbid) {
+        this.forbid = forbid;
+    }
+
+    public boolean isAllowExtraActivity() {
+        return allowExtraActivity;
+    }
+
+    public void setAllowExtraActivity(boolean allowExtraActivity) {
+        this.allowExtraActivity = allowExtraActivity;
+    }
 
     @Override
     public String toString() {

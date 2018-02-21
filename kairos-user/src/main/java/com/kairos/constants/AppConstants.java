@@ -248,6 +248,14 @@ public class AppConstants {
     public static final String TEMPLATE20 = "TEMPLATE20";
     public static final String TEMPLATE20_NAME = "Maximum senior days per year";
     public static final String TEMPLATE20_DESCRIPTION = "Maximum amount of senior days per year";
+
+    public static final String TEMPLATE21 = "TEMPLATE21";
+    public static final String TEMPLATE21_NAME = "Maximum time bank";
+    public static final String TEMPLATE21_DESCRIPTION = "Maximum time bank for staff";
+
+    public static final String TEMPLATE22 = "TEMPLATE22";
+    public static final String TEMPLATE22_NAME = "Minimum time bank";
+    public static final String TEMPLATE22_DESCRIPTION = "Minimum time bank for staff";
     public static final String ORGANIZATION_ID = "organizationId";
     public static final String UNIT_ID = "unitId";
 
