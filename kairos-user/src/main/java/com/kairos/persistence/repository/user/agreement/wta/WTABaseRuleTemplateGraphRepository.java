@@ -132,6 +132,10 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.onlyCompositeShifts as onlyCompositeShifts," +
             "t.recommendedValue as recommendedValue," +
             "t.lastUpdatedBy as lastUpdatedBy," +
+            "t.frequency as frequency," +
+            "t.yellowZone as yellowZone," +
+            "t.forbid as forbid," +
+            "t.allowExtraActivity as allowExtraActivity," +
             "phaseTemplateValues as phaseTemplateValues")
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByUnitId(Long unitId);
 
@@ -179,6 +183,10 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.onlyCompositeShifts as onlyCompositeShifts," +
             "t.recommendedValue as recommendedValue," +
             "t.lastUpdatedBy as lastUpdatedBy," +
+            "t.frequency as frequency," +
+            "t.yellowZone as yellowZone," +
+            "t.forbid as forbid," +
+            "t.allowExtraActivity as allowExtraActivity," +
             "phaseTemplateValues as phaseTemplateValues"
     )
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByCountryId(Long countryId);
