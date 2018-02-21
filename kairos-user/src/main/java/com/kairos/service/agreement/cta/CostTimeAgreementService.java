@@ -102,9 +102,25 @@ public class CostTimeAgreementService extends UserBaseService {
 
     }
 
-    /*private CTARuleTemplate createCTARuleTemplate(){
+    public CTARuleTemplateDTO createCTARuleTemplate(Long countryId, CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException{
+        if(ctaRuleTemplateGraphRepository.isCTARuleTemplateExistWithSameName(countryId, ctaRuleTemplateDTO.getName())){
+            throw new DuplicateDataException("CTA Rule Template already exists with same name : " +ctaRuleTemplateDTO.getName() );
+        }
+        // Set id null as new entry should be created
+        ctaRuleTemplateDTO.setId(null);
+        CTARuleTemplate ctaRuleTemplate= new CTARuleTemplate();
+        Long userId = UserContext.getUserDetails().getId();
+        User user = userGraphRepository.findOne(userId, 0);
+        // While updating rule template, do not update template type
+        ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplateDTO.getName());
+        this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, false);
+        ctaRuleTemplate.setLastModifiedBy(user);
+        this.save(ctaRuleTemplate);
 
-    }*/
+        ctaRuleTemplateGraphRepository.addCTARuleTemplateInCountry(countryId,ctaRuleTemplate.getId());
+
+        return ctaRuleTemplateDTO;
+    }
 
     private CTARuleTemplate createDefaultRuleTemplate(CTARuleTemplateType ctaRuleTemplateType, Currency currency) {
         CTARuleTemplate ctaRuleTemplate = null;
@@ -112,66 +128,65 @@ public class CostTimeAgreementService extends UserBaseService {
             case RULE_TEMPLATE_1:
                 ctaRuleTemplate = new CTARuleTemplate("Working Evening Shifts",
                         "CTA rule for evening shift, from 17-23 o'clock.  For this organization/unit this is payroll type '210:  Evening compensation'",
-                        CTARuleTemplateType.RULE_TEMPLATE_1, "210:  Evening compensation", "xyz");
+                         "210:  Evening compensation", "xyz");
                 break;
             case RULE_TEMPLATE_2:
 
                 ctaRuleTemplate = new CTARuleTemplate("Working Night Shifts",
                         "CTA rule for night shift, from 23-07 o. clock.  For this organization/unit this is payroll type “212:  Night compensation”",
-                        CTARuleTemplateType.RULE_TEMPLATE_2, "212:  Night compensation", "xyz");
+                         "212:  Night compensation", "xyz");
                 break;
             case RULE_TEMPLATE_3:
 
                 ctaRuleTemplate = new CTARuleTemplate("Working On a Saturday",
                         "CTA rule for Saturdays shift, from 08-24 o. clock. For this organization/unit this is payroll type " +
                                 "“214:  Saturday compensation”. If you are working from 00-07 on Saturday, you only gets evening " +
-                                "compensation", CTARuleTemplateType.RULE_TEMPLATE_3,
+                                "compensation",
                         "214:  Saturday compensation", "xyz");
                 break;
             case RULE_TEMPLATE_4:
                 ctaRuleTemplate = new CTARuleTemplate("Working On a Sunday",
                         "CTA rule for Saturdays shift, from 00-24 o. clock. For this organization/unit this is " +
                                 "payroll type “214:Saturday compensation”.All working time on Sundays gives compensation"
-                        , CTARuleTemplateType.RULE_TEMPLATE_4,
+                        ,
                         "214:Saturday compensation", "xyz");
                 break;
             case RULE_TEMPLATE_5:
                 ctaRuleTemplate = new CTARuleTemplate("Working On a Full Public Holiday",
                         "CTA rule for full public holiday shift, from 00-24 o. clock.  For this organization/unit this is " +
                                 "payroll type “216:  public holiday compensation”. All working time on full PH gives " +
-                                "compensation", CTARuleTemplateType.RULE_TEMPLATE_5,
+                                "compensation",
                         "216:public holiday compensation", "xyz");
                 break;
             case RULE_TEMPLATE_6:
                 ctaRuleTemplate = new CTARuleTemplate("Working On a Half Public Holiday",
                         "CTA rule for full public holiday shift, from 12-24 o. clock. For this organization/unit" +
                                 " this is payroll type “218:  half public holiday compensation”.All working time on " +
-                                "half PH gives compensation", CTARuleTemplateType.RULE_TEMPLATE_6,
+                                "half PH gives compensation",
                         "218: half public holiday compensation", "xyz");
                 break;
             case RULE_TEMPLATE_7:
                 ctaRuleTemplate = new CTARuleTemplate("Working Overtime",
                         "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
-                                " 50% overtime compensation”.", CTARuleTemplateType.RULE_TEMPLATE_7,
+                                " 50% overtime compensation”.",
                         "230:50% overtime compensation", "xyz");
                 break;
             case RULE_TEMPLATE_8:
                 ctaRuleTemplate = new CTARuleTemplate("Working Extratime",
                         "CTA rule for extra time shift, from 00-24 o. clock.  For this organization/unit this is payroll type" +
-                                " “250:  extratime compensation”. ", CTARuleTemplateType.RULE_TEMPLATE_8,
+                                " “250:  extratime compensation”. ",
                         "250:  extratime compensation", "xyz");
                 break;
             case RULE_TEMPLATE_9:
                 ctaRuleTemplate = new CTARuleTemplate("Late Notice Compensation",
                         "CTA rule for late notification on changes to working times.  If notice of change is done within 72 hours" +
                                 " before start of working day, then staff is entitled to at compensation of 105 kroner",
-                        CTARuleTemplateType.RULE_TEMPLATE_9,
                         "", "xyz");
                 break;
             case RULE_TEMPLATE_10:
                 ctaRuleTemplate = new CTARuleTemplate("Extra Dutyfree Day For Each Public Holiday",
                         "CTA rule for each public holiday.  Whenever there is a public holiday staff are entitled to an" +
-                                " extra day off, within 3 month or just compensated in the timebank.", CTARuleTemplateType.RULE_TEMPLATE_10,
+                                " extra day off, within 3 month or just compensated in the timebank.",
                         "", "xyz");
                 break;
             default:
@@ -215,12 +230,12 @@ public class CostTimeAgreementService extends UserBaseService {
         return loadAllCTARuleTemplateByCountry(countryId);
     }
 
-    public CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate,CTARuleTemplateDTO ctaRuleTemplateDTO) throws ExecutionException, InterruptedException {
+    public CTARuleTemplate buildCTARuleTemplate(CTARuleTemplate ctaRuleTemplate,CTARuleTemplateDTO ctaRuleTemplateDTO, Boolean doUpdate) throws ExecutionException, InterruptedException {
 
         BeanUtils.copyProperties(ctaRuleTemplateDTO,ctaRuleTemplate,"calculateOnDayTypes");
 
         CompletableFuture<Boolean> hasUpdated = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
-                .buildTimeTypesEmploymentTypeAndAccessGroups(ctaRuleTemplate, ctaRuleTemplateDTO);
+                .buildEmploymentTypeAndAccessGroups(ctaRuleTemplate, ctaRuleTemplateDTO);
         //Load reference only
         RuleTemplateCategory ruleTemplateCategory =
                 ruleTemplateCategoryGraphRepository.findOne(ctaRuleTemplateDTO.getRuleTemplateCategory(), 0);
@@ -232,22 +247,17 @@ public class CostTimeAgreementService extends UserBaseService {
                     return countryHolidayCalenders.stream();
                 }).collect(Collectors.toList());
 
-        if( !ctaRuleTemplate.getRuleTemplateCategory().getId().equals(ctaRuleTemplateDTO.getRuleTemplateCategory())){
+        if( doUpdate && !ctaRuleTemplate.getRuleTemplateCategory().getId().equals(ctaRuleTemplateDTO.getRuleTemplateCategory())){
             // Detach rule template from older category If category has been updated
             ruleTemplateCategoryGraphRepository.detachRuleTemplateCategoryFromCTARuleTemplate(ctaRuleTemplate.getId(),ctaRuleTemplate.getRuleTemplateCategory().getId());
         }
         ctaRuleTemplate.setRuleTemplateCategory(ruleTemplateCategory);
 
-        /*if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue()!=null
-                && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId()!=null){
-            Currency currency=currencyGraphRepository.findOne(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId());
-            ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().setCurrency(currency);
-        }*/
         setActivityBasesCostCalculationSettings(ctaRuleTemplate);
         if(ctaRuleTemplate.getCalculateValueAgainst()!=null && ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue() !=null){
             switch (ctaRuleTemplate.getCalculateValueAgainst().getCalculateValue().toString()){
                 case "FIXED_VALUE" :{
-                    if(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId()!=null){
+                    if(doUpdate && ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId()!=null){
                         Currency currency=currencyGraphRepository.findOne(ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().getCurrencyId());
                         ctaRuleTemplate.getCalculateValueAgainst().getFixedValue().setCurrency(currency);
                     }
@@ -265,7 +275,7 @@ public class CostTimeAgreementService extends UserBaseService {
             }
         }
         ctaRuleTemplate.getCalculateValueAgainst().setCalculateValue(ctaRuleTemplateDTO.getCalculateValueAgainst().getCalculateValue());
-
+//        ctaRuleTemplate.set
         logger.info("ctaRuleTemplate.getCalculateValueAgainst().getScale : {}",ctaRuleTemplate.getCalculateValueAgainst().getScale());
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
@@ -274,16 +284,16 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     @Async
-    public CompletableFuture<Boolean> buildTimeTypesEmploymentTypeAndAccessGroups
+    public CompletableFuture<Boolean> buildEmploymentTypeAndAccessGroups
             (CTARuleTemplate ctaRuleTemplate, CTARuleTemplateDTO ctaRuleTemplateDTO)
             throws InterruptedException, ExecutionException {
 
-        Callable<List<TimeType>> timeTypesTask = () -> {
+        /*Callable<List<TimeType>> timeTypesTask = () -> {
             Iterable<TimeType> timeTypes = timeTypeGraphRepository.findAllById(ctaRuleTemplateDTO.getTimeTypes(), 0);
             return StreamSupport.stream(timeTypes.spliterator(), true).collect(Collectors.toList());
         };
 
-        Future<List<TimeType>> timeTypesFuture = asynchronousService.executeAsynchronously(timeTypesTask);
+        Future<List<TimeType>> timeTypesFuture = asynchronousService.executeAsynchronously(timeTypesTask);*/
 
         Callable<List<EmploymentType>> employmentTypesTask = () -> {
             Iterable<EmploymentType> employmentTypes = employmentTypeGraphRepository.findAllById(ctaRuleTemplateDTO.getEmploymentTypes(), 0);
@@ -300,7 +310,7 @@ public class CostTimeAgreementService extends UserBaseService {
         Future<List<AccessGroup>> accessGroupsFuture = asynchronousService.executeAsynchronously(accessGroupsTask);
         */
         //set data
-        ctaRuleTemplate.setTimeTypes(timeTypesFuture.get());
+//        ctaRuleTemplate.setTimeTypes(timeTypesFuture.get());
         ctaRuleTemplate.setEmploymentTypes(employmentTypesFuture.get());
 //        ctaRuleTemplate.setCalculateValueIfPlanned(accessGroupsFuture.get());
         return CompletableFuture.completedFuture(true);
@@ -637,7 +647,9 @@ public class CostTimeAgreementService extends UserBaseService {
         CTARuleTemplate ctaRuleTemplate= ctaRuleTemplateGraphRepository.findOne(id,3);
         Long userId = UserContext.getUserDetails().getId();
         User user = userGraphRepository.findOne(userId, 0);
-        this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO);
+        // While updating rule template, do not update template type
+        ctaRuleTemplateDTO.setRuleTemplateType(ctaRuleTemplate.getRuleTemplateType());
+        this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, true);
         ctaRuleTemplate.setLastModifiedBy(user);
         this.save(ctaRuleTemplate);
         return ctaRuleTemplateDTO;

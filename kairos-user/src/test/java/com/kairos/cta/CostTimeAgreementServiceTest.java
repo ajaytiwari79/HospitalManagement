@@ -42,6 +42,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -83,7 +85,39 @@ public class CostTimeAgreementServiceTest {
     @Test
     public void addCTARuleTemplate()
     {
-        costTimeAgreementService.createDefaultCtaRuleTemplate(53L);
+        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("working overtime part 2",
+                "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
+                        " 50% overtime compensation”.",
+                "230:50% overtime compensation", "xyz");
+
+        ctaRuleTemplateDTO.setCalculationUnit(CalculationUnit.HOURS);
+        CompensationTable compensationTable = new CompensationTable(10);
+        ctaRuleTemplateDTO.setCompensationTable(compensationTable);
+        // Get currency
+        Currency currency = currencyService.getCurrencyByCountryId(countryId);
+        FixedValue fixedValue = new FixedValue(10, currency, FixedValue.Type.PER_ACTIVITY);
+        ctaRuleTemplateDTO.setCalculateValueAgainst(new CalculateValueAgainst(CalculateValueAgainst.CalculateValueType.FIXED_VALUE, 10.5f, fixedValue));
+        ctaRuleTemplateDTO.setApprovalWorkFlow(ApprovalWorkFlow.NO_APPROVAL_NEEDED);
+        ctaRuleTemplateDTO.setBudgetType(BudgetType.ACTIVITY_COST);
+        ctaRuleTemplateDTO.setActivityTypeForCostCalculation(ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE);
+        ctaRuleTemplateDTO.setPlanningCategory(PlanningCategory.DEVIATION_FROM_PLANNED);
+        ctaRuleTemplateDTO.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
+        ctaRuleTemplateDTO.setPlannedTimeWithFactor(PlannedTimeWithFactor.buildPlannedTimeWithFactor(10,true,AccountType.DUTYTIME_ACCOUNT));
+
+        RuleTemplateCategory category = ruleTemplateCategoryService.getCTARuleTemplateCategoryOfCountryByName(countryId, "NONE");
+        ctaRuleTemplateDTO.setRuleTemplateCategory(category.getId());
+        String baseUrl = getBaseUrl(organizationId, countryId);
+        HttpEntity<CTARuleTemplateDTO> requestBodyData = new HttpEntity<>(ctaRuleTemplateDTO);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<CTARuleTemplateDTO>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTARuleTemplateDTO>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<CTARuleTemplateDTO>> response = restTemplate.exchange(
+                baseUrl + "/cta_rule_template",
+                HttpMethod.POST, requestBodyData, typeReference);
+        logger.info("Status Code : "+response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||  HttpStatus.UNPROCESSABLE_ENTITY.equals(response.getStatusCode()) ||
+                HttpStatus.CONFLICT.equals(response.getStatusCode()));
+
     }
 
     @Test
@@ -116,7 +150,7 @@ public class CostTimeAgreementServiceTest {
     public void createCostTimeAgreement(){
         CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("working overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
-                        " 50% overtime compensation”.", CTARuleTemplateType.RULE_TEMPLATE_7,
+                        " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
         List<CTARuleTemplateDTO> ctaRuleTemplates = new ArrayList<>();
         ctaRuleTemplateDTO = prepareCTARuleTemplate(ctaRuleTemplateDTO);
@@ -157,7 +191,7 @@ public class CostTimeAgreementServiceTest {
         }
         CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Working Overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
-                        " 50% overtime compensation”.", CTARuleTemplateType.RULE_TEMPLATE_7,
+                        " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
         ctaRuleTemplateDTO = prepareCTARuleTemplate(ctaRuleTemplateDTO);
         List<CTARuleTemplateDTO> ctaRuleTemplates = new ArrayList<>();
@@ -196,7 +230,7 @@ public class CostTimeAgreementServiceTest {
     public  void updateCTARuleTemplateCategory() throws Exception{
         CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Working Overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
-                        " 50% overtime compensation”.", CTARuleTemplateType.RULE_TEMPLATE_7,
+                        " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
         List<CTARuleTemplateDTO> ctaRuleTemplates = new ArrayList<>();
         ctaRuleTemplates.add(ctaRuleTemplateDTO);
