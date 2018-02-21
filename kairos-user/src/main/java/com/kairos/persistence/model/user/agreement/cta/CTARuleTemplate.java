@@ -23,7 +23,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NodeEntity
 public class CTARuleTemplate extends RuleTemplate{
 
-    private CTARuleTemplateType ruleTemplateType;
+//    private CTARuleTemplateType ruleTemplateType;
+    private String ruleTemplateType;
     private String payrollType; //Ok
     private String payrollSystem; //Ok
     private CalculationUnit calculationUnit; //OK
@@ -66,11 +67,10 @@ public class CTARuleTemplate extends RuleTemplate{
 
     }
 
-    public CTARuleTemplate(String name, String description, CTARuleTemplateType ruleTemplateType, String payrollType, String payrollSystem) {
+    public CTARuleTemplate(String name, String description, String payrollType, String payrollSystem) {
         this.name=name;
         this.description=description;
         this.ruleTemplateCategory=ruleTemplateCategory;
-        this.ruleTemplateType=ruleTemplateType;
         this.payrollType=payrollType;
         this.payrollSystem=payrollSystem;
 
@@ -272,14 +272,21 @@ public class CTARuleTemplate extends RuleTemplate{
         this.plannedTimeWithFactor = plannedTimeWithFactor;
     }
 
-    public CTARuleTemplateType getRuleTemplateType() {
+    /*public CTARuleTemplateType getRuleTemplateType() {
         return ruleTemplateType;
     }
 
     public void setRuleTemplateType(CTARuleTemplateType ruleTemplateType) {
         this.ruleTemplateType = ruleTemplateType;
+    }*/
+
+    public String getRuleTemplateType() {
+        return ruleTemplateType;
     }
 
+    public void setRuleTemplateType(String ruleTemplateType) {
+        this.ruleTemplateType = ruleTemplateType;
+    }
 
     public List<TimeType> getTimeTypes() {
         return timeTypes;

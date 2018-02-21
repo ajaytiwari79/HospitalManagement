@@ -243,4 +243,10 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     }
 
+    public RuleTemplateCategory getCTARuleTemplateCategoryOfCountryByName(Long countryId, String name){
+        RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
+                .findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
+        return category;
+    }
+
 }

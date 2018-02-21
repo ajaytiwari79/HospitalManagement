@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CTA_RULE_TEMPLATE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENT_TYPE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TIME_TYPES;
 
@@ -60,9 +61,15 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
     List<CTARuleTemplateQueryResult>findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(List<Long> categoryList, Long countryId);
 */
 
+   @Query("MATCH (ctaRT:CTARuleTemplate) -[:"+HAS_CTA_RULE_TEMPLATE+"]-(c:Country) WHERE id(c)={0} AND lower(ctaRT.name)=lower({1}) return count(ctaRT)>0")
+   Boolean isCTARuleTemplateExistWithSameName(Long countryId, String name);
+
+    @Query("MATCH (ctaRT:CTARuleTemplate) -[:"+HAS_CTA_RULE_TEMPLATE+"]-(c:Country) WHERE id(c)={0} AND lower(ctaRT.ruleTemplateType)=lower({1}) return count(ctaRT)>0")
+    Boolean isCTARuleTemplateExistWithSameTemplateType(Long countryId, String ruleTemplateType);
+
    @Query("MATCH (p:`CTARuleTemplate`)-[:`HAS_RULE_TEMPLATES`]-(m0:`RuleTemplateCategory`) " +
            "WHERE NOT(p.`deleted` = true ) AND ID(m0) IN {0} "+
-           "MATCH (p)-[:HAS_CTA_RULE_TEMPLATE]-(country:Country) "+
+           "MATCH (p)-[:HAS_CTA_RULE_TEMPLATE]-(country:Country) WHERE id(country)={1} "+
            " optional  MATCH (p)-[:`BELONGS_TO`]-(cTARuleTemplateDayTypes:`CTARuleTemplateDayType`)"+
            " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(dayType:`DayType`)"+
            " optional  MATCH (cTARuleTemplateDayTypes)-[:`BELONGS_TO`]-(countryHolidayCalender:`CountryHolidayCalender`)"+
@@ -89,7 +96,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
            "p.payrollSystem as payrollSystem ,"+
            "p.calculationUnit as calculationUnit ,"+
            "{id:ID(compensationTable),granularityLevel:compensationTable.granularityLevel, "+
-           "compensationTableInterval:CASE WHEN compensationTableInterval IS NOT NULL THEN collect(distinct{id:ID(compensationTableInterval),compensationTableInterval:compensationTable.compensationMeasurementType, to:compensationTableInterval.to,from:compensationTableInterval.from,value:compensationTableInterval.value}) ELSE [] END } as compensationTable ,"+
+           "compensationTableInterval:CASE WHEN compensationTableInterval IS NOT NULL THEN collect(distinct{id:ID(compensationTableInterval),compensationMeasurementType:compensationTableInterval.compensationMeasurementType, to:compensationTableInterval.to,from:compensationTableInterval.from,value:compensationTableInterval.value}) ELSE [] END } as compensationTable ,"+
            "{id:ID(calculateValueAgainst),calculateValue:calculateValueAgainst.calculateValue,scale:round(calculateValueAgainst.scale *100)/100,fixedValue:{id:ID(fixedValue),amount:round(fixedValue.amount *100)/100,type:fixedValue.type,currencyId:ID(currency)}} as calculateValueAgainst ,"+
            "p.approvalWorkFlow as approvalWorkFlow ,"+
            "collect(distinct {dayType:ID(dayType),countryHolidayCalenders:holidaysIds}) as calculateOnDayTypes ,"+
@@ -118,5 +125,8 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
 
     @Query("MATCH (ctaRT:CTARuleTemplate)-[r:"+HAS_EMPLOYMENT_TYPE+"]-(et:EmploymentType) WHERE id(ctaRT)={0} DELETE r ")
     void detachAllEmploymentTypesFromCTARuleTemplate(Long ctaRuleTemplateId);
+
+    @Query("MATCH (ctaRT:CTARuleTemplate),(country:Country) WHERE id(country)={0} AND id(ctaRT)={1} CREATE UNIQUE (country)-[r:"+HAS_CTA_RULE_TEMPLATE+"]->(ctaRT) ")
+    void addCTARuleTemplateInCountry(Long countryId, Long ctaRuleTemplateId);
 
 }

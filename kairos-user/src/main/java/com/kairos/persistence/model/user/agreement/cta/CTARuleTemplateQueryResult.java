@@ -23,7 +23,7 @@ public class CTARuleTemplateQueryResult {
     public boolean disabled;
     @NotNull
     public Long ruleTemplateCategory;
-    private CTARuleTemplateType ruleTemplateType;
+    private String ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
     private CalculationUnit calculationUnit;
@@ -87,11 +87,11 @@ public class CTARuleTemplateQueryResult {
         this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
-    public CTARuleTemplateType getRuleTemplateType() {
+    public String getRuleTemplateType() {
         return ruleTemplateType;
     }
 
-    public void setRuleTemplateType(CTARuleTemplateType ruleTemplateType) {
+    public void setRuleTemplateType(String ruleTemplateType) {
         this.ruleTemplateType = ruleTemplateType;
     }
 
