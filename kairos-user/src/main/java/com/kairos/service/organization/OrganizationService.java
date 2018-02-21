@@ -556,12 +556,10 @@ public class OrganizationService extends UserBaseService {
         unit.setLevel(parent.getLevel());
 
         organizationGraphRepository.save(unit);
-
-        phaseRestClient.createDefaultPhases(unit.getId());
-
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit);
+        phaseRestClient.createDefaultPhases(unit.getId());
 
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());

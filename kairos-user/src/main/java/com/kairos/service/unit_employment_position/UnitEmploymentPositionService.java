@@ -1,9 +1,12 @@
 package com.kairos.service.unit_employment_position;
 
+import com.kairos.client.dto.timeBank.CostTimeAgreementDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
+import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
@@ -50,6 +53,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -472,7 +478,28 @@ public class UnitEmploymentPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    public UnitEmploymentPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, Long wtaId, Long ctaId) {
+    public CostTimeAgreementDTO getUnitEmploymentPositionCTA(Long unitEmploymentPositionId) {
+        UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
+        unitEmploymentPositionGraphRepository.getCtaByUnitEmploymentId(unitEmploymentPositionId);
+        CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitEmploymentPositionId);
+        costTimeAgreementDTO.setStaffId(unitEmploymentPosition.getStaff().getId());
+        costTimeAgreementDTO.setContractedMinByWeek(unitEmploymentPosition.getTotalWeeklyMinutes());
+        costTimeAgreementDTO.setWorkingDays(unitEmploymentPosition.getWorkingDaysInWeek());
+        costTimeAgreementDTO.setCtaRuleTemplateDTOS(getCtaRuleTemplateDtos(unitEmploymentPosition.getCta().getRuleTemplates()));
+        return costTimeAgreementDTO;
+    }
+
+    public List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> getCtaRuleTemplateDtos(List<RuleTemplate> ruleTemplates){
+        List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ruleTemplates.size());
+        ruleTemplates.forEach(rt->{
+            com.kairos.client.dto.timeBank.CTARuleTemplateDTO ctaRuleTemplateDTO = new com.kairos.client.dto.timeBank.CTARuleTemplateDTO();
+            ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
+
+        });
+        return ctaRuleTemplateDTOS;
+    }
+
+    public UnitEmploymentPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO,  Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, Long wtaId, Long ctaId){
         Long startDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getStartDate());
         Long endDateMillis = null;
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
@@ -485,7 +512,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
     public boolean addEmploymentToUnitByExternalId(List<TimeCareEmploymentDTO> timeCareEmploymentDTOs, String unitExternalId, Long expertiseId) {
         Organization organization = organizationGraphRepository.findByExternalId(unitExternalId);
         if (organization == null) {
-            throw new InternalError("Invalid external id");
+            throw new DataNotFoundByIdException("Invalid organization external id" + unitExternalId);
         }
         Organization parentOrganization = organizationService.fetchParentOrganization(organization.getId());
 
@@ -516,10 +543,11 @@ public class UnitEmploymentPositionService extends UserBaseService {
         if (positionCode == null) {
             throw new DataNotFoundByIdException("NO Position code exist in organization : " + parentOrganization.getId());
         }
-        for (TimeCareEmploymentDTO timeCareEmploymentDTO : timeCareEmploymentDTOs) {
-            Staff staff = staffGraphRepository.findByExternalId(timeCareEmploymentDTO.getPersonID());
-            if (staff == null) {
-                throw new DataNotFoundByIdException("NO staff exist with External Id" + timeCareEmploymentDTO.getPersonID());
+
+        for ( TimeCareEmploymentDTO timeCareEmploymentDTO : timeCareEmploymentDTOs) {
+            Staff staff = staffGraphRepository.findStaffByExternalId(timeCareEmploymentDTO.getPersonID(), organization.getId());
+            if(staff == null){
+                throw new DataNotFoundByIdException("NO staff exist with External Id : " + timeCareEmploymentDTO.getPersonID());
             }
             UnitEmploymentPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId(), wta.getId(), cta.getId());
             createUnitEmploymentPosition(organization.getId(), "Organization", unitEmploymentPosition, true);

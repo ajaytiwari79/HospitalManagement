@@ -74,10 +74,10 @@ public class OrganizationTypeService extends UserBaseService {
 
     }
 
-    public OrganizationType updateOrganizationType(Long organizationTypeId,UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
-        OrganizationType orgTypeToUpdate = organizationTypeGraphRepository.findOne(organizationTypeId);
+    public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
+        OrganizationType orgTypeToUpdate = organizationTypeGraphRepository.findOne(updateOrganizationTypeDTO.getId());
         if(!Optional.ofNullable(orgTypeToUpdate).isPresent()){
-            throw new DataNotFoundByIdException("Invalid organization type id " + organizationTypeId);
+            throw new DataNotFoundByIdException("Invalid organization type id " + updateOrganizationTypeDTO.getId());
         }
 
         List<Level> levels = orgTypeToUpdate.getLevels();

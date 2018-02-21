@@ -27,6 +27,7 @@ import com.kairos.persistence.model.user.unitEmploymentPosition.StaffUnitEmploym
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
@@ -43,6 +44,7 @@ import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.response.dto.web.StaffTaskDTO;
+import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -52,11 +54,14 @@ import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.unit_employment_position.UnitEmploymentPositionService;
+
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FileUtil;
 import com.kairos.util.userContext.UserContext;
+import org.apache.commons.collections.map.UnmodifiableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -152,6 +157,7 @@ public class StaffService extends UserBaseService {
     private UnitEmploymentPositionGraphRepository unitEmploymentPositionGraphRepository;
     @Autowired
     private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
+    @Inject private UnitEmploymentPositionService unitEmploymentPositionService;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -568,7 +574,9 @@ public class StaffService extends UserBaseService {
                         }
                     }
                     staff.setContactDetail(contactDetail);
-                    staff.setContactAddress(contactAddress);
+                    List<ContactAddress> contactAddresses=new ArrayList<>();
+                    contactAddresses.add(contactAddress);
+                    staff.setContactAddress(contactAddresses);
                     cell = row.getCell(2);
                     if (Optional.ofNullable(cell).isPresent()) {
                         cell.setCellType(Cell.CELL_TYPE_STRING);
@@ -897,7 +905,10 @@ public class StaffService extends UserBaseService {
         staff.setFamilyName(payload.getFamilyName());
         staff.setCprNumber(payload.getCprNumber());
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
-        staff.setContactAddress(contactAddress);
+        contactAddress.setPrimary(true);
+        List<ContactAddress> contactAddresses=new ArrayList<>();
+        contactAddresses.add(contactAddress);
+        staff.setContactAddress(contactAddresses);
         ObjectMapper objectMapper = new ObjectMapper();
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
@@ -974,8 +985,11 @@ public class StaffService extends UserBaseService {
 
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
-        if (contactAddress != null)
-            staff.setContactAddress(contactAddress);
+        if (contactAddress != null) {
+            List<ContactAddress> contactAddresses=new ArrayList<>();
+            contactAddresses.add(contactAddress);
+            staff.setContactAddress(contactAddresses);
+        }
         if (engineerTypeId != null)
             staff.setEngineerType(engineerTypeGraphRepository.findOne(engineerTypeId));
         staff.setUser(user);
@@ -1484,7 +1498,9 @@ public class StaffService extends UserBaseService {
                 contactAddress.setHouseNumber(matcher.group(0));
             }
         }
-        staff.setContactAddress(contactAddress);
+        List<ContactAddress> contactAddresses=new ArrayList<>();
+        contactAddresses.add(contactAddress);
+        staff.setContactAddress(contactAddresses);
 
         ContactDetail contactDetail = new ContactDetail();
         contactDetail.setPrivatePhone(timeCareStaffDTO.getCellPhoneNumber());
@@ -1502,4 +1518,30 @@ public class StaffService extends UserBaseService {
 
 
     }
+
+    public List<com.kairos.response.dto.web.StaffDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds){
+        List<Staff> staffs = staffGraphRepository.getStaffByExperties(unitId, expertiesIds);
+        List<Skill> skills = staffGraphRepository.getSkillByStaffIds(staffs.stream().map(s -> s.getId()).collect(Collectors.toList()));
+        List<com.kairos.response.dto.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
+        staffs.forEach(s -> {
+                com.kairos.response.dto.web.StaffDTO staffDTO = new com.kairos.response.dto.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
+                List<UnitEmploymentPositionQueryResult> ueps = unitEmploymentPositionService.getAllUnitEmploymentPositionsOfStaff(unitId, s.getId(), "Organization");
+                expertiesIds.forEach(e -> {
+                    ueps.forEach(uep -> {
+                        if (uep.getExpertise().getId().equals(e)) {
+                            staffDTO.setUnitEmploymentPositionId(uep.getId());
+                            staffDTOS.add(staffDTO);
+                        }
+                    });
+                });
+
+        });
+        return staffDTOS;
+    }
+
+
+    public Set<SkillDTO> getSkillSet(List<Skill> skills){
+        return skills.stream().map(skill->new SkillDTO(skill.getId(),skill.getName(),skill.getDescription())).collect(Collectors.toSet());
+    }
+
 }
