@@ -35,11 +35,15 @@ public class CTARuleTemplateQueryResult {
     private BudgetType budgetType;
     private List<CalculateValueIfPlanned> calculateValueIfPlanned =new ArrayList<>();
     private List<Long> employmentTypes =new ArrayList<>();
-    private ActivityType activityType;
+//    private ActivityType activityType;
     private PlanningCategory planningCategory;
     private List<StaffFunction> staffFunctions=new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
-    private List<Long> timeTypes =new ArrayList<>();
+//    private List<Long> timeTypes =new ArrayList<>();
+    private ActivityTypeForCostCalculation activityTypeForCostCalculation;
+    private List<Long> activityIds;
+    private Long timeTypeId;
+    private Long plannedTimeId;
 
     public CTARuleTemplateQueryResult() {
     }
@@ -177,13 +181,13 @@ public class CTARuleTemplateQueryResult {
         this.employmentTypes = employmentTypes;
     }
 
-    public ActivityType getActivityType() {
+/*    public ActivityType getActivityType() {
         return activityType;
     }
 
     public void setActivityType(ActivityType activityType) {
         this.activityType = activityType;
-    }
+    }*/
 
     public PlanningCategory getPlanningCategory() {
         return planningCategory;
@@ -209,13 +213,46 @@ public class CTARuleTemplateQueryResult {
         this.plannedTimeWithFactor = plannedTimeWithFactor;
     }
 
-    public List<Long> getTimeTypes() {
+    /*public List<Long> getTimeTypes() {
         return timeTypes;
     }
 
     public void setTimeTypes(List<Long> timeTypes) {
         this.timeTypes = timeTypes;
+    }*/
+
+    public ActivityTypeForCostCalculation getActivityTypeForCostCalculation() {
+        return activityTypeForCostCalculation;
     }
+
+    public void setActivityTypeForCostCalculation(ActivityTypeForCostCalculation activityTypeForCostCalculation) {
+        this.activityTypeForCostCalculation = activityTypeForCostCalculation;
+    }
+
+    public List<Long> getActivityIds() {
+        return activityIds;
+    }
+
+    public void setActivityIds(List<Long> activityIds) {
+        this.activityIds = activityIds;
+    }
+
+    public Long getTimeTypeId() {
+        return timeTypeId;
+    }
+
+    public void setTimeTypeId(Long timeTypeId) {
+        this.timeTypeId = timeTypeId;
+    }
+
+    public Long getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(Long plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -236,11 +273,11 @@ public class CTARuleTemplateQueryResult {
                 .append("budgetType", budgetType)
                 .append("calculateValueIfPlanned", calculateValueIfPlanned)
                 .append("employmentTypes", employmentTypes)
-                .append("activityType", activityType)
+//                .append("activityType", activityType)
                 .append("planningCategory", planningCategory)
                 .append("staffFunction", staffFunctions)
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)
-                .append("timeTypes", timeTypes)
+//                .append("timeTypes", timeTypes)
                 .toString();
     }
 }

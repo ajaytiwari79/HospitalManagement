@@ -474,7 +474,28 @@ public class UnitEmploymentPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    public UnitEmploymentPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, Long wtaId, Long ctaId) {
+    public CostTimeAgreementDTO getUnitEmploymentPositionCTA(Long unitEmploymentPositionId) {
+        UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
+        unitEmploymentPositionGraphRepository.getCtaByUnitEmploymentId(unitEmploymentPositionId);
+        CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitEmploymentPositionId);
+        costTimeAgreementDTO.setStaffId(unitEmploymentPosition.getStaff().getId());
+        costTimeAgreementDTO.setContractedMinByWeek(unitEmploymentPosition.getTotalWeeklyMinutes());
+        costTimeAgreementDTO.setWorkingDays(unitEmploymentPosition.getWorkingDaysInWeek());
+        costTimeAgreementDTO.setCtaRuleTemplateDTOS(getCtaRuleTemplateDtos(unitEmploymentPosition.getCta().getRuleTemplates()));
+        return costTimeAgreementDTO;
+    }
+
+    public List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> getCtaRuleTemplateDtos(List<RuleTemplate> ruleTemplates){
+        List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ruleTemplates.size());
+        ruleTemplates.forEach(rt->{
+            com.kairos.client.dto.timeBank.CTARuleTemplateDTO ctaRuleTemplateDTO = new com.kairos.client.dto.timeBank.CTARuleTemplateDTO();
+            ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
+
+        });
+        return ctaRuleTemplateDTOS;
+    }
+
+    public UnitEmploymentPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO,  Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, Long wtaId, Long ctaId){
         Long startDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getStartDate());
         Long endDateMillis = null;
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
@@ -522,7 +543,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
             Staff staff = staffGraphRepository.findByExternalId(timeCareEmploymentDTO.getPersonID());
             if (staff == null) {
                 throw new DataNotFoundByIdException("NO staff exist with External Id" + timeCareEmploymentDTO.getPersonID());
-            }
+        }
             UnitEmploymentPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId(), wta.getId(), cta.getId());
             createUnitEmploymentPosition(organization.getId(), "Organization", unitEmploymentPosition, true);
         }
@@ -547,24 +568,4 @@ public class UnitEmploymentPositionService extends UserBaseService {
     }
 
 
-    public CostTimeAgreementDTO getUnitEmploymentPositionCTA(Long unitEmploymentPositionId) {
-        UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
-        unitEmploymentPositionGraphRepository.getCtaByUnitEmploymentId(unitEmploymentPositionId);
-        CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitEmploymentPositionId);
-        costTimeAgreementDTO.setStaffId(unitEmploymentPosition.getStaff().getId());
-        costTimeAgreementDTO.setContractedMinByWeek(unitEmploymentPosition.getTotalWeeklyMinutes());
-        costTimeAgreementDTO.setWorkingDays(unitEmploymentPosition.getWorkingDaysInWeek());
-        costTimeAgreementDTO.setCtaRuleTemplateDTOS(getCtaRuleTemplateDtos(unitEmploymentPosition.getCta().getRuleTemplates()));
-        return costTimeAgreementDTO;
-    }
-
-    public List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> getCtaRuleTemplateDtos(List<RuleTemplate> ruleTemplates){
-        List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ruleTemplates.size());
-        ruleTemplates.forEach(rt->{
-            com.kairos.client.dto.timeBank.CTARuleTemplateDTO ctaRuleTemplateDTO = new com.kairos.client.dto.timeBank.CTARuleTemplateDTO();
-            ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
-
-        });
-        return ctaRuleTemplateDTOS;
-    }
 }

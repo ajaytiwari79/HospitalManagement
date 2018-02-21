@@ -16,7 +16,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
-
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -70,7 +69,7 @@ public class Staff extends UserBaseEntity {
     private ContactDetail contactDetail;
     //address tab
     @Relationship(type = HAS_CONTACT_ADDRESS)
-    private ContactAddress contactAddress;
+    private List<ContactAddress> contactAddress;
 
     @Relationship(type = BELONGS_TO)
     User user;
@@ -99,7 +98,6 @@ public class Staff extends UserBaseEntity {
     private String careOfName;
 
 
-
     public Staff(String firstName) {
         this.firstName = firstName;
     }
@@ -119,11 +117,11 @@ public class Staff extends UserBaseEntity {
         this.cprNumber = cprNumber;
     }
 
-    public ContactAddress getContactAddress() {
+    public List<ContactAddress> getContactAddress() {
         return contactAddress;
     }
 
-    public void setContactAddress(ContactAddress contactAddress) {
+    public void setContactAddress(List<ContactAddress> contactAddress) {
         this.contactAddress = contactAddress;
     }
 
@@ -147,7 +145,6 @@ public class Staff extends UserBaseEntity {
         this.generalNote = generalNote;
         this.reqFromPerson = requestFromPerson;
     }
-
 
 
     public long getEmployedSince() {
@@ -343,30 +340,6 @@ public class Staff extends UserBaseEntity {
         this.cprNumber = cprNumber;
     }
 
-    public Map<String,Object> fetchContactAddressDetail(){
-
-        ContactAddress contactAddress =this.contactAddress;
-        Map<String,Object> map = null;
-        if(contactAddress != null){
-            map = new HashMap<>();
-            map.put("houseNumber",contactAddress.getHouseNumber());
-            map.put("floorNumber",contactAddress.getFloorNumber());
-            map.put("street1",contactAddress.getStreet1());
-            map.put("zipCodeId",contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
-            map.put("city",contactAddress.getCity()!=null? contactAddress.getCity(): "");
-            map.put("municipalityId",(contactAddress.getMunicipality()==null)?null:contactAddress.getMunicipality().getId());
-            map.put("regionName",contactAddress.getRegionName());
-            map.put("country",contactAddress.getCountry());
-            map.put("latitude",contactAddress.getLatitude());
-            map.put("longitude",contactAddress.getLongitude());
-            map.put("province",contactAddress.getProvince());
-            map.put("streetUrl",contactAddress.getStreetUrl());
-            map.put("addressProtected",contactAddress.isAddressProtected());
-            map.put("verifiedByVisitour",contactAddress.isVerifiedByVisitour());
-        }
-        return map;
-    }
-
     public EngineerType getEngineerType() {
         return engineerType;
     }
@@ -493,7 +466,7 @@ public class Staff extends UserBaseEntity {
         this.client = client;
     }
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd")
     public Date getDateOfBirth() {
         return dateOfBirth;
     }

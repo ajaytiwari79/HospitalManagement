@@ -3,6 +3,7 @@ package com.kairos.service.country;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.PresenceTypeWithTimeTypeDTO;
 import com.kairos.persistence.model.user.country.Country;
@@ -107,6 +108,21 @@ public class PresenceTypeService extends UserBaseService {
       //  presenceTypeWithTimeTypes.setTimeTypes(timeTypeRestClient.getAllTimeTypes(countryId));
         return presenceTypeWithTimeTypes;
     }
+
+
+    public Organization fetchParentOrganization(Long unitId) {
+        Organization parent = null;
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+        } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
+            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+        } else {
+            parent = unit;
+        }
+        return parent;
+    }
+
 
     public PresenceTypeWithTimeTypeDTO getAllPresenceTypeAndTimeTypesByUnitId(Long unitId) {
         Organization organization = organizationService.fetchParentOrganization(unitId);

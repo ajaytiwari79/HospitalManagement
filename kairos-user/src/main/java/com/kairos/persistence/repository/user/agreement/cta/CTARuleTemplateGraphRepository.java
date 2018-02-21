@@ -105,7 +105,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
            "p.planningCategory as planningCategory ,"+
            "p.staffFunctions as staffFunctions ,"+
            "plannedTimeWithFactor as plannedTimeWithFactor ,"+
-           "collect(distinct ID(timeType)) as timeTypes,"+
+//           "collect(distinct ID(timeType)) as timeTypes,"+
            "ID(p) as id")
    List<CTARuleTemplateQueryResult>findByRuleTemplateCategoryIdInAndCountryAndDeletedFalse(List<Long> categoryList, Long countryId);
 

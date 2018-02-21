@@ -5,7 +5,6 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.auth.User;
@@ -89,7 +88,7 @@ public class CostTimeAgreementService extends UserBaseService {
         List<RuleTemplate> ctaRuleTemplates = new ArrayList<>();
         if (category != null) {
             Arrays.stream(CTARuleTemplateType.values()).forEach(cTARuleTemplate -> {
-                CTARuleTemplate ctaRuleTemplate = createRuleTemplate(cTARuleTemplate, currency);
+                CTARuleTemplate ctaRuleTemplate = createDefaultRuleTemplate(cTARuleTemplate, currency);
                 category.addRuleTemplate(ctaRuleTemplate);
                 ctaRuleTemplates.add(ctaRuleTemplate);
             });
@@ -103,7 +102,11 @@ public class CostTimeAgreementService extends UserBaseService {
 
     }
 
-    private CTARuleTemplate createRuleTemplate(CTARuleTemplateType ctaRuleTemplateType, Currency currency) {
+    /*private CTARuleTemplate createCTARuleTemplate(){
+
+    }*/
+
+    private CTARuleTemplate createDefaultRuleTemplate(CTARuleTemplateType ctaRuleTemplateType, Currency currency) {
         CTARuleTemplate ctaRuleTemplate = null;
         switch (ctaRuleTemplateType) {
             case RULE_TEMPLATE_1:

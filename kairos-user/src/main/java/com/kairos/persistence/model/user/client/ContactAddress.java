@@ -92,6 +92,7 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
 
     //short name of temporary address
     private String locationName;
+    private boolean primary;
 
     public String getLocationName() {
         return locationName;
@@ -308,6 +309,14 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
     public Municipality getMunicipality() {
 
         return municipality;
+    }
+
+    public boolean isPrimary() {
+        return primary;
+    }
+
+    public void setPrimary(boolean primary) {
+        this.primary = primary;
     }
 
     /**
