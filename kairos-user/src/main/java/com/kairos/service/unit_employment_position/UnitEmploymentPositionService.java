@@ -476,7 +476,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
     public CostTimeAgreementDTO getUnitEmploymentPositionCTA(Long unitEmploymentPositionId) {
         UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
-        unitEmploymentPositionGraphRepository.getCtaByUnitEmploymentId(unitEmploymentPositionId);
+        costTimeAgreementGraphRepository.getCtaByUnitEmploymentId(unitEmploymentPositionId);
         CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitEmploymentPositionId);
         costTimeAgreementDTO.setStaffId(unitEmploymentPosition.getStaff().getId());
         costTimeAgreementDTO.setContractedMinByWeek(unitEmploymentPosition.getTotalWeeklyMinutes());

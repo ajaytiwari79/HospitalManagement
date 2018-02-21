@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.user.agreement.cta;
 import com.kairos.persistence.model.constants.RelationshipConstants;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CTAListQueryResult;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -197,4 +198,9 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
 
     @Query("MATCH (cta:CostTimeAgreement)-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0} AND lower(cta.name)=lower({1}) return cta")
     CostTimeAgreement getCTAIdByCountryAndName(Long countryId, String ctaName);
+
+
+    @Query("")
+    CTARuleTemplateDTO getCtaByUnitEmploymentId(Long unitEmploymentPositionId);
+
 }
