@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -145,7 +146,7 @@ public class EmploymentTypeService extends UserBaseService {
         }
     }
 
-    public List<EmploymentTypeDTO> getEmploymentTypeSettingsOfOrganization(Long unitId) {
+    /*public List<EmploymentTypeDTO> getEmploymentTypeSettingsOfOrganization(Long unitId) {
         Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(organization).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
@@ -153,6 +154,25 @@ public class EmploymentTypeService extends UserBaseService {
         }
         Organization parent = organizationService.fetchParentOrganization(unitId);
         return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(parent.getId(), false);
+    }*/
+
+    public List<EmploymentTypeDTO> getEmploymentTypeSettingsOfOrganization(Long unitId) {
+        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
+        if (!Optional.ofNullable(organization).isPresent()) {
+            logger.error("Incorrect unit id " + unitId);
+            throw new DataNotFoundByIdException("Incorrect unit id ");
+        }
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        List<EmploymentTypeDTO> employmentSettingForOrganization = employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(parent.getId(), false, new ArrayList<>());
+        List<Long> listOfConfiguredEmploymentTypeIds = new ArrayList<>();
+        for ( EmploymentTypeDTO employmentTypeDTO: employmentSettingForOrganization) {
+            listOfConfiguredEmploymentTypeIds.add(employmentTypeDTO.getId());
+        }
+        if(unitId != parent.getId()){
+            List<EmploymentTypeDTO> employmentSettingForParentOrganization = employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(parent.getId(), false, listOfConfiguredEmploymentTypeIds);
+            employmentSettingForOrganization.addAll(employmentSettingForParentOrganization);
+        }
+        return employmentSettingForOrganization;
     }
 
     public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId) {
