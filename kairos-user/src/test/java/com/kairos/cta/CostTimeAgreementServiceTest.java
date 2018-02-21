@@ -62,6 +62,7 @@ public class CostTimeAgreementServiceTest {
 //    static Long countryId = 53L;
     static Long countryId = null;
     static Long organizationId = null;
+    static String nameOfCTA = "Overtime CTA";
 
     @Before
     public void setUp() throws Exception {
@@ -113,7 +114,7 @@ public class CostTimeAgreementServiceTest {
 
     @Test
     public void createCostTimeAgreement(){
-        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("New Test CTA",
+        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("working overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
                         " 50% overtime compensation”.", CTARuleTemplateType.RULE_TEMPLATE_7,
                 "230:50% overtime compensation", "xyz");
@@ -124,7 +125,7 @@ public class CostTimeAgreementServiceTest {
         OrganizationType organizationType = organizationService.getOneDefaultOrganizationTypeByCountryId(countryId);
         OrganizationType organizationSubType = organizationService.getOrganizationSubTypeById(organizationType.getId()).get(0);
         CollectiveTimeAgreementDTO collectiveTimeAgreementDTO = new CollectiveTimeAgreementDTO
-                ("CTA TEST", "Test description", expertise.getId(), organizationType.getId(), organizationSubType.getId(), new Date().getTime(), ctaRuleTemplates);
+                (nameOfCTA, "Test description", expertise.getId(), organizationType.getId(), organizationSubType.getId(), new Date().getTime(), ctaRuleTemplates);
         String baseUrl = getBaseUrl(organizationId, countryId);
         HttpEntity<CollectiveTimeAgreementDTO> requestBodyData = new HttpEntity<>(collectiveTimeAgreementDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> typeReference =
@@ -144,28 +145,30 @@ public class CostTimeAgreementServiceTest {
 
     @Test
     public void updateCostTimeAgreement(){
+        // Check for CTA by Id
+        if(createdCtaId == null){
+            logger.info("CTA Id is null");
+            createdCtaId = costTimeAgreementService.getCTAIdByNameAndCountry(nameOfCTA, countryId);
+        }
+        // If CTA not found by Id check for cta by name
+        if(createdCtaId == null){
+            logger.info("CTA not found with name : {}",nameOfCTA);
+            return;
+        }
         CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Working Overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
                         " 50% overtime compensation”.", CTARuleTemplateType.RULE_TEMPLATE_7,
                 "230:50% overtime compensation", "xyz");
+        ctaRuleTemplateDTO = prepareCTARuleTemplate(ctaRuleTemplateDTO);
         List<CTARuleTemplateDTO> ctaRuleTemplates = new ArrayList<>();
         ctaRuleTemplates.add(ctaRuleTemplateDTO);
         Expertise expertise = expertiseService.getExpertiseByCountryId(countryId);
         OrganizationType organizationType = organizationService.getOrganizationTypeByCountryId(countryId).get(0);
         OrganizationType organizationSubType = organizationService.getOrganizationSubTypeById(organizationType.getId()).get(0);
         CollectiveTimeAgreementDTO collectiveTimeAgreementDTO = new CollectiveTimeAgreementDTO
-                ("CTA TEST", "Test description", expertise.getId(), organizationType.getId(),
+                (nameOfCTA, "Test description", expertise.getId(), organizationType.getId(),
                         organizationSubType.getId(), new Date().getTime(), ctaRuleTemplates);
 
-        if(createdCtaId == null){
-            // GET CTA with name  "New Test CTA"
-            try{
-                collectiveTimeAgreementDTO = costTimeAgreementService.createCostTimeAgreement(countryId, collectiveTimeAgreementDTO);
-            } catch (Exception e){
-                logger.info("Exception occured");
-            }
-            createdCtaId = collectiveTimeAgreementDTO.getId();
-        }
         collectiveTimeAgreementDTO.setDescription("Description updated");
 
         String baseUrl = getBaseUrl(71L, 53L);
@@ -239,7 +242,8 @@ public class CostTimeAgreementServiceTest {
         CompensationTable compensationTable = new CompensationTable(10, compensationTableIntervals);
         ctaRuleTemplateDTO.setCompensationTable(compensationTable);
 
-
+        // Prepare Activity Data
+        ctaRuleTemplateDTO.setActivityTypeForCostCalculation(ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE);
         return ctaRuleTemplateDTO;
     }
 
