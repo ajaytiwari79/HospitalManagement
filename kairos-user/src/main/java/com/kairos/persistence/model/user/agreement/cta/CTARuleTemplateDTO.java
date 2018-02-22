@@ -13,14 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CTARuleTemplateDTO {
-    @NotNull
+//    @NotNull
     public Long id;
     public String name;
     public String description;
     public boolean disabled;
     @NotNull
     public Long ruleTemplateCategory;
-    private CTARuleTemplateType ruleTemplateType;
+    private String ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
     private CalculationUnit calculationUnit;
@@ -32,11 +32,16 @@ public class CTARuleTemplateDTO {
     private BudgetType budgetType;
     private List<CalculateValueIfPlanned> calculateValueIfPlanned =new ArrayList<>();
     private List<Long> employmentTypes =new ArrayList<>();
-    private ActivityType activityType;
+//    private ActivityType activityType;
     private PlanningCategory planningCategory;
     private List<StaffFunction> staffFunctions=new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
-    private List<Long> timeTypes =new ArrayList<>();
+//    private List<Long> timeTypes =new ArrayList<>();
+
+    private ActivityTypeForCostCalculation activityTypeForCostCalculation;
+    private List<Long> activityIds;
+    private Long timeTypeId;
+    private Long plannedTimeId;
 
     public CTARuleTemplateDTO() {
     }
@@ -80,11 +85,11 @@ public class CTARuleTemplateDTO {
         this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
-    public CTARuleTemplateType getRuleTemplateType() {
+    public String getRuleTemplateType() {
         return ruleTemplateType;
     }
 
-    public void setRuleTemplateType(CTARuleTemplateType ruleTemplateType) {
+    public void setRuleTemplateType(String ruleTemplateType) {
         this.ruleTemplateType = ruleTemplateType;
     }
 
@@ -174,13 +179,13 @@ public class CTARuleTemplateDTO {
         this.employmentTypes = employmentTypes;
     }
 
-    public ActivityType getActivityType() {
+    /*public ActivityType getActivityType() {
         return activityType;
     }
 
     public void setActivityType(ActivityType activityType) {
         this.activityType = activityType;
-    }
+    }*/
 
     public PlanningCategory getPlanningCategory() {
         return planningCategory;
@@ -206,12 +211,44 @@ public class CTARuleTemplateDTO {
         this.plannedTimeWithFactor = plannedTimeWithFactor;
     }
 
-    public List<Long> getTimeTypes() {
+/*    public List<Long> getTimeTypes() {
         return timeTypes;
     }
 
     public void setTimeTypes(List<Long> timeTypes) {
         this.timeTypes = timeTypes;
+    }*/
+
+    public ActivityTypeForCostCalculation getActivityTypeForCostCalculation() {
+        return activityTypeForCostCalculation;
+    }
+
+    public void setActivityTypeForCostCalculation(ActivityTypeForCostCalculation activityTypeForCostCalculation) {
+        this.activityTypeForCostCalculation = activityTypeForCostCalculation;
+    }
+
+    public List<Long> getActivityIds() {
+        return activityIds;
+    }
+
+    public void setActivityIds(List<Long> activityIds) {
+        this.activityIds = activityIds;
+    }
+
+    public Long getTimeTypeId() {
+        return timeTypeId;
+    }
+
+    public void setTimeTypeId(Long timeTypeId) {
+        this.timeTypeId = timeTypeId;
+    }
+
+    public Long getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(Long plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
     }
 
     public CTARuleTemplateDTO cloneNew(){
@@ -230,17 +267,16 @@ public class CTARuleTemplateDTO {
             ctaRuleTemplatePhaseInfo.setId(null);
         }
 
-        this.getActivityType().setId(null);
+//        this.getActivityType().setId(null);
         this.getPlannedTimeWithFactor().setId(null);
 
         return this;
     }
 
-    public CTARuleTemplateDTO(String name, String description, CTARuleTemplateType ruleTemplateType, String payrollType, String payrollSystem) {
+    public CTARuleTemplateDTO(String name, String description, String payrollType, String payrollSystem) {
         this.name=name;
         this.description=description;
         this.ruleTemplateCategory=ruleTemplateCategory;
-        this.ruleTemplateType=ruleTemplateType;
         this.payrollType=payrollType;
         this.payrollSystem=payrollSystem;
 
@@ -266,11 +302,11 @@ public class CTARuleTemplateDTO {
                 .append("budgetType", budgetType)
                 .append("calculateValueIfPlanned", calculateValueIfPlanned)
                 .append("employmentTypes", employmentTypes)
-                .append("activityType", activityType)
+//                .append("activityType", activityType)
                 .append("planningCategory", planningCategory)
                 .append("staffFunctions", staffFunctions)
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)
-                .append("timeTypes", timeTypes)
+//                .append("timeTypes", timeTypes)
                 .toString();
     }
 }

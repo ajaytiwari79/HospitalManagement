@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class ActivityTypeDTO {
     private Long id;
     private String name;
+    private CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTab;
 
     public Long getId() {
         return id;
@@ -23,5 +24,13 @@ public class ActivityTypeDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public CTAAndWTASettingsActivityTabDTO getCtaAndWtaSettingsActivityTab() {
+        return ctaAndWtaSettingsActivityTab;
+    }
+
+    public void setCtaAndWtaSettingsActivityTab(CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTab) {
+        this.ctaAndWtaSettingsActivityTab = ctaAndWtaSettingsActivityTab;
     }
 }
