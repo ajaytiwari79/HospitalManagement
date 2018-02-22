@@ -1,6 +1,5 @@
 package com.kairos.service.agreement.wta;
 
-import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
@@ -14,14 +13,12 @@ import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateVa
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
-import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
-import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -493,6 +490,36 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumSeniorDaysInYearWTATemplate.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     maximumSeniorDaysInYearWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
                     wtaBaseRuleTemplates.add(maximumSeniorDaysInYearWTATemplate);
+                    break;
+                case TEMPLATE21:
+                    MaximumTimeBank maximumTimeBank = new MaximumTimeBank();
+                    maximumTimeBank.setName(ruleTemplate.getName());
+                    maximumTimeBank.setTemplateType(ruleTemplate.getTemplateType());
+                    maximumTimeBank.setDescription(ruleTemplate.getDescription());
+                    maximumTimeBank.setFrequency(ruleTemplate.getFrequency());
+                    maximumTimeBank.setYellowZone(ruleTemplate.getYellowZone());
+                    maximumTimeBank.setForbid(ruleTemplate.isForbid());
+                    maximumTimeBank.setAllowExtraActivity(ruleTemplate.isAllowExtraActivity());
+                    maximumTimeBank.setRuleTemplateCategory(ruleTemplateCategory);
+                    maximumTimeBank.setDisabled(ruleTemplate.getDisabled());
+                    maximumTimeBank.setRecommendedValue(ruleTemplate.getRecommendedValue());
+                    maximumTimeBank.setPhaseTemplateValues(phaseTemplateValues);
+                    wtaBaseRuleTemplates.add(maximumTimeBank);
+                    break;
+                case TEMPLATE22:
+                    MinimumTimeBank minimumTimeBank = new MinimumTimeBank();
+                    minimumTimeBank.setName(ruleTemplate.getName());
+                    minimumTimeBank.setTemplateType(ruleTemplate.getTemplateType());
+                    minimumTimeBank.setDescription(ruleTemplate.getDescription());
+                    minimumTimeBank.setFrequency(ruleTemplate.getFrequency());
+                    minimumTimeBank.setYellowZone(ruleTemplate.getYellowZone());
+                    minimumTimeBank.setForbid(ruleTemplate.isForbid());
+                    minimumTimeBank.setAllowExtraActivity(ruleTemplate.isAllowExtraActivity());
+                    minimumTimeBank.setRuleTemplateCategory(ruleTemplateCategory);
+                    minimumTimeBank.setDisabled(ruleTemplate.getDisabled());
+                    minimumTimeBank.setRecommendedValue(ruleTemplate.getRecommendedValue());
+                    minimumTimeBank.setPhaseTemplateValues(phaseTemplateValues);
+                    wtaBaseRuleTemplates.add(minimumTimeBank);
                     break;
                 default:
                     throw new DataNotFoundByIdException("Invalid TEMPLATE");
