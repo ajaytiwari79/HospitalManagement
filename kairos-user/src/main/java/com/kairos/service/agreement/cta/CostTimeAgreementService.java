@@ -116,7 +116,7 @@ public class CostTimeAgreementService extends UserBaseService {
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, false);
         ctaRuleTemplate.setLastModifiedBy(user);
         this.save(ctaRuleTemplate);
-
+        ctaRuleTemplateDTO.setId(ctaRuleTemplate.getId());
         ctaRuleTemplateGraphRepository.addCTARuleTemplateInCountry(countryId,ctaRuleTemplate.getId());
 
         return ctaRuleTemplateDTO;
