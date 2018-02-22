@@ -62,9 +62,9 @@ public class RuleTemplateCategoryDTO {
     private Boolean onlyCompositeShifts;
     private String activityCode;
     private TimeBankTypeEnum frequency;
-    private int yellowZone;
-    private boolean forbid;
-    private boolean allowExtraActivity;
+    private Integer yellowZone;
+    private Boolean forbid;
+    private Boolean allowExtraActivity;
 
 
     public int getRecommendedValue() {
@@ -398,27 +398,27 @@ public class RuleTemplateCategoryDTO {
         this.frequency = frequency;
     }
 
-    public int getYellowZone() {
+    public Integer getYellowZone() {
         return yellowZone;
     }
 
-    public void setYellowZone(int yellowZone) {
+    public void setYellowZone(Integer yellowZone) {
         this.yellowZone = yellowZone;
     }
 
-    public boolean isForbid() {
+    public Boolean isForbid() {
         return forbid;
     }
 
-    public void setForbid(boolean forbid) {
+    public void setForbid(Boolean forbid) {
         this.forbid = forbid;
     }
 
-    public boolean isAllowExtraActivity() {
+    public Boolean isAllowExtraActivity() {
         return allowExtraActivity;
     }
 
-    public void setAllowExtraActivity(boolean allowExtraActivity) {
+    public void setAllowExtraActivity(Boolean allowExtraActivity) {
         this.allowExtraActivity = allowExtraActivity;
     }
 
