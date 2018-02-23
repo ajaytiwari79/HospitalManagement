@@ -844,14 +844,14 @@ public class BootDataService {
 
     private void createUnitEmploymentForCountryLevel() {
         accessGroup = accessGroupRepository.findAccessGroupByName(kairosCountryLevel.getId(), AppConstants.COUNTRY_ADMIN);
-        UnitEmployment unitEmployment = new UnitEmployment();
-        unitEmployment.setOrganization(kairosCountryLevel);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(kairosCountryLevel);
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        unitEmploymentGraphRepository.save(unitEmployment);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+        unitEmploymentGraphRepository.save(unitPermission);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
         accessPageService.setPagePermissionToAdmin(accessPermission);
-        employmentForAdmin.getUnitEmployments().add(unitEmployment);
+        employmentForAdmin.getUnitPermissions().add(unitPermission);
         kairosCountryLevel.getEmployments().add(employmentForAdmin);
         organizationGraphRepository.save(kairosCountryLevel);
     }
@@ -958,33 +958,33 @@ public class BootDataService {
 
     private void createUnitEmploymentForCityLevel() {
         accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.VISITATOR);
-        UnitEmployment unitEmployment = new UnitEmployment();
-        unitEmployment.setOrganization(oodlesCityLevel);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(oodlesCityLevel);
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        employmentForMichal.getUnitEmployments().add(unitEmployment);
+        employmentForMichal.getUnitPermissions().add(unitPermission);
         oodlesCityLevel.getEmployments().add(employmentForMichal);
 
         accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.TASK_GIVERS);
-        unitEmployment = new UnitEmployment();
-        unitEmployment.setOrganization(oodlesCityLevel);
+        unitPermission = new UnitPermission();
+        unitPermission.setOrganization(oodlesCityLevel);
         accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship taskGiverAccess = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+        UnitEmpAccessRelationship taskGiverAccess = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(taskGiverAccess);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        employmentForAlma.getUnitEmployments().add(unitEmployment);
+        employmentForAlma.getUnitPermissions().add(unitPermission);
         oodlesCityLevel.getEmployments().add(employmentForAlma);
 
         accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.PLANNER);
-        unitEmployment = new UnitEmployment();
-        unitEmployment.setOrganization(oodlesCityLevel);
+        unitPermission = new UnitPermission();
+        unitPermission.setOrganization(oodlesCityLevel);
         accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship plannerAccess = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+        UnitEmpAccessRelationship plannerAccess = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(plannerAccess);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        employmentForLiva.getUnitEmployments().add(unitEmployment);
+        employmentForLiva.getUnitPermissions().add(unitPermission);
         oodlesCityLevel.getEmployments().add(employmentForLiva);
         organizationGraphRepository.save(oodlesCityLevel);
     }

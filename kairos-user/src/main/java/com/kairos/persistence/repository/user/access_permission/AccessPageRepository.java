@@ -26,7 +26,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
             "Match (staff)-[:"+STAFF_HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup)-[r:"+ACCESS_GROUP_HAS_ACCESS_TO_PAGE+"{read:false}]->(accessPage:AccessPage{isModule:true}) return distinct accessPage")
     List<AccessPage> getAccessModulesForUnits(long parentOrganizationId, long userId);
 
-    @Query("Match (n:UnitEmployment)-[:"+HAS_ACCESS_PERMISSION+"]->(accessPermission:AccessPermission)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(p:AccessPage) where id(n)={0} AND id(p)={1} SET r.isRead={2} return r")
+    @Query("Match (n:UnitPermission)-[:"+HAS_ACCESS_PERMISSION+"]->(accessPermission:AccessPermission)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(p:AccessPage) where id(n)={0} AND id(p)={1} SET r.isRead={2} return r")
     void modifyAccessPagePermission(long unitEmploymentId, long accessPageId, boolean value);
 
     @Query("MATCH path=(accessPage:AccessPage{active:true})-[:"+SUB_PAGE+"*]->(subPage:AccessPage{active:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with ps\n" +
@@ -58,8 +58,8 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
     List<Map<String,Object>> getStaffPermission(long accessPermissionId);
 
     @Query("MATCH (n:Organization)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(n)={0} AND  id(staff)={2}\n" +
-            "Match (emp)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmp:UnitEmployment)-[:PROVIDED_BY]->(unit:Organization) where id(unit)={1}\n" +
-            "Match (unitEmp)-[:HAS_ACCESS_PERMISSION{isEnabled:true}]->(ap:AccessPermission)-[:HAS_ACCESS_GROUP]->(g:AccessGroup) where id(g)={3} with ap,g\n" +
+            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={1}\n" +
+            "Match (unitPermission)-[:HAS_ACCESS_PERMISSION{isEnabled:true}]->(ap:AccessPermission)-[:HAS_ACCESS_GROUP]->(g:AccessGroup) where id(g)={3} with ap,g\n" +
             "Match (g)-[:HAS_ACCESS_OF_TABS{isEnabled:true}]->(accessPage:AccessPage{isModule:true}) with accessPage,ap,g\n" +
             "MATCH path=(accessPage)-[:SUB_PAGE*]->() WITH NODES(path) AS np,g as g,ap as ap with REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1],g:g,ap:ap}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with distinct ps.g as g,ps as ps,ps.ap as ap\n" +
             "match (child:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g)\n" +
@@ -73,8 +73,8 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
 
     @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
             "MATCH (org)-[:"+HAS_EMPLOYMENTS+"]->(emp:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={1} with org,emp\n" +
-            "Match (emp)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(unitEmp:UnitEmployment)-[:"+PROVIDED_BY+"]->(org) with org,unitEmp\n" +
-            "Match (unitEmp)-[:"+HAS_ACCESS_PERMISSION+"{isEnabled:true}]->(ap:AccessPermission) with ap,org\n" +
+            "Match (emp)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitPermission:UnitPermission)-[:"+ APPLICABLE_IN_UNIT +"]->(org) with org,unitPermission\n" +
+            "Match (unitPermission)-[:"+HAS_ACCESS_PERMISSION+"{isEnabled:true}]->(ap:AccessPermission) with ap,org\n" +
             "MATCH (ap)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,ap,org\n"+
             "Match (ap)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(accessPage:AccessPage{isModule:true})<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup)\n" +
             "return id(accessPage) as id,accessPage.name as name,r.isRead as read,r.isWrite as write,accessPage.moduleId as moduleId,accessPage.active as active")
@@ -86,8 +86,8 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
 
     @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
             "MATCH (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with org,emp\n" +
-            "MATCH (emp)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmp:UnitEmployment)-[:PROVIDED_BY]->(org) with unitEmp,org\n" +
-            "Match (unitEmp)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission) with accessPermission,org\n" +
+            "MATCH (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) with unitPermission,org\n" +
+            "Match (unitPermission)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission) with accessPermission,org\n" +
             "MATCH (accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,accessPermission,org\n"+
             "Match (accessPermission)-[modulePermission:HAS_ACCESS_PAGE_PERMISSION]->(module:AccessPage{isModule:true})<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with module,accessPermission,modulePermission\n" +
             "Match (module)-[:SUB_PAGE*]->(subPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPermission,modulePermission,subPage,module\n"+
@@ -120,8 +120,8 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
     Boolean updateStatusOfAccessTabs(Long tabId,Boolean active);
 
     @Query("Match (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0}\n" +
-            "Match (emp)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment)-[:PROVIDED_BY]->(unit:Organization) where id(unit)={1}\n" +
-            "Match (unitEmployment)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup)\n" +
+            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={1}\n" +
+            "Match (unitPermission)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup)\n" +
             "Match (module:AccessPage{isModule:true})-[:SUB_PAGE]->(subPage:AccessPage)\n" +
             "optional Match (accessPermission)-[r:HAS_ACCESS_PAGE_PERMISSION]->(module)\n" +
             "optional Match (subPage)<-[r2:HAS_ACCESS_PAGE_PERMISSION]-(accessPermission)with {name:subPage.name,active:subPage.active,moduleId:subPage.moduleId,read:case when r2.isRead then r2.isRead else false end,write:case when r2.isWrite then r2.isWrite else false end,id:id(subPage)} as data,accessGroup,module,r,r2\n" +
@@ -136,7 +136,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
     List<StaffPermissionQueryResult> getTabsPermissionForHubUserForUnit();
 
     @Query("Match (emp:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with emp\n" +
-            "Match (emp:Employment)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(unitEmp:UnitEmployment)-[:"+PROVIDED_BY+"]->(org:Organization) with collect(org.isKairosHub) as hubList\n" +
+            "Match (emp:Employment)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitPermission:UnitPermission)-[:"+ APPLICABLE_IN_UNIT +"]->(org:Organization) with collect(org.isKairosHub) as hubList\n" +
             "return true in hubList")
     Boolean isHubMember(Long userId);
 

@@ -290,7 +290,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("Match (root:Organization) where id(root)={0} with root " +
             "Match (root)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with employment " +
-            "Match (employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment)-[:PROVIDED_BY]->(unit:Organization) where id(unit)={2} with unitEmployment " +
+            "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitEmployment:UnitEmployment)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitEmployment " +
             "MATCH (unitEmployment)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessPermission " +
             "Match (accessPermission)-[r:HAS_ACCESS_PAGE_PERMISSION]->(accessPage:AccessPage{moduleId:{3}}) with collect(r.isRead) as read " +
             "RETURN " +

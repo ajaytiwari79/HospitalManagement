@@ -34,7 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
@@ -138,13 +137,13 @@ public class EmploymentService extends UserBaseService {
             parentOrganization = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
 
-        UnitEmployment unitEmployment;
+        UnitPermission unitPermission;
         Employment employment;
         if(parentOrganization == null){
-            unitEmployment = unitEmploymentGraphRepository.getUnitEmployment(unitId, staffId,unitId);
+            unitPermission = unitEmploymentGraphRepository.getUnitEmployment(unitId, staffId,unitId);
             employment =  employmentGraphRepository.findEmployment(unit.getId(), staffId);
         } else {
-            unitEmployment = unitEmploymentGraphRepository.getUnitEmployment(parentOrganization.getId(), staffId,unitId);
+            unitPermission = unitEmploymentGraphRepository.getUnitEmployment(parentOrganization.getId(), staffId,unitId);
             employment =  employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
         }
 
@@ -156,16 +155,16 @@ public class EmploymentService extends UserBaseService {
                 employment = new Employment();
                 employment.setStaff(staff);
             }
-            if (unitEmployment == null) {
+            if (unitPermission == null) {
                 AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-                unitEmployment = new UnitEmployment();
-                unitEmployment.setOrganization(unit);
-                unitEmployment.setStartDate(DateUtil.getCurrentDate().getTime());
-                employment.getUnitEmployments().add(unitEmployment);
+                unitPermission = new UnitPermission();
+                unitPermission.setOrganization(unit);
+                unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+                employment.getUnitPermissions().add(unitPermission);
                 employmentGraphRepository.save(employment);
                 AccessPermission accessPermission = new AccessPermission(accessGroup);
                 accessPermissionGraphRepository.save(accessPermission);
-                unitEmploymentGraphRepository.linkUnitEmploymentWithAccessPermission(unitEmployment.getId(),accessPermission.getId());
+                unitEmploymentGraphRepository.linkUnitEmploymentWithAccessPermission(unitPermission.getId(),accessPermission.getId());
                 accessPageRepository.setDefaultPermission(accessPermission.getId(),accessGroupId);
                 accessPageQueryResults = getAccessPages(accessPermission);
                 if(parentOrganization == null){
@@ -188,7 +187,7 @@ public class EmploymentService extends UserBaseService {
                 if (accessPermission == null) {
                     accessPermission = new AccessPermission(accessGroup);
                     accessPermissionGraphRepository.save(accessPermission);
-                    unitEmploymentGraphRepository.linkUnitEmploymentWithAccessPermission(unitEmployment.getId(),accessPermission.getId());
+                    unitEmploymentGraphRepository.linkUnitEmploymentWithAccessPermission(unitPermission.getId(),accessPermission.getId());
                     accessPageRepository.setDefaultPermission(accessPermission.getId(),accessGroupId);
                     accessPageQueryResults = getAccessPages(accessPermission);
                     if(accessGroup.isTypeOfTaskGiver())
@@ -220,11 +219,11 @@ public class EmploymentService extends UserBaseService {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("startDate", DateConverter.getDate(unitEmployment.getStartDate()));
-        response.put("endDate", DateConverter.getDate(unitEmployment.getEndDate()));
+        response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
+        response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
         response.put("organizationId", unitId);
-        response.put("status", unitEmployment.getEmploymentStatus());
-        response.put("id", unitEmployment.getId());
+        response.put("status", unitPermission.getEmploymentStatus());
+        response.put("id", unitPermission.getId());
         response.put("synInFls",flsSyncStatus);
         response.put("accessPage",accessPageQueryResults);
         return response;
@@ -237,9 +236,9 @@ public class EmploymentService extends UserBaseService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         Wage wage = objectMapper.convertValue(wageDetails, Wage.class);
-        UnitEmployment unitEmployment = unitEmploymentGraphRepository.findOne(unitEmploymentId);
-        unitEmployment.getWages().add(wage);
-        unitEmploymentGraphRepository.save(unitEmployment);
+        UnitPermission unitPermission = unitEmploymentGraphRepository.findOne(unitEmploymentId);
+        unitPermission.getWages().add(wage);
+        unitEmploymentGraphRepository.save(unitPermission);
         wageDetails.put("id", wage.getId());
         return wageDetails;
 
@@ -289,16 +288,16 @@ public class EmploymentService extends UserBaseService {
         Employment employment = new Employment();
         employment.setName("Working as unit manager");
         employment.setStaff(staff);
-        UnitEmployment unitEmployment = new UnitEmployment();
-        unitEmployment.setUnitManagerEmployment(true);
-        unitEmployment.setOrganization(unit);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setUnitManagerEmployment(true);
+        unitPermission.setOrganization(unit);
 
         //set permission in unit employment
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission,accessPermission);
         unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
         accessPageService.setPagePermissionToStaff(accessPermission,accessGroup.getId());
-        employment.getUnitEmployments().add(unitEmployment);
+        employment.getUnitPermissions().add(unitPermission);
         if (parent == null) {
             unit.getEmployments().add(employment);
             organizationGraphRepository.save(unit);
@@ -580,14 +579,14 @@ public class EmploymentService extends UserBaseService {
                 parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
             }
 
-            UnitEmployment unitEmployment;
+            UnitPermission unitPermission;
             if(parent == null){
-                unitEmployment = unitEmploymentGraphRepository.getUnitEmployment(unit.getId(), staffId, unit.getId(), EmploymentStatus.PENDING);
+                unitPermission = unitEmploymentGraphRepository.getUnitEmployment(unit.getId(), staffId, unit.getId(), EmploymentStatus.PENDING);
             } else {
-                unitEmployment = unitEmploymentGraphRepository.getUnitEmployment(parent.getId(), staffId, unit.getId(), EmploymentStatus.PENDING);
+                unitPermission = unitEmploymentGraphRepository.getUnitEmployment(parent.getId(), staffId, unit.getId(), EmploymentStatus.PENDING);
             }
 
-            if (unitEmployment == null) {
+            if (unitPermission == null) {
                 throw new InternalError("unit employment is null");
             }
 
@@ -598,8 +597,8 @@ public class EmploymentService extends UserBaseService {
             partialLeave.setEmploymentId(partialLeaveDTO.getEmploymentId());
             partialLeave.setNote(partialLeaveDTO.getNote());
             partialLeave.setLeaveType(partialLeaveDTO.getLeaveType());
-            unitEmployment.getPartialLeaves().add(partialLeave);
-            unitEmploymentGraphRepository.save(unitEmployment);
+            unitPermission.getPartialLeaves().add(partialLeave);
+            unitEmploymentGraphRepository.save(unitPermission);
         }
         return parsePartialLeaveObj(partialLeave);
     }

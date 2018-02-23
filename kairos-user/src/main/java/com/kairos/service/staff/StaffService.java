@@ -61,13 +61,11 @@ import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FileUtil;
 import com.kairos.util.userContext.UserContext;
-import org.apache.commons.collections.map.UnmodifiableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,8 +80,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -157,7 +153,8 @@ public class StaffService extends UserBaseService {
     private UnitEmploymentPositionGraphRepository unitEmploymentPositionGraphRepository;
     @Autowired
     private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
-    @Inject private UnitEmploymentPositionService unitEmploymentPositionService;
+    @Inject
+    private UnitEmploymentPositionService unitEmploymentPositionService;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -236,7 +233,7 @@ public class StaffService extends UserBaseService {
         if (count != 0 && objectToUpdate.getVisitourId() != 0) {
             updateStaffPersonalInfoInFLS(objectToUpdate, unitId); // Update info to FLS
         }
-        if (staffPersonalDetail.getCurrentStatus()== StaffStatusEnum.INACTIVE) {
+        if (staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
             objectToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
         }
         objectToUpdate.setSignature(staffPersonalDetail.getSignature());
@@ -302,7 +299,7 @@ public class StaffService extends UserBaseService {
         map.put("languageId", staffGraphRepository.getLanguageId(staff.getId()));
         map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));
         map.put("cprNumber", staff.getCprNumber());
-        map.put("careOfName",staff.getCareOfName());
+        map.put("careOfName", staff.getCareOfName());
 
         // Visitour Speed Profile
         map.put("speedPercent", staff.getSpeedPercent());
@@ -574,7 +571,7 @@ public class StaffService extends UserBaseService {
                         }
                     }
                     staff.setContactDetail(contactDetail);
-                    List<ContactAddress> contactAddresses=new ArrayList<>();
+                    List<ContactAddress> contactAddresses = new ArrayList<>();
                     contactAddresses.add(contactAddress);
                     staff.setContactAddress(contactAddresses);
                     cell = row.getCell(2);
@@ -762,14 +759,14 @@ public class StaffService extends UserBaseService {
             organizationGraphRepository.save(organization);
 
             AccessGroup accessGroup = accessGroupRepository.findAccessGroupByName(organization.getId(), AppConstants.COUNTRY_ADMIN);
-            UnitEmployment unitEmployment = new UnitEmployment();
-            unitEmployment.setOrganization(organization);
+            UnitPermission unitPermission = new UnitPermission();
+            unitPermission.setOrganization(organization);
             AccessPermission accessPermission = new AccessPermission(accessGroup);
-            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
             unitEmpAccessRelationship.setEnabled(true);
             unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
             accessPageService.setPagePermissionToAdmin(accessPermission);
-            employment.getUnitEmployments().add(unitEmployment);
+            employment.getUnitPermissions().add(unitPermission);
             organization.getEmployments().add(employment);
             organizationGraphRepository.save(organization);
         } else {
@@ -844,8 +841,9 @@ public class StaffService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect id of an organization  " + unitId);
         }
         User user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
-        if (staffGraphRepository.staffAlreadyInUnit(payload.getExternalId(), unit.getId())) {
-            throw new DuplicateDataException("Staff already exist in organization");
+        Staff staff = staffGraphRepository.findByExternalId(payload.getExternalId());
+        if (Optional.ofNullable(staff).isPresent()) {
+            throw new DuplicateDataException("Staff already exists by this externalId");
         }
         setBasicDetailsOfUser(user, payload);
         Organization parent = null;
@@ -856,7 +854,7 @@ public class StaffService extends UserBaseService {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
 
-        Staff staff = createStaffObject(parent, unit, payload);
+        staff = createStaffObject(parent, unit, payload);
         Client client = createClientObject(staff);
         boolean isEmploymentExist = (staff.getId()) != null;
         staff.setUser(user);
@@ -906,7 +904,7 @@ public class StaffService extends UserBaseService {
         staff.setCprNumber(payload.getCprNumber());
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
         contactAddress.setPrimary(true);
-        List<ContactAddress> contactAddresses=new ArrayList<>();
+        List<ContactAddress> contactAddresses = new ArrayList<>();
         contactAddresses.add(contactAddress);
         staff.setContactAddress(contactAddresses);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -914,7 +912,7 @@ public class StaffService extends UserBaseService {
         staff.setContactDetail(contactDetail);
 
         //method call for getting Date of Birth From CPR Number
-        Date dateOfBirth=DateUtil.asDate(CPRUtil.getDateOfBirthFromCPR(payload.getCprNumber()));
+        Date dateOfBirth = DateUtil.asDate(CPRUtil.getDateOfBirthFromCPR(payload.getCprNumber()));
         staff.setDateOfBirth(dateOfBirth);
         staff.setCurrentStatus(payload.getCurrentStatus());
         if (Optional.ofNullable(staffQueryResult).isPresent()) {
@@ -958,14 +956,14 @@ public class StaffService extends UserBaseService {
         }
         employment.setName("Working as staff");
         employment.setStaff(staff);
-        UnitEmployment unitEmployment = new UnitEmployment();
-        unitEmployment.setOrganization(unit);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(unit);
         //set permission in unit employment
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        employment.getUnitEmployments().add(unitEmployment);
+        employment.getUnitPermissions().add(unitPermission);
         if (Optional.ofNullable(organization).isPresent()) {
             organization.getEmployments().add(employment);
             organizationGraphRepository.save(organization);
@@ -986,7 +984,7 @@ public class StaffService extends UserBaseService {
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
         if (contactAddress != null) {
-            List<ContactAddress> contactAddresses=new ArrayList<>();
+            List<ContactAddress> contactAddresses = new ArrayList<>();
             contactAddresses.add(contactAddress);
             staff.setContactAddress(contactAddresses);
         }
@@ -1323,7 +1321,7 @@ public class StaffService extends UserBaseService {
 
     public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitEmploymentId, long id, String type) {
         Long unitId = -1L;
-        Organization organization=organizationService.getOrganizationDetail(id, type);
+        Organization organization = organizationService.getOrganizationDetail(id, type);
         unitId = organization.getId();
 
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = new StaffAdditionalInfoQueryResult();
@@ -1335,8 +1333,8 @@ public class StaffService extends UserBaseService {
         if (Optional.ofNullable(unitEmploymentPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitEmploymentPosition(unitEmploymentPosition);
 
-             WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitEmploymentId);
-             staffAdditionalInfoQueryResult.getUnitEmploymentPosition().setWorkingTimeAgreement(wtaResponseDTO);
+            WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitEmploymentId);
+            staffAdditionalInfoQueryResult.getUnitEmploymentPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
         return staffAdditionalInfoQueryResult;
     }
@@ -1498,7 +1496,7 @@ public class StaffService extends UserBaseService {
                 contactAddress.setHouseNumber(matcher.group(0));
             }
         }
-        List<ContactAddress> contactAddresses=new ArrayList<>();
+        List<ContactAddress> contactAddresses = new ArrayList<>();
         contactAddresses.add(contactAddress);
         staff.setContactAddress(contactAddresses);
 
@@ -1519,29 +1517,29 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public List<com.kairos.response.dto.web.StaffDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds){
+    public List<com.kairos.response.dto.web.StaffDTO> getStaffByExperties(Long unitId, List<Long> expertiesIds) {
         List<Staff> staffs = staffGraphRepository.getStaffByExperties(unitId, expertiesIds);
         List<Skill> skills = staffGraphRepository.getSkillByStaffIds(staffs.stream().map(s -> s.getId()).collect(Collectors.toList()));
         List<com.kairos.response.dto.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
         staffs.forEach(s -> {
-                com.kairos.response.dto.web.StaffDTO staffDTO = new com.kairos.response.dto.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
-                List<UnitEmploymentPositionQueryResult> ueps = unitEmploymentPositionService.getAllUnitEmploymentPositionsOfStaff(unitId, s.getId(), "Organization");
-                expertiesIds.forEach(e -> {
-                    ueps.forEach(uep -> {
-                        if (uep.getExpertise().getId().equals(e)) {
-                            staffDTO.setUnitEmploymentPositionId(uep.getId());
-                            staffDTOS.add(staffDTO);
-                        }
-                    });
+            com.kairos.response.dto.web.StaffDTO staffDTO = new com.kairos.response.dto.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
+            List<UnitEmploymentPositionQueryResult> ueps = unitEmploymentPositionService.getAllUnitEmploymentPositionsOfStaff(unitId, s.getId(), "Organization");
+            expertiesIds.forEach(e -> {
+                ueps.forEach(uep -> {
+                    if (uep.getExpertise().getId().equals(e)) {
+                        staffDTO.setUnitEmploymentPositionId(uep.getId());
+                        staffDTOS.add(staffDTO);
+                    }
                 });
+            });
 
         });
         return staffDTOS;
     }
 
 
-    public Set<SkillDTO> getSkillSet(List<Skill> skills){
-        return skills.stream().map(skill->new SkillDTO(skill.getId(),skill.getName(),skill.getDescription())).collect(Collectors.toSet());
+    public Set<SkillDTO> getSkillSet(List<Skill> skills) {
+        return skills.stream().map(skill -> new SkillDTO(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toSet());
     }
 
 }

@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by prabjot on 24/10/16.
  */
 @NodeEntity
-public class UnitEmployment extends UserBaseEntity {
+public class UnitPermission extends UserBaseEntity {
 
     private String place;
     private long startDate;
@@ -32,7 +32,7 @@ public class UnitEmployment extends UserBaseEntity {
 
 
 
-    @Relationship(type = PROVIDED_BY)
+    @Relationship(type = APPLICABLE_IN_UNIT)
     private Organization organization;
 
 
@@ -46,7 +46,7 @@ public class UnitEmployment extends UserBaseEntity {
     List<PartialLeave> partialLeaves = new ArrayList<>();
 
 
-    public UnitEmployment(){}
+    public UnitPermission(){}
     public void setUnitManagerEmployment(boolean unitManagerEmployment) {
         isUnitManagerEmployment = unitManagerEmployment;
     }

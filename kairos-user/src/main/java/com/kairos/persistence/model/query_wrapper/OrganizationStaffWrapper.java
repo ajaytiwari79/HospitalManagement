@@ -7,8 +7,7 @@ import com.kairos.persistence.model.user.staff.Staff;
  * Created by vipul on 6/2/18.
  */
 public class OrganizationStaffWrapper {
-    private Organization organization
-            ;
+    private Organization organization;
     private Staff staff;
 
     public OrganizationStaffWrapper() {

@@ -4,14 +4,13 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.EmploymentStatus;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT_EMPLOYMENTS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT_PERMISSIONS;
 
 /**
  * Created by prabjot on 3/12/16.
@@ -21,8 +20,8 @@ public class Employment extends UserBaseEntity {
 
     private String name;
 
-    @Relationship(type = HAS_UNIT_EMPLOYMENTS)
-    private List<UnitEmployment> unitEmployments = new ArrayList<>();
+    @Relationship(type = HAS_UNIT_PERMISSIONS)
+    private List<UnitPermission> unitPermissions = new ArrayList<>();
 
     @Relationship(type = BELONGS_TO)
     private Staff staff;
@@ -47,12 +46,12 @@ public class Employment extends UserBaseEntity {
         this.staff = staff;
     }
 
-    public List<UnitEmployment> getUnitEmployments() {
-        return Optional.ofNullable(unitEmployments).orElse(new ArrayList<>());
+    public List<UnitPermission> getUnitPermissions() {
+        return Optional.ofNullable(unitPermissions).orElse(new ArrayList<>());
     }
 
-    public void setUnitEmployments(List<UnitEmployment> unitEmployments) {
-        this.unitEmployments = unitEmployments;
+    public void setUnitPermissions(List<UnitPermission> unitPermissions) {
+        this.unitPermissions = unitPermissions;
     }
 
     public void setEmploymentStatus(EmploymentStatus employmentStatus) {

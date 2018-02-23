@@ -144,8 +144,8 @@ public abstract class RelationshipConstants {
     public final static String HAS_LOCAL_AREA_TAGS = "HAS_LOCAL_AREA_TAGS";
     public final static String LAT_LNG = "LAT_AND_LNG";
     public final static String HAS_PARTIAL_LEAVES = "HAS_PARTIAL_LEAVES";
-    public final static String PROVIDED_BY = "PROVIDED_BY";
-    public final static String HAS_UNIT_EMPLOYMENTS = "HAS_UNIT_EMPLOYMENTS";
+    public final static String APPLICABLE_IN_UNIT = "APPLICABLE_IN_UNIT";
+    public final static String HAS_UNIT_PERMISSIONS = "HAS_UNIT_PERMISSIONS";
     public final static String HAS_WAGES = "HAS_WAGES";
     public final static String HAS_ACCESS_PAGE_PERMISSION = "HAS_ACCESS_PAGE_PERMISSION";
     public final static String HAS_ACCESS_GROUP = "HAS_ACCESS_GROUP";

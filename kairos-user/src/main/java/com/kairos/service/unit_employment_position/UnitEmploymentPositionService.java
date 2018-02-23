@@ -4,7 +4,6 @@ import com.kairos.client.dto.timeBank.CostTimeAgreementDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
@@ -24,7 +23,7 @@ import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPo
 
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.TimeCareEmploymentDTO;
-import com.kairos.persistence.model.user.staff.UnitEmployment;
+import com.kairos.persistence.model.user.staff.UnitPermission;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
@@ -103,17 +102,17 @@ public class UnitEmploymentPositionService extends UserBaseService {
     public UnitEmploymentPositionQueryResult createUnitEmploymentPosition(Long id, String type, UnitEmploymentPositionDTO unitEmploymentPositionDTO, Boolean createFromTimeCare) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Organization parentOrganization;
-        UnitEmployment unitEmployment;
+        UnitPermission unitPermission;
         PositionCode positionCode = null;
         if (!organization.isParentOrganization()) {
             parentOrganization = organizationService.getParentOfOrganization(organization.getId());
-            unitEmployment = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(parentOrganization.getId(), organization.getId(), unitEmploymentPositionDTO.getStaffId());
+            unitPermission = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(parentOrganization.getId(), organization.getId(), unitEmploymentPositionDTO.getStaffId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(parentOrganization.getId(), unitEmploymentPositionDTO.getPositionCodeId());
         } else {
-            unitEmployment = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(organization.getId(), unitEmploymentPositionDTO.getStaffId());
+            unitPermission = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(organization.getId(), unitEmploymentPositionDTO.getStaffId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(organization.getId(), unitEmploymentPositionDTO.getPositionCodeId());
         }
-        if (!Optional.ofNullable(unitEmployment).isPresent()) {
+        if (!Optional.ofNullable(unitPermission).isPresent()) {
             logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", unitEmploymentPositionDTO.getStaffId(), organization.getId());
             throw new DataNotFoundByIdException("unable to create position_code of staff");
         }
@@ -122,17 +121,17 @@ public class UnitEmploymentPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("position_code Name does not exist in unit " + unitEmploymentPositionDTO.getPositionCodeId());
         }
 
-        List<UnitEmploymentPosition> oldUnitEmploymentPositions = unitEmploymentPositionGraphRepository.getAllUEPByExpertise(unitEmploymentPositionDTO.getExpertiseId(), unitEmployment.getId());
+        List<UnitEmploymentPosition> oldUnitEmploymentPositions = unitEmploymentPositionGraphRepository.getAllUEPByExpertise(unitEmploymentPositionDTO.getExpertiseId(), unitPermission.getId());
         validateUnitEmploymentPositionWithExpertise(oldUnitEmploymentPositions, unitEmploymentPositionDTO);
         UnitEmploymentPosition unitEmploymentPosition = preparePosition(unitEmploymentPositionDTO, organization, id, createFromTimeCare);
 
         unitEmploymentPosition.setPositionCode(positionCode);
 
-        List<UnitEmploymentPosition> unitEmploymentPositions = unitEmployment.getUnitEmploymentPositions();
+        List<UnitEmploymentPosition> unitEmploymentPositions = unitPermission.getUnitEmploymentPositions();
 
         unitEmploymentPositions.add(unitEmploymentPosition);
-        unitEmployment.setUnitEmploymentPositions(unitEmploymentPositions);
-        save(unitEmployment);
+        unitPermission.setUnitEmploymentPositions(unitEmploymentPositions);
+        save(unitPermission);
         UnitEmploymentPositionQueryResult unitEmploymentPositionQueryResult = unitEmploymentPosition.getBasicDetails();
 
         //unitEmploymentPositionQueryResult.setUnion();
@@ -415,19 +414,19 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Organization parentOrganization;
-        UnitEmployment unitEmployment;
+        UnitPermission unitPermission;
         if (!organization.isParentOrganization()) {
             parentOrganization = organizationService.getParentOfOrganization(organization.getId());
-            unitEmployment = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(parentOrganization.getId(), organization.getId(), staffId);
+            unitPermission = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(parentOrganization.getId(), organization.getId(), staffId);
         } else {
-            unitEmployment = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(organization.getId(), staffId);
+            unitPermission = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(organization.getId(), staffId);
         }
-        if (!Optional.ofNullable(unitEmployment).isPresent()) {
+        if (!Optional.ofNullable(unitPermission).isPresent()) {
             logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", staffId, organization.getId());
             throw new DataNotFoundByIdException("unable to get unit employment  of staff");
         }
 
-        return unitEmploymentPositionGraphRepository.getAllUnitEmploymentPositionByStaff(unitEmployment.getId(), staffId);
+        return unitEmploymentPositionGraphRepository.getAllUnitEmploymentPositionByStaff(unitPermission.getId(), staffId);
     }
 
     public PositionCtaWtaQueryResult getCtaAndWtaByExpertiseId(Long unitId, Long expertiseId) {
