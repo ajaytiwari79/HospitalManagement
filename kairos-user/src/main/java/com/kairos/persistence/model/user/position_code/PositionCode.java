@@ -25,6 +25,8 @@ public class PositionCode extends UserBaseEntity {
 
     private String description;
 
+    private String timeCareId;
+
 
 
     public PositionCode() {
@@ -35,9 +37,10 @@ public class PositionCode extends UserBaseEntity {
     }
 
 
-    public PositionCode(String name, String description) {
+    public PositionCode(String name, String description, String timeCareId) {
         this.name = name;
         this.description = description;
+        this.timeCareId = timeCareId;
     }
 
     public String getName() {
@@ -56,4 +59,11 @@ public class PositionCode extends UserBaseEntity {
         this.description = description;
     }
 
+    public String getTimeCareId() {
+        return timeCareId;
+    }
+
+    public void setTimeCareId(String timeCareId) {
+        this.timeCareId = timeCareId;
+    }
 }
