@@ -30,14 +30,7 @@ public class UnitEmployment extends UserBaseEntity {
     private String employmentNumber;
     private boolean isUnitManagerEmployment;
 
-    public void setUnitManagerEmployment(boolean unitManagerEmployment) {
-        isUnitManagerEmployment = unitManagerEmployment;
-    }
 
-    public boolean isUnitManagerEmployment() {
-
-        return isUnitManagerEmployment;
-    }
 
     @Relationship(type = PROVIDED_BY)
     private Organization organization;
@@ -54,7 +47,14 @@ public class UnitEmployment extends UserBaseEntity {
 
 
     public UnitEmployment(){}
+    public void setUnitManagerEmployment(boolean unitManagerEmployment) {
+        isUnitManagerEmployment = unitManagerEmployment;
+    }
 
+    public boolean isUnitManagerEmployment() {
+
+        return isUnitManagerEmployment;
+    }
 
     public String getPlace() {
         return place;

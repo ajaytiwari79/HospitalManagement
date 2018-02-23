@@ -108,7 +108,7 @@ public class WTAService extends UserBaseService {
             wta.setTags(tags);
         }
 
-        wta = prepareWtaWhileCreate(countryId, wtaDTO);
+        prepareWtaWhileCreate(wta,countryId, wtaDTO);
         wta.setCountry(country);
         save(wta);
         assignWTAToOrganization(wta, wtaDTO);
@@ -179,9 +179,8 @@ public class WTAService extends UserBaseService {
         return;
     }
 
-    private WorkingTimeAgreement prepareWtaWhileCreate(long countryId, WTADTO wtaDTO) {
+    private WorkingTimeAgreement prepareWtaWhileCreate(WorkingTimeAgreement wta ,long countryId, WTADTO wtaDTO) {
 
-        WorkingTimeAgreement wta = new WorkingTimeAgreement();
         wta.setDescription(wtaDTO.getDescription());
         wta.setName(wtaDTO.getName());
 
@@ -202,6 +201,7 @@ public class WTAService extends UserBaseService {
         if (!Optional.ofNullable(organizationSubType).isPresent()) {
             throw new DataNotFoundByIdException("Invalid organization sub type " + wtaDTO.getOrganizationSubType());
         }
+
 
         wta.setOrganizationSubType(organizationSubType);
 
