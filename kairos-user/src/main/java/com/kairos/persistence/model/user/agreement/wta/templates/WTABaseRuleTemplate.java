@@ -20,35 +20,13 @@ public class WTABaseRuleTemplate extends RuleTemplate{
 
     protected String templateType;
 
-    public String getLastUpdatedBy() {
-        return lastUpdatedBy;
-    }
-
-    public void setLastUpdatedBy(String lastUpdatedBy) {
-        this.lastUpdatedBy = lastUpdatedBy;
-    }
-
     @Relationship(type = HAS_TEMPLATE_MATRIX)
 
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected int recommendedValue;
     protected String lastUpdatedBy;
 
-    public int getRecommendedValue() {
-        return recommendedValue;
-    }
 
-    public void setRecommendedValue(int recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-    public List<PhaseTemplateValue> getPhaseTemplateValues() {
-        return phaseTemplateValues;
-    }
-
-    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
-        this.phaseTemplateValues = phaseTemplateValues;
-    }
 
 
 
@@ -90,6 +68,28 @@ public class WTABaseRuleTemplate extends RuleTemplate{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    public int getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(int recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    public List<PhaseTemplateValue> getPhaseTemplateValues() {
+        return phaseTemplateValues;
+    }
+
+    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
+        this.phaseTemplateValues = phaseTemplateValues;
+    }
+    public String getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(String lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
     }
 
     public static WTABaseRuleTemplate copyProperties(WTABaseRuleTemplate source, WTABaseRuleTemplate target){
