@@ -703,4 +703,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("Match (union:Organization{union:true,isEnable:true}) where id (union)={0}  return union")
     Organization findByIdAndUnionTrueAndIsEnableTrue(Long unionId);
 
+    @Query("Match (o:Organization) WHERE id(o)={0} SET o.externalId={1}")
+    void setOrganizationExternalId(Long organizationId, String externalId);
 }

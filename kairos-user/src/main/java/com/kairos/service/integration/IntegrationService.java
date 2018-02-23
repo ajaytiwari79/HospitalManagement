@@ -3,6 +3,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.integration.TimeCare;
 import com.kairos.persistence.model.user.integration.Twillio;
 import com.kairos.persistence.model.user.integration.Visitour;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.integration.TimeCareGraphRepository;
 import com.kairos.persistence.repository.user.integration.TwillioGraphRepository;
 import com.kairos.persistence.repository.user.integration.VisitourGraphRepository;
@@ -32,6 +33,9 @@ public class IntegrationService {
     @Inject
     private VisitourGraphRepository visitourGraphRepository;
 
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public TimeCare saveTimeCareIntegrationData(Long unitId, TimeCare timeCare){
@@ -42,6 +46,8 @@ public class IntegrationService {
             timeCare1.setTimeCareExternalId(timeCare.getTimeCareExternalId());
             timeCare1.setOrganizationId(unitId);
 
+            // Set organization's time care ID
+            organizationGraphRepository.setOrganizationExternalId(unitId, timeCare.getTimeCareExternalId());
             timeCareGraphRepository.save(timeCare1);
             return timeCare1;
     }
