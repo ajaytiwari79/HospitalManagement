@@ -69,7 +69,10 @@ public class Staff extends UserBaseEntity {
     private ContactDetail contactDetail;
     //address tab
     @Relationship(type = HAS_CONTACT_ADDRESS)
-    private List<ContactAddress> contactAddress;
+    private ContactAddress contactAddress;
+
+    @Relationship(type = SECONDARY_CONTACT_ADDRESS)
+    private ContactAddress secondaryContactAddress;
 
     @Relationship(type = BELONGS_TO)
     User user;
@@ -98,6 +101,7 @@ public class Staff extends UserBaseEntity {
     private String careOfName;
 
 
+
     public Staff(String firstName) {
         this.firstName = firstName;
     }
@@ -117,11 +121,11 @@ public class Staff extends UserBaseEntity {
         this.cprNumber = cprNumber;
     }
 
-    public List<ContactAddress> getContactAddress() {
+    public ContactAddress getContactAddress() {
         return contactAddress;
     }
 
-    public void setContactAddress(List<ContactAddress> contactAddress) {
+    public void setContactAddress(ContactAddress contactAddress) {
         this.contactAddress = contactAddress;
     }
 
@@ -145,6 +149,7 @@ public class Staff extends UserBaseEntity {
         this.generalNote = generalNote;
         this.reqFromPerson = requestFromPerson;
     }
+
 
 
     public long getEmployedSince() {
@@ -340,6 +345,54 @@ public class Staff extends UserBaseEntity {
         this.cprNumber = cprNumber;
     }
 
+    public Map<String,Object> fetchPrimaryContactAddressDetail(){
+
+        ContactAddress contactAddress =this.contactAddress;
+        Map<String,Object> map = null;
+        if(contactAddress != null){
+            map = new HashMap<>();
+            map.put("houseNumber",contactAddress.getHouseNumber());
+            map.put("floorNumber",contactAddress.getFloorNumber());
+            map.put("street1",contactAddress.getStreet1());
+            map.put("zipCodeId",contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
+            map.put("city",contactAddress.getCity()!=null? contactAddress.getCity(): "");
+            map.put("municipalityId",(contactAddress.getMunicipality()==null)?null:contactAddress.getMunicipality().getId());
+            map.put("regionName",contactAddress.getRegionName());
+            map.put("country",contactAddress.getCountry());
+            map.put("latitude",contactAddress.getLatitude());
+            map.put("longitude",contactAddress.getLongitude());
+            map.put("province",contactAddress.getProvince());
+            map.put("streetUrl",contactAddress.getStreetUrl());
+            map.put("addressProtected",contactAddress.isAddressProtected());
+            map.put("verifiedByVisitour",contactAddress.isVerifiedByVisitour());
+        }
+        return map;
+    }
+    public Map<String,Object> fetchSecondaryContactAddressDetail(){
+
+        ContactAddress secondaryContactAddress =this.secondaryContactAddress;
+        Map<String,Object> map = null;
+        if(secondaryContactAddress != null){
+            map = new HashMap<>();
+            map.put("houseNumber",secondaryContactAddress.getHouseNumber());
+            map.put("floorNumber",secondaryContactAddress.getFloorNumber());
+            map.put("street1",secondaryContactAddress.getStreet1());
+            map.put("zipCodeId",secondaryContactAddress.getZipCode()!=null ? secondaryContactAddress.getZipCode().getId(): null);
+            map.put("city",secondaryContactAddress.getCity()!=null? secondaryContactAddress.getCity(): "");
+            map.put("municipalityId",(secondaryContactAddress.getMunicipality()==null)?null:secondaryContactAddress.getMunicipality().getId());
+            map.put("regionName",secondaryContactAddress.getRegionName());
+            map.put("country",secondaryContactAddress.getCountry());
+            map.put("latitude",secondaryContactAddress.getLatitude());
+            map.put("longitude",secondaryContactAddress.getLongitude());
+            map.put("province",secondaryContactAddress.getProvince());
+            map.put("streetUrl",secondaryContactAddress.getStreetUrl());
+            map.put("addressProtected",secondaryContactAddress.isAddressProtected());
+            map.put("verifiedByVisitour",secondaryContactAddress.isVerifiedByVisitour());
+        }
+        return map;
+    }
+
+
     public EngineerType getEngineerType() {
         return engineerType;
     }
@@ -466,7 +519,9 @@ public class Staff extends UserBaseEntity {
         this.client = client;
     }
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd")
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
+
     public Date getDateOfBirth() {
         return dateOfBirth;
     }
@@ -497,5 +552,13 @@ public class Staff extends UserBaseEntity {
 
     public void setCurrentStatus(StaffStatusEnum currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    public ContactAddress getSecondaryContactAddress() {
+        return secondaryContactAddress;
+    }
+
+    public void setSecondaryContactAddress(ContactAddress secondaryContactAddress) {
+        this.secondaryContactAddress = secondaryContactAddress;
     }
 }

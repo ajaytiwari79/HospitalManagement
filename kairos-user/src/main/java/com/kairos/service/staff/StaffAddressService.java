@@ -22,11 +22,13 @@ import com.kairos.util.DistanceCalculator;
 import com.kairos.util.FormatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.inject.Inject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
@@ -61,26 +63,23 @@ public class StaffAddressService extends UserBaseService {
     private OrganizationGraphRepository organizationGraphRepository;
 
     public ContactAddress saveAddress(long staffId, AddressDTO addressDTO, long unitId) {
-        List<ContactAddress> contactAddresses = new ArrayList<>();
+        ContactAddress contactAddress = null;
         Staff staff = staffGraphRepository.findOne(staffId);
 
         if (staff == null) {
             throw new DataNotFoundByIdException("Can't find Staff with provided Id");
 
         }
-        ContactAddress contactAddress=null;
+
         if (addressDTO.getId() != null) {
             contactAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
         }
-        else {
-            contactAddresses = staff.getContactAddress();
-        }
-        contactAddress= getCurrentAddress(contactAddresses,addressDTO);
         if (contactAddress == null) {
             logger.info("Creating new Address");
             contactAddress = new ContactAddress();
-        }
 
+        }
+        contactAddress.setPrimary(addressDTO.isPrimary());
         // Verify Address here
         if (addressDTO.isVerifiedByGoogleMap()) {
             logger.info("Google Map verified address received ");
@@ -112,9 +111,6 @@ public class StaffAddressService extends UserBaseService {
 
 
             // Geography Data
-            if(contactAddress.getId()!=null){
-                staffGraphRepository.removeMunicipalityRelationship(contactAddress.getId());
-            }
             contactAddress.setMunicipality(municipality);
             contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
             contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
@@ -137,22 +133,25 @@ public class StaffAddressService extends UserBaseService {
             contactAddress.setStreet1(addressDTO.getStreet1());
             contactAddress.setHouseNumber(addressDTO.getHouseNumber());
             contactAddress.setFloorNumber(addressDTO.getFloorNumber());
-            if(contactAddress.getId()!=null){
-                staffGraphRepository.removeZipCodeRelationship(contactAddress.getId());
-            }
             contactAddress.setZipCode(zipCode);
             contactAddress.setCity(zipCode.getName());
             contactAddress.setPrivateAddress(addressDTO.isAddressProtected());
-            // Specify Primary or not
-            contactAddress.setPrimary(addressDTO.isPrimary());
-            contactAddresses.add(contactAddress);
-            staff.setContactAddress(contactAddresses);
+
+            if(addressDTO.isPrimary())
+            {
+                staff.setContactAddress(contactAddress);
+            }else{
+                staff.setSecondaryContactAddress(contactAddress);
+            }
+
             staffGraphRepository.save(staff);
             // save directly
-            return contactAddress;
+            return staff.getContactAddress();
 
 
         } else {
+
+
             logger.info("Sending address to verify from TOM TOM server");
             // Send Address to verify
             Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, unitId);
@@ -192,17 +191,11 @@ public class StaffAddressService extends UserBaseService {
 
 
                 // Geography Data
-                if(contactAddress.getId()!=null) {
-                    staffGraphRepository.removeMunicipalityRelationship(contactAddress.getId());
-                }
                 contactAddress.setMunicipality(municipality);
                 contactAddress.setProvince(String.valueOf(geographyData.get("provinceName")));
                 contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
                 contactAddress.setRegionName(String.valueOf(geographyData.get("regionName")));
                 contactAddress.setCountry(String.valueOf(geographyData.get("countryName")));
-                if(contactAddress.getId()!=null) {
-                    staffGraphRepository.removeZipCodeRelationship(contactAddress.getId());
-                }
                 contactAddress.setZipCode(zipCode);
                 contactAddress.setCity(zipCode.getName());
                 contactAddress.setVerifiedByVisitour(true);
@@ -215,17 +208,20 @@ public class StaffAddressService extends UserBaseService {
                 contactAddress.setCity(zipCode.getName());
                 contactAddress.setPrivateAddress(addressDTO.isAddressProtected());
 
-                // Specify Primary or not
-                contactAddress.setPrimary(addressDTO.isPrimary());
-                contactAddresses.add(contactAddress);
-                staff.setContactAddress(contactAddresses);
+                if(addressDTO.isPrimary())
+                {
+                    staff.setContactAddress(contactAddress);
+                }else{
+                    staff.setSecondaryContactAddress(contactAddress);
+                }
                 staffGraphRepository.save(staff);
                 // save directly
-                return contactAddress;
+                return staff.getContactAddress();
 
             }
             return null;
         }
+
     }
 
     public Map<String, Object> getAddress(long unitId, long staffId, String type) {
@@ -237,7 +233,9 @@ public class StaffAddressService extends UserBaseService {
             return null;
         }
         ContactAddress address;
-        List<ContactAddress> staffAddress = staff.getContactAddress();
+
+        ContactAddress staffAddress = staff.getContactAddress();
+
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization organization = organizationGraphRepository.findOne(unitId);
@@ -255,17 +253,18 @@ public class StaffAddressService extends UserBaseService {
 
         double distance = 0;
         if (address != null && staffAddress != null) {
-            distance = DistanceCalculator.distance(address.getLatitude(), address.getLongitude(), address.getLatitude(), address.getLongitude(), "K");
+
+            distance = DistanceCalculator.distance(address.getLatitude(), address.getLongitude(), staffAddress.getLatitude(), staffAddress.getLongitude(), "K");
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("primaryStaffAddress", fetchContactAddressDetail(true,staffAddress));
-        Map<String,Object> secondaryAddress=fetchContactAddressDetail(false,staffAddress);
-        response.put("secondaryStaffAddress", (secondaryAddress==null)?initializeSecondaryAddress():secondaryAddress);
+        response.put("primaryStaffAddress", staff.fetchPrimaryContactAddressDetail());
+
+        response.put("secondaryStaffAddress", (staff.getSecondaryContactAddress()==null)?initializeSecondaryAddress():staff.fetchSecondaryContactAddressDetail());
         response.put("distanceFromWork", distance);
 
         if (countryId != null) {
-            ZipCode zipCode = (address == null) ? null : address.getZipCode();
+            ZipCode zipCode = (staffAddress == null) ? null : staffAddress.getZipCode();
             response.put("municipalities", (zipCode == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(zipCode.getId())));
             response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         }
@@ -291,7 +290,9 @@ public class StaffAddressService extends UserBaseService {
     }
     public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
         ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
-        if(Optional.ofNullable(organizationAddress).isPresent()) {
+
+        if(Optional.ofNullable(organizationAddress).isPresent()){
+
             ContactAddress contactAddress = new ContactAddress();
             contactAddress.setCity(organizationAddress.getCity());
             contactAddress.setStreet1(organizationAddress.getStreet1());
@@ -305,54 +306,10 @@ public class StaffAddressService extends UserBaseService {
             contactAddress.setRegionName(organizationAddress.getRegionName());
             contactAddress.setRegionCode(organizationAddress.getRegionCode());
             contactAddress.setProvince(organizationAddress.getProvince());
+            contactAddress.setPrimary(true);
             return contactAddress;
         }
         return null;
     }
 
-    public ContactAddress getCurrentAddress(List<ContactAddress> contactAddresses,AddressDTO addressDTO){
-        ContactAddress response=new ContactAddress();
-        boolean isContactAddressExist=false;
-        for(ContactAddress contactAddress:contactAddresses){
-            if(contactAddress.isPrimary()==addressDTO.isPrimary()){
-                response= contactAddress;
-                isContactAddressExist=true;
-                break;
-            }
-        }
-        if(!isContactAddressExist){
-            BeanUtils.copyProperties(addressDTO,response);
-            response.setPrimary(false);
-        }
-        return response;
-    }
-
-    public Map<String, Object> fetchContactAddressDetail(boolean primary, List<ContactAddress> contactAddresses) {
-
-        Map<String, Object> map = null;
-        for (ContactAddress contactAddress : contactAddresses) {
-            if (contactAddress != null && contactAddress.isPrimary() == primary) {
-
-                map = new HashMap<>();
-                map.put("houseNumber", contactAddress.getHouseNumber());
-                map.put("floorNumber", contactAddress.getFloorNumber());
-                map.put("street1", contactAddress.getStreet1());
-                map.put("zipCodeId", contactAddress.getZipCode() != null ? contactAddress.getZipCode().getId() : null);
-                map.put("city", contactAddress.getCity() != null ? contactAddress.getCity() : "");
-                map.put("municipalityId", (contactAddress.getMunicipality() == null) ? null : contactAddress.getMunicipality().getId());
-                map.put("regionName", contactAddress.getRegionName());
-                map.put("country", contactAddress.getCountry());
-                map.put("latitude", contactAddress.getLatitude());
-                map.put("longitude", contactAddress.getLongitude());
-                map.put("province", contactAddress.getProvince());
-                map.put("streetUrl", contactAddress.getStreetUrl());
-                map.put("addressProtected", contactAddress.isAddressProtected());
-                map.put("verifiedByVisitour", contactAddress.isVerifiedByVisitour());
-                map.put("primary",contactAddress.isPrimary());
-                map.put("municipalities", (contactAddress.getZipCode().getId() == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(contactAddress.getZipCode().getId())));
-
-            }
-        }
-        return map;
-    }
 }
