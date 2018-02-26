@@ -156,7 +156,6 @@ public abstract class RelationshipConstants {
     public final static String HAS_CONTACT_ADDRESS = "HAS_CONTACT_ADDRESS";
 
 
-
     //TimeCare
     public final static String TIMECARE_DEFAULT_COUNTRY_NAME = "Denmark";
     public final static String TIMECARE_DEFAULT_DUMMY_SUBSERVICE = "API Integration Sub Service";

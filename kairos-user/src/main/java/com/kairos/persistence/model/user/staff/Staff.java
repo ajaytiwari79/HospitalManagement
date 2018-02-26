@@ -518,7 +518,6 @@ public class Staff extends UserBaseEntity {
     }
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
-
     public Date getDateOfBirth() {
         return dateOfBirth;
     }

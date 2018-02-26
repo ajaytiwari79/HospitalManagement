@@ -70,7 +70,6 @@ public class StaffAddressService extends UserBaseService {
             throw new DataNotFoundByIdException("Can't find Staff with provided Id");
 
         }
-
         if (addressDTO.getId() != null) {
             contactAddress = contactAddressGraphRepository.findOne(addressDTO.getId());
         }
@@ -247,13 +246,11 @@ public class StaffAddressService extends UserBaseService {
 
         double distance = 0;
         if (address != null && staffAddress != null) {
-
             distance = DistanceCalculator.distance(address.getLatitude(), address.getLongitude(), staffAddress.getLatitude(), staffAddress.getLongitude(), "K");
         }
 
         Map<String, Object> response = new HashMap<>();
         response.put("primaryStaffAddress", staff.fetchPrimaryContactAddressDetail());
-
         response.put("secondaryStaffAddress", (staff.getSecondaryContactAddress()==null)?initializeSecondaryAddress():staff.fetchSecondaryContactAddressDetail());
         response.put("distanceFromWork", distance);
 
