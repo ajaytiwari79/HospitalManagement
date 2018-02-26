@@ -57,7 +57,7 @@ public class EmploymentService extends UserBaseService {
     @Inject
     private IntegrationService integrationService;
     @Inject
-    private UnitEmploymentGraphRepository unitEmploymentGraphRepository;
+    private UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
     @Inject
@@ -145,10 +145,10 @@ public class EmploymentService extends UserBaseService {
         UnitPermission unitPermission;
         Employment employment;
         if (parentOrganization == null) {
-            unitPermission = unitEmploymentGraphRepository.getUnitEmployment(unitId, staffId, unitId);
+            unitPermission = unitPermissionGraphRepository.getUnitPermissions(unitId, staffId, unitId);
             employment = employmentGraphRepository.findEmployment(unit.getId(), staffId);
         } else {
-            unitPermission = unitEmploymentGraphRepository.getUnitEmployment(parentOrganization.getId(), staffId, unitId);
+            unitPermission = unitPermissionGraphRepository.getUnitPermissions(parentOrganization.getId(), staffId, unitId);
             employment = employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
         }
 
@@ -169,7 +169,7 @@ public class EmploymentService extends UserBaseService {
                 employmentGraphRepository.save(employment);
                 AccessPermission accessPermission = new AccessPermission(accessGroup);
                 accessPermissionGraphRepository.save(accessPermission);
-                unitEmploymentGraphRepository.linkUnitEmploymentWithAccessPermission(unitPermission.getId(), accessPermission.getId());
+                unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
                 accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
                 accessPageQueryResults = getAccessPages(accessPermission);
                 if (parentOrganization == null) {
@@ -184,24 +184,24 @@ public class EmploymentService extends UserBaseService {
             } else {
                 AccessPermission accessPermission;
                 if (parentOrganization == null) {
-                    accessPermission = unitEmploymentGraphRepository.getAccessPermission(unit.getId(), unitId, staffId, accessGroupId);
+                    accessPermission = unitPermissionGraphRepository.getAccessPermission(unit.getId(), unitId, staffId, accessGroupId);
                 } else {
-                    accessPermission = unitEmploymentGraphRepository.getAccessPermission(parentOrganization.getId(), unitId, staffId, accessGroupId);
+                    accessPermission = unitPermissionGraphRepository.getAccessPermission(parentOrganization.getId(), unitId, staffId, accessGroupId);
                 }
                 AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
                 if (accessPermission == null) {
                     accessPermission = new AccessPermission(accessGroup);
                     accessPermissionGraphRepository.save(accessPermission);
-                    unitEmploymentGraphRepository.linkUnitEmploymentWithAccessPermission(unitPermission.getId(), accessPermission.getId());
+                    unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
                     accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
                     accessPageQueryResults = getAccessPages(accessPermission);
                     if (accessGroup.isTypeOfTaskGiver())
                         flsSyncStatus = syncStaffInVisitour(staff, unitId, flsCredentials);
                 } else {
                     if (parentOrganization == null) {
-                        unitEmploymentGraphRepository.updateUnitEmployment(unit.getId(), unitId, staffId, accessGroupId, true);
+                        unitPermissionGraphRepository.updateUnitPermission(unit.getId(), unitId, staffId, accessGroupId, true);
                     } else {
-                        unitEmploymentGraphRepository.updateUnitEmployment(parentOrganization.getId(), unitId, staffId, accessGroupId, true);
+                        unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, true);
                     }
                     accessPageQueryResults = Collections.emptyList();
                     if (accessGroup.isTypeOfTaskGiver())
@@ -210,9 +210,9 @@ public class EmploymentService extends UserBaseService {
             }
         } else {
             if (parentOrganization == null) {
-                unitEmploymentGraphRepository.updateUnitEmployment(unit.getId(), unitId, staffId, accessGroupId, false);
+                unitPermissionGraphRepository.updateUnitPermission(unit.getId(), unitId, staffId, accessGroupId, false);
             } else {
-                unitEmploymentGraphRepository.updateUnitEmployment(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
+                unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
             }
             flsSyncStatus = removeStaffFromFls(staff, flsCredentials);
             accessPageQueryResults = Collections.emptyList();
@@ -241,9 +241,9 @@ public class EmploymentService extends UserBaseService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         Wage wage = objectMapper.convertValue(wageDetails, Wage.class);
-        UnitPermission unitPermission = unitEmploymentGraphRepository.findOne(unitEmploymentId);
+        UnitPermission unitPermission = unitPermissionGraphRepository.findOne(unitEmploymentId);
         unitPermission.getWages().add(wage);
-        unitEmploymentGraphRepository.save(unitPermission);
+        unitPermissionGraphRepository.save(unitPermission);
         wageDetails.put("id", wage.getId());
         return wageDetails;
 
@@ -272,11 +272,11 @@ public class EmploymentService extends UserBaseService {
         List<Map<String, Object>> list = new ArrayList<>();
 
         if (parent == null) {
-            for (Map<String, Object> map : unitEmploymentGraphRepository.getUnitEmploymentsInAllUnits(staffId, unit.getId(), unit.getId())) {
+            for (Map<String, Object> map : unitPermissionGraphRepository.getUnitPermissionsInAllUnits(staffId, unit.getId(), unit.getId())) {
                 list.add((Map<String, Object>) map.get("data"));
             }
         } else {
-            for (Map<String, Object> map : unitEmploymentGraphRepository.getUnitEmploymentsInAllUnits(staffId, parent.getId(), unitId)) {
+            for (Map<String, Object> map : unitPermissionGraphRepository.getUnitPermissionsInAllUnits(staffId, parent.getId(), unitId)) {
                 list.add((Map<String, Object>) map.get("data"));
             }
         }
@@ -586,9 +586,9 @@ public class EmploymentService extends UserBaseService {
 
             UnitPermission unitPermission;
             if (parent == null) {
-                unitPermission = unitEmploymentGraphRepository.getUnitEmployment(unit.getId(), staffId, unit.getId(), EmploymentStatus.PENDING);
+                unitPermission = unitPermissionGraphRepository.getUnitPermissions(unit.getId(), staffId, unit.getId(), EmploymentStatus.PENDING);
             } else {
-                unitPermission = unitEmploymentGraphRepository.getUnitEmployment(parent.getId(), staffId, unit.getId(), EmploymentStatus.PENDING);
+                unitPermission = unitPermissionGraphRepository.getUnitPermissions(parent.getId(), staffId, unit.getId(), EmploymentStatus.PENDING);
             }
 
             if (unitPermission == null) {
@@ -603,7 +603,7 @@ public class EmploymentService extends UserBaseService {
             partialLeave.setNote(partialLeaveDTO.getNote());
             partialLeave.setLeaveType(partialLeaveDTO.getLeaveType());
             unitPermission.getPartialLeaves().add(partialLeave);
-            unitEmploymentGraphRepository.save(unitPermission);
+            unitPermissionGraphRepository.save(unitPermission);
         }
         return parsePartialLeaveObj(partialLeave);
     }

@@ -35,7 +35,7 @@ import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepo
 import com.kairos.persistence.repository.user.unitEmploymentPosition.UnitEmploymentPositionGraphRepository;
 
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.response.dto.web.UnitEmploymentPositionDTO;
 import com.kairos.response.dto.web.PositionWrapper;
 import com.kairos.service.UserBaseService;
@@ -78,7 +78,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
-    private UnitEmploymentGraphRepository unitEmploymentGraphRepository;
+    private UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
     private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
@@ -106,10 +106,10 @@ public class UnitEmploymentPositionService extends UserBaseService {
         PositionCode positionCode = null;
         if (!organization.isParentOrganization()) {
             parentOrganization = organizationService.getParentOfOrganization(organization.getId());
-            unitPermission = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(parentOrganization.getId(), organization.getId(), unitEmploymentPositionDTO.getStaffId());
+            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), organization.getId(), unitEmploymentPositionDTO.getStaffId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(parentOrganization.getId(), unitEmploymentPositionDTO.getPositionCodeId());
         } else {
-            unitPermission = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(organization.getId(), unitEmploymentPositionDTO.getStaffId());
+            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(organization.getId(), unitEmploymentPositionDTO.getStaffId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(organization.getId(), unitEmploymentPositionDTO.getPositionCodeId());
         }
         if (!Optional.ofNullable(unitPermission).isPresent()) {
@@ -233,10 +233,10 @@ public class UnitEmploymentPositionService extends UserBaseService {
         PositionCode position_code = null;
         if (!organization.isParentOrganization()) {
             parentOrganization = organizationService.getParentOfOrganization(organization.getId());
-            unitEmployment = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(parentOrganization.getId(), organization.getId(), unitEmploymentPositionDTO.getStaffId());
+            unitEmployment = unitEmploymentGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), organization.getId(), unitEmploymentPositionDTO.getStaffId());
             position_code = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(parentOrganization.getId(), unitEmploymentPositionDTO.getPositionCodeId());
         } else {
-            unitEmployment = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(organization.getId(), unitEmploymentPositionDTO.getStaffId());
+            unitEmployment = unitEmploymentGraphRepository.checkUnitPermissionOfStaff(organization.getId(), unitEmploymentPositionDTO.getStaffId());
             position_code = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(organization.getId(), unitEmploymentPositionDTO.getPositionCodeId());
         }
         if (!Optional.ofNullable(unitEmployment).isPresent()) {
@@ -417,9 +417,9 @@ public class UnitEmploymentPositionService extends UserBaseService {
         UnitPermission unitPermission;
         if (!organization.isParentOrganization()) {
             parentOrganization = organizationService.getParentOfOrganization(organization.getId());
-            unitPermission = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(parentOrganization.getId(), organization.getId(), staffId);
+            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), organization.getId(), staffId);
         } else {
-            unitPermission = unitEmploymentGraphRepository.checkUnitEmploymentOfStaff(organization.getId(), staffId);
+            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(organization.getId(), staffId);
         }
         if (!Optional.ofNullable(unitPermission).isPresent()) {
             logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", staffId, organization.getId());

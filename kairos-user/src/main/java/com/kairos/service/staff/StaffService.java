@@ -113,7 +113,7 @@ public class StaffService extends UserBaseService {
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
     @Inject
-    private UnitEmploymentGraphRepository unitEmploymentGraphRepository;
+    private UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
     private EnvConfig envConfig;
     @Inject
@@ -483,6 +483,7 @@ public class StaffService extends UserBaseService {
         } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
+
         try (InputStream stream = multipartFile.getInputStream()) {
             //Get the workbook instance for XLS file
             XSSFWorkbook workbook = new XSSFWorkbook(stream);
@@ -491,11 +492,30 @@ public class StaffService extends UserBaseService {
             Iterator<Row> rowIterator = sheet.iterator();
 
             if (!rowIterator.hasNext()) {
-                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 position_code");
+                throw new InternalError("Sheet has no more rows,we are expecting sheet at 0 position");
             }
             Row header = sheet.getRow(0);
+
+            Set<Long> extrenalIds = new HashSet<>();
+            boolean headerSkipped = false;
+            for (Row row : sheet) { // For each Row.
+                if (!headerSkipped) {
+                    headerSkipped = true;
+                    continue;
+                }
+                Cell cell = row.getCell(2); // Get the Cell at the Index / Column you want.
+                if (cell != null) {
+
+
+                    extrenalIds.add(new Double(cell.getNumericCellValue()).longValue());
+                }
+            }
+            List<Long> alreadyAddedStaffIds = staffGraphRepository.findStaffByExternalIdIn(extrenalIds);
+            logger.info(extrenalIds.toString());
+
             int NumberOfColumnsInSheet = header.getLastCellNum();
             int cprHeader = -1;
+
             for (int i = 0; i < NumberOfColumnsInSheet; i++) {
                 String columnHeader = header.getCell(i).getStringCellValue();
                 if (columnHeader.equalsIgnoreCase(CPR_NUMBER)) {
@@ -537,15 +557,21 @@ public class StaffService extends UserBaseService {
                     cell = row.getCell(2);
                     cell.setCellType(Cell.CELL_TYPE_STRING);
                     Long externalId = (StringUtils.isBlank(cell.getStringCellValue())) ? 0 : Long.parseLong(cell.getStringCellValue());
-                    StaffQueryResult staffQueryResult = (Optional.ofNullable(parent).isPresent()) ? staffGraphRepository.getStaffByExternalIdInOrganization(parent.getId(), externalId)
-                            : staffGraphRepository.getStaffByExternalIdInOrganization(unitId, externalId);
-                    Staff staff;
-                    if (Optional.ofNullable(staffQueryResult).isPresent()) {
-                        staff = staffQueryResult.getStaff();
-                    } else {
-                        logger.info("Creating new staff with kmd external id " + externalId + " in unit " + unit.getId());
-                        staff = new Staff();
+                    if (alreadyAddedStaffIds.contains(externalId)) {
+                        logger.info(" staff with kmd external id  already found  so we are skipping this " + externalId);
+                        staffErrorList.add(row.getRowNum());
+                        continue;
                     }
+//                    StaffQueryResult staffQueryResult = (Optional.ofNullable(parent).isPresent()) ? staffGraphRepository.getStaffByExternalIdInOrganization(parent.getId(), externalId)
+//                            : staffGraphRepository.getStaffByExternalIdInOrganization(unitId, externalId);
+
+//                    if (Optional.ofNullable(staffQueryResult).isPresent()) {
+//                        staff = staffQueryResult.getStaff();
+//                    } else {
+//                        logger.info("Creating new staff with kmd external id " + externalId + " in unit " + unit.getId());
+
+//                    }
+                    Staff staff = new Staff();
                     boolean isEmploymentExist = (staff.getId()) != null;
                     staff.setExternalId(externalId);
                     if (row.getCell(17) != null) {
@@ -560,16 +586,16 @@ public class StaffService extends UserBaseService {
                         contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
                     }
                     ContactDetail contactDetail = extractContactDetailFromRow(row);
-                    if (Optional.ofNullable(staffQueryResult).isPresent()) {
-
-                        if (Optional.ofNullable(contactDetail).isPresent()) {
-                            contactDetail.setId(staffQueryResult.getContactDetailId());
-                        }
-
-                        if (Optional.ofNullable(contactAddress).isPresent()) {
-                            contactAddress.setId(staffQueryResult.getContactAddressId());
-                        }
-                    }
+//                    if (Optional.ofNullable(staffQueryResult).isPresent()) {
+//
+//                        if (Optional.ofNullable(contactDetail).isPresent()) {
+//                            contactDetail.setId(staffQueryResult.getContactDetailId());
+//                        }
+//
+//                        if (Optional.ofNullable(contactAddress).isPresent()) {
+//                            contactAddress.setId(staffQueryResult.getContactAddressId());
+//                        }
+//                    }
                     staff.setContactDetail(contactDetail);
                     List<ContactAddress> contactAddresses = new ArrayList<>();
                     contactAddresses.add(contactAddress);

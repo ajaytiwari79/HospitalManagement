@@ -59,7 +59,7 @@ import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.agreement.RuleTemplateCategoryService;
@@ -140,7 +140,7 @@ public class BootDataService {
     @Inject
     AccessGroupService accessGroupService;
     @Inject
-    UnitEmploymentGraphRepository unitEmploymentGraphRepository;
+    UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
     StaffService staffService;
     @Inject
@@ -847,7 +847,7 @@ public class BootDataService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(kairosCountryLevel);
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        unitEmploymentGraphRepository.save(unitPermission);
+        unitPermissionGraphRepository.save(unitPermission);
         UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
         accessPageService.setPagePermissionToAdmin(accessPermission);
