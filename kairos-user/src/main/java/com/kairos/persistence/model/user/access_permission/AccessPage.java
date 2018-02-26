@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.access_permission;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.OrganizationCategory;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -27,6 +28,7 @@ public class AccessPage extends UserBaseEntity {
     private boolean isModule;
     private String moduleId;
     private boolean active;
+//    private List<OrganizationCategory> accessibleFor = new ArrayList<>();;
 
 
     @Relationship(type = SUB_PAGE)
@@ -87,4 +89,12 @@ public class AccessPage extends UserBaseEntity {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    /*public List<OrganizationCategory> getAccessibleFor() {
+        return accessibleFor;
+    }
+
+    public void setAccessibleFor(List<OrganizationCategory> accessibleFor) {
+        this.accessibleFor = accessibleFor;
+    }*/
 }

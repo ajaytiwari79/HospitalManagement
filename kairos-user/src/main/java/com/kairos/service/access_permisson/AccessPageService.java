@@ -1,8 +1,10 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.client.dto.organization.OrganizationCategoryDTO;
 import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.access_permission.*;
 import com.kairos.persistence.model.user.auth.StaffPermissionDTO;
@@ -337,4 +339,7 @@ public class AccessPageService extends UserBaseService {
     }
 
 
+    public List<OrganizationCategoryDTO> getListOfOrganizaionCategories(){
+        return new ArrayList<>();//OrganizationCategory.getListOfOrganizationCategory();
+    }
 }
