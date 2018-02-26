@@ -146,7 +146,7 @@ public class StaffAddressService extends UserBaseService {
 
             staffGraphRepository.save(staff);
             // save directly
-            return staff.getContactAddress();
+            return contactAddress;
 
 
         } else {
@@ -216,7 +216,7 @@ public class StaffAddressService extends UserBaseService {
                 }
                 staffGraphRepository.save(staff);
                 // save directly
-                return staff.getContactAddress();
+                return contactAddress;
 
             }
             return null;
