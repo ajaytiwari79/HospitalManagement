@@ -147,11 +147,8 @@ public class StaffAddressService extends UserBaseService {
             staffGraphRepository.save(staff);
             // save directly
             return contactAddress;
-
-
-        } else {
-
-
+        }
+        else {
             logger.info("Sending address to verify from TOM TOM server");
             // Send Address to verify
             Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, unitId);
@@ -221,7 +218,6 @@ public class StaffAddressService extends UserBaseService {
             }
             return null;
         }
-
     }
 
     public Map<String, Object> getAddress(long unitId, long staffId, String type) {
@@ -233,9 +229,7 @@ public class StaffAddressService extends UserBaseService {
             return null;
         }
         ContactAddress address;
-
         ContactAddress staffAddress = staff.getContactAddress();
-
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization organization = organizationGraphRepository.findOne(unitId);
@@ -290,9 +284,7 @@ public class StaffAddressService extends UserBaseService {
     }
     public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
         ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
-
         if(Optional.ofNullable(organizationAddress).isPresent()){
-
             ContactAddress contactAddress = new ContactAddress();
             contactAddress.setCity(organizationAddress.getCity());
             contactAddress.setStreet1(organizationAddress.getStreet1());

@@ -101,7 +101,6 @@ public class Staff extends UserBaseEntity {
     private String careOfName;
 
 
-
     public Staff(String firstName) {
         this.firstName = firstName;
     }
@@ -149,7 +148,6 @@ public class Staff extends UserBaseEntity {
         this.generalNote = generalNote;
         this.reqFromPerson = requestFromPerson;
     }
-
 
 
     public long getEmployedSince() {
@@ -518,7 +516,6 @@ public class Staff extends UserBaseEntity {
     public void setClient(Client client) {
         this.client = client;
     }
-
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
 
