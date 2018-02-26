@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.unitEmploymentPosition;
+package com.kairos.persistence.model.user.unit_position;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -204,9 +204,9 @@ public class UnitPosition extends UserBaseEntity {
     }
 
 
-    public UnitEmploymentPositionQueryResult getBasicDetails() {
-        UnitEmploymentPositionQueryResult result = null;
-        result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek,
+    public UnitPositionQueryResult getBasicDetails() {
+        UnitPositionQueryResult result = null;
+        result = new UnitPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek,
                 this.endDateMillis, this.totalWeeklyMinutes,
                 this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode,this.union);
         return result;

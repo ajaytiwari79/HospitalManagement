@@ -23,11 +23,11 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.language.Language;
-import com.kairos.persistence.model.user.unitEmploymentPosition.StaffUnitEmploymentDetails;
+import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
-import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
@@ -37,7 +37,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
-import com.kairos.persistence.repository.user.unitEmploymentPosition.UnitEmploymentPositionGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
@@ -54,7 +54,7 @@ import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
-import com.kairos.service.unit_employment_position.UnitEmploymentPositionService;
+import com.kairos.service.unit_employment_position.UnitPositionService;
 
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateConverter;
@@ -150,11 +150,11 @@ public class StaffService extends UserBaseService {
     @Inject
     private OrganizationService organizationService;
     @Autowired
-    private UnitEmploymentPositionGraphRepository unitEmploymentPositionGraphRepository;
+    private UnitPositionGraphRepository unitPositionGraphRepository;
     @Autowired
     private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
-    private UnitEmploymentPositionService unitEmploymentPositionService;
+    private UnitPositionService unitPositionService;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -1350,7 +1350,7 @@ public class StaffService extends UserBaseService {
 
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = new StaffAdditionalInfoQueryResult();
         staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
-        StaffUnitEmploymentDetails unitEmploymentPosition = unitEmploymentPositionGraphRepository.getUnitEmploymentPositionById(unitEmploymentId);
+        StaffUnitPositionDetails unitEmploymentPosition = unitPositionGraphRepository.getUnitPositionById(unitEmploymentId);
         staffAdditionalInfoQueryResult.setUnitId(organization.getId());
         staffAdditionalInfoQueryResult.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
@@ -1547,7 +1547,7 @@ public class StaffService extends UserBaseService {
         List<com.kairos.response.dto.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
         staffs.forEach(s -> {
             com.kairos.response.dto.web.StaffDTO staffDTO = new com.kairos.response.dto.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
-            List<UnitEmploymentPositionQueryResult> ueps = unitEmploymentPositionService.getAllUnitEmploymentPositionsOfStaff(unitId, s.getId(), "Organization");
+            List<UnitPositionQueryResult> ueps = unitPositionService.getUnitPositionsOfStaff(unitId, s.getId(), "Organization");
             expertiesIds.forEach(e -> {
                 ueps.forEach(uep -> {
                     if (uep.getExpertise().getId().equals(e)) {

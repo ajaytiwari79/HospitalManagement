@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.unitEmploymentPosition;
+package com.kairos.persistence.model.user.unit_position;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -18,7 +18,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UnitEmploymentPositionQueryResult {
+public class UnitPositionQueryResult {
     private Expertise expertise;
     @JsonIgnore
     private boolean deleted;
@@ -180,11 +180,11 @@ public class UnitEmploymentPositionQueryResult {
         this.union = union;
     }
 
-    public UnitEmploymentPositionQueryResult() {
+    public UnitPositionQueryResult() {
         //default cons
     }
 
-    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
+    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;
@@ -200,7 +200,7 @@ public class UnitEmploymentPositionQueryResult {
         this.costTimeAgreement = costTimeAgreement;
     }
 
-    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode,Organization union) {
+    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, Organization union) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;

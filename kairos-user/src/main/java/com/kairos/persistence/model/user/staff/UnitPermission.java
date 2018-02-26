@@ -2,7 +2,7 @@ package com.kairos.persistence.model.user.staff;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.EmploymentStatus;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.unitEmploymentPosition.UnitPosition;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 

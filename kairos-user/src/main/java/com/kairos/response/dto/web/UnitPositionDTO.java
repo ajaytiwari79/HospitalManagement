@@ -7,13 +7,13 @@ import javax.validation.constraints.NotNull;
 /**
  * Created by pawanmandhan on 27/7/17.
  */
-public class UnitEmploymentPositionDTO {
+public class UnitPositionDTO {
 
-    @NotNull(message = "Position code  is required for position_code")
-    @Range(min = 0, message = "Position code is required for position_code")
+    @NotNull(message = "Position code  is required for position")
+    @Range(min = 0, message = "Position code is required for position")
     private Long positionCodeId;
-    @NotNull(message = "expertise is required for position_code")
-    @Range(min = 0, message = "expertise is required for position_code")
+    @NotNull(message = "expertise is required for position")
+    @Range(min = 0, message = "expertise is required for position")
     private Long expertiseId;
 
     private Long startDateMillis;
@@ -32,9 +32,6 @@ public class UnitEmploymentPositionDTO {
     @NotNull(message = "wta can't be null")
     private Long wtaId;
     private Long ctaId;
-
-//    private Position.EmploymentType employmentType;
-
     @NotNull(message = "staffId is missing")
     @Range(min = 0, message = "staffId is missing")
     private Long staffId;
@@ -42,19 +39,13 @@ public class UnitEmploymentPositionDTO {
 
     private Long unionId;
 
-    public UnitEmploymentPositionDTO() {
+    public UnitPositionDTO() {
         //default cons
     }
 
 
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId) {
-        this.positionCodeId = positionCodeId;
-        this.expertiseId = expertiseId;
-    }
-
-
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
-                                     float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
+    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
+                           float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -66,21 +57,8 @@ public class UnitEmploymentPositionDTO {
         this.employmentTypeId = employmentTypeId;
     }
 
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
-        this.positionCodeId = positionCodeId;
-        this.expertiseId = expertiseId;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.hourlyWages = hourlyWages;
-        this.salary = salary;
-        this.employmentTypeId = employmentTypeId;
-        this.staffId = staffId;
-    }
 
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId) {
+    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.employmentTypeId = employmentTypeId;

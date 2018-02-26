@@ -4,11 +4,9 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.service.unit_employment_position.UnitEmploymentPositionService;
+import com.kairos.service.unit_employment_position.UnitPositionService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -46,7 +44,7 @@ public class PositionCodeServiceIntegrationTest {
     @Autowired
     TestRestTemplate restTemplate;
     @Autowired
-    UnitEmploymentPositionService unitEmploymentPositionService;
+    UnitPositionService unitPositionService;
     static private String baseUrlWithCountry;
     static private String baseUrlWithUnit;
     static Long createdId, createdIdDelete, wtaIdForUpdate;

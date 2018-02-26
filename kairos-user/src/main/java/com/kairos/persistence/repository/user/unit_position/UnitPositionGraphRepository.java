@@ -1,14 +1,14 @@
-package com.kairos.persistence.repository.user.unitEmploymentPosition;
+package com.kairos.persistence.repository.user.unit_position;
 
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.unitEmploymentPosition.StaffUnitEmploymentDetails;
+import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import org.springframework.data.neo4j.annotation.Query;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CTA;
 
-import com.kairos.persistence.model.user.unitEmploymentPosition.UnitPosition;
-import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPositionQueryResult;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
+import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -22,7 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 
 @Repository
-public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseRepository<UnitPosition, Long> {
+public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPosition, Long> {
     @Query("MATCH (unitEmpPosition:UnitEmploymentPosition{deleted:false}) where id(unitEmpPosition)={0}\n" +
             "match (unitEmpPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             "match (unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
@@ -38,7 +38,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "id(unitEmpPosition)   as id," +
             "unitEmpPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
             "unitEmpPosition.lastModificationDate as lastModificationDate")
-    StaffUnitEmploymentDetails getUnitEmploymentPositionById(long unitEmploymentId);
+    StaffUnitPositionDetails getUnitPositionById(long unitEmploymentId);
 /* Error while binding to WTA
 * java.lang.IllegalArgumentException: Can not set com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO field com.kairos.persistence.model.user.position_code.StaffUnitEmploymentDetails.workingTimeAgreement to java.util.Collections$UnmodifiableMap
 * */
@@ -63,7 +63,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "id(unitEmpPosition)   as id," +
             "unitEmpPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
             "unitEmpPosition.lastModificationDate as lastModificationDate")
-    List<UnitEmploymentPositionQueryResult> getAllUnitEmploymentPositionByStaff(Long unitEmploymentId, Long staffId);
+    List<UnitPositionQueryResult> getAllUnitPositionsByStaff(Long unitEmploymentId, Long staffId);
 
     @Query("Match (org:Organization) where id(org)={0} WITH org\n" +
             "Match (e:Expertise) where id(e)={1} WITH e,org\n" +
@@ -110,7 +110,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
             "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`)  WITH \n" +
             "cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,phaseInfo,activityType, plannedTimeWithFactor ,ruleTemplCat\n" +
             "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,timeTypes:timeTypes,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo,activityType:{id:id(activityType),onlyForActivityThatPartOfCostCalculation:activityType.onlyForActivityThatPartOfCostCalculation,activityTypes:activityType.activityTypes },plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType},calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates ORDER BY id DESC")
-    UnitEmploymentPositionQueryResult getCtaByUnitEmploymentId(Long unitEmploymentPositionId);
+    UnitPositionQueryResult getCtaByUnitEmploymentId(Long unitEmploymentId);
 
 
     @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(u)={1}\n" +
@@ -119,12 +119,12 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
     List<UnitPosition> getAllUEPByExpertise(Long expertiseId, Long unitEmploymentId);
 
     @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(uep)={0} return Id(u)")
-    Long findEmploymentByUnitEmploymentPosition(Long unitEmploymentPositionId);
+    Long findEmploymentByUnitPosition(Long unitEmploymentPositionId);
 
     @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(u)={1} AND Id(uep)<>{2}\n" +
             "match(uep)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={0}\n" +
             "return uep")
-    List<UnitPosition> getAllUEPByExpertiseExcludingCurrent(Long expertiseId, Long unitEmploymentId, Long currentUnitEmploymentPositionId);
+    List<UnitPosition> getAllUEPByExpertiseExcludingCurrent(Long expertiseId, Long unitEmploymentId, Long currentUnitPositionId);
 
     @Query("Match (org:Organization) where id(org)={0}\n" +
             "Match (e:Expertise) where id(e)={1}\n" +

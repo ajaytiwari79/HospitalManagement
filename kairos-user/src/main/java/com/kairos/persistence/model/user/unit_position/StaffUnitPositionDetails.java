@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.unitEmploymentPosition;
+package com.kairos.persistence.model.user.unit_position;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -16,7 +16,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StaffUnitEmploymentDetails {
+public class StaffUnitPositionDetails {
     private Expertise expertise;
     @JsonIgnore
     private boolean deleted;
@@ -35,7 +35,7 @@ public class StaffUnitEmploymentDetails {
     private WTAResponseDTO workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
 
-    public StaffUnitEmploymentDetails() {
+    public StaffUnitPositionDetails() {
     }
 
     public Expertise getExpertise() {

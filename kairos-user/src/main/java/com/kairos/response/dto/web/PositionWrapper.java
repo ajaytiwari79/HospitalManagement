@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web;
 
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
-import com.kairos.persistence.model.user.unitEmploymentPosition.UnitPosition;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
 
 import java.util.List;
 
