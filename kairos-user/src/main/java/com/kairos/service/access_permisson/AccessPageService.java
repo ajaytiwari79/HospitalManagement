@@ -338,8 +338,7 @@ public class AccessPageService extends UserBaseService {
         return false;
     }
 
-
     public List<OrganizationCategoryDTO> getListOfOrganizaionCategories(){
-        return new ArrayList<>();//OrganizationCategory.getListOfOrganizationCategory();
+        return OrganizationCategory.getListOfOrganizationCategory();
     }
 }

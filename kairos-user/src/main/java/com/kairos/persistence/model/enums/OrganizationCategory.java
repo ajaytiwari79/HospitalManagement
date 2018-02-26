@@ -4,7 +4,6 @@ import com.kairos.client.dto.organization.OrganizationCategoryDTO;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -17,12 +16,12 @@ public enum OrganizationCategory {
         this.value = value;
     }
 
-    /*public static List<OrganizationCategoryDTO> getListOfOrganizationCategory(){
+    public static List<OrganizationCategoryDTO> getListOfOrganizationCategory(){
         List<OrganizationCategoryDTO> organizationCategoryList = new ArrayList<>();
         for(OrganizationCategory organizationCategory : EnumSet.allOf(OrganizationCategory.class)){
             OrganizationCategoryDTO currentValue = new OrganizationCategoryDTO(organizationCategory.value, organizationCategory.name());
             organizationCategoryList.add(currentValue);
         }
         return organizationCategoryList;
-    }*/
+    }
 }

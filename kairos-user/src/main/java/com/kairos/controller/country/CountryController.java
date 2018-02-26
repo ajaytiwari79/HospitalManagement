@@ -1145,9 +1145,8 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry(countryId));
     }
 
-
-    @RequestMapping(value = COUNTRY_URL, method = RequestMethod.GET)
     @ApiOperation("Get Organization's Categories")
+    @RequestMapping(value = COUNTRY_URL + "/organization_category" , method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationCategories(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getListOfOrganizaionCategories());
