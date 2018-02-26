@@ -38,6 +38,10 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     List<Organization> findByOrganizationLevel(OrganizationLevel organizationLevel);
 
+    @Query("MATCH (t:TimeCare) WHERE t.timeCareExternalId = {0} WITH t.organizationId AS organizationId \n" +
+            "OPTIONAL MATCH (o:Organization) WHERE id(o)= organizationId RETURN o")
+    Organization findByTimeCareId(String timeCareId);
+
     @Query("MATCH (o:Organization {isEnable:true} ),(o1:Organization) where id(o)={0} AND id(o1)={1} create (o)-[:HAS_SUB_ORGANIZATION]->(o1) return o1")
     Organization createChildOrganization(long parentOrganizationId, long childOrganizationId);
 
