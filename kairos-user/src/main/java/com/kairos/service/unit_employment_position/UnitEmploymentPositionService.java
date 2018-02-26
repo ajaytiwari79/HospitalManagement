@@ -285,11 +285,13 @@ public class UnitEmploymentPositionService extends UserBaseService {
         }
         unitEmploymentPosition.setExpertise(expertise.get());
 
-        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(organization.getId(), unitEmploymentPositionDTO.getEmploymentTypeId(), false);
+        Organization parentOrganization = organizationService.fetchParentOrganization(organization.getId());
+        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentOrganization.getId(), unitEmploymentPositionDTO.getEmploymentTypeId(), false);
         if (!Optional.ofNullable(employmentType).isPresent()) {
-            throw new DataNotFoundByIdException("Employment Type does not exist in unit " + employmentType.getId() + " AND " + unitEmploymentPositionDTO.getEmploymentTypeId());
+            throw new DataNotFoundByIdException("Employment Type does not exist in unit " + unitEmploymentPositionDTO.getEmploymentTypeId() + " AND " + unitEmploymentPositionDTO.getEmploymentTypeId());
         }
         unitEmploymentPosition.setEmploymentType(employmentType);
+
 
 
         Staff staff = staffGraphRepository.findOne(unitEmploymentPositionDTO.getStaffId());

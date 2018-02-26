@@ -6,6 +6,7 @@ import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 import com.kairos.persistence.model.user.country.TimeType;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
@@ -15,6 +16,8 @@ import java.util.List;
 public class CTARuleTemplateDTO {
 //    @NotNull
     public Long id;
+    @NotEmpty(message = "error.cta.ruleTemplate.name.notEmpty")
+    @NotNull(message = "error.cta.ruleTemplate.name.notNull")
     public String name;
     public String description;
     public boolean disabled;
