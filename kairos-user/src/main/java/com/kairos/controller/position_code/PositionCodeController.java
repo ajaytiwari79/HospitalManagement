@@ -1,5 +1,6 @@
 package com.kairos.controller.position_code;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.response.dto.web.organization.position_code.PositionCodeDTO;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -27,8 +28,8 @@ public class PositionCodeController {
 
     @ApiOperation("Create PositionCode")
     @PostMapping(value = "/position_code")
-    ResponseEntity<Map<String, Object>> createPositionCode( @RequestParam("type") String type,@PathVariable Long unitId, @RequestBody PositionCode positionCode) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.createPositionCode( unitId, positionCode,type));
+    ResponseEntity<Map<String, Object>> createPositionCode( @RequestParam("type") String type,@PathVariable Long unitId, @RequestBody PositionCodeDTO positionCodeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.createPositionCode( unitId, positionCodeDTO,type));
     }
 
     @ApiOperation("Update PositionCode")
