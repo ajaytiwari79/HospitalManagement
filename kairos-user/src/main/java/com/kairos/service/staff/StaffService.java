@@ -496,7 +496,7 @@ public class StaffService extends UserBaseService {
             }
             Row header = sheet.getRow(0);
 
-            Set<Long> extrenalIds = new HashSet<>();
+            Set<Long> externalIdsOfStaffToBeSaved = new HashSet<>();
             boolean headerSkipped = false;
             for (Row row : sheet) { // For each Row.
                 if (!headerSkipped) {
@@ -505,13 +505,11 @@ public class StaffService extends UserBaseService {
                 }
                 Cell cell = row.getCell(2); // Get the Cell at the Index / Column you want.
                 if (cell != null) {
-
-
-                    extrenalIds.add(new Double(cell.getNumericCellValue()).longValue());
+                    externalIdsOfStaffToBeSaved.add(new Double(cell.getNumericCellValue()).longValue());
                 }
             }
-            List<Long> alreadyAddedStaffIds = staffGraphRepository.findStaffByExternalIdIn(extrenalIds);
-            logger.info(extrenalIds.toString());
+            List<Long> alreadyAddedStaffIds = staffGraphRepository.findStaffByExternalIdIn(externalIdsOfStaffToBeSaved);
+            logger.info(externalIdsOfStaffToBeSaved.toString());
 
             int NumberOfColumnsInSheet = header.getLastCellNum();
             int cprHeader = -1;
@@ -621,7 +619,7 @@ public class StaffService extends UserBaseService {
                         staff.setClient(client);
                         staff.setUser(user);
                     }
-                    //  staffGraphRepository.save(staff);
+                    staffGraphRepository.save(staff);
                     staffList.add(staff);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
                         createEmployment(parent, unit, staff, accessGroupId, isEmploymentExist);
