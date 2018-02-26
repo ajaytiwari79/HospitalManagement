@@ -7,9 +7,7 @@ import org.springframework.data.neo4j.annotation.Query;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_CTA;
 
-import com.kairos.persistence.model.user.unitEmploymentPosition.PositionCtaWtaQueryResult;
-
-import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPosition;
+import com.kairos.persistence.model.user.unitEmploymentPosition.UnitPosition;
 import com.kairos.persistence.model.user.unitEmploymentPosition.UnitEmploymentPositionQueryResult;
 
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -24,7 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 
 @Repository
-public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseRepository<UnitEmploymentPosition, Long> {
+public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseRepository<UnitPosition, Long> {
     @Query("MATCH (unitEmpPosition:UnitEmploymentPosition{deleted:false}) where id(unitEmpPosition)={0}\n" +
             "match (unitEmpPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
             "match (unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
@@ -118,7 +116,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
     @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(u)={1}\n" +
             "match(uep)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={0}\n" +
             "return uep")
-    List<UnitEmploymentPosition> getAllUEPByExpertise(Long expertiseId, Long unitEmploymentId);
+    List<UnitPosition> getAllUEPByExpertise(Long expertiseId, Long unitEmploymentId);
 
     @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(uep)={0} return Id(u)")
     Long findEmploymentByUnitEmploymentPosition(Long unitEmploymentPositionId);
@@ -126,7 +124,7 @@ public interface UnitEmploymentPositionGraphRepository extends Neo4jBaseReposito
     @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(u)={1} AND Id(uep)<>{2}\n" +
             "match(uep)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={0}\n" +
             "return uep")
-    List<UnitEmploymentPosition> getAllUEPByExpertiseExcludingCurrent(Long expertiseId, Long unitEmploymentId,Long currentUnitEmploymentPositionId);
+    List<UnitPosition> getAllUEPByExpertiseExcludingCurrent(Long expertiseId, Long unitEmploymentId, Long currentUnitEmploymentPositionId);
 
     @Query("Match (org:Organization) where id(org)={0}\n" +
             "Match (e:Expertise) where id(e)={1}\n" +

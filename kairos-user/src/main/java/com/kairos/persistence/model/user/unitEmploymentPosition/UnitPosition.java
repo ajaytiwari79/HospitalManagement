@@ -20,7 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
-public class UnitEmploymentPosition extends UserBaseEntity {
+public class UnitPosition extends UserBaseEntity {
 
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
@@ -53,12 +53,12 @@ public class UnitEmploymentPosition extends UserBaseEntity {
 
     private float salary;
 
-    public UnitEmploymentPosition() {
+    public UnitPosition() {
     }
 
 
-    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
-                                  PositionCode positionCode, String description, Long startDateMillis, Long endDateMillis, Long expiryDate
+    public UnitPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
+                        PositionCode positionCode, String description, Long startDateMillis, Long endDateMillis, Long expiryDate
             , int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
         this.expertise = expertise;
         this.cta = cta;
@@ -186,7 +186,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.staff = staff;
     }
 
-    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
+    public UnitPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
         this.expertise = expertise;
         this.cta = cta;
         this.workingTimeAgreement = workingTimeAgreement;
@@ -212,7 +212,7 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         return result;
     }
 
-    public UnitEmploymentPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary) {
+    public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary) {
 
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
