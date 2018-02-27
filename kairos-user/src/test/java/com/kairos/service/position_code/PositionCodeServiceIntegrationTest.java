@@ -60,7 +60,7 @@ public class PositionCodeServiceIntegrationTest {
     public void setUp() throws Exception {
         baseUrlWithUnit = getBaseUrl(71L, null, 95L);
         baseUrlWithCountry = getBaseUrl(71L, 53L, null);
-        positionCode = new PositionCode("Doctor" + Math.random(), "hey");
+        positionCode = new PositionCode("Doctor1" + Math.random(), "hey");
 
 
     }
@@ -74,7 +74,7 @@ public class PositionCodeServiceIntegrationTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<PositionCode>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<PositionCode>> response = restTemplate.exchange(
-                baseUrlWithUnit + "/position_code",
+                baseUrlWithUnit + "/position_code?moduleId=tab_23&type=Organization",
                 HttpMethod.POST, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdId = wtaIdForUpdate = createdIdDelete = response.getBody().getData().getId();

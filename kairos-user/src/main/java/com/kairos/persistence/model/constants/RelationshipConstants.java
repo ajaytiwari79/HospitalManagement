@@ -212,6 +212,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_PAY_LEVEL_MATRIX = "HAS_PAY_LEVEL_MATRIX";
     public final static String ORAGANIZATION_HAS_UNIONS = "ORAGANIZATION_HAS_UNIONS";
     public final static String STAFF_BELONGS_TO_UNION = "STAFF_BELONGS_TO_UNION";
+    public final static String UNIT_POSITION_BELONGS_TO_UNIT = "UNIT_POSITION_BELONGS_TO_UNIT";
 
 
     /**

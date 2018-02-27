@@ -37,11 +37,16 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = BELONGS_TO_STAFF, direction = "INCOMING")
     private Staff staff;
 
+
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private EmploymentType employmentType;
 
     @Relationship(type = STAFF_BELONGS_TO_UNION)
     private Organization union;
+
+    @Relationship(type = UNIT_POSITION_BELONGS_TO_UNIT)
+    private Organization unit;
+
 
     private Long startDateMillis;
     private Long endDateMillis;
@@ -55,23 +60,6 @@ public class UnitPosition extends UserBaseEntity {
     private float salary;
 
     public UnitPosition() {
-    }
-
-
-    public UnitPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
-                        PositionCode positionCode, String description, Long startDateMillis, Long endDateMillis, Long expiryDate
-            , int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
-        this.expertise = expertise;
-        this.cta = cta;
-        this.workingTimeAgreement = workingTimeAgreement;
-        this.positionCode = positionCode;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.salary = salary;
-        this.hourlyWages = hourlyWages;
-        this.workingDaysInWeek = workingDaysInWeek;
     }
 
 
@@ -220,6 +208,14 @@ public class UnitPosition extends UserBaseEntity {
 
     public void setLastWorkingDateMillis(Long lastWorkingDateMillis) {
         this.lastWorkingDateMillis = lastWorkingDateMillis;
+    }
+
+    public Organization getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Organization unit) {
+        this.unit = unit;
     }
 
     @Override

@@ -64,7 +64,7 @@ public class UnitPositionDTO {
     }
 
 
-    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId) {
+    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId, Long unitId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.employmentTypeId = employmentTypeId;
@@ -77,7 +77,7 @@ public class UnitPositionDTO {
         this.avgDailyWorkingHours = 60;
         this.hourlyWages = 10;
         this.salary = 500;
-
+        this.unitId = unitId;
     }
 
     public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {

@@ -1,4 +1,5 @@
 package com.kairos.persistence.model.user.staff;
+
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.EmploymentStatus;
 import com.kairos.persistence.model.organization.Organization;
@@ -31,14 +32,13 @@ public class UnitPermission extends UserBaseEntity {
     private boolean isUnitManagerEmployment;
 
 
-
     @Relationship(type = APPLICABLE_IN_UNIT)
     private Organization organization;
 
-
-    @Relationship(type = HAS_UNIT_EMPLOYMENT_POSITION)
-    private List<UnitPosition> unitPositions;
-
+    /*
+        @Relationship(type = HAS_UNIT_EMPLOYMENT_POSITION)
+        private List<UnitPosition> unitPositions;
+    */
     @Relationship(type = HAS_WAGES)
     private List<Wage> wages = new ArrayList<>();
 
@@ -46,7 +46,9 @@ public class UnitPermission extends UserBaseEntity {
     List<PartialLeave> partialLeaves = new ArrayList<>();
 
 
-    public UnitPermission(){}
+    public UnitPermission() {
+    }
+
     public void setUnitManagerEmployment(boolean unitManagerEmployment) {
         isUnitManagerEmployment = unitManagerEmployment;
     }
@@ -154,7 +156,7 @@ public class UnitPermission extends UserBaseEntity {
 
         return employmentNumber;
     }
-
+/*
     public List<UnitPosition> getUnitPositions() {
         return Optional.ofNullable(unitPositions).orElse(new ArrayList<UnitPosition>());
     }
@@ -162,4 +164,5 @@ public class UnitPermission extends UserBaseEntity {
     public void setUnitPositions(List<UnitPosition> unitPositions) {
         this.unitPositions = unitPositions;
     }
+    */
 }

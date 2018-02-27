@@ -98,43 +98,41 @@ public class UnitPositionService extends UserBaseService {
     private ClientGraphRepository clientGraphRepository;
 
 
-    public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
+    public UnitPosition createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Organization parentOrganization;
-        UnitPermission unitPermission;
+
         PositionCode positionCode = null;
         if (!organization.isParentOrganization()) {
             parentOrganization = organizationService.getParentOfOrganization(organization.getId());
-            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), organization.getId(), unitPositionDTO.getStaffId());
+            //  unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), organization.getId(), unitPositionDTO.getStaffId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(parentOrganization.getId(), unitPositionDTO.getPositionCodeId());
         } else {
-            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(organization.getId(), unitPositionDTO.getStaffId());
+            //unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(organization.getId(), unitPositionDTO.getStaffId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(organization.getId(), unitPositionDTO.getPositionCodeId());
         }
-        if (!Optional.ofNullable(unitPermission).isPresent()) {
-            logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", unitPositionDTO.getStaffId(), organization.getId());
-            throw new DataNotFoundByIdException("unable to create employment of staff");
-        }
+//        if (!Optional.ofNullable(unitPermission).isPresent()) {
+//            logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", unitPositionDTO.getStaffId(), organization.getId());
+//            throw new DataNotFoundByIdException("unable to create employment of staff");
+//        }
 
         if (!Optional.ofNullable(positionCode).isPresent()) {
             throw new DataNotFoundByIdException("position_code Name does not exist in unit " + unitPositionDTO.getPositionCodeId());
         }
 
-        List<UnitPosition> oldUnitPositions = unitPositionGraphRepository.getAllUEPByExpertise(unitPositionDTO.getExpertiseId(), unitPermission.getId());
-        validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
-        UnitPosition unitPosition = preparePosition(unitPositionDTO, organization, id, createFromTimeCare);
+        //List<UnitPosition> oldUnitPositions = unitPositionGraphRepository.getAllUEPByExpertise(unitPositionDTO.getExpertiseId(), unitPositionDTO.getStaffId(),organization.getId());
+        //validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
+        UnitPosition unitPosition = new UnitPosition();
+        preparePosition(unitPosition, unitPositionDTO, organization, id, createFromTimeCare);
 
         unitPosition.setPositionCode(positionCode);
 
-        List<UnitPosition> unitPositions = unitPermission.getUnitPositions();
-
-        unitPositions.add(unitPosition);
-        unitPermission.setUnitPositions(unitPositions);
-        save(unitPermission);
-        UnitPositionQueryResult unitPositionQueryResult = unitPosition.getBasicDetails();
+        unitPosition.setUnit(organization);
+        save(unitPosition);
+        //  UnitPositionQueryResult unitPositionQueryResult = unitPosition.getBasicDetails();
 
         //unitEmploymentPositionQueryResult.setUnion();
-        return unitPositionQueryResult;
+        return unitPosition;
     }
 
     public boolean validateUnitPositionWithExpertise(List<UnitPosition> unitPositions, UnitPositionDTO unitPositionDTO) {
@@ -215,8 +213,8 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
-    private UnitPosition preparePosition(UnitPositionDTO unitPositionDTO, Organization organization, Long unitId, Boolean createFromTimeCare) {
-        UnitPosition unitPosition = new UnitPosition();
+    private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Organization organization, Long unitId, Boolean createFromTimeCare) {
+
 
         if (Optional.ofNullable(unitPositionDTO.getUnionId()).isPresent()) {
             Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unitPositionDTO.getUnionId());
