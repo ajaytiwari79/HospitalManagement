@@ -28,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.util.DateUtil.ONLY_DATE;
@@ -74,11 +75,11 @@ public class UnitPositionServiceIntegrationTest {
     }
 
     @Test
-    public void getUnitPositions() throws Exception {
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
+    public void getUnitPositionsOfStaff() throws Exception {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<Map<String, Object>>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<List<Map<String, Object>>>> response = restTemplate.exchange(
                 baseUrlWithUnit + "/unit_position/staff/" + 8051 + "?moduleId=tab_23&type=Organization",
                 HttpMethod.GET, null, typeReference);
         logger.info(response.toString());

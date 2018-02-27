@@ -43,28 +43,26 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     /* Error while binding to WTA
     * java.lang.IllegalArgumentException: Can not set com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO field com.kairos.persistence.model.user.position_code.StaffUnitEmploymentDetails.workingTimeAgreement to java.util.Collections$UnmodifiableMap
     * */
-    @Query("match (uEmp:UnitEmployment)  where  Id(uEmp)={0} \n" +
-            "match(uEmp)-[:" + HAS_UNIT_EMPLOYMENT_POSITION + "]->(unitEmpPosition:UnitEmploymentPosition{deleted:false})" +
-            "match(unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
-            "match(unitEmpPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
-            "match(unitEmpPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false})" +
-            "optional match (unitEmpPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement)\n" +
-            "optional match (unitEmpPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
-            "optional match (unitEmpPosition)-[:" + STAFF_BELONGS_TO_UNION + "]->(unionData:Organization{isEnable:true,union:true})\n" +
+    @Query("match(s:Staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false})-[:" + UNIT_POSITION_BELONGS_TO_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1} \n" +
+            "match(unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
+            "match(unitPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
+            "match(unitPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false})" +
+            "optional match (unitPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement)\n" +
+            "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
+            "optional match (unitPosition)-[:" + STAFF_BELONGS_TO_UNION + "]->(unionData:Organization{isEnable:true,union:true})\n" +
             "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union," +
             "positionCode as positionCode," +
-            "unitEmpPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
-            "unitEmpPosition.startDateMillis as startDateMillis," +
-            "unitEmpPosition.endDateMillis as endDateMillis," +
-            "unitEmpPosition.salary as salary," +
-            "unitEmpPosition.workingDaysInWeek as workingDaysInWeek," +
+            "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
+            "unitPosition.startDateMillis as startDateMillis," +
+            "unitPosition.endDateMillis as endDateMillis," +
+            "unitPosition.salary as salary," +
+            "unitPosition.workingDaysInWeek as workingDaysInWeek," +
             "employmentType as employmentType," +
-            "unitEmpPosition.isEnabled as isEnabled," +
-            "unitEmpPosition.hourlyWages as hourlyWages," +
-            "id(unitEmpPosition)   as id," +
-            "unitEmpPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
-            "unitEmpPosition.lastWorkingDateMillis as lastWorkingDateMillis")
-    List<UnitPositionQueryResult> getAllUnitPositionsByStaff(Long unitEmploymentId, Long staffId);
+            "unitPosition.hourlyWages as hourlyWages," +
+            "id(unitPosition)   as id," +
+            "unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
+            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis")
+    List<UnitPositionQueryResult> getAllUnitPositionsByStaff(Long unitId, Long staffId);
 
     @Query("Match (org:Organization) where id(org)={0} WITH org\n" +
             "Match (e:Expertise) where id(e)={1} WITH e,org\n" +

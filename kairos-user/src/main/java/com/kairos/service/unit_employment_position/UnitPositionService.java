@@ -377,29 +377,27 @@ public class UnitPositionService extends UserBaseService {
 
     /*
      * @auth vipul
-     * used to get all positions of organization n buy organization and staff Id
+     * used to get all positions of organization n by organization and staff Id
      * */
     public List<UnitPositionQueryResult> getUnitPositionsOfStaff(long id, long staffId, String type) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Staff Id" + staffId);
         }
-
         Organization organization = organizationService.getOrganizationDetail(id, type);
-        Organization parentOrganization;
-        UnitPermission unitPermission;
-        if (!organization.isParentOrganization()) {
-            parentOrganization = organizationService.getParentOfOrganization(organization.getId());
-            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), organization.getId(), staffId);
-        } else {
-            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(organization.getId(), staffId);
-        }
-        if (!Optional.ofNullable(unitPermission).isPresent()) {
-            logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", staffId, organization.getId());
-            throw new DataNotFoundByIdException("unable to get unit employment  of staff");
-        }
-
-        return unitPositionGraphRepository.getAllUnitPositionsByStaff(unitPermission.getId(), staffId);
+//        Organization parentOrganization;
+//        UnitPermission unitPermission;
+//        if (!organization.isParentOrganization()) {
+//            parentOrganization = organizationService.getParentOfOrganization(organization.getId());
+//            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), organization.getId(), staffId);
+//        } else {
+//            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(organization.getId(), staffId);
+//        }
+//        if (!Optional.ofNullable(unitPermission).isPresent()) {
+//            logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", staffId, organization.getId());
+//            throw new DataNotFoundByIdException("unable to get unit employment  of staff");
+//        }
+        return unitPositionGraphRepository.getAllUnitPositionsByStaff(organization.getId(), staffId);
     }
 
     public PositionCtaWtaQueryResult getCtaAndWtaByExpertiseId(Long unitId, Long expertiseId) {
