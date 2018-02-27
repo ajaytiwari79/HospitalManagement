@@ -4,6 +4,7 @@ package com.kairos.service.agreement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
@@ -371,6 +372,9 @@ public class RuleTemplateService extends UserBaseService {
                 MaximumTimeBank maximumTimeBank = (MaximumTimeBank) oldTemplate;
                 maximumTimeBank.setDescription(templateDTO.getDescription());
                 maximumTimeBank.setFrequency(templateDTO.getFrequency());
+                if(!Optional.ofNullable(templateDTO.getYellowZone()).isPresent()){
+                    throw new DataNotMatchedException("yellowZone value can't be null");
+                }
                 maximumTimeBank.setYellowZone(templateDTO.getYellowZone());
                 maximumTimeBank.setForbid(templateDTO.isForbid());
                 maximumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
@@ -379,6 +383,9 @@ public class RuleTemplateService extends UserBaseService {
                 MinimumTimeBank minimumTimeBank = (MinimumTimeBank) oldTemplate;
                 minimumTimeBank.setDescription(templateDTO.getDescription());
                 minimumTimeBank.setFrequency(templateDTO.getFrequency());
+                if(!Optional.ofNullable(templateDTO.getYellowZone()).isPresent()){
+                    throw new DataNotMatchedException("yellowZone value can't be null");
+                }
                 minimumTimeBank.setYellowZone(templateDTO.getYellowZone());
                 minimumTimeBank.setForbid(templateDTO.isForbid());
                 minimumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
