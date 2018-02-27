@@ -498,9 +498,6 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumTimeBank.setTemplateType(ruleTemplate.getTemplateType());
                     maximumTimeBank.setDescription(ruleTemplate.getDescription());
                     maximumTimeBank.setFrequency(ruleTemplate.getFrequency());
-                    if(!Optional.ofNullable(ruleTemplate.getYellowZone()).isPresent()){
-                        throw new DataNotMatchedException("YellowZone can't be null");
-                    }
                     maximumTimeBank.setYellowZone(ruleTemplate.getYellowZone());
                     maximumTimeBank.setForbid(ruleTemplate.isForbid());
                     maximumTimeBank.setAllowExtraActivity(ruleTemplate.isAllowExtraActivity());
@@ -516,9 +513,6 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumTimeBank.setTemplateType(ruleTemplate.getTemplateType());
                     minimumTimeBank.setDescription(ruleTemplate.getDescription());
                     minimumTimeBank.setFrequency(ruleTemplate.getFrequency());
-                    if(!Optional.ofNullable(ruleTemplate.getYellowZone()).isPresent()){
-                        throw new DataNotMatchedException("YellowZone can't be null");
-                    }
                     minimumTimeBank.setYellowZone(ruleTemplate.getYellowZone());
                     minimumTimeBank.setForbid(ruleTemplate.isForbid());
                     minimumTimeBank.setAllowExtraActivity(ruleTemplate.isAllowExtraActivity());
