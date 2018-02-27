@@ -95,8 +95,24 @@ public class AccessPageService extends UserBaseService {
         return accessPage;
     }
 
-    public List<AccessPageDTO> getMainTabs(){
+    /*public List<AccessPageDTO> getMainTabs(){
         return accessPageRepository.getMainTabs();
+    }*/
+
+    public boolean getAccessForCategoryFromList(List<OrganizationCategory> accessibleFor, OrganizationCategory category){
+        return ( Optional.ofNullable(accessibleFor).isPresent() ?  accessibleFor.contains(category) : false );
+    }
+
+    public List<AccessPageDTO> getMainTabs(){
+        List<AccessPageDTO> accessPages = accessPageRepository.getMainTabs();
+        accessPages.stream().forEach(
+                accessPage -> {
+                    accessPage.setAccessibleForHub( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.HUB) );
+                    accessPage.setAccessibleForUnion( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.UNION) );
+                    accessPage.setAccessibleForOrganization( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.ORGANIZATION) );
+                });
+
+        return accessPages;
     }
 
     public List<AccessPageDTO> getChildTabs(Long tabId){

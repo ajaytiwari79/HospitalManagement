@@ -104,9 +104,16 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
 
     AccessPage findByModuleId(String moduleId);
 
-    @Query("Match (accessPage:AccessPage{isModule:true}) return id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId," +
+    /*@Query("Match (accessPage:AccessPage{isModule:true}) return id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId," +
             "accessPage.active as active")
+    List<AccessPageDTO> getMainTabs();*/
+
+    @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
+            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage) WHERE id(country)={0} WITH r\n" +
+            ",id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active RETURN \n" +
+            "id, name, moduleId, active, CASE WHEN r is NULL THEN null ELSE  r.accessibleFor END as accessibleFor")
     List<AccessPageDTO> getMainTabs();
+
 
     @Query("Match (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) where id(accessPage)={0} return id(subPage) as id," +
             "subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,id(accessPage) as parentTabId")
