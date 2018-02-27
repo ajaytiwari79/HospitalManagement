@@ -62,7 +62,6 @@ import java.util.stream.Collectors;
  * Created by pawanmandhan on 26/7/17.
  */
 
-
 @Transactional
 @Service
 
@@ -114,7 +113,7 @@ public class UnitPositionService extends UserBaseService {
         }
         if (!Optional.ofNullable(unitPermission).isPresent()) {
             logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", unitPositionDTO.getStaffId(), organization.getId());
-            throw new DataNotFoundByIdException("unable to create position_code of staff");
+            throw new DataNotFoundByIdException("unable to create employment of staff");
         }
 
         if (!Optional.ofNullable(positionCode).isPresent()) {
@@ -269,9 +268,15 @@ public class UnitPositionService extends UserBaseService {
         if (Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) {
             if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
                 throw new ActionNotPermittedException("Start date can't be less than End Date ");
-
             }
             unitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
+        }
+
+        if (Optional.ofNullable(unitPositionDTO.getLastWorkingDateMillis()).isPresent()) {
+            if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
+                throw new ActionNotPermittedException("Last  date can't be less than End Date ");
+            }
+            unitPosition.setLastWorkingDateMillis(unitPositionDTO.getLastWorkingDateMillis());
         }
         unitPosition.setTotalWeeklyMinutes(unitPositionDTO.getTotalWeeklyMinutes() + (unitPositionDTO.getTotalWeeklyHours() * 60));
         unitPosition.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
@@ -291,7 +296,7 @@ public class UnitPositionService extends UserBaseService {
         }
 
 // If already not present now its present    Previous its absent
-       else if (Optional.ofNullable(unitPositionDTO.getUnionId()).isPresent() && !Optional.ofNullable(oldUnitPosition.getUnion()).isPresent()) {
+        else if (Optional.ofNullable(unitPositionDTO.getUnionId()).isPresent() && !Optional.ofNullable(oldUnitPosition.getUnion()).isPresent()) {
             Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unitPositionDTO.getUnionId());
             if (!Optional.ofNullable(union).isPresent()) {
                 throw new DataNotFoundByIdException(" union does not exist in unit " + unitPositionDTO.getUnionId());
@@ -353,6 +358,12 @@ public class UnitPositionService extends UserBaseService {
                 throw new ActionNotPermittedException("Start date can't be less than End Date ");
             }
             oldUnitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
+        }
+        if (Optional.ofNullable(unitPositionDTO.getLastWorkingDateMillis()).isPresent()) {
+            if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
+                throw new ActionNotPermittedException("Last  date can't be less than End Date ");
+            }
+            oldUnitPosition.setLastWorkingDateMillis(unitPositionDTO.getLastWorkingDateMillis());
         }
         oldUnitPosition.setStartDateMillis(unitPositionDTO.getStartDateMillis());
 
@@ -452,9 +463,9 @@ public class UnitPositionService extends UserBaseService {
         return costTimeAgreementDTO;
     }
 
-    public List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> getCtaRuleTemplateDtos(List<RuleTemplate> ruleTemplates){
+    public List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> getCtaRuleTemplateDtos(List<RuleTemplate> ruleTemplates) {
         List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ruleTemplates.size());
-        ruleTemplates.forEach(rt->{
+        ruleTemplates.forEach(rt -> {
             com.kairos.client.dto.timeBank.CTARuleTemplateDTO ctaRuleTemplateDTO = new com.kairos.client.dto.timeBank.CTARuleTemplateDTO();
             ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
 
@@ -462,7 +473,7 @@ public class UnitPositionService extends UserBaseService {
         return ctaRuleTemplateDTOS;
     }
 
-    public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, Long wtaId, Long ctaId){
+    public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, Long wtaId, Long ctaId) {
         Long startDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getStartDate());
         Long endDateMillis = null;
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
@@ -507,9 +518,9 @@ public class UnitPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("NO Position code exist in organization : " + parentOrganization.getId());
         }
 
-        for ( TimeCareEmploymentDTO timeCareEmploymentDTO : timeCareEmploymentDTOs) {
+        for (TimeCareEmploymentDTO timeCareEmploymentDTO : timeCareEmploymentDTOs) {
             Staff staff = staffGraphRepository.findStaffByExternalId(timeCareEmploymentDTO.getPersonID(), organization.getId());
-            if(staff == null){
+            if (staff == null) {
                 throw new DataNotFoundByIdException("NO staff exist with External Id : " + timeCareEmploymentDTO.getPersonID());
             }
             UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId(), wta.getId(), cta.getId());

@@ -4,6 +4,8 @@ import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBasicResponse;
+import com.kairos.persistence.model.organization.OrganizationHierarchyData;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -19,9 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.GROUP;
@@ -170,8 +170,31 @@ public class PositionCodeService extends UserBaseService {
         List<UnionResponseDTO> unions = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
 
         List<PositionCode> positionCodes = (organization.isParentOrganization()) ? organizationGraphRepository.getPositionCodes(organization.getId()) : organizationGraphRepository.getPositionCodesOfParentOrganization(organization.getId());
+        List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
+        if (organization.isParentOrganization()) {
+            organizationHierarchy = organizationGraphRepository.getOrganizationHierarchy(organization.getId());
+            OrganizationBasicResponse currentOrganization = new OrganizationBasicResponse(organization.getId(), organization.getName());
+            organizationHierarchy.add(currentOrganization);
+
+        } else {
+            OrganizationHierarchyData data = organizationGraphRepository.getChildHierarchyByChildUnit(organization.getId());
+            logger.debug(data.getParent().getId() + "" + data.getParent().getName());
+
+            OrganizationBasicResponse parentOrganization = new OrganizationBasicResponse(data.getParent().getId(), data.getParent().getName());
+            organizationHierarchy.add(parentOrganization);
+            Iterator itr = data.getChildUnits().listIterator();
+            while (itr.hasNext()) {
+                Organization thisOrganization = (Organization) itr.next();
+                organizationHierarchy.add(new OrganizationBasicResponse(thisOrganization.getId(), thisOrganization.getName()));
+            }
+            logger.info(data.toString());
+        }
+
         positionCodeUnionWrapper.setPositionCodes(positionCodes);
         positionCodeUnionWrapper.setUnions(unions);
+        positionCodeUnionWrapper.setOrganizationHierarchy(organizationHierarchy);
+
+
         return positionCodeUnionWrapper;
     }
 

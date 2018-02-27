@@ -37,7 +37,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitEmpPosition.hourlyWages as hourlyWages," +
             "id(unitEmpPosition)   as id," +
             "unitEmpPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
-            "unitEmpPosition.lastModificationDate as lastModificationDate")
+            "unitEmpPosition.lastWorkingDateMillis as lastWorkingDateMillis")
     StaffUnitPositionDetails getUnitPositionById(long unitEmploymentId);
 /* Error while binding to WTA
 * java.lang.IllegalArgumentException: Can not set com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO field com.kairos.persistence.model.user.position_code.StaffUnitEmploymentDetails.workingTimeAgreement to java.util.Collections$UnmodifiableMap
@@ -62,7 +62,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitEmpPosition.hourlyWages as hourlyWages," +
             "id(unitEmpPosition)   as id," +
             "unitEmpPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
-            "unitEmpPosition.lastModificationDate as lastModificationDate")
+            "unitEmpPosition.lastWorkingDateMillis as lastWorkingDateMillis")
     List<UnitPositionQueryResult> getAllUnitPositionsByStaff(Long unitEmploymentId, Long staffId);
 
     @Query("Match (org:Organization) where id(org)={0} WITH org\n" +

@@ -18,6 +18,7 @@ public class UnitPositionDTO {
 
     private Long startDateMillis;
     private Long endDateMillis;
+    private Long lastWorkingDateMillis;
 
     @Range(min = 0, max = 60, message = "Incorrect Weekly minute")
     private int totalWeeklyMinutes;
@@ -38,6 +39,11 @@ public class UnitPositionDTO {
     // private Long expiryDate;
 
     private Long unionId;
+
+    @NotNull(message = "unitId  is required for position")
+    @Range(min = 0, message = "unit Id  is required for position")
+    private Long unitId;
+
 
     public UnitPositionDTO() {
         //default cons
@@ -202,5 +208,21 @@ public class UnitPositionDTO {
 
     public void setUnionId(Long unionId) {
         this.unionId = unionId;
+    }
+
+    public Long getLastWorkingDateMillis() {
+        return lastWorkingDateMillis;
+    }
+
+    public void setLastWorkingDateMillis(Long lastWorkingDateMillis) {
+        this.lastWorkingDateMillis = lastWorkingDateMillis;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 }

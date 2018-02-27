@@ -45,6 +45,7 @@ public class UnitPosition extends UserBaseEntity {
 
     private Long startDateMillis;
     private Long endDateMillis;
+    private Long lastWorkingDateMillis;
     private int totalWeeklyMinutes;
 
     private float avgDailyWorkingHours;
@@ -186,34 +187,16 @@ public class UnitPosition extends UserBaseEntity {
         this.staff = staff;
     }
 
-    public UnitPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
-        this.expertise = expertise;
-        this.cta = cta;
-        this.workingTimeAgreement = workingTimeAgreement;
-        this.positionCode = positionCode;
-        this.staff = staff;
-        this.deleted = deleted;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.hourlyWages = hourlyWages;
-        this.employmentType = employmentType;
-        this.salary = salary;
-    }
-
 
     public UnitPositionQueryResult getBasicDetails() {
         UnitPositionQueryResult result = null;
         result = new UnitPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek,
                 this.endDateMillis, this.totalWeeklyMinutes,
-                this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode,this.union);
+                this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode, this.union,this.lastWorkingDateMillis);
         return result;
     }
 
     public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary) {
-
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -229,6 +212,14 @@ public class UnitPosition extends UserBaseEntity {
 
     public void setUnion(Organization union) {
         this.union = union;
+    }
+
+    public Long getLastWorkingDateMillis() {
+        return lastWorkingDateMillis;
+    }
+
+    public void setLastWorkingDateMillis(Long lastWorkingDateMillis) {
+        this.lastWorkingDateMillis = lastWorkingDateMillis;
     }
 
     @Override

@@ -37,6 +37,7 @@ public class UnitPositionQueryResult {
     private WorkingTimeAgreement workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
     private Organization union;
+    private Long lastWorkingDateMillis;
 
     public int getWorkingDaysInWeek() {
         return workingDaysInWeek;
@@ -180,27 +181,20 @@ public class UnitPositionQueryResult {
         this.union = union;
     }
 
+    public Long getLastWorkingDateMillis() {
+        return lastWorkingDateMillis;
+    }
+
+    public void setLastWorkingDateMillis(Long lastWorkingDateMillis) {
+        this.lastWorkingDateMillis = lastWorkingDateMillis;
+    }
+
     public UnitPositionQueryResult() {
         //default cons
     }
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
-        this.expertise = expertise;
-        this.startDateMillis = startDateMillis;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.hourlyWages = hourlyWages;
-        this.id = id;
-        this.employmentType = employmentType;
-        this.salary = salary;
-        this.positionCode = positionCode;
-        this.workingTimeAgreement = workingTimeAgreement;
-        this.costTimeAgreement = costTimeAgreement;
-    }
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, Organization union) {
+    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;
@@ -212,7 +206,8 @@ public class UnitPositionQueryResult {
         this.employmentType = employmentType;
         this.salary = salary;
         this.positionCode = positionCode;
-        this.union=union;
+        this.union = union;
+        this.lastWorkingDateMillis = lastWorkingDateMillis;
     }
 
 }

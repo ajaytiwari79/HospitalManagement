@@ -50,7 +50,7 @@ public class TreeStructureService {
         QueryResult queryResult = objectMapper.convertValue(firstRecord,QueryResult.class);
         return queryResult;
 
-      /*  QueryResult queryResult = new QueryResult(firstRecord.getName(), firstRecord.getId(), firstRecord.getChildren());
+      /*  QueryResult queryResult = new QueryResult(firstRecord.getName(), firstRecord.getId(), firstRecord.getChildUnits());
         queryResult.setAccessable(firstRecord.isAccessable());
         queryResult.setType(firstRecord.getType());
         queryResult.setKairosHub(firstRecord.isKairosHub());
