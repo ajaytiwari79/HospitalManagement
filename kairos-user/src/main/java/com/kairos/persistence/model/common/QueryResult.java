@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 
 /**
  * Created by prabjot on 14/11/16.
@@ -24,6 +25,8 @@ public class QueryResult {
     private boolean isParentOrganization;
     private String timeZone;
     private Boolean union;
+    private OrganizationLevel organizationLevel;
+
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
     }
@@ -143,5 +146,13 @@ public class QueryResult {
 
     public void setUnion(Boolean union) {
         this.union = union;
+    }
+
+    public OrganizationLevel getOrganizationLevel() {
+        return organizationLevel;
+    }
+
+    public void setOrganizationLevel(OrganizationLevel organizationLevel) {
+        this.organizationLevel = organizationLevel;
     }
 }

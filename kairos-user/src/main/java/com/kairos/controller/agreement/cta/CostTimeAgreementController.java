@@ -72,6 +72,14 @@ public class CostTimeAgreementController {
                 costTimeAgreementService.loadAllCTAByUnit(unitId));
     }
 
+    @RequestMapping(value = "/country/{countryId}/cta_rule_template", method = RequestMethod.POST)
+    @ApiOperation("Create CTA Rule Template")
+    public ResponseEntity<Map<String, Object>> createCTARuleTemplate(@PathVariable Long countryId
+            , @RequestBody @Valid CTARuleTemplateDTO ctaRuleTemplateDTO ) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                costTimeAgreementService.createCTARuleTemplate(countryId,ctaRuleTemplateDTO));
+    }
+
     @RequestMapping(value = "/country/{countryId}/cta_rule_template/{templateId}", method = RequestMethod.PUT)
     @ApiOperation("Update CTA Rule Template")
     public ResponseEntity<Map<String, Object>> updateCTARuleTemplate(@PathVariable Long countryId,@PathVariable Long templateId

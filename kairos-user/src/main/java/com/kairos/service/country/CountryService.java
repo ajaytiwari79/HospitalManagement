@@ -14,6 +14,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.resources.Vehicle;
@@ -102,6 +103,7 @@ public class CountryService extends UserBaseService {
     private @Autowired PhaseRestClient phaseRestClient;
     private @Autowired ActivityTypesRestClient activityTypesRestClient;
     private @Inject OrganizationService organizationService;
+    private @Inject PresenceTypeService presenceTypeService;
 
 
     /**
@@ -453,6 +455,7 @@ public class CountryService extends UserBaseService {
         List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
      List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
      List<TimeTypeDTO> timeTypes= timeTypeRestClient.getAllTimeTypes(countryId);
+     List<PresenceTypeDTO> plannedTime= presenceTypeService.getAllPresenceTypeByCountry(countryId);
      List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
      List<ActivityTypeDTO> activityTypeDTOS=activityTypesRestClient.getActivityType(countryId);
      List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
@@ -470,6 +473,7 @@ public class CountryService extends UserBaseService {
         }).collect(Collectors.toList());
         ctaRuleTemplateDefaultDataWrapper.setEmploymentTypes(employmentTypeDTOS);
         ctaRuleTemplateDefaultDataWrapper.setTimeTypes(timeTypes);
+        ctaRuleTemplateDefaultDataWrapper.setPlannedTime(plannedTime);
 
         List<DayTypeDTO> dayTypeDTOS =dayTypes.stream().map(dayType -> {
             DayTypeDTO dayTypeDTO=new DayTypeDTO();
