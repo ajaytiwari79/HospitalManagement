@@ -10,7 +10,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
  * Created by pavan on 20/2/18.
  */
 @NodeEntity
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MinimumTimeBank extends WTABaseRuleTemplate{
     private TimeBankTypeEnum frequency;
