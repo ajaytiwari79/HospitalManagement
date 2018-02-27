@@ -23,21 +23,21 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPosition, Long> {
-    @Query("MATCH (unitEmpPosition:UnitEmploymentPosition{deleted:false}) where id(unitEmpPosition)={0}\n" +
-            "match (unitEmpPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
-            "match (unitEmpPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
-            "optional match (unitEmpPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
+    @Query("MATCH (unitPosition:UnitPosition{deleted:false}) where id(unitPosition)={0}\n" +
+            "match (unitPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
+            "match (unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(e:Expertise)\n" +
+            "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
             "return e as expertise,cta as costTimeAgreement," +
-            "unitEmpPosition.totalWeeklyHours as totalWeeklyHours," +
-            "unitEmpPosition.startDateMillis as startDateMillis," +
-            "unitEmpPosition.endDateMillis as endDateMillis," +
-            "unitEmpPosition.salary as salary," +
-            "unitEmpPosition.workingDaysInWeek as workingDaysInWeek," +
+            "unitPosition.totalWeeklyHours as totalWeeklyHours," +
+            "unitPosition.startDateMillis as startDateMillis," +
+            "unitPosition.endDateMillis as endDateMillis," +
+            "unitPosition.salary as salary," +
+            "unitPosition.workingDaysInWeek as workingDaysInWeek," +
             "et as employmentType," +
-            "unitEmpPosition.hourlyWages as hourlyWages," +
+            "unitPosition.hourlyWages as hourlyWages," +
             "id(unitEmpPosition)   as id," +
-            "unitEmpPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
-            "unitEmpPosition.lastWorkingDateMillis as lastWorkingDateMillis")
+            "unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
+            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis")
     StaffUnitPositionDetails getUnitPositionById(long unitEmploymentId);
 
     /* Error while binding to WTA
@@ -78,7 +78,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "return collect(wta)")
     List<WorkingTimeAgreement> getWtaByExpertise(Long organizationId, Long expertiseId);
 
-    @Query("MATCH (uep:UnitEmploymentPosition)-[:HAS_CTA]-(cta:CostTimeAgreement{deleted:false}) WHERE id(uep)={0}  WITH cta\n" +
+    @Query("MATCH (uep:UnitPosition)-[:HAS_CTA]-(cta:CostTimeAgreement{deleted:false}) WHERE id(uep)={0}  WITH cta\n" +
             "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{isEnabled:true}) WITH cta,expertise\n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType\n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType\n" +
@@ -112,18 +112,18 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     UnitPositionQueryResult getCtaByUnitEmploymentId(Long unitEmploymentId);
 
 
-    @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(u)={1}\n" +
-            "match(uep)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={0}\n" +
-            "return uep")
-    List<UnitPosition> getAllUEPByExpertise(Long expertiseId, Long staffId, Long unitId);
+    @Query("match(s:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPosition:UnitPosition{deleted:false})-[:" + UNIT_POSITION_BELONGS_TO_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1} \n" +
+            "match(unitPosition)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={2}\n" +
+            "return unitPosition")
+    List<UnitPosition> getAllUEPByExpertise(Long unitId, Long staffId, Long expertiseId);
 
-    @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(uep)={0} return Id(u)")
+    @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitPosition{deleted:false}) where id(uep)={0} return Id(u)")
     Long findEmploymentByUnitPosition(Long unitEmploymentPositionId);
 
-    @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitEmploymentPosition{deleted:false}) where id(u)={1} AND Id(uep)<>{2}\n" +
-            "match(uep)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={0}\n" +
-            "return uep")
-    List<UnitPosition> getAllUEPByExpertiseExcludingCurrent(Long expertiseId, Long unitEmploymentId, Long currentUnitPositionId);
+    @Query("match(s:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPosition:UnitPosition{deleted:false})-[:" + UNIT_POSITION_BELONGS_TO_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1}  AND Id(unitPosition)<>{3}\n" +
+            "match(unitPosition)-[:" + HAS_EXPERTISE_IN + "]-(e:Expertise) where id(e)={2}\n" +
+            "return unitPosition")
+    List<UnitPosition> getAllUEPByExpertiseExcludingCurrent(Long unitId, Long staffId, Long expertiseId, Long currentUnitPositionId);
 
     @Query("Match (org:Organization) where id(org)={0}\n" +
             "Match (e:Expertise) where id(e)={1}\n" +

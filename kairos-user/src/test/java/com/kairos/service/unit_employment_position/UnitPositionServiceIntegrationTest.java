@@ -61,7 +61,6 @@ public class UnitPositionServiceIntegrationTest {
 
     @Test
     public void createUnitPosition() throws Exception {
-
         UnitPositionDTO unitPositionDTO = new UnitPositionDTO(5791L, 1507L, 1616174226503L, null, 11, 11182L, 8051L, 15115L, null, 95L);
         HttpEntity<UnitPositionDTO> requestBodyData = new HttpEntity<>(unitPositionDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>> typeReference =
@@ -82,6 +81,21 @@ public class UnitPositionServiceIntegrationTest {
         ResponseEntity<RestTemplateResponseEnvelope<List<Map<String, Object>>>> response = restTemplate.exchange(
                 baseUrlWithUnit + "/unit_position/staff/" + 8051 + "?moduleId=tab_23&type=Organization",
                 HttpMethod.GET, null, typeReference);
+        logger.info(response.toString());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void updateUnitPosition() throws Exception {
+        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(5791L, 1507L, 1616174226503L, null, 12, 11182L, 8051L, 15115L, null, 95L);
+
+        HttpEntity<UnitPositionDTO> requestBodyData = new HttpEntity<>(unitPositionDTO);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<Map<String, Object>>> response = restTemplate.exchange(
+                baseUrlWithUnit + "/unit_position/" + 8586 + "?moduleId=tab_23&type=Organization",
+                HttpMethod.PUT, requestBodyData, typeReference);
         logger.info(response.toString());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }

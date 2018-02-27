@@ -374,19 +374,22 @@ public class StaffService extends UserBaseService {
         if (unit == null) {
             throw new InternalError("Unit can not be null");
         }
-        Organization parent = null;
-        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
-        } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
-        }
-
-        if (parent == null) {
-            return staffGraphRepository.getStaffWithBasicInfo(unit.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        } else {
-            return staffGraphRepository.getStaffInfoForFilters(parent.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        }
+        //TODO unnecessary queries should be removed
+        List<Map<String, Object>> data = staffGraphRepository.getStaffWithUnitPositionInUnit(unitId);
+        return data;
+//        Organization parent = null;
+//        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
+//            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+//
+//        } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
+//            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+//        }
+//
+//        if (parent == null) {
+//            return staffGraphRepository.getStaffWithBasicInfo(unit.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+//        } else {
+//            return staffGraphRepository.getStaffInfoForFilters(parent.getId(), unit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+//        }
     }
 
     public List<StaffAdditionalInfoQueryResult> getStaffWithAdditionalInfo(long unitId) {

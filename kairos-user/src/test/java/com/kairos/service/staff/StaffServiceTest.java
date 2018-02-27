@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Map;
+
 /**
  * Created by oodles on 23/10/17.
  */
@@ -29,6 +31,8 @@ public class StaffServiceTest {
     private String url;
     @Autowired
     TestRestTemplate restTemplate;
+    @Autowired
+    private StaffService staffService;
 
 
     @Test
@@ -53,6 +57,20 @@ public class StaffServiceTest {
                 baseUrl + "/staff/create_staff_from_web",
                 HttpMethod.POST, entity, Staff.class);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void getStaffWithBasicInfo() throws Exception {
+        String baseUrl = getBaseUrl(71L, 145L);
+        ResponseEntity<Object> response = restTemplate.exchange(
+                baseUrl + "staff?id=95&moduleId=tab_19&type=Organization",
+                HttpMethod.GET, null, Object.class);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void getStaffWithBasicInfo1() throws Exception {
+        staffService.getStaffWithBasicInfo(95L);
     }
 
     public final String getBaseUrl(Long organizationId, Long unitId) {

@@ -9,6 +9,7 @@ import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.persistence.model.user.country.EmploymentType;
 
@@ -120,8 +121,8 @@ public class UnitPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("position_code Name does not exist in unit " + unitPositionDTO.getPositionCodeId());
         }
 
-        //List<UnitPosition> oldUnitPositions = unitPositionGraphRepository.getAllUEPByExpertise(unitPositionDTO.getExpertiseId(), unitPositionDTO.getStaffId(),organization.getId());
-        //validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
+        List<UnitPosition> oldUnitPositions = unitPositionGraphRepository.getAllUEPByExpertise(organization.getId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId());
+        validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
         UnitPosition unitPosition = new UnitPosition();
         preparePosition(unitPosition, unitPositionDTO, organization, id, createFromTimeCare);
 
@@ -189,11 +190,8 @@ public class UnitPositionService extends UserBaseService {
         if (!Optional.ofNullable(oldUnitPosition).isPresent()) {
             throw new DataNotFoundByIdException("Invalid positionId id " + unitPositionId + " while updating the position_code");
         }
-        // findEmployment by UnitEmployment Id
-        Long unitEmploymentId = unitPositionGraphRepository.findEmploymentByUnitPosition(unitPositionId);
-
-        List<UnitPosition> oldUnitPositions;
-        oldUnitPositions = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getExpertiseId(), unitEmploymentId, unitPositionId);
+        List<UnitPosition> oldUnitPositions
+                = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
         validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
 
         preparePosition(oldUnitPosition, unitPositionDTO);
@@ -212,6 +210,15 @@ public class UnitPositionService extends UserBaseService {
         return true;
     }
 
+    private void copyAndLinkNewWTA(UnitPosition unitPosition, WorkingTimeAgreement workingTimeAgreement) {
+        WorkingTimeAgreement newWta = new WorkingTimeAgreement();
+        wtaService.copyWta(workingTimeAgreement, newWta);
+        if (workingTimeAgreement.getRuleTemplates().size() > 0) {
+            List<WTABaseRuleTemplate> ruleTemplates = wtaService.copyRuleTemplate(workingTimeAgreement.getRuleTemplates());
+            newWta.setRuleTemplates(ruleTemplates);
+        }
+        unitPosition.setWorkingTimeAgreement(newWta);
+    }
 
     private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Organization organization, Long unitId, Boolean createFromTimeCare) {
 
@@ -228,7 +235,7 @@ public class UnitPositionService extends UserBaseService {
         if (!wta.isPresent()) {
             throw new DataNotFoundByIdException("Invalid wta id ");
         }
-        unitPosition.setWorkingTimeAgreement(wta.get());
+        copyAndLinkNewWTA(unitPosition, wta.get());
 
 
         CostTimeAgreement cta = (unitPositionDTO.getCtaId() == null) ? null :
@@ -271,8 +278,8 @@ public class UnitPositionService extends UserBaseService {
         }
 
         if (Optional.ofNullable(unitPositionDTO.getLastWorkingDateMillis()).isPresent()) {
-            if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
-                throw new ActionNotPermittedException("Last  date can't be less than End Date ");
+            if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getLastWorkingDateMillis()) {
+                throw new ActionNotPermittedException("Last date can't be less than start Date ");
             }
             unitPosition.setLastWorkingDateMillis(unitPositionDTO.getLastWorkingDateMillis());
         }
@@ -281,7 +288,6 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setHourlyWages(unitPositionDTO.getHourlyWages());
         unitPosition.setSalary(unitPositionDTO.getSalary());
         unitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
-
         return unitPosition;
     }
 
@@ -358,7 +364,7 @@ public class UnitPositionService extends UserBaseService {
             oldUnitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
         }
         if (Optional.ofNullable(unitPositionDTO.getLastWorkingDateMillis()).isPresent()) {
-            if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
+            if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getLastWorkingDateMillis()) {
                 throw new ActionNotPermittedException("Last  date can't be less than End Date ");
             }
             oldUnitPosition.setLastWorkingDateMillis(unitPositionDTO.getLastWorkingDateMillis());

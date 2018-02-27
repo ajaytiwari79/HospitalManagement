@@ -108,7 +108,7 @@ public class WTAService extends UserBaseService {
             wta.setTags(tags);
         }
 
-        prepareWtaWhileCreate(wta,countryId, wtaDTO);
+        prepareWtaWhileCreate(wta, countryId, wtaDTO);
         wta.setCountry(country);
         save(wta);
         assignWTAToOrganization(wta, wtaDTO);
@@ -179,7 +179,7 @@ public class WTAService extends UserBaseService {
         return;
     }
 
-    private WorkingTimeAgreement prepareWtaWhileCreate(WorkingTimeAgreement wta ,long countryId, WTADTO wtaDTO) {
+    private WorkingTimeAgreement prepareWtaWhileCreate(WorkingTimeAgreement wta, long countryId, WTADTO wtaDTO) {
 
         wta.setDescription(wtaDTO.getDescription());
         wta.setName(wtaDTO.getName());
@@ -284,12 +284,11 @@ public class WTAService extends UserBaseService {
         save(versionWTA);
 
 
-
         oldWta.setDescription(updateDTO.getDescription());
         oldWta.setName(updateDTO.getName());
 
         oldWta.setStartDateMillis(updateDTO.getStartDateMillis());
-        if (oldWta.getEndDateMillis() !=null ) {
+        if (oldWta.getEndDateMillis() != null) {
             oldWta.setEndDateMillis(updateDTO.getEndDateMillis());
         }
 
@@ -405,7 +404,7 @@ public class WTAService extends UserBaseService {
 
             save(newWtaObject);
             // TODO
-           // assignWTAToOrganization(newWtaObject, organizationSubTypeId);
+            // assignWTAToOrganization(newWtaObject, organizationSubTypeId);
             // setting basic propery for response
             newWtaObject.setOrganizationType(newWtaObject.getOrganizationType().basicDetails());
             newWtaObject.setOrganizationSubType(newWtaObject.getOrganizationSubType().basicDetails());
@@ -423,10 +422,9 @@ public class WTAService extends UserBaseService {
 
     public List<WTABaseRuleTemplate> copyRuleTemplate(List<WTABaseRuleTemplate> ruleTemplates) {
         List<WTABaseRuleTemplate> copiedRuleTemplate = new ArrayList<>(ruleTemplates.size());
-        ObjectMapper objectMapper = new ObjectMapper();
         ruleTemplates.forEach(ruleTemplate -> {
-            WTABaseRuleTemplate wtaBaseRuleTemplate = new WTABaseRuleTemplate();
-            wtaBaseRuleTemplate = objectMapper.convertValue(ruleTemplate, WTABaseRuleTemplate.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+            WTABaseRuleTemplate wtaBaseRuleTemplate = objectMapper.convertValue(ruleTemplate, WTABaseRuleTemplate.class);
             wtaBaseRuleTemplate.setRuleTemplateCategory(ruleTemplate.getRuleTemplateCategory());
             wtaBaseRuleTemplate.setId(null);
 
@@ -462,7 +460,6 @@ public class WTAService extends UserBaseService {
         newWta.setEndDateMillis(oldWta.getEndDateMillis());
         newWta.setExpertise(oldWta.getExpertise());
         newWta.setId(null);
-
         return newWta;
 
     }

@@ -372,4 +372,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     @Query("match(s:Staff) where s.externalId IN {0} return s.externalId")
     List<Long> findStaffByExternalIdIn(Set<Long> externalIdsOfStaff);
 
+    @Query("match(s:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition)-[:UNIT_POSITION_BELONGS_TO_UNIT]-(organization:Organization) where id(organization)={0}\n" +
+            "return distinct s")
+    List<Map<String, Object>> getStaffWithUnitPositionInUnit(Long unitId);
+
 }
