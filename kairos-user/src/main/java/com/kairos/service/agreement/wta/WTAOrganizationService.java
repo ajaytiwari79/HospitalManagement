@@ -2,6 +2,7 @@ package com.kairos.service.agreement.wta;
 
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
@@ -497,6 +498,9 @@ public class WTAOrganizationService extends UserBaseService {
                     maximumTimeBank.setTemplateType(ruleTemplate.getTemplateType());
                     maximumTimeBank.setDescription(ruleTemplate.getDescription());
                     maximumTimeBank.setFrequency(ruleTemplate.getFrequency());
+                    if(!Optional.ofNullable(ruleTemplate.getYellowZone()).isPresent()){
+                        throw new DataNotMatchedException("YellowZone can't be null");
+                    }
                     maximumTimeBank.setYellowZone(ruleTemplate.getYellowZone());
                     maximumTimeBank.setForbid(ruleTemplate.isForbid());
                     maximumTimeBank.setAllowExtraActivity(ruleTemplate.isAllowExtraActivity());
@@ -512,6 +516,9 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumTimeBank.setTemplateType(ruleTemplate.getTemplateType());
                     minimumTimeBank.setDescription(ruleTemplate.getDescription());
                     minimumTimeBank.setFrequency(ruleTemplate.getFrequency());
+                    if(!Optional.ofNullable(ruleTemplate.getYellowZone()).isPresent()){
+                        throw new DataNotMatchedException("YellowZone can't be null");
+                    }
                     minimumTimeBank.setYellowZone(ruleTemplate.getYellowZone());
                     minimumTimeBank.setForbid(ruleTemplate.isForbid());
                     minimumTimeBank.setAllowExtraActivity(ruleTemplate.isAllowExtraActivity());
