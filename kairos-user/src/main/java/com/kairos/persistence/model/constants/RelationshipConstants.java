@@ -162,6 +162,7 @@ public abstract class RelationshipConstants {
     public final static String TIMECARE_DEFAULT_DUMMY_SERVICE = "API Integration Service";
     public final static String CONTACT_DETAIL = "CONTACT_DETAIL";
     public final static String CONTACT_ADDRESS = "CONTACT_ADDRESS";
+    public final static String SECONDARY_CONTACT_ADDRESS = "SECONDARY_CONTACT_ADDRESS";
     public final static String ZIP_CODE = "ZIP_CODE";
     public final static String BUSINESS_TYPE = "BUSINESS_TYPE";
     public final static String OWNERSHIP_TYPE = "OWNERSHIP_TYPE";
