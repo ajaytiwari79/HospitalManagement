@@ -24,7 +24,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 //@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 
 /**

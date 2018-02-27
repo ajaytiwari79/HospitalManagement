@@ -9,13 +9,14 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
 /**
  * Created by vipul on 12/10/17.
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
 public class RuleTemplateCategoryDTO {
