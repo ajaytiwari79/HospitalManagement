@@ -343,54 +343,6 @@ public class Staff extends UserBaseEntity {
         this.cprNumber = cprNumber;
     }
 
-    public Map<String,Object> fetchPrimaryContactAddressDetail(){
-
-        ContactAddress contactAddress =this.contactAddress;
-        Map<String,Object> map = null;
-        if(contactAddress != null){
-            map = new HashMap<>();
-            map.put("houseNumber",contactAddress.getHouseNumber());
-            map.put("floorNumber",contactAddress.getFloorNumber());
-            map.put("street1",contactAddress.getStreet1());
-            map.put("zipCodeId",contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
-            map.put("city",contactAddress.getCity()!=null? contactAddress.getCity(): "");
-            map.put("municipalityId",(contactAddress.getMunicipality()==null)?null:contactAddress.getMunicipality().getId());
-            map.put("regionName",contactAddress.getRegionName());
-            map.put("country",contactAddress.getCountry());
-            map.put("latitude",contactAddress.getLatitude());
-            map.put("longitude",contactAddress.getLongitude());
-            map.put("province",contactAddress.getProvince());
-            map.put("streetUrl",contactAddress.getStreetUrl());
-            map.put("addressProtected",contactAddress.isAddressProtected());
-            map.put("verifiedByVisitour",contactAddress.isVerifiedByVisitour());
-        }
-        return map;
-    }
-    public Map<String,Object> fetchSecondaryContactAddressDetail(){
-
-        ContactAddress secondaryContactAddress =this.secondaryContactAddress;
-        Map<String,Object> map = null;
-        if(secondaryContactAddress != null){
-            map = new HashMap<>();
-            map.put("houseNumber",secondaryContactAddress.getHouseNumber());
-            map.put("floorNumber",secondaryContactAddress.getFloorNumber());
-            map.put("street1",secondaryContactAddress.getStreet1());
-            map.put("zipCodeId",secondaryContactAddress.getZipCode()!=null ? secondaryContactAddress.getZipCode().getId(): null);
-            map.put("city",secondaryContactAddress.getCity()!=null? secondaryContactAddress.getCity(): "");
-            map.put("municipalityId",(secondaryContactAddress.getMunicipality()==null)?null:secondaryContactAddress.getMunicipality().getId());
-            map.put("regionName",secondaryContactAddress.getRegionName());
-            map.put("country",secondaryContactAddress.getCountry());
-            map.put("latitude",secondaryContactAddress.getLatitude());
-            map.put("longitude",secondaryContactAddress.getLongitude());
-            map.put("province",secondaryContactAddress.getProvince());
-            map.put("streetUrl",secondaryContactAddress.getStreetUrl());
-            map.put("addressProtected",secondaryContactAddress.isAddressProtected());
-            map.put("verifiedByVisitour",secondaryContactAddress.isVerifiedByVisitour());
-        }
-        return map;
-    }
-
-
     public EngineerType getEngineerType() {
         return engineerType;
     }

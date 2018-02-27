@@ -5,6 +5,7 @@ import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.client.ContactAddress;
+import com.kairos.persistence.model.user.client.ContactAddressDTO;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -133,18 +134,16 @@ public class StaffAddressService extends UserBaseService {
             contactAddress.setCity(zipCode.getName());
             contactAddress.setPrivateAddress(addressDTO.isAddressProtected());
 
-            if(addressDTO.isPrimary())
-            {
+            if (addressDTO.isPrimary()) {
                 staff.setContactAddress(contactAddress);
-            }else{
+            } else {
                 staff.setSecondaryContactAddress(contactAddress);
             }
 
             staffGraphRepository.save(staff);
             // save directly
             return contactAddress;
-        }
-        else {
+        } else {
             logger.info("Sending address to verify from TOM TOM server");
             // Send Address to verify
             Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, unitId);
@@ -201,10 +200,9 @@ public class StaffAddressService extends UserBaseService {
                 contactAddress.setCity(zipCode.getName());
                 contactAddress.setPrivateAddress(addressDTO.isAddressProtected());
 
-                if(addressDTO.isPrimary())
-                {
+                if (addressDTO.isPrimary()) {
                     staff.setContactAddress(contactAddress);
-                }else{
+                } else {
                     staff.setSecondaryContactAddress(contactAddress);
                 }
                 staffGraphRepository.save(staff);
@@ -247,8 +245,8 @@ public class StaffAddressService extends UserBaseService {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("primaryStaffAddress", staff.fetchPrimaryContactAddressDetail());
-        response.put("secondaryStaffAddress", (staff.getSecondaryContactAddress()==null)?initializeSecondaryAddress():staff.fetchSecondaryContactAddressDetail());
+        response.put("primaryStaffAddress", getContactAddress(staff.getContactAddress()));
+        response.put("secondaryStaffAddress", (staff.getSecondaryContactAddress() == null) ? initializeSecondaryAddress() : getContactAddress(staff.getSecondaryContactAddress()));
         response.put("distanceFromWork", distance);
 
         if (countryId != null) {
@@ -258,7 +256,19 @@ public class StaffAddressService extends UserBaseService {
         }
         return response;
     }
-    public Map<String,Object> initializeSecondaryAddress(){
+
+    public ContactAddressDTO getContactAddress(ContactAddress contactAddress) {
+        ContactAddressDTO contactAddressDTO = new ContactAddressDTO(contactAddress.getHouseNumber(),contactAddress.getFloorNumber(),contactAddress.getStreet1(),contactAddress.getCity(),
+                contactAddress.getRegionName(),contactAddress.getCountry(),contactAddress.getLatitude(),contactAddress.getLongitude(),contactAddress.getProvince(),contactAddress.getCountry(),
+                contactAddress.isAddressProtected(),contactAddress.isVerifiedByVisitour());
+        contactAddressDTO.setZipCodeId(contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
+        contactAddressDTO.setMunicipalityId((contactAddress.getMunicipality()==null) ?null :contactAddress.getMunicipality().getId());
+
+
+        return contactAddressDTO;
+    }
+
+    public Map<String, Object> initializeSecondaryAddress() {
         Map map = new HashMap<>();
         map.put("houseNumber", null);
         map.put("floorNumber", null);
@@ -266,19 +276,20 @@ public class StaffAddressService extends UserBaseService {
         map.put("zipCodeId", null);
         map.put("city", null);
         map.put("municipalityId", null);
-        map.put("regionName",null);
+        map.put("regionName", null);
         map.put("country", null);
         map.put("latitude", null);
         map.put("longitude", null);
         map.put("province", null);
         map.put("streetUrl", null);
-        map.put("addressProtected",null);
+        map.put("addressProtected", null);
         map.put("verifiedByVisitour", null);
         return map;
     }
+
     public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
         ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
-        if(Optional.ofNullable(organizationAddress).isPresent()){
+        if (Optional.ofNullable(organizationAddress).isPresent()) {
             ContactAddress contactAddress = new ContactAddress();
             contactAddress.setCity(organizationAddress.getCity());
             contactAddress.setStreet1(organizationAddress.getStreet1());

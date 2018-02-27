@@ -340,6 +340,21 @@ public class ContactAddress extends UserBaseEntity implements Cloneable{
         this.isVerifiedByVisitour = source.isVerifiedByVisitour;
         return this;
     }
+    public ContactAddress(String houseNumber, Integer floorNumber, String street1, String city, String regionName, String country, Float latitude, Float longitude,
+                             String province, String streetUrl, Boolean addressProtected, Boolean verifiedByVisitour) {
+        this.houseNumber = houseNumber;
+        this.floorNumber = floorNumber;
+        this.street1 = street1;
+        this.city = city;
+        this.regionName = regionName;
+        this.country = country;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.province = province;
+        this.streetUrl = streetUrl;
+        this.isAddressProtected = addressProtected;
+        this.isVerifiedByVisitour = verifiedByVisitour;
+    }
 
 
 }
