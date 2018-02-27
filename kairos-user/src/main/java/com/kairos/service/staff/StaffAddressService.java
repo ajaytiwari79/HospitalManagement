@@ -264,7 +264,6 @@ public class StaffAddressService extends UserBaseService {
         contactAddressDTO.setZipCodeId(contactAddress.getZipCode()!=null ? contactAddress.getZipCode().getId(): null);
         contactAddressDTO.setMunicipalityId((contactAddress.getMunicipality()==null) ?null :contactAddress.getMunicipality().getId());
 
-
         return contactAddressDTO;
     }
 
@@ -276,20 +275,20 @@ public class StaffAddressService extends UserBaseService {
         map.put("zipCodeId", null);
         map.put("city", null);
         map.put("municipalityId", null);
-        map.put("regionName", null);
+        map.put("regionName",null);
         map.put("country", null);
         map.put("latitude", null);
         map.put("longitude", null);
         map.put("province", null);
         map.put("streetUrl", null);
-        map.put("addressProtected", null);
+        map.put("addressProtected",null);
         map.put("verifiedByVisitour", null);
         return map;
     }
 
     public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
         ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
-        if (Optional.ofNullable(organizationAddress).isPresent()) {
+        if(Optional.ofNullable(organizationAddress).isPresent()) {
             ContactAddress contactAddress = new ContactAddress();
             contactAddress.setCity(organizationAddress.getCity());
             contactAddress.setStreet1(organizationAddress.getStreet1());
