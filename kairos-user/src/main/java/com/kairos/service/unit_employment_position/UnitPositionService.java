@@ -238,11 +238,11 @@ public class UnitPositionService extends UserBaseService {
         copyAndLinkNewWTA(unitPosition, wta.get());
 
 
-        CostTimeAgreement cta = (unitPositionDTO.getCtaId() == null) ? null :
-                costTimeAgreementGraphRepository.findOne(unitPositionDTO.getCtaId());
-        if (cta != null) {
-            unitPosition.setCta(cta);
-        }
+//        CostTimeAgreement cta = (unitPositionDTO.getCtaId() == null) ? null :
+//                costTimeAgreementGraphRepository.findOne(unitPositionDTO.getCtaId());
+//        if (cta != null) {
+//            unitPosition.setCta(cta);
+//        }
 
         Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId());
         if (!expertise.isPresent()) {
@@ -288,6 +288,9 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setHourlyWages(unitPositionDTO.getHourlyWages());
         unitPosition.setSalary(unitPositionDTO.getSalary());
         unitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
+        if (createFromTimeCare) {
+            unitPosition.setTimeCareExternalId(unitPositionDTO.getTimeCareExternalId());
+        }
         return unitPosition;
     }
 
@@ -481,7 +484,7 @@ public class UnitPositionService extends UserBaseService {
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
             endDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getEndDate());
         }
-        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(positionCodeId, expertiseId, startDateMillis, endDateMillis, Integer.parseInt(timeCareEmploymentDTO.getWeeklyHours()), employmentTypeId, staffId, wtaId, ctaId);
+        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(positionCodeId, expertiseId, startDateMillis, endDateMillis, Integer.parseInt(timeCareEmploymentDTO.getWeeklyHours()), employmentTypeId, staffId, wtaId, ctaId, new Long(timeCareEmploymentDTO.getId()));
         return unitPositionDTO;
     }
 
@@ -507,13 +510,13 @@ public class UnitPositionService extends UserBaseService {
         }
 
         WorkingTimeAgreement wta = unitPositionGraphRepository.getOneDefaultWTA(organization.getId(), expertise.getId());
-        CostTimeAgreement cta = unitPositionGraphRepository.getOneDefaultCTA(organization.getId(), expertise.getId());
+        //    CostTimeAgreement cta = unitPositionGraphRepository.getOneDefaultCTA(organization.getId(), expertise.getId());
         if (wta == null) {
             throw new DataNotFoundByIdException("NO WTA found for organization : " + organization.getId());
         }
-        if (cta == null) {
-            throw new DataNotFoundByIdException("NO CTA found for organization : " + organization.getId());
-        }
+//        if (cta == null) {
+//            throw new DataNotFoundByIdException("NO CTA found for organization : " + organization.getId());
+//        }
 
         PositionCode positionCode = positionCodeGraphRepository.getOneDefaultPositionCodeByUnitId(parentOrganization.getId());
         if (positionCode == null) {
@@ -525,7 +528,7 @@ public class UnitPositionService extends UserBaseService {
             if (staff == null) {
                 throw new DataNotFoundByIdException("NO staff exist with External Id : " + timeCareEmploymentDTO.getPersonID());
             }
-            UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId(), wta.getId(), cta.getId());
+            UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId(), wta.getId(), null);
             createUnitPosition(organization.getId(), "Organization", unitEmploymentPosition, true);
         }
         return true;

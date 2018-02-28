@@ -334,14 +334,14 @@ public class StaffService extends UserBaseService {
     }
 
 
-    public Map<String, Object> getStaff(String type, long id) {
+    public Map<String, Object> getStaff(String type, long id, Boolean allStaffRequired) {
 
-        List<Map<String, Object>> staff = null;
+        List<StaffPersonalDetailDTO> staff = null;
         Long countryId = null;
         List<AccessGroup> roles = null;
         List<EngineerType> engineerTypes = null;
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            staff = getStaffWithBasicInfo(id);
+            staff = getStaffWithBasicInfo(id, allStaffRequired);
             roles = accessGroupService.getAccessGroups(id);
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
@@ -357,12 +357,8 @@ public class StaffService extends UserBaseService {
             countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
         }
 
-        List<Map<String, Object>> response = new ArrayList<>();
-        for (Map<String, Object> map : staff) {
-            response.add((Map<String, Object>) map.get("data"));
-        }
         Map<String, Object> map = new HashMap();
-        map.put("staffList", response);
+        map.put("staffList", staff);
         map.put("engineerTypes", engineerTypes);
         map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
         map.put("roles", roles);
@@ -371,14 +367,31 @@ public class StaffService extends UserBaseService {
 
     /* @Modified by VIPUL
     * */
+
+    // TODO NEED TO FIX map
     public List<Map<String, Object>> getStaffWithBasicInfo(long unitId) {
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
-        if (unit == null) {
-            throw new InternalError("Unit can not be null");
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
         }
-        //TODO unnecessary queries should be removed Changed BY VIPUL
-        List<Map<String, Object>> data = staffGraphRepository.getStaffWithUnitPositionInUnit(unitId,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        return data;
+        List<Map<String, Object>> staffPersonalDetailDTOS = new ArrayList<>();
+        staffPersonalDetailDTOS = staffGraphRepository.getAllStaffHavingUnitPositionByUnitIdMap(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        return staffPersonalDetailDTOS;
+    }
+
+    public List<StaffPersonalDetailDTO> getStaffWithBasicInfo(long unitId, Boolean allStaffRequired) {
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
+        }
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = new ArrayList<>();
+        if (allStaffRequired) {
+            Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentOrganization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        } else {
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffHavingUnitPositionByUnitId(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        }
+        return staffPersonalDetailDTOS;
 //        Organization parent = null;
 //        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
 //            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
@@ -1339,11 +1352,10 @@ public class StaffService extends UserBaseService {
         if (allStaffRequired) {
             Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
             // unit is parent so fetching all staff from itself
-            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentOrganization.getId());
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentOrganization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         } else {
-            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffHavingUnitPositionByUnitId(unitId);
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffHavingUnitPositionByUnitId(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         }
-
         return staffPersonalDetailDTOS;
     }
 

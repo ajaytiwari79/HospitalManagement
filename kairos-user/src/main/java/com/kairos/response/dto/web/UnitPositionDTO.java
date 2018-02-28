@@ -44,14 +44,14 @@ public class UnitPositionDTO {
     @Range(min = 0, message = "unit Id  is required for position")
     private Long unitId;
 
-
+    private  Long timeCareExternalId;
     public UnitPositionDTO() {
         //default cons
     }
 
 
     public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
-                           float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
+                           float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId,Long timeCareExternalId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -61,6 +61,7 @@ public class UnitPositionDTO {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.employmentTypeId = employmentTypeId;
+        this.timeCareExternalId=timeCareExternalId;
     }
 
 
@@ -224,5 +225,13 @@ public class UnitPositionDTO {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public Long getTimeCareExternalId() {
+        return timeCareExternalId;
+    }
+
+    public void setTimeCareExternalId(Long timeCareExternalId) {
+        this.timeCareExternalId = timeCareExternalId;
     }
 }

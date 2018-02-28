@@ -58,6 +58,7 @@ public class UnitPosition extends UserBaseEntity {
     private float hourlyWages;
 
     private float salary;
+    private  Long timeCareExternalId;
 
     public UnitPosition() {
     }
@@ -216,6 +217,14 @@ public class UnitPosition extends UserBaseEntity {
 
     public void setUnit(Organization unit) {
         this.unit = unit;
+    }
+
+    public Long getTimeCareExternalId() {
+        return timeCareExternalId;
+    }
+
+    public void setTimeCareExternalId(Long timeCareExternalId) {
+        this.timeCareExternalId = timeCareExternalId;
     }
 
     @Override
