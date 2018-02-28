@@ -1328,12 +1328,20 @@ public class StaffService extends UserBaseService {
         return unitManagers;
     }
 
-    public List<StaffPersonalDetailDTO> getAllStaffByUnitId(long unitId) {
+    public List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
         }
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(unitId);
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = new ArrayList<>();
+        if (allStaffRequired) {
+            Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+            // unit is parent so fetching all staff from itself
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentOrganization.getId());
+        } else {
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffHavingUnitPositionByUnitId(unitId);
+        }
+
         return staffPersonalDetailDTOS;
     }
 
