@@ -103,8 +103,8 @@ public class AccessPageService extends UserBaseService {
         return ( Optional.ofNullable(accessibleFor).isPresent() ?  accessibleFor.contains(category) : false );
     }
 
-    public List<AccessPageDTO> getMainTabs(){
-        List<AccessPageDTO> accessPages = accessPageRepository.getMainTabs();
+    public List<AccessPageDTO> getMainTabs(Long countryId){
+        List<AccessPageDTO> accessPages = accessPageRepository.getMainTabs(countryId);
         accessPages.stream().forEach(
                 accessPage -> {
                     accessPage.setAccessibleForHub( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.HUB) );
@@ -115,13 +115,27 @@ public class AccessPageService extends UserBaseService {
         return accessPages;
     }
 
-    public List<AccessPageDTO> getChildTabs(Long tabId){
-        return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.getChildTabs(tabId):Collections.emptyList();
+    public List<AccessPageDTO> getChildTabs(Long tabId, Long countryId){
+        if( !Optional.ofNullable(tabId).isPresent() ){
+            return Collections.emptyList();
+        }
+        List<AccessPageDTO> accessPages = accessPageRepository.getChildTabs(tabId, countryId);
+        accessPages.stream().forEach(
+                accessPage -> {
+                    accessPage.setAccessibleForHub( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.HUB) );
+                    accessPage.setAccessibleForUnion( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.UNION) );
+                    accessPage.setAccessibleForOrganization( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.ORGANIZATION) );
+                });
+        return accessPages;
     }
 
     public Boolean updateStatus(boolean active,Long tabId){
         return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
     }
+
+    /*public Boolean updateAccessForOrganizationCategory(Long tabId, OrganizationCategory orgCategory, Boolean status){
+        return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
+    }*/
 
     public void createAccessPageByXml(Tab tab){
 

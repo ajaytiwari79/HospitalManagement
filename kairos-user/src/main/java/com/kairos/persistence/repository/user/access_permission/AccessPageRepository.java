@@ -112,12 +112,17 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
             "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage) WHERE id(country)={0} WITH r\n" +
             ",id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active RETURN \n" +
             "id, name, moduleId, active, CASE WHEN r is NULL THEN null ELSE  r.accessibleFor END as accessibleFor")
-    List<AccessPageDTO> getMainTabs();
+    List<AccessPageDTO> getMainTabs(Long countryId);
 
 
-    @Query("Match (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) where id(accessPage)={0} return id(subPage) as id," +
+    /*@Query("Match (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) where id(accessPage)={0} return id(subPage) as id," +
             "subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,id(accessPage) as parentTabId")
-    List<AccessPageDTO> getChildTabs(Long tabId);
+    List<AccessPageDTO> getChildTabs(Long tabId);*/
+
+    @Query("Match (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) where id(accessPage)={0} WITH subPage,accessPage\n" +
+            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage) WHERE id(country)={1} WITH r,subPage,id(accessPage) as parentTabId\n" +
+            "return id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active, parentTabId, CASE WHEN r is NULL THEN null ELSE  r.accessibleFor END as accessibleFor")
+    List<AccessPageDTO> getChildTabs(Long tabId, Long countryId);
 
     @Query("Match (accessPage:AccessPage) where id(accessPage)={0} set accessPage.name={1} return accessPage")
     AccessPage updateAccessTab(Long id, String name);
