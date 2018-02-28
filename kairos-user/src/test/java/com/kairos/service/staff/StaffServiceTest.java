@@ -70,7 +70,7 @@ public class StaffServiceTest {
 
     @Test
     public void getAllStaffByUnitId() throws Exception {
-        staffService.getAllStaffByUnitId(95L,false);
+        staffService.getStaffWithBasicInfo(95L);
     }
 
     public final String getBaseUrl(Long organizationId, Long unitId) {

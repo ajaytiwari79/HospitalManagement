@@ -369,13 +369,15 @@ public class StaffService extends UserBaseService {
         return map;
     }
 
+    /* @Modified by VIPUL
+    * */
     public List<Map<String, Object>> getStaffWithBasicInfo(long unitId) {
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         if (unit == null) {
             throw new InternalError("Unit can not be null");
         }
-        //TODO unnecessary queries should be removed
-        List<Map<String, Object>> data = staffGraphRepository.getStaffWithUnitPositionInUnit(unitId);
+        //TODO unnecessary queries should be removed Changed BY VIPUL
+        List<Map<String, Object>> data = staffGraphRepository.getStaffWithUnitPositionInUnit(unitId,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         return data;
 //        Organization parent = null;
 //        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
