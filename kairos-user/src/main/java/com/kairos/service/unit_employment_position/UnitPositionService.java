@@ -1,5 +1,6 @@
 package com.kairos.service.unit_employment_position;
 
+import com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO;
 import com.kairos.client.dto.timeBank.CostTimeAgreementDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -24,7 +25,6 @@ import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.model.user.staff.TimeCareEmploymentDTO;
-import com.kairos.persistence.model.user.staff.UnitPermission;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
@@ -440,12 +440,21 @@ public class UnitPositionService extends UserBaseService {
         newWta.setDisabled(false);
         unitPosition.setWorkingTimeAgreement(newWta);
         save(unitPosition);
-        UnitPositionQueryResult unitPositionQueryResult = unitPosition.getBasicDetails();
+        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
         newWta.setParentWTA(oldWta.basicDetails());
 
         newWta.setExpertise(newWta.getExpertise().retrieveBasicDetails());
         unitPositionQueryResult.setWorkingTimeAgreement(newWta);
         return unitPositionQueryResult;
+    }
+
+
+    private UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition) {
+        UnitPositionQueryResult
+                result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
+                unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
+                unitPosition.getId(), unitPosition.getEmploymentType(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(), unitPosition.getLastWorkingDateMillis());
+        return result;
     }
 
     public WTAResponseDTO getUnitPositionWTA(Long unitId, Long unitEmploymentPositionId) {
@@ -464,18 +473,18 @@ public class UnitPositionService extends UserBaseService {
         costTimeAgreementDTO.setStaffId(unitPosition.getStaff().getId());
         costTimeAgreementDTO.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
         costTimeAgreementDTO.setWorkingDays(unitPosition.getWorkingDaysInWeek());
-        costTimeAgreementDTO.setCtaRuleTemplateDTOS(getCtaRuleTemplateDtos(unitPosition.getCta().getRuleTemplates()));
+        costTimeAgreementDTO.setCtaRuleTemplateBasicDTOS(getCtaRuleTemplateDtos(unitPosition.getCta().getRuleTemplates()));
         return costTimeAgreementDTO;
     }
 
-    public List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> getCtaRuleTemplateDtos(List<RuleTemplate> ruleTemplates) {
-        List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ruleTemplates.size());
+    public List<CTARuleTemplateBasicDTO> getCtaRuleTemplateDtos(List<RuleTemplate> ruleTemplates) {
+        List<CTARuleTemplateBasicDTO> ctaRuleTemplateBasicDTOS = new ArrayList<>(ruleTemplates.size());
         ruleTemplates.forEach(rt -> {
-            com.kairos.client.dto.timeBank.CTARuleTemplateDTO ctaRuleTemplateDTO = new com.kairos.client.dto.timeBank.CTARuleTemplateDTO();
-            ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
+            CTARuleTemplateBasicDTO ctaRuleTemplateBasicDTO = new CTARuleTemplateBasicDTO();
+            ctaRuleTemplateBasicDTOS.add(ctaRuleTemplateBasicDTO);
 
         });
-        return ctaRuleTemplateDTOS;
+        return ctaRuleTemplateBasicDTOS;
     }
 
     public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, Long wtaId, Long ctaId) {

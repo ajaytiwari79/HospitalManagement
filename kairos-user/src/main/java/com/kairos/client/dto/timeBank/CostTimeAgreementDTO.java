@@ -5,7 +5,7 @@ import java.util.List;
 public class CostTimeAgreementDTO {
 
     private Long unitEmploymentPositionId;
-    private List<CTARuleTemplateDTO> ctaRuleTemplateDTOS;
+    private List<CTARuleTemplateBasicDTO> ctaRuleTemplateBasicDTOS;
     private int contractedMinByWeek;
     private int workingDays;
     private Long staffId;
@@ -49,12 +49,12 @@ public class CostTimeAgreementDTO {
         this.unitEmploymentPositionId = unitEmploymentPositionId;
     }
 
-    public List<CTARuleTemplateDTO> getCtaRuleTemplateDTOS() {
-        return ctaRuleTemplateDTOS;
+    public List<CTARuleTemplateBasicDTO> getCtaRuleTemplateBasicDTOS() {
+        return ctaRuleTemplateBasicDTOS;
     }
 
-    public void setCtaRuleTemplateDTOS(List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
-        this.ctaRuleTemplateDTOS = ctaRuleTemplateDTOS;
+    public void setCtaRuleTemplateBasicDTOS(List<CTARuleTemplateBasicDTO> ctaRuleTemplateBasicDTOS) {
+        this.ctaRuleTemplateBasicDTOS = ctaRuleTemplateBasicDTOS;
     }
 
 

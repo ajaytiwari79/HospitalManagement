@@ -177,14 +177,6 @@ public class UnitPosition extends UserBaseEntity {
     }
 
 
-    public UnitPositionQueryResult getBasicDetails() {
-        UnitPositionQueryResult result = null;
-        result = new UnitPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek,
-                this.endDateMillis, this.totalWeeklyMinutes,
-                this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode, this.union,this.lastWorkingDateMillis);
-        return result;
-    }
-
     public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary) {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;

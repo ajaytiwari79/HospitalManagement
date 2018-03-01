@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.StaffRelationship;
+import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientStaffRelation;
 import com.kairos.persistence.model.user.client.ContactDetail;
@@ -387,9 +388,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     @Query("match(s:Staff) where s.externalId IN {0} return s.externalId")
     List<Long> findStaffByExternalIdIn(Set<Long> externalIdsOfStaff);
 
-    @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition)-[:UNIT_POSITION_BELONGS_TO_UNIT]-(organization:Organization) where id(organization)={0}\n" +
+    @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:UNIT_POSITION_BELONGS_TO_UNIT]-(organization:Organization) where id(organization)={0}\n" +
             "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff\n" +
             "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType, staff, user\n" +
             "return distinct {id:id(staff),name:staff.firstName+\" \"+staff.lastName,firstName:staff.firstName,lastName:staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,visitourId:staff.visitourId, age:user.age, gender:user.gender, profilePic:{1} + staff.profilePic, engineerType:id(engineerType)} as data order by data.firstName")
     List<Map<String, Object>> getStaffWithUnitPositionInUnit(Long unitId, String imageUrl);
+
+    @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false}) where staff.externalId={0} AND unitPosition.timeCareExternalId={1} " +
+            "return unitPosition,staff ")
+    StaffUnitPositionWrapper getStaff(Long externalId, Long timeCareExternalId);
 }
