@@ -22,6 +22,7 @@ import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
+import com.kairos.response.dto.web.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.userContext.UserContext;
@@ -95,47 +96,38 @@ public class AccessPageService extends UserBaseService {
         return accessPage;
     }
 
-    /*public List<AccessPageDTO> getMainTabs(){
-        return accessPageRepository.getMainTabs();
-    }*/
-
-    public boolean getAccessForCategoryFromList(List<OrganizationCategory> accessibleFor, OrganizationCategory category){
-        return ( Optional.ofNullable(accessibleFor).isPresent() ?  accessibleFor.contains(category) : false );
-    }
-
     public List<AccessPageDTO> getMainTabs(Long countryId){
-        List<AccessPageDTO> accessPages = accessPageRepository.getMainTabs(countryId);
-        accessPages.stream().forEach(
-                accessPage -> {
-                    accessPage.setAccessibleForHub( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.HUB) );
-                    accessPage.setAccessibleForUnion( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.UNION) );
-                    accessPage.setAccessibleForOrganization( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.ORGANIZATION) );
-                });
-
-        return accessPages;
+        return accessPageRepository.getMainTabs(countryId);
     }
 
     public List<AccessPageDTO> getChildTabs(Long tabId, Long countryId){
         if( !Optional.ofNullable(tabId).isPresent() ){
             return Collections.emptyList();
         }
-        List<AccessPageDTO> accessPages = accessPageRepository.getChildTabs(tabId, countryId);
-        accessPages.stream().forEach(
-                accessPage -> {
-                    accessPage.setAccessibleForHub( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.HUB) );
-                    accessPage.setAccessibleForUnion( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.UNION) );
-                    accessPage.setAccessibleForOrganization( getAccessForCategoryFromList(accessPage.getAccessibleFor(),OrganizationCategory.ORGANIZATION) );
-                });
-        return accessPages;
+        return accessPageRepository.getChildTabs(tabId, countryId);
     }
 
     public Boolean updateStatus(boolean active,Long tabId){
         return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
     }
 
-    /*public Boolean updateAccessForOrganizationCategory(Long tabId, OrganizationCategory orgCategory, Boolean status){
-        return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
-    }*/
+    public Boolean updateAccessForOrganizationCategory(Long countryId, Long tabId, OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
+        if( !Optional.ofNullable(tabId).isPresent() ){
+            return false;
+        }
+        switch (orgCategoryTabAccessDTO.getOrganizationCategory()){
+            case HUB: {
+                return accessPageRepository.updateAccessStatusForHubOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
+            }
+            case ORGANIZATION: {
+                return accessPageRepository.updateAccessStatusForOrganizationOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
+            }
+            case UNION: {
+                return accessPageRepository.updateAccessStatusForUnionOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
+            }
+        }
+        return false;
+    }
 
     public void createAccessPageByXml(Tab tab){
 
@@ -370,5 +362,10 @@ public class AccessPageService extends UserBaseService {
 
     public List<OrganizationCategoryDTO> getListOfOrganizaionCategories(){
         return OrganizationCategory.getListOfOrganizationCategory();
+    }
+
+    // For Test Cases
+    public AccessPage getOneMainModule(){
+        return accessPageRepository.getOneMainModule();
     }
 }

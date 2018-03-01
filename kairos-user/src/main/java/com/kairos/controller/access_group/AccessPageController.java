@@ -4,6 +4,7 @@ import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.user.access_permission.AccessPageStatusDTO;
 import com.kairos.persistence.model.user.access_permission.Tab;
+import com.kairos.response.dto.web.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -57,6 +58,12 @@ public class AccessPageController {
     public ResponseEntity<Map<String,Object>> updateStatusOfTab(@PathVariable Long tabId,
                                                                 @Valid @RequestBody AccessPageStatusDTO accessPageStatusDTO){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateStatus(accessPageStatusDTO.getActive(),tabId));
+    }
+
+    @RequestMapping(value = "/country/{countryId}/tab/{tabId}/access_status",method = RequestMethod.PUT)
+    public ResponseEntity<Map<String,Object>> updateAccessStatusOfTab(@PathVariable Long tabId,@PathVariable Long countryId,
+                                                                @Valid @RequestBody OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.updateAccessForOrganizationCategory(countryId, tabId, orgCategoryTabAccessDTO));
     }
 
 

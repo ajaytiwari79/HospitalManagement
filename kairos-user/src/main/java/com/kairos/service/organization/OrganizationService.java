@@ -1248,6 +1248,12 @@ public class OrganizationService extends UserBaseService {
         organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByOrganizationId(unitId));
         return organizationMappingDTO;
     }
+
+
+    // For Test Cases
+    public Organization getOneParentUnitByCountry(Long countryId){
+        return organizationGraphRepository.getOneParentUnitByCountry(countryId);
+    }
 }
 
 

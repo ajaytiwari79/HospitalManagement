@@ -15,7 +15,7 @@ import java.util.List;
  * Created by prerna on 27/2/18.
  */
 @RelationshipEntity(type = RelationshipConstants.HAS_ACCESS_FOR_ORG_CATEGORY)
-public class CountryAccessGroupRelationship extends UserBaseEntity {
+public class CountryAccessPageRelationship extends UserBaseEntity {
 
     @StartNode
     private Country country;
@@ -23,9 +23,13 @@ public class CountryAccessGroupRelationship extends UserBaseEntity {
     @EndNode
     private AccessPage accessPage;
 
-    private List<OrganizationCategory> accessibleFor = new ArrayList<>();
+    private boolean accessibleForHub;
+    private boolean accessibleForUnion;
+    private boolean accessibleForOrganization;
 
-    public CountryAccessGroupRelationship(){
+    /*private List<OrganizationCategory> accessibleFor = new ArrayList<>();*/
+
+    public CountryAccessPageRelationship(){
         // default constructor
     }
 
@@ -45,11 +49,35 @@ public class CountryAccessGroupRelationship extends UserBaseEntity {
         this.accessPage = accessPage;
     }
 
-    public List<OrganizationCategory> getAccessibleFor() {
+    public boolean isAccessibleForHub() {
+        return accessibleForHub;
+    }
+
+    public void setAccessibleForHub(boolean accessibleForHub) {
+        this.accessibleForHub = accessibleForHub;
+    }
+
+    public boolean isAccessibleForUnion() {
+        return accessibleForUnion;
+    }
+
+    public void setAccessibleForUnion(boolean accessibleForUnion) {
+        this.accessibleForUnion = accessibleForUnion;
+    }
+
+    public boolean isAccessibleForOrganization() {
+        return accessibleForOrganization;
+    }
+
+    public void setAccessibleForOrganization(boolean accessibleForOrganization) {
+        this.accessibleForOrganization = accessibleForOrganization;
+    }
+
+    /*public List<OrganizationCategory> getAccessibleFor() {
         return accessibleFor;
     }
 
     public void setAccessibleFor(List<OrganizationCategory> accessibleFor) {
         this.accessibleFor = accessibleFor;
-    }
+    }*/
 }

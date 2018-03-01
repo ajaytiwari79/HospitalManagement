@@ -707,4 +707,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("Match (union:Organization{union:true,isEnable:true}) where id (union)={0}  return union")
     Organization findByIdAndUnionTrueAndIsEnableTrue(Long unionId);
 
+
+    // For Test Cases
+
+    @Query("Match (org:Organization{union:false,isKairosHub:false,isEnable:true})-[:"+COUNTRY+"]-(c:Country) where id (c)={0}  return org LIMIT 1")
+    Organization getOneParentUnitByCountry(Long countryId);
 }
