@@ -1,4 +1,5 @@
 package com.kairos.persistence.model.user.staff;
+import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -17,7 +18,7 @@ public class StaffPersonalDetail {
     private long visitourId;
     private ContactDetail contactDetail;
     private String inactiveFrom;
-    private Boolean active;
+    private StaffStatusEnum currentStatus;
     private long languageId;
     private long expertiseId;
    // @NotEmpty(message = "error.cprnumber.notnull") @NotNull(message = "error.cprnumber.notnull")
@@ -35,6 +36,7 @@ public class StaffPersonalDetail {
     private Float costHour;
     private Float costHourOvertime;
     private Integer capacity;
+    private String careOfName;
 
     public String getFirstName() {
         return firstName;
@@ -82,14 +84,6 @@ public class StaffPersonalDetail {
 
     public void setInactiveFrom(String inactiveFrom) {
         this.inactiveFrom = inactiveFrom;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
     }
 
     public long getLanguageId() {
@@ -194,5 +188,21 @@ public class StaffPersonalDetail {
 
     public void setCapacity(Integer capacity) {
         this.capacity = capacity;
+    }
+
+    public String getCareOfName() {
+        return careOfName;
+    }
+
+    public void setCareOfName(String careOfName) {
+        this.careOfName = careOfName;
+    }
+
+    public StaffStatusEnum getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(StaffStatusEnum currentStatus) {
+        this.currentStatus = currentStatus;
     }
 }

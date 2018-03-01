@@ -497,7 +497,7 @@ public class CitizenService {
             throw new InternalError("organization not found");
         staff.setFirstName(payload.getFirstName());
         staff.setLastName(payload.getLastName());
-        staff.setActive(payload.isActive());
+        staff.setCurrentStatus(payload.getCurrentStatus());
         staff.setEmail(payload.getPrimaryEmailAddress());
         staff.setKmdExternalId(payload.getId());
 

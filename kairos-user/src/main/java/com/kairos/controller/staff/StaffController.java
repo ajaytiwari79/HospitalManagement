@@ -556,6 +556,14 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffById(staffId));
     }
 
+    @RequestMapping(value = "/{staffId}/verifyUnitEmployment/{unitEmploymentId}", method = RequestMethod.GET)
+    @ApiOperation("verify staff has unit employment in unit or not ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @PathVariable long unitId, @PathVariable long staffId,
+                                                                        @PathVariable Long unitEmploymentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(staffId,unitEmploymentId, unitId, type));
+    }
+
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -563,11 +571,19 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.verifyStaffBelongsToUnit(staffId, unitId, type));
     }
 
+
     @RequestMapping(value = "/current_user/{userId}", method = RequestMethod.GET)
     @ApiOperation("fetch staff from given userId ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffByUser(@PathVariable long userId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByUserId(userId));
+    }
+
+    @RequestMapping(value = "/getStaffByExperties", method = RequestMethod.POST)
+    @ApiOperation("getStaffByExperties")
+    public ResponseEntity<Map<String, Object>> getStaffByExperties(@PathVariable Long unitId, @RequestBody List<Long> expertiesIds) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByExperties(unitId, expertiesIds));
     }
 
 

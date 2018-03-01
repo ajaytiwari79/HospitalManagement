@@ -2,6 +2,7 @@ package com.kairos.service.organization;
 
 import com.kairos.client.PhaseRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.organization.*;
@@ -9,12 +10,14 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
+import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
@@ -44,6 +47,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
+import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
@@ -174,6 +178,8 @@ public class OrganizationService extends UserBaseService {
 
     @Inject
     private WTAService wtaService;
+    @Inject
+    private EmploymentTypeGraphRepository employmentTypeGraphRepository;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -197,7 +203,7 @@ public class OrganizationService extends UserBaseService {
 
     /**
      * Calls OrganizationGraphRepository ,creates a new Organization
-     * and return newly created User.
+     * and return newly created Organization.
      *
      * @param organization
      * @return Organization
@@ -256,7 +262,9 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
-        //    phaseRestClient.createDefaultPhases(organization.getId());
+        // DO NOT CREATE PHASE for UNION
+        if (!orgDetails.getUnion())
+            phaseRestClient.createDefaultPhases(organization.getId());
 
 
         HashMap<String, Object> orgResponse = new HashMap<>();
@@ -334,6 +342,10 @@ public class OrganizationService extends UserBaseService {
 
     private Organization saveOrganizationDetails(Organization organization, ParentOrganizationDTO orgDetails, boolean isUpdateOperation, long countryId) {
         organization.setName(orgDetails.getName());
+        if (!Optional.ofNullable(orgDetails.getUnion()).isPresent()) {
+            throw new ActionNotPermittedException("Please specify this is union or organization");
+        }
+        organization.setUnion(orgDetails.getUnion());
         List<OrganizationType> organizationTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getTypeId());
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(orgDetails.getSubTypeId());
 
@@ -544,12 +556,10 @@ public class OrganizationService extends UserBaseService {
         unit.setLevel(parent.getLevel());
 
         organizationGraphRepository.save(unit);
-
-        //    phaseRestClient.createDefaultPhases(unit.getId());
-
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit);
+        phaseRestClient.createDefaultPhases(unit.getId());
 
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
@@ -730,6 +740,13 @@ public class OrganizationService extends UserBaseService {
     public Organization getOrganizationByExternalId(String externalId) {
         return organizationGraphRepository.findByExternalId(externalId);
 
+    }
+
+    public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, Long timeCareStaffId) {
+        OrganizationStaffWrapper organizationStaffWrapper = new OrganizationStaffWrapper();
+        organizationStaffWrapper.setOrganization(organizationGraphRepository.findByExternalId(externalId));
+        organizationStaffWrapper.setStaff(staffGraphRepository.findByExternalId(timeCareStaffId));
+        return organizationStaffWrapper;
     }
 
     public boolean deleteOrganizationById(long parentOrganizationId, long childOrganizationId) {
@@ -994,7 +1011,7 @@ public class OrganizationService extends UserBaseService {
     public Boolean verifyOrganizationExpertise(OrganizationMappingActivityTypeDTO organizationMappingActivityTypeDTO) {
         Long matchedExpertise = expertiseGraphRepository.findAllExpertiseCountMatchedByIds(organizationMappingActivityTypeDTO.getExpertises());
         if (matchedExpertise != organizationMappingActivityTypeDTO.getExpertises().size()) {
-            throw new DataNotMatchedException("Mismatched Expertises while updating organizationMapping ");
+            throw new DataNotMatchedException("Mismatched Expertise while updating organizationMapping ");
         }
         Long matchedRegion = regionGraphRepository.findAllRegionCountMatchedByIds(organizationMappingActivityTypeDTO.getRegions());
         if (matchedRegion != organizationMappingActivityTypeDTO.getRegions().size()) {
@@ -1023,17 +1040,18 @@ public class OrganizationService extends UserBaseService {
             Organization parentOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
             organizationTypeAndSubTypeDTO.setParentOrganizationId(parentOrganization.getId());
             organizationTypeAndSubTypeDTO.setParent(false);
-            organizationTypeAndSubTypeDTO.setUnitId(organization.getId());
-            return organizationTypeAndSubTypeDTO;
+            //organizationTypeAndSubTypeDTO.setUnitId(organization.getId());
+            //return organizationTypeAndSubTypeDTO;
         } else {
 
-            List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(organization.getId());
-            List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(organization.getId());
-            organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
-            organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
             organizationTypeAndSubTypeDTO.setParent(true);
-
         }
+
+        List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(organization.getId());
+        List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(organization.getId());
+        organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
+        organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
+
         organizationTypeAndSubTypeDTO.setUnitId(organization.getId());
 
         return organizationTypeAndSubTypeDTO;
@@ -1173,6 +1191,10 @@ public class OrganizationService extends UserBaseService {
         return organizationTypeGraphRepository.getOrganizationTypeById(countryId, orgTypeId);
     }
 
+    public OrganizationType getOneDefaultOrganizationTypeByCountryId(Long countryId) {
+        return organizationTypeGraphRepository.getOneDefaultOrganizationTypeById(countryId);
+    }
+
     public List<OrganizationType> getOrganizationSubTypeById(Long orgTypeId) {
         return organizationTypeGraphRepository.getOrganizationSubTypesByTypeId(orgTypeId);
     }
@@ -1218,6 +1240,14 @@ public class OrganizationService extends UserBaseService {
         return parent;
     }
 
+    public OrganizationMappingDTO getEmploymentTypeWithExpertise(Long unitId) {
+        OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
+        // Set employment type
+        organizationMappingDTO.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(unitId, false));
+        // set Expertise
+        organizationMappingDTO.setExpertise(expertiseGraphRepository.getAllExpertiseByOrganizationId(unitId));
+        return organizationMappingDTO;
+    }
 }
 
 

@@ -3,13 +3,14 @@ package com.kairos.persistence.repository.organization;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.department.Department;
-import com.kairos.persistence.model.user.position.PositionCode;
+import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -24,9 +25,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Interface for CRUD operation on Organization
  */
 @Repository
-public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organization,Long>,CustomOrganizationGraphRepository {
+public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organization, Long>, CustomOrganizationGraphRepository {
 
-    @Query("MATCH (o:Organization) return {name:o.name, id:id(o)} as organization")
+    @Query("MATCH (o:Organization {isEnable:true}) return {name:o.name, id:id(o)} as organization")
     List<Map<String, Object>> findAllOrganizations();
 
     Organization findByName(String name);
@@ -36,6 +37,10 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Organization findByExternalId(String externalId);
 
     List<Organization> findByOrganizationLevel(OrganizationLevel organizationLevel);
+
+    @Query("MATCH (t:TimeCare) WHERE t.timeCareExternalId = {0} WITH t.organizationId AS organizationId \n" +
+            "OPTIONAL MATCH (o:Organization) WHERE id(o)= organizationId RETURN o")
+    Organization findByTimeCareId(String timeCareId);
 
     @Query("MATCH (o:Organization {isEnable:true} ),(o1:Organization) where id(o)={0} AND id(o1)={1} create (o)-[:HAS_SUB_ORGANIZATION]->(o1) return o1")
     Organization createChildOrganization(long parentOrganizationId, long childOrganizationId);
@@ -86,8 +91,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("Match (organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) where id(organization)={0} with subType,organization\n" +
             "Match (subType)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]->(expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,organization\n" +
             "Match (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) with DISTINCT skill,r, organization\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=true with  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n"+
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n"+
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=true with  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
 
             "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with\n" +
             " {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
@@ -96,8 +101,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             " Match (unit:Organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) where id(unit)={1} with subType,unit\n" +
             " Match (subType)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]->(expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill{isEnabled:true}) with distinct skill,unit\n" +
             " Match (unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) with skill,unit,r\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags with  skill,unit,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n"+
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(unit) with  skill,r,unit,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n"+
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags with  skill,unit,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(unit) with  skill,r,unit,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             " Match (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:collect({id:id(skill),name:skill.name,visitourId:r.visitourId, customName:r.customName, description:skill.description,isEdited:true, tags:ctags+otags})} as selectedSkills\n" +
             " return {selectedSkills:collect(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsOfChildOrganizationWithActualName(long organizationId, long unitId);
@@ -120,19 +125,19 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
             "Match (organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) with subType,organization\n" +
-            "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill) with DISTINCT skill,organization\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=true with  skill,organization,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
-            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with distinct skill,skillCategory,organization,ctags\n" +
-            "optional Match (organization)-[r:"+ORGANISATION_HAS_SKILL+"]->(skill) with\n" +
+            "Match (subType)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]->(expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) with DISTINCT skill,organization\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[" + COUNTRY_HAS_TAG + "]-(c:Country) WHERE tag.countryTag=true with  skill,organization,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with distinct skill,skillCategory,organization,ctags\n" +
+            "optional Match (organization)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) with\n" +
             "{id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags})} as availableSkills\n" +
             "return {availableSkills:collect(availableSkills)} as data\n" +
             "UNION\n" +
             "Match (organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) where id(organization)={0} with subType,organization\n" +
-            "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:EXPERTISE_HAS_SKILLS{isEnabled:true}]->(skill:Skill) with distinct skill,organization\n" +
-            "Match (organization)-[r:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,organization,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
-            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with\n" +
+            "Match (subType)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]->(expertise:Expertise)-[r:EXPERTISE_HAS_SKILLS{isEnabled:true}]->(skill:Skill) with distinct skill,organization\n" +
+            "Match (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) with skill,r,organization\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[" + COUNTRY_HAS_TAG + "]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,organization,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[" + ORGANIZATION_HAS_TAG + "]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with\n" +
             "{id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId, customName:r.customName, isEdited:true, tags:ctags+otags})} as selectedSkills\n" +
             "return {selectedSkills:collect(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsOfParentOrganizationWithActualName(long unitId);
@@ -268,7 +273,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (o:Organization {isEnable:true})-[:HAS_SETTING]-(os:OrganizationSetting) where id(o)={0} WITH os as setting MATCH (setting)-[:OPENING_HOUR]-(oh:OpeningHours) return oh order by oh.index")
     List<OpeningHours> getOpeningHours(Long organizationId);
 
-    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[:" + BELONGS_TO + "]->(c:Country)  where id(c)={0} with org\n" +
+    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false})-[:" + BELONGS_TO + "]->(c:Country)  where id(c)={0} with org\n" +
             "Match (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) with collect(id(ot)) as organizationTypeIds,org\n" +
             "optional match (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with  collect(id(subType)) as organizationSubTypeIds,organizationTypeIds,org\n" +
             "MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode\n" +
@@ -333,14 +338,14 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     boolean isThisKairosHub(long organizationId);
 
 
-    @Query("MATCH (org:Organization) where id(org)={0} with org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->()-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps return {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],preKairos:ps.p.isPrekairos,kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],preKairos:ps.c.isPrekairos,kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone}} as data\n" +
+    @Query("MATCH (org:Organization) where id(org)={0} with org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->()-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps return {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],preKairos:ps.p.isPrekairos,kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],preKairos:ps.c.isPrekairos,kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data\n" +
             "UNION\n" +
-            "MATCH (org:Organization) where id(org)={0} with org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->()-[:HAS_GROUP]->(group:Group) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps return {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone}} as data\n" +
+            "MATCH (org:Organization) where id(org)={0} with org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->()-[:HAS_GROUP]->(group:Group) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps return {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data\n" +
             "UNION\n" +
-            "MATCH (org:Organization) where id(org)={0} with org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->() WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps return {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone}} as data \n" +
+            "MATCH (org:Organization) where id(org)={0} with org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->() WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps return {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data \n" +
             "UNION\n" +
-            "MATCH (org:Organization) where id(org)={0} with org MATCH path=(org)-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps return {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone}} as data")
-    List<Map<String, Object>> getOrganizationHierarchy(long parentOrganizationId);
+            "MATCH (org:Organization) where id(org)={0} with org MATCH path=(org)-[:HAS_GROUP]->(group:Group)-[:HAS_TEAM]->(team:Team) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps return {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data")
+    List<Map<String, Object>>   getOrganizationHierarchy(long parentOrganizationId);
 
 
     @Query("MATCH (parentO:Organization)-[rel]-(childO:Organization) where id(parentO)={0} AND id(childO)={1} DELETE rel")
@@ -354,7 +359,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Organization getParentOrganizationOfCityLevel(long unitId);
 
 
-    @Query("Match (o:Organization)-[rel:" + ORGANISATION_HAS_SKILL + "]->(s:Skill) where id(o)={0}  AND  id(s)={1} SET rel.isEnabled=false,rel.lastModificationDate={2} return rel")
+    @Query("Match (o:Organization)-[rel:" + ORGANISATION_HAS_SKILL + "]->(s:Skill) where id(o)={0}  AND  id(s)={1} \n" +
+            "Optional Match (o)-[:" + HAS_SUB_ORGANIZATION + "]->(sub:Organization)-[subRel:" + ORGANISATION_HAS_SKILL + "]->(s) SET rel.isEnabled=false, " +
+            "rel.lastModificationDate={2},subRel.isEnabled=false,subRel.lastModificationDate={2} ")
     void removeSkillFromOrganization(long unitId, long skillId, long lastModificationDate);
 
     @Query("Match (country:Country) where id(country)={0} with country   optional Match (ownershipTypes:OwnershipType{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(ownershipTypes),name:ownershipTypes.name}) as ownerships,country   optional Match (businessTypes:BusinessType{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(businessTypes),name:businessTypes.name}) as businessTypes,ownerships,country   optional Match (industryTypes:IndustryType{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(industryTypes),name:industryTypes.name}) as industryTypes,ownerships,businessTypes,country optional Match (employeeLimits:EmployeeLimit{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(employeeLimits),min:employeeLimits.minimum,max:employeeLimits.maximum}) as employeeLimits,industryTypes,ownerships,businessTypes,country   optional Match (vatTypes:VatType{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(vatTypes),name:vatTypes.name,percentage:vatTypes.percentage}) as vatTypes,employeeLimits,industryTypes,ownerships,businessTypes,country   optional Match (kairosStatus:KairosStatus{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(kairosStatus),name:kairosStatus.name}) as kairosStatus,vatTypes,employeeLimits,industryTypes,ownerships,businessTypes,country   optional Match (contractTypes:ContractType{isEnabled:true})-[:BELONGS_TO]->(country) with collect({id:id(contractTypes),name:contractTypes.name}) as contractTypes,kairosStatus,vatTypes,employeeLimits,industryTypes,ownerships,businessTypes,country  \n" +
@@ -374,7 +381,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "optional match (n)-[:" + CONTRACT_TYPE + "]->(contractType:ContractType) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,n,municipality,industryType,contractType\n" +
             "optional match (n)-[:" + KAIROS_STATUS + "]->(kairosStatus:KairosStatus) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,kairosStatus,n,municipality,industryType,contractType\n" +
             "optional match (n)-[:" + OWNERSHIP_TYPE + "]->(ownershipType:OwnershipType) with orgId,subTypeId,businessTypeId,employeeLimit,vatType,kairosStatus,ownershipType,n,municipality,industryType,contractType\n" +
-            "optional match (n)-[:" +HAS_LEVEL+"]-(level:Level)\n"+
+            "optional match (n)-[:" + HAS_LEVEL + "]-(level:Level)\n" +
             "return {name:n.name,shortName:n.shortName,eanNumber:n.eanNumber,costCenterCode:n.costCenterCode,costCenterName:n.costCenterName,industryTypeId:id(industryType),businessTypeId:businessTypeId,websiteUrl:n.webSiteUrl," +
             "employeeLimitId:id(employeeLimit),description:n.description,vatTypeId:id(vatType),ownershipTypeId:id(ownershipType),organizationTypeId:orgId,organizationSubTypeId:subTypeId,cvrNumber:n.cvrNumber,pNumber:n.pNumber," +
             "contractTypeId:id(contractType),isKairosHub:n.isKairosHub,clientSince:n.clientSince,kairosStatusId:id(kairosStatus),municipalityId:id(municipality),externalId:n.externalId,percentageWorkDeduction:n.endTimeDeduction," +
@@ -414,7 +421,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "Match (unit)-[r:PROVIDE_SERVICE{isEnabled:true}]->(os) with distinct os,r,unit, organization\n" +
             "match (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) with os,r,unit, organizationService, organization\n" +
             "OPTIONAL MATCH (unit)-[orgServiceCustomNameRelation:HAS_CUSTOM_SERVICE_NAME_FOR]-(organizationService:OrganizationService) \n" +
-            "with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,\n"+
+            "with {children: case when os is NULL then [] else collect({id:id(os),name:os.name,\n" +
             "customName:CASE WHEN r.customName IS null THEN os.name ELSE r.customName END,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,\n" +
             "customName: CASE WHEN orgServiceCustomNameRelation IS NULL THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END,\n" +
             "description:organizationService.description} as selectedServices return {selectedServices:collect(selectedServices)} as data")
@@ -471,13 +478,13 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "return municipality as municipality,contactAddress as contactAddress,zipCode as zipCode")
     OrganizationContactAddress getContactAddressOfOrg(long unitId);
 
-    @Query("Match (unit:Organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) where id(unit)={0} with subType,unit\n" +
-            "Match (subType)-[:"+ORG_TYPE_HAS_EXPERTISE+"{isEnabled:true}]->(expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill) with distinct skill,unit\n" +
-            "OPTIONAL MATCH (skill)-[:"+HAS_TAG+"]-(tag:Tag)<-[:"+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=unit.showCountryTags with DISTINCT  skill,unit,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-[:"+ORGANIZATION_HAS_TAG+"]-(unit) with  skill,unit,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
-            "Match (unit)-[r:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill:Skill) with skill,r,otags,ctags\n" +
-            "Match (skill)-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with skillCategory,skill,r,otags,ctags\n" +
-            "optional match (staff:Staff)-[staffSkillRel:"+STAFF_HAS_SKILLS+"{isEnabled:true}]->(skill) where id(staff) IN {1}\n" +
+    @Query("Match (unit:Organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) where id(unit)={0} with subType,unit\n" +
+            "Match (subType)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]->(expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) with distinct skill,unit\n" +
+            "OPTIONAL MATCH (skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + COUNTRY_HAS_TAG + "]-(c:Country) WHERE tag.countryTag=unit.showCountryTags with DISTINCT  skill,unit,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(unit) with  skill,unit,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "Match (unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) with skill,r,otags,ctags\n" +
+            "Match (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with skillCategory,skill,r,otags,ctags\n" +
+            "optional match (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) where id(staff) IN {1}\n" +
             "with {staff:case when staffSkillRel is null then [] else collect(id(staff)) end} as staff,skillCategory,skill,r,otags,ctags\n" +
             "return {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:collect({id:id(skill),name:case when r is null then skill.name else r.customName end,description:skill.description,isSelected:case when r is null then false else true end, customName:case when r is null then skill.name else r.customName end, isEdited:true,staff:staff.staff,tags:ctags+otags})} as data")
     List<Map<String, Object>> getAssignedSkillsOfStaffByOrganization(long unitId, List<Long> staffId);
@@ -508,8 +515,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             " return {id:id(skillCategory),name:skillCategory.name,skills:collect({skillId:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true})} as data")*/
     @Query("Match (unit:Organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) where id(unit)={0} with skill,unit,r\n" +
             "Match (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) with  unit,skill,skillCategory,r\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags with  unit,skill,skillCategory,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n"+
-            "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(unit) WITH skill,skillCategory,r,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n"+
+            "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags with  unit,skill,skillCategory,r,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(unit) WITH skill,skillCategory,r,ctags,CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             "return {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,skills:collect(distinct {id:id(skill),name:r.customName,visitourId:skill.visitourId,description:skill.description,customName:r.customName,isEdited:true, tags:ctags+otags})} as data")
     List<Map<String, Object>> getSkillsOfOrganization(long unitId);
 
@@ -667,5 +674,37 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "WHERE id(organization)={0}\n" +
             "return country")
     Country getCountry(Long organizationId);
+
+    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + BELONGS_TO + "]->(c:Country)  where id(c)={0} with org\n" +
+            "Match (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) with collect(id(ot)) as organizationTypeIds,org\n" +
+            "optional match (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) with  collect(id(subType)) as organizationSubTypeIds,organizationTypeIds,org\n" +
+            "MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) with organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode\n" +
+            "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) with municipality,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode\n" +
+            "MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) with collect(id(businessType)) as businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality\n" +
+            "optional MATCH (org)-[:" + HAS_LEVEL + "]-(level:Level{isEnabled:true}) with level,businessTypeIds,organizationSubTypeIds,organizationTypeIds,org,contactAddress,zipCode,municipality\n" +
+            "return collect({id:id(org),levelId:id(level),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,homeAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCode:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street1:contactAddress.street1,municipalityId:id(municipality)}}) as organizations")
+    OrganizationQueryResult getAllUnionOfCountry(long countryId);
+
+    @Query("match (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) where id(subType) IN {0} " +
+            "return  id(org) as id,org.name as name")
+    List<UnionResponseDTO> getAllUnionsByOrganizationSubType(List<Long> organizationSubTypesId);
+
+    @Query("Match (o:Organization)-[rel:" + ORAGANIZATION_HAS_UNIONS + "]->(union:Organization{isEnable:true,union:true}) " +
+            "return  id(union) as id,union.name as name")
+    List<UnionResponseDTO> getAllJoinedUnionsByOrganizationId(Long organizationId);
+
+    @Query("Match (o:Organization)-[rel:" + ORAGANIZATION_HAS_UNIONS + "]->(union:Organization) where id(o)={0}  AND  id(union)={1} \n" +
+            "SET rel.disabled=true, rel.dateOfSeparation={2} return rel")
+    void removeUnionFromOrganization(long unitId, long unionId, long dateOfSeparation);
+
+    @Query("Match (unit:Organization),(union:Organization) where id (unit)={0} AND id(union) = {1} merge (unit)-[r:" + ORAGANIZATION_HAS_UNIONS + "{dateOfJoining:{2},disabled:false}]->(union) return r")
+    void addUnionInOrganization(long unitId, Long unionId, long dateOfJoining);
+
+    @Query("Match (o:Organization)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false})-[rel:" + ORAGANIZATION_HAS_UNIONS + "]->(union:Organization{isEnable:true,union:true}) " +
+            "return  id(union) as id,union.name as name")
+    List<UnionResponseDTO> getAllUnionsFromParentOrganization(Long organizationId);
+
+    @Query("Match (union:Organization{union:true,isEnable:true}) where id (union)={0}  return union")
+    Organization findByIdAndUnionTrueAndIsEnableTrue(Long unionId);
 
 }

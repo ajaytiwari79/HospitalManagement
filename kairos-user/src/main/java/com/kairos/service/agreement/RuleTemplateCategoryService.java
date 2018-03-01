@@ -74,7 +74,6 @@ public class RuleTemplateCategoryService extends UserBaseService {
         save(country);
         return ruleTemplateCategory;
 
-
     }
 
     public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
@@ -143,7 +142,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
   * */
     public Map<String, Object> updateRuleTemplateCategory(RuleTemplateDTO ruleTemplateDTO, long countryId) {
         Map<String, Object> response = new HashMap();
-        if (ruleTemplateDTO.getRuleTemplateCategoryType().equals("CTA")) {
+        if (ruleTemplateDTO.getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.CTA)) {
             response = changeCTARuleTemplateCategory(countryId, ruleTemplateDTO);
         } else {
             response = changeWTARuleTemplateCategory(countryId, ruleTemplateDTO);
@@ -201,10 +200,11 @@ public class RuleTemplateCategoryService extends UserBaseService {
         RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory();
         Country country = countryGraphRepository.findOne(countryId);
         List<RuleTemplateCategory> ruleTemplateCategories = country.getRuleTemplateCategories();
+
         Optional<RuleTemplateCategory> countryRuleTemplateCategory = ruleTemplateCategories.parallelStream().filter(ruleTemplateCategory1 -> "CTA".equalsIgnoreCase(ruleTemplateCategory1.getRuleTemplateCategoryType() !=null ? ruleTemplateCategory1.getRuleTemplateCategoryType().toString() : "")
                 && ruleTemplateCategory1.getName().equalsIgnoreCase(ruleTemplateDTO.getCategoryName())).findFirst();
 
-        if (!countryRuleTemplateCategory.isPresent()) {
+        if (!countryRuleTemplateCategory.isPresent() || (countryRuleTemplateCategory.isPresent() && countryRuleTemplateCategory.get().isDeleted()==true)) {
             ruleTemplateCategory.setName(ruleTemplateDTO.getCategoryName());
             ruleTemplateCategory.setDeleted(false);
             ruleTemplateCategory.setRuleTemplateCategoryType(CTA);
@@ -237,6 +237,17 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
         return ruleTemplateWrapper;
 
+    }
+    // creating default rule template category NONE
+    public void createDefaultRuleTemplateCategory( RuleTemplateCategory ruleTemplateCategory) {
+        save(ruleTemplateCategory);
+
+    }
+
+    public RuleTemplateCategory getCTARuleTemplateCategoryOfCountryByName(Long countryId, String name){
+        RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
+                .findByName(countryId, "NONE", RuleTemplateCategoryType.CTA);
+        return category;
     }
 
 }

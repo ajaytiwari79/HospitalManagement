@@ -2,8 +2,10 @@ package com.kairos.config;
 
 import com.kairos.config.scheduler.DynamicCronScheduler;
 import com.kairos.constants.AppConstants;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.ClientEnum;
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
@@ -82,10 +84,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by kairosCountryLevel on 8/12/16.
@@ -278,9 +277,11 @@ public class BootDataService {
             //createCityLevelOrganization();
             //createCitizen();
         }
+
         /*createCTARuleTemplateCategory();
         startRegisteredCronJobs();
         createEquipmentCategories();*/
+        createCTARuleTemplateCategory("Denmark");
 
     }
 
@@ -801,7 +802,7 @@ public class BootDataService {
         adminAsStaff.setFamilyName("Ulrik");
         adminAsStaff.setFirstName("Ulrik");
         adminAsStaff.setLastName("Rasmussen");
-        adminAsStaff.setActive(true);
+        adminAsStaff.setCurrentStatus(StaffStatusEnum.ACTIVE);
         adminAsStaff.setEmail("ulrik@kairos.com");
         adminAsStaff.setNationalInsuranceNumber("NIN44500331");
         adminAsStaff.setLanguage(danish);
@@ -1012,22 +1013,28 @@ public class BootDataService {
         currencyGraphRepository.save(currency);
     }
 
-    private void createCTARuleTemplateCategory() {
-        RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
-                .findByName(53L, "NONE", RuleTemplateCategoryType.CTA);
+    private void createCTARuleTemplateCategory(String countryName) {
+        Country country = countryGraphRepository.findCountryIdByName(countryName);
 
-        if (category == null) {
-            category = new RuleTemplateCategory();
-            category.setName("NONE");
-            category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
-            ruleTemplateCategoryService.createRuleTemplateCategory(53L, category);
+        if (country == null) {
+            throw new DataNotFoundByIdException("Invalid Country");
+        }
+
+        RuleTemplateCategory category = ruleTemplateCategoryGraphRepository
+                .findByName(country.getId(), "NONE", RuleTemplateCategoryType.CTA);
+
+
+        if (!Optional.ofNullable(category).isPresent()) {
+            category = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.CTA);
+            category.setCountry(country);
+            ruleTemplateCategoryService.createDefaultRuleTemplateCategory( category);
         }
 
         if (costTimeAgreementService.isDefaultCTARuleTemplateExists()) {
             logger.info("default CTA rule template already exist");
         } else {
             logger.info("creating CTA rule template");
-            costTimeAgreementService.createDefaultCtaRuleTemplate(53L);
+            costTimeAgreementService.createDefaultCtaRuleTemplate(country.getId());
         }
 
     }

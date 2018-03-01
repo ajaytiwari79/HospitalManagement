@@ -70,6 +70,7 @@ public class OrganizationHierarchyService {
             }
             QueryResult queryResult = new QueryResult();
             queryResult.setId(organization.getId());
+            queryResult.setUnion(organization.isUnion());
             queryResult.setName(organization.getName());
             queryResult.setKairosHub(organization.isKairosHub());
             queryResult.setAccessable(true);
@@ -78,6 +79,7 @@ public class OrganizationHierarchyService {
             queryResult.setEnabled(organization.isEnable());
             queryResult.setParentOrganization(organization.isParentOrganization());
             queryResult.setTimeZone(organization.getTimeZone()!=null? organization.getTimeZone().getId():null);
+            queryResult.setOrganizationLevel(organization.getOrganizationLevel());
             return queryResult;
         }
 

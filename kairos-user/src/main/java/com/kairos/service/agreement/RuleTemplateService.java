@@ -2,9 +2,10 @@ package com.kairos.service.agreement;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
+import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
@@ -22,7 +23,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.util.ArrayUtil;
 import com.kairos.util.DateUtil;
-import org.apache.commons.lang.StringUtils;
+import com.kairos.util.userContext.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +56,7 @@ public class RuleTemplateService extends UserBaseService {
     @Inject
     private WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
 
+
     public boolean createRuleTemplate(long countryId) {
 
         List<RuleTemplate> baseRuleTemplates = new ArrayList<>();
@@ -66,9 +68,16 @@ public class RuleTemplateService extends UserBaseService {
         }
 
 
-        RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.WTA);
-        ruleTemplateCategoryService.createRuleTemplateCategory(countryId, ruleTemplateCategory);
-        ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
+        RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
+        if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
+            ruleTemplateCategory = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.WTA);
+            ruleTemplateCategory.setCountry(country);
+            save(ruleTemplateCategory);
+        }
+        if (Optional.ofNullable(country.getWTABaseRuleTemplate()).isPresent() && !country.getWTABaseRuleTemplate().isEmpty()) {
+            throw new DataNotFoundByIdException("WTA Rule Template already exists");
+        }
+
         String MONTHS = "MONTHS";
         String TUESDAY = "TUESDAY";
         long timeInMins = 10;
@@ -137,6 +146,11 @@ public class RuleTemplateService extends UserBaseService {
         MaximumSeniorDaysInYearWTATemplate wta20 = new MaximumSeniorDaysInYearWTATemplate(TEMPLATE20_NAME, TEMPLATE20, true, TEMPLATE20_DESCRIPTION, 1, "NA", dateInMillis, 1, "");
         baseRuleTemplates.add(wta20);
 
+        MaximumTimeBank wta21=new MaximumTimeBank(TEMPLATE21_NAME, TEMPLATE21, true, TEMPLATE21_DESCRIPTION, TimeBankTypeEnum.HOURLY,45,false,false);
+        baseRuleTemplates.add(wta21);
+
+        MinimumTimeBank wta22=new MinimumTimeBank(TEMPLATE22_NAME, TEMPLATE22, true, TEMPLATE22_DESCRIPTION, TimeBankTypeEnum.HOURLY,25,false,false);
+        baseRuleTemplates.add(wta22);
         country.setWTABaseRuleTemplate(baseRuleTemplates);
         save(country);
 
@@ -185,7 +199,8 @@ public class RuleTemplateService extends UserBaseService {
         return response;
     }
 
-    public RuleTemplateCategoryDTO updateRuleTemplate(long countryId, String templateType, RuleTemplateCategoryDTO templateDTO) {
+    public RuleTemplateCategoryDTO updateRuleTemplate(long countryId, RuleTemplateCategoryDTO templateDTO) {
+
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country");
@@ -352,14 +367,37 @@ public class RuleTemplateService extends UserBaseService {
                 maximumSeniorDaysInYearWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
                 maximumSeniorDaysInYearWTATemplate.setActivityCode(templateDTO.getActivityCode());
                 break;
+            case TEMPLATE21:
+                MaximumTimeBank maximumTimeBank = (MaximumTimeBank) oldTemplate;
+                maximumTimeBank.setDescription(templateDTO.getDescription());
+                maximumTimeBank.setFrequency(templateDTO.getFrequency());
+                maximumTimeBank.setYellowZone(templateDTO.getYellowZone());
+                maximumTimeBank.setForbid(templateDTO.isForbid());
+                maximumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
+                break;
+            case TEMPLATE22:
+                MinimumTimeBank minimumTimeBank = (MinimumTimeBank) oldTemplate;
+                minimumTimeBank.setDescription(templateDTO.getDescription());
+                minimumTimeBank.setFrequency(templateDTO.getFrequency());
+                minimumTimeBank.setYellowZone(templateDTO.getYellowZone());
+                minimumTimeBank.setForbid(templateDTO.isForbid());
+                minimumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
+                break;
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
         RuleTemplateCategory ruleTemplateCategory = null;
         ruleTemplateCategory = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
         oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
+        CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
+        oldTemplate.setPhaseTemplateValues(templateDTO.getPhaseTemplateValues());
+
         oldTemplate.setDisabled(templateDTO.getDisabled());
         oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
+        oldTemplate.setRecommendedValue(templateDTO.getRecommendedValue());
+
+        oldTemplate.setLastUpdatedBy(currentUserDetails.getFirstName());
+
         save(oldTemplate);
         return templateDTO;
     }

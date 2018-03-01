@@ -1,5 +1,7 @@
 package com.kairos.persistence.model.user.country.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -10,6 +12,8 @@ import java.util.Map;
 /**
  * Created by vipul on 28/11/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrganizationMappingDTO {
     private List<EmploymentType> employmentTypes;
     private List<Expertise> expertise;

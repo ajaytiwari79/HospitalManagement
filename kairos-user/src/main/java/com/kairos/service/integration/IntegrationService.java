@@ -1,10 +1,13 @@
 package com.kairos.service.integration;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.integration.TimeCare;
 import com.kairos.persistence.model.user.integration.Twillio;
 import com.kairos.persistence.model.user.integration.Visitour;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.integration.TimeCareGraphRepository;
 import com.kairos.persistence.repository.user.integration.TwillioGraphRepository;
 import com.kairos.persistence.repository.user.integration.VisitourGraphRepository;
+import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,12 @@ public class IntegrationService {
     @Inject
     private VisitourGraphRepository visitourGraphRepository;
 
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
+
+    @Inject
+    private OrganizationService organizationService;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public TimeCare saveTimeCareIntegrationData(Long unitId, TimeCare timeCare){
@@ -40,7 +49,15 @@ public class IntegrationService {
             timeCare1.setIntegrationId(timeCare.getIntegrationId());
             timeCare1.setTimeCareExternalId(timeCare.getTimeCareExternalId());
             timeCare1.setOrganizationId(unitId);
+
             timeCareGraphRepository.save(timeCare1);
+
+            // TODO Need to remove external ID field from organization domain
+            // Set organization's time care ID
+            Organization organization = organizationGraphRepository.findOne(unitId);
+            organization.setExternalId(timeCare.getTimeCareExternalId());
+            organizationGraphRepository.save(organization);
+
             return timeCare1;
     }
 

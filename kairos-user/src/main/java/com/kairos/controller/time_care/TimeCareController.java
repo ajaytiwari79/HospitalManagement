@@ -1,9 +1,11 @@
 package com.kairos.controller.time_care;
 
 import com.kairos.persistence.model.time_care.TimeCareSkill;
+import com.kairos.persistence.model.user.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.user.staff.TimeCareStaffDTO;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.service.unit_employment_position.UnitEmploymentPositionService;
 import com.kairos.util.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,8 @@ public class TimeCareController {
     private SkillService skillService;
     @Inject
     private StaffService staffService;
+    @Inject
+    private UnitEmploymentPositionService unitEmploymentPositionService;
 
     @RequestMapping(value = "/skills",method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> importSkillsFromTimeCare(@RequestBody List<TimeCareSkill> timeCareSkills){
@@ -39,5 +43,11 @@ public class TimeCareController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED,true,staffService.importStaffFromTimeCare(timeCareStaffDTOS,organizationExternalId));
     }
 
+    @RequestMapping(value = "/staff/employments",method = RequestMethod.POST)
+    public ResponseEntity<Map<String,Object>> importEmploymentsFromTimeCare(@RequestBody List<TimeCareEmploymentDTO> timeCareEmploymentDTOS,
+                                                                            @RequestParam(value = "expertiseId",required = false) Long expertiseId){
+
+        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,unitEmploymentPositionService.importAllEmploymentsFromTimeCare(timeCareEmploymentDTOS, expertiseId));
+    }
 
 }

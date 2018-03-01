@@ -5,6 +5,7 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -13,7 +14,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationDTO {
     private Long id;
-    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
+    @NotEmpty(message = "error.name.notnull")
+    @NotNull(message = "error.name.notnull")
     private String name;
     private String description;
     private boolean isPreKairos;
@@ -26,6 +28,8 @@ public class OrganizationDTO {
     private int nightShiftTimeDeduction = 7; //in percentage
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
     private boolean isOneTimeSyncPerformed;
+    private LocalTime nightStartTime;
+    private LocalTime nightEndTime;
 
     public Long getId() {
         return id;
@@ -121,5 +125,21 @@ public class OrganizationDTO {
 
     public void setOneTimeSyncPerformed(boolean oneTimeSyncPerformed) {
         isOneTimeSyncPerformed = oneTimeSyncPerformed;
+    }
+
+    public LocalTime getNightStartTime() {
+        return nightStartTime;
+    }
+
+    public void setNightStartTime(LocalTime nightStartTime) {
+        this.nightStartTime = nightStartTime;
+    }
+
+    public LocalTime getNightEndTime() {
+        return nightEndTime;
+    }
+
+    public void setNightEndTime(LocalTime nightEndTime) {
+        this.nightEndTime = nightEndTime;
     }
 }

@@ -11,6 +11,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -228,13 +229,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
             "Match (expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill) where id(expertise)={1} with staff,skill\n" +
             "MERGE (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill)\n" +
             "ON CREATE SET r.creationDate ={2},r.lastModificationDate ={3},r.isEnabled=true,r.skillLevel={4}\n" +
-            "ON MATCH SET r.lastModificationDate = {3},r.skillLevel={4},r.isEnabled=true return true")
+            "ON MATCH SET r.lastModificationDate = {3},r.skillLevel={4},r.isEnabled=true")
     void updateSkillsByExpertise(long staffId, long expertiseId, long creationDate, long lastModificationDate, Skill.SkillLevel skillLevel);
 
     @Query("Match (staff:Staff) where id(staff)={0} with staff\n" +
             "Match (expertise:Expertise)-[r:"+EXPERTISE_HAS_SKILLS+"{isEnabled:true}]->(skill:Skill) where id(expertise)={1} with staff,skill\n" +
             "Match (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill)\n" +
-            "set r.isEnabled=false return true")
+            "set r.isEnabled=false")
     void removeSkillsByExpertise(long staffId, long expertiseId);
 
     @Query("MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment) where id(organization)={0} with employment\n" +
@@ -351,6 +352,16 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff,Long> {
     Staff getStaffByUserId(Long userId,Long parentOrganizationId);
 
 
+    @Query("match(s:Staff)-[:BELONGS_TO]-(u:Employment)-[:HAS_EMPLOYMENTS]-(o:Organization) where id(o)={1} AND s.externalId={0} return s")
+    Staff findStaffByExternalId(Long externalId,Long organizationId);
+
+
+    @Query("MATCH (staff:Staff)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) where id(expertise) IN {1} return staff")
+    List<Staff> getStaffByExperties(Long unitId,List<Long> expertiesIds);
+
+    @Query("Match (staff:Staff) where id(staff) IN {0} with staff\n" +
+            " OPTIONAL MATCH (staff)-[r:STAFF_HAS_SKILLS]->(skill) with collect(skill) as skills return skills")
+    List<Skill> getSkillByStaffIds(List<Long> staffIds);
 
 
 }

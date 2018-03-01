@@ -162,6 +162,7 @@ public abstract class RelationshipConstants {
     public final static String TIMECARE_DEFAULT_DUMMY_SERVICE = "API Integration Service";
     public final static String CONTACT_DETAIL = "CONTACT_DETAIL";
     public final static String CONTACT_ADDRESS = "CONTACT_ADDRESS";
+    public final static String SECONDARY_CONTACT_ADDRESS = "SECONDARY_CONTACT_ADDRESS";
     public final static String ZIP_CODE = "ZIP_CODE";
     public final static String BUSINESS_TYPE = "BUSINESS_TYPE";
     public final static String OWNERSHIP_TYPE = "OWNERSHIP_TYPE";
@@ -187,6 +188,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_CTA_RULE_TEMPLATE = "HAS_CTA_RULE_TEMPLATE";
     public final static String HAS_RULE_TEMPLATE_CATEGORY = "HAS_RULE_TEMPLATE_CATEGORY";
     public final static String HAS_RULE_TEMPLATES = "HAS_RULE_TEMPLATES";
+    public final static String HAS_TEMPLATE_MATRIX="HAS_TEMPLATE_MATRIX";
     public final static String HAS_TIME_TYPES = "HAS_TIME_TYPES";
     public final static String HAS_LEVEL = "HAS_LEVEL";
     public final static String HAS_RELATION_TYPES = "HAS_RELATION_TYPES";
@@ -209,6 +211,8 @@ public abstract class RelationshipConstants {
     public final static String RESOURCE_HAS_EQUIPMENT = "RESOURCE_HAS_EQUIPMENT";
     public final static String LOCATED_IN = "LOCATED_IN";
     public final static String HAS_PAY_LEVEL_MATRIX = "HAS_PAY_LEVEL_MATRIX";
+    public final static String ORAGANIZATION_HAS_UNIONS = "ORAGANIZATION_HAS_UNIONS";
+    public final static String STAFF_BELONGS_TO_UNION = "STAFF_BELONGS_TO_UNION";
 
 
     /**

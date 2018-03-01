@@ -15,9 +15,8 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
-import com.kairos.persistence.repository.user.position.PositionCodeGraphRepository;
 
-import com.kairos.persistence.repository.user.position.UnitEmploymentPositionGraphRepository;
+import com.kairos.persistence.repository.user.unitEmploymentPosition.UnitEmploymentPositionGraphRepository;
 
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.OrganizationService;
@@ -30,12 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import java.util.*;
 
 
 /**
@@ -156,7 +153,20 @@ public class EmploymentTypeService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect unit id ");
         }
         Organization parent = organizationService.fetchParentOrganization(unitId);
-        return employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(parent.getId(), false);
+        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+
+        // Fetch all mapped settings with employment Type
+        List<EmploymentTypeDTO> employmentSettingForOrganization = employmentTypeGraphRepository.getCustomizedEmploymentTypeSettingsForOrganization(countryId, unitId, false);
+        List<Long> listOfConfiguredEmploymentTypeIds = new ArrayList<>();
+        for ( EmploymentTypeDTO employmentTypeDTO: employmentSettingForOrganization) {
+            listOfConfiguredEmploymentTypeIds.add(employmentTypeDTO.getId());
+        }
+
+        // Fetch employment type setting which are not customized yet
+        List<EmploymentTypeDTO> employmentSettingForParentOrganization = employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(countryId, parent.getId(), false, listOfConfiguredEmploymentTypeIds);
+        employmentSettingForOrganization.addAll(employmentSettingForParentOrganization);
+
+        return employmentSettingForOrganization;
     }
 
     public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId) {

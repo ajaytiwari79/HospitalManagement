@@ -23,7 +23,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NodeEntity
 public class CTARuleTemplate extends RuleTemplate{
 
-    private CTARuleTemplateType ruleTemplateType;
+//    private CTARuleTemplateType ruleTemplateType;
+    private String ruleTemplateType;
     private String payrollType; //Ok
     private String payrollSystem; //Ok
     private CalculationUnit calculationUnit; //OK
@@ -44,8 +45,8 @@ public class CTARuleTemplate extends RuleTemplate{
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
 
     private List<EmploymentType> employmentTypes=new ArrayList<>(); //OK
-    @Relationship(type = BELONGS_TO)
-    private ActivityType activityType;  // Remove it, No need to configure activity/activityType when we are having time type
+//    @Relationship(type = BELONGS_TO)
+//    private ActivityType activityType;  // Remove it, No need to configure activity/activityType when we are having time type
     private PlanningCategory planningCategory;
     private List<StaffFunction> staffFunctions=new ArrayList<>();
     @Relationship(type = BELONGS_TO)
@@ -57,15 +58,19 @@ public class CTARuleTemplate extends RuleTemplate{
     @Relationship(type = BELONGS_TO)
     private User lastModifiedBy;
 
+    private ActivityTypeForCostCalculation activityTypeForCostCalculation;
+    private List<Long> activityIds;
+    private Long timeTypeId;
+    private Long plannedTimeId;
+
     public CTARuleTemplate() {
 
     }
 
-    public CTARuleTemplate(String name, String description, CTARuleTemplateType ruleTemplateType, String payrollType, String payrollSystem) {
+    public CTARuleTemplate(String name, String description, String payrollType, String payrollSystem) {
         this.name=name;
         this.description=description;
         this.ruleTemplateCategory=ruleTemplateCategory;
-        this.ruleTemplateType=ruleTemplateType;
         this.payrollType=payrollType;
         this.payrollSystem=payrollSystem;
 
@@ -104,9 +109,9 @@ public class CTARuleTemplate extends RuleTemplate{
                 ctaRuleTemplatePhaseInfo.setId(null);
             }
         }
-        if(this.getActivityType() != null){
+        /*if(this.getActivityType() != null){
             this.getActivityType().setId(null);
-        }
+        }*/
         if(this.getPlannedTimeWithFactor() != null){
             this.getPlannedTimeWithFactor().setId(null);
         }
@@ -115,6 +120,38 @@ public class CTARuleTemplate extends RuleTemplate{
 
     public CTARuleTemplate buildCTARuleTemplateFromDTO(CTARuleTemplateDTO ctaRuleTemplateDTO){
         return this;
+    }
+
+    public ActivityTypeForCostCalculation getActivityTypeForCostCalculation() {
+        return activityTypeForCostCalculation;
+    }
+
+    public void setActivityTypeForCostCalculation(ActivityTypeForCostCalculation activityTypeForCostCalculation) {
+        this.activityTypeForCostCalculation = activityTypeForCostCalculation;
+    }
+
+    public List<Long> getActivityIds() {
+        return activityIds;
+    }
+
+    public void setActivityIds(List<Long> activityIds) {
+        this.activityIds = activityIds;
+    }
+
+    public Long getTimeTypeId() {
+        return timeTypeId;
+    }
+
+    public void setTimeTypeId(Long timeTypeId) {
+        this.timeTypeId = timeTypeId;
+    }
+
+    public Long getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(Long plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
     }
 
     public String getPayrollType() {
@@ -203,13 +240,13 @@ public class CTARuleTemplate extends RuleTemplate{
         this.employmentTypes = employmentTypes;
     }
 
-    public ActivityType getActivityType() {
+   /* public ActivityType getActivityType() {
         return activityType;
     }
 
     public void setActivityType(ActivityType activityType) {
         this.activityType = activityType;
-    }
+    }*/
 
     public PlanningCategory getPlanningCategory() {
         return planningCategory;
@@ -235,14 +272,21 @@ public class CTARuleTemplate extends RuleTemplate{
         this.plannedTimeWithFactor = plannedTimeWithFactor;
     }
 
-    public CTARuleTemplateType getRuleTemplateType() {
+    /*public CTARuleTemplateType getRuleTemplateType() {
         return ruleTemplateType;
     }
 
     public void setRuleTemplateType(CTARuleTemplateType ruleTemplateType) {
         this.ruleTemplateType = ruleTemplateType;
+    }*/
+
+    public String getRuleTemplateType() {
+        return ruleTemplateType;
     }
 
+    public void setRuleTemplateType(String ruleTemplateType) {
+        this.ruleTemplateType = ruleTemplateType;
+    }
 
     public List<TimeType> getTimeTypes() {
         return timeTypes;
@@ -292,7 +336,6 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append(budgetType, that.budgetType)
                 .append(calculateValueIfPlanned, that.calculateValueIfPlanned)
                 .append(employmentTypes, that.employmentTypes)
-                .append(activityType, that.activityType)
                 .append(planningCategory, that.planningCategory)
                 .append(staffFunctions, that.staffFunctions)
                 .append(plannedTimeWithFactor, that.plannedTimeWithFactor)
@@ -315,7 +358,6 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append(budgetType)
                 .append(calculateValueIfPlanned)
                 .append(employmentTypes)
-                .append(activityType)
                 .append(planningCategory)
                 .append(staffFunctions)
                 .append(plannedTimeWithFactor)
@@ -338,7 +380,6 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append("budgetType", budgetType)
                 .append("calculateValueIfPlanned", calculateValueIfPlanned)
                 .append("employmentTypes", employmentTypes)
-                .append("activityType", activityType)
                 .append("planningCategory", planningCategory)
                 .append("staffFunction", staffFunctions)
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)

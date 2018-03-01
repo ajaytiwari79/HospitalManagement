@@ -17,7 +17,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-group = 'com.kairos'
+group = 'com.gateway'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
@@ -33,11 +33,15 @@ ext {
 }
 
 dependencies {
-	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
+	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
-	compile('org.springframework.cloud:spring-cloud-starter-netflix-ribbon')
-	compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
+	compile('org.springframework.cloud:spring-cloud-starter-gateway')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
+	compile('org.springframework.boot:spring-boot-starter-data-redis')
+	compile('org.springframework.boot:spring-boot-starter-webflux')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('io.projectreactor:reactor-test')
+	testCompile('org.springframework.security:spring-security-test')
 }
 
 dependencyManagement {
@@ -45,4 +49,3 @@ dependencyManagement {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
-

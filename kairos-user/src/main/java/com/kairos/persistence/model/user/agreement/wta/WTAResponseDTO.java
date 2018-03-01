@@ -6,6 +6,7 @@ import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -16,6 +17,10 @@ import java.util.List;
 @QueryResult
 public class WTAResponseDTO {
 
+    private List<RuleTemplateCategoryDTO> ruleTemplates;
+
+    private WTAResponseDTO parentWTA;
+
     private Long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
@@ -23,14 +28,24 @@ public class WTAResponseDTO {
     private String description;
     private long id;
     private Expertise expertise;
-    private OrganizationType organizationType;//
-    private OrganizationType organizationSubType;//
-    private List<RuleTemplateCategoryDTO> ruleTemplates;
+    private OrganizationType organizationType;
+    private OrganizationType organizationSubType;
+
     private List<Tag> tags;
-    private WTAResponseDTO parentWTA;
+
 
     public WTAResponseDTO() {
         //default
+    }
+
+    public WTAResponseDTO(Long id, Long startDateMillis, Long endDateMillis, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description) {
+        this.id = id;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.name = name;
+        this.description = description;
+
+
     }
 
     public Long getStartDateMillis() {
@@ -129,8 +144,9 @@ public class WTAResponseDTO {
         this.parentWTA = parentWTA;
     }
 
-    public WTAResponseDTO(Long startDateMillis, Long endDateMillis, String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<Tag> tags) {
+    public WTAResponseDTO(Long id, Long startDateMillis, Long endDateMillis, String name, String description, Expertise expertise, OrganizationType organizationType, OrganizationType organizationSubType, List<Tag> tags) {
         this.startDateMillis = startDateMillis;
+        this.id = id;
         this.endDateMillis = endDateMillis;
         this.name = name;
         this.description = description;

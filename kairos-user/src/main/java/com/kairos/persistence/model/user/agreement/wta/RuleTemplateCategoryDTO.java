@@ -2,20 +2,28 @@ package com.kairos.persistence.model.user.agreement.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.enums.TimeBankTypeEnum;
+import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+
+import javax.validation.constraints.NotNull;
 import java.util.List;
+
 
 /**
  * Created by vipul on 12/10/17.
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
 public class RuleTemplateCategoryDTO {
+    private List<PhaseTemplateValue> phaseTemplateValues;
+
     private RuleTemplateCategory ruleTemplateCategory;
+
     private Long id;
     private String name;
     private String templateType;
@@ -23,7 +31,6 @@ public class RuleTemplateCategoryDTO {
     private Long timeLimit;
     private List<String> balanceType;
     private Boolean checkAgainstTimeRules;
-
     private Long daysLimit;
     private Long minimumRest;//hh:mm
     private Long daysWorked;
@@ -36,6 +43,7 @@ public class RuleTemplateCategoryDTO {
     private String intervalUnit;
     private Long validationStartDateMillis;
     private Boolean balanceAdjustment = false;
+    private int recommendedValue;
     private Boolean useShiftTimes = false;
     private Long maximumAvgTime;
     private Double maximumVetoPercentage;
@@ -54,9 +62,19 @@ public class RuleTemplateCategoryDTO {
     private Long shiftsLimit;
     private Boolean onlyCompositeShifts;
     private String activityCode;
+    private TimeBankTypeEnum frequency;
+    private Integer yellowZone;
+    private Boolean forbid;
+    private Boolean allowExtraActivity;
 
 
+    public int getRecommendedValue() {
+        return recommendedValue;
+    }
 
+    public void setRecommendedValue(int recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
 
     public void setCheckAgainstTimeRules(Boolean checkAgainstTimeRules) {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
@@ -77,6 +95,7 @@ public class RuleTemplateCategoryDTO {
     public Boolean getBalanceAdjustment() {
         return balanceAdjustment;
     }
+
 
     public void setBalanceAdjustment(Boolean balanceAdjustment) {
         this.balanceAdjustment = balanceAdjustment;
@@ -105,6 +124,7 @@ public class RuleTemplateCategoryDTO {
     public void setOnlyCompositeShifts(Boolean onlyCompositeShifts) {
         this.onlyCompositeShifts = onlyCompositeShifts;
     }
+
 
     public String getCategory() {
         return category;
@@ -363,6 +383,45 @@ public class RuleTemplateCategoryDTO {
     public void setActivityCode(String activityCode) {
         this.activityCode = activityCode;
     }
+    public List<PhaseTemplateValue> getPhaseTemplateValues() {
+        return phaseTemplateValues;
+    }
+
+    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
+        this.phaseTemplateValues = phaseTemplateValues;
+    }
+
+    public TimeBankTypeEnum getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(TimeBankTypeEnum frequency) {
+        this.frequency = frequency;
+    }
+
+    public Integer getYellowZone() {
+        return yellowZone;
+    }
+
+    public void setYellowZone(Integer yellowZone) {
+        this.yellowZone = yellowZone;
+    }
+
+    public Boolean isForbid() {
+        return forbid;
+    }
+
+    public void setForbid(Boolean forbid) {
+        this.forbid = forbid;
+    }
+
+    public Boolean isAllowExtraActivity() {
+        return allowExtraActivity;
+    }
+
+    public void setAllowExtraActivity(Boolean allowExtraActivity) {
+        this.allowExtraActivity = allowExtraActivity;
+    }
 
     @Override
     public String toString() {
@@ -417,11 +476,12 @@ public class RuleTemplateCategoryDTO {
         this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
-        this.timeLimit=timeInMins;
-        this.balanceType=balanceTypes;
-        this.checkAgainstTimeRules=checkAgainstTimeRules;
+        this.timeLimit = timeInMins;
+        this.balanceType = balanceTypes;
+        this.checkAgainstTimeRules = checkAgainstTimeRules;
 
     }
+
     // Template 13 Cons
     public RuleTemplateCategoryDTO(String name, String templateType, Boolean disabled, String description, Long numberShiftsPerPeriod, Long numberOfWeeks,
                                    String fromDayOfWeek, Long fromTime, Boolean proportional,

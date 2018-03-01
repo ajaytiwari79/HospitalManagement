@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.kairos.persistence.model.enums.StaffStatusEnum;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -11,6 +12,8 @@ import java.util.List;
  * Created by oodles on 3/2/17.
  */
 public class StaffDTO {
+
+    private Long id;
     @NotEmpty(message = "error.StaffDTO.firstName.notEmpty") @NotNull(message = "error.StaffDTO.firstName.notnull")
     private String firstName;
     @NotEmpty(message = "error.StaffDTO.lastName.notEmpty") @NotNull(message = "error.StaffDTO.lastName.notnull")
@@ -25,16 +28,25 @@ public class StaffDTO {
     private Integer workPhone;
 
     private Date employedSince;
-    private Boolean active;
     private Long inactiveFrom;
 
     @NotNull(message = "error.StaffDTO.teamId.notnull")
     private Long teamId;
 
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     private List<Long> skills;
 
     private  Long unit;
     private Long anonymousStaffId;
+    private StaffStatusEnum currentStatus;
 
     public String getFamilyName() {
         return familyName;
@@ -115,15 +127,6 @@ public class StaffDTO {
         this.employedSince = employedSince;
     }
 
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
     public long getInactiveFrom() {
         return inactiveFrom;
     }
@@ -162,5 +165,13 @@ public class StaffDTO {
 
     public void setAnonymousStaffId(Long anonymousStaffId) {
         this.anonymousStaffId = anonymousStaffId;
+    }
+
+    public StaffStatusEnum getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(StaffStatusEnum currentStatus) {
+        this.currentStatus = currentStatus;
     }
 }
