@@ -510,7 +510,7 @@ public class UnitPositionService extends UserBaseService {
         }
 
         WorkingTimeAgreement wta = unitPositionGraphRepository.getOneDefaultWTA(organization.getId(), expertise.getId());
-           CostTimeAgreement cta = unitPositionGraphRepository.getOneDefaultCTA(organization.getId(), expertise.getId());
+        CostTimeAgreement cta = unitPositionGraphRepository.getOneDefaultCTA(organization.getId(), expertise.getId());
         if (wta == null) {
             throw new DataNotFoundByIdException("NO WTA found for organization : " + organization.getId());
         }
@@ -524,7 +524,7 @@ public class UnitPositionService extends UserBaseService {
         }
 
         for (TimeCareEmploymentDTO timeCareEmploymentDTO : timeCareEmploymentDTOs) {
-            Staff staff = staffGraphRepository.findStaffByExternalId(timeCareEmploymentDTO.getPersonID(), organization.getId());
+            Staff staff = staffGraphRepository.findByExternalId(timeCareEmploymentDTO.getPersonID());
             if (staff == null) {
                 throw new DataNotFoundByIdException("NO staff exist with External Id : " + timeCareEmploymentDTO.getPersonID());
             }
