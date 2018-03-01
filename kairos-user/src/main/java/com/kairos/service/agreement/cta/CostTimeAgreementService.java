@@ -1,5 +1,6 @@
 package com.kairos.service.agreement.cta;
 
+import com.kairos.client.activity_types.ActivityTypesRestClient;
 import com.kairos.config.listener.ApplicationContextProviderNonManageBean;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
@@ -9,6 +10,7 @@ import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -32,16 +34,12 @@ import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -56,25 +54,26 @@ public class CostTimeAgreementService extends UserBaseService {
     private Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
 
 
-    private @Autowired UserService userService;
-    private @Autowired RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
-    private @Autowired CountryGraphRepository countryGraphRepository;
-    private @Autowired CTARuleTemplateGraphRepository ctaRuleTemplateGraphRepository;
-    private @Autowired AsynchronousService asynchronousService;
-    private @Autowired DayTypeGraphRepository dayTypeGraphRepository;
-    private @Autowired  EmploymentTypeGraphRepository employmentTypeGraphRepository;
-    private @Autowired AccessGroupRepository accessGroupRepository;
-    private @Autowired TimeTypeGraphRepository timeTypeGraphRepository;
-    private @Autowired UserGraphRepository userGraphRepository;
-    private  @Autowired CurrencyService currencyService;
-    private  @Autowired ExpertiseGraphRepository expertiseGraphRepository;
-    private @Autowired OrganizationTypeGraphRepository organizationTypeGraphRepository;
-    private @Autowired CurrencyGraphRepository currencyGraphRepository;
-    private @Autowired CountryHolidayCalenderGraphRepository countryHolidayCalenderGraphRepository;
-    private @Autowired CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
-    private @Autowired OrganizationGraphRepository organizationGraphRepository;
+    private @Inject UserService userService;
+    private @Inject RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
+    private @Inject CountryGraphRepository countryGraphRepository;
+    private @Inject CTARuleTemplateGraphRepository ctaRuleTemplateGraphRepository;
+    private @Inject AsynchronousService asynchronousService;
+    private @Inject DayTypeGraphRepository dayTypeGraphRepository;
+    private @Inject  EmploymentTypeGraphRepository employmentTypeGraphRepository;
+    private @Inject AccessGroupRepository accessGroupRepository;
+    private @Inject TimeTypeGraphRepository timeTypeGraphRepository;
+    private @Inject UserGraphRepository userGraphRepository;
+    private  @Inject CurrencyService currencyService;
+    private  @Inject ExpertiseGraphRepository expertiseGraphRepository;
+    private @Inject OrganizationTypeGraphRepository organizationTypeGraphRepository;
+    private @Inject CurrencyGraphRepository currencyGraphRepository;
+    private @Inject CountryHolidayCalenderGraphRepository countryHolidayCalenderGraphRepository;
+    private @Inject CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
+    private @Inject OrganizationGraphRepository organizationGraphRepository;
     private @Inject OrganizationTypeGraphRepository organizationTypeRepository;
     private @Inject OrganizationService organizationService;
+    private @Inject ActivityTypesRestClient activityTypesRestClient;
 
 
     public boolean isDefaultCTARuleTemplateExists(){
@@ -603,7 +602,7 @@ public class CostTimeAgreementService extends UserBaseService {
         costTimeAgreement.setCountry(countryGraphRepository.findOne(countryId,0));
         this.save(costTimeAgreement);
         // TO create CTA for organizations too which are linked with same sub type
-        publishNewCountryCTAToOrganizationByOrgSubType(costTimeAgreement, collectiveTimeAgreementDTO, costTimeAgreement.getOrganizationSubType().getId());
+        publishNewCountryCTAToOrganizationByOrgSubType(countryId, costTimeAgreement, collectiveTimeAgreementDTO, costTimeAgreement.getOrganizationSubType().getId());
 
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         /*BeanUtils.copyProperties(costTimeAgreement, collectiveTimeAgreementDTO);
@@ -678,25 +677,46 @@ public class CostTimeAgreementService extends UserBaseService {
         return costTimeAgreement;
     }
 
-    public CostTimeAgreement createCostTimeAgreementForOrganization(CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+    public CostTimeAgreement createCostTimeAgreementForOrganization(CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, HashMap<Long, Long> parentUnitActivityMap) throws ExecutionException, InterruptedException {
 
         CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
+
+        // Set activity Ids according to unit activity Ids
+        for(CTARuleTemplateDTO ruleTemplateDTO : collectiveTimeAgreementDTO.getRuleTemplates()){
+            List<Long> parentActivityIds = ruleTemplateDTO.getActivityIds();
+            List<Long> unitActivityIds = new ArrayList<Long>();
+            parentActivityIds.forEach(parentActivityId ->{
+                if( Optional.ofNullable( parentUnitActivityMap.get(parentActivityId) ).isPresent() ){
+                    unitActivityIds.add(parentUnitActivityMap.get(parentActivityId));
+                }
+            });
+            ruleTemplateDTO.setActivityIds(unitActivityIds);
+        }
+
         CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
                 .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, false, null);
 
         // Wait until they are all done
         CompletableFuture.allOf(hasUpdated).join();
+
         this.save(costTimeAgreement);
         return costTimeAgreement;
     }
 
-    public Boolean publishNewCountryCTAToOrganizationByOrgSubType(CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, Long organizationSubTypeId) throws ExecutionException, InterruptedException{
+    public Boolean publishNewCountryCTAToOrganizationByOrgSubType(Long countryId,CostTimeAgreement costTimeAgreement, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, Long organizationSubTypeId) throws ExecutionException, InterruptedException{
         List<Organization> organizations = organizationTypeRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        List<Long> organizationIds = new ArrayList<>();
+        List<Long> activityIds = new ArrayList<>();
+        organizations.stream().forEach(organization -> organizationIds.add(organization.getId()));
+        collectiveTimeAgreementDTO.getRuleTemplates().stream().forEach(ruleTemp -> {
+            activityIds.addAll(ruleTemp.getActivityIds());
+        });
+        HashMap<Long,HashMap<Long,Long>> unitActivities = activityTypesRestClient.getActivityIdsForUnitsByParentActivityId(countryId, organizationIds, activityIds);
         organizations.forEach(organization ->
         {
            try{
-               CostTimeAgreement newCostTimeAgreement =  createCostTimeAgreementForOrganization(collectiveTimeAgreementDTO);
+               CostTimeAgreement newCostTimeAgreement =  createCostTimeAgreementForOrganization(collectiveTimeAgreementDTO, unitActivities.get(organization.getId()));
                organization.getCostTimeAgreements().add(newCostTimeAgreement);
 //               newCostTimeAgreement.setParentCountryCTA(costTimeAgreement);
                collectiveTimeAgreementGraphRepository.linkParentCountryCTAToOrganization(costTimeAgreement.getId(), newCostTimeAgreement.getId());
