@@ -4,11 +4,13 @@ package com.kairos.service.agreement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
+import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
@@ -20,10 +22,12 @@ import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateG
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.RuleTemplateDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.agreement.wta.WTAOrganizationService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.util.ArrayUtil;
 import com.kairos.util.DateUtil;
 import com.kairos.util.userContext.UserContext;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +59,8 @@ public class RuleTemplateService extends UserBaseService {
     private TagService tagService;
     @Inject
     private WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
+    @Inject
+    private WTAOrganizationService wtaOrganizationService;
 
 
     public boolean createRuleTemplate(long countryId) {
@@ -146,10 +152,10 @@ public class RuleTemplateService extends UserBaseService {
         MaximumSeniorDaysInYearWTATemplate wta20 = new MaximumSeniorDaysInYearWTATemplate(TEMPLATE20_NAME, TEMPLATE20, true, TEMPLATE20_DESCRIPTION, 1, "NA", dateInMillis, 1, "");
         baseRuleTemplates.add(wta20);
 
-        MaximumTimeBank wta21=new MaximumTimeBank(TEMPLATE21_NAME, TEMPLATE21, true, TEMPLATE21_DESCRIPTION, TimeBankTypeEnum.HOURLY,45,false,false);
+        MaximumTimeBank wta21 = new MaximumTimeBank(TEMPLATE21_NAME, TEMPLATE21, true, TEMPLATE21_DESCRIPTION, TimeBankTypeEnum.HOURLY, 45, false, false);
         baseRuleTemplates.add(wta21);
 
-        MinimumTimeBank wta22=new MinimumTimeBank(TEMPLATE22_NAME, TEMPLATE22, true, TEMPLATE22_DESCRIPTION, TimeBankTypeEnum.HOURLY,25,false,false);
+        MinimumTimeBank wta22 = new MinimumTimeBank(TEMPLATE22_NAME, TEMPLATE22, true, TEMPLATE22_DESCRIPTION, TimeBankTypeEnum.HOURLY, 25, false, false);
         baseRuleTemplates.add(wta22);
         country.setWTABaseRuleTemplate(baseRuleTemplates);
         save(country);
@@ -470,6 +476,34 @@ public class RuleTemplateService extends UserBaseService {
         });
 
         return wtaBaseRuleTemplateDTOS;
+    }
+
+    public WTABaseRuleTemplate copyRuleTemplate(Long countryId, RuleTemplateCategoryDTO wtaRuleTemplateDTO) {
+        Country country = countryGraphRepository.findOne(countryId);
+        if (!Optional.ofNullable(country).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid Country");
+        }
+        RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, wtaRuleTemplateDTO.getRuleTemplateCategory().getName(), RuleTemplateCategoryType.WTA);
+        if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
+            throw new DataNotFoundByIdException("Category Not matched");
+        }
+
+        WTABaseRuleTemplate wtaBaseRuleTemplate1 = wtaBaseRuleTemplateGraphRepository.existsByName(wtaRuleTemplateDTO.getName());
+        if (Optional.ofNullable(wtaBaseRuleTemplate1).isPresent()) {
+            throw new DuplicateDataException("WTA Rule template already existed  " + wtaRuleTemplateDTO.getName());
+        }
+
+        WTABaseRuleTemplate wtaBaseRuleTemplate = new WTABaseRuleTemplate();
+        List<PhaseTemplateValue> phaseTemplateValues = wtaOrganizationService.copyPhaseTemplateValue(wtaRuleTemplateDTO.getPhaseTemplateValues());
+        BeanUtils.copyProperties(wtaRuleTemplateDTO, wtaBaseRuleTemplate);
+        wtaBaseRuleTemplate.setPhaseTemplateValues(phaseTemplateValues);
+        ruleTemplateCategory.getRuleTemplates().add(wtaBaseRuleTemplate);
+        country.getWTABaseRuleTemplate().add(wtaBaseRuleTemplate);
+        country.getRuleTemplateCategories().add(ruleTemplateCategory);
+        save(country);
+        return wtaBaseRuleTemplate;
+
+
     }
 
 }

@@ -160,7 +160,10 @@ public class WTAOrganizationService extends UserBaseService {
         return ruleTemplateCategory;
     }
 
-    protected List<PhaseTemplateValue> copyPhaseTemplateValue(List<PhaseTemplateValue> phaseTemplateValues) {
+    public List<PhaseTemplateValue> copyPhaseTemplateValue(List<PhaseTemplateValue> phaseTemplateValues) {
+        if(phaseTemplateValues==null){
+            return null;
+        }
 
         List<PhaseTemplateValue> phases = new ArrayList<>(4);
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {

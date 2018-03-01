@@ -46,6 +46,15 @@ public class PhaseTemplateValue extends UserBaseEntity {
         //Default Constructor
     }
 
+    public PhaseTemplateValue(int phaseId, String phaseName, short staffValue, short managementValue, boolean disabled, int optionalFrequency, boolean optional) {
+        this.phaseId = phaseId;
+        this.phaseName = phaseName;
+        this.staffValue = staffValue;
+        this.managementValue = managementValue;
+        this.disabled = disabled;
+        this.optionalFrequency = optionalFrequency;
+        this.optional = optional;
+    }
 
     public String getPhaseName() {
         return phaseName;

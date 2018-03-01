@@ -30,6 +30,7 @@ public class WTABaseRuleTemplate extends RuleTemplate{
 
 
 
+
     public WTABaseRuleTemplate(){}
 
     public WTABaseRuleTemplate(String name, String templateType, String description) {

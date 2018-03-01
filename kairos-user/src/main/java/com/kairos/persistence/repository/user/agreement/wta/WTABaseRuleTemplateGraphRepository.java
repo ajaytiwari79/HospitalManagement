@@ -191,4 +191,6 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     )
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByCountryId(Long countryId);
 
+    WTABaseRuleTemplate existsByName(String name);
+
 }
