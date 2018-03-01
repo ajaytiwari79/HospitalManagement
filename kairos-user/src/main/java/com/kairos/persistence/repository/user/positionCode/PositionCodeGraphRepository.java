@@ -22,7 +22,7 @@ public interface PositionCodeGraphRepository extends Neo4jBaseRepository<Positio
     @Query("MATCH (o:Organization)-[:"+ HAS_POSITION_CODE +"]->(pn:PositionCode{deleted:false}) WHERE id(o)={0} AND id(pn)= {1} return pn ")
     PositionCode getPositionCodeByUnitIdAndId(long orgId, long positionCodeId);
 
-    @Query("MATCH (o:Organization)-[:"+ HAS_POSITION_CODE +"]->(pn:PositionCode{deleted:false}) WHERE id(o)={0} return pn ")
+    @Query("MATCH (o:Organization)-[:"+ HAS_POSITION_CODE +"]->(pn:PositionCode{deleted:false}) WHERE id(o)={0} return pn LIMIT 1")
     PositionCode getOneDefaultPositionCodeByUnitId(long orgId);
 
 

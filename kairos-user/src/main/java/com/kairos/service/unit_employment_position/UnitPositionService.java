@@ -510,13 +510,13 @@ public class UnitPositionService extends UserBaseService {
         }
 
         WorkingTimeAgreement wta = unitPositionGraphRepository.getOneDefaultWTA(organization.getId(), expertise.getId());
-        //    CostTimeAgreement cta = unitPositionGraphRepository.getOneDefaultCTA(organization.getId(), expertise.getId());
+           CostTimeAgreement cta = unitPositionGraphRepository.getOneDefaultCTA(organization.getId(), expertise.getId());
         if (wta == null) {
             throw new DataNotFoundByIdException("NO WTA found for organization : " + organization.getId());
         }
-//        if (cta == null) {
-//            throw new DataNotFoundByIdException("NO CTA found for organization : " + organization.getId());
-//        }
+        if (cta == null) {
+            throw new DataNotFoundByIdException("NO CTA found for organization : " + organization.getId());
+        }
 
         PositionCode positionCode = positionCodeGraphRepository.getOneDefaultPositionCodeByUnitId(parentOrganization.getId());
         if (positionCode == null) {
