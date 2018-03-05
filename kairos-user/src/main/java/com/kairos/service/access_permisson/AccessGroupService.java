@@ -1,17 +1,24 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.client.dto.organization.OrganizationCategoryDTO;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.access_permission.AccessPage;
-import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.user.access_permission.AccessPermissionDTO;
+import com.kairos.persistence.model.user.access_permission.*;
+import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryAccessGroupRelationshipRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
+import com.kairos.response.dto.web.cta.AccessGroupDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.DateUtil;
@@ -19,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.*;
 
@@ -43,6 +47,10 @@ public class AccessGroupService extends UserBaseService {
     private AccessPermissionGraphRepository accessPermissionGraphRepository;
     @Inject
     private TreeStructureService treeStructureService;
+    @Inject
+    private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private CountryAccessGroupRelationshipRepository countryAccessGroupRelationshipRepository;
 
     public AccessGroup createAccessGroup(long organizationId, AccessGroup accessGroup) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
@@ -68,14 +76,14 @@ public class AccessGroupService extends UserBaseService {
         return null;
     }
 
-    public AccessGroup updateAccessGroup(long accessGroupId, AccessGroup accessGroup) {
-        AccessGroup objectToUpdate = accessGroupRepository.findOne(accessGroupId);
-        if (objectToUpdate == null) {
-            return null;
+    public AccessGroup updateAccessGroup(long accessGroupId, AccessGroupDTO accessGroupDTO) {
+        AccessGroup accessGrpToUpdate = accessGroupRepository.findOne(accessGroupId);
+        if (Optional.ofNullable(accessGrpToUpdate).isPresent()) {
+            throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
         }
-        objectToUpdate.setName(accessGroup.getName());
-        save(objectToUpdate);
-        return objectToUpdate;
+        accessGrpToUpdate.setName(accessGrpToUpdate.getName());
+        save(accessGrpToUpdate);
+        return accessGrpToUpdate;
     }
 
     public boolean deleteAccessGroup(long accessGroupId) {
@@ -111,7 +119,7 @@ public class AccessGroupService extends UserBaseService {
             String accessGroupNames[] = new String[]{VISITATOR, PLANNER, TASK_GIVERS, COUNTRY_ADMIN, UNIT_MANAGER};
             accessGroupList = new ArrayList<>(accessGroupNames.length);
             for (String name : accessGroupNames) {
-                AccessGroup accessGroup = new AccessGroup(name);
+                AccessGroup accessGroup = new AccessGroup(name, null);
                 accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
                 accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
                 if(TASK_GIVERS.equals(name)){
@@ -296,4 +304,93 @@ public class AccessGroupService extends UserBaseService {
     public List<AccessGroup> findAllAccessGroup(){
       return accessGroupRepository.findAll();
     }
+
+
+
+    /***** Access group - COUNTRY LEVEL - ENDS HERE ******************/
+
+    public AccessGroup createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
+        Country country = countryGraphRepository.findOne(countryId);
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithSameName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString());
+        if ( isAccessGroupExistWithSameName ) {
+            throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
+        }
+        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName(), accessGroupDTO.getDescription());
+        accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
+        accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+
+        CountryAccessGroupRelationship accessGroupRelationship = new CountryAccessGroupRelationship(country, accessGroup, accessGroupDTO.getOrganizationCategory());
+        accessGroupRelationship.setCreationDate(DateUtil.getCurrentDate().getTime());
+        accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+        countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
+        save(country);
+
+        //set default permission of access page while creating access group
+        accessGroupRepository.setAccessPagePermission(accessGroup.getId());
+        return accessGroup;
+    }
+
+    public AccessGroup updateCountryAccessGroup(long countryId, Long accessGroupId, CountryAccessGroupDTO accessGroupDTO) {
+        Country country = countryGraphRepository.findOne(countryId);
+        AccessGroup accessGrpToUpdate = accessGroupRepository.findCountryAccessGroupByIdAndCategory(countryId, accessGroupId, accessGroupDTO.getOrganizationCategory().toString());
+        if (! Optional.ofNullable(accessGrpToUpdate).isPresent()) {
+            throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
+        }
+        if( accessGroupRepository.isCountryAccessGroupExistWithSameNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId) ){
+            throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
+        }
+
+        accessGrpToUpdate.setName(accessGroupDTO.getName());
+        accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
+        accessGrpToUpdate.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+        save(accessGrpToUpdate);
+        return accessGrpToUpdate;
+
+    }
+
+    public boolean deleteCountryAccessGroup(long accessGroupId) {
+        AccessGroup accessGroupToDelete = accessGroupRepository.findOne(accessGroupId);
+        if (! Optional.ofNullable(accessGroupToDelete).isPresent()) {
+            throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
+        }
+        accessGroupToDelete.setDeleted(true);
+        accessGroupToDelete.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+        save(accessGroupToDelete);
+        return true;
+    }
+
+
+    AccessGroup getCountryAccessGroupByName(Long countryId, OrganizationCategory category, String name){
+        return accessGroupRepository.findCountryAccessGroupByNameAndCategory(countryId, name, category.toString());
+    }
+
+    public List<OrganizationCategoryDTO> getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId){
+        List<OrganizationCategoryDTO> organizationCategoryDTOS = OrganizationCategory.getListOfOrganizationCategory();
+        AccessGroupCountQueryResult accessGroupCountData = accessGroupRepository.getListOfOrgCategoryWithCountryAccessGroupCount(countryId);
+        organizationCategoryDTOS.forEach(orgCategoryDTO ->{
+            switch (OrganizationCategory.valueOf(orgCategoryDTO.getValue())){
+                case HUB: {
+                    orgCategoryDTO.setCount(accessGroupCountData.getHubCount());
+                    break;
+                }
+                case ORGANIZATION: {
+                    orgCategoryDTO.setCount(accessGroupCountData.getOrganizationCount());
+                    break;
+                }
+                case UNION: {
+                    orgCategoryDTO.setCount(accessGroupCountData.getUnionCount());
+                    break;
+                }
+            }
+        } );
+        return organizationCategoryDTOS;
+    }
+
+    public List<AccessGroupQueryResult> getCountryAccessGroups(Long countryId, OrganizationCategory organizationCategory) {
+
+        return accessGroupRepository.getCountryAccessGroupByOrgCategory(countryId, organizationCategory.toString());
+    }
+
+    /***** Access group - COUNTRY LEVEL - ENDS HERE ******************/
+
 }
