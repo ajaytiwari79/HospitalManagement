@@ -301,7 +301,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "optional MATCH(staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition)-[:UNIT_POSITION_BELONGS_TO_UNIT]-(organization) " +
             "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)\n" +
             "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType, staff, user,count(unitPos) as unitPosition\n" +
-            "return distinct {id:id(staff),name:staff.firstName+\" \"+staff.lastName,city:contactAddress.city,unitPosition as unitPositionCount,province:contactAddress.province  ,firstName:staff.firstName,lastName:staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,visitourId:staff.visitourId, age:user.age, gender:user.gender, profilePic:{1} + staff.profilePic, engineerType:id(engineerType)} as data order by data.firstName")
+            "return distinct {id:id(staff),name:staff.firstName+\" \"+staff.lastName,city:contactAddress.city, case  when unitPosition > 0 then TRUE else false end as unitPosition ,province:contactAddress.province  ,firstName:staff.firstName,lastName:staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,visitourId:staff.visitourId, age:user.age, gender:user.gender, profilePic:{1} + staff.profilePic, engineerType:id(engineerType)} as data order by data.firstName")
     List<Map<String, Object>> getAllStaffHavingUnitPositionByUnitIdMap(long unitId, String imageUrl);
 
     @Query("match (organization:Organization)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff) where id(organization)={0} \n" +
@@ -309,7 +309,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "optional MATCH(staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition)-[:UNIT_POSITION_BELONGS_TO_UNIT]-(organization)" +
             "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType, staff, user,unitPos \n" +
             "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)  with engineerType, staff,contactAddress, user ,count(unitPos) as unitPosition \n" +
-            "return  distinct id(staff) as id,unitPosition as unitPositionCount, contactAddress.city as city,contactAddress.province as province ,staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName,user.age as age, user.gender as gender, {1} + staff.profilePic as profilePic, id(engineerType) as engineerType")
+            "return  distinct id(staff) as id,case  when unitPosition > 0 then TRUE else false end as unitPosition , contactAddress.city as city,contactAddress.province as province ,staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName,user.age as age, user.gender as gender, {1} + staff.profilePic as profilePic, id(engineerType) as engineerType")
     List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, String imageUrl);
 
     @Query("MATCH (staff:Staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) where id(staff)={0} return id(engineerType)")

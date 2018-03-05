@@ -538,7 +538,7 @@ public class StaffController {
     @RequestMapping(value = "/staff_list", method = RequestMethod.GET)
     @ApiOperation("Get All staff List available in Org")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId, @RequestParam("includeNoUEP") boolean allStaffRequired) {
+    public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId, @RequestParam("unitPosition") boolean allStaffRequired) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffByUnitId(unitId, allStaffRequired));
     }
 

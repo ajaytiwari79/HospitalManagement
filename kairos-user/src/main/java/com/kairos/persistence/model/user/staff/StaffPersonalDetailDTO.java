@@ -30,7 +30,7 @@ public class StaffPersonalDetailDTO {
     protected Gender gender;
     private String city;
     private String province;
-    private Long unitPositionCount;
+    private Boolean unitPosition;
 
     public long getId() {
         return id;
@@ -208,11 +208,11 @@ public class StaffPersonalDetailDTO {
         this.province = province;
     }
 
-    public Long getUnitPositionCount() {
-        return unitPositionCount;
+    public Boolean getUnitPosition() {
+        return unitPosition;
     }
 
-    public void setUnitPositionCount(Long unitPositionCount) {
-        this.unitPositionCount = unitPositionCount;
+    public void setUnitPosition(Boolean unitPosition) {
+        this.unitPosition = unitPosition;
     }
 }
