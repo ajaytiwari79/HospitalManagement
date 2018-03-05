@@ -1,9 +1,12 @@
 package com.kairos.service.unit_employment_position;
 
+import com.kairos.client.TimeBankRestClient;
 import com.kairos.client.dto.timeBank.CostTimeAgreementDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.agreement.cta.CTAListQueryResult;
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
@@ -94,6 +97,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
     private WTAService wtaService;
     @Inject
     private ClientGraphRepository clientGraphRepository;
+    @Inject private TimeBankRestClient timeBankRestClient;
 
 
     public UnitEmploymentPositionQueryResult createUnitEmploymentPosition(Long id, String type, UnitEmploymentPositionDTO unitEmploymentPositionDTO, Boolean createFromTimeCare) {
@@ -131,6 +135,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         save(unitEmployment);
         UnitEmploymentPositionQueryResult unitEmploymentPositionQueryResult = unitEmploymentPosition.getBasicDetails();
 
+        timeBankRestClient.createBlankTimeBank(new CostTimeAgreementDTO(unitEmploymentPositionQueryResult.getId(),unitEmploymentPositionQueryResult.getTotalWeeklyMinutes(),unitEmploymentPositionQueryResult.getWorkingDaysInWeek(),new Date(unitEmploymentPositionQueryResult.getStartDateMillis())));
         //unitEmploymentPositionQueryResult.setUnion();
         return unitEmploymentPositionQueryResult;
     }
@@ -476,21 +481,26 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
     public CostTimeAgreementDTO getUnitEmploymentPositionCTA(Long unitEmploymentPositionId) {
         UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
-        costTimeAgreementGraphRepository.getCtaByUnitEmploymentId(unitEmploymentPositionId);
+        List<CTAListQueryResult> ctaRuleTemplateQueryResults = costTimeAgreementGraphRepository.getCtaByUnitEmploymentPositionId(unitEmploymentPositionId);
         CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitEmploymentPositionId);
         costTimeAgreementDTO.setStaffId(unitEmploymentPosition.getStaff().getId());
         costTimeAgreementDTO.setContractedMinByWeek(unitEmploymentPosition.getTotalWeeklyMinutes());
         costTimeAgreementDTO.setWorkingDays(unitEmploymentPosition.getWorkingDaysInWeek());
-        costTimeAgreementDTO.setCtaRuleTemplateDTOS(getCtaRuleTemplateDtos(unitEmploymentPosition.getCta().getRuleTemplates()));
+        costTimeAgreementDTO.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
         return costTimeAgreementDTO;
     }
 
-    public List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> getCtaRuleTemplateDtos(List<RuleTemplate> ruleTemplates){
+    public List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> getCtaRuleTemplateDtos(List<CTAListQueryResult> ruleTemplates){
         List<com.kairos.client.dto.timeBank.CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ruleTemplates.size());
         ruleTemplates.forEach(rt->{
             com.kairos.client.dto.timeBank.CTARuleTemplateDTO ctaRuleTemplateDTO = new com.kairos.client.dto.timeBank.CTARuleTemplateDTO();
+            /*ctaRuleTemplateDTO.setGranularity();
+            ctaRuleTemplateDTO.setActivityIds();
+            ctaRuleTemplateDTO.setDays();
+            ctaRuleTemplateDTO.setTimeTypes();
+            ctaRuleTemplateDTO.setPublicHolidays();
+            ctaRuleTemplateDTO.setCtaIntervalDTOS();*/
             ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
-
         });
         return ctaRuleTemplateDTOS;
     }

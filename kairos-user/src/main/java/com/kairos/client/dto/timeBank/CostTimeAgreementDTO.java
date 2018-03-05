@@ -1,20 +1,37 @@
 package com.kairos.client.dto.timeBank;
 
+import java.util.Date;
 import java.util.List;
 
 public class CostTimeAgreementDTO {
 
     private Long unitEmploymentPositionId;
-    private List<CTARuleTemplateDTO> ctaRuleTemplateDTOS;
+    private List<CTARuleTemplateDTO> ctaRuleTemplates;
     private int contractedMinByWeek;
     private int workingDays;
     private Long staffId;
+    private Date unitEmploymentPositionDate;
 
     public CostTimeAgreementDTO(Long unitEmploymentPositionId) {
         this.unitEmploymentPositionId = unitEmploymentPositionId;
     }
 
+    public CostTimeAgreementDTO(Long unitEmploymentPositionId, int contractedMinByWeek, int workingDays,Date unitEmploymentPositionDate) {
+        this.unitEmploymentPositionId = unitEmploymentPositionId;
+        this.contractedMinByWeek = contractedMinByWeek;
+        this.workingDays = workingDays;
+        this.unitEmploymentPositionDate = unitEmploymentPositionDate;
+    }
+
     public CostTimeAgreementDTO() {
+    }
+
+    public Date getUnitEmploymentPositionDate() {
+        return unitEmploymentPositionDate;
+    }
+
+    public void setUnitEmploymentPositionDate(Date unitEmploymentPositionDate) {
+        this.unitEmploymentPositionDate = unitEmploymentPositionDate;
     }
 
     public Long getStaffId() {
@@ -49,12 +66,12 @@ public class CostTimeAgreementDTO {
         this.unitEmploymentPositionId = unitEmploymentPositionId;
     }
 
-    public List<CTARuleTemplateDTO> getCtaRuleTemplateDTOS() {
-        return ctaRuleTemplateDTOS;
+    public List<CTARuleTemplateDTO> getCtaRuleTemplates() {
+        return ctaRuleTemplates;
     }
 
-    public void setCtaRuleTemplateDTOS(List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
-        this.ctaRuleTemplateDTOS = ctaRuleTemplateDTOS;
+    public void setCtaRuleTemplates(List<CTARuleTemplateDTO> ctaRuleTemplates) {
+        this.ctaRuleTemplates = ctaRuleTemplates;
     }
 
 

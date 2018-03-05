@@ -16,13 +16,30 @@ public class CTARuleTemplateDTO {
     private List<BigInteger> activityIds;
     private List<BigInteger> timeTypes;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
+    private int minutesFromCta;
 
     public CTARuleTemplateDTO() {
+    }
+
+
+    public CTARuleTemplateDTO(Long id, String name, int granularity, List<BigInteger> timeTypes) {
+        this.id = id;
+        this.name = name;
+        this.granularity = granularity;
+        this.timeTypes = timeTypes;
     }
 
     public CTARuleTemplateDTO(int granularity, List<BigInteger> timeTypes) {
         this.granularity = granularity;
         this.timeTypes = timeTypes;
+    }
+
+    public int getMinutesFromCta() {
+        return minutesFromCta;
+    }
+
+    public void setMinutesFromCta(int minutesFromCta) {
+        this.minutesFromCta = minutesFromCta;
     }
 
     public Long getId() {
