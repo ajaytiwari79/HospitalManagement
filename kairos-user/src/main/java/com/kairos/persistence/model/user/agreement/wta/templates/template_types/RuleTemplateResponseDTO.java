@@ -58,6 +58,7 @@ public class RuleTemplateResponseDTO {
     private int recommendedValue;
     private String lastUpdatedBy;
     private TimeBankTypeEnum frequency;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private Integer yellowZone;
     private Boolean forbid;
     private Boolean allowExtraActivity;

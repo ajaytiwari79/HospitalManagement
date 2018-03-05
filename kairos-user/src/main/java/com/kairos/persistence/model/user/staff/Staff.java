@@ -69,7 +69,10 @@ public class Staff extends UserBaseEntity {
     private ContactDetail contactDetail;
     //address tab
     @Relationship(type = HAS_CONTACT_ADDRESS)
-    private List<ContactAddress> contactAddress;
+    private ContactAddress contactAddress;
+
+    @Relationship(type = SECONDARY_CONTACT_ADDRESS)
+    private ContactAddress secondaryContactAddress;
 
     @Relationship(type = BELONGS_TO)
     User user;
@@ -117,11 +120,11 @@ public class Staff extends UserBaseEntity {
         this.cprNumber = cprNumber;
     }
 
-    public List<ContactAddress> getContactAddress() {
+    public ContactAddress getContactAddress() {
         return contactAddress;
     }
 
-    public void setContactAddress(List<ContactAddress> contactAddress) {
+    public void setContactAddress(ContactAddress contactAddress) {
         this.contactAddress = contactAddress;
     }
 
@@ -466,7 +469,7 @@ public class Staff extends UserBaseEntity {
         this.client = client;
     }
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
     public Date getDateOfBirth() {
         return dateOfBirth;
     }
@@ -497,5 +500,13 @@ public class Staff extends UserBaseEntity {
 
     public void setCurrentStatus(StaffStatusEnum currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    public ContactAddress getSecondaryContactAddress() {
+        return secondaryContactAddress;
+    }
+
+    public void setSecondaryContactAddress(ContactAddress secondaryContactAddress) {
+        this.secondaryContactAddress = secondaryContactAddress;
     }
 }
