@@ -2,6 +2,7 @@ package com.kairos.service.unit_employment_position;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.staff.Staff;
@@ -60,8 +61,9 @@ public class UnitPositionServiceIntegrationTest {
     }
 
     @Test
-    public void createUnitPosition() throws Exception {
-        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(5791L, 1507L, 1616174226503L, null, 11, 11182L, 8051L, 15115L, null, 95L);
+    public void test1_createUnitPosition() throws Exception {
+        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(5791L, 1507L, 1616174226503L, null,
+                11, 11182L, 8364L, 15115L, 14730L, 95L, null);
         HttpEntity<UnitPositionDTO> requestBodyData = new HttpEntity<>(unitPositionDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
@@ -71,10 +73,12 @@ public class UnitPositionServiceIntegrationTest {
                 HttpMethod.POST, requestBodyData, typeReference);
         logger.info(response.toString());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+        createdId = (long) response.getBody().getData().get("id");
     }
 
     @Test
-    public void getUnitPositionsOfStaff() throws Exception {
+
+    public void test2_getUnitPositionsOfStaff() throws Exception {
         ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map<String, Object>>>>() {
                 };
@@ -86,15 +90,15 @@ public class UnitPositionServiceIntegrationTest {
     }
 
     @Test
-    public void updateUnitPosition() throws Exception {
-        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(5791L, 1507L, 1616174226503L, null, 12, 11182L, 8051L, 15115L, null, 95L);
-
+    public void test3_updateUnitPosition() throws Exception {
+        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(5791L, 1507L, 1616174226503L, null,
+                11, 11182L, 8364L, 15115L, 14730L, 95L, null);
         HttpEntity<UnitPositionDTO> requestBodyData = new HttpEntity<>(unitPositionDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<Map<String, Object>>> response = restTemplate.exchange(
-                baseUrlWithUnit + "/unit_position/" + 8586 + "?moduleId=tab_23&type=Organization",
+                baseUrlWithUnit + "/unit_position/" + createdId + "?moduleId=tab_23&type=Organization",
                 HttpMethod.PUT, requestBodyData, typeReference);
         logger.info(response.toString());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));

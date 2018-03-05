@@ -44,15 +44,15 @@ public class UnitPositionDTO {
     @Range(min = 0, message = "unit Id  is required for position")
     private Long unitId;
 
-    private  Long timeCareExternalId;
+    private Long timeCareExternalId;
+
     public UnitPositionDTO() {
         //default cons
     }
 
 
-
     public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
-                           float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId,Long timeCareExternalId) {
+                           float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -66,7 +66,8 @@ public class UnitPositionDTO {
     }
 
 
-    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId,Long unitId,Long timeCareExternalId) {
+    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId,
+                           Long staffId, Long wtaId, Long ctaId, Long unitId, Long timeCareExternalId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.employmentTypeId = employmentTypeId;
@@ -76,10 +77,11 @@ public class UnitPositionDTO {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.totalWeeklyHours = totalWeeklyHours;
-        this.timeCareExternalId=timeCareExternalId;
+        this.timeCareExternalId = timeCareExternalId;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.hourlyWages = hourlyWages;
         this.salary = salary;
+        this.unitId = unitId;
         this.workingDaysInWeek = workingDaysInWeek;
     }
 
