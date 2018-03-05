@@ -2,19 +2,21 @@ package com.kairos.persistence.model.user.agreement.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
 /**
  * Created by vipul on 12/10/17.
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
 public class RuleTemplateCategoryDTO {
@@ -60,6 +62,11 @@ public class RuleTemplateCategoryDTO {
     private Long shiftsLimit;
     private Boolean onlyCompositeShifts;
     private String activityCode;
+    private TimeBankTypeEnum frequency;
+    private Integer yellowZone;
+    private Boolean forbid;
+    private Boolean allowExtraActivity;
+
 
     public int getRecommendedValue() {
         return recommendedValue;
@@ -384,7 +391,37 @@ public class RuleTemplateCategoryDTO {
         this.phaseTemplateValues = phaseTemplateValues;
     }
 
+    public TimeBankTypeEnum getFrequency() {
+        return frequency;
+    }
 
+    public void setFrequency(TimeBankTypeEnum frequency) {
+        this.frequency = frequency;
+    }
+
+    public Integer getYellowZone() {
+        return yellowZone;
+    }
+
+    public void setYellowZone(Integer yellowZone) {
+        this.yellowZone = yellowZone;
+    }
+
+    public Boolean isForbid() {
+        return forbid;
+    }
+
+    public void setForbid(Boolean forbid) {
+        this.forbid = forbid;
+    }
+
+    public Boolean isAllowExtraActivity() {
+        return allowExtraActivity;
+    }
+
+    public void setAllowExtraActivity(Boolean allowExtraActivity) {
+        this.allowExtraActivity = allowExtraActivity;
+    }
 
     @Override
     public String toString() {

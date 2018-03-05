@@ -248,6 +248,14 @@ public class AppConstants {
     public static final String TEMPLATE20 = "TEMPLATE20";
     public static final String TEMPLATE20_NAME = "Maximum senior days per year";
     public static final String TEMPLATE20_DESCRIPTION = "Maximum amount of senior days per year";
+
+    public static final String TEMPLATE21 = "TEMPLATE21";
+    public static final String TEMPLATE21_NAME = "Maximum time bank";
+    public static final String TEMPLATE21_DESCRIPTION = "Maximum time bank for staff";
+
+    public static final String TEMPLATE22 = "TEMPLATE22";
+    public static final String TEMPLATE22_NAME = "Minimum time bank";
+    public static final String TEMPLATE22_DESCRIPTION = "Minimum time bank for staff";
     public static final String ORGANIZATION_ID = "organizationId";
     public static final String UNIT_ID = "unitId";
 
@@ -260,6 +268,13 @@ public class AppConstants {
     public static final String SKILL_CATEGORY_FOR_TIME_CARE = "Skills From TimeCare";
     public static final int DB_RECORD_LIMIT = 100;
     public static final String KAIROS_EMAIL = "@kairos.com";
+
+
+    // Default data to import employments from time care
+    public static final float DEFAULT_AVERAGE_DAILY_WORKING_HOURS = 60;
+    public static final float DEFAULT_HOURLY_WAGES = 10;
+    public static final float DEFAULT_SALARY= 500;
+    public static final int DEFAULT_WORKING_DAYS_IN_WEEK = 5;
 
 
 

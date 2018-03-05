@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.agreement.wta.templates.template_types
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -56,6 +57,12 @@ public class RuleTemplateResponseDTO {
     private String activityCode;
     private int recommendedValue;
     private String lastUpdatedBy;
+    private TimeBankTypeEnum frequency;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private Integer yellowZone;
+    private Boolean forbid;
+    private Boolean allowExtraActivity;
+
 
     public String getLastUpdatedBy() {
         return lastUpdatedBy;
@@ -384,5 +391,37 @@ public class RuleTemplateResponseDTO {
 
     public void setActivityCode(String activityCode) {
         this.activityCode = activityCode;
+    }
+
+    public TimeBankTypeEnum getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(TimeBankTypeEnum frequency) {
+        this.frequency = frequency;
+    }
+
+    public Integer getYellowZone() {
+        return yellowZone;
+    }
+
+    public void setYellowZone(Integer yellowZone) {
+        this.yellowZone = yellowZone;
+    }
+
+    public Boolean isForbid() {
+        return forbid;
+    }
+
+    public void setForbid(Boolean forbid) {
+        this.forbid = forbid;
+    }
+
+    public Boolean isAllowExtraActivity() {
+        return allowExtraActivity;
+    }
+
+    public void setAllowExtraActivity(Boolean allowExtraActivity) {
+        this.allowExtraActivity = allowExtraActivity;
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
+import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
@@ -145,6 +146,11 @@ public class RuleTemplateService extends UserBaseService {
         MaximumSeniorDaysInYearWTATemplate wta20 = new MaximumSeniorDaysInYearWTATemplate(TEMPLATE20_NAME, TEMPLATE20, true, TEMPLATE20_DESCRIPTION, 1, "NA", dateInMillis, 1, "");
         baseRuleTemplates.add(wta20);
 
+        MaximumTimeBank wta21=new MaximumTimeBank(TEMPLATE21_NAME, TEMPLATE21, true, TEMPLATE21_DESCRIPTION, TimeBankTypeEnum.HOURLY,45,false,false);
+        baseRuleTemplates.add(wta21);
+
+        MinimumTimeBank wta22=new MinimumTimeBank(TEMPLATE22_NAME, TEMPLATE22, true, TEMPLATE22_DESCRIPTION, TimeBankTypeEnum.HOURLY,25,false,false);
+        baseRuleTemplates.add(wta22);
         country.setWTABaseRuleTemplate(baseRuleTemplates);
         save(country);
 
@@ -360,6 +366,22 @@ public class RuleTemplateService extends UserBaseService {
                 maximumSeniorDaysInYearWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
                 maximumSeniorDaysInYearWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
                 maximumSeniorDaysInYearWTATemplate.setActivityCode(templateDTO.getActivityCode());
+                break;
+            case TEMPLATE21:
+                MaximumTimeBank maximumTimeBank = (MaximumTimeBank) oldTemplate;
+                maximumTimeBank.setDescription(templateDTO.getDescription());
+                maximumTimeBank.setFrequency(templateDTO.getFrequency());
+                maximumTimeBank.setYellowZone(templateDTO.getYellowZone());
+                maximumTimeBank.setForbid(templateDTO.isForbid());
+                maximumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
+                break;
+            case TEMPLATE22:
+                MinimumTimeBank minimumTimeBank = (MinimumTimeBank) oldTemplate;
+                minimumTimeBank.setDescription(templateDTO.getDescription());
+                minimumTimeBank.setFrequency(templateDTO.getFrequency());
+                minimumTimeBank.setYellowZone(templateDTO.getYellowZone());
+                minimumTimeBank.setForbid(templateDTO.isForbid());
+                minimumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
                 break;
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");

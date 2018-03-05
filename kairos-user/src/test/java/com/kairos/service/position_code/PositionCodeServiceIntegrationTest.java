@@ -57,7 +57,7 @@ public class PositionCodeServiceIntegrationTest {
     public void setUp() throws Exception {
         baseUrlWithCountry = getBaseUrl(71L, null, 95L);
         baseUrlWithUnit = getBaseUrl(71L, 53L, null);
-        positionCode = new PositionCode("Doctor" + Math.random(), "hey");
+        positionCode = new PositionCode("Doctor" + Math.random(), "hey", null);
 
 
     }

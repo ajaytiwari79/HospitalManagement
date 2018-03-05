@@ -79,6 +79,7 @@ public class OrganizationHierarchyService {
             queryResult.setEnabled(organization.isEnable());
             queryResult.setParentOrganization(organization.isParentOrganization());
             queryResult.setTimeZone(organization.getTimeZone()!=null? organization.getTimeZone().getId():null);
+            queryResult.setOrganizationLevel(organization.getOrganizationLevel());
             return queryResult;
         }
 
