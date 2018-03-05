@@ -270,6 +270,13 @@ public class AppConstants {
     public static final String KAIROS_EMAIL = "@kairos.com";
 
 
+    // Default data to import employments from time care
+    public static final float DEFAULT_AVERAGE_DAILY_WORKING_HOURS = 60;
+    public static final float DEFAULT_HOURLY_WAGES = 10;
+    public static final float DEFAULT_SALARY= 500;
+    public static final int DEFAULT_WORKING_DAYS_IN_WEEK = 5;
+
+
 
 
 

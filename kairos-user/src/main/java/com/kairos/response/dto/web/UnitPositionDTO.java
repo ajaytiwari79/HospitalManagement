@@ -50,6 +50,7 @@ public class UnitPositionDTO {
     }
 
 
+
     public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
                            float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId,Long timeCareExternalId) {
         this.salary = salary;
@@ -65,7 +66,7 @@ public class UnitPositionDTO {
     }
 
 
-    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId, Long unitId,Long timeCareExternalId) {
+    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId,Long unitId,Long timeCareExternalId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.employmentTypeId = employmentTypeId;
@@ -75,12 +76,13 @@ public class UnitPositionDTO {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.totalWeeklyHours = totalWeeklyHours;
-        this.avgDailyWorkingHours = 60;
-        this.hourlyWages = 10;
-        this.salary = 500;
-        this.unitId = unitId;
         this.timeCareExternalId=timeCareExternalId;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.hourlyWages = hourlyWages;
+        this.salary = salary;
+        this.workingDaysInWeek = workingDaysInWeek;
     }
+
 
     public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
         this.totalWeeklyMinutes = totalWeeklyMinutes;

@@ -104,13 +104,23 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
 
     AccessPage findByModuleId(String moduleId);
 
-    @Query("Match (accessPage:AccessPage{isModule:true}) return id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId," +
-            "accessPage.active as active")
-    List<AccessPageDTO> getMainTabs();
+    @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage\n" +
+            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage) WHERE id(country)={0} WITH r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization,accessPage\n" +
+            "RETURN \n" +
+            "id(accessPage) as id,accessPage.name as name,accessPage.moduleId as moduleId,accessPage.active as active, \n" +
+            " CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
+            " CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
+            " CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization")
+    List<AccessPageDTO> getMainTabs(Long countryId);
 
-    @Query("Match (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) where id(accessPage)={0} return id(subPage) as id," +
-            "subPage.name as name,subPage.moduleId as moduleId,subPage.active as active,id(accessPage) as parentTabId")
-    List<AccessPageDTO> getChildTabs(Long tabId);
+    @Query("Match (accessPage:AccessPage)-[:"+SUB_PAGE+"]->(subPage:AccessPage) where id(accessPage)={0} WITH subPage,accessPage\n" +
+            "OPTIONAL MATCH (country:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage) WHERE id(country)={1} WITH r,subPage,id(accessPage) as parentTabId,\n" +
+            "r.accessibleForHub as accessibleForHub, r.accessibleForUnion as accessibleForUnion, r.accessibleForOrganization as accessibleForOrganization\n" +
+            "return id(subPage) as id, subPage.name as name,subPage.moduleId as moduleId,subPage.active as active, parentTabId,\n" +
+            "CASE WHEN accessibleForHub is NULL THEN false ELSE accessibleForHub END as accessibleForHub,\n" +
+            " CASE WHEN accessibleForUnion is NULL THEN false ELSE accessibleForUnion END as accessibleForUnion,\n" +
+            " CASE WHEN accessibleForOrganization is NULL THEN false ELSE accessibleForOrganization END as accessibleForOrganization")
+    List<AccessPageDTO> getChildTabs(Long tabId, Long countryId);
 
     @Query("Match (accessPage:AccessPage) where id(accessPage)={0} set accessPage.name={1} return accessPage")
     AccessPage updateAccessTab(Long id, String name);
@@ -118,6 +128,31 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
     @Query("Match (n:AccessPage) where id(n)={0} with n\n" +
             "Optional Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages set pages.active={1} return distinct true")
     Boolean updateStatusOfAccessTabs(Long tabId,Boolean active);
+
+    @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
+            "Optional Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages \n" +
+            "MATCH (c:Country) WHERE id(c)={1} WITH c, pages\n" +
+            "MERGE (c)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]->(pages)\n" +
+            "  ON CREATE SET r.accessibleForHub = {2},r.accessibleForUnion = false,r.accessibleForOrganization=false\n" +
+            "  ON MATCH  SET r.accessibleForHub = {2} return distinct true")
+    Boolean updateAccessStatusForHubOfCountry(Long tabId,Long countryId, Boolean accessStatus);
+
+    @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
+            "Optional Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages \n" +
+            "MATCH (c:Country) WHERE id(c)={1} WITH c, pages\n" +
+            "MERGE (c)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]->(pages)\n" +
+            "  ON CREATE SET r.accessibleForHub = false,r.accessibleForUnion = {2},r.accessibleForOrganization=false\n" +
+            "  ON MATCH  SET r.accessibleForUnion = {2} return distinct true")
+    Boolean updateAccessStatusForUnionOfCountry(Long tabId,Long countryId, Boolean accessStatus);
+
+    @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
+            "Optional Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages \n" +
+            "MATCH (c:Country) WHERE id(c)={1} WITH c, pages\n" +
+            "MERGE (c)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]->(pages)\n" +
+            "  ON CREATE SET r.accessibleForHub = false,r.accessibleForUnion = false,r.accessibleForOrganization={2}\n" +
+            "  ON MATCH  SET r.accessibleForOrganization = {2} return distinct true")
+    Boolean updateAccessStatusForOrganizationOfCountry(Long tabId,Long countryId, Boolean accessStatus);
+
 
     @Query("Match (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0}\n" +
             "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={1}\n" +
@@ -139,6 +174,12 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
             "Match (emp:Employment)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitPermission:UnitPermission)-[:"+ APPLICABLE_IN_UNIT +"]->(org:Organization) with collect(org.isKairosHub) as hubList\n" +
             "return true in hubList")
     Boolean isHubMember(Long userId);
+
+
+    // For Test Cases
+
+    @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage return accessPage LIMIT 1")
+    AccessPage getOneMainModule();
 
 }
 

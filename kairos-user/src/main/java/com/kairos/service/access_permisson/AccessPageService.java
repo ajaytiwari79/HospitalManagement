@@ -1,8 +1,10 @@
 package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.client.dto.organization.OrganizationCategoryDTO;
 import com.kairos.config.security.CurrentUserDetails;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.access_permission.*;
 import com.kairos.persistence.model.user.auth.StaffPermissionDTO;
@@ -20,6 +22,7 @@ import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentPageGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
+import com.kairos.response.dto.web.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.userContext.UserContext;
@@ -93,16 +96,37 @@ public class AccessPageService extends UserBaseService {
         return accessPage;
     }
 
-    public List<AccessPageDTO> getMainTabs(){
-        return accessPageRepository.getMainTabs();
+    public List<AccessPageDTO> getMainTabs(Long countryId){
+        return accessPageRepository.getMainTabs(countryId);
     }
 
-    public List<AccessPageDTO> getChildTabs(Long tabId){
-        return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.getChildTabs(tabId):Collections.emptyList();
+    public List<AccessPageDTO> getChildTabs(Long tabId, Long countryId){
+        if( !Optional.ofNullable(tabId).isPresent() ){
+            return Collections.emptyList();
+        }
+        return accessPageRepository.getChildTabs(tabId, countryId);
     }
 
     public Boolean updateStatus(boolean active,Long tabId){
         return (Optional.ofNullable(tabId).isPresent())?accessPageRepository.updateStatusOfAccessTabs(tabId,active):false;
+    }
+
+    public Boolean updateAccessForOrganizationCategory(Long countryId, Long tabId, OrgCategoryTabAccessDTO orgCategoryTabAccessDTO){
+        if( !Optional.ofNullable(tabId).isPresent() ){
+            return false;
+        }
+        switch (orgCategoryTabAccessDTO.getOrganizationCategory()){
+            case HUB: {
+                return accessPageRepository.updateAccessStatusForHubOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
+            }
+            case ORGANIZATION: {
+                return accessPageRepository.updateAccessStatusForOrganizationOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
+            }
+            case UNION: {
+                return accessPageRepository.updateAccessStatusForUnionOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
+            }
+        }
+        return false;
     }
 
     public void createAccessPageByXml(Tab tab){
@@ -336,5 +360,12 @@ public class AccessPageService extends UserBaseService {
         return false;
     }
 
+    public List<OrganizationCategoryDTO> getListOfOrganizaionCategories(){
+        return OrganizationCategory.getListOfOrganizationCategory();
+    }
 
+    // For Test Cases
+    public AccessPage getOneMainModule(){
+        return accessPageRepository.getOneMainModule();
+    }
 }

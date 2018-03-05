@@ -3,7 +3,7 @@ package com.kairos.controller.unit_employment_position;
 
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.response.dto.web.UnitPositionDTO;
-import com.kairos.service.unit_employment_position.UnitPositionService;
+import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

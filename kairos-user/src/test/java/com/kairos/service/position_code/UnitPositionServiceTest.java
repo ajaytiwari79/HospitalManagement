@@ -3,7 +3,7 @@ package com.kairos.service.position_code;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.response.dto.web.UnitPositionDTO;
-import com.kairos.service.unit_employment_position.UnitPositionService;
+import com.kairos.service.unit_position.UnitPositionService;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;

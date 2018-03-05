@@ -11,6 +11,7 @@ import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepository;
 import com.kairos.response.dto.web.PositionCodeUnionWrapper;
+import com.kairos.response.dto.web.organization.position_code.PositionCodeDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
@@ -53,10 +54,10 @@ public class PositionCodeService extends UserBaseService {
     private OrganizationService organizationService;
 
 
-    public PositionCode createPositionCode(Long id, PositionCode positionCode, String type) {
+    public PositionCode createPositionCode(Long id, PositionCodeDTO positionCodeDTO, String type) {
         Long unitId = organizationService.getOrganization(id, type);
         PositionCode position = null;
-        String name = "(?i)" + positionCode.getName().trim();
+        String name = "(?i)" + positionCodeDTO.getName().trim();
         //check if duplicate
         position = positionCodeGraphRepository.checkDuplicatePositionCode(unitId, name);
         if (position != null) {
@@ -72,6 +73,7 @@ public class PositionCodeService extends UserBaseService {
 
         List<PositionCode> positionCodeList = organization.getPositionCodeList();
         positionCodeList = (positionCodeList == null) ? new ArrayList<PositionCode>() : positionCodeList;
+        PositionCode positionCode = new PositionCode(positionCodeDTO.getName(), positionCodeDTO.getDescription(), positionCodeDTO.getTimeCareId());
         positionCodeList.add(positionCode);
         organization.setPositionCodeList(positionCodeList);
         save(organization);

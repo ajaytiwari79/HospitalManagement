@@ -7,7 +7,7 @@ import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.service.unit_employment_position.UnitPositionService;
+import com.kairos.service.unit_position.UnitPositionService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -27,7 +27,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -60,9 +59,6 @@ public class PositionCodeServiceIntegrationTest {
     public void setUp() throws Exception {
         baseUrlWithUnit = getBaseUrl(71L, null, 95L);
         baseUrlWithCountry = getBaseUrl(71L, 53L, null);
-        positionCode = new PositionCode("Doctor1" + Math.random(), "hey");
-
-
     }
 
 

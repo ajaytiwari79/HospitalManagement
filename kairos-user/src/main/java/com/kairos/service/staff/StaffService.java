@@ -54,7 +54,7 @@ import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
-import com.kairos.service.unit_employment_position.UnitPositionService;
+import com.kairos.service.unit_position.UnitPositionService;
 
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateConverter;
@@ -613,9 +613,8 @@ public class StaffService extends UserBaseService {
 //                        }
 //                    }
                     staff.setContactDetail(contactDetail);
-                    List<ContactAddress> contactAddresses = new ArrayList<>();
-                    contactAddresses.add(contactAddress);
-                    staff.setContactAddress(contactAddresses);
+                    staff.setContactAddress(contactAddress);
+
                     cell = row.getCell(2);
                     if (Optional.ofNullable(cell).isPresent()) {
                         cell.setCellType(Cell.CELL_TYPE_STRING);
@@ -945,10 +944,8 @@ public class StaffService extends UserBaseService {
         staff.setFamilyName(payload.getFamilyName());
         staff.setCprNumber(payload.getCprNumber());
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
-        contactAddress.setPrimary(true);
-        List<ContactAddress> contactAddresses = new ArrayList<>();
-        contactAddresses.add(contactAddress);
-        staff.setContactAddress(contactAddresses);
+        staff.setContactAddress(contactAddress);
+
         ObjectMapper objectMapper = new ObjectMapper();
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
@@ -1025,11 +1022,10 @@ public class StaffService extends UserBaseService {
 
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
-        if (contactAddress != null) {
-            List<ContactAddress> contactAddresses = new ArrayList<>();
-            contactAddresses.add(contactAddress);
-            staff.setContactAddress(contactAddresses);
-        }
+
+        if (contactAddress != null)
+            staff.setContactAddress(contactAddress);
+
         if (engineerTypeId != null)
             staff.setEngineerType(engineerTypeGraphRepository.findOne(engineerTypeId));
         staff.setUser(user);
@@ -1545,10 +1541,7 @@ public class StaffService extends UserBaseService {
                 contactAddress.setHouseNumber(matcher.group(0));
             }
         }
-        List<ContactAddress> contactAddresses = new ArrayList<>();
-        contactAddresses.add(contactAddress);
-        staff.setContactAddress(contactAddresses);
-
+        staff.setContactAddress(contactAddress);
         ContactDetail contactDetail = new ContactDetail();
         contactDetail.setPrivatePhone(timeCareStaffDTO.getCellPhoneNumber());
         contactDetail.setLandLinePhone(timeCareStaffDTO.getTelephoneNumber());

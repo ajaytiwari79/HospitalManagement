@@ -1,4 +1,4 @@
-package com.kairos.service.unit_employment_position;
+package com.kairos.service.unit_position;
 
 import com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO;
 import com.kairos.client.dto.timeBank.CostTimeAgreementDTO;

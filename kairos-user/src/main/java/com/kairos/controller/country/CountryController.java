@@ -17,6 +17,7 @@ import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
+import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.*;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.language.LanguageLevelService;
@@ -115,6 +116,8 @@ public class CountryController {
     private PresenceTypeService presenceTypeService;
     @Inject
     private TimeSlotService timeSlotService;
+    @Inject
+    private AccessPageService accessPageService;
 
     // Country
     @RequestMapping(value = "/country", method = RequestMethod.POST)
@@ -1140,6 +1143,13 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/time_slots", method = RequestMethod.GET)
      public ResponseEntity<Map<String, Object>> getTimeSlotOfCountry(@PathVariable Long countryId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry(countryId));
+    }
+
+    @ApiOperation("Get Organization's Categories")
+    @RequestMapping(value = COUNTRY_URL + "/organization_category" , method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationCategories(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessPageService.getListOfOrganizaionCategories());
     }
 
 

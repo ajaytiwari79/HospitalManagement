@@ -10,11 +10,11 @@ import org.neo4j.ogm.annotation.NodeEntity;
  * Created by pavan on 20/2/18.
  */
 @NodeEntity
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MinimumTimeBank extends WTABaseRuleTemplate{
     private TimeBankTypeEnum frequency;
-    private int yellowZone;
+    private Integer yellowZone;
     private boolean forbid;
     private boolean allowExtraActivity;
 
@@ -22,7 +22,7 @@ public class MinimumTimeBank extends WTABaseRuleTemplate{
         //Default Constructor
     }
 
-    public MinimumTimeBank(String name, String templateType,boolean disabled, String description, TimeBankTypeEnum frequency, int yellowZone, boolean forbid, boolean allowExtraActivity) {
+    public MinimumTimeBank(String name, String templateType,boolean disabled, String description, TimeBankTypeEnum frequency, Integer yellowZone, boolean forbid, boolean allowExtraActivity) {
         this.name=name;
         this.templateType=templateType;
         this.disabled=disabled;
@@ -41,11 +41,11 @@ public class MinimumTimeBank extends WTABaseRuleTemplate{
         this.frequency = frequency;
     }
 
-    public int getYellowZone() {
+    public Integer getYellowZone() {
         return yellowZone;
     }
 
-    public void setYellowZone(int yelloZone) {
+    public void setYellowZone(Integer yelloZone) {
         this.yellowZone = yelloZone;
     }
 
