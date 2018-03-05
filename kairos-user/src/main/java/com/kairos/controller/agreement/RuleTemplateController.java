@@ -57,8 +57,8 @@ public class RuleTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplateCategoryByUnit(unitId));
     }
 
-    @RequestMapping(value = COUNTRY_URL+"/copy_rule_templates/{templateType}", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> copyRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType ,@Valid @RequestBody RuleTemplateCategoryDTO templateDTO) {
+    @RequestMapping(value = COUNTRY_URL+"/copy_rule_template", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> copyRuleTemplate(@PathVariable Long countryId, @Valid @RequestBody RuleTemplateCategoryDTO templateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.copyRuleTemplate(countryId,templateDTO));
     }
 

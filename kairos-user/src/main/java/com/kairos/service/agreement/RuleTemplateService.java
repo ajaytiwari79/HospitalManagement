@@ -27,6 +27,8 @@ import com.kairos.service.country.tag.TagService;
 import com.kairos.util.ArrayUtil;
 import com.kairos.util.DateUtil;
 import com.kairos.util.userContext.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +63,7 @@ public class RuleTemplateService extends UserBaseService {
     private WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
-
+    private final Logger logger = LoggerFactory.getLogger(RuleTemplateService.class);
 
     public boolean createRuleTemplate(long countryId) {
 
@@ -216,7 +218,9 @@ public class RuleTemplateService extends UserBaseService {
         if (!Optional.ofNullable(oldTemplate).isPresent()) {
             throw new DataNotFoundByIdException("Invalid TemplateType id " + templateDTO.getId());
         }
-        switch (oldTemplate.getTemplateType()) {
+        String templateType=getTemplateType(templateDTO.getTemplateType());
+        logger.info("templateType:"+templateType);
+        switch (templateType) {
             case TEMPLATE1:
                 MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = (MaximumShiftLengthWTATemplate) oldTemplate;//oldTemplate;
                 maximumShiftLengthWTATemplate.setDescription(templateDTO.getDescription());
@@ -483,6 +487,9 @@ public class RuleTemplateService extends UserBaseService {
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country");
         }
+        if(!Optional.ofNullable(wtaRuleTemplateDTO.getTemplateType()).isPresent()){
+            throw new DataNotFoundByIdException("No templateType found");
+        }
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryRepository.findByName(countryId, wtaRuleTemplateDTO.getRuleTemplateCategory().getName(), RuleTemplateCategoryType.WTA);
         if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
             throw new DataNotFoundByIdException("Category Not matched");
@@ -495,15 +502,152 @@ public class RuleTemplateService extends UserBaseService {
 
         WTABaseRuleTemplate wtaBaseRuleTemplate = new WTABaseRuleTemplate();
         List<PhaseTemplateValue> phaseTemplateValues = wtaOrganizationService.copyPhaseTemplateValue(wtaRuleTemplateDTO.getPhaseTemplateValues());
-        BeanUtils.copyProperties(wtaRuleTemplateDTO, wtaBaseRuleTemplate);
+        String originalTemplateType=getTemplateType(wtaRuleTemplateDTO.getTemplateType());
+        String lastInsertedTemplateType=wtaBaseRuleTemplateGraphRepository.getLastInsertedTemplateType(countryId,originalTemplateType);
+        if(!Optional.ofNullable(lastInsertedTemplateType).isPresent()){
+            throw new DataNotFoundByIdException("No templateType found"+originalTemplateType);
+        }
+
+        switch (originalTemplateType){
+            case TEMPLATE1:
+                wtaBaseRuleTemplate=new MaximumShiftLengthWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getTimeLimit(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getCheckAgainstTimeRules());
+                break;
+            case TEMPLATE2:
+                wtaBaseRuleTemplate=new MinimumShiftLengthWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getTimeLimit(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getCheckAgainstTimeRules());
+                break;
+            case TEMPLATE3:
+                wtaBaseRuleTemplate=new MaximumConsecutiveWorkingDaysWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getCheckAgainstTimeRules(),wtaRuleTemplateDTO.getDaysLimit());
+                break;
+            case TEMPLATE4:
+                wtaBaseRuleTemplate=new MinimumRestInConsecutiveDaysWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getMinimumRest(),wtaRuleTemplateDTO.getDaysWorked());
+                break;
+            case TEMPLATE5:
+                wtaBaseRuleTemplate=new MaximumNightShiftLengthWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getTimeLimit(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getCheckAgainstTimeRules());
+                break;
+            case TEMPLATE6:
+                wtaBaseRuleTemplate=new MinimumConsecutiveNightsWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getDaysLimit());
+                break;
+            case TEMPLATE7:
+                wtaBaseRuleTemplate=new MaximumConsecutiveWorkingNightsWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getCheckAgainstTimeRules(),wtaRuleTemplateDTO.getNightsWorked());
+                break;
+            case TEMPLATE8:
+                wtaBaseRuleTemplate= new MinimumRestConsecutiveNightsWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getMinimumRest(),wtaRuleTemplateDTO.getNightsWorked());
+                break;
+            case TEMPLATE9:
+                wtaBaseRuleTemplate=new MaximumNumberOfNightsWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getNightsWorked(),wtaRuleTemplateDTO.getIntervalLength(),wtaRuleTemplateDTO.getValidationStartDateMillis(),wtaRuleTemplateDTO.getIntervalUnit());
+                break;
+            case TEMPLATE10:
+                wtaBaseRuleTemplate=new MaximumDaysOffInPeriodWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getIntervalLength(),wtaRuleTemplateDTO.getValidationStartDateMillis(),wtaRuleTemplateDTO.getDaysLimit(),wtaRuleTemplateDTO.getIntervalUnit());
+                break;
+            case TEMPLATE11:
+                wtaBaseRuleTemplate=new MaximumAverageScheduledTimeWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getIntervalLength(),wtaBaseRuleTemplate.getRecommendedValue(),wtaRuleTemplateDTO.getBalanceAdjustment(),wtaRuleTemplateDTO.getUseShiftTimes(),wtaRuleTemplateDTO.getMaximumAvgTime(),wtaRuleTemplateDTO.getIntervalUnit());
+                break;
+            case TEMPLATE12:
+                wtaBaseRuleTemplate=new MaximumVetoPerPeriodWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getMaximumVetoPercentage());
+                break;
+            case TEMPLATE13:
+                wtaBaseRuleTemplate=new NumberOfWeekendShiftInPeriodWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getNumberShiftsPerPeriod(),wtaRuleTemplateDTO.getNumberOfWeeks(),wtaRuleTemplateDTO.getFromDayOfWeek(),wtaRuleTemplateDTO.getFromTime(),wtaRuleTemplateDTO.getProportional(),wtaRuleTemplateDTO.getToDayOfWeek(),wtaRuleTemplateDTO.getToTime());
+                break;
+            case TEMPLATE14:
+                wtaBaseRuleTemplate=new CareDayCheckWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getIntervalLength(),wtaRuleTemplateDTO.getValidationStartDateMillis(),wtaRuleTemplateDTO.getIntervalUnit(),wtaRuleTemplateDTO.getDaysLimit());
+                break;
+            case TEMPLATE15:
+                wtaBaseRuleTemplate=new MinimumDailyRestingTimeWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getContinuousDayRestHours());
+                break;
+            case TEMPLATE16:
+                wtaBaseRuleTemplate=new MinimumDurationBetweenShiftWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getMinimumDurationBetweenShifts());
+                break;
+            case TEMPLATE17:
+                wtaBaseRuleTemplate=new MinimumWeeklyRestPeriodWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getContinuousWeekRest());
+                break;
+            case TEMPLATE18:
+                wtaBaseRuleTemplate=new ShortestAndAverageDailyRestWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getIntervalLength(),wtaRuleTemplateDTO.getIntervalUnit(),wtaRuleTemplateDTO.getValidationStartDateMillis(),wtaRuleTemplateDTO.getContinuousDayRestHours(),wtaRuleTemplateDTO.getAverageRest(),wtaRuleTemplateDTO.getShiftAffiliation());
+                break;
+            case TEMPLATE19:
+                wtaBaseRuleTemplate=new MaximumShiftsInIntervalWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBalanceType(),wtaRuleTemplateDTO.getIntervalLength(),wtaRuleTemplateDTO.getIntervalUnit(),wtaRuleTemplateDTO.getValidationStartDateMillis(),wtaRuleTemplateDTO.getShiftsLimit(),wtaRuleTemplateDTO.getOnlyCompositeShifts());
+                break;
+            case TEMPLATE20:
+                wtaBaseRuleTemplate=new MaximumSeniorDaysInYearWTATemplate(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getIntervalLength(),wtaRuleTemplateDTO.getIntervalUnit(),wtaRuleTemplateDTO.getValidationStartDateMillis(),wtaRuleTemplateDTO.getDaysLimit(),wtaRuleTemplateDTO.getActivityCode());
+                break;
+            case TEMPLATE21:
+                wtaBaseRuleTemplate=new MaximumTimeBank(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getFrequency(),wtaRuleTemplateDTO.getYellowZone(),wtaRuleTemplateDTO.isForbid(),wtaRuleTemplateDTO.isAllowExtraActivity());
+                break;
+            case TEMPLATE22:
+                wtaBaseRuleTemplate=new MinimumTimeBank(wtaRuleTemplateDTO.getName(),
+                        wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getFrequency(),wtaRuleTemplateDTO.getYellowZone(),wtaRuleTemplateDTO.isForbid(),wtaRuleTemplateDTO.isAllowExtraActivity());
+                break;
+        }
+        int number=getNumberFromlastInsertedTemplateType(lastInsertedTemplateType);
+
+        String templateTypeToBeSet=originalTemplateType+"-";
+        wtaBaseRuleTemplate.setTemplateType(templateTypeToBeSet+=++number);
+        wtaBaseRuleTemplate.setRecommendedValue(wtaRuleTemplateDTO.getRecommendedValue());
         wtaBaseRuleTemplate.setPhaseTemplateValues(phaseTemplateValues);
         ruleTemplateCategory.getRuleTemplates().add(wtaBaseRuleTemplate);
+        wtaBaseRuleTemplate.setRuleTemplateCategory(wtaRuleTemplateDTO.getRuleTemplateCategory());
         country.getWTABaseRuleTemplate().add(wtaBaseRuleTemplate);
         country.getRuleTemplateCategories().add(ruleTemplateCategory);
         save(country);
         return wtaBaseRuleTemplate;
 
 
+    }
+
+   private String getTemplateType(String templateType){
+        if(!templateType.contains("-")){
+            return templateType;
+        }
+       int lastCharIndex=templateType.lastIndexOf("-");
+        if(lastCharIndex>0){
+            char nextCharacter=templateType.charAt(lastCharIndex+1);
+            if(!Character.isDigit(templateType.charAt(lastCharIndex+1))){
+                return templateType;
+            }
+            else{
+                    return templateType.substring(0,lastCharIndex);
+            }
+        }
+        return null;
+   }
+
+
+    int getNumberFromlastInsertedTemplateType(String templateType){
+        if(!templateType.contains("-")){
+            return 0;
+        }
+        int lastCharIndex=templateType.lastIndexOf("-");
+        if(lastCharIndex>0){
+            char nextCharacter=templateType.charAt(lastCharIndex+1);
+            if(!Character.isDigit(templateType.charAt(lastCharIndex+1))){
+                return 0;
+            }
+            else{
+                return (int) Integer.parseInt(templateType.substring(++lastCharIndex,templateType.length()));
+            }
+        }
+
+        return 0;
     }
 
 }

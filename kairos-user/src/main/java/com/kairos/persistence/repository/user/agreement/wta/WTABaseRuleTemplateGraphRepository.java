@@ -192,5 +192,8 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByCountryId(Long countryId);
 
     WTABaseRuleTemplate existsByName(String name);
+    @Query("MATCH (c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE ]-(t:WTABaseRuleTemplate) where id(c)={0} and t.templateType CONTAINS {1} return t.templateType Order by t.created_at desc\n" +
+            "Limit 1")
+    String getLastInsertedTemplateType(Long countryId,String templateType);
 
 }
