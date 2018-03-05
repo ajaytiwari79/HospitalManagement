@@ -53,7 +53,8 @@ public class UnitEmploymentPositionDTO {
     }
 
 
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
+    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis,
+                                     int totalWeeklyMinutes,
                                      float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
@@ -66,21 +67,9 @@ public class UnitEmploymentPositionDTO {
         this.employmentTypeId = employmentTypeId;
     }
 
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary, Long employmentTypeId, Long staffId) {
-        this.positionCodeId = positionCodeId;
-        this.expertiseId = expertiseId;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.hourlyWages = hourlyWages;
-        this.salary = salary;
-        this.employmentTypeId = employmentTypeId;
-        this.staffId = staffId;
-    }
 
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId) {
+    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId,
+                                     float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.employmentTypeId = employmentTypeId;
@@ -90,9 +79,10 @@ public class UnitEmploymentPositionDTO {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.totalWeeklyHours = totalWeeklyHours;
-        this.avgDailyWorkingHours = 60;
-        this.hourlyWages = 10;
-        this.salary = 500;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.hourlyWages = hourlyWages;
+        this.salary = salary;
+        this.workingDaysInWeek = workingDaysInWeek;
 
     }
 

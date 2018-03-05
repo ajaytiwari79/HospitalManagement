@@ -1,8 +1,11 @@
 package com.kairos.persistence.model.user.access_permission;
 
+import com.kairos.persistence.model.enums.OrganizationCategory;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by prabjot on 10/10/17.
@@ -17,6 +20,10 @@ public class AccessPageDTO {
     private Long parentTabId;
     private String moduleId;
     private Boolean active;
+    private boolean accessibleForHub;
+    private boolean accessibleForUnion;
+    private boolean accessibleForOrganization;
+    private List<OrganizationCategory> accessibleFor = new ArrayList<>();
 
 
     public Long getParentTabId() {
@@ -65,5 +72,37 @@ public class AccessPageDTO {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public boolean isAccessibleForHub() {
+        return accessibleForHub;
+    }
+
+    public void setAccessibleForHub(boolean accessibleForHub) {
+        this.accessibleForHub = accessibleForHub;
+    }
+
+    public boolean isAccessibleForUnion() {
+        return accessibleForUnion;
+    }
+
+    public void setAccessibleForUnion(boolean accessibleForUnion) {
+        this.accessibleForUnion = accessibleForUnion;
+    }
+
+    public boolean isAccessibleForOrganization() {
+        return accessibleForOrganization;
+    }
+
+    public void setAccessibleForOrganization(boolean accessibleForOrganization) {
+        this.accessibleForOrganization = accessibleForOrganization;
+    }
+
+    public List<OrganizationCategory> getAccessibleFor() {
+        return accessibleFor;
+    }
+
+    public void setAccessibleFor(List<OrganizationCategory> accessibleFor) {
+        this.accessibleFor = accessibleFor;
     }
 }

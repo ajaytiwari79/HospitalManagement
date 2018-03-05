@@ -1,43 +1,27 @@
-package com.kairos.persistence.model.user.position_code;
+package com.kairos.response.dto.web.organization.position_code;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.validation.constraints.NotNull;
 
 /**
- * Created by pawanmandhan on 27/7/17.
+ * Created by prerna on 26/2/18.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@NodeEntity
-
-public class PositionCode extends UserBaseEntity {
-
+public class PositionCodeDTO {
 
     @NotEmpty(message = "error.PositionCode.name.notempty")
     @NotNull(message = "error.position_code.name.notnull")
-
     private String name;
 
     private String description;
 
     private String timeCareId;
 
-
-
-    public PositionCode() {
+    public PositionCodeDTO(){
+        // default constructor
     }
 
-    public PositionCode(String name) {
-        this.name = name;
-    }
-
-
-    public PositionCode(String name, String description, String timeCareId) {
+    public PositionCodeDTO(String name, String description, String timeCareId) {
         this.name = name;
         this.description = description;
         this.timeCareId = timeCareId;
