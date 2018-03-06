@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.user.access_permission;
 
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.access_permission.AccessGroupCountQueryResult;
+import com.kairos.persistence.model.user.access_permission.AccessGroupQueryResult;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.staff.Staff;
 import org.springframework.data.neo4j.annotation.Query;
@@ -100,5 +102,26 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     AccessGroup findTaskGiverAccessGroup(Long organizationId);
 
     List<AccessGroup> findAll();
+
+    @Query("MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} AND id(a)={1} AND r.organizationCategory={2} return a ")
+    AccessGroup findCountryAccessGroupByIdAndCategory(Long countryId, Long accessGroupId, String orgCategory);
+
+    @Query("MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} AND LOWER(a.name) = LOWER({1}) AND r.organizationCategory={2} return a ")
+    AccessGroup findCountryAccessGroupByNameAndCategory(Long countryId, String accessGroupName, String orgCategory);
+
+    @Query("MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} AND LOWER(a.name) = LOWER({1}) AND r.organizationCategory={2} return COUNT(a)>0 ")
+    Boolean isCountryAccessGroupExistWithSameName(Long countryId, String name, String orgCategory);
+
+    @Query("MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} AND LOWER(a.name) = LOWER({1}) AND r.organizationCategory={2} AND NOT(id(a) = {3}) return COUNT(a)>0 ")
+    Boolean isCountryAccessGroupExistWithSameNameExceptId(Long countryId, String name, String orgCategory, Long accessGroupId);
+
+    @Query("OPTIONAL MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'HUB'}]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} WITH COUNT(r) as hubCount\n" +
+            "OPTIONAL MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'UNION'}]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} WITH COUNT(r) as unionCount, hubCount\n" +
+            "OPTIONAL MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'ORGANIZATION'}]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} RETURN  COUNT(r) as organizationCount, hubCount, unionCount")
+    AccessGroupCountQueryResult getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId);
+
+    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} \n" +
+            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted")
+    List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategory(Long countryId, String orgCategory);
 }
 
