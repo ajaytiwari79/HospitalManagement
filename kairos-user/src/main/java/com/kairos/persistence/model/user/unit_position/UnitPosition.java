@@ -41,10 +41,10 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private EmploymentType employmentType;
 
-    @Relationship(type = STAFF_BELONGS_TO_UNION)
+    @Relationship(type = BACKING_BY_UNION)
     private Organization union;
 
-    @Relationship(type = UNIT_POSITION_BELONGS_TO_UNIT)
+    @Relationship(type = IN_UNIT)
     private Organization unit;
 
 

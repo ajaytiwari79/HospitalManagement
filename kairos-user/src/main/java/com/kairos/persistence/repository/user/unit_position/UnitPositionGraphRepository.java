@@ -43,13 +43,13 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     /* Error while binding to WTA
     * java.lang.IllegalArgumentException: Can not set com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO field com.kairos.persistence.model.user.position_code.StaffUnitEmploymentDetails.workingTimeAgreement to java.util.Collections$UnmodifiableMap
     * */
-    @Query("match(s:Staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false})-[:" + UNIT_POSITION_BELONGS_TO_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1} \n" +
+    @Query("match(s:Staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1} \n" +
             "match(unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
             "match(unitPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "match(unitPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false})" +
             "optional match (unitPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement)\n" +
             "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
-            "optional match (unitPosition)-[:" + STAFF_BELONGS_TO_UNION + "]->(unionData:Organization{isEnable:true,union:true})\n" +
+            "optional match (unitPosition)-[:" + BACKING_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true})\n" +
             "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union," +
             "positionCode as positionCode," +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
@@ -112,7 +112,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     UnitPositionQueryResult getCtaByUnitEmploymentId(Long unitEmploymentId);
 
 
-    @Query("match(s:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPosition:UnitPosition{deleted:false})-[:" + UNIT_POSITION_BELONGS_TO_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1} \n" +
+    @Query("match(s:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPosition:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1} \n" +
             "match(unitPosition)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={2}\n" +
             "return unitPosition")
     List<UnitPosition> getAllUEPByExpertise(Long unitId, Long staffId, Long expertiseId);
@@ -120,7 +120,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitPosition{deleted:false}) where id(uep)={0} return Id(u)")
     Long findEmploymentByUnitPosition(Long unitEmploymentPositionId);
 
-    @Query("match(s:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPosition:UnitPosition{deleted:false})-[:" + UNIT_POSITION_BELONGS_TO_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1}  AND Id(unitPosition)<>{3}\n" +
+    @Query("match(s:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPosition:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1}  AND Id(unitPosition)<>{3}\n" +
             "match(unitPosition)-[:" + HAS_EXPERTISE_IN + "]-(e:Expertise) where id(e)={2}\n" +
             "return unitPosition")
     List<UnitPosition> getAllUEPByExpertiseExcludingCurrent(Long unitId, Long staffId, Long expertiseId, Long currentUnitPositionId);

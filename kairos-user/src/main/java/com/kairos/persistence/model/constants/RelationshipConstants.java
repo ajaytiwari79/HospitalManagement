@@ -212,9 +212,9 @@ public abstract class RelationshipConstants {
     public final static String LOCATED_IN = "LOCATED_IN";
     public final static String HAS_PAY_LEVEL_MATRIX = "HAS_PAY_LEVEL_MATRIX";
     public final static String ORAGANIZATION_HAS_UNIONS = "ORAGANIZATION_HAS_UNIONS";
-    public final static String STAFF_BELONGS_TO_UNION = "STAFF_BELONGS_TO_UNION";
+    public final static String BACKING_BY_UNION = "BACKING_BY_UNION";
 
-    public final static String UNIT_POSITION_BELONGS_TO_UNIT = "UNIT_POSITION_BELONGS_TO_UNIT";
+    public final static String IN_UNIT = "IN_UNIT";
     public final static String HAS_ACCESS_FOR_ORG_CATEGORY = "HAS_ACCESS_FOR_ORG_CATEGORY";
 
     /**
