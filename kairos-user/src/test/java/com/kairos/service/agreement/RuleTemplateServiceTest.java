@@ -4,21 +4,14 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
-import com.kairos.persistence.model.user.agreement.wta.WTADTO;
-import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.user.agreement.wta.templates.template_types.RuleTemplateResponseDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,9 +57,9 @@ public class RuleTemplateServiceTest {
         RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("test-cat", RuleTemplateCategoryType.WTA);
         List<PhaseTemplateValue> phaseTemplateValues=new ArrayList<>(4);
         PhaseTemplateValue list1=new PhaseTemplateValue(1,"REQUEST",(short)10,(short)20,true,6,false);
-        PhaseTemplateValue list2=new PhaseTemplateValue(1,"PUZZLE",(short)20,(short)20,true,7,false);
-        PhaseTemplateValue list3=new PhaseTemplateValue(1,"CONSTRUCTION",(short)30,(short)20,true,8,false);
-        PhaseTemplateValue list4=new PhaseTemplateValue(1,"DRAFT",(short)40,(short)20,true,9,false);
+        PhaseTemplateValue list2=new PhaseTemplateValue(2,"PUZZLE",(short)20,(short)20,true,7,false);
+        PhaseTemplateValue list3=new PhaseTemplateValue(3,"CONSTRUCTION",(short)30,(short)20,true,8,false);
+        PhaseTemplateValue list4=new PhaseTemplateValue(4,"DRAFT",(short)40,(short)20,true,9,false);
         phaseTemplateValues.add(list1);
         phaseTemplateValues.add(list2);
         phaseTemplateValues.add(list3);
@@ -128,8 +121,6 @@ public class RuleTemplateServiceTest {
         ruleTemplateCategoryDTO.setContinuousDayRestHours(156L);
         ruleTemplateCategoryDTO.setRecommendedValue(20);
         ruleTemplateCategoryDTO.setId(4296L);
-
-
 
         HttpEntity<RuleTemplateCategoryDTO> requestBodyData = new HttpEntity<RuleTemplateCategoryDTO>(ruleTemplateCategoryDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<RuleTemplateCategoryDTO>> typeReference =
