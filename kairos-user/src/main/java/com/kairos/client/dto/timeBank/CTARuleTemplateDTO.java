@@ -14,7 +14,7 @@ public class CTARuleTemplateDTO {
     private List<LocalDate> publicHolidays;
     private int granularity;
     private List<BigInteger> activityIds;
-    private List<BigInteger> timeTypes;
+    private BigInteger timeTypeId;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
     private int minutesFromCta;
 
@@ -22,16 +22,16 @@ public class CTARuleTemplateDTO {
     }
 
 
-    public CTARuleTemplateDTO(Long id, String name, int granularity, List<BigInteger> timeTypes) {
+    public CTARuleTemplateDTO(Long id, String name, int granularity, BigInteger timeTypeId) {
         this.id = id;
         this.name = name;
         this.granularity = granularity;
-        this.timeTypes = timeTypes;
+        this.timeTypeId = timeTypeId;
     }
 
-    public CTARuleTemplateDTO(int granularity, List<BigInteger> timeTypes) {
+    public CTARuleTemplateDTO(int granularity, BigInteger timeTypeId) {
         this.granularity = granularity;
-        this.timeTypes = timeTypes;
+        this.timeTypeId = timeTypeId;
     }
 
     public int getMinutesFromCta() {
@@ -90,12 +90,12 @@ public class CTARuleTemplateDTO {
         this.activityIds = activityIds;
     }
 
-    public List<BigInteger> getTimeTypes() {
-        return timeTypes;
+    public BigInteger getTimeTypeId() {
+        return timeTypeId;
     }
 
-    public void setTimeTypes(List<BigInteger> timeTypes) {
-        this.timeTypes = timeTypes;
+    public void setTimeTypeId(BigInteger timeTypeId) {
+        this.timeTypeId = timeTypeId;
     }
 
     public List<CTAIntervalDTO> getCtaIntervalDTOS() {

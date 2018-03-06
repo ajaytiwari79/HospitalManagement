@@ -3,15 +3,23 @@ package com.kairos.client.dto.timeBank;
 public class CTAIntervalDTO {
 
     private String compensationType;
-    private int compensationValue;
+    private float compensationValue;
     private int startTime;
     private int endTime;
 
-    public CTAIntervalDTO(String compensationType, int compensationValue, int startTime, int endTime) {
+    public CTAIntervalDTO(String compensationType, float compensationValue, int startTime, int endTime) {
         this.compensationType = compensationType;
         this.compensationValue = compensationValue;
         this.startTime = startTime;
         this.endTime = endTime;
+    }
+
+    public CTAIntervalDTO() {
+    }
+
+    public CTAIntervalDTO(String compensationType, float compensationValue) {
+        this.compensationType = compensationType;
+        this.compensationValue = compensationValue;
     }
 
     public String getCompensationType() {
@@ -22,11 +30,11 @@ public class CTAIntervalDTO {
         this.compensationType = compensationType;
     }
 
-    public int getCompensationValue() {
+    public float getCompensationValue() {
         return compensationValue;
     }
 
-    public void setCompensationValue(int compensationValue) {
+    public void setCompensationValue(float compensationValue) {
         this.compensationValue = compensationValue;
     }
 
