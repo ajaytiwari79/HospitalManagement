@@ -311,7 +311,7 @@ public class AccessGroupService extends UserBaseService {
 
     public AccessGroup createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithSameName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString());
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString());
         if ( isAccessGroupExistWithSameName ) {
             throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
         }
@@ -336,7 +336,7 @@ public class AccessGroupService extends UserBaseService {
         if (! Optional.ofNullable(accessGrpToUpdate).isPresent()) {
             throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
         }
-        if( accessGroupRepository.isCountryAccessGroupExistWithSameNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId) ){
+        if( accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId) ){
             throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
         }
 
