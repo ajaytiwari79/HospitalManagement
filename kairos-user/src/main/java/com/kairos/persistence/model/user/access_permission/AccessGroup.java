@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * Created by prabjot on 9/27/16.
@@ -18,9 +19,11 @@ public class AccessGroup extends UserBaseEntity {
     private String name;
     private boolean isEnabled = true;
     private boolean typeOfTaskGiver;
+    private String description;
 
-    public AccessGroup(String name) {
+    public AccessGroup(String name, String description) {
         this.name = name;
+        this.description = description;
     }
     public AccessGroup(){}
 
@@ -47,5 +50,13 @@ public class AccessGroup extends UserBaseEntity {
 
     public void setTypeOfTaskGiver(boolean typeOfTaskGiver) {
         this.typeOfTaskGiver = typeOfTaskGiver;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
