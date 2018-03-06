@@ -72,7 +72,6 @@ public class PhaseTemplateValue extends UserBaseEntity {
         this.staffValue = staffValue;
     }
 
-
     public short getManagementValue() {
         return managementValue;
     }
