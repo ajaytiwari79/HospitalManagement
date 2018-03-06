@@ -254,7 +254,11 @@ public class StaffService extends UserBaseService {
         if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getTeamStaff(unitId, staffId);
         } else if (ORGANIZATION.equalsIgnoreCase(type)) {
-            staff = staffGraphRepository.getStaffByUnitId(unitId, staffId);
+            Organization unit = organizationGraphRepository.findOne(unitId);
+            Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+            // unit is parent so fetching all staff from itself
+            //staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentOrganization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+            staff = staffGraphRepository.getStaffByUnitId(parentOrganization.getId(), staffId);
         }
 
         if (staff == null) {
@@ -1248,7 +1252,9 @@ public class StaffService extends UserBaseService {
      */
     public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId, String date) {
 
-        Staff staff = staffGraphRepository.getStaffByUnitId(unitId, staffId);
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+        Staff staff = staffGraphRepository.getStaffByUnitId(parentOrganization.getId(), staffId);
         if (staff == null) {
             throw new InternalError("Staff not found");
         }

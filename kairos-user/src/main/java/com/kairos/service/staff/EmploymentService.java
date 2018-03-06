@@ -127,61 +127,59 @@ public class EmploymentService extends UserBaseService {
     }
 
 
-    public Map<String, Object> createEmployment(long unitId, long staffId, long accessGroupId, boolean created) {
+    public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
 
         Organization unit = organizationGraphRepository.findOne(unitId);
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         if (unit == null) {
             throw new InternalError("unit is null");
         }
-        Organization parentOrganization;
-        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parentOrganization = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
-        } else {
-            parentOrganization = organizationGraphRepository.getParentOfOrganization(unit.getId());
+        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+
+        if (!Optional.ofNullable(parentOrganization).isPresent()) {
+            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
         }
-
-        UnitPermission unitPermission;
-        Employment employment;
-        if (parentOrganization == null) {
-            unitPermission = unitPermissionGraphRepository.getUnitPermissions(unitId, staffId, unitId);
-            employment = employmentGraphRepository.findEmployment(unit.getId(), staffId);
-        } else {
-            unitPermission = unitPermissionGraphRepository.getUnitPermissions(parentOrganization.getId(), staffId, unitId);
-            employment = employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
-        }
-
         Staff staff = staffGraphRepository.findOne(staffId);
+        if (!Optional.ofNullable(staff).isPresent()) {
+            throw new DataNotFoundByIdException("staff  not found   ID: " + staffId);
+        }
+        Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
+        if (!Optional.ofNullable(employment).isPresent()) {
+            throw new DataNotFoundByIdException("staff employment  not found   ID: " + staffId);
+        }
+
         boolean flsSyncStatus = false;
         List<AccessPageQueryResult> accessPageQueryResults;
-        if (created) {
-            if (employment == null) {
-                employment = new Employment();
-                employment.setStaff(staff);
-            }
-            if (unitPermission == null) {
-                AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-                unitPermission = new UnitPermission();
-                unitPermission.setOrganization(unit);
-                unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
-                employment.getUnitPermissions().add(unitPermission);
-                employmentGraphRepository.save(employment);
-                AccessPermission accessPermission = new AccessPermission(accessGroup);
-                accessPermissionGraphRepository.save(accessPermission);
-                unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
-                accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
-                accessPageQueryResults = getAccessPages(accessPermission);
-                if (parentOrganization == null) {
-                    unit.getEmployments().add(employment);
-                    organizationGraphRepository.save(unit);
-                } else {
-                    parentOrganization.getEmployments().add(employment);
-                    organizationGraphRepository.save(parentOrganization);
-                }
-                if (accessGroup.isTypeOfTaskGiver())
-                    flsSyncStatus = syncStaffInVisitour(staff, unitId, flsCredentials);
-            } else {
+        Map<String, Object> response = new HashMap<>();
+
+//            if (employment == null) {
+//                employment = new Employment();
+//                employment.setStaff(staff);
+//            }
+
+        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(unit);
+        unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+        employment.getUnitPermissions().add(unitPermission);
+        employmentGraphRepository.save(employment);
+        AccessPermission accessPermission = new AccessPermission(accessGroup);
+        accessPermissionGraphRepository.save(accessPermission);
+        unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
+        accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
+        accessPageQueryResults = getAccessPages(accessPermission);
+//                if (parentOrganization == null) {
+//                    unit.getEmployments().add(employment);
+//                    organizationGraphRepository.save(unit);
+//                } else {
+//                    parentOrganization.getEmployments().add(employment);
+//                    organizationGraphRepository.save(parentOrganization);
+//                }
+//                if (accessGroup.isTypeOfTaskGiver())
+//                    flsSyncStatus = syncStaffInVisitour(staff, unitId, flsCredentials);
+        //     }
+            /*else {
                 AccessPermission accessPermission;
                 if (parentOrganization == null) {
                     accessPermission = unitPermissionGraphRepository.getAccessPermission(unit.getId(), unitId, staffId, accessGroupId);
@@ -221,22 +219,25 @@ public class EmploymentService extends UserBaseService {
         if (flsSyncStatus) {
             staff.setVisitourId(staff.getId());
             staffGraphRepository.save(staff);
-        }
+        }*/
 
-        Map<String, Object> response = new HashMap<>();
+
         response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
         response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
         response.put("organizationId", unitId);
-        response.put("status", unitPermission.getEmploymentStatus());
+
         response.put("id", unitPermission.getId());
         response.put("synInFls", flsSyncStatus);
         response.put("accessPage", accessPageQueryResults);
+
+
         return response;
     }
 
-    public Map<String, Object> updateEmployment(long unitEmploymentId, Map<String, Object> wageDetails) throws ParseException {
+    public Map<String, Object> updateEmployment(long unitEmploymentId, Map<String, Object> wageDetails) throws
+            ParseException {
 
-        wageDetails.put("startDate", DateConverter.parseDate(((String) wageDetails.get("startDate"))).getTime());
+     /*   wageDetails.put("startDate", DateConverter.parseDate(((String) wageDetails.get("startDate"))).getTime());
         wageDetails.put("endDate", DateConverter.parseDate(((String) wageDetails.get("endDate"))).getTime());
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -245,6 +246,7 @@ public class EmploymentService extends UserBaseService {
         unitPermission.getWages().add(wage);
         unitPermissionGraphRepository.save(unitPermission);
         wageDetails.put("id", wage.getId());
+     */
         return wageDetails;
 
     }
@@ -294,7 +296,7 @@ public class EmploymentService extends UserBaseService {
         employment.setName("Working as unit manager");
         employment.setStaff(staff);
         UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setUnitManagerEmployment(true);
+
         unitPermission.setOrganization(unit);
 
         //set permission in unit employment
@@ -602,7 +604,7 @@ public class EmploymentService extends UserBaseService {
             partialLeave.setEmploymentId(partialLeaveDTO.getEmploymentId());
             partialLeave.setNote(partialLeaveDTO.getNote());
             partialLeave.setLeaveType(partialLeaveDTO.getLeaveType());
-            unitPermission.getPartialLeaves().add(partialLeave);
+            //  unitPermission.getPartialLeaves().add(partialLeave);
             unitPermissionGraphRepository.save(unitPermission);
         }
         return parsePartialLeaveObj(partialLeave);

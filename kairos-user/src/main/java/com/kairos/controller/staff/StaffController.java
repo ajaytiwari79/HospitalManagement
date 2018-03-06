@@ -165,7 +165,7 @@ public class StaffController {
         long accessGroupId = Long.parseLong((String) employmentDetail.get("roleId"));
         boolean isCreated = (boolean) employmentDetail.get("isCreated");
         long unitId = Long.parseLong((String) employmentDetail.get("organizationId"));
-        Map<String, Object> response = employmentService.createEmployment(unitId, staffId, accessGroupId, isCreated);
+        Map<String, Object> response = employmentService.createUnitPermission(unitId, staffId, accessGroupId, isCreated);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

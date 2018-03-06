@@ -262,8 +262,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     Staff findByKmdExternalId(Long kmdExternalId);
 
 
-    @Query("Match (e:Employment)-[:" + BELONGS_TO + "]->(staff:Staff) where id(staff)={1} with e,staff\n" +
-            "Match (e)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(unit:Organization) where id(unit)={0} return staff")
+    @Query("MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff) where id(organization)={0} AND id(staff)={1}\n" +
+            " return staff")
     Staff getStaffByUnitId(long unitId, long staffId);
 
     @Query("Match (unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(organization:Organization) where id(organization)={0} with unitPermission\n" +
