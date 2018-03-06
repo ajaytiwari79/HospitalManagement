@@ -54,7 +54,7 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
             "Match (unitPermission)-[r:" + HAS_ACCESS_PERMISSION + "]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) where id(accessGroup)={3} set r.isEnabled={4} return r.isEnabled;")
     boolean updateUnitPermission(long organizationId, long unitId, long staffId, long accessGroupId, boolean isEnabled);
 
-    @Query("Match (unitPermission:unitPermission),(accessPermission:AccessPermission) where id(unitPermission)={0} AND id(accessPermission)={1}\n" +
+    @Query("Match (unitPermission:UnitPermission),(accessPermission:AccessPermission) where id(unitPermission)={0} AND id(accessPermission)={1}\n" +
             "Create (unitPermission)-[r:" + HAS_ACCESS_PERMISSION + "{isEnabled:true}]->(accessPermission) return count(r) as count")
     int linkUnitPermissionWithAccessPermission(long unitEmploymentId, long accessPermissionId);
 

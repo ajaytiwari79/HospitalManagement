@@ -166,6 +166,7 @@ public class EmploymentService extends UserBaseService {
         employmentGraphRepository.save(employment);
         AccessPermission accessPermission = new AccessPermission(accessGroup);
         accessPermissionGraphRepository.save(accessPermission);
+        logger.info(unitPermission.getId() + " Currently created Unit position ");
         unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
         accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
         accessPageQueryResults = getAccessPages(accessPermission);
