@@ -54,8 +54,8 @@ public class UnitEmploymentPositionController {
 
     @ApiOperation(value = "Update unit_employment_position")
     @PutMapping(value = "/unitEmploymentPosition/{unitEmploymentPositionId}")
-    public ResponseEntity<Map<String, Object>> updateUnitEmploymentPosition(@PathVariable Long unitEmploymentPositionId, @RequestBody @Valid UnitEmploymentPositionDTO position) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.updateUnitEmploymentPosition(unitEmploymentPositionId, position));
+    public ResponseEntity<Map<String, Object>> updateUnitEmploymentPosition(@PathVariable Long unitId,@PathVariable Long unitEmploymentPositionId, @RequestBody @Valid UnitEmploymentPositionDTO position) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.updateUnitEmploymentPosition(unitEmploymentPositionId, position,unitId));
     }
 
     @ApiOperation(value = "Update unit_employment_position's WTA")
@@ -86,8 +86,8 @@ public class UnitEmploymentPositionController {
 
     @ApiOperation(value = "get unitEmploymentPosition's CTA")
     @GetMapping(value = "/getCTAbyUnitEmployementPosition/{unitEmploymentPositionId}")
-    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitEmploymentPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getUnitEmploymentPositionCTA( unitEmploymentPositionId));
+    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitEmploymentPositionId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getUnitEmploymentPositionCTA( unitEmploymentPositionId,unitId));
     }
 
 }

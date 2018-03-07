@@ -11,6 +11,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +27,7 @@ public class TimeBankRestClient {
     RestTemplate restTemplate;
 
 
+    @Async
     public Boolean createBlankTimeBank(CostTimeAgreementDTO costTimeAgreementDTO){
         String baseUrl = getBaseUrl(true);
         try {
@@ -50,6 +52,32 @@ public class TimeBankRestClient {
         }
 
     }
+
+    public Boolean updateBlankTimeBank(CostTimeAgreementDTO costTimeAgreementDTO){
+        String baseUrl = getBaseUrl(true);
+        try {
+            HttpEntity<CostTimeAgreementDTO> request = new HttpEntity<>(costTimeAgreementDTO);
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/timeBank/updateBlankTimebank",
+                            HttpMethod.PUT, request, typeReference);
+
+            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+
+    }
+
 
     private final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){

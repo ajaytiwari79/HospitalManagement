@@ -141,7 +141,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         unitEmployment.setUnitEmploymentPositions(unitEmploymentPositions);
         save(unitEmployment);
         UnitEmploymentPositionQueryResult unitEmploymentPositionQueryResult = unitEmploymentPosition.getBasicDetails();
-        timeBankRestClient.createBlankTimeBank(getUnitEmploymentPositionCTA(unitEmploymentPositionQueryResult.getId()));
+        timeBankRestClient.createBlankTimeBank(getUnitEmploymentPositionCTA(unitEmploymentPositionQueryResult.getId(),id));
         //unitEmploymentPositionQueryResult.setUnion();
         return unitEmploymentPositionQueryResult;
     }
@@ -188,7 +188,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         return true;
     }
 
-    public PositionWrapper updateUnitEmploymentPosition(long unitEmploymentPositionId, UnitEmploymentPositionDTO unitEmploymentPositionDTO) {
+    public PositionWrapper updateUnitEmploymentPosition(long unitEmploymentPositionId, UnitEmploymentPositionDTO unitEmploymentPositionDTO,Long unitId) {
 
         List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(unitEmploymentPositionDTO.getStaffId());
         if (clientMinimumDTO.size() > 0) {
@@ -206,7 +206,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
         oldUnitEmploymentPositions = unitEmploymentPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitEmploymentPositionDTO.getExpertiseId(), unitEmploymentId, unitEmploymentPositionId);
         validateUnitEmploymentPositionWithExpertise(oldUnitEmploymentPositions, unitEmploymentPositionDTO);
 
-        preparePosition(oldUnitEmploymentPosition, unitEmploymentPositionDTO);
+        preparePosition(oldUnitEmploymentPosition, unitEmploymentPositionDTO,unitId);
         save(oldUnitEmploymentPosition);
         return new PositionWrapper(oldUnitEmploymentPosition);
 
@@ -359,7 +359,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
     }
 
-    private void preparePosition(UnitEmploymentPosition oldUnitEmploymentPosition, UnitEmploymentPositionDTO unitEmploymentPositionDTO) {
+    private void preparePosition(UnitEmploymentPosition oldUnitEmploymentPosition, UnitEmploymentPositionDTO unitEmploymentPositionDTO,Long unitId) {
 
         prepareUnion(oldUnitEmploymentPosition, unitEmploymentPositionDTO);
 
@@ -401,7 +401,9 @@ public class UnitEmploymentPositionService extends UserBaseService {
         }
         oldUnitEmploymentPosition.setStartDateMillis(unitEmploymentPositionDTO.getStartDateMillis());
 
-
+        if(unitEmploymentPositionDTO.getWorkingDaysInWeek()!=oldUnitEmploymentPosition.getWorkingDaysInWeek() || unitEmploymentPositionDTO.getTotalWeeklyMinutes()!=oldUnitEmploymentPosition.getTotalWeeklyMinutes()){
+            timeBankRestClient.updateBlankTimeBank(getUnitEmploymentPositionCTA(oldUnitEmploymentPosition.getId(),unitId));
+        }
         oldUnitEmploymentPosition.setWorkingDaysInWeek(unitEmploymentPositionDTO.getWorkingDaysInWeek());
         oldUnitEmploymentPosition.setTotalWeeklyMinutes(unitEmploymentPositionDTO.getTotalWeeklyMinutes() + (unitEmploymentPositionDTO.getTotalWeeklyHours() * 60));
         oldUnitEmploymentPosition.setAvgDailyWorkingHours(unitEmploymentPositionDTO.getAvgDailyWorkingHours());
@@ -486,13 +488,15 @@ public class UnitEmploymentPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    public CostTimeAgreementDTO getUnitEmploymentPositionCTA(Long unitEmploymentPositionId) {
+    public CostTimeAgreementDTO getUnitEmploymentPositionCTA(Long unitEmploymentPositionId,Long unitId) {
         UnitEmploymentPosition unitEmploymentPosition = unitEmploymentPositionGraphRepository.findOne(unitEmploymentPositionId);
         CTAListQueryResult ctaRuleTemplateQueryResults = costTimeAgreementGraphRepository.getCtaByUnitEmploymentPositionId(unitEmploymentPositionId);
+        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitEmploymentPositionId);
         costTimeAgreementDTO.setStaffId(unitEmploymentPosition.getStaff().getId());
+        costTimeAgreementDTO.setCountryId(countryId);
         costTimeAgreementDTO.setContractedMinByWeek(unitEmploymentPosition.getTotalWeeklyMinutes());
-        costTimeAgreementDTO.setWorkingDays(unitEmploymentPosition.getWorkingDaysInWeek());
+        costTimeAgreementDTO.setWorkingDaysPerWeek(unitEmploymentPosition.getWorkingDaysInWeek());
         costTimeAgreementDTO.setUnitEmploymentPositionDate(new Date(unitEmploymentPosition.getStartDateMillis()));
         costTimeAgreementDTO.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
         return costTimeAgreementDTO;

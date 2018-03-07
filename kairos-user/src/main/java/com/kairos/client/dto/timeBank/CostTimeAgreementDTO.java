@@ -8,22 +8,31 @@ public class CostTimeAgreementDTO {
     private Long unitEmploymentPositionId;
     private List<CTARuleTemplateDTO> ctaRuleTemplates;
     private int contractedMinByWeek;
-    private int workingDays;
+    private int workingDaysPerWeek;
     private Long staffId;
     private Date unitEmploymentPositionDate;
+    private Long countryId;
 
     public CostTimeAgreementDTO(Long unitEmploymentPositionId) {
         this.unitEmploymentPositionId = unitEmploymentPositionId;
     }
 
-    public CostTimeAgreementDTO(Long unitEmploymentPositionId, int contractedMinByWeek, int workingDays,Date unitEmploymentPositionDate) {
+    public CostTimeAgreementDTO(Long unitEmploymentPositionId, int contractedMinByWeek, int workingDaysPerWeek, Date unitEmploymentPositionDate) {
         this.unitEmploymentPositionId = unitEmploymentPositionId;
         this.contractedMinByWeek = contractedMinByWeek;
-        this.workingDays = workingDays;
+        this.workingDaysPerWeek = workingDaysPerWeek;
         this.unitEmploymentPositionDate = unitEmploymentPositionDate;
     }
 
     public CostTimeAgreementDTO() {
+    }
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 
     public Date getUnitEmploymentPositionDate() {
@@ -50,12 +59,12 @@ public class CostTimeAgreementDTO {
         this.contractedMinByWeek = contractedMinByWeek;
     }
 
-    public int getWorkingDays() {
-        return workingDays;
+    public int getWorkingDaysPerWeek() {
+        return workingDaysPerWeek;
     }
 
-    public void setWorkingDays(int workingDays) {
-        this.workingDays = workingDays;
+    public void setWorkingDaysPerWeek(int workingDaysPerWeek) {
+        this.workingDaysPerWeek = workingDaysPerWeek;
     }
 
     public Long getUnitEmploymentPositionId() {
