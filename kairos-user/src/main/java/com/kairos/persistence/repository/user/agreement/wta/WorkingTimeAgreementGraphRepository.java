@@ -35,7 +35,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where id(o)={0}\n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertises:Expertise{isEnabled:true})\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTempCatg:RuleTemplateCategory)" +
-            " with wta,o,expertises,ruleTemp,ruleTempCatg\n" +
+            "with wta,o,expertises,ruleTemp,ruleTempCatg\n" +
             "with wta,expertises, CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode," +
             "onlyCompositeShifts:ruleTemp.onlyCompositeShifts,shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest," +

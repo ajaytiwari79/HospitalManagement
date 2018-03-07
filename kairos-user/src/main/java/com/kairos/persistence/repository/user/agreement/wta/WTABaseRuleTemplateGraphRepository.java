@@ -142,7 +142,7 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     @Query("MATCH (c:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE + "]-(t:WTABaseRuleTemplate) where id(c)={0} " +
             "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory{ruleTemplateCategoryType:'WTA'})  " +
             "Optional Match (t)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "with tempValue order by tempValue.phaseId ,t,c,r "+
+            "with tempValue order by tempValue.sequence ,t,c,r "+
             "with t,c,r, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
