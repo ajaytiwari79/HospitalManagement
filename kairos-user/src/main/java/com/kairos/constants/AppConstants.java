@@ -167,6 +167,8 @@ public class AppConstants {
     public static final String CITIZEN_ID = "citizenId";
 
 
+
+
     public static final String TEMPLATE1 = "maximum-shift-length";
     public static final String TEMPLATE1_NAME = "Maximum Shift Length";
     public static final String TEMPLATE1_DESCRIPTION = "Checks that the shift length does not exceed a set value. Only shifts with an activity that adds time to the chosen balance types will be checked. If \"Check Time Rules\" is checked only those activities that have the setting \"Check Time Rules\" will be checked";
@@ -252,10 +254,10 @@ public class AppConstants {
     public static final String TEMPLATE21 = "maximum-time-bank";
     public static final String TEMPLATE21_NAME = "Maximum time bank";
     public static final String TEMPLATE21_DESCRIPTION = "Maximum time bank for staff";
-
+//
     public static final String TEMPLATE22 = "minimum-time-bank";
-    public static final String TEMPLATE22_NAME = "Minimum time bank";
-    public static final String TEMPLATE22_DESCRIPTION = "Minimum time bank for staff";
+//    public static final String TEMPLATE22_NAME = "Minimum time bank";
+//    public static final String TEMPLATE22_DESCRIPTION = "Minimum time bank for staff";
     public static final String ORGANIZATION_ID = "organizationId";
     public static final String UNIT_ID = "unitId";
 
