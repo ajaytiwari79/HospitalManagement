@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.AppConstants.AG_COUNTRY_ADMIN;
 import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -42,7 +43,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     AccessGroup findAccessGroupByName(long organizationId, String name);
 
     @Query("Match (organization:Organization) where id(organization)={0}\n" +
-            "Match (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{isEnabled:true}) return accessGroup")
+            "Match (organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup{isEnabled:true}) WHERE NOT (accessGroup.name='"+AG_COUNTRY_ADMIN+"') return accessGroup")
     List<AccessGroup> getAccessGroups(long unitId);
 
     @Query("Match (root:Organization) where id(root)={0} with root\n" +
@@ -133,5 +134,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     // For Test cases
     @Query("Match (accessGroup:AccessGroup)-[:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]->(accessPage:AccessPage) with accessPage where id(accessGroup)={0} return accessPage")
     List<Long> getAccessPageIdsByAccessGroup(long accessGroupId);
+
+    @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup {name:{1}}) WHERE id(o)={0} return ag")
+    AccessGroup getAccessGroupOfOrganizationByName(long organizationId, String name);
 }
 

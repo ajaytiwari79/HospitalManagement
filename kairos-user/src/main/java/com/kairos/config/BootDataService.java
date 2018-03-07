@@ -655,6 +655,9 @@ public class BootDataService {
 
         organizationService.createOrganization(kairosCountryLevel, null);
         //organizationGraphRepository.addSkillInOrganization(kairosCountryLevel.getId(),skillList,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
+
+        // Create AccessGroup for Ulrik as AG_COUNTRY_ADMIN
+        createCountryAdminAccessGroup();
         createEmployment();
         createTeam();
         createGroup();
@@ -836,6 +839,13 @@ public class BootDataService {
         kairosCountryLevel = organizationGraphRepository.save(kairosCountryLevel);
     }
 
+    private void createCountryAdminAccessGroup() {
+        AccessGroup accessGroup = new AccessGroup(AppConstants.AG_COUNTRY_ADMIN, "Country Admin Access Group");
+        accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
+        accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+        accessGroupRepository.save(accessGroup);
+    }
+
     private void createEmployment() {
         employmentForAdmin = new Employment("working as country admin", adminAsStaff);
         kairosCountryLevel.getEmployments().add(employmentForAdmin);
@@ -843,7 +853,8 @@ public class BootDataService {
     }
 
     private void createUnitEmploymentForCountryLevel() {
-        accessGroup = accessGroupRepository.findAccessGroupByName(kairosCountryLevel.getId(), AppConstants.COUNTRY_ADMIN);
+//        accessGroup = accessGroupRepository.findAccessGroupByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
+        accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
         UnitEmployment unitEmployment = new UnitEmployment();
         unitEmployment.setOrganization(kairosCountryLevel);
         AccessPermission accessPermission = new AccessPermission(accessGroup);
