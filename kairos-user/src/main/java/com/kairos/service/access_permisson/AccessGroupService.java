@@ -178,7 +178,15 @@ public class AccessGroupService extends UserBaseService {
     }
 
 
-    public List<AccessPageQueryResult> getAccessPageHierarchy(long accessGroupId) {
+    public List<AccessPageQueryResult> getAccessPageHierarchy(long accessGroupId, Long countryId) {
+        // Check if access group is of country
+        if(Optional.ofNullable(countryId).isPresent()){
+            AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
+            if (Optional.ofNullable(accessGroup).isPresent()) {
+                throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
+            }
+        }
+
         List<Map<String, Object>> accessPages = accessPageRepository.getAccessPageHierarchy(accessGroupId);
         ObjectMapper objectMapper = new ObjectMapper();
         List<AccessPageQueryResult> queryResults = new ArrayList<>();
@@ -230,7 +238,14 @@ public class AccessGroupService extends UserBaseService {
         return modules;
     }
 
-    public boolean setAccessPagePermissions(long accessGroupId, List<Long> accessGroupIds,boolean isSelected) {
+    public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessGroupIds,boolean isSelected, Long countryId) {
+        // Check if access group is of country
+        if(Optional.ofNullable(countryId).isPresent()){
+            AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
+            if (Optional.ofNullable(accessGroup).isPresent()) {
+                throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
+            }
+        }
         long creationDate = DateUtil.getCurrentDate().getTime();
         long lastModificationDate = DateUtil.getCurrentDate().getTime();
         accessGroupRepository.updateAccessPagePermission(accessGroupId,accessGroupIds,isSelected,creationDate,lastModificationDate);
@@ -393,4 +408,8 @@ public class AccessGroupService extends UserBaseService {
 
     /***** Access group - COUNTRY LEVEL - ENDS HERE ******************/
 
+    // For Test Cases
+    List<Long> getAccessPageIdsByAccessGroup(Long accessGroupId){
+       return accessGroupRepository.getAccessPageIdsByAccessGroup(accessGroupId);
+    }
 }

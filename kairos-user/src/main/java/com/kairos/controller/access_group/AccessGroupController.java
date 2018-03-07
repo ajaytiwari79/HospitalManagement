@@ -109,7 +109,7 @@ public class AccessGroupController {
     @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/access_page", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAccessPageHierarchy(@PathVariable long accessGroupId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessPageHierarchy(accessGroupId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessPageHierarchy(accessGroupId, null));
 
     }
 
@@ -117,7 +117,7 @@ public class AccessGroupController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setAccessPageInGroup(@PathVariable long accessGroupId, @RequestBody AccessGroupPermissionDTO accessGroupPermission) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setAccessPagePermissions(accessGroupId, accessGroupPermission.getAccessPageIds(), accessGroupPermission.isSelected()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setAccessPagePermissions(accessGroupId, accessGroupPermission.getAccessPageIds(), accessGroupPermission.isSelected(), null));
     }
 
     @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/access_page", method = RequestMethod.GET)
@@ -169,5 +169,19 @@ public class AccessGroupController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryAccessGroups(@PathVariable Long countryId, @PathVariable OrganizationCategory organizationCategory) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getCountryAccessGroups(countryId, organizationCategory));
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/access_group/{accessGroupId}/access_page", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAccessPageHierarchyForCountry(@PathVariable long accessGroupId, @PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessPageHierarchy(accessGroupId, countryId));
+
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/access_group/{accessGroupId}/access_page", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> setAccessPageInAccessGroupForCountry(@PathVariable long accessGroupId, @PathVariable Long countryId, @RequestBody AccessGroupPermissionDTO accessGroupPermission) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setAccessPagePermissions(accessGroupId, accessGroupPermission.getAccessPageIds(), accessGroupPermission.isSelected(), countryId));
     }
 }
