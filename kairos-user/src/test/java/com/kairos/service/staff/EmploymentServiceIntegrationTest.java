@@ -54,7 +54,7 @@ public class EmploymentServiceIntegrationTest {
     }
 
     @Test
-    public void createEmployment() throws Exception {
+    public void createUnitPermission() throws Exception {
         Map<String, Object> employmentDetail = new HashMap();
         employmentDetail.put("organizationId", 145 + "");
         employmentDetail.put("roleId", 97 + "");

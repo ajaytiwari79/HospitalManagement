@@ -8,6 +8,7 @@ import com.kairos.persistence.model.user.staff.StaffFilterDTO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,7 +51,7 @@ public class StaffServiceTest {
     public void createStaffFromWeb() throws Exception {
         String baseUrl = getBaseUrl(71L, 145L);
         StaffCreationPOJOData staffCreationPOJOData = new StaffCreationPOJOData("vipul", "pandey",
-                "2903344442", "", "v@a.com", Gender.MALE,
+                Mockito.anyLong() + "", "", "pandeyVipul@a.com", Gender.MALE,
                 "VIPUL", new Double(Math.random()).longValue(), 99L);
         HttpEntity<StaffCreationPOJOData> entity = new HttpEntity<>(staffCreationPOJOData);
         ResponseEntity<Staff> response = restTemplate.exchange(

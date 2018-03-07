@@ -157,9 +157,12 @@ public class EmploymentService extends UserBaseService {
 //                employment = new Employment();
 //                employment.setStaff(staff);
 //            }
-
+        UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId);
+        if (Optional.ofNullable(unitPermission).isPresent()) {
+            throw new DataNotFoundByIdException("Unit permission already exist" + staffId);
+        }
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-        UnitPermission unitPermission = new UnitPermission();
+        unitPermission = new UnitPermission();
         unitPermission.setOrganization(unit);
         unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
         employment.getUnitPermissions().add(unitPermission);

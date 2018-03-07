@@ -161,7 +161,7 @@ public class UserService extends UserBaseService {
         Map<String, Object> map = new HashMap<>();
         map.put("email", currentUser.getEmail());
         //map.put("isPasswordUpdated", currentUser.isPasswordUpdated());
-        map.put("otp",otp);
+        map.put("otp", otp);
         return map;
 
     }
@@ -362,31 +362,34 @@ public class UserService extends UserBaseService {
     }
 
     /**
-     * @author prabjot
-     * This method provides array of supported operations that user can perform.
      * @param organizationId
      * @return list of permissions.
+     * @author prabjot
+     * This method provides array of supported operations that user can perform.
      */
-    public List<Map<String,Object>> getPermissions(long organizationId) {
-        Organization organization = organizationGraphRepository.findOne(organizationId,0);
-        if(organization == null){
+    public List<Map<String, Object>> getPermissions(long organizationId) {
+        Organization organization = organizationGraphRepository.findOne(organizationId, 0);
+        if (organization == null) {
             return Collections.emptyList();
         }
 
         long loggedinUserId = UserContext.getUserDetails().getId();
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
-        List<AccessPageQueryResult> mainModulePermissions = (organization.isKairosHub())?accessPageRepository.getPermissionOfMainModuleForHubMembers():
+
+        Organization parentOrganization = (organization.isParentOrganization()) ? organization : organizationGraphRepository.getParentOfOrganization(organization.getId());
+
+        List<AccessPageQueryResult> mainModulePermissions = (organization.isKairosHub()) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
                 accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
         List<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> unitPermissionMap;
         for (Organization unit : units) {
             List<AccessPageQueryResult> accessPageQueryResults;
-             if(organization.isKairosHub()){
+            if (organization.isKairosHub()) {
                 accessPageQueryResults = accessPageRepository.getTabsPermissionForHubMember();
-             } else {
-               accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId);
-             }
+            } else {
+                accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId);
+            }
             unitPermissionMap = new HashMap<>();
             unitPermissionMap.put("id", unit.getId());
             unitPermissionMap.put("permissions", getUnionOfPermissions(accessPageQueryResults));
@@ -401,18 +404,18 @@ public class UserService extends UserBaseService {
             response.put("name", mainModule.getName());
             response.put("read", mainModule.isRead());
             response.put("write", mainModule.isWrite());
-            response.put("moduleId",mainModule.getModuleId());
-            response.put("active",mainModule.isActive());
+            response.put("moduleId", mainModule.getModuleId());
+            response.put("active", mainModule.isActive());
             List<Map<String, Object>> unitPermissionList = new ArrayList<>();
             for (Map<String, Object> unitPermission : list) {
                 Map<String, Object> unitPermissionForModule = new HashMap<>();
                 unitPermissionForModule.put("unitId", unitPermission.get("id"));
                 List<AccessPageQueryResult> allModulePermission = (List<AccessPageQueryResult>) unitPermission.get("permissions");
                 Optional<AccessPageQueryResult> modulePermission = allModulePermission.stream().filter(permission -> permission.getId() == mainModule.getId()).findFirst();
-                if(modulePermission.isPresent()){
+                if (modulePermission.isPresent()) {
                     unitPermissionForModule.put("tabPermissions", modulePermission.get().getChildren());
                 } else {
-                    unitPermissionForModule.put("tabPermissions",Collections.emptyList());
+                    unitPermissionForModule.put("tabPermissions", Collections.emptyList());
                 }
 
                 unitPermissionList.add(unitPermissionForModule);
@@ -428,6 +431,7 @@ public class UserService extends UserBaseService {
     /**
      * Return the union of permissions, suppose user have permission of tab A and tab B and Tab c having different roles
      * {unit manager,planner,visitator}, then final permissions will count as union of permissions of three roles.
+     *
      * @param accessPageQueryResults
      * @return List of tabs with permission parameter {tab name(String),read(boolean),write(boolean)}
      */
@@ -458,7 +462,7 @@ public class UserService extends UserBaseService {
                 }
 
                 List<AccessPageQueryResult> subPageList = new ArrayList<>();
-                BeanUtils.copyProperties(module.getChildren(),subPageList);
+                BeanUtils.copyProperties(module.getChildren(), subPageList);
 
                 for (AccessPageQueryResult subPage : subPageList) {
                     AccessPageQueryResult children = new AccessPageQueryResult();
@@ -496,33 +500,33 @@ public class UserService extends UserBaseService {
         return subPages;
     }
 
-    public List<GrantedAuthority> getTabPermission(Long userId){
+    public List<GrantedAuthority> getTabPermission(Long userId) {
         long startTime = System.currentTimeMillis();
         Set<TabPermission> tabPermissions = userGraphRepository.getAccessPermissionsOfUser(userId);
-        Map<Long,List<TabPermission>> tabPermissionsByUnit = tabPermissions.stream().collect(Collectors.groupingBy(TabPermission::getUnitId));
-        Set<Map.Entry<Long,List<TabPermission>>> entries = tabPermissionsByUnit.entrySet();
-        Iterator<Map.Entry<Long,List<TabPermission>>> entryIterator = entries.iterator();
+        Map<Long, List<TabPermission>> tabPermissionsByUnit = tabPermissions.stream().collect(Collectors.groupingBy(TabPermission::getUnitId));
+        Set<Map.Entry<Long, List<TabPermission>>> entries = tabPermissionsByUnit.entrySet();
+        Iterator<Map.Entry<Long, List<TabPermission>>> entryIterator = entries.iterator();
         List<GrantedAuthority> permissions = new ArrayList<>();
-        while (entryIterator.hasNext()){
-            Map.Entry<Long,List<TabPermission>> unitPermissions = entryIterator.next();
-            Map<String,TabPermission> processedTabs = new HashedMap();
+        while (entryIterator.hasNext()) {
+            Map.Entry<Long, List<TabPermission>> unitPermissions = entryIterator.next();
+            Map<String, TabPermission> processedTabs = new HashedMap();
             unitPermissions.getValue().stream().forEach(tabPermission -> {
-                if(processedTabs.containsKey(tabPermission.getTabId())){
-                    if(tabPermission.isWrite() || !processedTabs.get(tabPermission.getTabId()).isRead() && tabPermission.isRead()){
-                        processedTabs.put(tabPermission.getTabId(),tabPermission);
+                if (processedTabs.containsKey(tabPermission.getTabId())) {
+                    if (tabPermission.isWrite() || !processedTabs.get(tabPermission.getTabId()).isRead() && tabPermission.isRead()) {
+                        processedTabs.put(tabPermission.getTabId(), tabPermission);
                     }
                 } else {
-                    processedTabs.put(tabPermission.getTabId(),tabPermission);
+                    processedTabs.put(tabPermission.getTabId(), tabPermission);
                 }
             });
-            permissions.addAll(getAuthoritiesList(processedTabs,unitPermissions.getKey()));
+            permissions.addAll(getAuthoritiesList(processedTabs, unitPermissions.getKey()));
         }
         long endTime = System.currentTimeMillis();
-        logger.info("Total time taken by : UserService:getTabPermission() " + (endTime-startTime) + " ms");
+        logger.info("Total time taken by : UserService:getTabPermission() " + (endTime - startTime) + " ms");
         return permissions;
     }
 
-    private List<GrantedAuthority> getAuthoritiesList(Map<String,TabPermission> permissionByUnit,Long unitId) {
+    private List<GrantedAuthority> getAuthoritiesList(Map<String, TabPermission> permissionByUnit, Long unitId) {
 
         Set<Map.Entry<String, TabPermission>> entries = permissionByUnit.entrySet();
         List<GrantedAuthority> permissionList = entries.stream().map(stringTabPermissionEntry -> {
@@ -533,7 +537,7 @@ public class UserService extends UserBaseService {
             } else if (stringTabPermissionEntry.getValue().isRead()) {
                 permission = unitId + "_" + stringTabPermissionEntry.getValue().getTabId() +
                         "_" + "r";
-            } else{
+            } else {
                 permission = unitId + "_" + stringTabPermissionEntry.getValue().getTabId();
             }
             return new SimpleGrantedAuthority(permission);
