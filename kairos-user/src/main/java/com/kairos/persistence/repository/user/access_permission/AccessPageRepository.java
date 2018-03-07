@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;
+import static com.kairos.constants.AppConstants.MANAGE_COUNTRY_TAB_MODULE_ID;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -76,10 +77,11 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
             "Match (emp)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(unitEmp:UnitEmployment)-[:"+PROVIDED_BY+"]->(org) with org,unitEmp\n" +
             "Match (unitEmp)-[:"+HAS_ACCESS_PERMISSION+"{isEnabled:true}]->(ap:AccessPermission) with ap,org\n" +
             "MATCH (ap)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,ap,org\n"+
-            "Match (ap)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(accessPage:AccessPage{isModule:true})<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup)\n" +
+            "Match (ap)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(accessPage:AccessPage{isModule:true})<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) WHERE NOT(accessPage.moduleId='"+MANAGE_COUNTRY_TAB_MODULE_ID+"')\n" +
             "return id(accessPage) as id,accessPage.name as name,r.isRead as read,r.isWrite as write,accessPage.moduleId as moduleId,accessPage.active as active")
     List<AccessPageQueryResult> getPermissionOfMainModule(long orgId, long userId);
 
+    // TODO For HUB permission for module is not AccessGroup wise, we are giving access of all modules to every user of hub
     @Query("Match (accessPage:AccessPage{isModule:true})\n" +
             "return id(accessPage) as id,accessPage.name as name,true as read,true as write,accessPage.moduleId as moduleId,accessPage.active as active")
     List<AccessPageQueryResult> getPermissionOfMainModuleForHubMembers();

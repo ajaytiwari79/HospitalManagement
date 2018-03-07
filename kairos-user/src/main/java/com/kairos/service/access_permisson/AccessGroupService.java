@@ -139,10 +139,18 @@ public class AccessGroupService extends UserBaseService {
                 accessGroupIds.add(accessGroup.getId());
                 accessGroupList.add(accessGroup);
             }
+
             organization.setAccessGroups(accessGroupList);
             accessGroupRepository.setAccessPagePermission(accessGroupIds);
         } else {
-            organization.setAccessGroups(parent.getAccessGroups());
+            // Remove AG_COUNTRY_ADMIN access group to be copied
+            List<AccessGroup> accessGroups = new ArrayList<>(parent.getAccessGroups());
+            accessGroups.stream().forEach(accessGroup -> {
+                if(accessGroup.getName().equals(AG_COUNTRY_ADMIN)){
+                    accessGroups.remove(accessGroup);
+                }
+            });
+            organization.setAccessGroups(accessGroups);
         }
         save(organization);
         return accessGroupList;
