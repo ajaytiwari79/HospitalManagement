@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
 import com.kairos.response.dto.web.cta.AccessGroupDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.DateUtil;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,8 @@ public class AccessGroupService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private CountryAccessGroupRelationshipRepository countryAccessGroupRelationshipRepository;
+    @Inject
+    private OrganizationService organizationService;
 
     public AccessGroup createAccessGroup(long organizationId, AccessGroup accessGroup) {
         Organization organization = organizationGraphRepository.findOne(organizationId);
@@ -96,6 +99,15 @@ public class AccessGroupService extends UserBaseService {
         return true;
     }
 
+    public OrganizationCategory getOrganizationCategory(Organization organization){
+        if(organization.isUnion()){
+            return OrganizationCategory.UNION;
+        } else if(organization.isKairosHub()){
+            return OrganizationCategory.HUB;
+        } else{
+            return OrganizationCategory.ORGANIZATION;
+        }
+    }
 
     /**
      * @param organization
@@ -113,18 +125,16 @@ public class AccessGroupService extends UserBaseService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
         }
+        Long countryId = organizationService.getCountryIdOfOrganization(organization.getId());
         List<AccessGroup> accessGroupList = null;
         List<Long> accessGroupIds = new ArrayList<>();
         if (parent == null) {
-            String accessGroupNames[] = new String[]{VISITATOR, PLANNER, TASK_GIVERS, COUNTRY_ADMIN, UNIT_MANAGER};
-            accessGroupList = new ArrayList<>(accessGroupNames.length);
-            for (String name : accessGroupNames) {
-                AccessGroup accessGroup = new AccessGroup(name, null);
+            List<AccessGroup> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, getOrganizationCategory(organization).toString());
+            accessGroupList = new ArrayList<>(countryAccessGroups.size());
+            for (AccessGroup countryAccessGroup : countryAccessGroups){
+                AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription());
                 accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
                 accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
-                if(TASK_GIVERS.equals(name)){
-                    accessGroup.setTypeOfTaskGiver(true);
-                }
                 save(accessGroup);
                 accessGroupIds.add(accessGroup.getId());
                 accessGroupList.add(accessGroup);
