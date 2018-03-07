@@ -4,8 +4,8 @@ package com.kairos.constants;
  * Created by pavan on 7/3/18.
  */
 public enum RuleTemplates{
-    MAXIMUM_SHIFT_LENGTH("MAXIMUM_SHIFT_LENGTH","Maximum Shift Length","the description"),
-    MINIMUM_SHIFT_LENGTH ("MINIMUM_SHIFT_LENGTH","Minimum shift length","f"),
+    MAXIMUM_SHIFT_LENGTH("MAXIMUM_SHIFT_LENGTH","Maximum Shift Length","Checks that the shift length does not exceed a set value. Only shifts with an activity that adds time to the chosen balance types will be checked. If \"Check Time Rules\" is checked only those activities that have the setting \"Check Time Rules\" will be checked"),
+    MINIMUM_SHIFT_LENGTH ("MINIMUM_SHIFT_LENGTH","Minimum shift length","Checks that the shift length is not below a set value. Only shifts with an activity that adds time to the chosen balance types will be checked. If \"Check Time Rules\" is checked only those activities that have the setting \"Check Time Rules\" will be checked."),
     MAXIMUM_NUMBER_OF_CONSECUTIVE_DAYS("MAXIMUM_NUMBER_OF_CONSECUTIVE_DAYS","Maximum number of consecutive days","Checks maximum number of consecutive scheduled days"),
     MINIMUM_REST_AFTER_CONSECUTIVE_DAYS_WORKED("MINIMUM_REST_AFTER_CONSECUTIVE_DAYS_WORKED","Minimum rest after consecutive days worked","Checks the least amount of continuous rest after a given number of consecutive days with shifts."),
     MAXIMUM_NIGHT_SHIFTS_LENGTH("MAXIMUM_NIGHT_SHIFTS_LENGTH","Maximum night shift’s length","Checks that the shift length for a night shift does not exceed a set value. Only shifts with an activity that adds time to the chosen balance types will be checked. If \"Check Time Rules\" is checked only those activities that have the setting \"Check Time Rules\" will be checked."),
