@@ -1030,12 +1030,13 @@ public class BootDataService {
             ruleTemplateCategoryService.createDefaultRuleTemplateCategory( category);
         }
 
-        if (costTimeAgreementService.isDefaultCTARuleTemplateExists()) {
+        // No need to create default CTA Rule templates
+        /*if (costTimeAgreementService.isDefaultCTARuleTemplateExists()) {
             logger.info("default CTA rule template already exist");
         } else {
             logger.info("creating CTA rule template");
             costTimeAgreementService.createDefaultCtaRuleTemplate(country.getId());
-        }
+        }*/
 
     }
 

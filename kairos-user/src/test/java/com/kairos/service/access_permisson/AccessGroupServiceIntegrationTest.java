@@ -8,8 +8,9 @@ import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.access_permission.AccessGroupPermissionDTO;
+import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.country.equipment.EquipmentCategory;
 import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
 import com.kairos.service.country.CountryService;
@@ -33,8 +34,6 @@ import javax.inject.Inject;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by prerna on 5/3/18.
  */
@@ -55,7 +54,7 @@ public class AccessGroupServiceIntegrationTest {
     @Inject OrganizationService organizationService;
 
     static String nameOfAccessGroup = "PLANNER";
-    static Long createAccessGroupId = null;
+    static Long createdAccessGroupId = null;
     static Long countryId = null;
     static Long organizationId = null;
     static OrganizationCategory category = OrganizationCategory.HUB;
@@ -92,7 +91,7 @@ public class AccessGroupServiceIntegrationTest {
         logger.info("STATUS CODE ---------------------> {}",response.getStatusCode());
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.CONFLICT.equals(response.getStatusCode()));
         if(HttpStatus.CREATED.equals(response.getStatusCode())) {
-            createAccessGroupId = response.getBody().getData().getId();
+            createdAccessGroupId = response.getBody().getData().getId();
         }
     }
 
@@ -103,10 +102,10 @@ public class AccessGroupServiceIntegrationTest {
         logger.info("Access Group name : "+nameOfAccessGroup);
         String baseUrl=getBaseUrl(organizationId,countryId, null);
 
-        if(createAccessGroupId == null){
+        if(createdAccessGroupId == null){
             logger.info("Access Group Id is null");
             AccessGroup accessGroup = accessGroupService.getCountryAccessGroupByName(countryId, category, nameOfAccessGroup);
-            createAccessGroupId = accessGroup.getId();
+            createdAccessGroupId = accessGroup.getId();
         }
         CountryAccessGroupDTO accessGroupDTO = new CountryAccessGroupDTO(nameOfAccessGroup, null, OrganizationCategory.HUB);
 
@@ -117,7 +116,7 @@ public class AccessGroupServiceIntegrationTest {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<AccessGroup>> response = restTemplate.exchange(
-                baseUrl+"/access_group/"+createAccessGroupId,
+                baseUrl+"/access_group/"+ createdAccessGroupId,
                 HttpMethod.PUT, requestBodyData, resTypeReference);
 
         logger.info("STATUS CODE ---------------------> {}",response.getStatusCode());
@@ -130,19 +129,19 @@ public class AccessGroupServiceIntegrationTest {
     @OrderTest(order = 3)
     public void deleteCountryAccessGroup() throws Exception {
 
-        if(createAccessGroupId == null){
+        if(createdAccessGroupId == null){
             logger.info("Access Group Id is null");
             AccessGroup accessGroup = accessGroupService.getCountryAccessGroupByName(countryId, category, nameOfAccessGroup);
-            createAccessGroupId = accessGroup.getId();
+            createdAccessGroupId = accessGroup.getId();
         }
-        logger.info("createAccessGroupId : "+createAccessGroupId);
+        logger.info("createdAccessGroupId : "+ createdAccessGroupId);
         String baseUrl=getBaseUrl(organizationId,countryId, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> resTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = restTemplate.exchange(
-                baseUrl+"/access_group/"+createAccessGroupId,
+                baseUrl+"/access_group/"+ createdAccessGroupId,
                 HttpMethod.DELETE, null, resTypeReference);
 
         logger.info("STATUS CODE ---------------------> {}",response.getStatusCode());
@@ -186,6 +185,63 @@ public class AccessGroupServiceIntegrationTest {
                 HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
 
         logger.info("response.getBody().getData() : "+response.getBody().getData());
+    }
+
+    @Test
+    @OrderTest(order = 6)
+    public void getAccessPageHierarchy() throws Exception{
+        String baseUrl=getBaseUrl(organizationId,countryId, null);
+        if(createdAccessGroupId == null){
+            logger.info("Access Group Id is null");
+            AccessGroup accessGroup = accessGroupService.getCountryAccessGroupByName(countryId, category, nameOfAccessGroup);
+            createdAccessGroupId = accessGroup.getId();
+        }
+        logger.info("createdAccessGroupId : "+ createdAccessGroupId);
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AccessPageQueryResult>>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<AccessPageQueryResult>>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<List<AccessPageQueryResult>>> response = restTemplate.exchange(
+                baseUrl+"/access_group/"+ createdAccessGroupId +"/access_page",
+                HttpMethod.GET, null, resTypeReference);
+
+        logger.info("STATUS CODE ---------------------> {}",response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
+
+        logger.info("response.getBody().getData() : "+response.getBody().getData());
+    }
+
+    @Test
+    @OrderTest(order = 7)
+    public void setAccessPagePermissions() throws Exception {
+
+        String baseUrl=getBaseUrl(organizationId,countryId, null);
+
+        if(createdAccessGroupId == null){
+            logger.info("Access Group Id is null");
+            AccessGroup accessGroup = accessGroupService.getCountryAccessGroupByName(countryId, category, nameOfAccessGroup);
+            createdAccessGroupId = accessGroup.getId();
+        }
+        AccessGroupPermissionDTO accessGroupPermissionDTO = new AccessGroupPermissionDTO();
+        accessGroupPermissionDTO.setSelected(true);
+        accessGroupPermissionDTO.setAccessPageIds(accessGroupService.getAccessPageIdsByAccessGroup(createdAccessGroupId));
+
+        HttpEntity<AccessGroupPermissionDTO> requestBodyData = new HttpEntity<>(accessGroupPermissionDTO);
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = restTemplate.exchange(
+                baseUrl+"/access_group/"+ createdAccessGroupId +"/access_page",
+                HttpMethod.PUT, requestBodyData, resTypeReference);
+
+        logger.info("STATUS CODE ---------------------> {}",response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) ||
+                HttpStatus.CONFLICT.equals(response.getStatusCode()) );
     }
 
     public final String getBaseUrl(Long organizationId,Long countryId, Long unitId){
