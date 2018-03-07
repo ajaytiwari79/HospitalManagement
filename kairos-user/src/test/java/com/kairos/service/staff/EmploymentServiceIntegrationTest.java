@@ -45,7 +45,7 @@ public class EmploymentServiceIntegrationTest {
     @Before
     public void setUp() throws Exception {
         baseUrlWithUnit = getBaseUrl(71L, null, 95L);
-        staffId = 8364L;
+        staffId = 5581L;
     }
 
     @After
@@ -56,10 +56,10 @@ public class EmploymentServiceIntegrationTest {
     @Test
     public void createUnitPermission() throws Exception {
         Map<String, Object> employmentDetail = new HashMap();
-        employmentDetail.put("organizationId", 145 + "");
+        employmentDetail.put("organizationId", 10711 + "");
         employmentDetail.put("roleId", 97 + "");
         employmentDetail.put("isCreated", true);
-        employmentDetail.put("unit", 145 + "");
+        employmentDetail.put("unit", 10711 + "");
         HttpEntity<Map<String, Object>> requestBodyData = new HttpEntity<>(employmentDetail);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>> typeReference =

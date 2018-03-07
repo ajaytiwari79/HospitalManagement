@@ -367,28 +367,36 @@ public class UserService extends UserBaseService {
      * @author prabjot
      * This method provides array of supported operations that user can perform.
      */
-    public List<Map<String, Object>> getPermissions(long organizationId) {
+    public Set<HashMap<String, Object>> getPermissions(long organizationId) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 0);
         if (organization == null) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
 
         long loggedinUserId = UserContext.getUserDetails().getId();
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
 
-        Organization parentOrganization = (organization.isParentOrganization()) ? organization : organizationGraphRepository.getParentOfOrganization(organization.getId());
 
         List<AccessPageQueryResult> mainModulePermissions = (organization.isKairosHub()) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
                 accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
-        List<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
-        List<Map<String, Object>> list = new ArrayList<>();
+        Set<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
+        // USER HAS NO main module permission check his permission in current unit only via parent employment id
+        Organization parentOrganization = (organization.isParentOrganization()) ? organization : organizationGraphRepository.getParentOfOrganization(organization.getId());
+        if (unionOfPermissionOfModule.isEmpty()) {
+            List<Long> organizationIds =
+                    units.parallelStream().map(Organization::getId).collect(Collectors.toList());
+
+            mainModulePermissions = accessPageRepository.getPermissionOfMainModule(organizationIds, loggedinUserId, parentOrganization.getId());
+            unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
+        }
+        Set<Map<String, Object>> list = new HashSet<>();
         Map<String, Object> unitPermissionMap;
         for (Organization unit : units) {
             List<AccessPageQueryResult> accessPageQueryResults;
             if (organization.isKairosHub()) {
                 accessPageQueryResults = accessPageRepository.getTabsPermissionForHubMember();
             } else {
-                accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId);
+                accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId,parentOrganization.getId());
             }
             unitPermissionMap = new HashMap<>();
             unitPermissionMap.put("id", unit.getId());
@@ -396,7 +404,8 @@ public class UserService extends UserBaseService {
             list.add(unitPermissionMap);
         }
 
-        List<Map<String, Object>> permissionList = new ArrayList<>();
+        Set<HashMap<String, Object>> permissionList = new HashSet<>();
+
 
         unionOfPermissionOfModule.forEach(mainModule -> {
             HashMap<String, Object> response = new HashMap<>();
@@ -406,12 +415,13 @@ public class UserService extends UserBaseService {
             response.put("write", mainModule.isWrite());
             response.put("moduleId", mainModule.getModuleId());
             response.put("active", mainModule.isActive());
-            List<Map<String, Object>> unitPermissionList = new ArrayList<>();
+            Set<HashMap<String, Object>> unitPermissionList = new HashSet<>();
             for (Map<String, Object> unitPermission : list) {
-                Map<String, Object> unitPermissionForModule = new HashMap<>();
+                HashMap<String, Object> unitPermissionForModule = new HashMap<>();
                 unitPermissionForModule.put("unitId", unitPermission.get("id"));
-                List<AccessPageQueryResult> allModulePermission = (List<AccessPageQueryResult>) unitPermission.get("permissions");
-                Optional<AccessPageQueryResult> modulePermission = allModulePermission.stream().filter(permission -> permission.getId() == mainModule.getId()).findFirst();
+                Set<AccessPageQueryResult> allModulePermission = (Set<AccessPageQueryResult>) unitPermission.get("permissions");
+                Optional<AccessPageQueryResult> modulePermission =
+                        allModulePermission.stream().filter(permission -> permission.getId() == mainModule.getId()).findFirst();
                 if (modulePermission.isPresent()) {
                     unitPermissionForModule.put("tabPermissions", modulePermission.get().getChildren());
                 } else {
@@ -423,6 +433,7 @@ public class UserService extends UserBaseService {
             response.put("unitPermissions", unitPermissionList);
             permissionList.add(response);
         });
+
         return permissionList;
 
     }
@@ -435,9 +446,9 @@ public class UserService extends UserBaseService {
      * @param accessPageQueryResults
      * @return List of tabs with permission parameter {tab name(String),read(boolean),write(boolean)}
      */
-    private List<AccessPageQueryResult> getUnionOfPermissions(List<AccessPageQueryResult> accessPageQueryResults) {
+    private Set<AccessPageQueryResult> getUnionOfPermissions(List<AccessPageQueryResult> accessPageQueryResults) {
 
-
+        Set<AccessPageQueryResult> filteredPageUniqueData = new HashSet<>();
         List<AccessPageQueryResult> filteredPages = new ArrayList<>();
         HashMap<Long, Boolean> moduleToProceed = new HashMap<>();
         HashMap<Long, Boolean> subPageToProceed = new HashMap<>();
@@ -483,11 +494,12 @@ public class UserService extends UserBaseService {
                     }
                     module.getChildren().add(children);
                 }
-                filteredPages.add(module);
+                filteredPageUniqueData.add(module);
             }
 
         }
-        return filteredPages;
+        filteredPages.addAll(filteredPageUniqueData);
+        return filteredPageUniqueData;
     }
 
 
