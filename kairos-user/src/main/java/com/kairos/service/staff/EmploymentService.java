@@ -152,27 +152,35 @@ public class EmploymentService extends UserBaseService {
         boolean flsSyncStatus = false;
         List<AccessPageQueryResult> accessPageQueryResults;
         Map<String, Object> response = new HashMap<>();
+        UnitPermission unitPermission = null;
+        if (created) {
 
-//            if (employment == null) {
-//                employment = new Employment();
-//                employment.setStaff(staff);
-//            }
-        UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId);
-        if (Optional.ofNullable(unitPermission).isPresent()) {
-            throw new DataNotFoundByIdException("Unit permission already exist" + staffId);
+            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId);
+            if (Optional.ofNullable(unitPermission).isPresent()) {
+                throw new DataNotFoundByIdException("Unit permission already exist" + staffId);
+            }
+            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+            unitPermission = new UnitPermission();
+            unitPermission.setOrganization(unit);
+            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+            employment.getUnitPermissions().add(unitPermission);
+            employmentGraphRepository.save(employment);
+            AccessPermission accessPermission = new AccessPermission(accessGroup);
+            accessPermissionGraphRepository.save(accessPermission);
+            logger.info(unitPermission.getId() + " Currently created Unit position ");
+            unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
+            accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
+            accessPageQueryResults = getAccessPages(accessPermission);
+            response.put("accessPage", accessPageQueryResults);
+            response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
+            response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
+            response.put("id", unitPermission.getId());
+
+        } else {
+            // need to remove unit permission
+            unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
+
         }
-        AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-        unitPermission = new UnitPermission();
-        unitPermission.setOrganization(unit);
-        unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
-        employment.getUnitPermissions().add(unitPermission);
-        employmentGraphRepository.save(employment);
-        AccessPermission accessPermission = new AccessPermission(accessGroup);
-        accessPermissionGraphRepository.save(accessPermission);
-        logger.info(unitPermission.getId() + " Currently created Unit position ");
-        unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
-        accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
-        accessPageQueryResults = getAccessPages(accessPermission);
 //                if (parentOrganization == null) {
 //                    unit.getEmployments().add(employment);
 //                    organizationGraphRepository.save(unit);
@@ -226,13 +234,10 @@ public class EmploymentService extends UserBaseService {
         }*/
 
 
-        response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
-        response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
         response.put("organizationId", unitId);
 
-        response.put("id", unitPermission.getId());
+
         response.put("synInFls", flsSyncStatus);
-        response.put("accessPage", accessPageQueryResults);
 
 
         return response;

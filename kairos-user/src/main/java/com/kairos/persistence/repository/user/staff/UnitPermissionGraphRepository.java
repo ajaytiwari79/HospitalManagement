@@ -51,8 +51,8 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
             "Match (organization)-[:" + HAS_EMPLOYMENTS + "]->(employment:Employment)-[:BELONGS_TO]->(staff) with employment\n" +
             "Match (employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission) with unitPermission\n" +
             "match (unitPermission)-[r:" + APPLICABLE_IN_UNIT + "]->(unit:Organization) where id(unit)={1} with unitPermission\n" +
-            "Match (unitPermission)-[r:" + HAS_ACCESS_PERMISSION + "]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) where id(accessGroup)={3} set r.isEnabled={4} return r.isEnabled;")
-    boolean updateUnitPermission(long organizationId, long unitId, long staffId, long accessGroupId, boolean isEnabled);
+            "Match (unitPermission)-[r:" + HAS_ACCESS_PERMISSION + "]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) where id(accessGroup)={3} detach delete unitPermission ,r ")
+    void updateUnitPermission(long organizationId, long unitId, long staffId, long accessGroupId, boolean isEnabled);
 
     @Query("Match (unitPermission:UnitPermission),(accessPermission:AccessPermission) where id(unitPermission)={0} AND id(accessPermission)={1}\n" +
             "Create (unitPermission)-[r:" + HAS_ACCESS_PERMISSION + "{isEnabled:true}]->(accessPermission) return count(r) as count")
