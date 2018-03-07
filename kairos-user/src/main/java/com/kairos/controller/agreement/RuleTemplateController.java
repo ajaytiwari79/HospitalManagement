@@ -1,6 +1,5 @@
 package com.kairos.controller.agreement;
 
-import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.RuleTemplateDTO;
 import com.kairos.service.agreement.RuleTemplateCategoryService;
@@ -58,7 +57,10 @@ public class RuleTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplateCategoryByUnit(unitId));
     }
 
-
+    @RequestMapping(value = COUNTRY_URL+"/copy_rule_template", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> copyRuleTemplate(@PathVariable Long countryId, @Valid @RequestBody RuleTemplateCategoryDTO templateDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.copyRuleTemplate(countryId,templateDTO));
+    }
 
 
 }

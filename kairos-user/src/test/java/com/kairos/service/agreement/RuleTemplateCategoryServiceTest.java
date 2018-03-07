@@ -2,6 +2,7 @@ package com.kairos.service.agreement;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.constants.RuleTemplates;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
@@ -24,10 +25,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.AppConstants.TEMPLATE2;
-import static com.kairos.constants.AppConstants.TEMPLATE2_DESCRIPTION;
 
 /**
  * Created by vipul on 14/12/17.
@@ -52,9 +49,9 @@ public class RuleTemplateCategoryServiceTest {
     public void setUp() throws Exception {
         long timeInMins = 10;
         List<String> balanceTypes = new ArrayList<>(0);
-        maximumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE1_NAME, TEMPLATE1, false, TEMPLATE1_DESCRIPTION, timeInMins, balanceTypes, true);
+        maximumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(RuleTemplates.MAXIMUM_SHIFT_LENGTH.getName(), RuleTemplates.MAXIMUM_SHIFT_LENGTH.getTemplateType(), false, RuleTemplates.MAXIMUM_SHIFT_LENGTH.getDescription(), timeInMins, balanceTypes, true);
         maximumShiftLengthWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
-        minimumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE2_NAME, TEMPLATE2, false, TEMPLATE2_DESCRIPTION, timeInMins, balanceTypes, true);
+        minimumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(RuleTemplates.MINIMUM_SHIFT_LENGTH.getName(), RuleTemplates.MINIMUM_SHIFT_LENGTH.getTemplateType(), false, RuleTemplates.MINIMUM_SHIFT_LENGTH.getDescription(), timeInMins, balanceTypes, true);
         minimumShiftLengthWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
     }
 
