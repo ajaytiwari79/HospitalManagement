@@ -127,6 +127,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted")
     List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategory(Long countryId, String orgCategory);
 
+    @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} RETURN ag")
+    List<AccessGroup> getCountryAccessGroupByCategory(Long countryId, String organizationCategory);
 
     // For Test cases
     @Query("Match (accessGroup:AccessGroup)-[:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]->(accessPage:AccessPage) with accessPage where id(accessGroup)={0} return accessPage")
