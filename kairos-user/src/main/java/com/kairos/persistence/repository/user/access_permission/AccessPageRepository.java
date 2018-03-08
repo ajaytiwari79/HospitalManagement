@@ -144,24 +144,16 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Optional Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages set pages.active={1} return distinct true")
     Boolean updateStatusOfAccessTabs(Long tabId, Boolean active);
 
-//    @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
-//            <<<<<<<HEAD
-//            "Optional Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages \n" +
-//                    "MATCH (c:Country) WHERE id(c)={1} WITH c, pages\n" +
-//                    "MERGE (c)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]->(pages)\n" +
-//                    "  ON CREATE SET r.accessibleForHub = {2},r.accessibleForUnion = false,r.accessibleForOrganization=false\n" +
-//                    "  ON MATCH  SET r.accessibleForHub = {2} return distinct true")
-//    Boolean updateAccessStatusForHubOfCountry(Long tabId, Long countryId, Boolean accessStatus);
 
+    @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
+            "OPTIONAL Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
+            "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +
+            "UNWIND listOfPage as page\n" +
+            "MERGE (c)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]->(page)\n" +
+            "ON CREATE SET r.accessibleForHub = {2},r.accessibleForUnion = false,r.accessibleForOrganization=false\n" +
+            "ON MATCH  SET r.accessibleForHub = {2} return distinct true")
+    Boolean updateAccessStatusForHubOfCountry(Long tabId, Long countryId, Boolean accessStatus);
 
-//    @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
-//            "Optional Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages \n" +
-//            "MATCH (c:Country) WHERE id(c)={1} WITH c, pages\n" +
-//            "MERGE (c)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]->(pages)\n" +
-//            "  ON CREATE SET r.accessibleForHub = false,r.accessibleForUnion = false,r.accessibleForOrganization={2}\n" +
-//            "  ON MATCH  SET r.accessibleForOrganization = {2} return distinct true")
-//
-////    Boolean updateAccessStatusForOrganizationOfCountry(Long tabId, Long countryId, Boolean accessStatus);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
@@ -172,15 +164,6 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "ON MATCH  SET r.accessibleForUnion = {2} return distinct true")
     Boolean updateAccessStatusForUnionOfCountry(Long tabId, Long countryId, Boolean accessStatus);
 
-/*
-    @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
-            "Optional Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages \n" +
-            "MATCH (c:Country) WHERE id(c)={1} WITH c, pages\n" +
-            "MERGE (c)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]->(pages)\n" +
-            "  ON CREATE SET r.accessibleForHub = false,r.accessibleForUnion = {2},r.accessibleForOrganization=false\n" +
-            "  ON MATCH  SET r.accessibleForUnion = {2} return distinct true")
-    Boolean updateAccessStatusForUnionOfCountry(Long tabId, Long countryId, Boolean accessStatus);
-*/
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
@@ -212,10 +195,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Match (emp:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization) with collect(org.isKairosHub) as hubList\n" +
             "return true in hubList")
     Boolean isHubMember(Long userId);
-
-
     // For Test Cases
-
     @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage return accessPage LIMIT 1")
     AccessPage getOneMainModule();
 

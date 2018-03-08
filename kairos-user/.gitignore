@@ -3,6 +3,8 @@
 !gradle/wrapper/gradle-wrapper.jar
 /logs/spring-boot-logging.log
 logs/spring-boot-logging.log
+application-authorization.properties
+src/test/resources/application-authorization.properties
 ### STS ###
 .apt_generated
 .classpath
