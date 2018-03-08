@@ -20,7 +20,7 @@ public class PhaseTemplateValue extends UserBaseEntity {
     private boolean disabled=true;
     private int optionalFrequency=0;
     private boolean optional=false;
-    private int sequence;
+
 
     public int getOptionalFrequency() {
         return optionalFrequency;
@@ -97,13 +97,7 @@ public class PhaseTemplateValue extends UserBaseEntity {
         this.optional = optional;
     }
 
-    public int getSequence() {
-        return sequence;
-    }
 
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
-    }
 
     @Override
     public String toString() {
