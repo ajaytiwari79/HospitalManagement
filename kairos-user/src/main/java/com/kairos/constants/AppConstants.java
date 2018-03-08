@@ -81,6 +81,7 @@ public class AppConstants {
     public static final String PLANNER = "PLANNER";
     public static final String TASK_GIVERS = "TASK_GIVERS";
     public static final String COUNTRY_ADMIN = "COUNTRY_ADMIN";
+    public static final String AG_COUNTRY_ADMIN = "AG_COUNTRY_ADMIN";
     public static final String UNIT_MANAGER = "UNIT_MANAGER";
     public static final String ACCESS_PAGE_PROPERTIES_FILE_PATH = "/page-id.properties";
 
@@ -185,6 +186,8 @@ public class AppConstants {
     public static final float DEFAULT_HOURLY_WAGES = 10;
     public static final float DEFAULT_SALARY= 500;
     public static final int DEFAULT_WORKING_DAYS_IN_WEEK = 5;
+
+    public static final String MANAGE_COUNTRY_TAB_MODULE_ID = "module_4";
 
 
 

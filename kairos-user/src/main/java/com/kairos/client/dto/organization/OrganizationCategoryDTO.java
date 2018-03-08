@@ -9,6 +9,8 @@ public class OrganizationCategoryDTO {
 
     private String value;
 
+    private int count;
+
     public OrganizationCategoryDTO(){
         // default constructor
     }
@@ -33,5 +35,13 @@ public class OrganizationCategoryDTO {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }
