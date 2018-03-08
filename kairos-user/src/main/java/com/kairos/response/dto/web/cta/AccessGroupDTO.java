@@ -1,8 +1,14 @@
 package com.kairos.response.dto.web.cta;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
+
 public class AccessGroupDTO {
     private Long id;
+    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;
+    private String description;
 
     public AccessGroupDTO() {
         //default constructor
@@ -27,5 +33,13 @@ public class AccessGroupDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -349,9 +349,14 @@ public class TeamService extends UserBaseService {
         return staff;
     }
 
+       /*
+        By Yasir
+        Commented below method as we are no longer using FLS Visitour
+       */
+
     private boolean updateTeamIdOfStaffInVisitour(String teamId,long staffId, long unitId){
 
-        logger.info("Updating staff in visitour");
+        /*logger.info("Updating staff in visitour");
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         Map <String,Object> engineerMetaData = new HashMap<>();
         engineerMetaData.put("fmvtid",staffId);
@@ -361,7 +366,7 @@ public class TeamService extends UserBaseService {
         logger.info("FLS staff sync status-->" + code);
         if(code == 0){
             return true;
-        }
+        }*/
         return false;
     }
 

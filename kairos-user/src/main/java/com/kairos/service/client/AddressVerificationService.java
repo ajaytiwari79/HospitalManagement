@@ -55,8 +55,12 @@ public class AddressVerificationService {
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
 
+    /*
+      By Yasir
+      Commented below method as we are no longer using FLS Visitour
+    */
     public Map<String, Object> verifyAddress(AddressDTO contactAddress, long unitId) {
-        Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
+        /*Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         ZipCode zipCodeData = zipCodeGraphRepository.findOne(contactAddress.getZipCodeId());
         int zipCode;
         if(zipCodeData != null){
@@ -79,7 +83,7 @@ public class AddressVerificationService {
             logger.debug("GeoCode Response from TOM TOM : " + geoCodeResponse);
             return geoCodeResponse;
         }
-        logger.debug("Address not verified with TOMTOM");
+        logger.debug("Address not verified with TOMTOM");*/
         return null;
     }
 
@@ -124,10 +128,13 @@ public class AddressVerificationService {
         return null;
     }
 
-
+    /*
+    By Yasir
+    Commented below method as we are no longer using FLS Visitour
+     */
     public Map<String, Object> verifyAddressSheet(AddressDTO contactAddress, long unitId) {
 //        int zipCode = zipCodeGraphRepository.findOne(contactAddress.getZipCodeId()).getZipCode();
-        logger.debug("Verifying with Information \n house: " + contactAddress.getHouseNumber() + "\n City:" + contactAddress.getCity() + "\n ZipCode: " + contactAddress.getZipCodeValue() +
+       /* logger.debug("Verifying with Information \n house: " + contactAddress.getHouseNumber() + "\n City:" + contactAddress.getCity() + "\n ZipCode: " + contactAddress.getZipCodeValue() +
                 "\n Street: " + contactAddress.getStreet1());
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         Map<String, Object> addressToVerify = new HashMap<>();
@@ -142,7 +149,7 @@ public class AddressVerificationService {
             logger.debug("GeoCode Response from TOM TOM : " + geoCodeResponse);
             return geoCodeResponse;
         }
-        logger.debug("Address not verified with TOMTOM");
+        logger.debug("Address not verified with TOMTOM");*/
         return null;
     }
 
