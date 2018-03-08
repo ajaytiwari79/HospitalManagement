@@ -497,7 +497,7 @@ public class RuleTemplateService extends UserBaseService {
             throw new DataNotFoundByIdException("Category Not matched");
         }
 
-        WTABaseRuleTemplate wtaBaseRuleTemplate1 = wtaBaseRuleTemplateGraphRepository.existsByName(wtaRuleTemplateDTO.getName());
+        WTABaseRuleTemplate wtaBaseRuleTemplate1 = wtaBaseRuleTemplateGraphRepository.existsByName(wtaRuleTemplateDTO.getName().trim());
         if (Optional.ofNullable(wtaBaseRuleTemplate1).isPresent()) {
             throw new DuplicateDataException("WTA Rule template already existed  " + wtaRuleTemplateDTO.getName());
         }
