@@ -46,8 +46,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
-import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.AppConstants.TEMPLATE20;
 
 
 /**

@@ -189,6 +189,7 @@ public class UnitPositionQueryResult {
         this.lastWorkingDateMillis = lastWorkingDateMillis;
     }
 
+
     public UnitPositionQueryResult() {
         //default cons
     }
@@ -206,8 +207,9 @@ public class UnitPositionQueryResult {
         this.employmentType = employmentType;
         this.salary = salary;
         this.positionCode = positionCode;
-        this.union = union;
-        this.lastWorkingDateMillis = lastWorkingDateMillis;
+        this.union=union;
+        this.workingTimeAgreement = workingTimeAgreement;
+        this.costTimeAgreement = costTimeAgreement;
     }
 
 }

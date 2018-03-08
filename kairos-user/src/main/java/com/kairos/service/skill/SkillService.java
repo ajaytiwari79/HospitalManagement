@@ -447,10 +447,10 @@ public class SkillService extends UserBaseService {
             staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtil.getCurrentDate().getTime());
             response = Collections.emptyList();
         }
-        if (staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId) != 0) {
+        /*if (staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId) != 0) {
             logger.info("Staff  is TaskGiver: Now Syncing Skills in Visitour");
             updateSkillsOfStaffInVisitour(staff, unitId);
-        }
+        }*/
         return response;
 
     }
@@ -496,11 +496,11 @@ public class SkillService extends UserBaseService {
         } else {
             staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, Skill.SkillLevel.ADVANCE, false);
         }
-        int count = staffGraphRepository.checkIfStaffIsTaskGiver(staffId, id);
+        /*int count = staffGraphRepository.checkIfStaffIsTaskGiver(staffId, id);
         if (count != 0) {
             logger.info("Staff  is TaskGiver: Now Syncing Skills in Visitour");
             updateSkillsOfStaffInVisitour(staff, id);
-        }
+        }*/
         return true;
 
     }
@@ -542,9 +542,14 @@ public class SkillService extends UserBaseService {
     }
 
 
+       /*
+            By Yasir
+            Commented below method as we are no longer using FLS Visitour
+    */
+
     public boolean updateSkillsOfStaffInVisitour(Staff staff, long unitId) {
 
-        Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
+        /*Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
 
         List<String> skillsToUpdate = staffGraphRepository.getStaffVisitourIdWithLevel(unitId, staff.getId());
 
@@ -565,7 +570,7 @@ public class SkillService extends UserBaseService {
         }
         if (code == 0) {
             return true;
-        }
+        }*/
         return false;
 
     }

@@ -58,7 +58,7 @@ public class UnitPosition extends UserBaseEntity {
     private float hourlyWages;
 
     private float salary;
-    private  Long timeCareExternalId;
+    private Long timeCareExternalId;
 
     public UnitPosition() {
     }
@@ -177,19 +177,10 @@ public class UnitPosition extends UserBaseEntity {
     }
 
 
-    public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary) {
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.hourlyWages = hourlyWages;
-        this.salary = salary;
-    }
-
     public Organization getUnion() {
         return union;
     }
+
 
     public void setUnion(Organization union) {
         this.union = union;
@@ -217,6 +208,17 @@ public class UnitPosition extends UserBaseEntity {
 
     public void setTimeCareExternalId(Long timeCareExternalId) {
         this.timeCareExternalId = timeCareExternalId;
+    }
+
+
+    public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary) {
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.hourlyWages = hourlyWages;
+        this.salary = salary;
     }
 
     @Override

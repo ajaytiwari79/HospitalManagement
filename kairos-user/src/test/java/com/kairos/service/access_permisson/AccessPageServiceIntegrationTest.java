@@ -44,7 +44,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(OrderTestRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class AccessPageServiceTest {
+public class AccessPageServiceIntegrationTest {
 
     private Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
 
