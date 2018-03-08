@@ -86,7 +86,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Match (emp)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) with org,unitPermission\n" +
             "Match (unitPermission)-[:" + HAS_ACCESS_PERMISSION + "{isEnabled:true}]->(ap:AccessPermission) with ap,org\n" +
             "MATCH (ap)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,ap,org\n" +
-            "Match (ap)-[r:" + HAS_ACCESS_PAGE_PERMISSION + "]->(accessPage:AccessPage{isModule:true})<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup)\n" +
+            "Match (ap)-[r:" + HAS_ACCESS_PAGE_PERMISSION + "]->(accessPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup)\n" +
             "return  id(accessPage) as id,accessPage.name as name,r.isRead as read,r.isWrite as write,accessPage.moduleId as moduleId,accessPage.active as active")
     List<AccessPageQueryResult> getPermissionOfMainModule(List<Long> orgIds, long userId, Long parentOrganizationId);
 

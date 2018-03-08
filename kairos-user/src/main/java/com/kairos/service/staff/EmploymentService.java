@@ -94,7 +94,7 @@ public class EmploymentService extends UserBaseService {
             logger.info("Staff does not found by id {}", staffId);
             throw new DataNotFoundByIdException("Staff does not found by id");
         } else if (!objectToUpdate.getExternalId().equals(staffEmploymentDetail.getTimeCareExternalId())) {
-            throw new ActionNotPermittedException("Sorry external id can't be changed");
+            throw new ActionNotPermittedException("External id can't be changed");
         }
         EngineerType engineerType = engineerTypeGraphRepository.findOne(staffEmploymentDetail.getEngineerTypeId());
         objectToUpdate.setEmail(staffEmploymentDetail.getEmail());
@@ -167,7 +167,7 @@ public class EmploymentService extends UserBaseService {
             employmentGraphRepository.save(employment);
             AccessPermission accessPermission = new AccessPermission(accessGroup);
             accessPermissionGraphRepository.save(accessPermission);
-            logger.info(unitPermission.getId() + " Currently created Unit position ");
+            logger.info(unitPermission.getId() + " Currently created Unit Permission ");
             unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
             accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
             accessPageQueryResults = getAccessPages(accessPermission);
@@ -233,10 +233,7 @@ public class EmploymentService extends UserBaseService {
             staffGraphRepository.save(staff);
         }*/
 
-
         response.put("organizationId", unitId);
-
-
         response.put("synInFls", flsSyncStatus);
 
 

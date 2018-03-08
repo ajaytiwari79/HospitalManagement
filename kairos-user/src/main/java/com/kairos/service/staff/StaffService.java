@@ -1014,13 +1014,13 @@ public class StaffService extends UserBaseService {
             unit.getEmployments().add(employment);
             organizationGraphRepository.save(unit);
         }
-        if (accessGroup.isTypeOfTaskGiver()) {
-            Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unit.getId());
-            if (StringUtils.isBlank(flsCredentials.get("flsDefaultUrl"))) {
-                throw new FlsCredentialException("Fls credentials not found");
-            }
-            employmentService.syncStaffInVisitour(staff, unit.getId(), flsCredentials);
-        }
+//        if (accessGroup.isTypeOfTaskGiver()) {
+//            Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unit.getId());
+//            if (StringUtils.isBlank(flsCredentials.get("flsDefaultUrl"))) {
+//                throw new FlsCredentialException("Fls credentials not found");
+//            }
+//            employmentService.syncStaffInVisitour(staff, unit.getId(), flsCredentials);
+//        }
     }
 
 
@@ -1370,21 +1370,21 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitEmploymentId, long id, String type) {
+    public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitPositionId, long id, String type) {
         Long unitId = -1L;
         Organization organization = organizationService.getOrganizationDetail(id, type);
         unitId = organization.getId();
 
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = new StaffAdditionalInfoQueryResult();
         staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
-        StaffUnitPositionDetails unitEmploymentPosition = unitPositionGraphRepository.getUnitPositionById(unitEmploymentId);
+        StaffUnitPositionDetails unitEmploymentPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         staffAdditionalInfoQueryResult.setUnitId(organization.getId());
         staffAdditionalInfoQueryResult.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
         if (Optional.ofNullable(unitEmploymentPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitEmploymentPosition(unitEmploymentPosition);
 
-            WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitEmploymentId);
+            WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             staffAdditionalInfoQueryResult.getUnitEmploymentPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
         return staffAdditionalInfoQueryResult;

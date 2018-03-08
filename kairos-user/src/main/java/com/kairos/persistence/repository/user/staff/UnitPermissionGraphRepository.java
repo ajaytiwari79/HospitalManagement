@@ -56,7 +56,7 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
 
     @Query("Match (unitPermission:UnitPermission),(accessPermission:AccessPermission) where id(unitPermission)={0} AND id(accessPermission)={1}\n" +
             "Create (unitPermission)-[r:" + HAS_ACCESS_PERMISSION + "{isEnabled:true}]->(accessPermission) return count(r) as count")
-    int linkUnitPermissionWithAccessPermission(long unitEmploymentId, long accessPermissionId);
+    int linkUnitPermissionWithAccessPermission(long unitPermissionId, long accessPermissionId);
 
 
     @Query("Match (organization:Organization),(staff:Staff) where id(organization)={0} AND id(staff)={2} with organization,staff \n" +
@@ -66,7 +66,7 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
             "return  unitPermission")
     UnitPermission checkUnitPermissionOfStaff(Long parentOrganizationId, Long organizationId, Long staffId);
 
-    // for parent organization
+    // forg parent organization
     @Query("Match (organization:Organization),(staff:Staff) where id(organization)={0} AND id(staff)={1} with organization,staff \n" +
             "Match (organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff)  \n" +
             "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]-(organization)\n" +
