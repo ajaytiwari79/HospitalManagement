@@ -336,7 +336,13 @@ public class EmploymentService extends UserBaseService {
      * @return
      */
     public boolean syncStaffInVisitour(Staff staff,long unitId, Map<String, String> flsCredentials){
-        logger.info("Syncing staff in fls");
+
+            /*
+                    By Yasir
+                Commented below method as we are no longer using FLS Visitour
+             */
+
+        /*logger.info("Syncing staff in fls");
         ContactDetail staffContactDetail = staffGraphRepository.getContactDetail(staff.getId());
 
         OrganizationContactAddress organizationContactData = organizationGraphRepository.getContactAddressOfOrg(unitId);
@@ -397,13 +403,18 @@ public class EmploymentService extends UserBaseService {
         logger.info("FLS staff sync status-->" + code);
         if (code == 0) {
             return true;
-        }
+        }*/
         return false;
 
     }
 
+
+    /*
+        By Yasir
+    Commented below method as we are no longer using FLS Visitour
+ */
     private boolean removeStaffFromFls(Staff staff, Map<String, String> flsCredentials) {
-        Map<String, Object> engineerMetaData = new HashMap<>();
+        /*Map<String, Object> engineerMetaData = new HashMap<>();
         engineerMetaData.put("fmvtid", staff.getId());
         engineerMetaData.put("fmextID", staff.getId());
         engineerMetaData.put("active", false);
@@ -411,7 +422,7 @@ public class EmploymentService extends UserBaseService {
         logger.info("FLS staff sync status-->" + code);
         if (code == 0) {
             return true;
-        }
+        }*/
         return false;
     }
 

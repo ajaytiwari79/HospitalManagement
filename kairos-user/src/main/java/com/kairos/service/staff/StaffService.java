@@ -232,10 +232,10 @@ public class StaffService extends UserBaseService {
         objectToUpdate.setCapacity(staffPersonalDetail.getCapacity());
         objectToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
 
-        int count = staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId);
+        /*int count = staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId);
         if (count != 0 && objectToUpdate.getVisitourId() != 0) {
             updateStaffPersonalInfoInFLS(objectToUpdate, unitId); // Update info to FLS
-        }
+        }*/
         if (staffPersonalDetail.getCurrentStatus()== StaffStatusEnum.INACTIVE) {
             objectToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
         }
@@ -805,10 +805,13 @@ public class StaffService extends UserBaseService {
         return null;
     }
 
-
+   /*
+   By Yasir
+   Commented below method as we are no longer using FLS Visitour
+    */
     public Map<String, String> createStaffSchedule(long organizationId, Long unitId) throws ParseException {
 
-        Map<String, String> workScheduleStatus = new HashMap<>();
+        /*Map<String, String> workScheduleStatus = new HashMap<>();
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
         List<Map<String, Object>> fieldStaffs = staffGraphRepository.getFieldStaff(organizationId, unitId);
         logger.debug("field staff found is" + fieldStaffs);
@@ -831,7 +834,8 @@ public class StaffService extends UserBaseService {
 
         }
         workScheduleStatus.put("message", "success");
-        return workScheduleStatus;
+        return workScheduleStatus;*/
+        return null;
     }
 
 

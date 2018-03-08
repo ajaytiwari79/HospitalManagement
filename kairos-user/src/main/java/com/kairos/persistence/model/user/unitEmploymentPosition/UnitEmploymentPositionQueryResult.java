@@ -200,7 +200,7 @@ public class UnitEmploymentPositionQueryResult {
         this.costTimeAgreement = costTimeAgreement;
     }
 
-    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode,Organization union) {
+    public UnitEmploymentPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode,Organization union,WorkingTimeAgreement workingTimeAgreement, CostTimeAgreement costTimeAgreement) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;
@@ -213,6 +213,8 @@ public class UnitEmploymentPositionQueryResult {
         this.salary = salary;
         this.positionCode = positionCode;
         this.union=union;
+        this.workingTimeAgreement = workingTimeAgreement;
+        this.costTimeAgreement = costTimeAgreement;
     }
 
 }
