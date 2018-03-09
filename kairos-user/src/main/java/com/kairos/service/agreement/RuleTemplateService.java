@@ -402,7 +402,6 @@ public class RuleTemplateService extends UserBaseService {
         oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         oldTemplate.setPhaseTemplateValues(templateDTO.getPhaseTemplateValues());
-
         oldTemplate.setDisabled(templateDTO.getDisabled());
         oldTemplate.setRuleTemplateCategory(ruleTemplateCategory);
         oldTemplate.setRecommendedValue(templateDTO.getRecommendedValue());

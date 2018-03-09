@@ -91,7 +91,7 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     @Query("MATCH (o:Organization)-[:" + BELONGS_TO + "]-(c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE]-(t:WTABaseRuleTemplate) where id(o)={0} " +
             "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory)  " +
             "Optional Match (t)-[: " + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "with tempValue order by tempValue.phaseId ,t,c,r "+
+            "with tempValue ORDER BY tempValue.sequence ,t,c,r "+
             "with t,c,r, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
@@ -142,7 +142,7 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     @Query("MATCH (c:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE + "]-(t:WTABaseRuleTemplate) where id(c)={0} " +
             "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory{ruleTemplateCategoryType:'WTA'})  " +
             "Optional Match (t)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "with tempValue order by tempValue.phaseId ,t,c,r "+
+            "with tempValue ORDER BY tempValue.sequence ,t,c,r "+
             "with t,c,r, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
@@ -195,7 +195,7 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "return t")
     WTABaseRuleTemplate existsByName(Long countryId,String name);
 
-    @Query("MATCH (c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE ]-(t:WTABaseRuleTemplate) where id(c)={0} and t.templateType CONTAINS {1} return t.templateType Order by t.created_at desc\n" +
+    @Query("MATCH (c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE ]-(t:WTABaseRuleTemplate) where id(c)={0} and t.templateType CONTAINS {1} return t.templateType ORDER BY t.created_at desc\n" +
             "Limit 1")
     String getLastInsertedTemplateType(Long countryId,String templateType);
 

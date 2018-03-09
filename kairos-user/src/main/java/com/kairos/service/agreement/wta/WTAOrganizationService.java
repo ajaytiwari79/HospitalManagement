@@ -176,6 +176,7 @@ public class WTAOrganizationService extends UserBaseService {
             newPhaseTemplateValue.setStaffValue(phaseTemplateValue.getStaffValue());
             newPhaseTemplateValue.setOptionalFrequency(phaseTemplateValue.getOptionalFrequency());
             newPhaseTemplateValue.setPhaseId(phaseTemplateValue.getPhaseId());
+            newPhaseTemplateValue.setSequence(phaseTemplateValue.getSequence());
             newPhaseTemplateValue.setDeleted(false);
             newPhaseTemplateValue.setPhaseName(phaseTemplateValue.getPhaseName());
             phases.add(newPhaseTemplateValue);
