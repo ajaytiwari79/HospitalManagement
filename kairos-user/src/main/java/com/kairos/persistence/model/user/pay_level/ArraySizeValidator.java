@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.pay_level;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -14,6 +15,6 @@ public class ArraySizeValidator implements ConstraintValidator<ValidSize, Set<Lo
 
     @Override
     public boolean isValid(Set<Long> values, ConstraintValidatorContext context) {
-        return (values == null || values.isEmpty()) ? false : true;
+        return (!Optional.ofNullable(values).isPresent() || values.isEmpty()) ? false : true;
     }
 }
