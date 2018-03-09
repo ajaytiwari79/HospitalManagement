@@ -40,8 +40,8 @@ public class UnitPositionDTO {
 
     private Long unionId;
 
-    @NotNull(message = "unitId  is required for position")
-    @Range(min = 0, message = "unit Id  is required for position")
+    //@NotNull(message = "unitId  is required for position")
+    //@Range(min = 0, message = "unit Id  is required for position")
     private Long unitId;
 
     private Long timeCareExternalId;
