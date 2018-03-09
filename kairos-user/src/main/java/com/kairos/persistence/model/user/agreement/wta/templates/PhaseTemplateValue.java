@@ -22,7 +22,6 @@ public class PhaseTemplateValue extends UserBaseEntity {
     private boolean optional=false;
     private int sequence;
 
-
     public int getOptionalFrequency() {
         return optionalFrequency;
     }
