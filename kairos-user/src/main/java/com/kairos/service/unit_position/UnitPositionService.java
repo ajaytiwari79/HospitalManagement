@@ -105,6 +105,7 @@ public class UnitPositionService extends UserBaseService {
 
 
     public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
+        unitPositionDTO.setUnitId(id);//Todo vipul as you say it should be removed for future
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Organization parentOrganization;
 
@@ -196,7 +197,7 @@ public class UnitPositionService extends UserBaseService {
 
         preparePosition(oldUnitPosition, unitPositionDTO);
         save(oldUnitPosition);
-        return new PositionWrapper(oldUnitPosition);
+        return new PositionWrapper(getBasicDetails(oldUnitPosition));
 
     }
 
