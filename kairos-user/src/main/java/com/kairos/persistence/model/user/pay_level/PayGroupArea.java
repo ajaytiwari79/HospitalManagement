@@ -7,6 +7,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_MUNICIPALITY;
 
@@ -20,7 +21,7 @@ public class PayGroupArea extends UserBaseEntity {
     private String name;
     private String description;
     @Relationship(type = HAS_MUNICIPALITY)
-    private Municipality municipality;
+    private Set<Municipality> municipality;
     private Long startDateMillis;
     private Long endDateMillis;
 
@@ -44,11 +45,11 @@ public class PayGroupArea extends UserBaseEntity {
         this.description = description;
     }
 
-    public Municipality getMunicipality() {
+    public Set<Municipality> getMunicipality() {
         return municipality;
     }
 
-    public void setMunicipality(Municipality municipality) {
+    public void setMunicipality(Set<Municipality> municipality) {
         this.municipality = municipality;
     }
 

@@ -1,12 +1,11 @@
 package com.kairos.response.dto.web.pay_level;
 
 import com.kairos.persistence.model.user.pay_level.FutureDate;
+import com.kairos.persistence.model.user.pay_level.ValidSize;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.util.List;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -14,18 +13,34 @@ import java.util.Set;
  */
 public class PayGroupAreaDTO {
 
+    private Long id;
     @NotNull(message = "Name can not be null")
     private String name;
     private String description;
-    @Size(min = 0,message = "Please select mun")
+
+    @ValidSize(message = "Please select atleast 1 municipality")
     private Set<Long> municipalityId;
-    @FutureOrPresent
-    private Long startDateMillis;
-    private Long endDateMillis;
+
+    @NotNull(message = "Start date can't be null")
+    @DateLong
+    @FutureDate
+    private Date startDateMillis;
+
+    @FutureDate
+    @DateLong
+    private Date endDateMillis;
 
 
     public PayGroupAreaDTO() {
         //default constructor
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -52,19 +67,19 @@ public class PayGroupAreaDTO {
         this.municipalityId = municipalityId;
     }
 
-    public Long getStartDateMillis() {
+    public Date getStartDateMillis() {
         return startDateMillis;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
+    public void setStartDateMillis(Date startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDateMillis() {
+    public Date getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
+    public void setEndDateMillis(Date endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 }

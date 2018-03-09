@@ -35,19 +35,19 @@ public class PayGroupAreaService extends UserBaseService{
         if(country == null){
             throw new InternalError("Invalid country id " + countryId);
         }
-        payGroupAreaDTO.setId(null);
+      /*  payGroupAreaDTO.setId(null);
         ObjectMapper objectMapper = new ObjectMapper();
         PayGroupArea payGroupArea = objectMapper.convertValue(payGroupAreaDTO,PayGroupArea.class);
         save(payGroupArea);
-        payGroupAreaDTO.setId(payGroupArea.getId());
-        return payGroupAreaDTO;
+       payGroupAreaDTO.setId(payGroupArea.getId());
+      */   return payGroupAreaDTO;
     }
 
     public PayGroupAreaDTO updatePayGroupArea(Long payGroupAreaId,PayGroupAreaDTO payGroupAreaDTO){
         PayGroupArea payGroupArea = getPayGroupAreaById(payGroupAreaId);
         payGroupArea.setName(payGroupArea.getName());
         save(payGroupArea);
-        payGroupAreaDTO.setId(payGroupArea.getId());
+      //  payGroupAreaDTO.setId(payGroupArea.getId());
         return payGroupAreaDTO;
     }
 
