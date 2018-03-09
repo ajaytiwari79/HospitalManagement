@@ -2,25 +2,31 @@ package com.kairos.persistence.model.user.pay_level;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.region.Municipality;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+
+import java.math.BigDecimal;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_MUNICIPALITY;
 
 /**
- * Created by prabjot on 20/12/17.
+ * @Created by prabjot on 20/12/17.
+ * @Modified by VIPUl for KP-2320 on 9-March-18
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+
 @NodeEntity
 public class PayGroupArea extends UserBaseEntity {
     private String name;
-    private float value;
+    private String description;
+    @Relationship(type = HAS_MUNICIPALITY)
+    private Municipality municipality;
+    private Long startDateMillis;
+    private Long endDateMillis;
 
     public PayGroupArea() {
         //default constructor
     }
-
-    public PayGroupArea(String name, String description) {
-        this.name = name;
-    }
-
 
     public String getName() {
         return name;
@@ -30,11 +36,35 @@ public class PayGroupArea extends UserBaseEntity {
         this.name = name;
     }
 
-    public float getValue() {
-        return value;
+    public String getDescription() {
+        return description;
     }
 
-    public void setValue(float value) {
-        this.value = value;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Municipality getMunicipality() {
+        return municipality;
+    }
+
+    public void setMunicipality(Municipality municipality) {
+        this.municipality = municipality;
+    }
+
+    public Long getStartDateMillis() {
+        return startDateMillis;
+    }
+
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
+    }
+
+    public Long getEndDateMillis() {
+        return endDateMillis;
+    }
+
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 }
