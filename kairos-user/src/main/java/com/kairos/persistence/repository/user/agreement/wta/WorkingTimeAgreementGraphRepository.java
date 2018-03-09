@@ -91,7 +91,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue) \n" +
             "with tempValue, wta,o,expertise,ruleTemp,ruleTemplateCatg order by tempValue.sequence \n" +
             "with wta,o,expertise,ruleTemp,ruleTemplateCatg, " +
-            "CASE WHEN tempValue IS NOT NULL THEN collect({phaseName:tempValue.phaseName,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
+            "CASE WHEN tempValue IS NOT NULL THEN collect({phaseName:tempValue.phaseName,sequence:tempValue.sequence,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
             "managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency}) else [] END as phaseTempValues " +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,isDisabled:ruleTemp.isDisabled,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
@@ -191,7 +191,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
             "with tempValue, expertise,wta,ruleTemp,ruleTemplateCatg order by tempValue.sequence " +
             "with expertise,wta,ruleTemp,ruleTemplateCatg, " +
-            "CASE WHEN tempValue IS NOT NULL THEN collect ({phaseName:tempValue.phaseName,phaseId:tempValue.phaseId," +
+            "CASE WHEN tempValue IS NOT NULL THEN collect ({phaseName:tempValue.phaseName,sequence:tempValue.sequence,phaseId:tempValue.phaseId," +
             "staffValue:tempValue.staffValue,managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency})  else [] END as phaseTempValues \n" +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
@@ -230,7 +230,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
             "with tempValue, wta,ruleTemp order by tempValue.sequence \n" +
             "with wta,ruleTemp, " +
-            "CASE WHEN tempValue IS NOT NULL THEN collect({id:id(tempValue),phaseName:tempValue.phaseName,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
+            "CASE WHEN tempValue IS NOT NULL THEN collect({id:id(tempValue),phaseName:tempValue.phaseName,sequence:tempValue.sequence,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
             "managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency}) else [] END as phaseTempValues " +
             "return  " +
             "wta.startDateMillis as startDateMillis,CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit," +
