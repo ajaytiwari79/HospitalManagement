@@ -99,23 +99,18 @@ public class UnitPositionService extends UserBaseService {
     private ClientGraphRepository clientGraphRepository;
 
 
-    public UnitPosition createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
+    public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Organization parentOrganization;
 
         PositionCode positionCode = null;
         if (!organization.isParentOrganization()) {
             parentOrganization = organizationService.getParentOfOrganization(organization.getId());
-            //  unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), organization.getId(), unitPositionDTO.getStaffId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(parentOrganization.getId(), unitPositionDTO.getPositionCodeId());
         } else {
-            //unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(organization.getId(), unitPositionDTO.getStaffId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(organization.getId(), unitPositionDTO.getPositionCodeId());
         }
-//        if (!Optional.ofNullable(unitPermission).isPresent()) {
-//            logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", unitPositionDTO.getStaffId(), organization.getId());
-//            throw new DataNotFoundByIdException("unable to create employment of staff");
-//        }
+
 
         if (!Optional.ofNullable(positionCode).isPresent()) {
             throw new DataNotFoundByIdException("position_code Name does not exist in unit " + unitPositionDTO.getPositionCodeId());
@@ -130,10 +125,10 @@ public class UnitPositionService extends UserBaseService {
 
         unitPosition.setUnit(organization);
         save(unitPosition);
-        //  UnitPositionQueryResult unitPositionQueryResult = unitPosition.getBasicDetails();
+        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
 
-        //unitEmploymentPositionQueryResult.setUnion();
-        return unitPosition;
+
+        return unitPositionQueryResult;
     }
 
     public boolean validateUnitPositionWithExpertise(List<UnitPosition> unitPositions, UnitPositionDTO unitPositionDTO) {
@@ -238,11 +233,11 @@ public class UnitPositionService extends UserBaseService {
         copyAndLinkNewWTA(unitPosition, wta.get());
 
 
-//        CostTimeAgreement cta = (unitPositionDTO.getCtaId() == null) ? null :
-//                costTimeAgreementGraphRepository.findOne(unitPositionDTO.getCtaId());
-//        if (cta != null) {
-//            unitPosition.setCta(cta);
-//        }
+        CostTimeAgreement cta = (unitPositionDTO.getCtaId() == null) ? null :
+                costTimeAgreementGraphRepository.findOne(unitPositionDTO.getCtaId());
+        if (cta != null) {
+            unitPosition.setCta(cta);
+        }
 
         Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId());
         if (!expertise.isPresent()) {
@@ -453,7 +448,8 @@ public class UnitPositionService extends UserBaseService {
         UnitPositionQueryResult
                 result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
-                unitPosition.getId(), unitPosition.getEmploymentType(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(), unitPosition.getLastWorkingDateMillis());
+                unitPosition.getId(), unitPosition.getEmploymentType(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
+                unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), unitPosition.getWorkingTimeAgreement());
         return result;
     }
 
