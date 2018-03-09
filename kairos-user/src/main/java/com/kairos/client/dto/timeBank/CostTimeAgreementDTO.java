@@ -1,12 +1,14 @@
 package com.kairos.client.dto.timeBank;
 
+import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
+
 import java.util.Date;
 import java.util.List;
 
 public class CostTimeAgreementDTO {
 
     private Long unitEmploymentPositionId;
-    private List<CTARuleTemplateDTO> ctaRuleTemplates;
+    private List<CTARuleTemplateBasicDTO> ctaRuleTemplates;
     private int contractedMinByWeek;
     private int workingDaysPerWeek;
     private Long staffId;
@@ -75,11 +77,11 @@ public class CostTimeAgreementDTO {
         this.unitEmploymentPositionId = unitEmploymentPositionId;
     }
 
-    public List<CTARuleTemplateDTO> getCtaRuleTemplates() {
+    public List<CTARuleTemplateBasicDTO> getCtaRuleTemplates() {
         return ctaRuleTemplates;
     }
 
-    public void setCtaRuleTemplates(List<CTARuleTemplateDTO> ctaRuleTemplates) {
+    public void setCtaRuleTemplates(List<CTARuleTemplateBasicDTO> ctaRuleTemplates) {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
 

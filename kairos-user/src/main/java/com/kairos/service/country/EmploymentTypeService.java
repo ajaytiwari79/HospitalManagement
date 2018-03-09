@@ -16,7 +16,7 @@ import com.kairos.persistence.repository.user.country.EmploymentTypeGraphReposit
 
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 
-import com.kairos.persistence.repository.user.unitEmploymentPosition.UnitEmploymentPositionGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.OrganizationService;
@@ -50,7 +50,7 @@ public class EmploymentTypeService extends UserBaseService {
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
-    private UnitEmploymentPositionGraphRepository unitEmploymentPositionGraphRepository;
+    private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject
     private RegionService regionService;
     @Inject
