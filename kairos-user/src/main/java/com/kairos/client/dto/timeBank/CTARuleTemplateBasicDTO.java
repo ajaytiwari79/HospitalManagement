@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
-public class CTARuleTemplateDTO {
+public class CTARuleTemplateBasicDTO {
 
 
     private Long id;
@@ -17,10 +17,10 @@ public class CTARuleTemplateDTO {
     private List<BigInteger> timeTypes;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
 
-    public CTARuleTemplateDTO() {
+    public CTARuleTemplateBasicDTO() {
     }
 
-    public CTARuleTemplateDTO(int granularity, List<BigInteger> timeTypes) {
+    public CTARuleTemplateBasicDTO(int granularity, List<BigInteger> timeTypes) {
         this.granularity = granularity;
         this.timeTypes = timeTypes;
     }

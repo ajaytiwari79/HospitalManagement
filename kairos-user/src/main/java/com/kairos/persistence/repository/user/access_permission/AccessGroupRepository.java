@@ -48,7 +48,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
 
     @Query("Match (root:Organization) where id(root)={0} with root\n" +
             "Match (root)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={1} with employment\n" +
-            "Match (employment)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(unitEmployment:UnitEmployment)-[:"+PROVIDED_BY+"]->(unit:Organization) with unitEmployment\n" +
+            "Match (employment)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitEmployment:UnitEmployment)-[:"+ APPLICABLE_IN_UNIT +"]->(unit:Organization) with unitEmployment\n" +
             "MATCH (unitEmployment)-[:"+HAS_ACCESS_PERMISSION+"]->(accessPermission:AccessPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) with accessPermission\n" +
             "Match (accessPermission)-[r:"+HAS_ACCESS_PAGE_PERMISSION+"]->(accessPage:AccessPage{moduleId:{2}}) return {readPermission:collect(r.isRead),writePermission:collect(r.isWrite)} as data")
     Map<String,Object> getAccessPermission(long organizationId, long userId, String pageId);
@@ -72,7 +72,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "unwind coll as accessPage with distinct accessPage,accessGroup\n" +
             "Match (n:Organization),(staff:Staff),(accessPage:AccessPage) where id(n)={0} AND id(staff)={1} with n,staff,accessPage,accessGroup\n" +
             "MATCH (n)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff)-[:BELONGS_TO]->(user:User) with user,emp,accessPage,accessGroup\n" +
-            "Match (emp)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmp:UnitEmployment)-[:PROVIDED_BY]->(unit:Organization) where id(unit)={2} with unitEmp,accessPage,accessGroup\n" +
+            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitEmp:UnitEmployment)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitEmp,accessPage,accessGroup\n" +
             "Match (unitEmp)-[:HAS_ACCESS_PERMISSION]->(ap:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) with ap,accessPage\n" +
             "Merge (ap)-[r:HAS_ACCESS_PAGE_PERMISSION]->(accessPage)\n" +
             "ON CREATE SET r.isRead={5},r.isWrite={6}\n" +
@@ -80,14 +80,14 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     void setPermissionForTab(long organizationId, long staffId, long unitId, long accessGroupId, long accessPageId, boolean isRead, boolean isWrite);
 
     @Query("Match (employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with employment\n" +
-            "Match (employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment)-[:PROVIDED_BY]->(unit:Organization) where id(unit)={0} with unitEmployment \n" +
+            "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitEmployment:UnitEmployment)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={0} with unitEmployment \n" +
             "Match (unitEmployment)-[:HAS_ACCESS_PERMISSION{isEnabled:true}]->(ap:AccessPermission) with ap\n" +
             "Match (ap)-[r:HAS_ACCESS_PAGE_PERMISSION]->(tab:AccessPage{moduleId:{2}}) with collect(r.isRead) as permission\n" +
             "return true in permission")
     boolean hasReadPermission(long unitId, long userId, String tabId);
 
     @Query("Match (employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with employment\n" +
-            "Match (employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment)-[:PROVIDED_BY]->(unit:Organization) where id(unit)={0} with unitEmployment\n" +
+            "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitEmployment:UnitEmployment)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={0} with unitEmployment\n" +
             "Match (unitEmployment)-[:HAS_ACCESS_PERMISSION{isEnabled:true}]->(ap:AccessPermission) with ap\n" +
             "Match (ap)-[r:HAS_ACCESS_PAGE_PERMISSION]->(tab:AccessPage{moduleId:{2}}) with collect(r.isWrite) as permission\n" +
             "return true in permission")

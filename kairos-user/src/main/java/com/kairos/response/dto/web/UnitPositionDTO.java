@@ -7,17 +7,18 @@ import javax.validation.constraints.NotNull;
 /**
  * Created by pawanmandhan on 27/7/17.
  */
-public class UnitEmploymentPositionDTO {
+public class UnitPositionDTO {
 
-    @NotNull(message = "Position code  is required for position_code")
-    @Range(min = 0, message = "Position code is required for position_code")
+    @NotNull(message = "Position code  is required for position")
+    @Range(min = 0, message = "Position code is required for position")
     private Long positionCodeId;
-    @NotNull(message = "expertise is required for position_code")
-    @Range(min = 0, message = "expertise is required for position_code")
+    @NotNull(message = "expertise is required for position")
+    @Range(min = 0, message = "expertise is required for position")
     private Long expertiseId;
 
     private Long startDateMillis;
     private Long endDateMillis;
+    private Long lastWorkingDateMillis;
 
     @Range(min = 0, max = 60, message = "Incorrect Weekly minute")
     private int totalWeeklyMinutes;
@@ -32,9 +33,6 @@ public class UnitEmploymentPositionDTO {
     @NotNull(message = "wta can't be null")
     private Long wtaId;
     private Long ctaId;
-
-//    private Position.EmploymentType employmentType;
-
     @NotNull(message = "staffId is missing")
     @Range(min = 0, message = "staffId is missing")
     private Long staffId;
@@ -42,20 +40,19 @@ public class UnitEmploymentPositionDTO {
 
     private Long unionId;
 
-    public UnitEmploymentPositionDTO() {
+    @NotNull(message = "unitId  is required for position")
+    @Range(min = 0, message = "unit Id  is required for position")
+    private Long unitId;
+
+    private Long timeCareExternalId;
+
+    public UnitPositionDTO() {
         //default cons
     }
 
 
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId) {
-        this.positionCodeId = positionCodeId;
-        this.expertiseId = expertiseId;
-    }
-
-
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis,
-                                     int totalWeeklyMinutes,
-                                     float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
+    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
+                           float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -65,11 +62,12 @@ public class UnitEmploymentPositionDTO {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.employmentTypeId = employmentTypeId;
+
     }
 
 
-    public UnitEmploymentPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId, Long staffId, Long wtaId, Long ctaId,
-                                     float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
+    public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId,
+                           Long staffId, Long wtaId, Long ctaId, Long unitId, Long timeCareExternalId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.employmentTypeId = employmentTypeId;
@@ -79,12 +77,14 @@ public class UnitEmploymentPositionDTO {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.totalWeeklyHours = totalWeeklyHours;
+        this.timeCareExternalId = timeCareExternalId;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.hourlyWages = hourlyWages;
         this.salary = salary;
+        this.unitId = unitId;
         this.workingDaysInWeek = workingDaysInWeek;
-
     }
+
 
     public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -214,5 +214,29 @@ public class UnitEmploymentPositionDTO {
 
     public void setUnionId(Long unionId) {
         this.unionId = unionId;
+    }
+
+    public Long getLastWorkingDateMillis() {
+        return lastWorkingDateMillis;
+    }
+
+    public void setLastWorkingDateMillis(Long lastWorkingDateMillis) {
+        this.lastWorkingDateMillis = lastWorkingDateMillis;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    public Long getTimeCareExternalId() {
+        return timeCareExternalId;
+    }
+
+    public void setTimeCareExternalId(Long timeCareExternalId) {
+        this.timeCareExternalId = timeCareExternalId;
     }
 }

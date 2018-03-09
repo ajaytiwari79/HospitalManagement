@@ -11,6 +11,7 @@ import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
+import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
@@ -22,6 +23,7 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -742,10 +744,12 @@ public class OrganizationService extends UserBaseService {
 
     }
 
-    public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, Long timeCareStaffId) {
+    public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, Long staffExternalId, Long staffTimeCareEmploymentId) {
         OrganizationStaffWrapper organizationStaffWrapper = new OrganizationStaffWrapper();
         organizationStaffWrapper.setOrganization(organizationGraphRepository.findByExternalId(externalId));
-        organizationStaffWrapper.setStaff(staffGraphRepository.findByExternalId(timeCareStaffId));
+        StaffUnitPositionWrapper staffData = staffGraphRepository.getStaff(staffExternalId, staffTimeCareEmploymentId);
+        organizationStaffWrapper.setStaff(staffData.getStaff());
+        organizationStaffWrapper.setUnitPosition(staffData.getUnitPosition());
         return organizationStaffWrapper;
     }
 
