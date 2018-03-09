@@ -204,7 +204,7 @@ public class UnitEmploymentPositionService extends UserBaseService {
 
         preparePosition(oldUnitEmploymentPosition, unitEmploymentPositionDTO);
         save(oldUnitEmploymentPosition);
-        return new PositionWrapper(oldUnitEmploymentPosition);
+        return new PositionWrapper(oldUnitEmploymentPosition.getBasicDetails());
 
     }
 
