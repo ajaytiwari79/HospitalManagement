@@ -1,5 +1,6 @@
 package com.kairos.response.dto.web.pay_level;
 
+import com.kairos.persistence.model.user.pay_level.DateRange;
 import com.kairos.persistence.model.user.pay_level.FutureDate;
 import com.kairos.persistence.model.user.pay_level.ValidSize;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
@@ -13,6 +14,8 @@ import java.util.Set;
  *
  * @MOdified by vipul for additional property
  */
+
+@DateRange
 public class PayGroupAreaDTO {
 
     private Long id;
@@ -36,6 +39,7 @@ public class PayGroupAreaDTO {
     public PayGroupAreaDTO() {
         //default constructor
     }
+
 
     public Long getId() {
         return id;

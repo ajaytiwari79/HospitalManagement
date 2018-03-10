@@ -4,15 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.pay_level.MunicipalityPayGroupAreaWrapper;
 import com.kairos.persistence.model.user.pay_level.PayGroupArea;
-import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.pay_level.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.response.dto.web.pay_level.PayGroupAreaDTO;
 import com.kairos.service.UserBaseService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +18,6 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Created by prabjot on 21/12/17.
@@ -42,19 +39,28 @@ public class PayGroupAreaService extends UserBaseService {
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid country id " + countryId);
         }
-        Set<Municipality> municipalities = municipalityGraphRepository.getMunicipalitiesByIds(payGroupAreaDTO.getMunicipalityId());
-        if (municipalities.size() != payGroupAreaDTO.getMunicipalityId().size()) {
-            throw new DataNotMatchedException("Incorrect muncipality List " + countryId);
-        }
+        List<MunicipalityPayGroupAreaWrapper> municipalitiesAndPayGroup = payGroupAreaGraphRepository.getMunicipalitiesAndPayGroup(payGroupAreaDTO.getMunicipalityId());
+        validatePayGroupArea(municipalitiesAndPayGroup, payGroupAreaDTO);
+        //checking weather the municipality list is blank ,if any municipality is already linked with payGroupArea so setting an end date on that
+
+//        if (!Optional.ofNullable(municipalitiesAndPayGroup.get(0).getMunicipalityList()).isPresent()
+//                || municipalitiesAndPayGroup.getMunicipalityList().size() != payGroupAreaDTO.getMunicipalityId().size()) {
+//            throw new DataNotMatchedException("Incorrect municipality List ");
+//        }
+
         payGroupAreaDTO.setId(null);
         ObjectMapper objectMapper = new ObjectMapper();
         PayGroupArea payGroupArea = objectMapper.convertValue(payGroupAreaDTO, PayGroupArea.class);
-        payGroupArea.setMunicipality(municipalities);
-        save(payGroupArea);
+        //   payGroupArea.setMunicipality(municipalitiesAndPayGroup.getMunicipalityList());
+        //  save(payGroupArea);
 
-        payGroupAreaDTO.setId(payGroupArea.getId());
+        //payGroupAreaDTO.setId(payGroupArea.getId());
 
         return payGroupAreaDTO;
+    }
+
+    public void validatePayGroupArea(List<MunicipalityPayGroupAreaWrapper> municipalitiesAndPayGroup, PayGroupAreaDTO payGroupAreaDTO) {
+
     }
 
     public PayGroupAreaDTO updatePayGroupArea(Long payGroupAreaId, PayGroupAreaDTO payGroupAreaDTO) {
@@ -67,6 +73,7 @@ public class PayGroupAreaService extends UserBaseService {
 
     public boolean deletePayGroupArea(Long payGroupAreaId) {
         PayGroupArea payGroupArea = getPayGroupAreaById(payGroupAreaId);
+        payGroupArea.setDeleted(true);
         save(payGroupArea);
         return true;
     }

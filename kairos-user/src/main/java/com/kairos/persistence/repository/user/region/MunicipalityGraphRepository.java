@@ -47,6 +47,5 @@ public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municip
     @Query("Match (zipCode:ZipCode{zipCode:{0}})-[:" + MUNICIPALITY + "]->(municipality:Municipality) return municipality")
     List<Municipality> getMuncipalityByZipcode(int zipcode);
 
-    @Query("MATCH (municipality:Municipality{isEnable:true}) where id(municipality) IN {0} return municipality")
-    Set<Municipality> getMunicipalitiesByIds(Set<Long> muncipalitiesIds);
+
 }

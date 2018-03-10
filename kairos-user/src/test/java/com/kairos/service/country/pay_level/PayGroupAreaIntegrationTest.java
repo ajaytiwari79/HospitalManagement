@@ -31,12 +31,10 @@ import java.util.Set;
 @RunWith(OrderTestRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class PayGroupAreaIntegrationTest {
-
     @Value("${server.host.http.url}")
     private String url;
     @Autowired
     TestRestTemplate restTemplate;
-
     static Long payGroupId;
     static private String baseUrlWithCountry;
 
@@ -49,18 +47,20 @@ public class PayGroupAreaIntegrationTest {
     @Test
     @OrderTest(order = 1)
     public void savePayGroupArea() {
-        Set<Long> muncipalityId = new HashSet<>();
-        muncipalityId.add(1032L);
+        Set<Long> municipalityId = new HashSet<>();
+        municipalityId.add(1032L);
+        municipalityId.add(1035L);
+        municipalityId.add(1024L);
 
-        PayGroupAreaDTO payGroupAreaDTO = new PayGroupAreaDTO("North", "Pay grp 1", muncipalityId, DateUtil.getCurrentDate(), null);
+        PayGroupAreaDTO payGroupAreaDTO = new PayGroupAreaDTO("North", "Pay grp 1", municipalityId, DateUtil.getCurrentDate(), null);
         HttpEntity<PayGroupAreaDTO> entity = new HttpEntity<>(payGroupAreaDTO);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<PayGroupArea>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayGroupArea>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<PayGroupAreaDTO>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayGroupAreaDTO>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<PayGroupArea>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<PayGroupAreaDTO>> response = restTemplate.exchange(
                 baseUrlWithCountry + "/pay_group_area",
                 HttpMethod.POST, entity, typeReference);
-        RestTemplateResponseEnvelope<PayGroupArea> responseBody = response.getBody();
+        RestTemplateResponseEnvelope<PayGroupAreaDTO> responseBody = response.getBody();
         payGroupId = responseBody.getData().getId();
         Assert.assertEquals(201, response.getStatusCodeValue());
         Assert.assertNotNull(payGroupId);

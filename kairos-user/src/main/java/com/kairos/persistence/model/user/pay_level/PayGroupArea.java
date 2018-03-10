@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.pay_level;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.region.Municipality;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -16,6 +17,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_M
  * @Modified by VIPUl for KP-2320 on 9-March-18
  */
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
 public class PayGroupArea extends UserBaseEntity {
     private String name;
@@ -27,6 +30,11 @@ public class PayGroupArea extends UserBaseEntity {
 
     public PayGroupArea() {
         //default constructor
+    }
+
+    public PayGroupArea(Long startDateMillis, Long endDateMillis) {
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
     }
 
     public String getName() {
