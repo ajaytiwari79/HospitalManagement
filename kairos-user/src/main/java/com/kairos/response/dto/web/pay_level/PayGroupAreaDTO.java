@@ -10,6 +10,8 @@ import java.util.Set;
 
 /**
  * Created by prabjot on 21/12/17.
+ *
+ * @MOdified by vipul for additional property
  */
 public class PayGroupAreaDTO {
 
@@ -80,6 +82,14 @@ public class PayGroupAreaDTO {
     }
 
     public void setEndDateMillis(Date endDateMillis) {
+        this.endDateMillis = endDateMillis;
+    }
+
+    public PayGroupAreaDTO(@NotNull(message = "Name can not be null") String name, String description, Set<Long> municipalityId, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis) {
+        this.name = name;
+        this.description = description;
+        this.municipalityId = municipalityId;
+        this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
     }
 }

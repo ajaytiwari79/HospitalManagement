@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.MUNICIPALITY;
 
@@ -15,35 +16,37 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.MUNIC
  * Created by oodles on 22/12/16.
  */
 @Repository
-public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municipality,Long>{
+public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municipality, Long> {
 
     List<Municipality> findAll();
 
     @Query("MATCH (m:Municipality {isEnable:true})-[:PROVINCE]-(p:Province) where id(p) = {0}  return {name:m.name, code:m.code, geoFence:m.geoFence, latitude:m.latitude, longitude:m.longitude,id: id(m)} as result ")
-    List<Map<String,Object>>  getAllMunicipalitiesOfProvince(Long provinceId);
+    List<Map<String, Object>> getAllMunicipalitiesOfProvince(Long provinceId);
 
     @Query("MATCH (m:Municipality {isEnable:true})-[:MUNICIPALITY]-(zc:ZipCode  {isEnable:true}) where id(m) = {0} return {name:zc.name, zipCode:zc.zipCode, geoFence:zc.geoFence,id: id(zc)} as result ")
-    List<Map<String,Object>> getAllZipCodes(Long municipalityId);
+    List<Map<String, Object>> getAllZipCodes(Long municipalityId);
 
     /**
      * if zipcode has connected to multiple municipality, this will return one municipality randomly with no
      * promise of order maintain,results can be different  for same zip code
+     *
      * @param zipCodeId
      * @return
      */
-    @Query("Match (zipCode:ZipCode)-[:"+MUNICIPALITY+"]->(municipality:Municipality) where id(zipCode)={0} return municipality limit 1")
+    @Query("Match (zipCode:ZipCode)-[:" + MUNICIPALITY + "]->(municipality:Municipality) where id(zipCode)={0} return municipality limit 1")
     Municipality getMunicipalityByZipCodeId(long zipCodeId);
 
-    @Query("Match (zipCode:ZipCode)-[:"+MUNICIPALITY+"]->(municipality:Municipality) where id(zipCode)={0} return municipality")
+    @Query("Match (zipCode:ZipCode)-[:" + MUNICIPALITY + "]->(municipality:Municipality) where id(zipCode)={0} return municipality")
     List<Municipality> getMunicipalitiesByZipCode(long zipCode);
 
     Municipality findByCode(String code);
 
-    @Query("Match (zipCode:ZipCode)-[:"+MUNICIPALITY+"]->(municipality:Municipality) where zipCode.zipCode={0} return municipality limit 1")
+    @Query("Match (zipCode:ZipCode)-[:" + MUNICIPALITY + "]->(municipality:Municipality) where zipCode.zipCode={0} return municipality limit 1")
     Municipality getMunicipalityByZipCodeId(int zipCodeId);
 
-    @Query("Match (zipCode:ZipCode{zipCode:{0}})-[:"+MUNICIPALITY+"]->(municipality:Municipality) return municipality")
+    @Query("Match (zipCode:ZipCode{zipCode:{0}})-[:" + MUNICIPALITY + "]->(municipality:Municipality) return municipality")
     List<Municipality> getMuncipalityByZipcode(int zipcode);
 
-
+    @Query("MATCH (municipality:Municipality{isEnable:true}) where id(municipality) IN {0} return municipality")
+    Set<Municipality> getMunicipalitiesByIds(Set<Long> muncipalitiesIds);
 }
