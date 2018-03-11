@@ -44,6 +44,23 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
             "return {name:accessPage.name,id:id(accessPage),selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
     List<Map<String,Object>> getAccessPageHierarchy(long accessGroupId);
 
+
+    // Fetch access page hierarchy show only selected access page
+    @Query("match (ag:AccessGroup) where id(ag)={0} WITH ag \n" +
+            "MATCH path=(accessPage:AccessPage{active:true})-[:SUB_PAGE*]->(subPage:AccessPage{active:true})-[:HAS_ACCESS_OF_TABS]-(ag) \n" +
+            "WITH NODES(path) AS np,ag WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-3, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs,ag UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps,ag with ps,ag\n" +
+            "optional match (parent:AccessPage)<-[r2:HAS_ACCESS_OF_TABS]-(ag)\n" +
+            "where id(parent)=id(ps.p) with r2,ps,ag\n" +
+            "optional match (child:AccessPage)<-[r:HAS_ACCESS_OF_TABS]-(ag)\n" +
+            "where id(child)=id(ps.c) with r,r2,ps,ag\n" +
+            "return {name:ps.p.name,id:id(ps.p),selected:case when r2.isEnabled then true else false end,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),selected:case when r.isEnabled then true else false end})} as data\n" +
+            "UNION\n" +
+            "match (ag:AccessGroup) where id(ag)={0} WITH ag \n" +
+            "Match (accessPage:AccessPage{isModule:true,active:true}) where not (accessPage)-[:SUB_PAGE]->() with accessPage, ag\n" +
+            "Match (accessPage)<-[r:HAS_ACCESS_OF_TABS]-(ag) with accessPage, ag,r\n" +
+            "return {name:accessPage.name,id:id(accessPage),selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
+    List<Map<String,Object>> getSelectedAccessPageHierarchy(Long accessGroupId);
+
     @Query("Match (accessGroup:AccessGroup),(accessPermission:AccessPermission) where id(accessPermission)={0} AND id(accessGroup)={1}\n" +
             "Match (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]->(accessPage:AccessPage) with accessPage,r,accessPermission\n" +
             "Create unique (accessPermission)-[:"+HAS_ACCESS_PAGE_PERMISSION+"{isEnabled:r.isEnabled,isRead:true,isWrite:false}]->(accessPage) return accessPermission")
@@ -130,6 +147,20 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage,Lon
     @Query("Match (n:AccessPage) where id(n)={0} with n\n" +
             "Optional Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages set pages.active={1} return distinct true")
     Boolean updateStatusOfAccessTabs(Long tabId,Boolean active);
+
+    @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
+            "OPTIONAL Match (n)-[:SUB_PAGE*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
+            "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +
+            "UNWIND listOfPage as page\n" +
+            "MERGE (c)-[r:HAS_ACCESS_FOR_ORG_CATEGORY]->(page)\n" +
+            "ON CREATE SET r.accessibleForHub = (CASE WHEN {2}='HUB' THEN {3} ELSE false END), \n" +
+            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE false END), \n"+
+            "r.accessibleForOrganization= (CASE WHEN {2}='ORGANIZATION' THEN {3} ELSE false END)\n" +
+            "ON MATCH SET r.accessibleForHub = (CASE WHEN {2}='HUB' THEN {3} ELSE r.accessibleForHub  END), \n"+
+            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE r.accessibleForUnion  END),\n"+
+            "r.accessibleForOrganization= (CASE WHEN {2}='ORGANIZATION' THEN {3} ELSE r.accessibleForOrganization END)\n" +
+            " return distinct true")
+    Boolean updateAccessStatusOfCountryByCategory(Long tabId,Long countryId, String organizationCategory, Boolean accessStatus);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
