@@ -1,13 +1,9 @@
 package com.kairos.service.country;
 
-import com.google.gson.JsonObject;
 import com.kairos.UserServiceApplication;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
-import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,8 +16,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Created by prabjot on 8/11/17.
@@ -37,11 +34,14 @@ public class OrganizationTypeIntegrationTest {
 
     @Test
     public void createOrganizationTypeForCountry(){
-        String baseUrl=getBaseUrl(71L,null);
-        OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO("test123", Arrays.asList("country"));
+        String baseUrl=getBaseUrl(4L,null);
+        Level level=new Level("testLevel");
+        List<Level> levels=new ArrayList<>();
+        levels.add(level);
+        OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO("Mytest", levels);
         HttpEntity<OrganizationTypeDTO> entity = new HttpEntity<>(organizationTypeDTO);
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl+"/country/53/organization_type",
+                baseUrl+"/country/4/organization_type",
                 HttpMethod.POST, entity, String.class);
         Assert.assertEquals(true,response.getBody().contains(organizationTypeDTO.getName()));
     }

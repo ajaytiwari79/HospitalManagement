@@ -1,5 +1,6 @@
 package com.kairos.response.dto.web;
 
+import com.kairos.persistence.model.organization.Level;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -12,13 +13,13 @@ public class OrganizationTypeDTO {
 
     @NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull")
     private String name;
-    private List<String> levels;
+    private List<Level> levels;
 
     public OrganizationTypeDTO() {
         //default constructor
     }
 
-    public OrganizationTypeDTO(String name, List<String> levels) {
+    public OrganizationTypeDTO(String name, List<Level> levels) {
         this.name = name;
         this.levels = levels;
     }
@@ -31,11 +32,11 @@ public class OrganizationTypeDTO {
         this.name = name;
     }
 
-    public List<String> getLevels() {
+    public List<Level> getLevels() {
         return levels;
     }
 
-    public void setLevels(List<String> levels) {
+    public void setLevels(List<Level> levels) {
         this.levels = levels;
     }
 }

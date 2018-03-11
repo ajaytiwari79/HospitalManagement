@@ -11,10 +11,8 @@ import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -42,7 +40,7 @@ public class OrganizationTypeService extends UserBaseService {
         if(!Optional.ofNullable(country).isPresent()){
             throw new DataNotFoundByIdException("Invalid country id " + countryId);
         }
-        List<Level> levels = organizationTypeDTO.getLevels().stream().map(level->new Level(level)).collect(Collectors.toList());
+        List<Level> levels = organizationTypeDTO.getLevels();
         OrganizationType organizationType = new OrganizationType(organizationTypeDTO.getName(),country,levels);
         return prepareResponse(save(organizationType));
     }
