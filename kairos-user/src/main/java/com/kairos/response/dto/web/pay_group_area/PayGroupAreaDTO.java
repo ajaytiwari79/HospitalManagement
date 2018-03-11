@@ -1,4 +1,4 @@
-package com.kairos.response.dto.web.pay_level;
+package com.kairos.response.dto.web.pay_group_area;
 
 import com.kairos.persistence.model.user.pay_level.DateRange;
 import com.kairos.persistence.model.user.pay_level.FutureDate;

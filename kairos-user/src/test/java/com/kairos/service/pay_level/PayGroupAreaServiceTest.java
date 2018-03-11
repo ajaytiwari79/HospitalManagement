@@ -1,27 +1,32 @@
 package com.kairos.service.pay_level;
 
-import com.kairos.persistence.model.user.pay_level.MunicipalityPayGroupAreaWrapper;
-import com.kairos.persistence.model.user.pay_level.PayGroupArea;
+import com.kairos.persistence.model.user.pay_group_area.MunicipalityPayGroupAreaWrapper;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.response.dto.web.pay_level.PayGroupAreaDTO;
+import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
+import com.kairos.service.pay_group_area.PayGroupAreaService;
 import com.kairos.util.DateUtil;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by vipul on 10/3/18.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class PayGroupAreaServiceTest {
     List<MunicipalityPayGroupAreaWrapper> municipalityPayGroupArea;
     Set<Long> municipalityId;
     PayGroupAreaDTO payGroupAreaDTO;
+    @InjectMocks
+    private PayGroupAreaService payGroupAreaService;
 
     @Before
     public void setUp() throws Exception {
@@ -46,7 +51,7 @@ public class PayGroupAreaServiceTest {
 
     @Test
     public void validatePayGroupArea() throws Exception {
-
+        payGroupAreaService.validatePayGroupArea(municipalityPayGroupArea, payGroupAreaDTO);
     }
 
 }

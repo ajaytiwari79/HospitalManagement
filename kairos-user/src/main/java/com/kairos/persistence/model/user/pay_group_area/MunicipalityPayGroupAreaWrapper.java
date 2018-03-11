@@ -1,10 +1,7 @@
-package com.kairos.persistence.model.user.pay_level;
+package com.kairos.persistence.model.user.pay_group_area;
 
 import com.kairos.persistence.model.user.region.Municipality;
 import org.springframework.data.neo4j.annotation.QueryResult;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by vipul on 10/3/18.

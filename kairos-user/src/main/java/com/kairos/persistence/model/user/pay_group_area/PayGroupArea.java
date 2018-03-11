@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.pay_level;
+package com.kairos.persistence.model.user.pay_group_area;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

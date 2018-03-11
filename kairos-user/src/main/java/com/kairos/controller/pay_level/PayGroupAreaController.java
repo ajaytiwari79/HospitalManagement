@@ -1,7 +1,7 @@
 package com.kairos.controller.pay_level;
 
-import com.kairos.response.dto.web.pay_level.PayGroupAreaDTO;
-import com.kairos.service.pay_level.PayGroupAreaService;
+import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
+import com.kairos.service.pay_group_area.PayGroupAreaService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import org.springframework.http.HttpStatus;

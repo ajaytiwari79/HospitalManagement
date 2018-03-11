@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.user.pay_level;
 
-import com.kairos.response.dto.web.pay_level.PayGroupAreaDTO;
+import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import org.joda.time.DateTime;
 
 import javax.validation.ConstraintValidator;

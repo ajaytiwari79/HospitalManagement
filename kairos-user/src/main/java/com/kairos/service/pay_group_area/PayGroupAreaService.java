@@ -1,15 +1,14 @@
-package com.kairos.service.pay_level;
+package com.kairos.service.pay_group_area;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.pay_level.MunicipalityPayGroupAreaWrapper;
-import com.kairos.persistence.model.user.pay_level.PayGroupArea;
+import com.kairos.persistence.model.user.pay_group_area.MunicipalityPayGroupAreaWrapper;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.pay_level.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
-import com.kairos.response.dto.web.pay_level.PayGroupAreaDTO;
+import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import com.kairos.service.UserBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.pay_level;
 
-import com.kairos.persistence.model.user.pay_level.MunicipalityPayGroupAreaWrapper;
-import com.kairos.persistence.model.user.pay_level.PayGroupArea;
+import com.kairos.persistence.model.user.pay_group_area.MunicipalityPayGroupAreaWrapper;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
