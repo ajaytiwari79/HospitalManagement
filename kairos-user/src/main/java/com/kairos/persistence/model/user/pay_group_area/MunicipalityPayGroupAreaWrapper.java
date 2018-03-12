@@ -17,6 +17,11 @@ public class MunicipalityPayGroupAreaWrapper {
         // default constructor
     }
 
+    public MunicipalityPayGroupAreaWrapper(Municipality municipality, PayGroupArea payGroupArea) {
+        this.municipality = municipality;
+        this.payGroupArea = payGroupArea;
+    }
+
     public Municipality getMunicipality() {
         return municipality;
     }

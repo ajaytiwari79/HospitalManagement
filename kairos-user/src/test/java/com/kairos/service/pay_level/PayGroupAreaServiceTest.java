@@ -22,9 +22,9 @@ import java.util.Set;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class PayGroupAreaServiceTest {
-    List<MunicipalityPayGroupAreaWrapper> municipalityPayGroupArea;
-    Set<Long> municipalityId;
-    PayGroupAreaDTO payGroupAreaDTO;
+    private List<MunicipalityPayGroupAreaWrapper> municipalityPayGroupArea;
+    private Set<Long> municipalityId;
+    private PayGroupAreaDTO payGroupAreaDTO;
     @InjectMocks
     private PayGroupAreaService payGroupAreaService;
 
@@ -36,17 +36,12 @@ public class PayGroupAreaServiceTest {
         municipalityId.add(1024L);
         municipalityPayGroupArea = new ArrayList<>(10);
         payGroupAreaDTO = new PayGroupAreaDTO("North", "Pay grp 1", municipalityId, DateUtil.getCurrentDate(), null);
+        MunicipalityPayGroupAreaWrapper currentObject = new MunicipalityPayGroupAreaWrapper(new Municipality(1032L), new PayGroupArea(1520743512000L, 1520743512000L));
+        MunicipalityPayGroupAreaWrapper currentObject1 = new MunicipalityPayGroupAreaWrapper(new Municipality(1035L), new PayGroupArea(1520743512000L, 1520743512000L));
+        municipalityPayGroupArea.add(currentObject);
+        municipalityPayGroupArea.add(currentObject1);
 
-        Municipality municipality = new Municipality(1032L);
-        Municipality municipality2 = new Municipality(1035L);
 
-        PayGroupArea payGroupArea = new PayGroupArea(1520743512000L, 1520743512000L);
-        PayGroupArea payGroupArea2 = new PayGroupArea(1520743512000L, 1520743512000L);
-
-        municipalityPayGroupArea.get(0).setPayGroupArea(payGroupArea);
-        municipalityPayGroupArea.get(0).setMunicipality(municipality);
-        municipalityPayGroupArea.get(1).setPayGroupArea(payGroupArea2);
-        municipalityPayGroupArea.get(1).setMunicipality(municipality2);
     }
 
     @Test
