@@ -306,9 +306,9 @@ public class AccessPageService extends UserBaseService {
             staff = staffGraphRepository.getStaffByUserId(userId,parentOrganizationId);
             employment = employmentGraphRepository.findEmployment(parentOrganizationId,staff.getId());
         }
-        UnitEmployment unitEmployment = new UnitEmployment();
-        unitEmployment.setOrganization(organization);
-        employment.getUnitEmployments().add(unitEmployment);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(organization);
+        employment.getUnitPermissions().add(unitPermission);
         Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = accessPermissionByGroup.entrySet();
         Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -332,14 +332,14 @@ public class AccessPageService extends UserBaseService {
                     employmentAccessPageRelations.add(employmentAccessSubPageRelation);
                 }
             }
-            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment,accessPermission);
+            UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission,accessPermission);
             unitEmpAccessRelationships.add(unitEmpAccessRelationship);
         }
         if(organization.isParentOrganization()){
             organization.getEmployments().add(employment);
             save(organization);
         } else {
-            employment.getUnitEmployments().add(unitEmployment);
+            employment.getUnitPermissions().add(unitPermission);
             save(employment);
         }
         unitEmpAccessGraphRepository.saveAll(unitEmpAccessRelationships);

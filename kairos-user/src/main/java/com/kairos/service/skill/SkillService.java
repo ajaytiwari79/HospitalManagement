@@ -14,6 +14,7 @@ import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -510,20 +511,20 @@ public class SkillService extends UserBaseService {
         List<Map<String, Object>> skills;
         List<Map<String, Object>> response = new ArrayList<>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            List<Map<String, Object>> staffList = staffService.getStaffWithBasicInfo(id);
+            List<StaffPersonalDetailDTO> staffList = staffService.getStaffWithBasicInfo(id, false);
             List<Long> staffIds = new ArrayList<>(staffList.size());
-            for (Map<String, Object> map : staffList) {
-                response.add((Map<String, Object>) map.get("data"));
-                staffIds.add((long) ((Map<String, Object>) map.get("data")).get("id"));
+            for (StaffPersonalDetailDTO map : staffList) {
+                response.add((Map<String, Object>) map);
+                staffIds.add(map.getId());
             }
             skills = organizationGraphRepository.getAssignedSkillsOfStaffByOrganization(id, staffIds);
 
         } else if (TEAM.equalsIgnoreCase(type)) {
-            List<Map<String, Object>> staffList = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+            List<StaffPersonalDetailDTO> staffList = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
             List<Long> staffIds = new ArrayList<>(staffList.size());
-            for (Map<String, Object> map : staffList) {
-                response.add((Map<String, Object>) map.get("data"));
-                staffIds.add((long) ((Map<String, Object>) map.get("data")).get("id"));
+            for (StaffPersonalDetailDTO map : staffList) {
+                response.add((Map<String, Object>) map);
+                staffIds.add(map.getId());
             }
             skills = teamGraphRepository.getAssignedSkillsOfStaffByTeam(id, staffIds);
         } else {
@@ -618,14 +619,14 @@ public class SkillService extends UserBaseService {
                 skillGraphRepository.findByExternalIdIn(externalIds);
 
         SkillCategory skillCategory = skillCategoryGraphRepository.findByName(SKILL_CATEGORY_FOR_TIME_CARE);
-        if(skillCategory == null){
+        if (skillCategory == null) {
             skillCategory = new SkillCategory(SKILL_CATEGORY_FOR_TIME_CARE);
         }
         skillCategory.setCountry(country);
         List<Skill> skillsToCreate = new ArrayList<>();
         for (TimeCareSkill timeCareSkill : timeCareSkills) {
             Optional<Skill> result = skillsByExternalIds.stream().filter(skillByExternalId -> skillByExternalId.getExternalId().equals(String.valueOf(timeCareSkill.getId()))).findFirst();
-            Skill skill = (result.isPresent())?result.get():new Skill();
+            Skill skill = (result.isPresent()) ? result.get() : new Skill();
             skill.setName(timeCareSkill.getName());
             skill.setShortName(timeCareSkill.getShortName());
             skill.setSkillCategory(skillCategory);

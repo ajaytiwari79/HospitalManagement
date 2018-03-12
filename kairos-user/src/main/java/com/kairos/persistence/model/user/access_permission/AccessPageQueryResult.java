@@ -4,6 +4,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by prabjot on 26/1/17.
@@ -109,5 +110,25 @@ public class AccessPageQueryResult {
                 ", moduleId='" + moduleId + '\'' +
                 ", children=" + children +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AccessPageQueryResult)) return false;
+        AccessPageQueryResult that = (AccessPageQueryResult) o;
+        return getId() == that.getId() &&
+                isSelected() == that.isSelected() &&
+                isModule() == that.isModule() &&
+                isRead() == that.isRead() &&
+                isWrite() == that.isWrite() &&
+                isActive() == that.isActive() &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getModuleId(), that.getModuleId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), isSelected(), isModule(), isRead(), isWrite(), isActive(), getModuleId());
     }
 }

@@ -60,7 +60,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("Match (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0} with organization,employment\n" +
             "optional match (organization)-[:HAS_SUB_ORGANIZATION*]->(unit:Organization) with organization+[unit] as coll,employment\n" +
             "unwind coll as units with distinct units,employment\n" +
-            "MATCH (employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmp:UnitEmployment)-[:PROVIDED_BY]->(units) with unitEmp,units\n" +
+            "MATCH (employment)-[:HAS_UNIT_PERMISSIONS]->(unitEmp:UnitEmployment)-[:APPLICABLE_IN_UNIT]->(units) with unitEmp,units\n" +
             "Match (unitEmp)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission) with accessPermission,units\n" +
             "MATCH (accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,accessPermission,units\n" +
             "Match (accessPermission)-[modulePermission:HAS_ACCESS_PAGE_PERMISSION]->(accessPage:AccessPage) with accessPage,accessPermission,modulePermission,units\n" +

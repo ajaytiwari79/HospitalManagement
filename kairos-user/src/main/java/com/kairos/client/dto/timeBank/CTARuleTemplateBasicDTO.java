@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
-public class CTARuleTemplateDTO {
+public class CTARuleTemplateBasicDTO {
 
 
     private Long id;
@@ -14,16 +14,17 @@ public class CTARuleTemplateDTO {
     private List<LocalDate> publicHolidays;
     private int granularity;
     private List<BigInteger> activityIds;
-    private List<BigInteger> timeTypes;
+    private BigInteger timeTypeId;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
 
-    public CTARuleTemplateDTO() {
+    public CTARuleTemplateBasicDTO() {
     }
 
-    public CTARuleTemplateDTO(int granularity, List<BigInteger> timeTypes) {
+    public CTARuleTemplateBasicDTO(int granularity, List<BigInteger> timeTypes) {
         this.granularity = granularity;
-        this.timeTypes = timeTypes;
+        this.timeTypeId = timeTypeId;
     }
+
 
     public Long getId() {
         return id;
@@ -73,12 +74,12 @@ public class CTARuleTemplateDTO {
         this.activityIds = activityIds;
     }
 
-    public List<BigInteger> getTimeTypes() {
-        return timeTypes;
+    public BigInteger getTimeTypeId() {
+        return timeTypeId;
     }
 
-    public void setTimeTypes(List<BigInteger> timeTypes) {
-        this.timeTypes = timeTypes;
+    public void setTimeTypeId(BigInteger timeTypeId) {
+        this.timeTypeId = timeTypeId;
     }
 
     public List<CTAIntervalDTO> getCtaIntervalDTOS() {
