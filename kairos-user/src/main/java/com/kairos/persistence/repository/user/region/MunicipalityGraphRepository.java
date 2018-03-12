@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.MUNIC
 @Repository
 public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municipality, Long> {
 
-    @Query("MATCH (m:Municipality {isEnable:true}) return m")
+
     List<Municipality> findAll();
 
     @Query("MATCH (m:Municipality {isEnable:true})-[:PROVINCE]-(p:Province) where id(p) = {0}  return {name:m.name, code:m.code, geoFence:m.geoFence, latitude:m.latitude, longitude:m.longitude,id: id(m)} as result ")
@@ -48,7 +48,7 @@ public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municip
     @Query("Match (zipCode:ZipCode{zipCode:{0}})-[:" + MUNICIPALITY + "]->(municipality:Municipality) return municipality")
     List<Municipality> getMuncipalityByZipcode(int zipcode);
 
-    @Query("match(municipality:Municipality{isEnable:true})-[:PROVINCE]->(p:Province)-[:REGION]->(r:Region)-[:BELONGS_TO]->(country:Country) where id(country)={0}\n" +
-            "return municipality")
-    List<Municipality> getMunicipalityByCountryId(Long countryId);
+//    @Query("match(municipality:Municipality{isEnable:true})-[:PROVINCE]->(p:Province)-[:REGION]->(r:Region)-[:BELONGS_TO]->(country:Country) where id(country)={0} \n" +
+//            "return municipality")
+//    List<Municipality> getMunicipalityByCountryId(Long countryId);
 }

@@ -1,12 +1,9 @@
 package com.kairos.service.pay_group_area;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.pay_group_area.MunicipalityPayGroupAreaWrapper;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
-import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaMunicipalityRelationship;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.pay_level.PayGroupAreaGraphRepository;
@@ -20,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,38 +51,28 @@ public class PayGroupAreaService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid municipality id " + payGroupAreaDTO.getMunicipalityId());
         }
         // Pay group area is already created Need to make a relationship with the new Municipality with pay group area
-        if (Optional.ofNullable(payGroupAreaDTO.getId()).isPresent()) {
-            PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaDTO.getId());
-            if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
-                throw new DataNotFoundByIdException("Invalid pay group id");
-            }
-
-        } else {
-            // creating a new Pay group area and creating relationship among them
-            ObjectMapper objectMapper = new ObjectMapper();
-            PayGroupArea payGroupArea = objectMapper.convertValue(payGroupAreaDTO, PayGroupArea.class);
-            payGroupArea.setLevel(level);
-            save(payGroupArea);
-            PayGroupAreaMunicipalityRelationship municipalityRelationship
-                    = new PayGroupAreaMunicipalityRelationship(payGroupArea, municipality.get(),
-                    payGroupAreaDTO.getStartDateMillis().getTime(), payGroupAreaDTO.getEndDateMillis().getTime());
-            save(municipalityRelationship);
-
-
-        }
+//        if (Optional.ofNullable(payGroupAreaDTO.getId()).isPresent()) {
+//            PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaDTO.getId());
+//            if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
+//                throw new DataNotFoundByIdException("Invalid pay group id");
+//            }
+//
+//        } else {
+//            // creating a new Pay group area and creating relationship among them
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            PayGroupArea payGroupArea = objectMapper.convertValue(payGroupAreaDTO, PayGroupArea.class);
+//            payGroupArea.setLevel(level);
+//            save(payGroupArea);
+//            PayGroupAreaMunicipalityRelationship municipalityRelationship
+//                    = new PayGroupAreaMunicipalityRelationship(payGroupArea, municipality.get(),
+//                    payGroupAreaDTO.getStartDateMillis().getTime(), payGroupAreaDTO.getEndDateMillis().getTime());
+//            save(municipalityRelationship);
+//
+//
+//        }
 
         return payGroupAreaDTO;
     }
-
-//    public void validatePayGroupArea(List<MunicipalityPayGroupAreaWrapper> municipalitiesAndPayGroup, PayGroupAreaDTO payGroupAreaDTO) {
-//
-//        for (int i = 0; i < municipalitiesAndPayGroup.size(); i++) {
-//            MunicipalityPayGroupAreaWrapper municipalityPayGroupAreaWrapper = municipalitiesAndPayGroup.get(i);
-//            if (municipalityPayGroupAreaWrapper.getMunicipality() != null && payGroupAreaDTO.getMunicipalityId().contains(municipalityPayGroupAreaWrapper.getMunicipality().getId())) {
-//
-//            }
-//        }
-//    }
 
     public PayGroupAreaDTO updatePayGroupArea(Long payGroupAreaId, PayGroupAreaDTO payGroupAreaDTO) {
         PayGroupArea payGroupArea = getPayGroupAreaById(payGroupAreaId);
@@ -122,8 +108,8 @@ public class PayGroupAreaService extends UserBaseService {
             throw new InternalError("Invalid country id");
         }
         List<Level> levels = countryGraphRepository.getLevelsByCountry(countryId);
-        List<Municipality> municipalities = municipalityGraphRepository.getMunicipalityByCountryId(countryId);
-        PayGroupAreaResponse payGroupArea = new PayGroupAreaResponse(levels, municipalities, null);
+       // List<Municipality> municipalities = municipalityGraphRepository.getMunicipalityByCountryId(countryId);
+        PayGroupAreaResponse payGroupArea = new PayGroupAreaResponse(levels, null, null);
         return payGroupArea;
     }
 }

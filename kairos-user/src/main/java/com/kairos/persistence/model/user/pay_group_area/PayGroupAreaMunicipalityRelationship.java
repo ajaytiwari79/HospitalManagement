@@ -11,12 +11,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_M
 /**
  * Created by vipul on 12/3/18.
  */
-@RelationshipEntity(type = HAS_MUNICIPALITY)
-public class PayGroupAreaMunicipalityRelationship extends UserBaseEntity {
+//@RelationshipEntity(type = HAS_MUNICIPALITY)
+public class PayGroupAreaMunicipalityRelationship  {
 
-    @StartNode
+    //  @StartNode
     private PayGroupArea payGroupArea;
-    @EndNode
+    // @EndNode
     private Municipality municipality;
     private Long startDateMillis;
     private Long endDateMillis;
@@ -25,12 +25,6 @@ public class PayGroupAreaMunicipalityRelationship extends UserBaseEntity {
         //default constructor
     }
 
-    public PayGroupAreaMunicipalityRelationship(PayGroupArea payGroupArea, Municipality municipality, Long startDateMillis, Long endDateMillis) {
-        this.payGroupArea = payGroupArea;
-        this.municipality = municipality;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-    }
 
     public PayGroupArea getPayGroupArea() {
         return payGroupArea;
