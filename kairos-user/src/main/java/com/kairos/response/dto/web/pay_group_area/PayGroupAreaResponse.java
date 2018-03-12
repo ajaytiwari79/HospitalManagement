@@ -2,6 +2,7 @@ package com.kairos.response.dto.web.pay_group_area;
 
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.List;
 public class PayGroupAreaResponse {
     private List<Level> levels = new ArrayList<>();
     private List<Municipality> municipalities = new ArrayList<>();
-    private List<PayGroupArea> payGroupAreas = new ArrayList<>();
+    private List<PayGroupAreaQueryResult> payGroupAreas = new ArrayList<>();
 
     public PayGroupAreaResponse() {
         // default constructor
@@ -35,15 +36,15 @@ public class PayGroupAreaResponse {
         this.municipalities = municipalities;
     }
 
-    public List<PayGroupArea> getPayGroupAreas() {
+    public List<PayGroupAreaQueryResult> getPayGroupAreas() {
         return payGroupAreas;
     }
 
-    public void setPayGroupAreas(List<PayGroupArea> payGroupAreas) {
+    public void setPayGroupAreas(List<PayGroupAreaQueryResult> payGroupAreas) {
         this.payGroupAreas = payGroupAreas;
     }
 
-    public PayGroupAreaResponse(List<Level> levels, List<Municipality> municipalities, List<PayGroupArea> payGroupAreas) {
+    public PayGroupAreaResponse(List<Level> levels, List<Municipality> municipalities, List<PayGroupAreaQueryResult> payGroupAreas) {
         this.levels = levels;
         this.municipalities = municipalities;
         this.payGroupAreas = payGroupAreas;

@@ -6,6 +6,7 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaMunicipalityRelationship;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaRelationshipRepository;
@@ -116,9 +117,11 @@ public class PayGroupAreaService extends UserBaseService {
         if (country == null) {
             throw new InternalError("Invalid country id");
         }
-        List<Level> levels = countryGraphRepository.getLevelsByCountry(countryId);
+
+        List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
         List<Municipality> municipalities = municipalityGraphRepository.getMunicipalityByCountryId(countryId);
-        PayGroupAreaResponse payGroupArea = new PayGroupAreaResponse(levels, municipalities, null);
+        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaByCountry(countryId);
+        PayGroupAreaResponse payGroupArea = new PayGroupAreaResponse(organizationLevels, municipalities, payGroupAreas);
         return payGroupArea;
     }
 }

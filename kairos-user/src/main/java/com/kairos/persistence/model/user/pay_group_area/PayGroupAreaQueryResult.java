@@ -1,49 +1,26 @@
-package com.kairos.response.dto.web.pay_group_area;
+package com.kairos.persistence.model.user.pay_group_area;
 
-import com.kairos.persistence.model.user.pay_level.DateRange;
-import com.kairos.persistence.model.user.pay_level.FutureDate;
-import com.kairos.persistence.model.user.pay_level.ValidSize;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.Set;
 
 /**
- * Created by prabjot on 21/12/17.
- *
- * @MOdified by vipul for additional property
+ * Created by vipul on 12/3/18.
  */
-
-@DateRange
-
-public class PayGroupAreaDTO {
-
+@JsonIgnoreProperties(ignoreUnknown = true)
+@QueryResult
+public class PayGroupAreaQueryResult {
     private Long id;
-    @NotNull(message = "Name can not be null")
     private String name;
     private String description;
-
-    @NotNull(message = "Please select municipality")
     private Long municipalityId;
-
-    @NotNull(message = "Start date can't be null")
-    @DateLong
-    @FutureDate
     private Date startDateMillis;
-
-    @FutureDate
-    @DateLong
     private Date endDateMillis;
-
-    @NotNull(message = "Level can not be null")
     private Long levelId;
 
-    public PayGroupAreaDTO() {
-        //default constructor
+    public PayGroupAreaQueryResult() {
     }
-
 
     public Long getId() {
         return id;
@@ -98,15 +75,6 @@ public class PayGroupAreaDTO {
     }
 
     public void setLevelId(Long levelId) {
-        this.levelId = levelId;
-    }
-
-    public PayGroupAreaDTO(@NotNull(message = "Name can not be null") String name, String description, Long municipalityId, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull Long levelId) {
-        this.name = name;
-        this.description = description;
-        this.municipalityId = municipalityId;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
         this.levelId = levelId;
     }
 }
