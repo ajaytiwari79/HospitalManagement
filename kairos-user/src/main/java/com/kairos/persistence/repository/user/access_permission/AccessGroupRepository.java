@@ -59,17 +59,17 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
             "OPTIONAL Match (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForHub=true WITH accessGroup,accessPage \n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage) return r")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForHubAccessGroup(Long countryId, Long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
             "OPTIONAL Match (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForUnion=true WITH accessGroup,accessPage \n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage) return r")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForUnionAccessGroup(Long countryId, Long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
             "OPTIONAL Match (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForOrganization=true WITH accessGroup,accessPage \n" +
-            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage) return r")
+            "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForOrganizationAccessGroup(Long countryId, Long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup),(accessPage:AccessPage) where id(accessGroup) IN {0}\n" +
@@ -77,9 +77,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     List<Map<String,Object>> setAccessPagePermission(List<Long> accessGroupIds);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={0} WITH accessGroup\n" +
-            "OPTIONAL Match (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage)  WITH accessPage \n" +
-            "Match (orgAccessGroup:AccessGroup) where id(orgAccessGroup)={1} WITH orgAccessGroup,accessPage \n" +
-            "create unique (orgAccessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage) return r")
+            "OPTIONAL Match (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage)  WITH accessPage, r \n" +
+            "Match (orgAccessGroup:AccessGroup) where id(orgAccessGroup)={1} WITH orgAccessGroup,accessPage, accessGroup \n" +
+            "create unique (orgAccessGroup)-[orgAccessPageRel:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:r.read, write:r.write}]->(accessPage) return orgAccessPageRel")
     List<Map<String,Object>> setAccessPagePermissionForAccessGroup(Long countryAccessGroupId, Long orgAccessGroupId);
 
     /*@Query("Match (n:AccessPage) where id(n)={0} with n \n" +
@@ -113,6 +113,12 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "Match (c)-[:"+HAS_ACCESS_GROUP+"]-(accessGroup:AccessGroup) WHERE  r.organizationCategory = {2} WITH accessGroup, page" +
             "MATCH (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"]->(page) DELETE r")
     void removeAccessPageRelationshipForOrganizationAccessGroup(Long accessGroupId, String organizationCategory);*/
+
+    @Query("Match (n:AccessPage) where id(n)={0} with n\n" +
+            "Optional Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages \n"+
+            " Optional Match (pages)-[r:"+HAS_ACCESS_OF_TABS+"]-(ag:AccessGroup) WHERE id(ag) = {1} WITH r\n"+
+            "set r.read={2}, r.write={3} return distinct true")
+    Boolean updatePermissionsForAccessTabsOfAccessGroup(Long tabId, Long accessGroupId, Boolean read, Boolean write);
 
 
     @Query("Match (accessGroup:AccessGroup),(accessPage:AccessPage) where id(accessGroup)={0} and id(accessPage) IN {1}\n" +

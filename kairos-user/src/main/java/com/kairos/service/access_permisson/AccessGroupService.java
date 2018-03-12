@@ -255,7 +255,7 @@ public class AccessGroupService extends UserBaseService {
         return modules;
     }
 
-    public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessGroupIds,boolean isSelected, Long countryId) {
+    public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessPageIds,boolean isSelected, Long countryId) {
         // Check if access group is of country
         if(Optional.ofNullable(countryId).isPresent()){
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
@@ -265,7 +265,7 @@ public class AccessGroupService extends UserBaseService {
         }
         long creationDate = DateUtil.getCurrentDate().getTime();
         long lastModificationDate = DateUtil.getCurrentDate().getTime();
-        accessGroupRepository.updateAccessPagePermission(accessGroupId,accessGroupIds,isSelected,creationDate,lastModificationDate);
+        accessGroupRepository.updateAccessPagePermission(accessGroupId,accessPageIds,isSelected,creationDate,lastModificationDate);
         return true;
     }
 
@@ -338,6 +338,10 @@ public class AccessGroupService extends UserBaseService {
     }
 
 
+
+    public Boolean updatePermissionsForAccessTabsOfAccessGroup(Long accessGroupId, Long accessPageId, AccessPermissionDTO accessPermissionDTO){
+        return accessGroupRepository.updatePermissionsForAccessTabsOfAccessGroup(accessPageId, accessGroupId, accessPermissionDTO.isRead(), accessPermissionDTO.isWrite());
+    }
 
     /***** Access group - COUNTRY LEVEL - STARTS HERE ******************/
 

@@ -16,6 +16,8 @@ public class AccessGroupPageRelationShip extends UserBaseEntity {
     @StartNode private AccessGroup accessGroup;
     @EndNode private AccessPage accessPage;
     private boolean isEnabled;
+    private boolean read;
+    private boolean write;
 
     public AccessGroup getAccessGroup() {
         return accessGroup;
@@ -39,5 +41,21 @@ public class AccessGroupPageRelationShip extends UserBaseEntity {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
+    }
+
+    public boolean isWrite() {
+        return write;
+    }
+
+    public void setWrite(boolean write) {
+        this.write = write;
     }
 }
