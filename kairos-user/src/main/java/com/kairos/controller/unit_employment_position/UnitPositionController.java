@@ -86,8 +86,8 @@ public class UnitPositionController {
 
     @ApiOperation(value = "get unit_position's CTA")
     @GetMapping(value = "/unit_position/{unitPositionId}")
-    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitEmploymentPositionCTA( unitPositionId));
+    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitPositionId,@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitEmploymentPositionCTA( unitPositionId,unitId));
     }
 
 }

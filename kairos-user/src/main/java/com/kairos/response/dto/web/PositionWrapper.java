@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web;
 
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
-import com.kairos.persistence.model.user.unit_position.UnitPosition;
+import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
 public class PositionWrapper {
 
     private List<ClientMinimumDTO> relatedCitizens;
-    private UnitPosition unitPosition;
+    private UnitPositionQueryResult unitPosition;
 
     public PositionWrapper() {
         //default constructor
@@ -21,7 +21,7 @@ public class PositionWrapper {
         this.relatedCitizens = relatedCitizens;
     }
 
-    public PositionWrapper(UnitPosition unitPosition) {
+    public PositionWrapper(UnitPositionQueryResult unitPosition) {
         this.unitPosition = unitPosition;
     }
 
@@ -33,11 +33,11 @@ public class PositionWrapper {
         this.relatedCitizens = relatedCitizens;
     }
 
-    public UnitPosition getUnitPosition() {
+    public UnitPositionQueryResult getUnitPosition() {
         return unitPosition;
     }
 
-    public void setUnitPosition(UnitPosition unitPosition) {
+    public void setUnitPosition(UnitPositionQueryResult unitPosition) {
         this.unitPosition = unitPosition;
     }
 }
