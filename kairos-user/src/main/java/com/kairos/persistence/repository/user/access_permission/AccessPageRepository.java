@@ -161,7 +161,6 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Optional Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages set pages.active={1} return distinct true")
     Boolean updateStatusOfAccessTabs(Long tabId, Boolean active);
 
-
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:SUB_PAGE*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
             "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +
@@ -184,7 +183,6 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "ON CREATE SET r.accessibleForHub = {2},r.accessibleForUnion = false,r.accessibleForOrganization=false\n" +
             "ON MATCH  SET r.accessibleForHub = {2} return distinct true")
     Boolean updateAccessStatusForHubOfCountry(Long tabId, Long countryId, Boolean accessStatus);
-
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
