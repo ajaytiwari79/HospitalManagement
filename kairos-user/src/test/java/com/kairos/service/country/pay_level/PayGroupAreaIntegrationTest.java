@@ -46,12 +46,9 @@ public class PayGroupAreaIntegrationTest {
     @Test
     @OrderTest(order = 1)
     public void savePayGroupArea() {
-        Set<Long> municipalityId = new HashSet<>();
-        municipalityId.add(1032L);
-        municipalityId.add(1035L);
-        municipalityId.add(1024L);
+        Long municipalityId = 1032L;
 
-        PayGroupAreaDTO payGroupAreaDTO = new PayGroupAreaDTO("North", "Pay grp 1", municipalityId, DateUtil.getCurrentDate(), null);
+        PayGroupAreaDTO payGroupAreaDTO = new PayGroupAreaDTO("North", "Pay grp 1", municipalityId, DateUtil.getCurrentDate(), null, null);
         HttpEntity<PayGroupAreaDTO> entity = new HttpEntity<>(payGroupAreaDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PayGroupAreaDTO>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayGroupAreaDTO>>() {
@@ -69,7 +66,7 @@ public class PayGroupAreaIntegrationTest {
     @Test
     @OrderTest(order = 2)
     public void updatePayGroupArea() {
-        PayGroupAreaDTO payGroupAreaDTO = new PayGroupAreaDTO("East", "Pay level for 10-20 years experience", null, null, null);
+        PayGroupAreaDTO payGroupAreaDTO = new PayGroupAreaDTO("East", "Pay level for 10-20 years experience", null, null, null, null);
         String baseUrl = getBaseUrl(145L, 53L, null);
         HttpEntity<PayGroupAreaDTO> entity = new HttpEntity<>(payGroupAreaDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<TimeSlotSet>> typeReference =

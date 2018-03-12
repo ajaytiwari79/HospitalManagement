@@ -2,13 +2,17 @@ package com.kairos.service.pay_group_area;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.pay_group_area.MunicipalityPayGroupAreaWrapper;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaMunicipalityRelationship;
+import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.pay_level.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
+import com.kairos.response.dto.web.pay_group_area.PayGroupAreaResponse;
 import com.kairos.service.UserBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,35 +46,47 @@ public class PayGroupAreaService extends UserBaseService {
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid country id " + countryId);
         }
-        List<MunicipalityPayGroupAreaWrapper> municipalitiesAndPayGroup = payGroupAreaGraphRepository.getMunicipalitiesAndPayGroup(payGroupAreaDTO.getMunicipalityId());
-        validatePayGroupArea(municipalitiesAndPayGroup, payGroupAreaDTO);
-        //checking weather the municipality list is blank ,if any municipality is already linked with payGroupArea so setting an end date on that
+        Level level = countryGraphRepository.getLevel(countryId, payGroupAreaDTO.getLevelId());
+        if (!Optional.ofNullable(level).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid level id " + payGroupAreaDTO.getLevelId());
+        }
+        Optional<Municipality> municipality = municipalityGraphRepository.findById(payGroupAreaDTO.getMunicipalityId());
+        if (!Optional.ofNullable(municipality).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid municipality id " + payGroupAreaDTO.getMunicipalityId());
+        }
+        // Pay group area is already created Need to make a relationship with the new Municipality with pay group area
+        if (Optional.ofNullable(payGroupAreaDTO.getId()).isPresent()) {
+            PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaDTO.getId());
+            if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
+                throw new DataNotFoundByIdException("Invalid pay group id");
+            }
 
-//        if (!Optional.ofNullable(municipalitiesAndPayGroup.get(0).getMunicipalityList()).isPresent()
-//                || municipalitiesAndPayGroup.getMunicipalityList().size() != payGroupAreaDTO.getMunicipalityId().size()) {
-//            throw new DataNotMatchedException("Incorrect municipality List ");
-//        }
+        } else {
+            // creating a new Pay group area and creating relationship among them
+            ObjectMapper objectMapper = new ObjectMapper();
+            PayGroupArea payGroupArea = objectMapper.convertValue(payGroupAreaDTO, PayGroupArea.class);
+            payGroupArea.setLevel(level);
+            save(payGroupArea);
+            PayGroupAreaMunicipalityRelationship municipalityRelationship
+                    = new PayGroupAreaMunicipalityRelationship(payGroupArea, municipality.get(),
+                    payGroupAreaDTO.getStartDateMillis().getTime(), payGroupAreaDTO.getEndDateMillis().getTime());
+            save(municipalityRelationship);
 
-        payGroupAreaDTO.setId(null);
-        ObjectMapper objectMapper = new ObjectMapper();
-        PayGroupArea payGroupArea = objectMapper.convertValue(payGroupAreaDTO, PayGroupArea.class);
-        //   payGroupArea.setMunicipality(municipalitiesAndPayGroup.getMunicipalityList());
-        //  save(payGroupArea);
 
-        //payGroupAreaDTO.setId(payGroupArea.getId());
+        }
 
         return payGroupAreaDTO;
     }
 
-    public void validatePayGroupArea(List<MunicipalityPayGroupAreaWrapper> municipalitiesAndPayGroup, PayGroupAreaDTO payGroupAreaDTO) {
-
-        for (int i = 0; i < municipalitiesAndPayGroup.size(); i++) {
-            MunicipalityPayGroupAreaWrapper municipalityPayGroupAreaWrapper = municipalitiesAndPayGroup.get(i);
-            if (municipalityPayGroupAreaWrapper.getMunicipality() != null && payGroupAreaDTO.getMunicipalityId().contains(municipalityPayGroupAreaWrapper.getMunicipality().getId())) {
-
-            }
-        }
-    }
+//    public void validatePayGroupArea(List<MunicipalityPayGroupAreaWrapper> municipalitiesAndPayGroup, PayGroupAreaDTO payGroupAreaDTO) {
+//
+//        for (int i = 0; i < municipalitiesAndPayGroup.size(); i++) {
+//            MunicipalityPayGroupAreaWrapper municipalityPayGroupAreaWrapper = municipalitiesAndPayGroup.get(i);
+//            if (municipalityPayGroupAreaWrapper.getMunicipality() != null && payGroupAreaDTO.getMunicipalityId().contains(municipalityPayGroupAreaWrapper.getMunicipality().getId())) {
+//
+//            }
+//        }
+//    }
 
     public PayGroupAreaDTO updatePayGroupArea(Long payGroupAreaId, PayGroupAreaDTO payGroupAreaDTO) {
         PayGroupArea payGroupArea = getPayGroupAreaById(payGroupAreaId);
@@ -81,7 +97,11 @@ public class PayGroupAreaService extends UserBaseService {
     }
 
     public boolean deletePayGroupArea(Long payGroupAreaId) {
-        PayGroupArea payGroupArea = getPayGroupAreaById(payGroupAreaId);
+        PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
+        if (!Optional.ofNullable(payGroupArea).isPresent()) {
+            logger.info("pay group area not found for deletion  ");
+            throw new DataNotFoundByIdException("Invalid pay group id");
+        }
         payGroupArea.setDeleted(true);
         save(payGroupArea);
         return true;
@@ -95,11 +115,15 @@ public class PayGroupAreaService extends UserBaseService {
         return payGroupArea;
     }
 
-    public List<PayGroupArea> getPayGroupArea(Long countryId) {
+    public PayGroupAreaResponse getPayGroupArea(Long countryId) {
+
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             throw new InternalError("Invalid country id");
         }
-        return new ArrayList<>();
+        List<Level> levels = countryGraphRepository.getLevelsByCountry(countryId);
+        List<Municipality> municipalities = municipalityGraphRepository.getMunicipalityByCountryId(countryId);
+        PayGroupAreaResponse payGroupArea = new PayGroupAreaResponse(levels, municipalities, null);
+        return payGroupArea;
     }
 }

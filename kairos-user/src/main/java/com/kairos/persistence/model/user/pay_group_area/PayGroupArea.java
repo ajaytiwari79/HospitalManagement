@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.pay_group_area;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.region.Municipality;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_MUNICIPALITY;
+import static com.kairos.persistence.model.constants.RelationshipConstants.IN_LEVEL;
 
 /**
  * @Created by prabjot on 20/12/17.
@@ -23,19 +25,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_M
 public class PayGroupArea extends UserBaseEntity {
     private String name;
     private String description;
-    @Relationship(type = HAS_MUNICIPALITY)
-    private Set<Municipality> municipality;
-    private Long startDateMillis;
-    private Long endDateMillis;
+    @Relationship(type = IN_LEVEL)
+    private Level level;
 
     public PayGroupArea() {
         //default constructor
     }
 
-    public PayGroupArea(Long startDateMillis, Long endDateMillis) {
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-    }
 
     public String getName() {
         return name;
@@ -53,27 +49,11 @@ public class PayGroupArea extends UserBaseEntity {
         this.description = description;
     }
 
-    public Set<Municipality> getMunicipality() {
-        return municipality;
+    public Level getLevel() {
+        return level;
     }
 
-    public void setMunicipality(Set<Municipality> municipality) {
-        this.municipality = municipality;
-    }
-
-    public Long getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public Long getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
+    public void setLevel(Level level) {
+        this.level = level;
     }
 }

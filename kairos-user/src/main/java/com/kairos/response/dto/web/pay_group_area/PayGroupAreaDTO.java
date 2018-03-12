@@ -23,8 +23,8 @@ public class PayGroupAreaDTO {
     private String name;
     private String description;
 
-    @ValidSize(message = "Please select atleast 1 municipality")
-    private Set<Long> municipalityId;
+    @NotNull(message = "Please select municipality")
+    private Long municipalityId;
 
     @NotNull(message = "Start date can't be null")
     @DateLong
@@ -35,6 +35,8 @@ public class PayGroupAreaDTO {
     @DateLong
     private Date endDateMillis;
 
+    @NotNull(message = "Level can not be null")
+    private Long levelId;
 
     public PayGroupAreaDTO() {
         //default constructor
@@ -65,11 +67,11 @@ public class PayGroupAreaDTO {
         this.description = description;
     }
 
-    public Set<Long> getMunicipalityId() {
+    public Long getMunicipalityId() {
         return municipalityId;
     }
 
-    public void setMunicipalityId(Set<Long> municipalityId) {
+    public void setMunicipalityId(Long municipalityId) {
         this.municipalityId = municipalityId;
     }
 
@@ -89,11 +91,20 @@ public class PayGroupAreaDTO {
         this.endDateMillis = endDateMillis;
     }
 
-    public PayGroupAreaDTO(@NotNull(message = "Name can not be null") String name, String description, Set<Long> municipalityId, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis) {
+    public Long getLevelId() {
+        return levelId;
+    }
+
+    public void setLevelId(Long levelId) {
+        this.levelId = levelId;
+    }
+
+    public PayGroupAreaDTO(@NotNull(message = "Name can not be null") String name, String description, Long municipalityId, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull Long levelId) {
         this.name = name;
         this.description = description;
         this.municipalityId = municipalityId;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
+        this.levelId = levelId;
     }
 }
