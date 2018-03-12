@@ -115,7 +115,8 @@ public class AccessPageService extends UserBaseService {
         if( !Optional.ofNullable(tabId).isPresent() ){
             return false;
         }
-        switch (orgCategoryTabAccessDTO.getOrganizationCategory()){
+        return accessPageRepository.updateAccessStatusOfCountryByCategory(tabId, countryId, orgCategoryTabAccessDTO.getOrganizationCategory().toString(), orgCategoryTabAccessDTO.isAccessStatus());
+        /*switch (orgCategoryTabAccessDTO.getOrganizationCategory()){
             case HUB: {
                 return accessPageRepository.updateAccessStatusForHubOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
             }
@@ -125,8 +126,8 @@ public class AccessPageService extends UserBaseService {
             case UNION: {
                 return accessPageRepository.updateAccessStatusForUnionOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
             }
-        }
-        return false;
+        }*/
+//        return false;
     }
 
     public void createAccessPageByXml(Tab tab){
