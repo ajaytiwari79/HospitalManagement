@@ -61,7 +61,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "return {name:accessPage.name,id:id(accessPage),selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")*/
     @Query("match (ag:AccessGroup) where id(ag)={0} WITH ag \n" +
             "MATCH path=(accessPage:AccessPage{active:true})-[:SUB_PAGE*]->(subPage:AccessPage{active:true})-[:HAS_ACCESS_OF_TABS]-(ag) \n" +
-            "WITH NODES(path) AS np,ag WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs,ag UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps,ag with ps,ag\n" +
+            "WITH NODES(path) AS np,ag WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-3, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs,ag UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps,ag with ps,ag\n" +
             "optional match (parent:AccessPage)<-[r2:HAS_ACCESS_OF_TABS]-(ag)\n" +
             "where id(parent)=id(ps.p) with r2,ps,ag\n" +
             "optional match (child:AccessPage)<-[r:HAS_ACCESS_OF_TABS]-(ag)\n" +
