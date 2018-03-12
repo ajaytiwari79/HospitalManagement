@@ -144,8 +144,8 @@ public abstract class RelationshipConstants {
     public final static String HAS_LOCAL_AREA_TAGS = "HAS_LOCAL_AREA_TAGS";
     public final static String LAT_LNG = "LAT_AND_LNG";
     public final static String HAS_PARTIAL_LEAVES = "HAS_PARTIAL_LEAVES";
-    public final static String PROVIDED_BY = "PROVIDED_BY";
-    public final static String HAS_UNIT_EMPLOYMENTS = "HAS_UNIT_EMPLOYMENTS";
+    public final static String APPLICABLE_IN_UNIT = "APPLICABLE_IN_UNIT";
+    public final static String HAS_UNIT_PERMISSIONS = "HAS_UNIT_PERMISSIONS";
     public final static String HAS_WAGES = "HAS_WAGES";
     public final static String HAS_ACCESS_PAGE_PERMISSION = "HAS_ACCESS_PAGE_PERMISSION";
     public final static String HAS_ACCESS_GROUP = "HAS_ACCESS_GROUP";
@@ -212,7 +212,9 @@ public abstract class RelationshipConstants {
     public final static String LOCATED_IN = "LOCATED_IN";
     public final static String HAS_PAY_LEVEL_MATRIX = "HAS_PAY_LEVEL_MATRIX";
     public final static String ORAGANIZATION_HAS_UNIONS = "ORAGANIZATION_HAS_UNIONS";
-    public final static String STAFF_BELONGS_TO_UNION = "STAFF_BELONGS_TO_UNION";
+    public final static String BACKING_BY_UNION = "BACKING_BY_UNION";
+
+    public final static String IN_UNIT = "IN_UNIT";
     public final static String HAS_ACCESS_FOR_ORG_CATEGORY = "HAS_ACCESS_FOR_ORG_CATEGORY";
 
     /**

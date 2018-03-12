@@ -39,7 +39,7 @@ public class CTARuleTemplateQueryResult {
     private PlanningCategory planningCategory;
     private List<StaffFunction> staffFunctions=new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
-//    private List<Long> timeTypes =new ArrayList<>();
+    private List<Long> timeTypes =new ArrayList<>();
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
     private List<Long> activityIds;
     private Long timeTypeId;

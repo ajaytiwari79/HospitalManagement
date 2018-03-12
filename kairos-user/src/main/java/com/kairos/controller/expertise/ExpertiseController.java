@@ -1,7 +1,7 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.service.expertise.ExpertiseService;
-import com.kairos.service.unit_employment_position.UnitEmploymentPositionService;
+import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +25,7 @@ public class ExpertiseController {
     @Inject
     private ExpertiseService expertiseService;
     @Inject
-    private UnitEmploymentPositionService unitEmploymentPositionService;
+    private UnitPositionService unitPositionService;
 
 
     @ApiOperation(value = "Assign Staff expertise")
@@ -54,7 +54,7 @@ public class ExpertiseController {
     @ApiOperation(value = "Get cta and wta by expertise")
     @RequestMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/expertise/{expertiseId}/cta_wta")
     ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getCtaAndWtaByExpertiseId(unitId, expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getCtaAndWtaByExpertiseId(unitId, expertiseId));
     }
 
 

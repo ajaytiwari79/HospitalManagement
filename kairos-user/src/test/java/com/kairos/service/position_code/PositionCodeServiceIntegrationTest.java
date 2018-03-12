@@ -4,17 +4,17 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.service.unit_employment_position.UnitEmploymentPositionService;
+import com.kairos.service.unit_position.UnitPositionService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,9 @@ public class PositionCodeServiceIntegrationTest {
     @Autowired
     TestRestTemplate restTemplate;
     @Autowired
-    UnitEmploymentPositionService unitEmploymentPositionService;
+    UnitPositionService unitPositionService;
+    @Mock
+    private OrganizationGraphRepository organizationGraphRepository;
     static private String baseUrlWithCountry;
     static private String baseUrlWithUnit;
     static Long createdId, createdIdDelete, wtaIdForUpdate;
@@ -55,11 +57,8 @@ public class PositionCodeServiceIntegrationTest {
 
     @Before
     public void setUp() throws Exception {
-        baseUrlWithCountry = getBaseUrl(71L, null, 95L);
-        baseUrlWithUnit = getBaseUrl(71L, 53L, null);
-        positionCode = new PositionCode("Doctor" + Math.random(), "hey", null);
-
-
+        baseUrlWithUnit = getBaseUrl(71L, null, 95L);
+        baseUrlWithCountry = getBaseUrl(71L, 53L, null);
     }
 
 
@@ -71,7 +70,7 @@ public class PositionCodeServiceIntegrationTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<PositionCode>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<PositionCode>> response = restTemplate.exchange(
-                baseUrlWithUnit + "/position_code",
+                baseUrlWithUnit + "/position_code?moduleId=tab_23&type=Organization",
                 HttpMethod.POST, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdId = wtaIdForUpdate = createdIdDelete = response.getBody().getData().getId();
@@ -87,10 +86,20 @@ public class PositionCodeServiceIntegrationTest {
                 baseUrlWithUnit + "/position_code",
                 HttpMethod.GET, null, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
-
     }
 
-
+    @Test
+    @OrderTest(order = 3)
+    public void getUnionsAndPositionCodes() throws Exception {
+        HttpEntity<PositionCode> requestBodyData = new HttpEntity<>(positionCode);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<PositionCode>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PositionCode>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<PositionCode>> response = restTemplate.exchange(
+                baseUrlWithUnit + "/unions_with_position_code?moduleId=tab_73&type=Organization",
+                HttpMethod.GET, requestBodyData, typeReference);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
 
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {
@@ -100,6 +109,7 @@ public class PositionCodeServiceIntegrationTest {
         } else if (organizationId != null && unitId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
                     .append("/unit/").append(unitId).toString();
+            logger.info(baseUrl);
             return baseUrl;
         } else {
             throw new UnsupportedOperationException("organization ID must not be null");

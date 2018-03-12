@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.unitEmploymentPosition;
+package com.kairos.persistence.model.user.unit_position;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -20,7 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
-public class UnitEmploymentPosition extends UserBaseEntity {
+public class UnitPosition extends UserBaseEntity {
 
     @Relationship(type = HAS_EXPERTISE_IN)
     private Expertise expertise;
@@ -37,14 +37,20 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     @Relationship(type = BELONGS_TO_STAFF, direction = "INCOMING")
     private Staff staff;
 
+
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
     private EmploymentType employmentType;
 
-    @Relationship(type = STAFF_BELONGS_TO_UNION)
+    @Relationship(type = BACKING_BY_UNION)
     private Organization union;
+
+    @Relationship(type = IN_UNIT)
+    private Organization unit;
+
 
     private Long startDateMillis;
     private Long endDateMillis;
+    private Long lastWorkingDateMillis;
     private int totalWeeklyMinutes;
 
     private float avgDailyWorkingHours;
@@ -52,25 +58,9 @@ public class UnitEmploymentPosition extends UserBaseEntity {
     private float hourlyWages;
 
     private float salary;
+    private Long timeCareExternalId;
 
-    public UnitEmploymentPosition() {
-    }
-
-
-    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta,
-                                  PositionCode positionCode, String description, Long startDateMillis, Long endDateMillis, Long expiryDate
-            , int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, float salary, int workingDaysInWeek) {
-        this.expertise = expertise;
-        this.cta = cta;
-        this.workingTimeAgreement = workingTimeAgreement;
-        this.positionCode = positionCode;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.salary = salary;
-        this.hourlyWages = hourlyWages;
-        this.workingDaysInWeek = workingDaysInWeek;
+    public UnitPosition() {
     }
 
 
@@ -186,49 +176,49 @@ public class UnitEmploymentPosition extends UserBaseEntity {
         this.staff = staff;
     }
 
-    public UnitEmploymentPosition(Expertise expertise, CostTimeAgreement cta, WorkingTimeAgreement wta, PositionCode positionCode, Staff staff, boolean deleted, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, EmploymentType employmentType, float salary) {
-        this.expertise = expertise;
-        this.cta = cta;
-        this.workingTimeAgreement = workingTimeAgreement;
-        this.positionCode = positionCode;
-        this.staff = staff;
-        this.deleted = deleted;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.hourlyWages = hourlyWages;
-        this.employmentType = employmentType;
-        this.salary = salary;
-    }
-
-
-    public UnitEmploymentPositionQueryResult getBasicDetails() {
-        UnitEmploymentPositionQueryResult result = null;
-        result = new UnitEmploymentPositionQueryResult(this.expertise.retrieveBasicDetails(), this.startDateMillis, this.workingDaysInWeek,
-                this.endDateMillis, this.totalWeeklyMinutes,
-                this.avgDailyWorkingHours, this.hourlyWages, this.id, this.employmentType, this.salary, this.positionCode,this.union,this.workingTimeAgreement,this.cta);
-        return result;
-    }
-
-    public UnitEmploymentPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary) {
-
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.hourlyWages = hourlyWages;
-        this.salary = salary;
-    }
 
     public Organization getUnion() {
         return union;
     }
 
+
     public void setUnion(Organization union) {
         this.union = union;
+    }
+
+    public Long getLastWorkingDateMillis() {
+        return lastWorkingDateMillis;
+    }
+
+    public void setLastWorkingDateMillis(Long lastWorkingDateMillis) {
+        this.lastWorkingDateMillis = lastWorkingDateMillis;
+    }
+
+    public Organization getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Organization unit) {
+        this.unit = unit;
+    }
+
+    public Long getTimeCareExternalId() {
+        return timeCareExternalId;
+    }
+
+    public void setTimeCareExternalId(Long timeCareExternalId) {
+        this.timeCareExternalId = timeCareExternalId;
+    }
+
+
+    public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary) {
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.hourlyWages = hourlyWages;
+        this.salary = salary;
     }
 
     @Override

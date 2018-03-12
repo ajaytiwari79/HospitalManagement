@@ -2,6 +2,8 @@ package com.kairos.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
+import org.joda.time.Months;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -34,7 +36,7 @@ public  class Tst {
 
     public static void main(String[] agrs){
 
-        List<Integer> list = Arrays.asList();
+        /*List<Integer> list = Arrays.asList();
         Optional<Integer> a = list.stream()
                 .findFirst();
         System.out.println(a.isPresent());
@@ -89,9 +91,13 @@ public  class Tst {
             System.out.print("\nNew Day: "+dateTime.getDayOfWeek());
 
 
-        }
+        }*/
 
-
+        DateTime startDate = new DateTime();
+        //DateTime endDate = startDate.plus(Months.months(2));
+        // Ceates an interval from a start to an end instant.
+        //Interval interval = new Interval(startDate, endDate);
+        System.out.println("Interval = " + startDate);
 
 
     }

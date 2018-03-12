@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.user.staff.Employment;
-import com.kairos.persistence.model.user.staff.UnitEmployment;
+import com.kairos.persistence.model.user.staff.UnitPermission;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -23,23 +23,14 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     Employment findEmployment(long organizationId, long staffId);
 
     @Query("Match (organization:Organization),(accessGroup:AccessGroup),(staff:Staff) where id(organization)={1} AND id(accessGroup)={2} AND id(staff) ={0} with organization,accessGroup,staff\n" +
-            "Match (staff)<-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+HAS_UNIT_EMPLOYMENTS+"]->(unitEmployment:UnitEmployment{employmentStatus:'PENDING'}) with unitEmployment,organization,accessGroup\n" +
-            "Match (organization)<-[:"+PROVIDED_BY+"]-(unitEmployment)-[:"+HAS_ACCESS_PERMISSION+"{isEnabled:true}]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) with distinct unitEmployment,organization\n" +
-            "return {id:id(unitEmployment),startDate:unitEmployment.startDate,endDate:unitEmployment.endDate,organizationId:id(organization),status:unitEmployment.employmentStatus} as data")
+            "Match (staff)<-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitPermission:UnitPermission) with unitPermission,organization,accessGroup\n" +
+            "Match (organization)<-[:"+ APPLICABLE_IN_UNIT +"]-(unitPermission)-[:"+HAS_ACCESS_PERMISSION+"{isEnabled:true}]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) with distinct unitPermission,organization\n" +
+            "return {id:id(unitPermission),startDate:unitPermission.startDate,endDate:unitPermission.endDate,organizationId:id(organization),status:unitPermission.employmentStatus} as data")
     Map<String,Object> getEmploymentOfParticularRole(long staffId, long organizationId, long accessGroupId);
 
     @Query("Match (organization:Organization),(staff:Staff),(unit:Organization) where id(organization)={0} AND id(staff) IN {1} AND id(unit)={2}\n" +
             "create (organization)-[r:"+HAS_EMPLOYMENTS+"]->(employment:Employment) with employment,r,staff,organization,unit\n" +
-            "create (employment)-[r2:BELONGS_TO]->(staff) create (employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment{employmentStatus:'PENDING'})-[:PROVIDED_BY]->(unit) return r")
+            "create (employment)-[r2:BELONGS_TO]->(staff) create (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit) return r")
     void createEmployments(long organizationId, List<Long> staffId, long unitId);
 
-    @Query("Match (organization:Organization),(staff:Staff),(unit:Organization) where id(organization)={0} AND id(staff)={2} AND id(unit)={1}\n" +
-            "match (organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff) with employment,staff,organization,unit match (employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment)-[:PROVIDED_BY]->(unit)\n" +
-            "return unitEmployment limit 1")
-    UnitEmployment getUnitEmployment(long organizationId, long unitId, long staffId);
-
-    @Query("Match (organization:Organization),(staff:Staff),(unit:Organization) where id(organization)={0} AND id(staff)={2} AND id(unit)={1}\n" +
-            "match (organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff) with employment,staff,organization,unit create (employment)-[:HAS_UNIT_EMPLOYMENTS]->(unitEmployment:UnitEmployment{employmentStatus:'PENDING'})-[:PROVIDED_BY]->(unit)\n" +
-            "return unitEmployment limit 1")
-    UnitEmployment createUnitEmployment(long organizationId, long unitId, long staffId);
 }
