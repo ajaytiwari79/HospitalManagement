@@ -17,9 +17,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGroupArea, Long> {
 
-    @Query("match(country:Country)-[:" + HAS_LEVEL + "]->(level:Level)  where id(country) IN {0}\n" +
-            "match(level)-[:" + IN_LEVEL + "]-(p:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality)\n" +
-            "RETURN  id(municipality) as id,municipality.name as name,municipality.description as description, id(municipality) as municipalityId" +
+    @Query("match(country:Country)-[:" + HAS_LEVEL + "]->(level:Level)  where id(country) = {0}\n" +
+            "match(level)-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality)\n" +
+            "RETURN  id(payGroupArea) as id,payGroupArea.name as name,payGroupArea.description as description, id(municipality) as municipalityId, " +
             "id(level) as levelId,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis")
     List<PayGroupAreaQueryResult> getPayGroupAreaByCountry(Long countryId);
 }

@@ -15,8 +15,8 @@ public class PayGroupAreaQueryResult {
     private String name;
     private String description;
     private Long municipalityId;
-    private Date startDateMillis;
-    private Date endDateMillis;
+    private Long startDateMillis;
+    private Long endDateMillis;
     private Long levelId;
 
     public PayGroupAreaQueryResult() {
@@ -54,19 +54,19 @@ public class PayGroupAreaQueryResult {
         this.municipalityId = municipalityId;
     }
 
-    public Date getStartDateMillis() {
+    public Long getStartDateMillis() {
         return startDateMillis;
     }
 
-    public void setStartDateMillis(Date startDateMillis) {
+    public void setStartDateMillis(Long startDateMillis) {
         this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDateMillis() {
+    public Long getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Date endDateMillis) {
+    public void setEndDateMillis(Long endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 
