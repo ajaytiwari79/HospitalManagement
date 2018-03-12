@@ -38,6 +38,8 @@ public class Municipality extends UserBaseEntity {
     private Province province;
     private boolean isEnable = true;
 
+    public Municipality() {
+    }
 
     public String getGeoFence() {
         return geoFence;

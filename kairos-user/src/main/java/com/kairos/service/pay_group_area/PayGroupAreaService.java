@@ -10,6 +10,8 @@ import com.kairos.persistence.repository.user.pay_level.PayGroupAreaGraphReposit
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import com.kairos.service.UserBaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,8 @@ public class PayGroupAreaService extends UserBaseService {
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
+    @Inject
+    private Logger logger = LoggerFactory.getLogger(PayGroupArea.class);
 
     public PayGroupAreaDTO savePayGroupArea(Long countryId, PayGroupAreaDTO payGroupAreaDTO) {
 
@@ -60,6 +64,12 @@ public class PayGroupAreaService extends UserBaseService {
 
     public void validatePayGroupArea(List<MunicipalityPayGroupAreaWrapper> municipalitiesAndPayGroup, PayGroupAreaDTO payGroupAreaDTO) {
 
+        for (int i = 0; i < municipalitiesAndPayGroup.size(); i++) {
+            MunicipalityPayGroupAreaWrapper municipalityPayGroupAreaWrapper = municipalitiesAndPayGroup.get(i);
+            if (municipalityPayGroupAreaWrapper.getMunicipality() != null && payGroupAreaDTO.getMunicipalityId().contains(municipalityPayGroupAreaWrapper.getMunicipality().getId())) {
+
+            }
+        }
     }
 
     public PayGroupAreaDTO updatePayGroupArea(Long payGroupAreaId, PayGroupAreaDTO payGroupAreaDTO) {

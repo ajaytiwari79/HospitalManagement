@@ -34,17 +34,17 @@ public class PayGroupAreaServiceTest {
         municipalityId.add(1032L);
         municipalityId.add(1035L);
         municipalityId.add(1024L);
-        municipalityPayGroupArea = new ArrayList<>();
+        municipalityPayGroupArea = new ArrayList<>(10);
         payGroupAreaDTO = new PayGroupAreaDTO("North", "Pay grp 1", municipalityId, DateUtil.getCurrentDate(), null);
+
         Municipality municipality = new Municipality(1032L);
         Municipality municipality2 = new Municipality(1035L);
+
         PayGroupArea payGroupArea = new PayGroupArea(1520743512000L, 1520743512000L);
         PayGroupArea payGroupArea2 = new PayGroupArea(1520743512000L, 1520743512000L);
 
         municipalityPayGroupArea.get(0).setPayGroupArea(payGroupArea);
         municipalityPayGroupArea.get(0).setMunicipality(municipality);
-
-
         municipalityPayGroupArea.get(1).setPayGroupArea(payGroupArea2);
         municipalityPayGroupArea.get(1).setMunicipality(municipality2);
     }
