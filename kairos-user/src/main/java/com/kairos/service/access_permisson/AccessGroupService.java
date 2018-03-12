@@ -204,7 +204,7 @@ public class AccessGroupService extends UserBaseService {
             }
         }
 
-        List<Map<String, Object>> accessPages = accessPageRepository.getAccessPageHierarchy(accessGroupId);
+        List<Map<String, Object>> accessPages = accessPageRepository.getSelectedAccessPageHierarchy(accessGroupId);
         ObjectMapper objectMapper = new ObjectMapper();
         List<AccessPageQueryResult> queryResults = new ArrayList<>();
         for (Map<String, Object> accessPage : accessPages) {
