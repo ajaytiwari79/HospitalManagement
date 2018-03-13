@@ -2,8 +2,7 @@ package com.kairos.client;
 
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.client.dto.timeBank.CostTimeAgreementDTO;
-import com.kairos.response.dto.web.KMDShift;
+import com.kairos.client.dto.timeBank.TimebankWrapper;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +27,10 @@ public class TimeBankRestClient {
 
 
     @Async
-    public Boolean createBlankTimeBank(CostTimeAgreementDTO costTimeAgreementDTO){
+    public Boolean createBlankTimeBank(TimebankWrapper timebankWrapper){
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<CostTimeAgreementDTO> request = new HttpEntity<>(costTimeAgreementDTO);
+            HttpEntity<TimebankWrapper> request = new HttpEntity<>(timebankWrapper);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
@@ -53,10 +52,10 @@ public class TimeBankRestClient {
 
     }
 
-    public Boolean updateBlankTimeBank(CostTimeAgreementDTO costTimeAgreementDTO){
+    public Boolean updateBlankTimeBank(TimebankWrapper timebankWrapper){
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<CostTimeAgreementDTO> request = new HttpEntity<>(costTimeAgreementDTO);
+            HttpEntity<TimebankWrapper> request = new HttpEntity<>(timebankWrapper);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(

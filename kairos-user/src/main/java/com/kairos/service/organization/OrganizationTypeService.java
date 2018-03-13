@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
@@ -11,11 +12,8 @@ import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-
 import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +40,12 @@ public class OrganizationTypeService extends UserBaseService {
         if(!Optional.ofNullable(country).isPresent()){
             throw new DataNotFoundByIdException("Invalid country id " + countryId);
         }
-        List<Level> levels = organizationTypeDTO.getLevels().stream().map(level->new Level(level)).collect(Collectors.toList());
+        OrganizationType isAlreadyExist=organizationTypeGraphRepository.findByName(countryId,organizationTypeDTO.getName().trim());
+        if(Optional.ofNullable(isAlreadyExist).isPresent()){
+            throw new DuplicateDataException("OrganizationType already exists");
+        }
+        List<Level> levels = countryGraphRepository.findByAllByLevelId(countryId,organizationTypeDTO.getLevels());
+
         OrganizationType organizationType = new OrganizationType(organizationTypeDTO.getName(),country,levels);
         return prepareResponse(save(organizationType));
     }
@@ -79,26 +82,10 @@ public class OrganizationTypeService extends UserBaseService {
         if(!Optional.ofNullable(orgTypeToUpdate).isPresent()){
             throw new DataNotFoundByIdException("Invalid organization type id " + updateOrganizationTypeDTO.getId());
         }
-
-        List<Level> levels = orgTypeToUpdate.getLevels();
-        updateOrganizationTypeDTO.getLevelsToUpdate().forEach(levelToUpdate->{
-            if(!Optional.ofNullable(levelToUpdate.getId()).isPresent()){
-                levels.add(new Level(levelToUpdate.getName()));
-            } else {
-                Optional<Level> result = levels.stream().filter(levelInList->levelInList.getId().equals(levelToUpdate.getId())).findFirst();
-                if(result.isPresent()){
-                    Level level = result.get();
-                    level.setName(result.get().getName());
-                }
-            }
-        });
-        updateOrganizationTypeDTO.getLevelsToDelete().forEach(levelToDelete ->{
-            Optional<Level> result = levels.stream().filter(levelInList -> levelInList.getId().equals(levelToDelete)).findFirst();
-            if(result.isPresent()){
-                Level level = result.get();
-                level.setDeleted(true);
-            }
-        });
+        if(!updateOrganizationTypeDTO.getLevelsToDelete().isEmpty()){
+            organizationTypeGraphRepository.removeLevelRelationshipFromOrganizationType(updateOrganizationTypeDTO.getId(),updateOrganizationTypeDTO.getLevelsToDelete());
+        }
+        List<Level> levels = countryGraphRepository.findByAllByLevelId(orgTypeToUpdate.getCountry().getId(), updateOrganizationTypeDTO.getLevelsToUpdate());
         orgTypeToUpdate.setLevels(levels);
         orgTypeToUpdate.setName(updateOrganizationTypeDTO.getName());
         return prepareResponse(save(orgTypeToUpdate));

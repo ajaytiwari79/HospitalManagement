@@ -59,7 +59,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Match (accessPage:AccessPage{isModule:true,active:true}) where not (accessPage)-[:SUB_PAGE]->() with accessPage, ag\n" +
             "Match (accessPage)<-[r:HAS_ACCESS_OF_TABS]-(ag) with accessPage, ag,r\n" +
             "return {name:accessPage.name,id:id(accessPage),selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
-    List<Map<String,Object>> getSelectedAccessPageHierarchy(Long accessGroupId);
+    List<Map<String, Object>> getSelectedAccessPageHierarchy(Long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup),(accessPermission:AccessPermission) where id(accessPermission)={0} AND id(accessGroup)={1}\n" +
             "Match (accessGroup)-[r:" + HAS_ACCESS_OF_TABS + "{isEnabled:true}]->(accessPage:AccessPage) with accessPage,r,accessPermission\n" +
@@ -167,22 +167,22 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "UNWIND listOfPage as page\n" +
             "MERGE (c)-[r:HAS_ACCESS_FOR_ORG_CATEGORY]->(page)\n" +
             "ON CREATE SET r.accessibleForHub = (CASE WHEN {2}='HUB' THEN {3} ELSE false END), \n" +
-            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE false END), \n"+
+            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE false END), \n" +
             "r.accessibleForOrganization= (CASE WHEN {2}='ORGANIZATION' THEN {3} ELSE false END)\n" +
-            "ON MATCH SET r.accessibleForHub = (CASE WHEN {2}='HUB' THEN {3} ELSE r.accessibleForHub  END), \n"+
-            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE r.accessibleForUnion  END),\n"+
+            "ON MATCH SET r.accessibleForHub = (CASE WHEN {2}='HUB' THEN {3} ELSE r.accessibleForHub  END), \n" +
+            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE r.accessibleForUnion  END),\n" +
             "r.accessibleForOrganization= (CASE WHEN {2}='ORGANIZATION' THEN {3} ELSE r.accessibleForOrganization END)\n" +
             " return distinct true")
-    Boolean updateAccessStatusOfCountryByCategory(Long tabId,Long countryId, String organizationCategory, Boolean accessStatus);
+    Boolean updateAccessStatusOfCountryByCategory(Long tabId, Long countryId, String organizationCategory, Boolean accessStatus);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
-            "OPTIONAL Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
+            "OPTIONAL Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
             "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +
             "UNWIND listOfPage as page\n" +
-            "MERGE (c)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]->(page)\n" +
+            "MERGE (c)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]->(page)\n" +
             "ON CREATE SET r.accessibleForHub = {2},r.accessibleForUnion = false,r.accessibleForOrganization=false\n" +
             "ON MATCH  SET r.accessibleForHub = {2} return distinct true")
-    Boolean updateAccessStatusForHubOfCountry(Long tabId,Long countryId, Boolean accessStatus);
+    Boolean updateAccessStatusForHubOfCountry(Long tabId, Long countryId, Boolean accessStatus);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
@@ -224,6 +224,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Match (emp:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization) with collect(org.isKairosHub) as hubList\n" +
             "return true in hubList")
     Boolean isHubMember(Long userId);
+
     // For Test Cases
     @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage return accessPage LIMIT 1")
     AccessPage getOneMainModule();
