@@ -48,6 +48,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -480,7 +481,7 @@ public class UnitPositionService extends UserBaseService {
         timebankWrapper.setCountryId(countryId);
         timebankWrapper.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
         timebankWrapper.setWorkingDaysPerWeek(unitPosition.getWorkingDaysInWeek());
-        timebankWrapper.setUnitPositionDate(new Date(unitPosition.getStartDateMillis()));
+        timebankWrapper.setUnitPositionDate(DateUtil.asLocalDate(new Date(unitPosition.getStartDateMillis())));
         timebankWrapper.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
         return timebankWrapper;
     }

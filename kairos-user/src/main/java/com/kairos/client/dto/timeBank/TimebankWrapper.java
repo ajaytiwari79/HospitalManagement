@@ -1,5 +1,6 @@
 package com.kairos.client.dto.timeBank;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -10,14 +11,14 @@ public class TimebankWrapper {
     private int contractedMinByWeek;
     private int workingDaysPerWeek;
     private Long staffId;
-    private Date unitPositionDate;
+    private LocalDate unitPositionDate;
     private Long countryId;
 
     public TimebankWrapper(Long unitPositionId) {
         this.unitPositionId = unitPositionId;
     }
 
-    public TimebankWrapper(Long unitPositionId, int contractedMinByWeek, int workingDaysPerWeek, Date unitPositionDate) {
+    public TimebankWrapper(Long unitPositionId, int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionDate) {
         this.unitPositionId = unitPositionId;
         this.contractedMinByWeek = contractedMinByWeek;
         this.workingDaysPerWeek = workingDaysPerWeek;
@@ -35,11 +36,11 @@ public class TimebankWrapper {
         this.countryId = countryId;
     }
 
-    public Date getUnitPositionDate() {
+    public LocalDate getUnitPositionDate() {
         return unitPositionDate;
     }
 
-    public void setUnitPositionDate(Date unitPositionDate) {
+    public void setUnitPositionDate(LocalDate unitPositionDate) {
         this.unitPositionDate = unitPositionDate;
     }
 
