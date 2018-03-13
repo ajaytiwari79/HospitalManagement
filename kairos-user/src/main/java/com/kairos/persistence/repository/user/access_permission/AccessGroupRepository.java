@@ -77,7 +77,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     List<Map<String,Object>> setAccessPagePermission(List<Long> accessGroupIds);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={0} WITH accessGroup\n" +
-            "OPTIONAL Match (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage)  WITH accessPage \n" +
+            "Match (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage:AccessPage)  WITH accessPage \n" +
             "Match (orgAccessGroup:AccessGroup) where id(orgAccessGroup)={1} WITH orgAccessGroup,accessPage \n" +
             "create unique (orgAccessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPagePermissionForAccessGroup(Long countryAccessGroupId, Long orgAccessGroupId);
