@@ -35,9 +35,9 @@ public class OrganizationTypeIntegrationTest {
     @Test
     public void createOrganizationTypeForCountry(){
         String baseUrl=getBaseUrl(4L,null);
-        Level level=new Level("testLevel");
-        List<Level> levels=new ArrayList<>();
-        levels.add(level);
+
+        List<Long> levels=new ArrayList<>();
+        levels.add(14L);
         OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO("Mytest", levels);
         HttpEntity<OrganizationTypeDTO> entity = new HttpEntity<>(organizationTypeDTO);
         ResponseEntity<String> response = restTemplate.exchange(

@@ -13,13 +13,13 @@ public class OrganizationTypeDTO {
 
     @NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull")
     private String name;
-    private List<Level> levels;
+    private List<Long> levels;
 
     public OrganizationTypeDTO() {
         //default constructor
     }
 
-    public OrganizationTypeDTO(String name, List<Level> levels) {
+    public OrganizationTypeDTO(String name, List<Long> levels) {
         this.name = name;
         this.levels = levels;
     }
@@ -32,11 +32,11 @@ public class OrganizationTypeDTO {
         this.name = name;
     }
 
-    public List<Level> getLevels() {
+    public List<Long> getLevels() {
         return levels;
     }
 
-    public void setLevels(List<Level> levels) {
+    public void setLevels(List<Long> levels) {
         this.levels = levels;
     }
 }
