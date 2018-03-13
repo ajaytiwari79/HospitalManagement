@@ -115,7 +115,17 @@ public class AccessPageService extends UserBaseService {
         if( !Optional.ofNullable(tabId).isPresent() ){
             return false;
         }
-        return accessPageRepository.updateAccessStatusOfCountryByCategory(tabId, countryId, orgCategoryTabAccessDTO.getOrganizationCategory().toString(), orgCategoryTabAccessDTO.isAccessStatus());
+
+        Boolean isKairosHub = orgCategoryTabAccessDTO.getOrganizationCategory().equals(OrganizationCategory.HUB) ? true : false;
+        Boolean isUnion = orgCategoryTabAccessDTO.getOrganizationCategory().equals(OrganizationCategory.UNION) ? true : false;
+
+        if(orgCategoryTabAccessDTO.isAccessStatus()){
+            accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
+            accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString(), isKairosHub, isUnion);
+        } else {
+            accessGroupRepository.removeAccessPageRelationshipForCountryAccessGroup(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
+            accessGroupRepository.removeAccessPageRelationshipForOrganizationAccessGroup(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString(), isKairosHub, isUnion);
+        }
         /*switch (orgCategoryTabAccessDTO.getOrganizationCategory()){
             case HUB: {
                 return accessPageRepository.updateAccessStatusForHubOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
@@ -128,6 +138,8 @@ public class AccessPageService extends UserBaseService {
             }
         }*/
 //        return false;
+        return accessPageRepository.updateAccessStatusOfCountryByCategory(tabId, countryId, orgCategoryTabAccessDTO.getOrganizationCategory().toString(), orgCategoryTabAccessDTO.isAccessStatus());
+
     }
 
     public void createAccessPageByXml(Tab tab){
