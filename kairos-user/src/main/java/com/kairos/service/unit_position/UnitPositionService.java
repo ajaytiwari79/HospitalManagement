@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.client.TimeBankRestClient;
 import com.kairos.client.dto.timeBank.CTAIntervalDTO;
-import com.kairos.client.dto.timeBank.CostTimeAgreementDTO;
+import com.kairos.client.dto.timeBank.TimebankWrapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
@@ -470,18 +470,18 @@ public class UnitPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    public CostTimeAgreementDTO getUnitPositionCTA(Long unitPositionId, Long unitId) {
+    public TimebankWrapper getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         CTAListQueryResult ctaRuleTemplateQueryResults = costTimeAgreementGraphRepository.getCtaByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-        CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitPositionId);
-        costTimeAgreementDTO.setStaffId(unitPosition.getStaff().getId());
-        costTimeAgreementDTO.setCountryId(countryId);
-        costTimeAgreementDTO.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
-        costTimeAgreementDTO.setWorkingDaysPerWeek(unitPosition.getWorkingDaysInWeek());
-        costTimeAgreementDTO.setUnitPositionDate(new Date(unitPosition.getStartDateMillis()));
-        costTimeAgreementDTO.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
-        return costTimeAgreementDTO;
+        TimebankWrapper timebankWrapper = new TimebankWrapper(unitPositionId);
+        timebankWrapper.setStaffId(unitPosition.getStaff().getId());
+        timebankWrapper.setCountryId(countryId);
+        timebankWrapper.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
+        timebankWrapper.setWorkingDaysPerWeek(unitPosition.getWorkingDaysInWeek());
+        timebankWrapper.setUnitPositionDate(new Date(unitPosition.getStartDateMillis()));
+        timebankWrapper.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
+        return timebankWrapper;
     }
 
     public List<com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO> getCtaRuleTemplateDtos(CTAListQueryResult ctaListQueryResult){

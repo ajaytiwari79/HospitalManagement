@@ -3,7 +3,7 @@ package com.kairos.client.dto.timeBank;
 import java.util.Date;
 import java.util.List;
 
-public class CostTimeAgreementDTO {
+public class TimebankWrapper {
 
     private Long unitPositionId;
     private List<CTARuleTemplateBasicDTO> ctaRuleTemplates;
@@ -13,18 +13,18 @@ public class CostTimeAgreementDTO {
     private Date unitPositionDate;
     private Long countryId;
 
-    public CostTimeAgreementDTO(Long unitPositionId) {
+    public TimebankWrapper(Long unitPositionId) {
         this.unitPositionId = unitPositionId;
     }
 
-    public CostTimeAgreementDTO(Long unitPositionId, int contractedMinByWeek, int workingDaysPerWeek, Date unitPositionDate) {
+    public TimebankWrapper(Long unitPositionId, int contractedMinByWeek, int workingDaysPerWeek, Date unitPositionDate) {
         this.unitPositionId = unitPositionId;
         this.contractedMinByWeek = contractedMinByWeek;
         this.workingDaysPerWeek = workingDaysPerWeek;
         this.unitPositionDate = unitPositionDate;
     }
 
-    public CostTimeAgreementDTO() {
+    public TimebankWrapper() {
     }
 
     public Long getCountryId() {
