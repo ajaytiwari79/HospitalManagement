@@ -1,29 +1,27 @@
 package com.kairos.client.dto.timeBank;
 
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
-
 import java.util.Date;
 import java.util.List;
 
 public class CostTimeAgreementDTO {
 
-    private Long unitEmploymentPositionId;
+    private Long unitPositionId;
     private List<CTARuleTemplateBasicDTO> ctaRuleTemplates;
     private int contractedMinByWeek;
     private int workingDaysPerWeek;
     private Long staffId;
-    private Date unitEmploymentPositionDate;
+    private Date unitPositionDate;
     private Long countryId;
 
-    public CostTimeAgreementDTO(Long unitEmploymentPositionId) {
-        this.unitEmploymentPositionId = unitEmploymentPositionId;
+    public CostTimeAgreementDTO(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
     }
 
-    public CostTimeAgreementDTO(Long unitEmploymentPositionId, int contractedMinByWeek, int workingDaysPerWeek, Date unitEmploymentPositionDate) {
-        this.unitEmploymentPositionId = unitEmploymentPositionId;
+    public CostTimeAgreementDTO(Long unitPositionId, int contractedMinByWeek, int workingDaysPerWeek, Date unitPositionDate) {
+        this.unitPositionId = unitPositionId;
         this.contractedMinByWeek = contractedMinByWeek;
         this.workingDaysPerWeek = workingDaysPerWeek;
-        this.unitEmploymentPositionDate = unitEmploymentPositionDate;
+        this.unitPositionDate = unitPositionDate;
     }
 
     public CostTimeAgreementDTO() {
@@ -37,12 +35,12 @@ public class CostTimeAgreementDTO {
         this.countryId = countryId;
     }
 
-    public Date getUnitEmploymentPositionDate() {
-        return unitEmploymentPositionDate;
+    public Date getUnitPositionDate() {
+        return unitPositionDate;
     }
 
-    public void setUnitEmploymentPositionDate(Date unitEmploymentPositionDate) {
-        this.unitEmploymentPositionDate = unitEmploymentPositionDate;
+    public void setUnitPositionDate(Date unitPositionDate) {
+        this.unitPositionDate = unitPositionDate;
     }
 
     public Long getStaffId() {
@@ -69,12 +67,12 @@ public class CostTimeAgreementDTO {
         this.workingDaysPerWeek = workingDaysPerWeek;
     }
 
-    public Long getUnitEmploymentPositionId() {
-        return unitEmploymentPositionId;
+    public Long getUnitPositionId() {
+        return unitPositionId;
     }
 
-    public void setUnitEmploymentPositionId(Long unitEmploymentPositionId) {
-        this.unitEmploymentPositionId = unitEmploymentPositionId;
+    public void setUnitPositionId(Long unitPositionId) {
+        this.unitPositionId = unitPositionId;
     }
 
     public List<CTARuleTemplateBasicDTO> getCtaRuleTemplates() {

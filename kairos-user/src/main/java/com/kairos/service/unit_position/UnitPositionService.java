@@ -3,8 +3,8 @@ package com.kairos.service.unit_position;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.client.TimeBankRestClient;
 import com.kairos.client.dto.timeBank.CTAIntervalDTO;
-import com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO;
 import com.kairos.client.dto.timeBank.CostTimeAgreementDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -102,6 +102,8 @@ public class UnitPositionService extends UserBaseService {
     private WTAService wtaService;
     @Inject
     private ClientGraphRepository clientGraphRepository;
+    @Inject
+    private TimeBankRestClient timeBankRestClient;
 
 
     public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
@@ -132,7 +134,7 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setUnit(organization);
         save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
-
+        timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(),id));
 
         return unitPositionQueryResult;
     }
@@ -468,16 +470,16 @@ public class UnitPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    public CostTimeAgreementDTO getUnitEmploymentPositionCTA(Long unitEmploymentPositionId,Long unitId) {
-        UnitPosition unitEmploymentPosition = unitPositionGraphRepository.findOne(unitEmploymentPositionId);
-        CTAListQueryResult ctaRuleTemplateQueryResults = costTimeAgreementGraphRepository.getCtaByUnitEmploymentPositionId(unitEmploymentPositionId);
+    public CostTimeAgreementDTO getUnitPositionCTA(Long unitPositionId, Long unitId) {
+        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
+        CTAListQueryResult ctaRuleTemplateQueryResults = costTimeAgreementGraphRepository.getCtaByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-        CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitEmploymentPositionId);
-        costTimeAgreementDTO.setStaffId(unitEmploymentPosition.getStaff().getId());
+        CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitPositionId);
+        costTimeAgreementDTO.setStaffId(unitPosition.getStaff().getId());
         costTimeAgreementDTO.setCountryId(countryId);
-        costTimeAgreementDTO.setContractedMinByWeek(unitEmploymentPosition.getTotalWeeklyMinutes());
-        costTimeAgreementDTO.setWorkingDaysPerWeek(unitEmploymentPosition.getWorkingDaysInWeek());
-        costTimeAgreementDTO.setUnitEmploymentPositionDate(new Date(unitEmploymentPosition.getStartDateMillis()));
+        costTimeAgreementDTO.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
+        costTimeAgreementDTO.setWorkingDaysPerWeek(unitPosition.getWorkingDaysInWeek());
+        costTimeAgreementDTO.setUnitPositionDate(new Date(unitPosition.getStartDateMillis()));
         costTimeAgreementDTO.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
         return costTimeAgreementDTO;
     }
