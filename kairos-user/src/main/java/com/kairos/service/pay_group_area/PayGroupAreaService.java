@@ -118,7 +118,7 @@ public class PayGroupAreaService extends UserBaseService {
                     }
                     else {
                         logger.info("e");
-                        throw new ActionNotPermittedException("Overlap date range");
+                        throw new ActionNotPermittedException("Overlap date range"+new DateTime(payGroupAreaDTO.getEndDateMillis())+" "+(new DateTime(payGroupAreas.get(i).getStartDateMillis())));
                     }
 
                 }
