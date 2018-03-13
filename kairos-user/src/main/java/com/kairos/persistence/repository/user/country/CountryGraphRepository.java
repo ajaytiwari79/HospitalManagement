@@ -211,6 +211,6 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     List<EmploymentType> getEmploymentTypeByCountry(long countryId, Boolean isDeleted);
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} and id(level) IN {1}return level")
-    List<Level> findByLevelIds(Long countryId,List<Long> levelIds);
+    List<Level> findByAllByLevelId(Long countryId,List<Long> levelIds);
 
 }
