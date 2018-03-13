@@ -92,6 +92,11 @@ public class PayGroupAreaService extends UserBaseService {
         return payGroupAreaDTO;
     }
 
+    private void getAllPayGroupAreaByLevelAndMunicipality(Long levelId, Long municipalityId) {
+        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findPayGroupAreaByLevelAndMunicipality(levelId, municipalityId);
+        logger.info(payGroupAreas.size() + "");
+    }
+
     public boolean deletePayGroupArea(Long payGroupAreaId) {
         PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
         if (!Optional.ofNullable(payGroupArea).isPresent()) {
@@ -117,7 +122,6 @@ public class PayGroupAreaService extends UserBaseService {
         if (country == null) {
             throw new InternalError("Invalid country id");
         }
-
         List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
         List<Municipality> municipalities = municipalityGraphRepository.getMunicipalityByCountryId(countryId);
         List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaByCountry(countryId);

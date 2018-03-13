@@ -22,4 +22,9 @@ public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGrou
             "RETURN  id(payGroupArea) as id,payGroupArea.name as name,payGroupArea.description as description, id(municipality) as municipalityId, " +
             "id(level) as levelId,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis")
     List<PayGroupAreaQueryResult> getPayGroupAreaByCountry(Long countryId);
+
+    @Query("MATCH (level:Level)-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(level)={0} AND id(municipality)={1}\n" +
+            "RETURN  id(payGroupArea) as id,payGroupArea.name as name,payGroupArea.description as description, id(municipality) as municipalityId, " +
+            "id(level) as levelId,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis")
+    List<PayGroupArea> findPayGroupAreaByLevelAndMunicipality(Long levelId, Long municipalityId);
 }
