@@ -121,10 +121,10 @@ public class AccessPageService extends UserBaseService {
 
         if(orgCategoryTabAccessDTO.isAccessStatus()){
             accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
-            accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString(), isKairosHub, isUnion);
+            accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, countryId, isKairosHub, isUnion);
         } else {
             accessGroupRepository.removeAccessPageRelationshipForCountryAccessGroup(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
-            accessGroupRepository.removeAccessPageRelationshipForOrganizationAccessGroup(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString(), isKairosHub, isUnion);
+            accessGroupRepository.removeAccessPageRelationshipForOrganizationAccessGroup(tabId, countryId, isKairosHub, isUnion);
         }
         /*switch (orgCategoryTabAccessDTO.getOrganizationCategory()){
             case HUB: {
