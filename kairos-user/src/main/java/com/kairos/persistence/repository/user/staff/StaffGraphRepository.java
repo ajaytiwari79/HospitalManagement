@@ -288,7 +288,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "return  id(staff) as id,user.gender as gender,staff.profilePic as profilePic, contactAddress.city as city,contactAddress.province as province , staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.organizationId as organizationId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName")
     List<StaffPersonalDetailDTO> getStaffInfoById(long unitId, long staffId);
 
-    @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition)-[:IN_UNIT]-(organization:Organization) where id(organization)={0}\n" +
+    @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization:Organization) where id(organization)={0}\n" +
             "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff\n" +
             "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)\n" +
             "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType,contactAddress, staff, user\n" +
@@ -296,7 +296,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     List<StaffPersonalDetailDTO> getAllStaffHavingUnitPositionByUnitId(long unitId, String imageUrl);
 
 
-    @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition)-[:IN_UNIT]-(organization:Organization) where id(organization)={0}\n" +
+    @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization:Organization) where id(organization)={0}\n" +
             "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff\n" +
             "optional MATCH(staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition)-[:IN_UNIT]-(organization) " +
             "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)\n" +
@@ -306,7 +306,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
 
     @Query("match (organization:Organization)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff) where id(organization)={0} \n" +
             "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff\n" +
-            "optional MATCH(staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition)-[:IN_UNIT]-(organization)" +
+            "optional MATCH(staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization)" +
             "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType, staff, user,unitPos \n" +
             "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)  with engineerType, staff,contactAddress, user ,count(unitPos) as unitPosition \n" +
             "return  distinct id(staff) as id,case  when unitPosition > 0 then TRUE else false end as unitPosition , contactAddress.city as city,contactAddress.province as province ,staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName,user.age as age, user.gender as gender, {1} + staff.profilePic as profilePic, id(engineerType) as engineerType")

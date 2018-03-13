@@ -1,6 +1,7 @@
 package com.kairos.service.pay_group_area;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
@@ -15,6 +16,8 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaResponse;
 import com.kairos.service.UserBaseService;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,6 +60,7 @@ public class PayGroupAreaService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid municipality id " + payGroupAreaDTO.getMunicipalityId());
         }
         // Pay group area is already created Need to make a relationship with the new Municipality with pay group area
+        getAllPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO);
         if (Optional.ofNullable(payGroupAreaDTO.getId()).isPresent()) {
             PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaDTO.getId());
             if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
@@ -76,7 +80,7 @@ public class PayGroupAreaService extends UserBaseService {
             PayGroupAreaMunicipalityRelationship municipalityRelationship
                     = new PayGroupAreaMunicipalityRelationship(payGroupArea, municipality.get(),
                     payGroupAreaDTO.getStartDateMillis().getTime(), payGroupAreaDTO.getEndDateMillis().getTime());
-            payGroupAreaRelationshipRepository.save(municipalityRelationship);
+            //  payGroupAreaRelationshipRepository.save(municipalityRelationship);
 
 
         }
@@ -92,9 +96,41 @@ public class PayGroupAreaService extends UserBaseService {
         return payGroupAreaDTO;
     }
 
-    private void getAllPayGroupAreaByLevelAndMunicipality(Long levelId, Long municipalityId) {
-        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findPayGroupAreaByLevelAndMunicipality(levelId, municipalityId);
-        logger.info(payGroupAreas.size() + "");
+    private void getAllPayGroupAreaByLevelAndMunicipality(PayGroupAreaDTO payGroupAreaDTO) {
+        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.findPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO.getLevelId(), payGroupAreaDTO.getMunicipalityId());
+        for (int i = 0; i < payGroupAreas.size(); i++) {
+            if (payGroupAreaDTO.getEndDateMillis() != null) {
+                if (payGroupAreas.get(i).getEndDateMillis() != null) {
+                    if (new DateTime(payGroupAreas.get(i).getStartDateMillis()).isAfter(new DateTime(payGroupAreaDTO.getEndDateMillis()))
+                            || new DateTime(payGroupAreas.get(i).getEndDateMillis()).isBefore(new DateTime(payGroupAreaDTO.getStartDateMillis()))) {
+                        continue;
+                    } else {
+                        throw new ActionNotPermittedException("Overlap date range" + new DateTime(payGroupAreas.get(i).getStartDateMillis())
+                                + " " + (new DateTime(payGroupAreaDTO.getEndDateMillis())) + " " + new DateTime(payGroupAreas.get(i).getEndDateMillis()) + " " + (new DateTime(payGroupAreaDTO.getStartDateMillis())));
+                    }
+                } else {
+                    //current db object have null end date.
+                    logger.info(" CASE 1: current object have both end date and start date");
+                    if (new DateTime(payGroupAreaDTO.getEndDateMillis()).isBefore(new DateTime(payGroupAreas.get(i).getStartDateMillis()))) {
+                        //going to update the end date in db
+                        Long dateOneDayLessStartDate = payGroupAreaDTO.getStartDateMillis().getTime() - (24 * 60 * 60 * 1000);
+                        payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupAreas.get(i).getId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
+                    }
+                    else {
+                        logger.info("e");
+                        throw new ActionNotPermittedException("Overlap date range");
+                    }
+
+                }
+            } else {
+                if (payGroupAreas.get(i).getEndDateMillis() != null) {
+                    logger.info(" CASE 3,2,4: current object have both end date and start date");
+                } else {
+                    logger.info(" CASE 1,2,6: current object have both end date and start date");
+                }
+            }
+        }
+
     }
 
     public boolean deletePayGroupArea(Long payGroupAreaId) {
