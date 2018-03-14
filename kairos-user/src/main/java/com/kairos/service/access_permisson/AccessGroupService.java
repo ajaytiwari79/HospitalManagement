@@ -234,9 +234,11 @@ public class AccessGroupService extends UserBaseService {
 
         List<Map<String, Object>> accessPages;
         if(parent == null){
-            accessPages = accessPageRepository.getAccessPageByAccessGroup(unitId,unitId,staffId,accessGroupId);
+//            accessPages = accessPageRepository.getAccessPageByAccessGroup(unitId,unitId,staffId,accessGroupId);
+            accessPages = accessPageRepository.getAccessPagePermissionOfStaff(unitId,unitId,staffId,accessGroupId);
         } else {
-            accessPages = accessPageRepository.getAccessPageByAccessGroup(parent.getId(),unitId,staffId,accessGroupId);
+//            accessPages = accessPageRepository.getAccessPageByAccessGroup(parent.getId(),unitId,staffId,accessGroupId);
+            accessPages = accessPageRepository.getAccessPagePermissionOfStaff(parent.getId(),unitId,staffId,accessGroupId);
         }
         ObjectMapper objectMapper = new ObjectMapper();
         List<AccessPageQueryResult> queryResults = new ArrayList<>();
@@ -322,11 +324,29 @@ public class AccessGroupService extends UserBaseService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-        if(parent == null){
+        AccessPageQueryResult readAndWritePermission = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPermissionDTO.getPageId());
+
+        Boolean write = accessPermissionDTO.isWrite();
+        Boolean read = accessPermissionDTO.isWrite() ? true : accessPermissionDTO.isRead();
+        if(readAndWritePermission.isRead() == read  && readAndWritePermission.isWrite() == write){
+            // CHECK if custom permission exist and then delete
+            accessGroupRepository.deleteCustomPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),read,write);
+        } else {
+            if(parent == null){
+//                accessGroupRepository.setPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
+                accessGroupRepository.setCustomPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),read,write);
+            } else {
+//                accessGroupRepository.setPermissionForTab(parent.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
+                accessGroupRepository.setCustomPermissionForTab(parent.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),read,write);
+            }
+        }
+        /*if(parent == null){
             accessGroupRepository.setPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
+            accessGroupRepository.setCustomPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
         } else {
             accessGroupRepository.setPermissionForTab(parent.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
-        }
+            accessGroupRepository.setCustomPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
+        }*/
     }
 
     private void assignPermissionOnNewUnit(Long organizationId,Long unitId){

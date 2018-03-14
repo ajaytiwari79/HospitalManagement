@@ -149,6 +149,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_WAGES = "HAS_WAGES";
     public final static String HAS_ACCESS_PAGE_PERMISSION = "HAS_ACCESS_PAGE_PERMISSION";
     public final static String HAS_ACCESS_GROUP = "HAS_ACCESS_GROUP";
+    public final static String HAS_CUSTOMIZED_PERMISSION = "HAS_CUSTOMIZED_PERMISSION";
     public final static String HAS_ACCESS_PERMISSION = "HAS_ACCESS_PERMISSION";
     public final static String HAS_SUB_TYPE = "HAS_SUB_TYPE";
     public final static String HAS_REGIONS = "HAS_REGIONS";
