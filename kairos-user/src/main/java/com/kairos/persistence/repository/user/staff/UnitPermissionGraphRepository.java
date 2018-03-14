@@ -51,20 +51,20 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
             "Match (organization)-[:" + HAS_EMPLOYMENTS + "]->(employment:Employment)-[:BELONGS_TO]->(staff) with employment\n" +
             "Match (employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission) with unitPermission\n" +
             "match (unitPermission)-[r:" + APPLICABLE_IN_UNIT + "]->(unit:Organization) where id(unit)={1} with unitPermission\n" +
-            "Match (unitPermission)-[r:" + HAS_ACCESS_PERMISSION + "]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) where id(accessGroup)={3} detach delete unitPermission ,r ")
+            "Match (unitPermission)-[r:"+ HAS_ACCESS_GROUP +"]->(accessGroup:AccessGroup) where id(accessGroup)={3} detach delete unitPermission ,r ")
     void updateUnitPermission(long organizationId, long unitId, long staffId, long accessGroupId, boolean isEnabled);
 
     @Query("Match (unitPermission:UnitPermission),(accessPermission:AccessPermission) where id(unitPermission)={0} AND id(accessPermission)={1}\n" +
             "Create (unitPermission)-[r:" + HAS_ACCESS_PERMISSION + "{isEnabled:true}]->(accessPermission) return count(r) as count")
     int linkUnitPermissionWithAccessPermission(long unitPermissionId, long accessPermissionId);
-
-
+    
     @Query("Match (organization:Organization),(staff:Staff) where id(organization)={0} AND id(staff)={2} with organization,staff \n" +
             "Match (organization)-[:HAS_EMPLOYMENTS]->(employment:Employment)-[:BELONGS_TO]->(staff)  \n" +
             "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)\n" +
             "match(unitPermission)-[:APPLICABLE_IN_UNIT]-(co:Organization) where id(co)={1}\n" +
+            "Match (unitPermission)-[:HAS_ACCESS_PERMISSION]-(ap:AccessPermission)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(organization)  WHERE id(ag)={3}\n" +
             "return  unitPermission")
-    UnitPermission checkUnitPermissionOfStaff(Long parentOrganizationId, Long organizationId, Long staffId);
+    UnitPermission checkUnitPermissionOfStaff(Long parentOrganizationId, Long organizationId, Long staffId, Long accessGroupId);
 
     // forg parent organization
     @Query("Match (organization:Organization),(staff:Staff) where id(organization)={0} AND id(staff)={1} with organization,staff \n" +

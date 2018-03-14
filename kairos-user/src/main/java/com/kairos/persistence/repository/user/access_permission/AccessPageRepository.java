@@ -74,6 +74,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "return {name:accessPage.name,id:id(accessPage),read:r.read, write:r.write,selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
     List<Map<String,Object>> getSelectedAccessPageHierarchy(Long accessGroupId);
 
+
     @Query("Match (accessGroup:AccessGroup),(accessPermission:AccessPermission) where id(accessPermission)={0} AND id(accessGroup)={1}\n" +
             "Match (accessGroup)-[r:" + HAS_ACCESS_OF_TABS + "{isEnabled:true}]->(accessPage:AccessPage) with accessPage,r,accessPermission\n" +
             "Create unique (accessPermission)-[:" + HAS_ACCESS_PAGE_PERMISSION + "{isEnabled:r.isEnabled,isRead:true,isWrite:false}]->(accessPage) return accessPermission")
@@ -109,8 +110,9 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     @Query("MATCH (n:Organization)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(n)={0} AND  id(staff)={2}\n" +
             "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={1}\n" +
             "Match (unitPermission)-[:HAS_ACCESS_GROUP]->(g:AccessGroup) where id(g)={3} with g,unitPermission\n" +
-            "Match (g)-[:HAS_ACCESS_OF_TABS{isEnabled:true}]->(accessPage:AccessPage{isModule:true}) with accessPage,g,unitPermission\n" +
-            "MATCH path=(accessPage)-[:SUB_PAGE*]->() WITH NODES(path) AS np,g as g,unitPermission as unitPermission with REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1],g:g,unitPermission:unitPermission}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with distinct ps.g as g,ps as ps,ps.unitPermission as unitPermission\n" +
+            "Match (g)-[:HAS_ACCESS_OF_TABS]->(accessPage:AccessPage{isModule:true}) with accessPage,g,unitPermission\n" +
+            "MATCH path=(accessPage)-[:SUB_PAGE*]->(accessPage1:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) \n" +
+            "WITH NODES(path) AS np,g as g,unitPermission as unitPermission with REDUCE(s=[], i IN RANGE(0, LENGTH(np)-3, 1) | s + {p:np[i], c:np[i+1],g:g,unitPermission:unitPermission}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with distinct ps.g as g,ps as ps,ps.unitPermission as unitPermission\n" +
             "optional match (parent:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) where id(parent)=id(ps.p) \n" +
             "optional match (unitPermission)<-[parentCustomRel:HAS_CUSTOMIZED_PERMISSION]-(parent:AccessPage)\n" +
             "where id(parent)=id(ps.p) with r,parentCustomRel,ps,unitPermission,g\n" +
@@ -118,11 +120,11 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "optional match (unitPermission)<-[childCustomRel:HAS_CUSTOMIZED_PERMISSION]-(child:AccessPage)\n" +
             "where id(child)=id(ps.c) with r,r2,parentCustomRel,childCustomRel,ps\n" +
             "return {name:ps.p.name,id:id(ps.p),\n" +
-            "read:CASE WHEN parentCustomRel IS NULL THEN r.isRead ELSE parentCustomRel.read END ,\n" +
-            "write:CASE WHEN parentCustomRel IS NULL THEN r.isWrite ELSE parentCustomRel.write END,module:ps.p.isModule,moduleId:ps.p.moduleId,\n" +
+            "read:CASE WHEN parentCustomRel IS NULL THEN r.read ELSE parentCustomRel.read END ,\n" +
+            "write:CASE WHEN parentCustomRel IS NULL THEN r.write ELSE parentCustomRel.write END,module:ps.p.isModule,moduleId:ps.p.moduleId,\n" +
             "children:collect( distinct {name:ps.c.name,id:id(ps.c),moduleId:ps.c.moduleId,\n" +
-            "read:CASE WHEN parentCustomRel IS NULL THEN r2.isRead ELSE childCustomRel.isRead END,\n" +
-            "write:CASE WHEN parentCustomRel IS NULL THEN r2.isWrite ELSE childCustomRel.isWrite END})} as data")
+            "read:CASE WHEN parentCustomRel IS NULL THEN r2.read ELSE childCustomRel.read END,\n" +
+            "write:CASE WHEN parentCustomRel IS NULL THEN r2.write ELSE childCustomRel.write END})} as data")
     List<Map<String, Object>> getAccessPagePermissionOfStaff(long orgId, long unitId, long staffId, long accessGroupId);
 
 
@@ -204,22 +206,22 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "UNWIND listOfPage as page\n" +
             "MERGE (c)-[r:HAS_ACCESS_FOR_ORG_CATEGORY]->(page)\n" +
             "ON CREATE SET r.accessibleForHub = (CASE WHEN {2}='HUB' THEN {3} ELSE false END), \n" +
-            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE false END), \n"+
+            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE false END), \n" +
             "r.accessibleForOrganization= (CASE WHEN {2}='ORGANIZATION' THEN {3} ELSE false END)\n" +
-            "ON MATCH SET r.accessibleForHub = (CASE WHEN {2}='HUB' THEN {3} ELSE r.accessibleForHub  END), \n"+
-            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE r.accessibleForUnion  END),\n"+
+            "ON MATCH SET r.accessibleForHub = (CASE WHEN {2}='HUB' THEN {3} ELSE r.accessibleForHub  END), \n" +
+            "r.accessibleForUnion = (CASE WHEN {2}='UNION' THEN {3} ELSE r.accessibleForUnion  END),\n" +
             "r.accessibleForOrganization= (CASE WHEN {2}='ORGANIZATION' THEN {3} ELSE r.accessibleForOrganization END)\n" +
             " return distinct true")
-    Boolean updateAccessStatusOfCountryByCategory(Long tabId,Long countryId, String organizationCategory, Boolean accessStatus);
+    Boolean updateAccessStatusOfCountryByCategory(Long tabId, Long countryId, String organizationCategory, Boolean accessStatus);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
-            "OPTIONAL Match (n)-[:"+SUB_PAGE+"*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
+            "OPTIONAL Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
             "MATCH (c:Country) WHERE id(c)={1} WITH c, listOfPage\n" +
             "UNWIND listOfPage as page\n" +
-            "MERGE (c)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]->(page)\n" +
+            "MERGE (c)-[r:" + HAS_ACCESS_FOR_ORG_CATEGORY + "]->(page)\n" +
             "ON CREATE SET r.accessibleForHub = {2},r.accessibleForUnion = false,r.accessibleForOrganization=false\n" +
             "ON MATCH  SET r.accessibleForHub = {2} return distinct true")
-    Boolean updateAccessStatusForHubOfCountry(Long tabId,Long countryId, Boolean accessStatus);
+    Boolean updateAccessStatusForHubOfCountry(Long tabId, Long countryId, Boolean accessStatus);
 
     @Query("Match (n:AccessPage) where id(n)={0} with n \n" +
             "OPTIONAL Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage)  with collect(subPage)+collect(n) as coll unwind coll as pages with distinct pages with collect(pages) as listOfPage \n" +
@@ -261,6 +263,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Match (emp:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization) with collect(org.isKairosHub) as hubList\n" +
             "return true in hubList")
     Boolean isHubMember(Long userId);
+
     // For Test Cases
     @Query("Match (accessPage:AccessPage{isModule:true}) WITH accessPage return accessPage LIMIT 1")
     AccessPage getOneMainModule();

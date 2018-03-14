@@ -328,7 +328,7 @@ public class AccessGroupService extends UserBaseService {
 
         Boolean write = accessPermissionDTO.isWrite();
         Boolean read = accessPermissionDTO.isWrite() ? true : accessPermissionDTO.isRead();
-        if(readAndWritePermission.isRead() == read  && readAndWritePermission.isWrite() == write){
+        if(Optional.ofNullable(readAndWritePermission).isPresent() && readAndWritePermission.isRead() == read  && readAndWritePermission.isWrite() == write){
             // CHECK if custom permission exist and then delete
             accessGroupRepository.deleteCustomPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),read,write);
         } else {

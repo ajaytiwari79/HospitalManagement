@@ -136,8 +136,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "unwind coll as accessPage with distinct accessPage,accessGroup\n" +
             "Match (n:Organization),(staff:Staff),(accessPage:AccessPage) where id(n)={0} AND id(staff)={1} with n,staff,accessPage,accessGroup\n" +
             "MATCH (n)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff)-[:BELONGS_TO]->(user:User) with user,emp,accessPage,accessGroup\n" +
-            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitEmp:UnitEmployment)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitEmp,accessPage,accessGroup\n" +
-            "Match (unitEmp)-[:HAS_ACCESS_PERMISSION]->(ap:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) with ap,accessPage\n" +
+            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitPermission,accessPage,accessGroup\n" +
+            "Match (unitPermission)-[:HAS_ACCESS_PERMISSION]->(ap:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) with ap,accessPage\n" +
             "Merge (ap)-[r:HAS_ACCESS_PAGE_PERMISSION]->(accessPage)\n" +
             "ON CREATE SET r.isRead={5},r.isWrite={6}\n" +
             "ON MATCH SET  r.isRead={5},r.isWrite={6} return distinct true")

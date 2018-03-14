@@ -1001,20 +1001,37 @@ public class StaffService extends UserBaseService {
         employment.setStaff(staff);
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(unit);
+        unitPermission.setAccessGroup(accessGroup);
         //set permission in unit employment
-        AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
-        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
+//        AccessPermission accessPermission = new AccessPermission(accessGroup);
+//        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
+//        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+//        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
         employment.getUnitPermissions().add(unitPermission);
         save(employment);
-//        if (Optional.ofNullable(organization).isPresent()) {
-//            organization.getEmployments().add(employment);
-//            organizationGraphRepository.save(organization);
-//        } else {
-//            unit.getEmployments().add(employment);
-//            organizationGraphRepository.save(unit);
-//        }
+
+        if (Optional.ofNullable(organization).isPresent()) {
+            if (Optional.ofNullable(organization.getEmployments()).isPresent()) {
+                organization.getEmployments().add(employment);
+                organizationGraphRepository.save(organization);
+            } else {
+                List<Employment> employments = new ArrayList<>();
+                employments.add(employment);
+                organization.setEmployments(employments);
+                organizationGraphRepository.save(organization);
+            }
+        } else {
+            if (Optional.ofNullable(unit.getEmployments()).isPresent()) {
+                unit.getEmployments().add(employment);
+                organizationGraphRepository.save(unit);
+            } else {
+                List<Employment> employments = new ArrayList<>();
+                employments.add(employment);
+                unit.setEmployments(employments);
+                organizationGraphRepository.save(unit);
+            }
+
+        }
 //        if (accessGroup.isTypeOfTaskGiver()) {
 //            Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unit.getId());
 //            if (StringUtils.isBlank(flsCredentials.get("flsDefaultUrl"))) {
