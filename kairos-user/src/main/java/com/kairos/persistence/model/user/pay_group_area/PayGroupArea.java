@@ -32,6 +32,11 @@ public class PayGroupArea extends UserBaseEntity {
         //default constructor
     }
 
+    public PayGroupArea(String name, String description, Level level) {
+        this.name = name;
+        this.description = description;
+        this.level = level;
+    }
 
     public String getName() {
         return name;

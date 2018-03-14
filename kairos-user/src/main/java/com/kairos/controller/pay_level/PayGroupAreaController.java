@@ -42,8 +42,21 @@ public class PayGroupAreaController {
     }
 
     @GetMapping("/pay_group_area")
-    public ResponseEntity<Map<String, Object>> getPayGroup(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.getPayGroupArea(countryId));
+    public ResponseEntity<Map<String, Object>> getPayGroup(@PathVariable Long countryId, @RequestParam Long organizationLevel)
+     {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.getPayGroupArea(countryId, organizationLevel));
+    }
+
+    @DeleteMapping("/remove_pay_group_area/{payGroupAreaId}")
+    public ResponseEntity<Map<String, Object>> deletePayGroupFromMunicipality(@PathVariable Long payGroupAreaId, @RequestParam Long municipalityId, @RequestParam Long relationshipId)
+    {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.deletePayGroupFromMunicipality(payGroupAreaId, municipalityId,relationshipId));
+    }
+
+
+    @GetMapping("/municipality_organization_level")
+    public ResponseEntity<Map<String, Object>> getMunicipalityAndOrganizationLevel(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.getMunicipalityAndOrganizationLevel(countryId));
     }
 
 

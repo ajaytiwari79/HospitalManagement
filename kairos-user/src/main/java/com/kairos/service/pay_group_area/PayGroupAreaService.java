@@ -17,7 +17,6 @@ import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaResponse;
 import com.kairos.service.UserBaseService;
 import org.joda.time.DateTime;
-import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,7 @@ public class PayGroupAreaService extends UserBaseService {
 
     private Logger logger = LoggerFactory.getLogger(PayGroupArea.class);
 
-    public PayGroupAreaDTO savePayGroupArea(Long countryId, PayGroupAreaDTO payGroupAreaDTO) {
+    public PayGroupAreaQueryResult savePayGroupArea(Long countryId, PayGroupAreaDTO payGroupAreaDTO) {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -60,82 +59,122 @@ public class PayGroupAreaService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid municipality id " + payGroupAreaDTO.getMunicipalityId());
         }
         // Pay group area is already created Need to make a relationship with the new Municipality with pay group area
-        getAllPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO);
-        if (Optional.ofNullable(payGroupAreaDTO.getId()).isPresent()) {
-            PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaDTO.getId());
+        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository
+                .findPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO.getLevelId(), payGroupAreaDTO.getMunicipalityId(), -1L);
+
+        validateAllPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO, payGroupAreas);
+        PayGroupArea payGroupArea;
+        if (Optional.ofNullable(payGroupAreaDTO.getPayGroupAreaId()).isPresent()) {
+            payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaDTO.getPayGroupAreaId());
             if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
                 throw new DataNotFoundByIdException("Invalid pay group id");
             }
-
         } else {
             // creating a new Pay group area and creating relationship among them
-            ObjectMapper objectMapper = new ObjectMapper();
-            PayGroupArea payGroupArea = new PayGroupArea();
-            payGroupArea.setId(null);
-            payGroupArea = objectMapper.convertValue(payGroupAreaDTO, PayGroupArea.class);
-            payGroupArea.setLevel(level);
 
+            payGroupArea = new PayGroupArea(payGroupAreaDTO.getName(), payGroupAreaDTO.getDescription(), level);
             payGroupAreaGraphRepository.save(payGroupArea);
             logger.info(payGroupArea.getId().toString());
-            PayGroupAreaMunicipalityRelationship municipalityRelationship
-                    = new PayGroupAreaMunicipalityRelationship(payGroupArea, municipality.get(),
-                    payGroupAreaDTO.getStartDateMillis().getTime(), payGroupAreaDTO.getEndDateMillis().getTime());
-            //  payGroupAreaRelationshipRepository.save(municipalityRelationship);
+        }
+        Long endDateMillis = (payGroupAreaDTO.getEndDateMillis() != null) ? payGroupAreaDTO.getEndDateMillis().getTime() : null;
+        PayGroupAreaMunicipalityRelationship municipalityRelationship = new PayGroupAreaMunicipalityRelationship(payGroupArea, municipality.get(),
+                payGroupAreaDTO.getStartDateMillis().getTime(), endDateMillis);
+        payGroupAreaRelationshipRepository.save(municipalityRelationship);
+        PayGroupAreaQueryResult payGroupAreaQueryResult = new PayGroupAreaQueryResult(payGroupArea, municipalityRelationship, municipality.get());
+        payGroupAreaQueryResult.setId(municipalityRelationship.getId());
+        return payGroupAreaQueryResult;
+    }
 
+    public PayGroupAreaQueryResult updatePayGroupArea(Long payGroupAreaId, PayGroupAreaDTO payGroupAreaDTO) {
+        PayGroupAreaQueryResult payGroupAreaObject = payGroupAreaGraphRepository.findPayGroupAreaByIdAndMunicipality(payGroupAreaDTO.getId(), payGroupAreaId, payGroupAreaDTO.getMunicipalityId());
 
+        Optional<PayGroupAreaMunicipalityRelationship> municipalityRelationship = payGroupAreaRelationshipRepository.findById(payGroupAreaDTO.getId());
+        if (!municipalityRelationship.isPresent()) {
+            logger.info("pay group area not found");
+            throw new DataNotFoundByIdException("Invalid pay group id" + payGroupAreaDTO.getId());
         }
 
-        return payGroupAreaDTO;
+
+        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository
+                .findPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO.getLevelId(), payGroupAreaDTO.getMunicipalityId(), payGroupAreaDTO.getId());
+
+        validateAllPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO, payGroupAreas);
+
+
+        Long endDateMillis = (payGroupAreaDTO.getEndDateMillis() != null) ? payGroupAreaDTO.getEndDateMillis().getTime() : null;
+
+        PayGroupAreaQueryResult payGroupAreaQueryResult;
+        if (!payGroupAreaDTO.getMunicipalityId().equals(municipalityRelationship.get().getMunicipality().getId())) {
+            // user has changed the municipality we need to
+            logger.info(payGroupAreaDTO.getMunicipalityId() + "-----CHANGED-----" + (municipalityRelationship.get().getMunicipality().getId()));
+            Optional<Municipality> municipality = municipalityGraphRepository.findById(payGroupAreaDTO.getMunicipalityId());
+            if (!Optional.ofNullable(municipality).isPresent()) {
+                throw new DataNotFoundByIdException("Invalid municipality id " + payGroupAreaDTO.getMunicipalityId());
+            }
+
+            payGroupAreaGraphRepository.removePayGroupAreaFromMunicipality(payGroupAreaId, municipalityRelationship.get().getMunicipality().getId(), payGroupAreaDTO.getId());
+
+            PayGroupAreaMunicipalityRelationship municipalityNewRelation = new PayGroupAreaMunicipalityRelationship(municipalityRelationship.get().getPayGroupArea(), municipality.get(),
+                    payGroupAreaDTO.getStartDateMillis().getTime(), endDateMillis);
+            municipalityNewRelation.getPayGroupArea().setName(payGroupAreaDTO.getName());
+            municipalityNewRelation.getPayGroupArea().setDescription(payGroupAreaDTO.getDescription());
+            payGroupAreaRelationshipRepository.save(municipalityNewRelation);
+            payGroupAreaQueryResult = new PayGroupAreaQueryResult(municipalityNewRelation.getPayGroupArea(), municipalityNewRelation, municipality.get());
+
+        } else {
+            municipalityRelationship.get().setEndDateMillis(endDateMillis);
+            municipalityRelationship.get().setStartDateMillis(payGroupAreaDTO.getStartDateMillis().getTime());
+            municipalityRelationship.get().getPayGroupArea().setName(payGroupAreaDTO.getName());
+            municipalityRelationship.get().getPayGroupArea().setDescription(payGroupAreaDTO.getDescription());
+            payGroupAreaRelationshipRepository.save(municipalityRelationship.get());
+            payGroupAreaQueryResult = new PayGroupAreaQueryResult(municipalityRelationship.get().getPayGroupArea(), municipalityRelationship.get(), municipalityRelationship.get().getMunicipality());
+            // User hasnt changes the municipacity only related data needs to be changed
+        }
+        return payGroupAreaQueryResult;
     }
 
-    public PayGroupAreaDTO updatePayGroupArea(Long payGroupAreaId, PayGroupAreaDTO payGroupAreaDTO) {
-        PayGroupArea payGroupArea = getPayGroupAreaById(payGroupAreaId);
-        payGroupArea.setName(payGroupArea.getName());
-        save(payGroupArea);
-        //  payGroupAreaDTO.setId(payGroupArea.getId());
-        return payGroupAreaDTO;
-    }
+    private void validateAllPayGroupAreaByLevelAndMunicipality(PayGroupAreaDTO payGroupAreaDTO, List<PayGroupAreaQueryResult> payGroupAreas) {
 
-    private void getAllPayGroupAreaByLevelAndMunicipality(PayGroupAreaDTO payGroupAreaDTO) {
-        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.findPayGroupAreaByLevelAndMunicipality(payGroupAreaDTO.getLevelId(), payGroupAreaDTO.getMunicipalityId());
         for (int i = 0; i < payGroupAreas.size(); i++) {
             if (payGroupAreaDTO.getEndDateMillis() != null) {
                 if (payGroupAreas.get(i).getEndDateMillis() != null) {
-                    if (new DateTime(payGroupAreas.get(i).getStartDateMillis()).isAfter(new DateTime(payGroupAreaDTO.getEndDateMillis()))
-                            || new DateTime(payGroupAreas.get(i).getEndDateMillis()).isBefore(new DateTime(payGroupAreaDTO.getStartDateMillis()))) {
-                        continue;
-                    } else {
+                    if (new DateTime(payGroupAreas.get(i).getStartDateMillis()).isBefore(new DateTime(payGroupAreaDTO.getEndDateMillis()))
+                            && new DateTime(payGroupAreas.get(i).getEndDateMillis()).isAfter(new DateTime(payGroupAreaDTO.getStartDateMillis()))) {
                         throw new ActionNotPermittedException("Overlap date range" + new DateTime(payGroupAreas.get(i).getStartDateMillis())
                                 + " " + (new DateTime(payGroupAreaDTO.getEndDateMillis())) + " " + new DateTime(payGroupAreas.get(i).getEndDateMillis()) + " " + (new DateTime(payGroupAreaDTO.getStartDateMillis())));
                     }
                 } else {
-                    //current db object have null end date.
-                    logger.info(" CASE 1: current object have both end date and start date");
-                    if (new DateTime(payGroupAreaDTO.getEndDateMillis()).isBefore(new DateTime(payGroupAreas.get(i).getStartDateMillis()))) {
-                        //going to update the end date in db
+                    if (new DateTime(payGroupAreaDTO.getEndDateMillis()).isAfter(new DateTime(payGroupAreas.get(i).getStartDateMillis()))) {
                         Long dateOneDayLessStartDate = payGroupAreaDTO.getStartDateMillis().getTime() - (24 * 60 * 60 * 1000);
-                        payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupAreas.get(i).getId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
-                    }
-                    else {
-                        logger.info("e");
-                        throw new ActionNotPermittedException("Overlap date range"+new DateTime(payGroupAreaDTO.getEndDateMillis())+" "+(new DateTime(payGroupAreas.get(i).getStartDateMillis())));
+                        payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupAreas.get(i).getId(),payGroupAreas.get(i).getPayGroupAreaId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
+                    } else {
+                        throw new ActionNotPermittedException("Overlap date range " + new DateTime(payGroupAreaDTO.getEndDateMillis()) + " " + (new DateTime(payGroupAreas.get(i).getStartDateMillis())));
                     }
 
                 }
             } else {
                 if (payGroupAreas.get(i).getEndDateMillis() != null) {
-                    logger.info(" CASE 3,2,4: current object have both end date and start date");
+                    if (new DateTime(payGroupAreas.get(i).getEndDateMillis()).isAfter(new DateTime(payGroupAreaDTO.getStartDateMillis()))) {
+                        throw new ActionNotPermittedException("Overlap date range " + new DateTime(payGroupAreaDTO.getStartDateMillis()) + " old" + (new DateTime(payGroupAreas.get(i).getEndDateMillis())));
+                    }
                 } else {
-                    logger.info(" CASE 1,2,6: current object have both end date and start date");
+                    logger.info(new DateTime(payGroupAreaDTO.getStartDateMillis())+"to create CURRENT -->"+(new DateTime(payGroupAreas.get(i).getStartDateMillis())));
+
+                    if (new DateTime(payGroupAreaDTO.getStartDateMillis()).isAfter(new DateTime(payGroupAreas.get(i).getStartDateMillis()))) {
+                        Long dateOneDayLessStartDate = payGroupAreaDTO.getStartDateMillis().getTime() - (24 * 60 * 60 * 1000);
+                        logger.info(new DateTime(dateOneDayLessStartDate) + " new Date to update--------------");
+                        payGroupAreaGraphRepository.updateEndDateOfPayGroupArea(payGroupAreas.get(i).getId(),payGroupAreas.get(i).getPayGroupAreaId(), payGroupAreaDTO.getMunicipalityId(), dateOneDayLessStartDate);
+                    } else {
+                        throw new ActionNotPermittedException("Overlap date range " + new DateTime(payGroupAreaDTO.getStartDateMillis()) + " " + (new DateTime(payGroupAreas.get(i).getStartDateMillis())));
+                    }
                 }
             }
         }
-
     }
 
     public boolean deletePayGroupArea(Long payGroupAreaId) {
         PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
-        if (!Optional.ofNullable(payGroupArea).isPresent()) {
+        if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
             logger.info("pay group area not found for deletion  ");
             throw new DataNotFoundByIdException("Invalid pay group id");
         }
@@ -144,24 +183,36 @@ public class PayGroupAreaService extends UserBaseService {
         return true;
     }
 
-    private PayGroupArea getPayGroupAreaById(Long payGroupAreaId) {
-        PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
-        if (payGroupArea == null) {
-            throw new DataNotFoundByIdException("Invalid pay group id");
+    public List<PayGroupAreaQueryResult> getPayGroupArea(Long countryId, Long levelId) {
+        Level level = countryGraphRepository.getLevel(countryId, levelId);
+        if (!Optional.ofNullable(level).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid level in country");
         }
-        return payGroupArea;
+        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(levelId);
+        return payGroupAreas;
     }
 
-    public PayGroupAreaResponse getPayGroupArea(Long countryId) {
-
+    public PayGroupAreaResponse getMunicipalityAndOrganizationLevel(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId, 0);
-        if (country == null) {
-            throw new InternalError("Invalid country id");
+        if (!Optional.ofNullable(country).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid country id");
         }
         List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
         List<Municipality> municipalities = municipalityGraphRepository.getMunicipalityByCountryId(countryId);
-        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaByCountry(countryId);
-        PayGroupAreaResponse payGroupArea = new PayGroupAreaResponse(organizationLevels, municipalities, payGroupAreas);
+        PayGroupAreaResponse payGroupArea = new PayGroupAreaResponse(organizationLevels, municipalities);
         return payGroupArea;
     }
+
+
+    public boolean deletePayGroupFromMunicipality(Long payGroupAreaId, Long municipalityId, Long relationshipId) {
+        PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGroupAreaId);
+        if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted() == true) {
+            logger.info("pay group area not found for deletion  ");
+            throw new DataNotFoundByIdException("Invalid pay group id");
+        }
+
+        payGroupAreaGraphRepository.removePayGroupAreaFromMunicipality(payGroupAreaId, municipalityId, relationshipId);
+        return true;
+    }
+
 }

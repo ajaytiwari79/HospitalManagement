@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.pay_group_area;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.user.region.Municipality;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.Date;
@@ -12,9 +13,10 @@ import java.util.Date;
 @QueryResult
 public class PayGroupAreaQueryResult {
     private Long id;
+    private Long payGroupAreaId;
     private String name;
     private String description;
-    private Long municipalityId;
+    private Municipality municipality;
     private Long startDateMillis;
     private Long endDateMillis;
     private Long levelId;
@@ -46,12 +48,12 @@ public class PayGroupAreaQueryResult {
         this.description = description;
     }
 
-    public Long getMunicipalityId() {
-        return municipalityId;
+    public Municipality getMunicipality() {
+        return municipality;
     }
 
-    public void setMunicipalityId(Long municipalityId) {
-        this.municipalityId = municipalityId;
+    public void setMunicipality(Municipality municipality) {
+        this.municipality = municipality;
     }
 
     public Long getStartDateMillis() {
@@ -77,4 +79,24 @@ public class PayGroupAreaQueryResult {
     public void setLevelId(Long levelId) {
         this.levelId = levelId;
     }
+
+    public Long getPayGroupAreaId() {
+        return payGroupAreaId;
+    }
+
+    public void setPayGroupAreaId(Long payGroupAreaId) {
+        this.payGroupAreaId = payGroupAreaId;
+    }
+
+    public PayGroupAreaQueryResult(PayGroupArea payGroupArea, PayGroupAreaMunicipalityRelationship relationship, Municipality municipality) {
+        this.id = relationship.getId();
+        this.payGroupAreaId = payGroupArea.getId();
+        this.name = payGroupArea.getName();
+        this.description = payGroupArea.getDescription();
+        this.municipality = municipality.retrieveBasicDetails();
+        this.startDateMillis = relationship.getStartDateMillis();
+        this.endDateMillis = relationship.getEndDateMillis();
+    }
+
+
 }

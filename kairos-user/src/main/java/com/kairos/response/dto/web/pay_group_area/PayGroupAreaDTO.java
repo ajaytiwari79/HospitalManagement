@@ -21,6 +21,7 @@ import java.util.Set;
 public class PayGroupAreaDTO {
 
     private Long id;
+    private Long payGroupAreaId;
     @NotNull(message = "Name can not be null")
     private String name;
     private String description;
@@ -99,6 +100,14 @@ public class PayGroupAreaDTO {
 
     public void setLevelId(Long levelId) {
         this.levelId = levelId;
+    }
+
+    public Long getPayGroupAreaId() {
+        return payGroupAreaId;
+    }
+
+    public void setPayGroupAreaId(Long payGroupAreaId) {
+        this.payGroupAreaId = payGroupAreaId;
     }
 
     public PayGroupAreaDTO(@NotNull(message = "Name can not be null") String name, String description, Long municipalityId, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull Long levelId) {

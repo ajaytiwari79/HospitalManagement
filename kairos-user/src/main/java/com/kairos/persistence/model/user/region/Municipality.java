@@ -41,6 +41,11 @@ public class Municipality extends UserBaseEntity {
     public Municipality() {
     }
 
+    public Municipality(Long id,String name) {
+        this.name = name;
+        this.id=id;
+    }
+
     public String getGeoFence() {
         return geoFence;
     }
@@ -109,6 +114,9 @@ public class Municipality extends UserBaseEntity {
         response.put("code", this.code);
         response.put("geoFence", this.geoFence);
         return response;
+    }
 
+    public Municipality retrieveBasicDetails() {
+        return new Municipality(this.id, this.name);
     }
 }

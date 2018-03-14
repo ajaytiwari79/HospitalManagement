@@ -1,8 +1,11 @@
 package com.kairos.response.dto.web.pay_group_area;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +13,11 @@ import java.util.List;
 /**
  * Created by vipul on 12/3/18.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PayGroupAreaResponse {
     private List<Level> organizationLevels = new ArrayList<>();
     private List<Municipality> municipalities = new ArrayList<>();
-    private List<PayGroupAreaQueryResult> payGroupAreas = new ArrayList<>();
 
     public PayGroupAreaResponse() {
         // default constructor
@@ -35,17 +39,12 @@ public class PayGroupAreaResponse {
         this.municipalities = municipalities;
     }
 
-    public List<PayGroupAreaQueryResult> getPayGroupAreas() {
-        return payGroupAreas;
-    }
 
-    public void setPayGroupAreas(List<PayGroupAreaQueryResult> payGroupAreas) {
-        this.payGroupAreas = payGroupAreas;
-    }
-
-    public PayGroupAreaResponse(List<Level> organizationLevels, List<Municipality> municipalities, List<PayGroupAreaQueryResult> payGroupAreas) {
+    public PayGroupAreaResponse(List<Level> organizationLevels, List<Municipality> municipalities) {
         this.organizationLevels = organizationLevels;
         this.municipalities = municipalities;
-        this.payGroupAreas = payGroupAreas;
+
     }
+
+
 }

@@ -17,18 +17,27 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGroupArea, Long> {
 
-    @Query("match(country:Country)-[:" + HAS_LEVEL + "]->(level:Level)  where id(country) = {0}\n" +
+    @Query("match(level:Level)  where id(level) = {0}\n" +
             "match(level)-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality)\n" +
-            "RETURN  id(payGroupArea) as id,payGroupArea.name as name,payGroupArea.description as description, id(municipality) as municipalityId, " +
-            "id(level) as levelId,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis")
-    List<PayGroupAreaQueryResult> getPayGroupAreaByCountry(Long countryId);
+            "RETURN  id(payGroupArea) as payGroupAreaId,payGroupArea.name as name,payGroupArea.description as description, municipality as municipality, " +
+            "id(level) as levelId,id(rel) as id,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis")
+    List<PayGroupAreaQueryResult> getPayGroupAreaByOrganizationLevelId(Long organizationLevelId);
 
-    @Query("MATCH (level:Level)-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(level)={0} AND id(municipality)={1}\n" +
-            "RETURN  id(payGroupArea) as id,payGroupArea.name as name,payGroupArea.description as description, id(municipality) as municipalityId, " +
-            "id(level) as levelId,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis")
-    List<PayGroupAreaQueryResult> findPayGroupAreaByLevelAndMunicipality(Long levelId, Long municipalityId);
+    @Query("MATCH (level:Level)-[:" + IN_LEVEL + "]-(payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(level)={0} AND id(municipality)={1} AND id(rel) <> {2}\n" +
+            "RETURN  id(payGroupArea) as payGroupAreaId,payGroupArea.name as name,payGroupArea.description as description,municipality as municipality, " +
+            "id(level) as levelId,id(rel) as id,rel.endDateMillis as endDateMillis,rel.startDateMillis as startDateMillis")
+    List<PayGroupAreaQueryResult> findPayGroupAreaByLevelAndMunicipality(Long levelId, Long municipalityId,Long currentRelationId);
 
-    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(level)={0} AND id(municipality)={1}\n" +
-            "SET rel.endDateMillis ={2}")
-    void updateEndDateOfPayGroupArea(Long payGroupAreaId, Long municipalityId, Long dateOneDayLessStartDate);
+    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(rel)={0} AND id(payGroupArea)={1} AND id(municipality)={2} \n" +
+            "SET rel.endDateMillis ={3}")
+    void updateEndDateOfPayGroupArea(Long id,Long payGroupAreaId, Long municipalityId, Long dateOneDayLessStartDate);
+
+    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(payGroupArea)={0} AND id(municipality)={1} AND id(rel)={2}\n" +
+            "DETACH DELETE rel")
+    void removePayGroupAreaFromMunicipality(Long payGroupAreaId, Long municipalityId, Long relationshipId);
+
+    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false})-[rel:" + HAS_MUNICIPALITY + "]-(municipality:Municipality) where id(rel)={0} AND id(payGroupArea)={1} AND id(municipality)={2}\n" +
+            "RETURN  id(payGroupArea) as payGroupAreaId,payGroupArea.name as name,payGroupArea.description as description,municipality as municipality, " +
+            "rel.endDateMillis as endDateMillis,id(rel) as id,rel.startDateMillis as startDateMillis")
+    PayGroupAreaQueryResult findPayGroupAreaByIdAndMunicipality(Long id,Long payGroupAreaId, Long municipalityId);
 }
