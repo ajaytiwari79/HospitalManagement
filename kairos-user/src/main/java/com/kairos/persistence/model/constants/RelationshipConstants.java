@@ -216,7 +216,8 @@ public abstract class RelationshipConstants {
 
     public final static String IN_UNIT = "IN_UNIT";
     public final static String HAS_ACCESS_FOR_ORG_CATEGORY = "HAS_ACCESS_FOR_ORG_CATEGORY";
-
+    public final static String HAS_MUNICIPALITY = "HAS_MUNICIPALITY";
+    public final static String IN_LEVEL = "IN_LEVEL";
     /**
      * Default constructor
      */
