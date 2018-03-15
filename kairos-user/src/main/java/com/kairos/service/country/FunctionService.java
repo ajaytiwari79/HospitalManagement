@@ -14,7 +14,6 @@ import com.kairos.response.dto.web.FunctionDTO;
 import com.kairos.persistence.model.user.country.FunctionResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;

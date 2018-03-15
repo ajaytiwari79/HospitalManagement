@@ -5,7 +5,6 @@ import com.kairos.persistence.model.user.country.FunctionResponseDTO;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 /**
