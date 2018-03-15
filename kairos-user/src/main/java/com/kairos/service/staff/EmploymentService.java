@@ -155,7 +155,7 @@ public class EmploymentService extends UserBaseService {
         UnitPermission unitPermission = null;
         if (created) {
 
-            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId);
+            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId, accessGroupId);
             if (Optional.ofNullable(unitPermission).isPresent()) {
                 throw new DataNotFoundByIdException("Unit permission already exist" + staffId);
             }

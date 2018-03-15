@@ -3,9 +3,9 @@ package com.kairos.service.unit_position;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.client.TimeBankRestClient;
 import com.kairos.client.dto.timeBank.CTAIntervalDTO;
-import com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO;
-import com.kairos.client.dto.timeBank.CostTimeAgreementDTO;
+import com.kairos.client.dto.timeBank.TimebankWrapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
@@ -48,6 +48,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -102,6 +103,8 @@ public class UnitPositionService extends UserBaseService {
     private WTAService wtaService;
     @Inject
     private ClientGraphRepository clientGraphRepository;
+    @Inject
+    private TimeBankRestClient timeBankRestClient;
 
 
     public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
@@ -114,6 +117,7 @@ public class UnitPositionService extends UserBaseService {
             parentOrganization = organizationService.getParentOfOrganization(organization.getId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(parentOrganization.getId(), unitPositionDTO.getPositionCodeId());
         } else {
+            parentOrganization=organization;
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(organization.getId(), unitPositionDTO.getPositionCodeId());
         }
 
@@ -125,14 +129,14 @@ public class UnitPositionService extends UserBaseService {
         List<UnitPosition> oldUnitPositions = unitPositionGraphRepository.getAllUEPByExpertise(organization.getId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId());
         validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
         UnitPosition unitPosition = new UnitPosition();
-        preparePosition(unitPosition, unitPositionDTO, organization, id, createFromTimeCare);
+        preparePosition(unitPosition, unitPositionDTO, organization, parentOrganization, createFromTimeCare);
 
         unitPosition.setPositionCode(positionCode);
 
         unitPosition.setUnit(organization);
         save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
-
+        timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(),id));
 
         return unitPositionQueryResult;
     }
@@ -221,7 +225,7 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setWorkingTimeAgreement(newWta);
     }
 
-    private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Organization organization, Long unitId, Boolean createFromTimeCare) {
+    private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Organization organization, Organization parentOrganization, Boolean createFromTimeCare) {
 
 
         if (Optional.ofNullable(unitPositionDTO.getUnionId()).isPresent()) {
@@ -251,9 +255,9 @@ public class UnitPositionService extends UserBaseService {
         }
         unitPosition.setExpertise(expertise.get());
 
-        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(organization.getId(), unitPositionDTO.getEmploymentTypeId(), false);
+        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentOrganization.getId(), unitPositionDTO.getEmploymentTypeId(), false);
         if (!Optional.ofNullable(employmentType).isPresent()) {
-            throw new DataNotFoundByIdException("Employment Type does not exist in unit " + employmentType.getId() + " AND " + unitPositionDTO.getEmploymentTypeId());
+            throw new DataNotFoundByIdException("Employment Type does not exist in unit "  + unitPositionDTO.getEmploymentTypeId());
         }
         unitPosition.setEmploymentType(employmentType);
 
@@ -468,18 +472,18 @@ public class UnitPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    public CostTimeAgreementDTO getUnitEmploymentPositionCTA(Long unitEmploymentPositionId,Long unitId) {
-        UnitPosition unitEmploymentPosition = unitPositionGraphRepository.findOne(unitEmploymentPositionId);
-        CTAListQueryResult ctaRuleTemplateQueryResults = costTimeAgreementGraphRepository.getCtaByUnitEmploymentPositionId(unitEmploymentPositionId);
+    public TimebankWrapper getUnitPositionCTA(Long unitPositionId, Long unitId) {
+        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
+        CTAListQueryResult ctaRuleTemplateQueryResults = costTimeAgreementGraphRepository.getCtaByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-        CostTimeAgreementDTO costTimeAgreementDTO = new CostTimeAgreementDTO(unitEmploymentPositionId);
-        costTimeAgreementDTO.setStaffId(unitEmploymentPosition.getStaff().getId());
-        costTimeAgreementDTO.setCountryId(countryId);
-        costTimeAgreementDTO.setContractedMinByWeek(unitEmploymentPosition.getTotalWeeklyMinutes());
-        costTimeAgreementDTO.setWorkingDaysPerWeek(unitEmploymentPosition.getWorkingDaysInWeek());
-        costTimeAgreementDTO.setUnitEmploymentPositionDate(new Date(unitEmploymentPosition.getStartDateMillis()));
-        costTimeAgreementDTO.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
-        return costTimeAgreementDTO;
+        TimebankWrapper timebankWrapper = new TimebankWrapper(unitPositionId);
+        timebankWrapper.setStaffId(unitPosition.getStaff().getId());
+        timebankWrapper.setCountryId(countryId);
+        timebankWrapper.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
+        timebankWrapper.setWorkingDaysPerWeek(unitPosition.getWorkingDaysInWeek());
+        timebankWrapper.setUnitPositionDate(DateUtil.asLocalDate(new Date(unitPosition.getStartDateMillis())));
+        timebankWrapper.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
+        return timebankWrapper;
     }
 
     public List<com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO> getCtaRuleTemplateDtos(CTAListQueryResult ctaListQueryResult){

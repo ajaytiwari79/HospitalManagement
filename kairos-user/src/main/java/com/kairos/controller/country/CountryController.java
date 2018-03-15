@@ -203,7 +203,7 @@ public class CountryController {
     }
 
     @ApiOperation(value = "Update Organization Types")
-    @RequestMapping(value = COUNTRY_URL + "/organization_type", method = RequestMethod.PUT)
+    @RequestMapping(value = COUNTRY_URL + "/organization_type/{organizationTypeId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateOrganizationType(@Validated @RequestBody UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.updateOrganizationType(updateOrganizationTypeDTO));

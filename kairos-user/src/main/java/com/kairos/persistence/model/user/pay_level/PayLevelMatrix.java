@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.pay_level;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 
 import java.util.ArrayList;
 import java.util.List;

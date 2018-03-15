@@ -47,7 +47,6 @@ import javax.inject.Inject;
 import java.util.*;
 
 
-
 /**
  * Created by pawanmandhan on 2/8/17.
  */
@@ -100,6 +99,7 @@ public class WTAService extends UserBaseService {
         if (Optional.ofNullable(wta).isPresent()) {
             throw new DuplicateDataException("Duplicate WTA name" + wtaDTO.getName());
         }
+        wta = new WorkingTimeAgreement();
         // Link tags to WTA
         if (wtaDTO.getTags().size() > 0) {
             List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(wtaDTO.getTags(), MasterDataTypeEnum.WTA);

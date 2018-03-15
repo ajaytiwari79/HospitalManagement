@@ -5,6 +5,7 @@ import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 
 import java.util.List;
 
+
 /**
  * Created by prabjot on 15/11/17.
  */
