@@ -324,11 +324,29 @@ public class AccessGroupService extends UserBaseService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-        AccessPageQueryResult readAndWritePermission = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPermissionDTO.getPageId());
+        AccessPageQueryResult readAndWritePermissionForAccessGroup = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPermissionDTO.getPageId());
+
+        AccessPageQueryResult  customReadAndWritePermissionForAccessGroup = accessPageRepository.getCustomPermissionOfTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessPermissionDTO.getPageId());
+        Boolean savedReadCheck = readAndWritePermissionForAccessGroup.isRead();
+        Boolean savedWriteCheck = readAndWritePermissionForAccessGroup.isWrite();
+        if( Optional.ofNullable(customReadAndWritePermissionForAccessGroup).isPresent()){
+            savedReadCheck = customReadAndWritePermissionForAccessGroup.isRead();
+            savedWriteCheck = customReadAndWritePermissionForAccessGroup.isWrite();
+        }
 
         Boolean write = accessPermissionDTO.isWrite();
-        Boolean read = accessPermissionDTO.isWrite() ? true : accessPermissionDTO.isRead();
-        if(Optional.ofNullable(readAndWritePermission).isPresent() && readAndWritePermission.isRead() == read  && readAndWritePermission.isWrite() == write){
+        Boolean read = accessPermissionDTO.isRead();
+
+        if(savedReadCheck != read && !read){
+            write = false;
+        }
+
+        if(savedWriteCheck != write && write){
+            read = true;
+        }
+
+        // Check if new permissions are different then of Access Group
+        if(Optional.ofNullable(readAndWritePermissionForAccessGroup).isPresent() && readAndWritePermissionForAccessGroup.isRead() == read  && readAndWritePermissionForAccessGroup.isWrite() == write){
             // CHECK if custom permission exist and then delete
             accessGroupRepository.deleteCustomPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),read,write);
         } else {

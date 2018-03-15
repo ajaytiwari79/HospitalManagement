@@ -104,8 +104,21 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     List<Map<String, Object>> getAccessPageByAccessGroup(long orgId, long unitId, long staffId, long accessGroupId);
 
 
-    @Query("Match (accessGroup:AccessGroup{deleted:false})-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessPage:AccessPage) where id(accessPage)={1} AND id(accessGroup)={0} return {read:r.isRead, write:r.isWrite}")
+    @Query("Match (accessGroup:AccessGroup{deleted:false})-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessPage:AccessPage) where id(accessPage)={1} AND id(accessGroup)={0} return r.read as read, r.write as write")
     AccessPageQueryResult getAccessPermissionForAccessPage(Long accessGroupId, Long accessPageId);
+
+
+    @Query("Match (accessPage:AccessPage) where id(accessPage)={3} with accessPage\n" +
+            /*"optional match (accessPage)-[:SUB_PAGE*]->(subPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPage+[subPage] as coll,accessGroup as accessGroup\n" +
+            "unwind coll as accessPage with distinct accessPage,accessGroup\n" +*/
+            "Match (n:Organization),(staff:Staff) where id(n)={0} AND id(staff)={1} with n,staff,accessPage\n" +
+            "MATCH (n)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff)-[:BELONGS_TO]->(user:User) with user,emp,accessPage\n" +
+            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitPermission,accessPage\n" +
+            "Match (unitPermission)-[r:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n" +
+            "RETURN r.read as read, r.write as write")
+    AccessPageQueryResult getCustomPermissionOfTab(long organizationId, long staffId, long unitId, long accessPageId);
+
+
 
     @Query("MATCH (n:Organization)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(n)={0} AND  id(staff)={2}\n" +
             "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={1}\n" +
@@ -114,17 +127,17 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH path=(accessPage)-[:SUB_PAGE*]->(accessPage1:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) \n" +
             "WITH NODES(path) AS np,g as g,unitPermission as unitPermission with REDUCE(s=[], i IN RANGE(0, LENGTH(np)-3, 1) | s + {p:np[i], c:np[i+1],g:g,unitPermission:unitPermission}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps with distinct ps.g as g,ps as ps,ps.unitPermission as unitPermission\n" +
             "optional match (parent:AccessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) where id(parent)=id(ps.p) \n" +
-            "optional match (unitPermission)<-[parentCustomRel:HAS_CUSTOMIZED_PERMISSION]-(parent:AccessPage)\n" +
+            "optional match (unitPermission)-[parentCustomRel:HAS_CUSTOMIZED_PERMISSION]->(parent:AccessPage)\n" +
             "where id(parent)=id(ps.p) with r,parentCustomRel,ps,unitPermission,g\n" +
             "optional match (child:AccessPage)<-[r2:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) where id(child)=id(ps.c)\n" +
-            "optional match (unitPermission)<-[childCustomRel:HAS_CUSTOMIZED_PERMISSION]-(child:AccessPage)\n" +
+            "optional match (unitPermission)-[childCustomRel:HAS_CUSTOMIZED_PERMISSION]->(child:AccessPage)\n" +
             "where id(child)=id(ps.c) with r,r2,parentCustomRel,childCustomRel,ps\n" +
             "return {name:ps.p.name,id:id(ps.p),\n" +
             "read:CASE WHEN parentCustomRel IS NULL THEN r.read ELSE parentCustomRel.read END ,\n" +
             "write:CASE WHEN parentCustomRel IS NULL THEN r.write ELSE parentCustomRel.write END,module:ps.p.isModule,moduleId:ps.p.moduleId,\n" +
             "children:collect( distinct {name:ps.c.name,id:id(ps.c),moduleId:ps.c.moduleId,\n" +
-            "read:CASE WHEN parentCustomRel IS NULL THEN r2.read ELSE childCustomRel.read END,\n" +
-            "write:CASE WHEN parentCustomRel IS NULL THEN r2.write ELSE childCustomRel.write END})} as data")
+            "read:CASE WHEN childCustomRel IS NULL THEN r2.read ELSE childCustomRel.read END,\n" +
+            "write:CASE WHEN childCustomRel IS NULL THEN r2.write ELSE childCustomRel.write END})} as data")
     List<Map<String, Object>> getAccessPagePermissionOfStaff(long orgId, long unitId, long staffId, long accessGroupId);
 
 

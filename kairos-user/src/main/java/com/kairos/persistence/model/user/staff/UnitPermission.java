@@ -32,22 +32,11 @@ public class UnitPermission extends UserBaseEntity {
     @Relationship(type = APPLICABLE_IN_UNIT)
     private Organization organization;
 
-
     @Relationship(type = HAS_ACCESS_GROUP)
     private AccessGroup accessGroup;
 
-    @Relationship(type = HAS_CUSTOMIZED_PERMISSION)
-    private AccessPage accessPage;
 
     public UnitPermission() {
-    }
-
-    public AccessPage getAccessPage() {
-        return accessPage;
-    }
-
-    public void setAccessPage(AccessPage accessPage) {
-        this.accessPage = accessPage;
     }
 
     public String getPlace() {

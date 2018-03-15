@@ -150,8 +150,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH (n)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff)-[:BELONGS_TO]->(user:User) with user,emp,accessPage,accessGroup\n" +
             "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitPermission,accessPage,accessGroup\n" +
            "MERGE (unitPermission)-[r:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n" +
-            "ON CREATE SET r.isRead={5},r.isWrite={6}\n" +
-            "ON MATCH SET r.isRead={5},r.isWrite={6} return distinct true")
+            "ON CREATE SET r.read={5},r.write={6}\n" +
+            "ON MATCH SET r.read={5},r.write={6} return distinct true")
     void setCustomPermissionForTab(long organizationId, long staffId, long unitId, long accessGroupId, long accessPageId, boolean isRead, boolean isWrite);
 
 
@@ -225,4 +225,5 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup {name:{1}}) WHERE id(o)={0} return ag")
     AccessGroup getAccessGroupOfOrganizationByName(long organizationId, String name);
 }
+
 

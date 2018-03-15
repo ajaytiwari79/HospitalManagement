@@ -156,13 +156,17 @@ public class EmploymentService extends UserBaseService {
         if (created) {
 
             unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId, accessGroupId);
-            if (Optional.ofNullable(unitPermission).isPresent()) {
-                throw new DataNotFoundByIdException("Unit permission already exist" + staffId);
+            if(Optional.ofNullable(unitPermission).isPresent() && unitPermissionGraphRepository.checkUnitPermissionLinkedWithAccessGroup(unitPermission.getId(), accessGroupId)) {
+                throw new DataNotFoundByIdException("Unit permission already exist for Access Group" + staffId);
+            } else if(!Optional.ofNullable(unitPermission).isPresent()){
+                unitPermission = new UnitPermission();
+                unitPermission.setOrganization(unit);
+                unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
             }
             AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-            unitPermission = new UnitPermission();
-            unitPermission.setOrganization(unit);
-            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+//            unitPermission = new UnitPermission();
+//            unitPermission.setOrganization(unit);
+//            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
             unitPermission.setAccessGroup(accessGroup);
             employment.getUnitPermissions().add(unitPermission);
             employmentGraphRepository.save(employment);
