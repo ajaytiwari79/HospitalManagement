@@ -48,6 +48,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -116,6 +117,7 @@ public class UnitPositionService extends UserBaseService {
             parentOrganization = organizationService.getParentOfOrganization(organization.getId());
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(parentOrganization.getId(), unitPositionDTO.getPositionCodeId());
         } else {
+            parentOrganization=organization;
             positionCode = positionCodeGraphRepository.getPositionCodeByUnitIdAndId(organization.getId(), unitPositionDTO.getPositionCodeId());
         }
 
@@ -127,7 +129,7 @@ public class UnitPositionService extends UserBaseService {
         List<UnitPosition> oldUnitPositions = unitPositionGraphRepository.getAllUEPByExpertise(organization.getId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId());
         validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
         UnitPosition unitPosition = new UnitPosition();
-        preparePosition(unitPosition, unitPositionDTO, organization, id, createFromTimeCare);
+        preparePosition(unitPosition, unitPositionDTO, organization, parentOrganization, createFromTimeCare);
 
         unitPosition.setPositionCode(positionCode);
 
@@ -223,7 +225,7 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setWorkingTimeAgreement(newWta);
     }
 
-    private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Organization organization, Long unitId, Boolean createFromTimeCare) {
+    private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Organization organization, Organization parentOrganization, Boolean createFromTimeCare) {
 
 
         if (Optional.ofNullable(unitPositionDTO.getUnionId()).isPresent()) {
@@ -253,9 +255,9 @@ public class UnitPositionService extends UserBaseService {
         }
         unitPosition.setExpertise(expertise.get());
 
-        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(organization.getId(), unitPositionDTO.getEmploymentTypeId(), false);
+        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentOrganization.getId(), unitPositionDTO.getEmploymentTypeId(), false);
         if (!Optional.ofNullable(employmentType).isPresent()) {
-            throw new DataNotFoundByIdException("Employment Type does not exist in unit " + employmentType.getId() + " AND " + unitPositionDTO.getEmploymentTypeId());
+            throw new DataNotFoundByIdException("Employment Type does not exist in unit "  + unitPositionDTO.getEmploymentTypeId());
         }
         unitPosition.setEmploymentType(employmentType);
 
@@ -479,7 +481,7 @@ public class UnitPositionService extends UserBaseService {
         timebankWrapper.setCountryId(countryId);
         timebankWrapper.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
         timebankWrapper.setWorkingDaysPerWeek(unitPosition.getWorkingDaysInWeek());
-        timebankWrapper.setUnitPositionDate(new Date(unitPosition.getStartDateMillis()));
+        timebankWrapper.setUnitPositionDate(DateUtil.asLocalDate(new Date(unitPosition.getStartDateMillis())));
         timebankWrapper.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
         return timebankWrapper;
     }

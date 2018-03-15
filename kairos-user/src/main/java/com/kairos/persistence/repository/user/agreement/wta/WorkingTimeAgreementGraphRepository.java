@@ -205,7 +205,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     )
     WTAResponseDTO getVersionOfWTA(Long organizationId);
 
-    @Query("match (uep:UnitEmploymentPosition)-[:" + HAS_WTA + "]-(wta:WorkingTimeAgreement) where id(uep)={0}\n" +
+    @Query("match (uep:UnitPosition)-[:" + HAS_WTA + "]-(wta:WorkingTimeAgreement) where id(uep)={0}\n" +
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
@@ -225,7 +225,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     )
     WTAResponseDTO findWtaByUnitEmploymentPosition(Long unitEmploymentPositionId);
 
-    @Query("match (uep:UnitEmploymentPosition)-[:" + HAS_WTA + "]-(wta:WorkingTimeAgreement{deleted:false}) where id(uep)={0}\n" +
+    @Query("match (uep:UnitPosition)-[:" + HAS_WTA + "]-(wta:WorkingTimeAgreement{deleted:false}) where id(uep)={0}\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)\n" +
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
             "with tempValue, wta,ruleTemp ORDER BY tempValue.sequence \n" +
