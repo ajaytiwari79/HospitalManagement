@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.pay_level;
+package com.kairos.persistence.model.user.pay_table;
 
 import java.util.List;
 import java.util.Map;

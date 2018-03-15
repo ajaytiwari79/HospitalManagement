@@ -1,6 +1,5 @@
 package com.kairos.service.pay_group_area;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Level;
@@ -11,7 +10,7 @@ import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaRelationshipRepository;
-import com.kairos.persistence.repository.user.pay_level.PayGroupAreaGraphRepository;
+import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaResponse;
@@ -186,7 +185,7 @@ public class PayGroupAreaService extends UserBaseService {
         if (!Optional.ofNullable(level).isPresent()) {
             throw new DataNotFoundByIdException("Invalid level in country");
         }
-        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(levelId);
+        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaWithMunicipalityByOrganizationLevelId(levelId);
         return payGroupAreas;
     }
 

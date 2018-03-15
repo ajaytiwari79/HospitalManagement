@@ -1,11 +1,8 @@
-package com.kairos.persistence.model.user.pay_level;
-
-import org.joda.time.DateTime;
+package com.kairos.persistence.model.user.pay_table;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
-import java.util.Date;
 
 import static java.lang.annotation.ElementType.*;
 

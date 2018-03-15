@@ -1,0 +1,96 @@
+package com.kairos.persistence.model.user.pay_table;
+
+import com.kairos.persistence.model.organization.Level;
+import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.util.List;
+
+/**
+ * Created by vipul on 15/3/18.
+ */
+@QueryResult
+public class PayTableQueryResult {
+    private Long id;
+    private String name;
+    private String shortName;
+    private Long startDateMillis;
+    private Long endDateMillis;
+    private Level level;
+    private List<PayGrade> payGrades;
+    private String description;
+
+    public PayTableQueryResult() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
+    public Long getStartDateMillis() {
+        return startDateMillis;
+    }
+
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
+    }
+
+    public Long getEndDateMillis() {
+        return endDateMillis;
+    }
+
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
+    }
+
+    public Level getLevel() {
+        return level;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
+    }
+
+    public List<PayGrade> getPayGrades() {
+        return payGrades;
+    }
+
+    public void setPayGrades(List<PayGrade> payGrades) {
+        this.payGrades = payGrades;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public PayTableQueryResult(String name, String shortName, String description, Long startDateMillis, Long endDateMillis) {
+        this.name = name;
+        this.description = description;
+        this.shortName = shortName;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+    }
+}

@@ -1,8 +1,7 @@
-package com.kairos.persistence.model.user.pay_level;
+package com.kairos.persistence.model.user.pay_table;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import javax.validation.constraints.Future;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

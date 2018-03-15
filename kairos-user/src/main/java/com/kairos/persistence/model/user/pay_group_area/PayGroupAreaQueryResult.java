@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.pay_group_area;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.region.Municipality;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -10,6 +11,7 @@ import java.util.Date;
  * Created by vipul on 12/3/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
 public class PayGroupAreaQueryResult {
     private Long id;

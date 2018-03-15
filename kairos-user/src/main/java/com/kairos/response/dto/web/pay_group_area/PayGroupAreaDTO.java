@@ -1,14 +1,12 @@
 package com.kairos.response.dto.web.pay_group_area;
 
-import com.kairos.persistence.model.user.pay_level.DateRange;
-import com.kairos.persistence.model.user.pay_level.FutureDate;
-import com.kairos.persistence.model.user.pay_level.ValidSize;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.user.pay_table.DateRange;
+import com.kairos.persistence.model.user.pay_table.FutureDate;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Created by prabjot on 21/12/17.
@@ -17,7 +15,7 @@ import java.util.Set;
  */
 
 @DateRange
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PayGroupAreaDTO {
 
     private Long id;

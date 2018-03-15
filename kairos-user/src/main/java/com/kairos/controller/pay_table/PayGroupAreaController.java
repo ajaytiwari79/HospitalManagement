@@ -1,4 +1,4 @@
-package com.kairos.controller.pay_level;
+package com.kairos.controller.pay_table;
 
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import com.kairos.service.pay_group_area.PayGroupAreaService;
@@ -54,8 +54,6 @@ public class PayGroupAreaController {
     {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.deletePayGroupFromMunicipality(payGroupAreaId, municipalityId,relationshipId));
     }
-
-
     @GetMapping("/municipality_organization_level")
     public ResponseEntity<Map<String, Object>> getMunicipalityAndOrganizationLevel(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.getMunicipalityAndOrganizationLevel(countryId));
