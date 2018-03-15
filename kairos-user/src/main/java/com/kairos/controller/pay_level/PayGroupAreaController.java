@@ -48,7 +48,9 @@ public class PayGroupAreaController {
     }
 
     @DeleteMapping("/remove_pay_group_area/{payGroupAreaId}")
-    public ResponseEntity<Map<String, Object>> deletePayGroupFromMunicipality(@PathVariable Long payGroupAreaId, @RequestParam Long municipalityId, @RequestParam Long relationshipId)
+    public ResponseEntity<Map<String, Object>> deletePayGroupFromMunicipality(@PathVariable Long payGroupAreaId,
+                                                                              @RequestParam Long municipalityId,
+                                                                              @RequestParam Long relationshipId)
     {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payGroupAreaService.deletePayGroupFromMunicipality(payGroupAreaId, municipalityId,relationshipId));
     }

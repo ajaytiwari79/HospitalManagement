@@ -86,7 +86,6 @@ public class PayGroupAreaService extends UserBaseService {
     }
 
     public PayGroupAreaQueryResult updatePayGroupArea(Long payGroupAreaId, PayGroupAreaDTO payGroupAreaDTO) {
-        PayGroupAreaQueryResult payGroupAreaObject = payGroupAreaGraphRepository.findPayGroupAreaByIdAndMunicipality(payGroupAreaDTO.getId(), payGroupAreaId, payGroupAreaDTO.getMunicipalityId());
 
         Optional<PayGroupAreaMunicipalityRelationship> municipalityRelationship = payGroupAreaRelationshipRepository.findById(payGroupAreaDTO.getId());
         if (!municipalityRelationship.isPresent()) {
@@ -150,7 +149,6 @@ public class PayGroupAreaService extends UserBaseService {
                     } else {
                         throw new ActionNotPermittedException("Overlap date range " + new DateTime(payGroupAreaDTO.getEndDateMillis()) + " " + (new DateTime(payGroupAreas.get(i).getStartDateMillis())));
                     }
-
                 }
             } else {
                 if (payGroupAreas.get(i).getEndDateMillis() != null) {
