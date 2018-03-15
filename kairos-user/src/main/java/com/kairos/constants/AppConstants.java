@@ -81,6 +81,7 @@ public class AppConstants {
     public static final String PLANNER = "PLANNER";
     public static final String TASK_GIVERS = "TASK_GIVERS";
     public static final String COUNTRY_ADMIN = "COUNTRY_ADMIN";
+    public static final String AG_COUNTRY_ADMIN = "AG_COUNTRY_ADMIN";
     public static final String UNIT_MANAGER = "UNIT_MANAGER";
     public static final String ACCESS_PAGE_PROPERTIES_FILE_PATH = "/page-id.properties";
 
@@ -166,96 +167,6 @@ public class AppConstants {
     public static final String MERGED_TASK_NAME = "Merged Task";
     public static final String CITIZEN_ID = "citizenId";
 
-
-    public static final String TEMPLATE1 = "TEMPLATE1";
-    public static final String TEMPLATE1_NAME = "Maximum Shift Length";
-    public static final String TEMPLATE1_DESCRIPTION = "Checks that the shift length does not exceed a set value. Only shifts with an activity that adds time to the chosen balance types will be checked. If \"Check Time Rules\" is checked only those activities that have the setting \"Check Time Rules\" will be checked";
-
-    public static final String TEMPLATE2 = "TEMPLATE2";
-    public static final String TEMPLATE2_NAME = "Minimum shift length";
-    public static final String TEMPLATE2_DESCRIPTION = "Checks that the shift length is not below a set value. Only shifts with an activity that adds time to the chosen balance types will be checked. If \"Check Time Rules\" is checked only those activities that have the setting \"Check Time Rules\" will be checked.";
-
-    public static final String TEMPLATE3 = "TEMPLATE3";
-    public static final String TEMPLATE3_NAME = "Maximum number of consecutive days";
-    public static final String TEMPLATE3_DESCRIPTION = "Checks maximum number of consecutive scheduled days";
-
-    public static final String TEMPLATE4 = "TEMPLATE4";
-    public static final String TEMPLATE4_NAME = "Minimum rest after consecutive days worked";
-    public static final String TEMPLATE4_DESCRIPTION = "Checks the least amount of continuous rest after a given number of consecutive days with shifts.";
-
-    public static final String TEMPLATE5 = "TEMPLATE5";
-    public static final String TEMPLATE5_NAME = "Maximum night shift’s length";
-    public static final String TEMPLATE5_DESCRIPTION = "Checks that the shift length for a night shift does not exceed a set value. Only shifts with an activity that adds time to the chosen balance types will be checked. If \"Check Time Rules\" is checked only those activities that have the setting \"Check Time Rules\" will be checked.";
-
-    public static final String TEMPLATE6 = "TEMPLATE6";
-    public static final String TEMPLATE6_NAME = "Minimum number of consecutive nights";
-    public static final String TEMPLATE6_DESCRIPTION = "Checks minimum number of consecutive nights.";
-
-    public static final String TEMPLATE7 = "TEMPLATE7";
-    public static final String TEMPLATE7_NAME = " Maximum number of consecutive nights";
-    public static final String TEMPLATE7_DESCRIPTION = "Checks maximum number of consecutive nights with night shifts.";
-
-    public static final String TEMPLATE8 = "TEMPLATE8";
-    public static final String TEMPLATE8_NAME = "Minimum rest after consecutive nights worked";
-    public static final String TEMPLATE8_DESCRIPTION = "Checks the least amount of continuous rest after a given number of consecutive nights with\n" +
-            "night shifts.";
-
-    public static final String TEMPLATE9 = "TEMPLATE9";
-    public static final String TEMPLATE9_NAME = "Maximum number of work nights";
-    public static final String TEMPLATE9_DESCRIPTION = "Checks that the number of nights worked in a set interval do not exceed the set value.";
-
-    public static final String TEMPLATE10 = "TEMPLATE10";
-    public static final String TEMPLATE10_NAME = "Minimum number of days off per period";
-    public static final String TEMPLATE10_DESCRIPTION = "Minimum amount of days off per interval. A day off is a non working day. A day off between\n" +
-            "00:00-24:00. For persons that work night shifts the day the calculation of hours should be on the day that has the majority of hours.";
-
-    public static final String TEMPLATE11 = "TEMPLATE11";
-    public static final String TEMPLATE11_NAME = "Maximum average scheduled time per week within an interval";
-    public static final String TEMPLATE11_DESCRIPTION = "The rule checks that the average scheduled time per week for the specified balance type in the interval does not exceed the specified max time.";
-
-    public static final String TEMPLATE12 = "TEMPLATE12";
-    public static final String TEMPLATE12_NAME = "Maximum veto per period";
-    public static final String TEMPLATE12_DESCRIPTION = "Sets the maximum amount of veto time per period. The value is set in percent of the possible work time. The possible work time = work time - absence shifts.";
-
-    public static final String TEMPLATE13 = "TEMPLATE13";
-    public static final String TEMPLATE13_NAME = "Number of weekend shifts in a period compared to average.";
-    public static final String TEMPLATE13_DESCRIPTION = "This rule is to prevent persons who have already requested weekend shifts (more than the average an employee should do during the period) from being allocated more weekend shifts at optimisation.";
-
-    public static final String TEMPLATE14 = "TEMPLATE14";
-    public static final String TEMPLATE14_NAME = "Care days check";
-    public static final String TEMPLATE14_DESCRIPTION = "Care days check.";
-
-    public static final String TEMPLATE15 = "TEMPLATE15";
-    public static final String TEMPLATE15_NAME = "Minimum daily resting time";
-    public static final String TEMPLATE15_DESCRIPTION = "Checks the minimum continuous rest period in every arbitrary 24h interval.";
-
-    public static final String TEMPLATE16 = "TEMPLATE16";
-    public static final String TEMPLATE16_NAME = "Minimum duration between shifts";
-    public static final String TEMPLATE16_DESCRIPTION = "Minimum duration between shifts.";
-
-    public static final String TEMPLATE17 = "TEMPLATE17";
-    public static final String TEMPLATE17_NAME = "Minimum weekly rest period,fixed weeks";
-    public static final String TEMPLATE17_DESCRIPTION = "Sets the minimum consecutive rest for any 7-days interval. Uses the persons setting for week offset.";
-
-    public static final String TEMPLATE18 = "TEMPLATE18";
-    public static final String TEMPLATE18_NAME = "Shortest and average daily rest,fixed times";
-    public static final String TEMPLATE18_DESCRIPTION = "Daily rest is calculated for all working days within a period. Minimum X h rest and average 11 h rest per period. A working day is defined as having a shift on that day.";
-
-    public static final String TEMPLATE19 = "TEMPLATE19";
-    public static final String TEMPLATE19_NAME = "Maximum number of shifts per interval";
-    public static final String TEMPLATE19_DESCRIPTION = "Checks that the number of shifts in the specified interval do not exceed the indicated value. If this rule is added to an activities contract, shifts with that activity are checked";
-
-    public static final String TEMPLATE20 = "TEMPLATE20";
-    public static final String TEMPLATE20_NAME = "Maximum senior days per year";
-    public static final String TEMPLATE20_DESCRIPTION = "Maximum amount of senior days per year";
-
-    public static final String TEMPLATE21 = "TEMPLATE21";
-    public static final String TEMPLATE21_NAME = "Maximum time bank";
-    public static final String TEMPLATE21_DESCRIPTION = "Maximum time bank for staff";
-
-    public static final String TEMPLATE22 = "TEMPLATE22";
-    public static final String TEMPLATE22_NAME = "Minimum time bank";
-    public static final String TEMPLATE22_DESCRIPTION = "Minimum time bank for staff";
     public static final String ORGANIZATION_ID = "organizationId";
     public static final String UNIT_ID = "unitId";
 
@@ -275,6 +186,8 @@ public class AppConstants {
     public static final float DEFAULT_HOURLY_WAGES = 10;
     public static final float DEFAULT_SALARY= 500;
     public static final int DEFAULT_WORKING_DAYS_IN_WEEK = 5;
+
+    public static final String MANAGE_COUNTRY_TAB_MODULE_ID = "module_4";
 
 
 

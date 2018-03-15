@@ -2,6 +2,7 @@ package com.kairos.service.agreement.wta;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.constants.RuleTemplates;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
 import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
@@ -65,12 +66,12 @@ public class WTAServiceIntegrationTest {
 
         RuleTemplateCategory ruleTemplateCategory = new RuleTemplateCategory("NONE", RuleTemplateCategoryType.WTA);
 
-        maximumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE1_NAME, TEMPLATE1, false, TEMPLATE1_DESCRIPTION, timeInMins, balanceTypes, true);
+        maximumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(RuleTemplates.MAXIMUM_SHIFT_LENGTH.getName(), RuleTemplates.MAXIMUM_SHIFT_LENGTH.getTemplateType(), false, RuleTemplates.MAXIMUM_SHIFT_LENGTH.getDescription(), timeInMins, balanceTypes, true);
 
-        minimumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE2_NAME, TEMPLATE2, false, TEMPLATE2_DESCRIPTION, timeInMins, balanceTypes, true);
-        numberOfWeekendShiftInPeriodWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE13_NAME, TEMPLATE13, true, TEMPLATE13_DESCRIPTION, 12L, 12L, TUESDAY, 2L, true, TUESDAY, 1L);
-        careDayCheckWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE14_NAME, TEMPLATE14, true, TEMPLATE14_DESCRIPTION, 2L, dateInMillis, MONTHS, 1L);
-        minimumDailyRestingTimeWTATemplate = new RuleTemplateCategoryDTO(TEMPLATE15_NAME, TEMPLATE15, true, TEMPLATE15_DESCRIPTION, timeInMins);
+        minimumShiftLengthWTATemplate = new RuleTemplateCategoryDTO(RuleTemplates.MINIMUM_SHIFT_LENGTH.getName(), RuleTemplates.MINIMUM_SHIFT_LENGTH.getTemplateType(), false, RuleTemplates.MINIMUM_SHIFT_LENGTH.getDescription(), timeInMins, balanceTypes, true);
+        numberOfWeekendShiftInPeriodWTATemplate = new RuleTemplateCategoryDTO(RuleTemplates.NUMBER_OF_WEEKEND_SHIFTS_IN_A_PERIOD_COMPARED_TO_AVERAGE.getName(), RuleTemplates.NUMBER_OF_WEEKEND_SHIFTS_IN_A_PERIOD_COMPARED_TO_AVERAGE.getTemplateType(), true, RuleTemplates.NUMBER_OF_WEEKEND_SHIFTS_IN_A_PERIOD_COMPARED_TO_AVERAGE.getDescription(), 12L, 12L, TUESDAY, 2L, true, TUESDAY, 1L);
+        careDayCheckWTATemplate = new RuleTemplateCategoryDTO(RuleTemplates.CARE_DAYS_CHECK.getName(), RuleTemplates.CARE_DAYS_CHECK.getTemplateType(), true, RuleTemplates.CARE_DAYS_CHECK.getDescription(), 2L, dateInMillis, MONTHS, 1L);
+        minimumDailyRestingTimeWTATemplate = new RuleTemplateCategoryDTO(RuleTemplates.MINIMUM_DAILY_RESTING_TIME.getName(), RuleTemplates.MINIMUM_DAILY_RESTING_TIME.getTemplateType(), true, RuleTemplates.MINIMUM_DAILY_RESTING_TIME.getDescription(), timeInMins);
 
         maximumShiftLengthWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);
         minimumShiftLengthWTATemplate.setRuleTemplateCategory(ruleTemplateCategory);

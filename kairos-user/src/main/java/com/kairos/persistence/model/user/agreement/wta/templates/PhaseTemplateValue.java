@@ -20,6 +20,7 @@ public class PhaseTemplateValue extends UserBaseEntity {
     private boolean disabled=true;
     private int optionalFrequency=0;
     private boolean optional=false;
+    private int sequence;
 
     public int getOptionalFrequency() {
         return optionalFrequency;
@@ -46,6 +47,15 @@ public class PhaseTemplateValue extends UserBaseEntity {
         //Default Constructor
     }
 
+    public PhaseTemplateValue(int phaseId, String phaseName, short staffValue, short managementValue, boolean disabled, int optionalFrequency, boolean optional) {
+        this.phaseId = phaseId;
+        this.phaseName = phaseName;
+        this.staffValue = staffValue;
+        this.managementValue = managementValue;
+        this.disabled = disabled;
+        this.optionalFrequency = optionalFrequency;
+        this.optional = optional;
+    }
 
     public String getPhaseName() {
         return phaseName;
@@ -62,7 +72,6 @@ public class PhaseTemplateValue extends UserBaseEntity {
     public void setStaffValue(short staffValue) {
         this.staffValue = staffValue;
     }
-
 
     public short getManagementValue() {
         return managementValue;
@@ -86,6 +95,14 @@ public class PhaseTemplateValue extends UserBaseEntity {
 
     public void setOptional(boolean optional) {
         this.optional = optional;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 
     @Override

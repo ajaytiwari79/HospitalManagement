@@ -165,7 +165,7 @@ public class StaffController {
         long accessGroupId = Long.parseLong((String) employmentDetail.get("roleId"));
         boolean isCreated = (boolean) employmentDetail.get("isCreated");
         long unitId = Long.parseLong((String) employmentDetail.get("organizationId"));
-        Map<String, Object> response = employmentService.createEmployment(unitId, staffId, accessGroupId, isCreated);
+        Map<String, Object> response = employmentService.createUnitPermission(unitId, staffId, accessGroupId, isCreated);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }
@@ -271,11 +271,12 @@ public class StaffController {
      * @param type
      * @param id
      * @return
+     * @Modify vipul
      */
     @RequestMapping(method = RequestMethod.GET)
     @ApiOperation("get staff")
-    public ResponseEntity<Map<String, Object>> getStaff(@RequestParam String type, @RequestParam long id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaff(type, id));
+    public ResponseEntity<Map<String, Object>> getStaff(@RequestParam String type, @RequestParam long id, @RequestParam("unitPosition") boolean allStaffRequired) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaff(type, id,allStaffRequired));
     }
 
 
@@ -537,8 +538,8 @@ public class StaffController {
     @RequestMapping(value = "/staff_list", method = RequestMethod.GET)
     @ApiOperation("Get All staff List available in Org")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffByUnitId(unitId));
+    public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId, @RequestParam("unitPosition") boolean allStaffRequired) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffByUnitId(unitId, allStaffRequired));
     }
 
 
@@ -556,12 +557,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffById(staffId));
     }
 
-    @RequestMapping(value = "/{staffId}/verifyUnitEmployment/{unitEmploymentId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{staffId}/verifyUnitEmployment/{unitPositionId}", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @PathVariable long unitId, @PathVariable long staffId,
-                                                                        @PathVariable Long unitEmploymentId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(staffId,unitEmploymentId, unitId, type));
+                                                                      @PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(staffId, unitPositionId, unitId, type));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)

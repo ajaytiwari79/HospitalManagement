@@ -59,7 +59,7 @@ import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
-import com.kairos.persistence.repository.user.staff.UnitEmploymentGraphRepository;
+import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.agreement.RuleTemplateCategoryService;
@@ -140,7 +140,7 @@ public class BootDataService {
     @Inject
     AccessGroupService accessGroupService;
     @Inject
-    UnitEmploymentGraphRepository unitEmploymentGraphRepository;
+    UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
     StaffService staffService;
     @Inject
@@ -655,6 +655,9 @@ public class BootDataService {
 
         organizationService.createOrganization(kairosCountryLevel, null);
         //organizationGraphRepository.addSkillInOrganization(kairosCountryLevel.getId(),skillList,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
+
+        // Create AccessGroup for Ulrik as AG_COUNTRY_ADMIN
+        createCountryAdminAccessGroup();
         createEmployment();
         createTeam();
         createGroup();
@@ -836,6 +839,13 @@ public class BootDataService {
         kairosCountryLevel = organizationGraphRepository.save(kairosCountryLevel);
     }
 
+    private void createCountryAdminAccessGroup() {
+        AccessGroup accessGroup = new AccessGroup(AppConstants.AG_COUNTRY_ADMIN, "Country Admin Access Group");
+        accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
+        accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+        accessGroupRepository.save(accessGroup);
+    }
+
     private void createEmployment() {
         employmentForAdmin = new Employment("working as country admin", adminAsStaff);
         kairosCountryLevel.getEmployments().add(employmentForAdmin);
@@ -843,15 +853,20 @@ public class BootDataService {
     }
 
     private void createUnitEmploymentForCountryLevel() {
-        accessGroup = accessGroupRepository.findAccessGroupByName(kairosCountryLevel.getId(), AppConstants.COUNTRY_ADMIN);
-        UnitEmployment unitEmployment = new UnitEmployment();
-        unitEmployment.setOrganization(kairosCountryLevel);
+
+        accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(kairosCountryLevel);
+
+//        accessGroup = accessGroupRepository.findAccessGroupByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
+
+
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        unitEmploymentGraphRepository.save(unitEmployment);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+        unitPermissionGraphRepository.save(unitPermission);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
         accessPageService.setPagePermissionToAdmin(accessPermission);
-        employmentForAdmin.getUnitEmployments().add(unitEmployment);
+        employmentForAdmin.getUnitPermissions().add(unitPermission);
         kairosCountryLevel.getEmployments().add(employmentForAdmin);
         organizationGraphRepository.save(kairosCountryLevel);
     }
@@ -958,33 +973,33 @@ public class BootDataService {
 
     private void createUnitEmploymentForCityLevel() {
         accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.VISITATOR);
-        UnitEmployment unitEmployment = new UnitEmployment();
-        unitEmployment.setOrganization(oodlesCityLevel);
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(oodlesCityLevel);
         AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        employmentForMichal.getUnitEmployments().add(unitEmployment);
+        employmentForMichal.getUnitPermissions().add(unitPermission);
         oodlesCityLevel.getEmployments().add(employmentForMichal);
 
         accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.TASK_GIVERS);
-        unitEmployment = new UnitEmployment();
-        unitEmployment.setOrganization(oodlesCityLevel);
+        unitPermission = new UnitPermission();
+        unitPermission.setOrganization(oodlesCityLevel);
         accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship taskGiverAccess = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+        UnitEmpAccessRelationship taskGiverAccess = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(taskGiverAccess);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        employmentForAlma.getUnitEmployments().add(unitEmployment);
+        employmentForAlma.getUnitPermissions().add(unitPermission);
         oodlesCityLevel.getEmployments().add(employmentForAlma);
 
         accessGroup = accessGroupRepository.findAccessGroupByName(oodlesCityLevel.getId(), AppConstants.PLANNER);
-        unitEmployment = new UnitEmployment();
-        unitEmployment.setOrganization(oodlesCityLevel);
+        unitPermission = new UnitPermission();
+        unitPermission.setOrganization(oodlesCityLevel);
         accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship plannerAccess = new UnitEmpAccessRelationship(unitEmployment, accessPermission);
+        UnitEmpAccessRelationship plannerAccess = new UnitEmpAccessRelationship(unitPermission, accessPermission);
         unitEmpAccessGraphRepository.save(plannerAccess);
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
-        employmentForLiva.getUnitEmployments().add(unitEmployment);
+        employmentForLiva.getUnitPermissions().add(unitPermission);
         oodlesCityLevel.getEmployments().add(employmentForLiva);
         organizationGraphRepository.save(oodlesCityLevel);
     }
@@ -1030,12 +1045,13 @@ public class BootDataService {
             ruleTemplateCategoryService.createDefaultRuleTemplateCategory( category);
         }
 
-        if (costTimeAgreementService.isDefaultCTARuleTemplateExists()) {
+        // No need to create default CTA Rule templates
+        /*if (costTimeAgreementService.isDefaultCTARuleTemplateExists()) {
             logger.info("default CTA rule template already exist");
         } else {
             logger.info("creating CTA rule template");
             costTimeAgreementService.createDefaultCtaRuleTemplate(country.getId());
-        }
+        }*/
 
     }
 

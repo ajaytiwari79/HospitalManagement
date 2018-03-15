@@ -13,26 +13,26 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_A
 @RelationshipEntity(type = HAS_ACCESS_PERMISSION)
 public class UnitEmpAccessRelationship extends UserBaseEntity {
 
-    @StartNode private UnitEmployment unitEmployment;
+    @StartNode private UnitPermission unitPermission;
     @EndNode private AccessPermission accessPermission;
     @Property
     private boolean isEnabled  = true;
 
-    public UnitEmpAccessRelationship(UnitEmployment unitEmployment, AccessPermission accessPermission) {
-        this.unitEmployment = unitEmployment;
+    public UnitEmpAccessRelationship(UnitPermission unitPermission, AccessPermission accessPermission) {
+        this.unitPermission = unitPermission;
         this.accessPermission = accessPermission;
     }
 
-    public UnitEmployment getUnitEmployment() {
-        return unitEmployment;
+    public UnitPermission getUnitPermission() {
+        return unitPermission;
     }
 
     public AccessPermission getAccessPermission() {
         return accessPermission;
     }
 
-    public void setUnitEmployment(UnitEmployment unitEmployment) {
-        this.unitEmployment = unitEmployment;
+    public void setUnitPermission(UnitPermission unitPermission) {
+        this.unitPermission = unitPermission;
     }
 
     public void setAccessPermission(AccessPermission accessPermission) {
