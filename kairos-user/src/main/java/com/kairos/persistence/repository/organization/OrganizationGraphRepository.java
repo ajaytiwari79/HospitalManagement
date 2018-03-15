@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.organization;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
+import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.user.client.Client;
@@ -722,6 +723,16 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("Match (org:Organization{union:false,isKairosHub:false,isEnable:true})-[:" + COUNTRY + "]-(c:Country) where id (c)={0}  return org LIMIT 1")
     Organization getOneParentUnitByCountry(Long countryId);
+
+    //for getting Unions by Ids
+
+    @Query("Match (union:Organization{union:true,isEnable:true}) where id (union) IN {0}  return union")
+    List<Organization> findAllUnionById(List<Long> unionId);
+
+    @Query("MATCH (union:Organization{isEnable:true,union:true})-[:" + BELONGS_TO + "]->(country:Country)  where id(country)={0} return id(union) as id, union.name as name")
+    List<UnionQueryResult> findAllByUnionsByCountryId(Long countryId);
+
+
 }
 
 
