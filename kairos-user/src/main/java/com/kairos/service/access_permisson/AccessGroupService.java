@@ -233,13 +233,18 @@ public class AccessGroupService extends UserBaseService {
         }
 
         List<Map<String, Object>> accessPages;
-        if(parent == null){
+
+        accessPages = accessPageRepository.getAccessPagePermissionOfStaff(
+                (Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)
+                ,unitId,staffId,accessGroupId);
+
+        /*if(parent == null){
 //            accessPages = accessPageRepository.getAccessPageByAccessGroup(unitId,unitId,staffId,accessGroupId);
             accessPages = accessPageRepository.getAccessPagePermissionOfStaff(unitId,unitId,staffId,accessGroupId);
         } else {
 //            accessPages = accessPageRepository.getAccessPageByAccessGroup(parent.getId(),unitId,staffId,accessGroupId);
             accessPages = accessPageRepository.getAccessPagePermissionOfStaff(parent.getId(),unitId,staffId,accessGroupId);
-        }
+        }*/
         ObjectMapper objectMapper = new ObjectMapper();
         List<AccessPageQueryResult> queryResults = new ArrayList<>();
         for (Map<String, Object> accessPage : accessPages) {
@@ -257,6 +262,7 @@ public class AccessGroupService extends UserBaseService {
         return modules;
     }
 
+//    public Boolean setAccessPagePermissions(Long accessPageId, long accessGroupId, List<Long> accessPageIds,boolean isSelected, Long countryId) {
     public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessPageIds,boolean isSelected, Long countryId) {
         // Check if access group is of country
         if(Optional.ofNullable(countryId).isPresent()){
@@ -268,6 +274,7 @@ public class AccessGroupService extends UserBaseService {
         long creationDate = DateUtil.getCurrentDate().getTime();
         long lastModificationDate = DateUtil.getCurrentDate().getTime();
         accessGroupRepository.updateAccessPagePermission(accessGroupId,accessPageIds,isSelected,creationDate,lastModificationDate);
+//        accessGroupRepository.setParentAccessPageEnabled(accessPageId,accessGroupId);
         return true;
     }
 

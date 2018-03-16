@@ -131,6 +131,12 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "ON MATCH SET r.isEnabled={2},r.lastModificationDate={4} return true")
     List<Map<String,Object>> updateAccessPagePermission(long accessGroupId, List<Long> pageIds, boolean isSelected, long creationDate, long lastModificationDate);
 
+    @Query("Match (accessPage:AccessPage) where  id(accessPage) IN {0}\n" +
+            "Match (accessPage)<-[:SUB_PAGE]-(parentPage:AccessPage) WITH parentPage\n" +
+            "Match (accessGroup:AccessGroup)-[r:"+HAS_ACCESS_OF_TABS+"]->(parentPage) WHERE id(accessGroup)={1}\n"+
+            "SET r.isEnabled=true")
+    void setParentAccessPageEnabled (Long accessPageId, long accessGroupId);
+
     @Query("Match (accessPage:AccessPage),(accessGroup:AccessGroup) where id(accessPage)={4} AND id(accessGroup)={3} with accessPage,accessGroup\n" +
             "optional match (accessPage)-[:SUB_PAGE*]->(subPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPage+[subPage] as coll,accessGroup as accessGroup\n" +
             "unwind coll as accessPage with distinct accessPage,accessGroup\n" +

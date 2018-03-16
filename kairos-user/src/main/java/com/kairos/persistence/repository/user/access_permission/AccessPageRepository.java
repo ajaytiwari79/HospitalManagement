@@ -68,6 +68,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "where id(child)=id(ps.c) with r,r2,ps,ag\n" +
             "return {name:ps.p.name,id:id(ps.p),selected:case when r2.isEnabled then true else false end, read:r2.read, write:r2.write,module:ps.p.isModule,children:collect({name:ps.c.name,id:id(ps.c),read:r.read, write:r.write,selected:case when r.isEnabled then true else false end})} as data\n" +
             "UNION\n" +
+            // Fetch modules which does not have child
             "match (ag:AccessGroup) where id(ag)={0} WITH ag \n" +
             "Match (accessPage:AccessPage{isModule:true,active:true}) where not (accessPage)-[:SUB_PAGE]->() with accessPage, ag\n" +
             "Match (accessPage)<-[r:HAS_ACCESS_OF_TABS]-(ag) with accessPage, ag,r\n" +
@@ -137,12 +138,50 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "write:CASE WHEN parentCustomRel IS NULL THEN r.write ELSE parentCustomRel.write END,module:ps.p.isModule,moduleId:ps.p.moduleId,\n" +
             "children:collect( distinct {name:ps.c.name,id:id(ps.c),moduleId:ps.c.moduleId,\n" +
             "read:CASE WHEN childCustomRel IS NULL THEN r2.read ELSE childCustomRel.read END,\n" +
-            "write:CASE WHEN childCustomRel IS NULL THEN r2.write ELSE childCustomRel.write END})} as data")
+            "write:CASE WHEN childCustomRel IS NULL THEN r2.write ELSE childCustomRel.write END})} as data\n"+
+            " UNION\n" +
+            "MATCH (n:Organization)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(n)={0} AND  id(staff)={2}\n" +
+            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={1}\n" +
+            "Match (unitPermission)-[:HAS_ACCESS_GROUP]->(g:AccessGroup) where id(g)={3} with g,unitPermission\n" +
+            "Match (accessPage:AccessPage{isModule:true,active:true}) where not (accessPage)-[:SUB_PAGE]->() with accessPage, g, unitPermission\n" +
+            "Match (accessPage)<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(g) with accessPage, g,r, unitPermission\n" +
+            "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n" +
+            "return {name:accessPage.name,id:id(accessPage),\n" +
+            "read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END, write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,\n" +
+            "selected:case when r.isEnabled then true else false end,module:accessPage.isModule,children:[]} as data")
     List<Map<String, Object>> getAccessPagePermissionOfStaff(long orgId, long unitId, long staffId, long accessGroupId);
+
+    @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
+            "MATCH (org)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={1}  with org,emp\n" +
+            "Match (emp)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) with org,unitPermission\n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,org,unitPermission\n" +
+//            "Match (unitPermission)-[:" + HAS_ACCESS_PERMISSION + "{isEnabled:true}]->(ap:AccessPermission) with ap,org\n" +
+//            "MATCH (ap)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,ap,org\n" +
+            "Match (accessPage:AccessPage{isModule:true})<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with unitPermission, accessPage,r\n" +
+            "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n"+
+            "return id(accessPage) as id,accessPage.name as name," +
+            "CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read,CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END  as write," +
+            "accessPage.moduleId as moduleId,accessPage.active as active")
+    List<AccessPageQueryResult> getPermissionOfMainModule(long orgId, long userId);
+
+    @Query("MATCH (org:Organization),(pOrg:Organization) where id(org) IN {0} AND id(pOrg)={2} \n" +
+            "MATCH (pOrg)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={1}  with org,emp\n" +
+            "Match (emp)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) with org,unitPermission\n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,org,unitPermission\n" +
+//            "Match (unitPermission)-[:" + HAS_ACCESS_PERMISSION + "{isEnabled:true}]->(ap:AccessPermission) with ap,org\n" +
+//            "MATCH (ap)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,ap,org\n" +
+//            "Match (ap)-[r:" + HAS_ACCESS_PAGE_PERMISSION + "]->(accessPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup)\n" +
+//            "return  id(accessPage) as id,accessPage.name as name,r.isRead as read,r.isWrite as write,accessPage.moduleId as moduleId,accessPage.active as active")
+            "Match (accessPage:AccessPage{isModule:true})<-[r:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with unitPermission, accessPage,r\n" +
+            "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n"+
+            "return id(accessPage) as id,accessPage.name as name," +
+            "CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read,CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END  as write," +
+            "accessPage.moduleId as moduleId,accessPage.active as active")
+    List<AccessPageQueryResult> getPermissionOfMainModule(List<Long> orgIds, long userId, Long parentOrganizationId);
 
 
     //TODO CHECK ERROR
-    @Query("MATCH (org:Organization) where id(org)={0} with org\n" +
+    /*@Query("MATCH (org:Organization) where id(org)={0} with org\n" +
             "MATCH (org)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={1}  with org,emp\n" +
             "Match (emp)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) with org,unitPermission\n" +
             "Match (unitPermission)-[:" + HAS_ACCESS_PERMISSION + "{isEnabled:true}]->(ap:AccessPermission) with ap,org\n" +
@@ -159,7 +198,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Match (ap)-[r:" + HAS_ACCESS_PAGE_PERMISSION + "]->(accessPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup)\n" +
             "return  id(accessPage) as id,accessPage.name as name,r.isRead as read,r.isWrite as write,accessPage.moduleId as moduleId,accessPage.active as active")
     List<AccessPageQueryResult> getPermissionOfMainModule(List<Long> orgIds, long userId, Long parentOrganizationId);
-
+*/
 
     // TODO For HUB permission for module is not AccessGroup wise, we are giving access of all modules to every user of hub
 
@@ -167,7 +206,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "return id(accessPage) as id,accessPage.name as name,true as read,true as write,accessPage.moduleId as moduleId,accessPage.active as active")
     List<AccessPageQueryResult> getPermissionOfMainModuleForHubMembers();
 
-    @Query("MATCH (org:Organization),(parentOrganization:Organization) where id(org)={0} AND id(parentOrganization)={2} with org,parentOrganization\n" +
+    /*@Query("MATCH (org:Organization),(parentOrganization:Organization) where id(org)={0} AND id(parentOrganization)={2} with org,parentOrganization\n" +
             "MATCH (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with org,emp\n" +
             "MATCH (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) with unitPermission,org\n" +
             "Match (unitPermission)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission) with accessPermission,org\n" +
@@ -176,7 +215,35 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "Match (module)-[:SUB_PAGE*]->(subPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPermission,modulePermission,subPage,module\n" +
             "Match (subPage:AccessPage)<-[subPagePermission:HAS_ACCESS_PAGE_PERMISSION]-(accessPermission) with module,subPage,modulePermission,subPagePermission\n" +
             "return module.name as name,id(module) as id,module.moduleId as moduleId,modulePermission.isRead as read,modulePermission.isWrite as write,module.isModule as isModule,module.active as active,collect( distinct {name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:subPagePermission.isRead,write:subPagePermission.isWrite,isModule:subPage.isModule,active:subPage.active}) as children")
+    List<AccessPageQueryResult> getTabPermissionForUnit(long unitId, long userId, Long parentOrganizationId);*/
+
+    /*@Query("MATCH (org:Organization),(parentOrganization:Organization) where id(org)={0} AND id(parentOrganization)={2} with org,parentOrganization\n" +
+            "MATCH (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with org,emp\n" +
+            "MATCH (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) with unitPermission,org\n" +
+//            "Match (unitPermission)-[:HAS_ACCESS_GROUP]->(accessPermission:AccessPermission) with accessPermission,org\n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,org,unitPermission\n" +
+            "Match (module:AccessPage{isModule:true})<-[modulePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with module,modulePermission,unitPermission\n" +
+            "optional match (unitPermission)-[moduleCustomRel:HAS_CUSTOMIZED_PERMISSION]->(module) with module,modulePermission,unitPermission,moduleCustomRel\n"+
+            "Match (module)-[:SUB_PAGE*]->(subPage:AccessPage)<-[subPagePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with modulePermission,subPagePermission,subPage,module,unitPermission,moduleCustomRel\n" +
+            "optional match (unitPermission)-[subPageCustomRel:HAS_CUSTOMIZED_PERMISSION]->(subPage)\n"+
+//            "Match (subPage:AccessPage)<-[subPagePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with module,subPage,modulePermission,subPagePermission\n" +
+            "return module.name as name,id(module) as id,module.moduleId as moduleId," +
+            "CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write," +
+            "module.isModule as isModule,module.active as active," +
+            "collect( distinct {name:subPage.name,id:id(subPage),moduleId:subPage.moduleId," +
+            "read:CASE WHEN subPageCustomRel IS NULL THEN subPagePermission.read ELSE subPageCustomRel.read END,write:CASE WHEN subPageCustomRel IS NULL THEN subPagePermission.write ELSE subPageCustomRel.write END," +
+            "isModule:subPage.isModule,active:subPage.active}) as children")*/
+    @Query("MATCH (org:Organization),(parentOrganization:Organization) where id(org)={0} AND id(parentOrganization)={2} with org,parentOrganization\n" +
+            "MATCH (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={1} with org,emp\n" +
+            "MATCH (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(org) with unitPermission,org\n" +
+            "MATCH (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup) with accessGroup,org,unitPermission\n" +
+            "Match (module:AccessPage{isModule:true})<-[modulePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with module,modulePermission,unitPermission,accessGroup\n" +
+            "optional match (unitPermission)-[moduleCustomRel:HAS_CUSTOMIZED_PERMISSION]->(module) with module,modulePermission,unitPermission,moduleCustomRel,accessGroup\n" +
+            "Match (module)-[:SUB_PAGE*]->(subPage:AccessPage)<-[subPagePermission:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with modulePermission,subPagePermission,subPage,module,unitPermission,moduleCustomRel\n" +
+            "optional match (unitPermission)-[subPageCustomRel:HAS_CUSTOMIZED_PERMISSION]->(subPage)\n" +
+            "return module.name as name,id(module) as id,module.moduleId as moduleId,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.read ELSE moduleCustomRel.read END as read,CASE WHEN moduleCustomRel IS NULL THEN modulePermission.write ELSE moduleCustomRel.write END as write,module.isModule as isModule,module.active as active,collect( distinct {name:subPage.name,id:id(subPage),moduleId:subPage.moduleId,read:CASE WHEN subPageCustomRel IS NULL THEN subPagePermission.read ELSE subPageCustomRel.read END,write:CASE WHEN subPageCustomRel IS NULL THEN subPagePermission.write ELSE subPageCustomRel.write END,isModule:subPage.isModule,active:subPage.active}) as children")
     List<AccessPageQueryResult> getTabPermissionForUnit(long unitId, long userId, Long parentOrganizationId);
+
 
     @Query("Match (accessPage:AccessPage{isModule:true}) with accessPage as module\n" +
             "Match (module)-[:SUB_PAGE*]->(subPage:AccessPage) with module,subPage\n" +

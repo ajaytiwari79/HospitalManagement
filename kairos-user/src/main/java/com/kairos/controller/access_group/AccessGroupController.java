@@ -113,6 +113,12 @@ public class AccessGroupController {
 
     }
 
+    /*@RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/access_page/{accessPageId}", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> setAccessPageInGroup(@PathVariable long accessGroupId, @PathVariable Long accessPageId, @RequestBody AccessGroupPermissionDTO accessGroupPermission) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setAccessPagePermissions(accessPageId, accessGroupId, accessGroupPermission.getAccessPageIds(), accessGroupPermission.isSelected(), null));
+    }*/
     @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/access_page", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setAccessPageInGroup(@PathVariable long accessGroupId, @RequestBody AccessGroupPermissionDTO accessGroupPermission) {
@@ -178,11 +184,17 @@ public class AccessGroupController {
 
     }
 
+    /*@RequestMapping(value = COUNTRY_URL+"/access_group/{accessGroupId}/access_page/{accessPageId}", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> setAccessPageInAccessGroupForCountry(@PathVariable long accessGroupId, @PathVariable Long accessPageId, @PathVariable Long countryId, @RequestBody AccessGroupPermissionDTO accessGroupPermission) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setAccessPagePermissions(accessPageId, accessGroupId, accessGroupPermission.getAccessPageIds(), accessGroupPermission.isSelected(), countryId));
+    }*/
     @RequestMapping(value = COUNTRY_URL+"/access_group/{accessGroupId}/access_page", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> setAccessPageInAccessGroupForCountry(@PathVariable long accessGroupId, @PathVariable Long countryId, @RequestBody AccessGroupPermissionDTO accessGroupPermission) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setAccessPagePermissions(accessGroupId, accessGroupPermission.getAccessPageIds(), accessGroupPermission.isSelected(), countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.setAccessPagePermissions( accessGroupId, accessGroupPermission.getAccessPageIds(), accessGroupPermission.isSelected(), countryId));
     }
 
     @RequestMapping(value = COUNTRY_URL+"/access_group/{accessGroupId}/access_page/{accessPageId}/permission", method = RequestMethod.PUT)
