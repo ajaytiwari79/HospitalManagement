@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.pay_level;
+package com.kairos.persistence.model.user.pay_table;
 
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import org.joda.time.DateTime;

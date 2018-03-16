@@ -1,19 +1,17 @@
-package com.kairos.persistence.model.user.pay_level;
+package com.kairos.persistence.model.user.pay_table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
  * Created by prabjot on 26/12/17.
  */
-@QueryResult
+
 public class PayLevelDTO {
 
     private Long id;

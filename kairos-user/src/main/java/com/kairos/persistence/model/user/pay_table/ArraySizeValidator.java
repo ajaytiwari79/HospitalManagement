@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.pay_level;
+package com.kairos.persistence.model.user.pay_table;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

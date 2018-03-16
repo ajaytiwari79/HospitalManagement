@@ -46,10 +46,9 @@ public abstract class RelationshipConstants {
     public final static String HAS_CUSTOM_SERVICE_NAME_FOR = "HAS_CUSTOM_SERVICE_NAME_FOR";
 
 
-    public final static String HAS_POSITION_CODE ="HAS_POSITION_CODE";
-    public final static String HAS_UNIT_EMPLOYMENT_POSITION ="HAS_UNIT_EMPLOYMENT_POSITION";
-    public final static String EMPLOYMENT_TYPE_SETTINGS= "EMPLOYMENT_TYPE_SETTINGS";
-
+    public final static String HAS_POSITION_CODE = "HAS_POSITION_CODE";
+    public final static String HAS_UNIT_EMPLOYMENT_POSITION = "HAS_UNIT_EMPLOYMENT_POSITION";
+    public final static String EMPLOYMENT_TYPE_SETTINGS = "EMPLOYMENT_TYPE_SETTINGS";
 
 
     // Group
@@ -188,9 +187,10 @@ public abstract class RelationshipConstants {
     public final static String HAS_CTA_RULE_TEMPLATE = "HAS_CTA_RULE_TEMPLATE";
     public final static String HAS_RULE_TEMPLATE_CATEGORY = "HAS_RULE_TEMPLATE_CATEGORY";
     public final static String HAS_RULE_TEMPLATES = "HAS_RULE_TEMPLATES";
-    public final static String HAS_TEMPLATE_MATRIX="HAS_TEMPLATE_MATRIX";
+    public final static String HAS_TEMPLATE_MATRIX = "HAS_TEMPLATE_MATRIX";
     public final static String HAS_TIME_TYPES = "HAS_TIME_TYPES";
     public final static String HAS_LEVEL = "HAS_LEVEL";
+    public final static String IN_ORGANIZATION_LEVEL = "IN_ORGANIZATION_LEVEL";
     public final static String HAS_RELATION_TYPES = "HAS_RELATION_TYPES";
     public final static String RELATION_TYPE = "RELATION_TYPE";
     public final static String RELATION_WITH_NEXT_TO_KIN = "RELATION_WITH_NEXT_TO_KIN";
@@ -218,6 +218,10 @@ public abstract class RelationshipConstants {
     public final static String HAS_ACCESS_FOR_ORG_CATEGORY = "HAS_ACCESS_FOR_ORG_CATEGORY";
     public final static String HAS_MUNICIPALITY = "HAS_MUNICIPALITY";
     public final static String IN_LEVEL = "IN_LEVEL";
+    public final static String HAS_PAY_GRADE = "HAS_PAY_GRADE";
+
+    public final static String HAS_PAY_GROUP_AREA = "HAS_PAY_GROUP_AREA";
+
     /**
      * Default constructor
      */
