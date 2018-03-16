@@ -122,7 +122,13 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "Optional Match (n)-[:" + SUB_PAGE + "*]->(subPage:AccessPage) with n+[subPage] as coll unwind coll as pages with distinct pages \n"+
             " Optional Match (pages)-[r:"+HAS_ACCESS_OF_TABS+"]-(ag:AccessGroup) WHERE id(ag) = {1} WITH r\n"+
             "set r.read={2}, r.write={3} return distinct true")
-    Boolean updatePermissionsForAccessTabsOfAccessGroup(Long tabId, Long accessGroupId, Boolean read, Boolean write);
+    Boolean updatePermissionsForAccessTabsAndChildrenOfAccessGroup(Long tabId, Long accessGroupId, Boolean read, Boolean write);
+
+    @Query("Match (n:AccessPage) where id(n)={0} with n\n" +
+           " Optional Match (n)-[r:"+HAS_ACCESS_OF_TABS+"]-(ag:AccessGroup) WHERE id(ag) = {1} WITH r\n"+
+            "set r.read={2}, r.write={3} return distinct true")
+    Boolean updatePermissionsForAccessTabOfAccessGroup(Long tabId, Long accessGroupId, Boolean read, Boolean write);
+
 
 
     @Query("Match (accessGroup:AccessGroup),(accessPage:AccessPage) where id(accessGroup)={0} and id(accessPage) IN {1}\n" +
@@ -156,6 +162,16 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "MATCH (n)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff)-[:BELONGS_TO]->(user:User) with user,emp,accessPage,accessGroup\n" +
             "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitPermission,accessPage,accessGroup\n" +
            "MERGE (unitPermission)-[r:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n" +
+            "ON CREATE SET r.read={5},r.write={6}\n" +
+            "ON MATCH SET r.read={5},r.write={6} return distinct true")
+    void setCustomPermissionForTabAndChildren(long organizationId, long staffId, long unitId, long accessGroupId, long accessPageId, boolean isRead, boolean isWrite);
+
+    @Query("Match (accessPage:AccessPage),(accessGroup:AccessGroup) where id(accessPage)={4} AND id(accessGroup)={3} with accessPage,accessGroup\n" +
+            "optional match (accessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPage, accessGroup\n" +
+            "Match (n:Organization),(staff:Staff),(accessPage:AccessPage) where id(n)={0} AND id(staff)={1} with n,staff,accessPage,accessGroup\n" +
+            "MATCH (n)-[:HAS_EMPLOYMENTS]->(emp:Employment)-[:BELONGS_TO]->(staff)-[:BELONGS_TO]->(user:User) with user,emp,accessPage,accessGroup\n" +
+            "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={2} with unitPermission,accessPage,accessGroup\n" +
+            "MERGE (unitPermission)-[r:HAS_CUSTOMIZED_PERMISSION]->(accessPage)\n" +
             "ON CREATE SET r.read={5},r.write={6}\n" +
             "ON MATCH SET r.read={5},r.write={6} return distinct true")
     void setCustomPermissionForTab(long organizationId, long staffId, long unitId, long accessGroupId, long accessPageId, boolean isRead, boolean isWrite);
