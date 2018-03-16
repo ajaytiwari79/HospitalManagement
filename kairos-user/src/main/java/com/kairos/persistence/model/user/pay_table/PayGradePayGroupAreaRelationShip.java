@@ -46,4 +46,10 @@ public class PayGradePayGroupAreaRelationShip extends UserBaseEntity {
     public void setPayGradeValue(Long payGradeValue) {
         this.payGradeValue = payGradeValue;
     }
+
+    public PayGradePayGroupAreaRelationShip(PayGrade payGrade, PayGroupArea payGroupArea, Long payGradeValue) {
+        this.payGrade = payGrade;
+        this.payGroupArea = payGroupArea;
+        this.payGradeValue = payGradeValue;
+    }
 }

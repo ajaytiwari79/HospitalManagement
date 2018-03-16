@@ -156,7 +156,6 @@ public class PayGroupAreaService extends UserBaseService {
                     }
                 } else {
                     logger.info(new DateTime(payGroupAreaDTO.getStartDateMillis())+"to create CURRENT -->"+(new DateTime(payGroupAreas.get(i).getStartDateMillis())));
-
                     if (new DateTime(payGroupAreaDTO.getStartDateMillis()).isAfter(new DateTime(payGroupAreas.get(i).getStartDateMillis()))) {
                         Long dateOneDayLessStartDate = payGroupAreaDTO.getStartDateMillis().getTime() - (24 * 60 * 60 * 1000);
                         logger.info(new DateTime(dateOneDayLessStartDate) + " new Date to update--------------");

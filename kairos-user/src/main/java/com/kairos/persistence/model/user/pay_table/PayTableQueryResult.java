@@ -1,8 +1,10 @@
 package com.kairos.persistence.model.user.pay_table;
 
 import com.kairos.persistence.model.organization.Level;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,7 +16,8 @@ public class PayTableQueryResult {
     private String name;
     private String shortName;
     private Long startDateMillis;
-    private Long endDateMillis;
+    @DateLong
+    private Date endDateMillis;
     private Level level;
     private List<PayGrade> payGrades;
     private String description;
@@ -54,11 +57,11 @@ public class PayTableQueryResult {
         this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDateMillis() {
+    public Date getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
+    public void setEndDateMillis(Date endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 
@@ -86,11 +89,24 @@ public class PayTableQueryResult {
         this.description = description;
     }
 
-    public PayTableQueryResult(String name, String shortName, String description, Long startDateMillis, Long endDateMillis) {
+    public PayTableQueryResult(String name, String shortName, String description, Long startDateMillis, Date endDateMillis) {
         this.name = name;
         this.description = description;
         this.shortName = shortName;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("PayTableQueryResult{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", shortName='").append(shortName).append('\'');
+        sb.append(", startDateMillis=").append(startDateMillis);
+        sb.append(", endDateMillis=").append(endDateMillis);
+        sb.append(", description='").append(description).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

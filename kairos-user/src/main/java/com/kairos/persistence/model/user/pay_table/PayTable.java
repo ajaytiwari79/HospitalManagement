@@ -21,9 +21,9 @@ public class PayTable extends UserBaseEntity {
     @Relationship(type = IN_ORGANIZATION_LEVEL)
     private Level level;
     @DateLong
-    private Date startDate;
+    private Date startDateMillis;
     @DateLong
-    private Date endDate;
+    private Date endDateMillis;
     @Relationship(type = HAS_PAY_GRADE)
     private List<PayGrade> payGrades;
     private String description;
@@ -31,20 +31,20 @@ public class PayTable extends UserBaseEntity {
         //default constructor
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Date getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Date startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Date getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Date endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
 
@@ -88,12 +88,12 @@ public class PayTable extends UserBaseEntity {
         this.description = description;
     }
 
-    public PayTable(String name, String shortName,String description, Level level, Date startDate, Date endDate) {
+    public PayTable(String name, String shortName, String description, Level level, Date startDateMillis, Date endDateMillis) {
         this.name = name;
         this.description=description;
         this.shortName = shortName;
         this.level = level;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
     }
 }

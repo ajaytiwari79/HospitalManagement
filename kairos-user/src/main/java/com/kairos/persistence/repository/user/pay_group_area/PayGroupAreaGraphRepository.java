@@ -8,6 +8,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -46,4 +47,7 @@ public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGrou
             "RETURN  id(payGroupArea) as payGroupAreaId,payGroupArea.name as name,payGroupArea.description as description,municipality as municipality, " +
             "rel.endDateMillis as endDateMillis,id(rel) as id,rel.startDateMillis as startDateMillis")
     PayGroupAreaQueryResult findPayGroupAreaByIdAndMunicipality(Long id, Long payGroupAreaId, Long municipalityId);
+
+    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false}) where id(payGroupArea) IN {0} return payGroupArea")
+    List<PayGroupArea> findAllById(List<Long> payGroupArea);
 }

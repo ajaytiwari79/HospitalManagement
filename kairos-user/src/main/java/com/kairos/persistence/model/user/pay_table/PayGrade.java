@@ -18,6 +18,10 @@ public class PayGrade extends UserBaseEntity {
     public PayGrade() {
     }
 
+    public PayGrade(Long payGradeLevel) {
+        this.payGradeLevel = payGradeLevel;
+    }
+
     public Long getPayGradeLevel() {
         return payGradeLevel;
     }

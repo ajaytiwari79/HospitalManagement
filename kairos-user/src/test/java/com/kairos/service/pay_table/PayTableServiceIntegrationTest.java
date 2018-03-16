@@ -4,10 +4,10 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.user.pay_table.PayLevelDTO;
 import com.kairos.persistence.model.user.pay_table.PayLevelUpdateDTO;
 import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.persistence.model.user.pay_table.PayTableQueryResult;
+import com.kairos.persistence.model.user.pay_table.OrganizationLevelPayTableDTO;
 import com.kairos.response.dto.web.pay_table.PayTableDTO;
 import com.kairos.response.dto.web.pay_table.PayTableResponseWrapper;
 import com.kairos.util.DateUtil;
@@ -29,6 +29,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static com.kairos.util.DateUtil.ONLY_DATE;
 
@@ -72,9 +73,23 @@ public class PayTableServiceIntegrationTest {
     }
 
     @Test
+    @OrderTest(order = 2)
+    public void getOrganizationLevelWisePayTables() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationLevelPayTableDTO>>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<OrganizationLevelPayTableDTO>>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<List<OrganizationLevelPayTableDTO>>> response = restTemplate.exchange(
+                baseUrlWithCountry + "/organization_level_pay_table",
+                HttpMethod.GET, null, typeReference);
+        RestTemplateResponseEnvelope<List<OrganizationLevelPayTableDTO>> responseBody = response.getBody();
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+
+    }
+
+    @Test
     @OrderTest(order = 1)
     public void createPayTable() {
-        PayTableDTO payTableDTO = new PayTableDTO("Test pay level", "SF", DateUtil.getCurrentDate(), null, organizationLevel);
+        PayTableDTO payTableDTO = new PayTableDTO("Test pay level", "SF", "", DateUtil.getCurrentDate(), null, organizationLevel);
         HttpEntity<PayTableDTO> entity = new HttpEntity<>(payTableDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableQueryResult>> typeReference =
@@ -88,7 +103,7 @@ public class PayTableServiceIntegrationTest {
         payTableId = responseBody.getData().getId();
         Assert.assertEquals(201, response.getStatusCodeValue());
         Assert.assertNotNull(payTableId);
-      //  Assert.assertEquals(responseBody.getData().getName(), payTableDTO.getName());
+        //  Assert.assertEquals(responseBody.getData().getName(), payTableDTO.getName());
     }
 
     @Test
@@ -113,7 +128,7 @@ public class PayTableServiceIntegrationTest {
         payTableId = responseBody.getData().getId();
         Assert.assertEquals(200, response.getStatusCodeValue());
         Assert.assertNotNull(payTableId);
-        Assert.assertEquals(responseBody.getData().getStartDate(), startDate);
+        Assert.assertEquals(responseBody.getData().getStartDateMillis(), startDate);
     }
 
 
