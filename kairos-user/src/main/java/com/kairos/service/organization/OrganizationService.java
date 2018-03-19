@@ -762,7 +762,7 @@ public class OrganizationService extends UserBaseService {
     public Map<String, Object> getManageHierarchyData(long unitId) {
 
         Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
+        if (!Optional.ofNullable(organization).isPresent()) {
             throw new InternalError("organization is null");
         }
 
@@ -775,7 +775,7 @@ public class OrganizationService extends UserBaseService {
         List<Map<String, Object>> groups = organizationGraphRepository.getGroups(unitId);
         response.put("groups", groups.size() != 0 ? groups.get(0).get("groups") : Collections.emptyList());
 
-        if (countryId != null) {
+        if (Optional.ofNullable(countryId).isPresent()) {
             response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         }
 
@@ -785,14 +785,7 @@ public class OrganizationService extends UserBaseService {
             organizationTypesForUnit.add((Map<String, Object>) organizationType.get("data"));
         }
 
-        List<Map<String, Object>> businessTypes = new ArrayList<>();
-        for (BusinessType businessType : organization.getBusinessTypes()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", businessType.getId());
-            map.put("name", businessType.getName());
-            businessTypes.add(map);
-        }
-
+        List<BusinessType> businessTypes=businessTypeGraphRepository.findBusinesTypesByCountry(countryId);
         response.put("organizationTypes", organizationTypesForUnit);
         response.put("businessTypes", businessTypes);
         response.put("level", organization.getLevel());
