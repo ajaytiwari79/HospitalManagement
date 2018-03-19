@@ -32,7 +32,7 @@ public class FunctionService extends UserBaseEntity{
 
     @Inject OrganizationGraphRepository organizationGraphRepository;
 
-    public Function createFunction(Long countryId, FunctionDTO functionDTO){
+    public FunctionResponseDTO createFunction(Long countryId, FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
             throw new DataNotFoundByIdException("Country not found: "+countryId);
@@ -43,23 +43,25 @@ public class FunctionService extends UserBaseEntity{
         }
         List<Level> levels=new ArrayList<>();
         if(!functionDTO.getOrganizationLevelIds().isEmpty()){
-            levels=countryGraphRepository.getAllLevelById(countryId,functionDTO.getOrganizationLevelIds());
+            levels=countryGraphRepository.getLevelsByIdsIn(countryId,functionDTO.getOrganizationLevelIds());
         }
         List<Organization> unions=new ArrayList<>();
         if(!functionDTO.getUnionIds().isEmpty()){
-            unions= organizationGraphRepository.findAllUnionById(functionDTO.getUnionIds());
+            unions= organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
         Function function=new Function(functionDTO.getName(),functionDTO.getDescription(),functionDTO.getStartDate(),functionDTO.getEndDate(),unions,levels,country);
         functionGraphRepository.save(function);
-        function.setCountry(null);
-        return function;
+        FunctionResponseDTO functionResponseDTO=new FunctionResponseDTO(function.getId(),function.getName(),function.getDescription(),
+                function.getStartDate(),function.getEndDate(),function.getUnions(),function.getOrganizationLevels());
+
+        return functionResponseDTO;
     }
 
     public List<FunctionResponseDTO> getFunctions(long countryId){
         return functionGraphRepository.findFunctionsByCountry(countryId);
 
     }
-    public Function updateFunction(Long countryId,FunctionDTO functionDTO){
+    public FunctionResponseDTO updateFunction(Long countryId,FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
             throw new DataNotFoundByIdException("Country not found: "+countryId);
@@ -74,11 +76,11 @@ public class FunctionService extends UserBaseEntity{
         }
         List<Level> levels=new ArrayList<>();
         if(!functionDTO.getOrganizationLevelIds().isEmpty()){
-            levels=countryGraphRepository.getAllLevelById(countryId,functionDTO.getOrganizationLevelIds());
+            levels=countryGraphRepository.getLevelsByIdsIn(countryId,functionDTO.getOrganizationLevelIds());
         }
         List<Organization> unions=new ArrayList<>();
         if(!functionDTO.getUnionIds().isEmpty()){
-            unions= organizationGraphRepository.findAllUnionById(functionDTO.getUnionIds());
+            unions= organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
 
         function.setName(functionDTO.getName());
@@ -88,8 +90,10 @@ public class FunctionService extends UserBaseEntity{
         function.setUnions(unions);
         function.setOrganizationLevels(levels);
         functionGraphRepository.save(function);
-        function.setCountry(null);
-        return function;
+        FunctionResponseDTO functionResponseDTO=new FunctionResponseDTO(function.getId(),function.getName(),function.getDescription(),
+                function.getStartDate(),function.getEndDate(),function.getUnions(),function.getOrganizationLevels());
+
+        return functionResponseDTO;
     }
     public boolean deleteFunction(long functionId){
         Function function=functionGraphRepository.findOne(functionId);

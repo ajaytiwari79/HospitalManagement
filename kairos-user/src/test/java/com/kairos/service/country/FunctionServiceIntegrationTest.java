@@ -52,8 +52,8 @@ public class FunctionServiceIntegrationTest {
     }
     @Test
     public void createFunction() throws Exception {
-        functionDTO.setName("pawan");
-        functionDTO.setDescription("pawan Description");
+        functionDTO.setName("Gruppeleder i integrerede ordninger");
+        functionDTO.setDescription("function test Description");
         functionDTO.setStartDate(new Date(2015,12,10));
         functionDTO.setEndDate(new Date(2019,12,10));
         List<Long> unionIds=new ArrayList<>();
@@ -91,7 +91,7 @@ public class FunctionServiceIntegrationTest {
     @Test
     public void updateFunction() throws Exception {
         functionDTO.setId(1826L);
-        functionDTO.setName("kkkkkkkkkkk");
+        functionDTO.setName("Gruppeleder i integrerede ordninger test ");
         functionDTO.setDescription("Test Description for Test Case");
         functionDTO.setStartDate(new Date(2018,10,10));
         functionDTO.setEndDate(new Date(2019,10,10));
@@ -127,7 +127,7 @@ public class FunctionServiceIntegrationTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Map>>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<List<Map>>> response = restTemplate.exchange(
-                baseUrlWithCountry + "/get_unions_and_levels",
+                baseUrlWithCountry + "/unions_and_levels",
                 HttpMethod.GET, null, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
 

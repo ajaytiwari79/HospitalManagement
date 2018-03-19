@@ -33,6 +33,16 @@ public class FunctionResponseDTO {
         //Default Constructor
     }
 
+    public FunctionResponseDTO(Long id, String name, String description, Date startDate, Date endDate, List<Organization> unions, List<Level> organizationLevels) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.unions = unions;
+        this.organizationLevels = organizationLevels;
+    }
+
     public Long getId() {
         return id;
     }

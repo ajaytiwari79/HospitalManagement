@@ -44,7 +44,7 @@ public class OrganizationTypeService extends UserBaseService {
         if(Optional.ofNullable(isAlreadyExist).isPresent()){
             throw new DuplicateDataException("OrganizationType already exists");
         }
-        List<Level> levels = countryGraphRepository.getAllLevelById(countryId,organizationTypeDTO.getLevels());
+        List<Level> levels = countryGraphRepository.getLevelsByIdsIn(countryId,organizationTypeDTO.getLevels());
 
         OrganizationType organizationType = new OrganizationType(organizationTypeDTO.getName(),country,levels);
         return prepareResponse(save(organizationType));
@@ -85,7 +85,7 @@ public class OrganizationTypeService extends UserBaseService {
         if(!updateOrganizationTypeDTO.getLevelsToDelete().isEmpty()){
             organizationTypeGraphRepository.removeLevelRelationshipFromOrganizationType(updateOrganizationTypeDTO.getId(),updateOrganizationTypeDTO.getLevelsToDelete());
         }
-        List<Level> levels = countryGraphRepository.getAllLevelById(orgTypeToUpdate.getCountry().getId(), updateOrganizationTypeDTO.getLevelsToUpdate());
+        List<Level> levels = countryGraphRepository.getLevelsByIdsIn(orgTypeToUpdate.getCountry().getId(), updateOrganizationTypeDTO.getLevelsToUpdate());
         orgTypeToUpdate.setLevels(levels);
         orgTypeToUpdate.setName(updateOrganizationTypeDTO.getName());
         return prepareResponse(save(orgTypeToUpdate));
