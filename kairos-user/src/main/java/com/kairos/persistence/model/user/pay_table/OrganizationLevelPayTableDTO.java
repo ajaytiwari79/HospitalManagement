@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class OrganizationLevelPayTableDTO {
     private String name;
     private String description;
     List<PayTable> payTables;
+    List<PayGroupArea> payGroupAreas;
 
     public OrganizationLevelPayTableDTO() {
     }
@@ -50,5 +52,13 @@ public class OrganizationLevelPayTableDTO {
 
     public void setPayTables(List<PayTable> payTables) {
         this.payTables = payTables;
+    }
+
+    public List<PayGroupArea> getPayGroupAreas() {
+        return payGroupAreas;
+    }
+
+    public void setPayGroupAreas(List<PayGroupArea> payGroupAreas) {
+        this.payGroupAreas = payGroupAreas;
     }
 }

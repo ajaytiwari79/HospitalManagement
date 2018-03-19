@@ -1,8 +1,6 @@
 package com.kairos.controller.pay_table;
 
-import com.kairos.persistence.model.user.pay_table.PayLevelDTO;
 import com.kairos.response.dto.web.pay_table.PayGradeDTO;
-import com.kairos.response.dto.web.pay_table.PayGradeMatrixDTO;
 import com.kairos.response.dto.web.pay_table.PayTableDTO;
 import com.kairos.service.pay_table.PayTableService;
 import com.kairos.util.response.ResponseHandler;
@@ -44,9 +42,15 @@ public class PayTableController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getOrganizationLevelWisePayTables(countryId));
     }
 
+    // to create a new pay table in country
     @RequestMapping(value = "/pay_table", method = POST)
     public ResponseEntity<Map<String, Object>> createPayLevel(@PathVariable Long countryId, @Validated @RequestBody PayTableDTO payTableDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, payTableService.createPayLevel(countryId, payTableDTO));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, payTableService.createPayTable(countryId, payTableDTO));
+    }
+    // to update a the above created pay table in country
+    @RequestMapping(value = "/pay_table/{payTableId}", method = PUT)
+    public ResponseEntity<Map<String, Object>> updatePayLevel(@PathVariable Long countryId, @PathVariable Long payTableId, @Validated @RequestBody PayTableDTO payTableDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.updatePayTable(countryId, payTableId, payTableDTO));
     }
 
     @RequestMapping(value = "/pay_table/{payTableId}/pay_grade", method = PUT)
@@ -55,10 +59,11 @@ public class PayTableController {
     }
 
 
-    @RequestMapping(value = "/pay_table/{payTableId}", method = PUT)
-    public ResponseEntity<Map<String, Object>> updatePayLevel(@PathVariable Long payTableId, @Validated @RequestBody PayTableDTO payTableDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.updatePayLevel(payTableId, payTableDTO));
-    }
 
+
+    @RequestMapping(value = "/pay_table/{payTableId}/pay_grade", method = GET)
+    public ResponseEntity<Map<String, Object>> getpayGridsByPayTableId(@PathVariable Long payTableId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayGridsByPayTableId(payTableId));
+    }
 
 }
