@@ -16,10 +16,7 @@ import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRe
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.model.user.pay_table.OrganizationLevelPayTableDTO;
 import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGraphRepository;
-import com.kairos.response.dto.web.pay_table.PayGradeDTO;
-import com.kairos.response.dto.web.pay_table.PayTableMatrixDTO;
-import com.kairos.response.dto.web.pay_table.PayTableDTO;
-import com.kairos.response.dto.web.pay_table.PayTableResponseWrapper;
+import com.kairos.response.dto.web.pay_table.*;
 import com.kairos.service.UserBaseService;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -136,14 +133,55 @@ public class PayTableService extends UserBaseService {
 
     }
 
+    private void prepareDates(PayTable payTable, PayGradeUpdateDTO payTableDTO) {
+        if (payTable.getStartDateMillis().equals(payTableDTO.getStartDateMillis())) {
+            payTable.setStartDateMillis(payTableDTO.getStartDateMillis());
+        } else {
+            // The start date is modified Now We need to compare is it less than today
+            if (new DateTime(payTableDTO.getStartDateMillis()).isBeforeNow()) {
+                throw new ActionNotPermittedException("Start Date Cant be less than current date");
+            }
+            payTable.setStartDateMillis(payTableDTO.getStartDateMillis());
+        }
+        // End date
+        // If already end date was set  but now no value so we are removing
+        if (!Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent() &&
+                Optional.ofNullable(payTable.getEndDateMillis()).isPresent()) {
+            payTable.setEndDateMillis(null);
 
-    public PayTableDTO updatePayTable(Long countryId, Long payTableId, PayTableDTO payTableDTO) {
+        }
+
+        // If already not present now its present    Previous its absent
+        else if (!Optional.ofNullable(payTable.getEndDateMillis()).isPresent()
+                && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
+            if (new DateTime(payTableDTO.getEndDateMillis()).isBeforeNow()) {
+                throw new ActionNotPermittedException("end Date Cant be less than current date");
+            }
+            payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
+        }
+
+// If already present and still present // NOw checking are they same or different
+        else if (Optional.ofNullable(payTable.getEndDateMillis()).isPresent() && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
+            if (payTable.getEndDateMillis().equals(payTableDTO.getEndDateMillis())) {  // both are same so nothing is change
+                payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
+            } else {
+                // The end date is modified Now We need to compare is it less than today
+                if (new DateTime(payTableDTO.getEndDateMillis()).isBeforeNow()) {
+                    throw new ActionNotPermittedException("end Date Cant be less than current date");
+                }
+                payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
+            }
+        }
+
+    }
+
+    public PayTableQueryResult updatePayTable(Long countryId, Long payTableId, PayGradeUpdateDTO payTableDTO) {
 
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent()) {
             throw new DataNotFoundByIdException("Invalid pay level id");
         }
-        // skipped to current paytable it is checking weather any other payTable has same name or short name in current organization level
+        // skipped to current pay table it is checking weather any other payTable has same name or short name in current organization level
         Boolean isAlreadyExists = payTableGraphRepository.
                 checkPayTableNameAlreadyExitsByNameOrShortName(countryId, payTableId, "(?i)" + payTableDTO.getName().trim(),
                         "(?i)" + payTableDTO.getShortName().trim());
@@ -153,11 +191,11 @@ public class PayTableService extends UserBaseService {
         payTable.setName(payTableDTO.getName().trim());
         payTable.setShortName(payTableDTO.getShortName().trim());
         payTable.setDescription(payTableDTO.getDescription());
-        payTable.setStartDateMillis(payTableDTO.getStartDateMillis());
-        payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
-
+        prepareDates(payTable, payTableDTO);
         save(payTable);
-        return payTableDTO;
+        PayTableQueryResult payTableQueryResult = new PayTableQueryResult(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis());
+        payTableQueryResult.setId(payTable.getId());
+        return payTableQueryResult;
     }
 
     public PayGradeQueryResult addPayGradeInPayTable(Long payTableId, PayGradeDTO payGradeDTO) {

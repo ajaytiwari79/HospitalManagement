@@ -20,7 +20,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     List<PayTableQueryResult> findPayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
 
     @Query("MATCH (c:Country) where id(c)={0}\n" +
-            " MATCH(c)-[:HAS_LEVEL]->(level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false}) where payTable.name =~{2} OR payTable.shortName=~{3}  AND id(payTable)<>{1} " +
+            " MATCH(c)-[:HAS_LEVEL]->(level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false}) where (payTable.name =~{2} OR payTable.shortName=~{3}) AND id(payTable)<>{1} " +
             " with count(payTable) as payTableCount\n" +
             " RETURN case when payTableCount>0 THEN  true ELSE false END as response")
     Boolean checkPayTableNameAlreadyExitsByNameOrShortName(Long countryId, Long currentPayTableId, String payTableName, String payTableShortName);
