@@ -238,13 +238,6 @@ public class CostTimeAgreementService extends UserBaseService {
         //Load reference only
         RuleTemplateCategory ruleTemplateCategory =
                 ruleTemplateCategoryGraphRepository.findOne(ctaRuleTemplateDTO.getRuleTemplateCategory(), 0);
-        List<Long> dayTypesIds = ctaRuleTemplateDTO.getCalculateOnDayTypes().parallelStream().map(CTARuleTemplateDayTypeDTO::getDayType).collect(Collectors.toList());
-        Iterable<DayType> dayTypeList = dayTypeGraphRepository.findAllById(dayTypesIds, 0);
-        List<Long> countryHolidayCalendersIds = ctaRuleTemplateDTO.getCalculateOnDayTypes().parallelStream()
-                .map(CTARuleTemplateDayTypeDTO::getCountryHolidayCalenders).flatMap(countryHolidayCalenders ->
-                {
-                    return countryHolidayCalenders.stream();
-                }).collect(Collectors.toList());
 
         if( doUpdate && !ctaRuleTemplate.getRuleTemplateCategory().getId().equals(ctaRuleTemplateDTO.getRuleTemplateCategory())){
             // Detach rule template from older category If category has been updated
@@ -710,9 +703,13 @@ public class CostTimeAgreementService extends UserBaseService {
         List<Long> organizationIds = new ArrayList<>();
         List<Long> activityIds = new ArrayList<>();
         organizations.stream().forEach(organization -> organizationIds.add(organization.getId()));
-        collectiveTimeAgreementDTO.getRuleTemplates().stream().forEach(ruleTemp -> {
-            activityIds.addAll(ruleTemp.getActivityIds());
+         collectiveTimeAgreementDTO.getRuleTemplates().stream().forEach(ruleTemp -> {
+             if(Optional.ofNullable( ruleTemp.getActivityIds() ).isPresent() ){
+                 activityIds.addAll(ruleTemp.getActivityIds());
+             }
         });
+
+
         HashMap<Long,HashMap<Long,Long>> unitActivities = activityTypesRestClient.getActivityIdsForUnitsByParentActivityId(countryId, organizationIds, activityIds);
         organizations.forEach(organization ->
         {

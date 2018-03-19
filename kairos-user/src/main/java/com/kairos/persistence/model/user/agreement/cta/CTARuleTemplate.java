@@ -33,8 +33,8 @@ public class CTARuleTemplate extends RuleTemplate{
     @Relationship(type = BELONGS_TO)
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-    @Relationship(type = BELONGS_TO)
-    List<CTARuleTemplateDayType>calculateOnDayTypes=new ArrayList<>(); // Need to confirm, Can have different values for dayType and countryHoliday
+//    @Relationship(type = BELONGS_TO)
+//    List<CTARuleTemplateDayType>calculateOnDayTypes=new ArrayList<>(); // Need to confirm, Can have different values for dayType and countryHoliday
     @Relationship(type = BELONGS_TO)
     private List<CTARuleTemplatePhaseInfo>phaseInfo=new ArrayList<>(); //Query beforeStart
     private BudgetType budgetType;
@@ -56,6 +56,7 @@ public class CTARuleTemplate extends RuleTemplate{
     private List<Long> activityIds;
     private Long timeTypeId;
     private Long plannedTimeId;
+    private List<Long> dayTypeIds;
 
     public CTARuleTemplate() {
 
@@ -196,13 +197,6 @@ public class CTARuleTemplate extends RuleTemplate{
         this.approvalWorkFlow = approvalWorkFlow;
     }
 
-    public List<CTARuleTemplateDayType> getCalculateOnDayTypes() {
-        return calculateOnDayTypes;
-    }
-
-    public void setCalculateOnDayTypes(List<CTARuleTemplateDayType> calculateOnDayTypes) {
-        this.calculateOnDayTypes = calculateOnDayTypes;
-    }
     public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
         return phaseInfo;
     }
@@ -273,6 +267,14 @@ public class CTARuleTemplate extends RuleTemplate{
     public void setRuleTemplateType(CTARuleTemplateType ruleTemplateType) {
         this.ruleTemplateType = ruleTemplateType;
     }*/
+
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
+    }
 
     public String getRuleTemplateType() {
         return ruleTemplateType;

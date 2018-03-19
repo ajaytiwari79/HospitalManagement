@@ -39,11 +39,11 @@ public class CTARuleTemplateQueryResult {
     private PlanningCategory planningCategory;
     private List<StaffFunction> staffFunctions=new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
-    private List<Long> timeTypes =new ArrayList<>();
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
     private List<Long> activityIds;
     private Long timeTypeId;
     private Long plannedTimeId;
+    private List<Long> dayTypeIds;
 
     public CTARuleTemplateQueryResult() {
     }
@@ -251,6 +251,14 @@ public class CTARuleTemplateQueryResult {
 
     public void setPlannedTimeId(Long plannedTimeId) {
         this.plannedTimeId = plannedTimeId;
+    }
+
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
     }
 
     @Override
