@@ -175,4 +175,16 @@ public class StaffCreationPOJOData {
     public void setCurrentStatus(StaffStatusEnum currentStatus) {
         this.currentStatus = currentStatus;
     }
+
+    public StaffCreationPOJOData(@NotNull(message = "error.staff.firstname.notnull") String firstName, @NotNull(message = "error.staff.lastname.notnull") String lastName, @NotNull(message = "error.staff.cprNumber.notnull") String cprNumber, String familyName, @Email(message = "error.email.valid") String privateEmail, Gender gender, String userName, @NotNull(message = "error.staff.externalid.notnull") Long externalId, @NotNull(message = "error.staff.accessGroup.id.notnull") Long accessGroupId) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.cprNumber = cprNumber;
+        this.familyName = familyName;
+        this.privateEmail = privateEmail;
+        this.gender = gender;
+        this.userName = userName;
+        this.externalId = externalId;
+        this.accessGroupId = accessGroupId;
+    }
 }

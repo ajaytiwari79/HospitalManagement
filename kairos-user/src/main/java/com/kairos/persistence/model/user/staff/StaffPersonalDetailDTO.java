@@ -30,6 +30,7 @@ public class StaffPersonalDetailDTO {
     protected Gender gender;
     private String city;
     private String province;
+    private Boolean unitPosition;
 
     public long getId() {
         return id;
@@ -168,7 +169,7 @@ public class StaffPersonalDetailDTO {
     }
 
     public String getName() {
-        return this.firstName+" "+this.lastName;
+        return this.firstName + " " + this.lastName;
     }
 
     public void setName(String name) {
@@ -205,5 +206,13 @@ public class StaffPersonalDetailDTO {
 
     public void setProvince(String province) {
         this.province = province;
+    }
+
+    public Boolean getUnitPosition() {
+        return unitPosition;
+    }
+
+    public void setUnitPosition(Boolean unitPosition) {
+        this.unitPosition = unitPosition;
     }
 }

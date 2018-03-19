@@ -499,6 +499,7 @@ public class CostTimeAgreementService extends UserBaseService {
         ctaRuleTemplate.setEmploymentTypes(employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds, false));
 
         // Fetch Time Type
+
         /*List<Long> timeTypeIds = ctaRuleTemplateDTO.getTimeTypes();
         ctaRuleTemplate.setTimeTypes(timeTypeGraphRepository.findTimeTypeByIds(timeTypeIds));
 */

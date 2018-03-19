@@ -35,7 +35,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where id(o)={0}\n" +
             "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertises:Expertise{isEnabled:true})\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTempCatg:RuleTemplateCategory)" +
-            " with wta,o,expertises,ruleTemp,ruleTempCatg\n" +
+            "with wta,o,expertises,ruleTemp,ruleTempCatg\n" +
             "with wta,expertises, CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode," +
             "onlyCompositeShifts:ruleTemp.onlyCompositeShifts,shiftsLimit:ruleTemp.shiftsLimit,shiftAffiliation:ruleTemp.shiftAffiliation,averageRest:ruleTemp.averageRest," +
@@ -59,8 +59,9 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTempCatg:RuleTemplateCategory)\n" +
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
             "optional MATCH (wta)-[r:" + HAS_TAG + "]->(t:Tag)<-[:" + COUNTRY_HAS_TAG + "]-(c) WHERE t.masterDataType='WTA' AND t.countryTag=true AND t.deleted =false " +
-            "with wta,expertise,orgType,orgSubType,ruleTemp,ruleTempCatg,t, \n" +
-            "CASE WHEN tempValue IS NOT NULL THEN collect({id:id(tempValue),phaseName:tempValue.phaseName,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
+            "with tempValue,wta,expertise,orgType,orgSubType,ruleTemp,ruleTempCatg,t  ORDER BY tempValue.sequence \n" +
+            "with wta,expertise,orgType,orgSubType,ruleTemp,ruleTempCatg,t, "+
+            "CASE WHEN tempValue IS NOT NULL THEN collect({id:id(tempValue),phaseName:tempValue.phaseName,sequence:tempValue.sequence,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
             "managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency}) else [] END as phaseTempValues " +
             "return wta.isEnabled as isEnabled, " +
             "CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})   END as tags, \n" +
@@ -88,8 +89,9 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory) \n" +
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue) \n" +
-            "with wta,o,expertise,ruleTemp,ruleTemplateCatg, \n" +
-            "CASE WHEN tempValue IS NOT NULL THEN collect({phaseName:tempValue.phaseName,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
+            "with tempValue, wta,o,expertise,ruleTemp,ruleTemplateCatg ORDER BY tempValue.sequence \n" +
+            "with wta,o,expertise,ruleTemp,ruleTemplateCatg, " +
+            "CASE WHEN tempValue IS NOT NULL THEN collect({phaseName:tempValue.phaseName,sequence:tempValue.sequence,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
             "managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency}) else [] END as phaseTempValues " +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,isDisabled:ruleTemp.isDisabled,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
@@ -150,7 +152,9 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "with expertise,wta,ruleTemp,organization,ruleTemplateCatg, CASE WHEN tempValue IS NOT NULL THEN collect ({id:id(tempValue),phaseName:tempValue.phaseName,phaseId:tempValue.phaseId," +
+            "with tempValue, expertise,wta,ruleTemp,organization,ruleTemplateCatg ORDER BY tempValue.sequence \n" +
+            "with expertise,wta,ruleTemp,organization,ruleTemplateCatg, " +
+            "CASE WHEN tempValue IS NOT NULL THEN collect ({id:id(tempValue),phaseName:tempValue.phaseName,sequence:tempValue.sequence,phaseId:tempValue.phaseId," +
             "staffValue:tempValue.staffValue,managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency})  else [] END as phaseTempValues \n" +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
@@ -185,7 +189,9 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "with expertise,wta,ruleTemp,ruleTemplateCatg, CASE WHEN tempValue IS NOT NULL THEN collect ({phaseName:tempValue.phaseName,phaseId:tempValue.phaseId," +
+            "with tempValue, expertise,wta,ruleTemp,ruleTemplateCatg ORDER BY tempValue.sequence " +
+            "with expertise,wta,ruleTemp,ruleTemplateCatg, " +
+            "CASE WHEN tempValue IS NOT NULL THEN collect ({phaseName:tempValue.phaseName,sequence:tempValue.sequence,phaseId:tempValue.phaseId," +
             "staffValue:tempValue.staffValue,managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency})  else [] END as phaseTempValues \n" +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
@@ -199,12 +205,12 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     )
     WTAResponseDTO getVersionOfWTA(Long organizationId);
 
-    @Query("match (n:UnitEmploymentPosition)-[:" + HAS_WTA + "]-(wta:WorkingTimeAgreement) where id(n)={0}\n" +
+    @Query("match (uep:UnitPosition)-[:" + HAS_WTA + "]-(wta:WorkingTimeAgreement) where id(uep)={0}\n" +
             "optional match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTemplateCatg:RuleTemplateCategory)\n" +
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            " with tempValue order by tempValue.phaseId ,n,expertise,wta,ruleTemp,ruleTemplateCatg "+
-            "with n,expertise,wta,ruleTemp,ruleTemplateCatg, CASE WHEN tempValue IS NOT NULL THEN collect ({phaseName:tempValue.phaseName,phaseId:tempValue.phaseId," +
+            "with tempValue, uep,expertise,wta,ruleTemp,ruleTemplateCatg ORDER BY tempValue.sequence "+
+            "with uep,expertise,wta,ruleTemp,ruleTemplateCatg, CASE WHEN tempValue IS NOT NULL THEN collect ({phaseName:tempValue.phaseName,sequence:tempValue.sequence,phaseId:tempValue.phaseId," +
             "staffValue:tempValue.staffValue,managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency})  else [] END as phaseTempValues \n" +
             "RETURN CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,ruleTemplateCategory:{name:ruleTemplateCatg.name,id:Id(ruleTemplateCatg)},fromDayOfWeek:ruleTemp.fromDayOfWeek," +
             "minimumDurationBetweenShifts:ruleTemp.minimumDurationBetweenShifts, fromTime:ruleTemp.fromTime,activityCode:ruleTemp.activityCode,onlyCompositeShifts:ruleTemp.onlyCompositeShifts," +
@@ -219,11 +225,12 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     )
     WTAResponseDTO findWtaByUnitEmploymentPosition(Long unitEmploymentPositionId);
 
-    @Query("match (n:UnitEmploymentPosition)-[:" + HAS_WTA + "]-(wta:WorkingTimeAgreement{deleted:false}) where id(n)={0}\n" +
+    @Query("match (uep:UnitPosition)-[:" + HAS_WTA + "]-(wta:WorkingTimeAgreement{deleted:false}) where id(uep)={0}\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)\n" +
             "Optional Match (ruleTemp)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "with wta,ruleTemp, \n" +
-            "CASE WHEN tempValue IS NOT NULL THEN collect({id:id(tempValue),phaseName:tempValue.phaseName,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
+            "with tempValue, wta,ruleTemp ORDER BY tempValue.sequence \n" +
+            "with wta,ruleTemp, " +
+            "CASE WHEN tempValue IS NOT NULL THEN collect({id:id(tempValue),phaseName:tempValue.phaseName,sequence:tempValue.sequence,phaseId:tempValue.phaseId,staffValue:tempValue.staffValue," +
             "managementValue:tempValue.managementValue,disabled:tempValue.disabled,optional:tempValue.optional,optionalFrequency:tempValue.optionalFrequency}) else [] END as phaseTempValues " +
             "return  " +
             "wta.startDateMillis as startDateMillis,CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit," +
