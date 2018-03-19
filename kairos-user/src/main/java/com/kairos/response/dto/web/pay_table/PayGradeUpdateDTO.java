@@ -83,4 +83,13 @@ public class PayGradeUpdateDTO {
     public void setLevelId(Long levelId) {
         this.levelId = levelId;
     }
+
+    public PayGradeUpdateDTO(String name, String shortName, String description, Date startDateMillis, Date endDateMillis,Long levelId) {
+        this.name = name;
+        this.shortName = shortName;
+        this.description = description;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.levelId=levelId;
+    }
 }

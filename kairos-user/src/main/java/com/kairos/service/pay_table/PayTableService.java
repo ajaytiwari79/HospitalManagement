@@ -18,6 +18,7 @@ import com.kairos.persistence.model.user.pay_table.OrganizationLevelPayTableDTO;
 import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGraphRepository;
 import com.kairos.response.dto.web.pay_table.*;
 import com.kairos.service.UserBaseService;
+import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -138,7 +139,7 @@ public class PayTableService extends UserBaseService {
             payTable.setStartDateMillis(payTableDTO.getStartDateMillis());
         } else {
             // The start date is modified Now We need to compare is it less than today
-            if (new DateTime(payTableDTO.getStartDateMillis()).isBeforeNow()) {
+            if (new DateTime(payTableDTO.getStartDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
                 throw new ActionNotPermittedException("Start Date Cant be less than current date");
             }
             payTable.setStartDateMillis(payTableDTO.getStartDateMillis());
@@ -154,7 +155,7 @@ public class PayTableService extends UserBaseService {
         // If already not present now its present    Previous its absent
         else if (!Optional.ofNullable(payTable.getEndDateMillis()).isPresent()
                 && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
-            if (new DateTime(payTableDTO.getEndDateMillis()).isBeforeNow()) {
+            if (new DateTime(payTableDTO.getEndDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
                 throw new ActionNotPermittedException("end Date Cant be less than current date");
             }
             payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
@@ -166,7 +167,7 @@ public class PayTableService extends UserBaseService {
                 payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
             } else {
                 // The end date is modified Now We need to compare is it less than today
-                if (new DateTime(payTableDTO.getEndDateMillis()).isBeforeNow()) {
+                if (new DateTime(payTableDTO.getEndDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
                     throw new ActionNotPermittedException("end Date Cant be less than current date");
                 }
                 payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
