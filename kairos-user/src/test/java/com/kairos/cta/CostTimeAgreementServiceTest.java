@@ -91,7 +91,7 @@ public class CostTimeAgreementServiceTest {
     @Test
     public void addCTARuleTemplate()
     {
-        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("CTA RT4",
+        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Overtime CTA",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
                         " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
@@ -148,7 +148,7 @@ public class CostTimeAgreementServiceTest {
 
     @Test
     public void createCostTimeAgreement(){
-        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("working overtime NEw",
+        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("working overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
                         " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
