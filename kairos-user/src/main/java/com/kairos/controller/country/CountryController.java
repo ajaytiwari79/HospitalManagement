@@ -1187,7 +1187,5 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getUnionAndOrganizationLevels(countryId));
 
     }
-
-
 }
 
