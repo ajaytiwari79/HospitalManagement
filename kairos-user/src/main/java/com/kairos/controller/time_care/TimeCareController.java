@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.COUNTRY_URL;
 
 /**
  * Created by prabjot on 16/1/18.
@@ -31,10 +32,10 @@ public class TimeCareController {
     @Inject
     private UnitPositionService unitPositionService;
 
-    @RequestMapping(value = "/skills",method = RequestMethod.POST)
-    public ResponseEntity<Map<String,Object>> importSkillsFromTimeCare(@RequestBody List<TimeCareSkill> timeCareSkills){
+    @RequestMapping(value = COUNTRY_URL+"/skills",method = RequestMethod.POST)
+    public ResponseEntity<Map<String,Object>> importSkillsFromTimeCare(@PathVariable Long countryId,@RequestBody List<TimeCareSkill> timeCareSkills){
 
-        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,skillService.importSkillsFromTimeCare(timeCareSkills,53L));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED,true,skillService.importSkillsFromTimeCare(timeCareSkills,countryId));
     }
 
     @RequestMapping(value = "/organization/{organizationExternalId}/staff",method = RequestMethod.POST)
