@@ -494,7 +494,7 @@ public class CountryService extends UserBaseService {
 
     // For getting all OrganizationLevel and Unions
     public OrganizationLevelAndUnionWrapper getUnionAndOrganizationLevels(Long countryId){
-        List<UnionQueryResult> unions=organizationGraphRepository.findAllByUnionsByCountryId(countryId);
+        List<UnionQueryResult> unions=organizationGraphRepository.findAllUnionsByCountryId(countryId);
         List<Level> organizationLevels=countryGraphRepository.getLevelsByCountry(countryId);
         OrganizationLevelAndUnionWrapper organizationLevelAndUnionWrapper =new OrganizationLevelAndUnionWrapper(unions,organizationLevels);
         return organizationLevelAndUnionWrapper;

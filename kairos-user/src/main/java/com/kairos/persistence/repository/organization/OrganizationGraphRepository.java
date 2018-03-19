@@ -730,6 +730,6 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<Organization> findAllUnionById(List<Long> unionId);
 
     @Query("MATCH (union:Organization{isEnable:true,union:true})-[:" + BELONGS_TO + "]->(country:Country)  where id(country)={0} return id(union) as id, union.name as name")
-    List<UnionQueryResult> findAllByUnionsByCountryId(Long countryId);
+    List<UnionQueryResult> findAllUnionsByCountryId(Long countryId);
 
 }
