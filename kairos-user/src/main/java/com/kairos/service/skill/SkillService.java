@@ -607,7 +607,7 @@ public class SkillService extends UserBaseService {
     public List<Skill> importSkillsFromTimeCare(List<TimeCareSkill> timeCareSkills, Long countryId) {
 
         Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
+        if (!Optional.ofNullable(country).isPresent()) {
             throw new InternalError("Invalid country id ");
         }
 
@@ -618,8 +618,8 @@ public class SkillService extends UserBaseService {
         List<Skill> skillsByExternalIds = (externalIds.isEmpty()) ? new ArrayList<>() :
                 skillGraphRepository.findByExternalIdIn(externalIds);
 
-        SkillCategory skillCategory = skillCategoryGraphRepository.findByName(SKILL_CATEGORY_FOR_TIME_CARE);
-        if (skillCategory == null) {
+        SkillCategory skillCategory = skillCategoryGraphRepository.findByNameIgnoreCaseAndIsEnabledTrue(countryId,"(?i)"+SKILL_CATEGORY_FOR_TIME_CARE);
+        if (!Optional.ofNullable(skillCategory).isPresent()) {
             skillCategory = new SkillCategory(SKILL_CATEGORY_FOR_TIME_CARE);
         }
         skillCategory.setCountry(country);
