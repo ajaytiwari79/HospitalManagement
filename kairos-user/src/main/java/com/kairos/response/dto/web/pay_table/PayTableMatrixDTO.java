@@ -8,14 +8,14 @@ import javax.validation.constraints.NotNull;
  * Created by vipul on 16/3/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PayGradeMatrixDTO {
+public class PayTableMatrixDTO {
     @NotNull(message = "Pay Group Area can not be null")
     private Long payGroupAreaId;
     @NotNull(message = "Pay Grade value can not be null")
     private Long payGradeValue;
     private Long id;
 
-    public PayGradeMatrixDTO() {
+    public PayTableMatrixDTO() {
         //default cons
     }
 
@@ -43,7 +43,7 @@ public class PayGradeMatrixDTO {
         this.id = id;
     }
 
-    public PayGradeMatrixDTO(Long payGroupAreaId, Long payGradeValue, Long id) {
+    public PayTableMatrixDTO(Long payGroupAreaId, Long payGradeValue, Long id) {
         this.payGroupAreaId = payGroupAreaId;
         this.payGradeValue = payGradeValue;
         this.id = id;

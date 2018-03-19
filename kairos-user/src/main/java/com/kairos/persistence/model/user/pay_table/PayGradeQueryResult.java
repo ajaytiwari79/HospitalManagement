@@ -2,7 +2,7 @@ package com.kairos.persistence.model.user.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.response.dto.web.pay_table.PayGradeMatrixDTO;
+import com.kairos.response.dto.web.pay_table.PayTableMatrixDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -17,8 +17,11 @@ public class PayGradeQueryResult {
     private Long payTableId;
     private Long payGradeLevel;
     private Long payGradeId;
-    private List<PayGradeMatrixDTO> payGrades;
+    private List<PayTableMatrixDTO> payGradesMatrix;
 
+    public PayGradeQueryResult() {
+        //default
+    }
 
     public Long getPayTableId() {
         return payTableId;
@@ -44,18 +47,18 @@ public class PayGradeQueryResult {
         this.payGradeId = payGradeId;
     }
 
-    public List<PayGradeMatrixDTO> getPayGrades() {
-        return payGrades;
+    public List<PayTableMatrixDTO> getPayGradesMatrix() {
+        return payGradesMatrix;
     }
 
-    public void setPayGrades(List<PayGradeMatrixDTO> payGrades) {
-        this.payGrades = payGrades;
+    public void setPayGradesMatrix(List<PayTableMatrixDTO> payGradesMatrix) {
+        this.payGradesMatrix = payGradesMatrix;
     }
 
-    public PayGradeQueryResult(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayGradeMatrixDTO> payGrades) {
+    public PayGradeQueryResult(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayTableMatrixDTO> payGradesMatrix) {
         this.payTableId = payTableId;
         this.payGradeLevel = payGradeLevel;
         this.payGradeId = payGradeId;
-        this.payGrades = payGrades;
+        this.payGradesMatrix = payGradesMatrix;
     }
 }
