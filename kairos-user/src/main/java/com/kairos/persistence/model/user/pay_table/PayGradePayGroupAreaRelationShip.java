@@ -21,7 +21,7 @@ public class PayGradePayGroupAreaRelationShip extends UserBaseEntity {
     private PayGroupArea payGroupArea;
 
 
-    private BigDecimal payGroupAmount;
+    private BigDecimal payGroupAreaAmount;
 
     public PayGradePayGroupAreaRelationShip() {
     }
@@ -42,17 +42,17 @@ public class PayGradePayGroupAreaRelationShip extends UserBaseEntity {
         this.payGrade = payGrade;
     }
 
-    public BigDecimal getPayGroupAmount() {
-        return payGroupAmount;
+    public BigDecimal getPayGroupAreaAmount() {
+        return payGroupAreaAmount;
     }
 
-    public void setPayGroupAmount(BigDecimal payGroupAmount) {
-        this.payGroupAmount = payGroupAmount;
+    public void setPayGroupAreaAmount(BigDecimal payGroupAreaAmount) {
+        this.payGroupAreaAmount = payGroupAreaAmount;
     }
 
-    public PayGradePayGroupAreaRelationShip(PayGrade payGrade, PayGroupArea payGroupArea, BigDecimal payGroupAmount) {
+    public PayGradePayGroupAreaRelationShip(PayGrade payGrade, PayGroupArea payGroupArea, BigDecimal payGroupAreaAmount) {
         this.payGrade = payGrade;
         this.payGroupArea = payGroupArea;
-        this.payGroupAmount = payGroupAmount;
+        this.payGroupAreaAmount = payGroupAreaAmount;
     }
 }

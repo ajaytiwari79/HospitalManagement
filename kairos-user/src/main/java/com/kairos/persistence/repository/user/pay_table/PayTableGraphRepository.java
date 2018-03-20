@@ -27,7 +27,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
 
     @Query("MATCH (c:Country) where id(c)={0} \n" +
             "MATCH(c)-[:HAS_LEVEL]->(level:Level{isEnabled:true})\n" +
-            "OPTIONAL MATCH (level)<-[:IN_ORGANIZATION_LEVEL]-(payTable:PayTable{deleted:false})\n" +
+            "OPTIONAL MATCH (level)<-[:"+IN_ORGANIZATION_LEVEL+"]-(payTable:PayTable{deleted:false})\n" +
             "with level,Case when payTable IS NOT NULL THEN collect({id:id(payTable),name:payTable.name,startDateMillis:payTable.startDateMillis,endDateMillis:payTable.endDateMillis,description:payTable.description,shortName:payTable.shortName}) else [] end as payTables\n" +
             "with level,payTables \n OPTIONAL MATCH  (level:Level)-[:IN_LEVEL]-(payGroupArea:PayGroupArea{deleted:false})\n" +
             "return id(level) as id,level.name as name ,level.description as description, Case when payGroupArea IS NOT NULL THEN \n" +
@@ -39,9 +39,9 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             " RETURN case when payGradeCount>0 THEN  true ELSE false END as response")
     Boolean checkPayGradeLevelAlreadyExists(Long payTableId, Long payGradeLevel);
 
-    @Query("MATCH (payTable:PayTable{deleted:false})-[:"+HAS_PAY_GRADE+"]->(payGrade:PayGrade{deleted:false}) where id(payTable)={0} \n" +
-            " Match(payGrade)-[rel:"+HAS_PAY_GROUP_AREA+"]-(pga:PayGroupArea{deleted:false})\n" +
-            "return id(payTable) as payTableId,id(payGrade) as payGradeId,payGrade.payGradeLevel as payGradeLevel,collect({id:id(rel),payGroupAreaId:id(pga),payGroupAmount:rel.payGroupAmount}) as payTableMatrix")
+    @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false}) where id(payTable)={0} \n" +
+            "Match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea{deleted:false})\n" +
+            "return id(payTable) as payTableId,id(payGrade) as payGradeId,payGrade.payGradeLevel as payGradeLevel,collect({id:id(rel),payGroupAreaId:id(pga),payGroupAreaAmount:rel.payGroupAreaAmount}) as payTableMatrix")
     List<PayGradeQueryResult> getPayGridsByPayTableId(Long payTableId);
 
 }

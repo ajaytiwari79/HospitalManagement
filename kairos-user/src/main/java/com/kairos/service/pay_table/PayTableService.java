@@ -246,7 +246,7 @@ public class PayTableService extends UserBaseService {
         List<PayTableMatrixDTO> payGradeMatrices = new ArrayList<>();
         payGradePayGroupAreaRelationShips.forEach(currentPayGroupArea -> {
             PayTableMatrixDTO payTableMatrixDTO =
-                    new PayTableMatrixDTO(currentPayGroupArea.getPayGroupArea().getId(), currentPayGroupArea.getPayGroupAmount(), currentPayGroupArea.getId());
+                    new PayTableMatrixDTO(currentPayGroupArea.getPayGroupArea().getId(), currentPayGroupArea.getPayGroupAreaAmount(), currentPayGroupArea.getId());
             payGradeMatrices.add(payTableMatrixDTO);
         });
         return payGradeMatrices;
@@ -298,7 +298,7 @@ public class PayTableService extends UserBaseService {
             } else {
                 for (PayGradePayGroupAreaRelationShip currentPayGradeData : payGradeData) {
                     if (currentPayGradeData.getId().equals(payGradeDTO.getPayTableMatrix().get(i).getId())) {
-                        currentPayGradeData.setPayGroupAmount(payGradeDTO.getPayTableMatrix().get(i).getPayGroupAreaAmount());
+                        currentPayGradeData.setPayGroupAreaAmount(payGradeDTO.getPayTableMatrix().get(i).getPayGroupAreaAmount());
                     }
                 }
             }
