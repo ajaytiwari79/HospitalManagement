@@ -6,7 +6,7 @@ import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.pay_table.OrganizationLevelPayTableDTO;
 import com.kairos.persistence.model.user.pay_table.PayTableQueryResult;
-import com.kairos.response.dto.web.pay_table.PayGradeUpdateDTO;
+import com.kairos.response.dto.web.pay_table.PayTableUpdateDTO;
 import com.kairos.response.dto.web.pay_table.PayTableDTO;
 import com.kairos.response.dto.web.pay_table.PayTableResponseWrapper;
 import com.kairos.util.DateUtil;
@@ -111,8 +111,8 @@ public class PayTableServiceIntegrationTest {
     @Test
     @OrderTest(order = 3)
     public void updatePayLevel() {
-        PayGradeUpdateDTO payGradeUpdateDTO = new PayGradeUpdateDTO("Test pay level", "SF", "By test", currentDate.toDate(), null, organizationLevel);
-        HttpEntity<PayGradeUpdateDTO> entity = new HttpEntity<>(payGradeUpdateDTO);
+        PayTableUpdateDTO payTableUpdateDTO = new PayTableUpdateDTO("Test pay level", "SF", "By test", currentDate.toDate(), null, organizationLevel);
+        HttpEntity<PayTableUpdateDTO> entity = new HttpEntity<>(payTableUpdateDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableQueryResult>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableQueryResult>>() {

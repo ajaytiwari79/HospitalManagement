@@ -39,9 +39,9 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             " RETURN case when payGradeCount>0 THEN  true ELSE false END as response")
     Boolean checkPayGradeLevelAlreadyExists(Long payTableId, Long payGradeLevel);
 
-    @Query("MATCH (payTable:PayTable{deleted:false})-[:HAS_PAY_GRADE]->(payGrade:PayGrade{deleted:false}) where id(payTable)={0} \n" +
-            " Match(payGrade)-[rel:HAS_PAY_GROUP_AREA]-(pga:PayGroupArea{deleted:false})\n" +
-            "return id(payTable) as payTableId,id(payGrade) as payGradeId,payGrade.payGradeLevel as payGradeLevel,collect({id:id(rel),payGroupAreaId:id(pga),payGradeValue:rel.payGradeValue}) as payGradesMatrix")
+    @Query("MATCH (payTable:PayTable{deleted:false})-[:"+HAS_PAY_GRADE+"]->(payGrade:PayGrade{deleted:false}) where id(payTable)={0} \n" +
+            " Match(payGrade)-[rel:"+HAS_PAY_GROUP_AREA+"]-(pga:PayGroupArea{deleted:false})\n" +
+            "return id(payTable) as payTableId,id(payGrade) as payGradeId,payGrade.payGradeLevel as payGradeLevel,collect({id:id(rel),payGroupAreaId:id(pga),payGroupAmount:rel.payGroupAmount}) as payTableMatrix")
     List<PayGradeQueryResult> getPayGridsByPayTableId(Long payTableId);
 
 }

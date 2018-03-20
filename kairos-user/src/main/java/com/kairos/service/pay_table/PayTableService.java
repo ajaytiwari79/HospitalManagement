@@ -13,6 +13,7 @@ import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepos
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
+import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.model.user.pay_table.OrganizationLevelPayTableDTO;
 import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGraphRepository;
@@ -37,6 +38,8 @@ public class PayTableService extends UserBaseService {
 
     @Inject
     private PayTableGraphRepository payTableGraphRepository;
+    @Inject
+    private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
@@ -78,7 +81,7 @@ public class PayTableService extends UserBaseService {
         logger.info(payTableDTO.toString());
         Level level = countryGraphRepository.getLevel(countryId, payTableDTO.getLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid level id " + payTableDTO.getLevelId());
+            throw new DataNotFoundByIdException("Invalid grade id " + payTableDTO.getLevelId());
         }
 
         Boolean isAlreadyExists = payTableGraphRepository.
@@ -134,10 +137,8 @@ public class PayTableService extends UserBaseService {
 
     }
 
-    private void prepareDates(PayTable payTable, PayGradeUpdateDTO payTableDTO) {
-        if (payTable.getStartDateMillis().equals(payTableDTO.getStartDateMillis())) {
-            payTable.setStartDateMillis(payTableDTO.getStartDateMillis());
-        } else {
+    private void prepareDates(PayTable payTable, PayTableUpdateDTO payTableDTO) {
+        if (!payTable.getStartDateMillis().equals(payTableDTO.getStartDateMillis())) {
             // The start date is modified Now We need to compare is it less than today
             if (new DateTime(payTableDTO.getStartDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
                 throw new ActionNotPermittedException("Start Date Cant be less than current date");
@@ -146,27 +147,22 @@ public class PayTableService extends UserBaseService {
         }
         // End date
         // If already end date was set  but now no value so we are removing
-        if (!Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent() &&
-                Optional.ofNullable(payTable.getEndDateMillis()).isPresent()) {
+        if (!Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent() && Optional.ofNullable(payTable.getEndDateMillis()).isPresent()) {
             payTable.setEndDateMillis(null);
 
         }
 
         // If already not present now its present    Previous its absent
-        else if (!Optional.ofNullable(payTable.getEndDateMillis()).isPresent()
-                && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
+        else if (!Optional.ofNullable(payTable.getEndDateMillis()).isPresent() && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
             if (new DateTime(payTableDTO.getEndDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
                 throw new ActionNotPermittedException("end Date Cant be less than current date");
             }
             payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
         }
 
-// If already present and still present // NOw checking are they same or different
+        // If already present and still present // NOw checking are they same or different
         else if (Optional.ofNullable(payTable.getEndDateMillis()).isPresent() && Optional.ofNullable(payTableDTO.getEndDateMillis()).isPresent()) {
-            if (payTable.getEndDateMillis().equals(payTableDTO.getEndDateMillis())) {  // both are same so nothing is change
-                payTable.setEndDateMillis(payTableDTO.getEndDateMillis());
-            } else {
-                // The end date is modified Now We need to compare is it less than today
+            if (!payTable.getEndDateMillis().equals(payTableDTO.getEndDateMillis())) {//The end date is modified Now We need to compare is it less than today
                 if (new DateTime(payTableDTO.getEndDateMillis()).isBefore(new DateTime(DateUtil.getCurrentDate()))) {
                     throw new ActionNotPermittedException("end Date Cant be less than current date");
                 }
@@ -176,11 +172,11 @@ public class PayTableService extends UserBaseService {
 
     }
 
-    public PayTableQueryResult updatePayTable(Long countryId, Long payTableId, PayGradeUpdateDTO payTableDTO) {
+    public PayTableQueryResult updatePayTable(Long countryId, Long payTableId, PayTableUpdateDTO payTableDTO) {
 
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid pay level id");
+            throw new DataNotFoundByIdException("Invalid pay grade id");
         }
         // skipped to current pay table it is checking weather any other payTable has same name or short name in current organization level
         Boolean isAlreadyExists = payTableGraphRepository.
@@ -202,7 +198,7 @@ public class PayTableService extends UserBaseService {
     public PayGradeQueryResult addPayGradeInPayTable(Long payTableId, PayGradeDTO payGradeDTO) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid pay level id");
+            throw new DataNotFoundByIdException("Invalid pay grade id");
         }
         Boolean isAlreadyExists = payTableGraphRepository.checkPayGradeLevelAlreadyExists(payTableId, payGradeDTO.getPayGradeLevel());
         if (isAlreadyExists) {
@@ -223,7 +219,7 @@ public class PayTableService extends UserBaseService {
         List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(payGroupAreasId);
 
         if (payGroupAreas.size() != payGroupAreasId.size()) {
-            throw new DataNotMatchedException("unable to get all municipality");
+            throw new DataNotMatchedException("unable to get all payGroup areas ");
         }
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
         // contains all
@@ -234,14 +230,13 @@ public class PayTableService extends UserBaseService {
 
                 if (payGradeDTO.getPayTableMatrix().get(i).getPayGroupAreaId().equals(currentPayGroupArea.getId())) {
                     PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
-                            = new PayGradePayGroupAreaRelationShip(payGrade, currentPayGroupArea, payGradeDTO.getPayTableMatrix().get(i).getPayGradeValue());
+                            = new PayGradePayGroupAreaRelationShip(payGrade, currentPayGroupArea, payGradeDTO.getPayTableMatrix().get(i).getPayGroupAreaAmount());
                     payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
                 }
 
             }
         });
         payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
-
         PayGradeQueryResult payGradeQueryResult =
                 new PayGradeQueryResult(payTableId, payGrade.getPayGradeLevel(), payGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips));
         return payGradeQueryResult;
@@ -249,21 +244,68 @@ public class PayTableService extends UserBaseService {
 
     private List<PayTableMatrixDTO> getPayGradeResponse(List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips) {
         List<PayTableMatrixDTO> payGradeMatrices = new ArrayList<>();
-
         payGradePayGroupAreaRelationShips.forEach(currentPayGroupArea -> {
             PayTableMatrixDTO payTableMatrixDTO =
-                    new PayTableMatrixDTO(currentPayGroupArea.getPayGroupArea().getId(), currentPayGroupArea.getPayGradeValue(), currentPayGroupArea.getId());
+                    new PayTableMatrixDTO(currentPayGroupArea.getPayGroupArea().getId(), currentPayGroupArea.getPayGroupAmount(), currentPayGroupArea.getId());
             payGradeMatrices.add(payTableMatrixDTO);
         });
         return payGradeMatrices;
     }
 
     public List<PayGradeQueryResult> getPayGridsByPayTableId(Long payTableId) {
-
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
-        if (!Optional.ofNullable(payTable).isPresent()) {
+        if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             throw new DataNotFoundByIdException("Invalid pay table id");
         }
         return payTableGraphRepository.getPayGridsByPayTableId(payTableId);
     }
+
+    public boolean removePayGradeInPayTable(Long payTableId, Long payGradeId) {
+        PayGrade payGrade = payGradeGraphRepository.findOne(payGradeId);
+        if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
+            throw new DataNotFoundByIdException("Invalid pay grade id");
+        }
+        payGradeGraphRepository.removeAllPayGroupAreasFromPayGrade(payGrade.getId());
+        return true;
+    }
+
+    public boolean removePayTable(Long payTableId) {
+        PayTable payTable = payTableGraphRepository.findOne(payTableId);
+        if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
+            throw new DataNotFoundByIdException("Invalid pay table id");
+        }
+        payTable.setDeleted(true);
+        save(payTable);
+        return true;
+    }
+
+    public PayGradeDTO updatePayGradeInPayTable(Long payGradeId, PayGradeDTO payGradeDTO) {
+        PayGrade payGrade = payGradeGraphRepository.findOne(payGradeId);
+        if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
+            throw new DataNotFoundByIdException("Invalid pay grade id");
+        }
+        List<Long> relationshipIds = payGradeDTO.getPayTableMatrix().stream().map(PayTableMatrixDTO::getId).collect(Collectors.toList());
+        Iterable<PayGradePayGroupAreaRelationShip> payGradeData = payTableRelationShipGraphRepository.findAllById(relationshipIds);
+
+        for (int i = 0; i < payGradeDTO.getPayTableMatrix().size(); i++) {
+            // Rare case
+            if (payGradeDTO.getPayTableMatrix().get(i).getId() == null) { // this is a new pay group area which is added after creation and now user is setting value on that
+                PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGradeDTO.getPayTableMatrix().get(i).getPayGroupAreaId());
+                PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
+                        = new PayGradePayGroupAreaRelationShip(payGrade, payGroupArea, payGradeDTO.getPayTableMatrix().get(i).getPayGroupAreaAmount());
+                payTableRelationShipGraphRepository.save(payGradePayGroupAreaRelationShip);
+                payGradeDTO.getPayTableMatrix().get(i).setId(payGradePayGroupAreaRelationShip.getId());
+            } else {
+                for (PayGradePayGroupAreaRelationShip currentPayGradeData : payGradeData) {
+                    if (currentPayGradeData.getId().equals(payGradeDTO.getPayTableMatrix().get(i).getId())) {
+                        currentPayGradeData.setPayGroupAmount(payGradeDTO.getPayTableMatrix().get(i).getPayGroupAreaAmount());
+                    }
+                }
+            }
+        }
+
+        payTableRelationShipGraphRepository.saveAll(payGradeData);
+        return payGradeDTO;
+    }
+
 }
