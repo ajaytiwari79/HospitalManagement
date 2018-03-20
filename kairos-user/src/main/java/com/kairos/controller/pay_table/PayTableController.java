@@ -68,7 +68,7 @@ public class PayTableController {
 
 
     // add a new pay grade in payTable
-    @RequestMapping(value = "/pay_table/{payTableId}/pay_grade", method = PUT)
+    @RequestMapping(value = "/pay_table/{payTableId}/pay_grade", method = POST)
     public ResponseEntity<Map<String, Object>> addPayGradeInPayTable(@PathVariable Long payTableId, @Validated @RequestBody PayGradeDTO payGradeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, payTableService.addPayGradeInPayTable(payTableId, payGradeDTO));
     }
