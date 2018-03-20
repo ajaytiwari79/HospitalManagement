@@ -601,4 +601,11 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
+    // For Test Cases
+    public UnitPosition getDefaultUnitPositionByOrg(Long orgId){
+        return unitPositionGraphRepository.getDefaultUnitPositionByOrg(orgId);
+    }
+
+
+
 }

@@ -31,6 +31,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,7 @@ public class CostTimeAgreementService extends UserBaseService {
     private @Inject OrganizationService organizationService;
     private @Inject ActivityTypesRestClient activityTypesRestClient;
     private @Inject UnitPositionGraphRepository unitPositionGraphRepository;
+    private @Inject UnitPositionService unitPositionService;
 
 
     public boolean isDefaultCTARuleTemplateExists(){
@@ -517,7 +519,7 @@ public class CostTimeAgreementService extends UserBaseService {
             return  expertise;
         };
 
-        Future<Optional<Expertise>>expertiseFuture=asynchronousService.executeAsynchronously(expertiseCallable);
+        Future<Optional<Expertise>> expertiseFuture=asynchronousService.executeAsynchronously(expertiseCallable);
 
               // Get Rule Templates
         Callable<List<RuleTemplate>> ctaRuleTemplatesCallable=()-> {
@@ -537,14 +539,14 @@ public class CostTimeAgreementService extends UserBaseService {
             }
             return ruleTemplates;
         };
-        Future<List<RuleTemplate>>ctaRuleTemplatesFuture=asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
+        Future<List<RuleTemplate>> ctaRuleTemplatesFuture=asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
 
         // Get Organization Type
         Callable<Optional<OrganizationType>> OrganizationTypesListCallable=()->{
             Optional<OrganizationType> organizationType=organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationType());
             return  organizationType;
         };
-        Future<Optional<OrganizationType>>organizationTypesFuture=asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
+        Future<Optional<OrganizationType>> organizationTypesFuture=asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
 
 
         // Get Organization Sub Type
@@ -552,13 +554,15 @@ public class CostTimeAgreementService extends UserBaseService {
             Optional<OrganizationType> organizationType=organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationSubType());
             return  organizationType;
         };
-        Future<Optional<OrganizationType>>organizationSubTypesFuture=asynchronousService.executeAsynchronously(OrganizationSubTypesListCallable);
+        Future<Optional<OrganizationType>> organizationSubTypesFuture=asynchronousService.executeAsynchronously(OrganizationSubTypesListCallable);
 
         //set data
          if(expertiseFuture.get().isPresent())
              costTimeAgreement.setExpertise(expertiseFuture.get().get());
-        costTimeAgreement.setOrganizationType(organizationTypesFuture.get().get());
-        costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
+        if(organizationTypesFuture.get().isPresent())
+            costTimeAgreement.setOrganizationType(organizationTypesFuture.get().get());
+        if(organizationSubTypesFuture.get().isPresent())
+            costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
         costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
         costTimeAgreement.setStartDateMillis(collectiveTimeAgreementDTO.getStartDateMillis());
         costTimeAgreement.setEndDateMillis(collectiveTimeAgreementDTO.getEndDateMillis());
@@ -775,7 +779,7 @@ public class CostTimeAgreementService extends UserBaseService {
         }
         CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
         collectiveTimeAgreementDTO.setId(null);
-        // In case of copy CTA need to remove ID of CTA
+
         BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
 
         costTimeAgreement.setId(null);
@@ -787,13 +791,28 @@ public class CostTimeAgreementService extends UserBaseService {
 
         CostTimeAgreement oldCTA = collectiveTimeAgreementGraphRepository.getLinkedCTAWithUnitPosition(unitPositionId);
         collectiveTimeAgreementGraphRepository.detachCTAFromUnitPosition(unitPositionId);
-        unitPosition.setCta(costTimeAgreement);
-        this.save(costTimeAgreement);
 
-        oldCTA.setParent(costTimeAgreement);
-        this.save(oldCTA);
+        costTimeAgreement.setParent(oldCTA);
+        unitPosition.setCta(costTimeAgreement);
+        unitPositionService.save(unitPosition);
 
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         return collectiveTimeAgreementDTO;
+    }
+
+    public CostTimeAgreement getCTALinkedWithUnitPosition(Long unitPositionId){
+        return unitPositionGraphRepository.getCTALinkedWithUnitPosition(unitPositionId);
+    }
+
+    public Long getExpertiseIdOfCTA(Long ctaId){
+        return collectiveTimeAgreementGraphRepository.getExpertiseOfCTA(ctaId);
+    }
+
+    public Long getOrgTypeOfCTA(Long ctaId){
+        return collectiveTimeAgreementGraphRepository.getOrgTypeOfCTA(ctaId);
+    }
+
+    public Long getOrgSubTypeOfCTA(Long ctaId){
+        return collectiveTimeAgreementGraphRepository.getOrgSubTypeOfCTA(ctaId);
     }
 }

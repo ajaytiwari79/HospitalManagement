@@ -2,6 +2,7 @@ package com.kairos.cta;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.config.OrderTest;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.cta.*;
@@ -10,6 +11,7 @@ import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
@@ -19,6 +21,7 @@ import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.unit_position.UnitPositionService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -37,6 +40,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -50,21 +54,24 @@ import java.util.stream.Stream;
 @SpringBootTest(classes = UserServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class CostTimeAgreementServiceTest {
     private Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
-    @Autowired private RuleTemplateCategoryService ruleTemplateCategoryService;
-    @Autowired private CostTimeAgreementService costTimeAgreementService;
-    @Autowired private CurrencyService currencyService;
-    @Autowired DayTypeService dayTypeService;
-    @Autowired ExpertiseService expertiseService;
-    @Autowired OrganizationService organizationService;
-    @Autowired CountryService countryService;
+    @Inject private RuleTemplateCategoryService ruleTemplateCategoryService;
+    @Inject private CostTimeAgreementService costTimeAgreementService;
+    @Inject private CurrencyService currencyService;
+    @Inject DayTypeService dayTypeService;
+    @Inject ExpertiseService expertiseService;
+    @Inject OrganizationService organizationService;
+    @Inject CountryService countryService;
+    @Inject UnitPositionService unitPositionService;
     @Value("${server.host.http.url}")
     private String url;
-    @Autowired
+    @Inject
     TestRestTemplate restTemplate;
     static Long createdCtaId = null;
 //    static Long countryId = 53L;
     static Long countryId = null;
     static Long organizationId = null;
+    static Long unitPositionId = null;
+    static CostTimeAgreement ctaLinkedWithUnitPosition;
     static String nameOfCTA = "Overtime CTA";
 
     @Before
@@ -76,7 +83,13 @@ public class CostTimeAgreementServiceTest {
 
         // Fetch parent unit
         Organization org = organizationService.getOneParentUnitByCountry(countryId);
-        organizationId = org == null ? null : org.getId();
+        organizationId = 163L;//org == null ? null : org.getId();
+
+        // Fetch unit position
+        UnitPosition unitPosition = unitPositionService.getDefaultUnitPositionByOrg(organizationId);
+        unitPositionId = unitPosition == null ? null : unitPosition.getId();
+
+        ctaLinkedWithUnitPosition = costTimeAgreementService.getCTALinkedWithUnitPosition(unitPositionId);
     }
 
 
@@ -129,13 +142,13 @@ public class CostTimeAgreementServiceTest {
 
     @Test
     public void getAllRuleTemplate(){
-        CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS= costTimeAgreementService.loadAllCTARuleTemplateByCountry(53L);
+        CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS= costTimeAgreementService.loadAllCTARuleTemplateByCountry(countryId);
         System.out.println(ctaRuleTemplateDTOS);
     }
     @Test
     public void getCurrency(){
 
-        Currency currency=currencyService.getCurrencyByCountryId(53L);
+        Currency currency=currencyService.getCurrencyByCountryId(countryId);
         System.out.println(currency);
 
     }
@@ -227,6 +240,7 @@ public class CostTimeAgreementServiceTest {
         String ruleTemplateCategory="test";
     }
 
+    @Test
     public  void updateCTARuleTemplateCategory() throws Exception{
         CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Working Overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
@@ -279,6 +293,64 @@ public class CostTimeAgreementServiceTest {
         // Prepare Activity Data
         ctaRuleTemplateDTO.setActivityTypeForCostCalculation(ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE);
         return ctaRuleTemplateDTO;
+    }
+
+
+
+
+    @Test
+    public void createCostTimeAgreementForUnitPosition(){
+        // Check for CTA by Id
+        if(ctaLinkedWithUnitPosition == null){
+            logger.info("CTA With Unit position not found");
+            return;
+        }
+
+        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Working Overtime",
+                "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
+                        " 50% overtime compensation”.",
+                "230:50% overtime compensation", "xyz");
+        ctaRuleTemplateDTO = prepareCTARuleTemplate(ctaRuleTemplateDTO);
+        List<CTARuleTemplateDTO> ctaRuleTemplates = new ArrayList<>();
+        ctaRuleTemplates.add(ctaRuleTemplateDTO);
+
+        Long expertiseId = costTimeAgreementService.getExpertiseIdOfCTA(ctaLinkedWithUnitPosition.getId());
+        Long orgTypeId = costTimeAgreementService.getOrgTypeOfCTA(ctaLinkedWithUnitPosition.getId());
+        Long orgSubTypeId = costTimeAgreementService.getOrgSubTypeOfCTA(ctaLinkedWithUnitPosition.getId());
+
+        CollectiveTimeAgreementDTO collectiveTimeAgreementDTO = new CollectiveTimeAgreementDTO
+                (nameOfCTA, "Test description", expertiseId, orgTypeId,
+                        orgSubTypeId, new Date().getTime(), ctaRuleTemplates);
+
+        collectiveTimeAgreementDTO.setDescription("Description updated");
+
+        String baseUrl = getBaseUrl(organizationId, null);
+        HttpEntity<CollectiveTimeAgreementDTO> requestBodyData = new HttpEntity<>(collectiveTimeAgreementDTO);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
+                baseUrl + "/unit/"+organizationId+"/unit_position/"+unitPositionId+"/cta/"+ctaLinkedWithUnitPosition.getId(),
+                HttpMethod.PUT, requestBodyData, typeReference);
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
+    }
+
+    @Test
+    public void getMainTabs() throws Exception {
+
+        String baseUrl=getBaseUrl(organizationId,null);
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAListQueryResult>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAListQueryResult>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<CTAListQueryResult>> response = restTemplate.exchange(
+                baseUrl+"/unit/"+organizationId+"/unit_position/"+unitPositionId+"/cta",
+                HttpMethod.GET, null, resTypeReference);
+
+        logger.info("STATUS CODE ---------------------> {}",response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
+
     }
 
     public final String getBaseUrl(Long organizationId, Long countryId) {

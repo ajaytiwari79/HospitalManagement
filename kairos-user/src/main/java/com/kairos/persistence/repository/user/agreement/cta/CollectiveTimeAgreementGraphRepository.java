@@ -206,4 +206,13 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[r:HAS_CTA]-(up:UnitPosition) WHERE id(up)={0} RETURN cta")
     CostTimeAgreement getLinkedCTAWithUnitPosition(Long unitPositinId);
 
+    @Query("match (cta:CostTimeAgreement{deleted:false})-[:"+HAS_EXPERTISE_IN+"]-(expertise:Expertise) where id(cta)={0} RETURN id(cta)")
+    Long getExpertiseOfCTA(Long ctaId);
+
+    @Query("match (cta:CostTimeAgreement{deleted:false})-[:"+BELONGS_TO_ORG_TYPE+"]-(orgType:OrganizationType) where id(cta)={0} RETURN id(cta)")
+    Long getOrgTypeOfCTA(Long ctaId);
+
+    @Query("match (cta:CostTimeAgreement{deleted:false})-[:"+BELONGS_TO_ORG_SUB_TYPE+"]-(orgSubType:OrganizationType) where id(cta)={0} RETURN id(cta)")
+    Long getOrgSubTypeOfCTA(Long ctaId);
+
 }
