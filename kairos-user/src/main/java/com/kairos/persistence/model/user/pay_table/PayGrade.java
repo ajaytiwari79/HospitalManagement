@@ -14,12 +14,21 @@ import java.util.List;
 public class PayGrade extends UserBaseEntity {
 
     private Long payGradeLevel;
+    private boolean active;
 
     public PayGrade() {
     }
 
     public PayGrade(Long payGradeLevel) {
         this.payGradeLevel = payGradeLevel;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public Long getPayGradeLevel() {
