@@ -93,4 +93,17 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> getExpertiseForCTA(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getExpertiseForOrgCTA(unitId));
     }
+
+    @ApiOperation(value = "Update Unit Position's CTA")
+    @PutMapping(value = "/unit_position/{unitPositionId}/cta/{ctaId}")
+    public ResponseEntity<Map<String, Object>> updateUnitPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable Long ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.createCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, collectiveTimeAgreementDTO));
+    }
+
+    @ApiOperation(value = "get unit_position's WTA")
+    @GetMapping(value = "/unit_position/{unitPositionId}/wta")
+    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionWTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getUnitPositionWTA(unitId, unitPositionId));
+    }
+
 }

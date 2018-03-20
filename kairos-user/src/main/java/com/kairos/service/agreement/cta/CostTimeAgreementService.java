@@ -13,6 +13,7 @@ import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -22,8 +23,8 @@ import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategory
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.*;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
-import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
@@ -74,6 +75,7 @@ public class CostTimeAgreementService extends UserBaseService {
     private @Inject OrganizationTypeGraphRepository organizationTypeRepository;
     private @Inject OrganizationService organizationService;
     private @Inject ActivityTypesRestClient activityTypesRestClient;
+    private @Inject UnitPositionGraphRepository unitPositionGraphRepository;
 
 
     public boolean isDefaultCTARuleTemplateExists(){
@@ -747,7 +749,6 @@ public class CostTimeAgreementService extends UserBaseService {
         return true;
     }
 
-
     public List<ExpertiseTagDTO> getExpertiseForOrgCTA(long unitId) {
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
@@ -756,5 +757,43 @@ public class CostTimeAgreementService extends UserBaseService {
     public Long getCTAIdByNameAndCountry(String name, Long countryId){
         CostTimeAgreement cta = collectiveTimeAgreementGraphRepository.getCTAIdByCountryAndName(countryId, name);
         return  (Optional.ofNullable(cta).isPresent()) ? null : cta.getId();
+    }
+
+    public CTAListQueryResult getUnitPositionCTA(Long unitId, Long unitEmploymentPositionId) {
+        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitEmploymentPositionId);
+        if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {
+            throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitEmploymentPositionId);
+        }
+        CTAListQueryResult cta = collectiveTimeAgreementGraphRepository.getCTAByUnitPositionId(unitEmploymentPositionId);
+        return cta;
+    }
+
+    public CollectiveTimeAgreementDTO createCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
+        if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {
+            throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitPositionId);
+        }
+        CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
+        collectiveTimeAgreementDTO.setId(null);
+        // In case of copy CTA need to remove ID of CTA
+        BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
+
+        costTimeAgreement.setId(null);
+        CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, false, null);
+
+        // Wait until they are all done
+        CompletableFuture.allOf(hasUpdated).join();
+
+        CostTimeAgreement oldCTA = collectiveTimeAgreementGraphRepository.getLinkedCTAWithUnitPosition(unitPositionId);
+        collectiveTimeAgreementGraphRepository.detachCTAFromUnitPosition(unitPositionId);
+        unitPosition.setCta(costTimeAgreement);
+        this.save(costTimeAgreement);
+
+        oldCTA.setParent(costTimeAgreement);
+        this.save(oldCTA);
+
+        collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
+        return collectiveTimeAgreementDTO;
     }
 }
