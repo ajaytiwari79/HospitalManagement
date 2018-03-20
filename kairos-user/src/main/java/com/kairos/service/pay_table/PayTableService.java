@@ -1,5 +1,7 @@
 package com.kairos.service.pay_table;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
@@ -20,10 +22,12 @@ import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGrap
 import com.kairos.response.dto.web.pay_table.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
+import org.apache.commons.lang3.SerializationUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -238,7 +242,7 @@ public class PayTableService extends UserBaseService {
         });
         payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
         PayGradeQueryResult payGradeQueryResult =
-                new PayGradeQueryResult(payTableId, payGrade.getPayGradeLevel(), payGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips));
+                new PayGradeQueryResult(payTableId, payGrade.getPayGradeLevel(), payGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), payGrade.isActive());
         return payGradeQueryResult;
     }
 
@@ -308,4 +312,15 @@ public class PayTableService extends UserBaseService {
         return payGradeDTO;
     }
 
+    public boolean publishPayTable(Long payTableId, Long publishedDateMillis) {
+        PayTable payTable = payTableGraphRepository.findOne(payTableId, 2);
+        if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
+            throw new DataNotFoundByIdException("Invalid pay table id");
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        PayTable payTableByMapper = objectMapper.convertValue(payTable, PayTable.class);
+        PayTable payTableByBeanUtil = new PayTable();
+        BeanUtils.copyProperties(payTableByBeanUtil, payTable);
+        return true;
+    }
 }

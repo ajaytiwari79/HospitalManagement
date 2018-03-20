@@ -21,6 +21,7 @@ public class PayTableQueryResult {
     private Level level;
     private List<PayGrade> payGrades;
     private String description;
+    private Boolean active;
 
     public PayTableQueryResult() {
     }
@@ -87,6 +88,14 @@ public class PayTableQueryResult {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public PayTableQueryResult(String name, String shortName, String description, Long startDateMillis, Date endDateMillis) {

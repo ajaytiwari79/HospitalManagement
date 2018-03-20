@@ -89,4 +89,10 @@ public class PayTableController {
     public ResponseEntity<Map<String, Object>> updatePayGradeInPayTable(@PathVariable Long payGradeId, @Validated @RequestBody PayGradeDTO payGradeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.updatePayGradeInPayTable(payGradeId, payGradeDTO));
     }
+
+    @RequestMapping(value = "/pay_table/{payTableId}/pay_grade", method = GET)
+    public ResponseEntity<Map<String, Object>> publishPayTable(@PathVariable Long payTableId,@RequestParam Long publishedDateMillis) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.publishPayTable(payTableId,publishedDateMillis));
+    }
+
 }

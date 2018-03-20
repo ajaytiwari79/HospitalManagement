@@ -17,6 +17,7 @@ public class PayGradeQueryResult {
     private Long payTableId;
     private Long payGradeLevel;
     private Long payGradeId;
+    private Boolean active;
     private List<PayTableMatrixDTO> payTableMatrix;
 
     public PayGradeQueryResult() {
@@ -55,10 +56,19 @@ public class PayGradeQueryResult {
         this.payTableMatrix = payTableMatrix;
     }
 
-    public PayGradeQueryResult(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayTableMatrixDTO> payTableMatrix) {
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public PayGradeQueryResult(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayTableMatrixDTO> payTableMatrix, Boolean active) {
         this.payTableId = payTableId;
         this.payGradeLevel = payGradeLevel;
         this.payGradeId = payGradeId;
         this.payTableMatrix = payTableMatrix;
+        this.active = active;
     }
 }
