@@ -41,7 +41,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("MATCH (u:User) WHERE id(u) = {0} SET org.isDeleted = true ")
     void safeDelete(Long aLong);
 
-    @Query("Match (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with organization\n" +
+    @Query("Match (organization:Organization{isEnable:true})-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with organization\n" +
             "return id(organization) as id,organization.name as name,organization.isKairosHub as isKairosHub")
     List<OrganizationWrapper> getOrganizations(long userId);
 

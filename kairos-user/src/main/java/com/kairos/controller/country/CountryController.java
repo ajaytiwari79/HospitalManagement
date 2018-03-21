@@ -13,6 +13,7 @@ import com.kairos.persistence.model.user.payment_type.PaymentType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
+import com.kairos.response.dto.web.FunctionDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
@@ -118,6 +119,8 @@ public class CountryController {
     private TimeSlotService timeSlotService;
     @Inject
     private AccessPageService accessPageService;
+    @Inject
+    private FunctionService functionService;
 
     // Country
     @RequestMapping(value = "/country", method = RequestMethod.POST)
@@ -1145,6 +1148,44 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry(countryId));
     }
 
+    //Functions
 
+    @ApiOperation(value = "Add function by countryId")
+    @RequestMapping(value = COUNTRY_URL + "/function", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> addFunction(@PathVariable long countryId,@Validated @RequestBody FunctionDTO functionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.createFunction(countryId, functionDTO));
+    }
+
+    @ApiOperation(value = "Get functions by countryId")
+    @RequestMapping(value = COUNTRY_URL + "/functions", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getFunctions(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctions(countryId));
+
+    }
+
+    @ApiOperation(value = "Update functions")
+    @RequestMapping(value = COUNTRY_URL + "/function/{functionId}", method = RequestMethod.PUT)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateFunction(@PathVariable long countryId,@Validated @RequestBody FunctionDTO functionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateFunction(countryId,functionDTO));
+    }
+
+    @ApiOperation(value = "Delete function by functionId")
+    @RequestMapping(value = COUNTRY_URL + "/function/{functionId}", method = RequestMethod.DELETE)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteFunction(@PathVariable long functionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.deleteFunction(functionId));
+    }
+
+    // API to get Union And Levels
+    @ApiOperation(value = "Get Unions and Levels by countryId")
+    @RequestMapping(value = COUNTRY_URL + "/unions_and_levels", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> get(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getUnionAndOrganizationLevels(countryId));
+
+    }
 }
 

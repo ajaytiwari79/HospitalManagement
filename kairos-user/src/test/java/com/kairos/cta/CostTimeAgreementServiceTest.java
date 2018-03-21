@@ -2,6 +2,7 @@ package com.kairos.cta;
 
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
@@ -68,9 +69,14 @@ public class CostTimeAgreementServiceTest {
 
     @Before
     public void setUp() throws Exception {
+
+        // Fetch country
         Country country = countryService.getCountryByName("Denmark");
         countryId = country == null ? null : country.getId();
-        organizationId = 145l;
+
+        // Fetch parent unit
+        Organization org = organizationService.getOneParentUnitByCountry(countryId);
+        organizationId = org == null ? null : org.getId();
     }
 
 
@@ -79,13 +85,13 @@ public class CostTimeAgreementServiceTest {
         RuleTemplateCategory category=new RuleTemplateCategory();
         category.setName("NONE");
         category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
-        ruleTemplateCategoryService.createRuleTemplateCategory(53L,category);
+        ruleTemplateCategoryService.createRuleTemplateCategory(countryId,category);
     }
 
     @Test
     public void addCTARuleTemplate()
     {
-        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("working overtime part 2",
+        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Overtime CTA",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
                         " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
@@ -120,12 +126,6 @@ public class CostTimeAgreementServiceTest {
 
     }
 
-    @Test
-    public void getHoliday(){
-     Date date= Date.from(LocalDate.of(2018,1,2).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-        List<DayType> dayTypes= dayTypeService.getDayTypeByDate(53L,date);
-        System.out.println(dayTypes);
-    }
 
     @Test
     public void getAllRuleTemplate(){
