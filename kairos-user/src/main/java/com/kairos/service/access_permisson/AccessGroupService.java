@@ -273,7 +273,10 @@ public class AccessGroupService extends UserBaseService {
         }
         long creationDate = DateUtil.getCurrentDate().getTime();
         long lastModificationDate = DateUtil.getCurrentDate().getTime();
-        accessGroupRepository.updateAccessPagePermission(accessGroupId,accessPageIds,isSelected,creationDate,lastModificationDate);
+        Boolean read =  isSelected;
+        Boolean write =  isSelected;
+
+        accessGroupRepository.updateAccessPagePermission(accessGroupId,accessPageIds,isSelected,creationDate,lastModificationDate, read, write);
 //        accessGroupRepository.setParentAccessPageEnabled(accessPageId,accessGroupId);
         return true;
     }
@@ -359,9 +362,9 @@ public class AccessGroupService extends UserBaseService {
             accessGroupRepository.deleteCustomPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),read,write);
         } else {
             if(updateChildren) {
-                accessGroupRepository.setCustomPermissionForTab((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
-            } else {
                 accessGroupRepository.setCustomPermissionForTabAndChildren((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
+            } else {
+                accessGroupRepository.setCustomPermissionForTab((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
             }
         }
         /*if(parent == null){
