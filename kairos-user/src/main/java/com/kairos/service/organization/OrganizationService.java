@@ -27,6 +27,7 @@ import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
+import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
@@ -182,6 +183,8 @@ public class OrganizationService extends UserBaseService {
     private WTAService wtaService;
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
+    @Inject
+    CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -255,6 +258,7 @@ public class OrganizationService extends UserBaseService {
         List<WorkingTimeAgreement> allWta = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
         linkWTAToOrganization(allWtaCopy, allWta);
         organization.setWorkingTimeAgreements(allWtaCopy);
+        organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
 
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());

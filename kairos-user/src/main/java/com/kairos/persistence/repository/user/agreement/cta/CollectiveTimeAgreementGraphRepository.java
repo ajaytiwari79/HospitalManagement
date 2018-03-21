@@ -172,4 +172,8 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             ",plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType},calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates ORDER BY id DESC")
     CTAListQueryResult getCtaByUnitPositionId(Long unitEmploymentPositionId);
 
+    @Query("match(cta:CostTimeAgreement{deleted:false})-[:"+ BELONGS_TO_ORG_SUB_TYPE+"]->(ost) WHERE id(ost) IN {0} \n" +
+            "MATCH(cta)-[:BELONGS_TO]-(country:Country) where id(country)={1} return cta")
+    List<CostTimeAgreement> getCTAsByOrganiationSubTypeIdsIn(List<Long> organizationSubTypeIds, long countryId);
+
 }
