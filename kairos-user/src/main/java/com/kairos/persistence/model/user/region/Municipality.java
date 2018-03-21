@@ -19,13 +19,16 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.PROVI
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
 public class Municipality extends UserBaseEntity {
-    @NotEmpty(message = "error.Municipality.name.notEmpty") @NotNull(message = "error.Municipality.name.notnull")
+    @NotEmpty(message = "error.Municipality.name.notEmpty")
+    @NotNull(message = "error.Municipality.name.notnull")
     private String name;
 
-    @NotEmpty(message = "error.Municipality.geoFence.notEmpty") @NotNull(message = "error.Municipality.geoFence.notnull")
+    @NotEmpty(message = "error.Municipality.geoFence.notEmpty")
+    @NotNull(message = "error.Municipality.geoFence.notnull")
     private String geoFence;
 
-    @NotEmpty(message = "error.Municipality.code.notEmpty") @NotNull(message = "error.Municipality.code.notnull")
+    @NotEmpty(message = "error.Municipality.code.notEmpty")
+    @NotNull(message = "error.Municipality.code.notnull")
     private String code;
 
     private float latitude;
@@ -35,6 +38,13 @@ public class Municipality extends UserBaseEntity {
     private Province province;
     private boolean isEnable = true;
 
+    public Municipality() {
+    }
+
+    public Municipality(Long id,String name) {
+        this.name = name;
+        this.id=id;
+    }
 
     public String getGeoFence() {
         return geoFence;
@@ -85,7 +95,6 @@ public class Municipality extends UserBaseEntity {
     }
 
 
-
     public String getCode() {
         return code;
     }
@@ -94,13 +103,20 @@ public class Municipality extends UserBaseEntity {
         this.code = code;
     }
 
-    public Map<String,Object> retrieveDetails() {
-        Map<String,Object> response = new HashMap();
-        response.put("id",this.id);
-        response.put("name",this.name);
-        response.put("code",this.code);
-        response.put("geoFence",this.geoFence);
-        return  response;
+    public Municipality(Long id) {
+        this.id = id;
+    }
 
+    public Map<String, Object> retrieveDetails() {
+        Map<String, Object> response = new HashMap();
+        response.put("id", this.id);
+        response.put("name", this.name);
+        response.put("code", this.code);
+        response.put("geoFence", this.geoFence);
+        return response;
+    }
+
+    public Municipality retrieveBasicDetails() {
+        return new Municipality(this.id, this.name);
     }
 }
