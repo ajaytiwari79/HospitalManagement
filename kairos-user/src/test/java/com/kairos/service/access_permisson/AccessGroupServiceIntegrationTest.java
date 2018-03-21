@@ -9,6 +9,7 @@ import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessGroupPermissionDTO;
+import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
@@ -76,7 +77,7 @@ public class AccessGroupServiceIntegrationTest {
     public void createCountryAccessGroup() throws Exception {
 
         String baseUrl=getBaseUrl(organizationId,countryId, null);
-        CountryAccessGroupDTO accessGroupDTO = new CountryAccessGroupDTO(nameOfAccessGroup, null, category);
+        CountryAccessGroupDTO accessGroupDTO = new CountryAccessGroupDTO(nameOfAccessGroup, null, category, AccessGroupRole.STAFF);
         logger.info("Access Group name : "+accessGroupDTO.getName());
         HttpEntity<CountryAccessGroupDTO> requestBodyData = new HttpEntity<>(accessGroupDTO);
 
@@ -107,7 +108,7 @@ public class AccessGroupServiceIntegrationTest {
             AccessGroup accessGroup = accessGroupService.getCountryAccessGroupByName(countryId, category, nameOfAccessGroup);
             createdAccessGroupId = accessGroup.getId();
         }
-        CountryAccessGroupDTO accessGroupDTO = new CountryAccessGroupDTO(nameOfAccessGroup, null, OrganizationCategory.HUB);
+        CountryAccessGroupDTO accessGroupDTO = new CountryAccessGroupDTO(nameOfAccessGroup, null, OrganizationCategory.HUB, AccessGroupRole.STAFF);
 
         HttpEntity<CountryAccessGroupDTO> requestBodyData = new HttpEntity<>(accessGroupDTO);
 

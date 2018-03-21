@@ -86,6 +86,7 @@ public class AccessGroupService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
         }
         accessGrpToUpdate.setName(accessGrpToUpdate.getName());
+        accessGrpToUpdate.setRole(accessGrpToUpdate.getRole());
         save(accessGrpToUpdate);
         return accessGrpToUpdate;
     }
@@ -132,7 +133,7 @@ public class AccessGroupService extends UserBaseService {
             List<AccessGroup> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, getOrganizationCategory(organization.isUnion(), organization.isKairosHub()).toString());
             accessGroupList = new ArrayList<>(countryAccessGroups.size());
             for (AccessGroup countryAccessGroup : countryAccessGroups){
-                AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription());
+                AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole());
                 accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
                 accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
                 save(accessGroup);
@@ -364,7 +365,7 @@ public class AccessGroupService extends UserBaseService {
         if ( isAccessGroupExistWithSameName ) {
             throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
         }
-        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName(), accessGroupDTO.getDescription());
+        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName(), accessGroupDTO.getDescription(), accessGroupDTO.getRole());
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
@@ -392,6 +393,7 @@ public class AccessGroupService extends UserBaseService {
         accessGrpToUpdate.setName(accessGroupDTO.getName());
         accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+        accessGrpToUpdate.setRole(accessGroupDTO.getRole());
         save(accessGrpToUpdate);
         return accessGrpToUpdate;
 
