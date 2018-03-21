@@ -238,13 +238,6 @@ public class AccessGroupService extends UserBaseService {
                 (Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)
                 ,unitId,staffId,accessGroupId);
 
-        /*if(parent == null){
-//            accessPages = accessPageRepository.getAccessPageByAccessGroup(unitId,unitId,staffId,accessGroupId);
-            accessPages = accessPageRepository.getAccessPagePermissionOfStaff(unitId,unitId,staffId,accessGroupId);
-        } else {
-//            accessPages = accessPageRepository.getAccessPageByAccessGroup(parent.getId(),unitId,staffId,accessGroupId);
-            accessPages = accessPageRepository.getAccessPagePermissionOfStaff(parent.getId(),unitId,staffId,accessGroupId);
-        }*/
         ObjectMapper objectMapper = new ObjectMapper();
         List<AccessPageQueryResult> queryResults = new ArrayList<>();
         for (Map<String, Object> accessPage : accessPages) {
@@ -262,7 +255,6 @@ public class AccessGroupService extends UserBaseService {
         return modules;
     }
 
-//    public Boolean setAccessPagePermissions(Long accessPageId, long accessGroupId, List<Long> accessPageIds,boolean isSelected, Long countryId) {
     public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessPageIds,boolean isSelected, Long countryId) {
         // Check if access group is of country
         if(Optional.ofNullable(countryId).isPresent()){
@@ -277,7 +269,6 @@ public class AccessGroupService extends UserBaseService {
         Boolean write =  isSelected;
 
         accessGroupRepository.updateAccessPagePermission(accessGroupId,accessPageIds,isSelected,creationDate,lastModificationDate, read, write);
-//        accessGroupRepository.setParentAccessPageEnabled(accessPageId,accessGroupId);
         return true;
     }
 
@@ -367,13 +358,6 @@ public class AccessGroupService extends UserBaseService {
                 accessGroupRepository.setCustomPermissionForTab((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
             }
         }
-        /*if(parent == null){
-            accessGroupRepository.setPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
-            accessGroupRepository.setCustomPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
-        } else {
-            accessGroupRepository.setPermissionForTab(parent.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
-            accessGroupRepository.setCustomPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
-        }*/
     }
 
     private void assignPermissionOnNewUnit(Long organizationId,Long unitId){

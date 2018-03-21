@@ -129,19 +129,11 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "set r.read={2}, r.write={3} return distinct true")
     Boolean updatePermissionsForAccessTabOfAccessGroup(Long tabId, Long accessGroupId, Boolean read, Boolean write);
 
-
-
     @Query("Match (accessGroup:AccessGroup),(accessPage:AccessPage) where id(accessGroup)={0} and id(accessPage) IN {1}\n" +
             "MERGE (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"]->(accessPage)\n" +
             "ON CREATE SET r.isEnabled={2},r.creationDate={3},r.lastModificationDate={4},r.isRead={5},r.isWrite={6}\n" +
             "ON MATCH SET r.isEnabled={2},r.lastModificationDate={4},r.isRead={5},r.isWrite={6} return true")
     List<Map<String,Object>> updateAccessPagePermission(long accessGroupId, List<Long> pageIds, boolean isSelected, long creationDate, long lastModificationDate, Boolean read, Boolean write);
-
-    @Query("Match (accessPage:AccessPage) where  id(accessPage) IN {0}\n" +
-            "Match (accessPage)<-[:SUB_PAGE]-(parentPage:AccessPage) WITH parentPage\n" +
-            "Match (accessGroup:AccessGroup)-[r:"+HAS_ACCESS_OF_TABS+"]->(parentPage) WHERE id(accessGroup)={1}\n"+
-            "SET r.isEnabled=true")
-    void setParentAccessPageEnabled (Long accessPageId, long accessGroupId);
 
     @Query("Match (accessPage:AccessPage),(accessGroup:AccessGroup) where id(accessPage)={4} AND id(accessGroup)={3} with accessPage,accessGroup\n" +
             "optional match (accessPage)-[:SUB_PAGE*]->(subPage:AccessPage)<-[:HAS_ACCESS_OF_TABS{isEnabled:true}]-(accessGroup) with accessPage+[subPage] as coll,accessGroup as accessGroup\n" +

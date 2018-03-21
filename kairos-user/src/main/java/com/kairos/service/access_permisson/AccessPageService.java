@@ -126,18 +126,6 @@ public class AccessPageService extends UserBaseService {
             accessGroupRepository.removeAccessPageRelationshipForCountryAccessGroup(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
             accessGroupRepository.removeAccessPageRelationshipForOrganizationAccessGroup(tabId, countryId, isKairosHub, isUnion);
         }
-        /*switch (orgCategoryTabAccessDTO.getOrganizationCategory()){
-            case HUB: {
-                return accessPageRepository.updateAccessStatusForHubOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
-            }
-            case ORGANIZATION: {
-                return accessPageRepository.updateAccessStatusForOrganizationOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
-            }
-            case UNION: {
-                return accessPageRepository.updateAccessStatusForUnionOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
-            }
-        }*/
-//        return false;
         return accessPageRepository.updateAccessStatusOfCountryByCategory(tabId, countryId, orgCategoryTabAccessDTO.getOrganizationCategory().toString(), orgCategoryTabAccessDTO.isAccessStatus());
 
     }
