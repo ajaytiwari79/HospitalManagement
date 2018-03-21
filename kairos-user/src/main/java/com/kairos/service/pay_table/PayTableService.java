@@ -32,6 +32,8 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static javax.management.timer.Timer.ONE_DAY;
+
 /**
  * Created by prabjot on 26/12/17.
  */
@@ -332,17 +334,18 @@ public class PayTableService extends UserBaseService {
             for (PayGrade currentPayGrade : payTable.getPayGrades()) {
                 currentPayGrade.setPublished(true);
             }
-            payTableGraphRepository.changeStateOfRelationShip(payTableId,PayGradeStateEnum.PUBLISHED);
+            payTableGraphRepository.changeStateOfRelationShip(payTableId, PayGradeStateEnum.PUBLISHED);
             save(payTable);
-        } else {                   // PayTable is already active might be any paygrade is not active we need to active that
-
-            ObjectMapper objectMapper = new ObjectMapper();
+            return payTable;
+        } else {                   // PayTable is already active might be any paygrade is not active we need to active that and create a new Paytable
             PayTable payTableByMapper = new PayTable();
-            payTableByMapper = objectMapper.convertValue(payTable, PayTable.class);
-            PayTable payTableByBeanUtil = new PayTable();
-            BeanUtils.copyProperties(payTable, payTableByBeanUtil);
+            BeanUtils.copyProperties(payTable, payTableByMapper);
+            payTableByMapper.setId(null);
+            payTableByMapper.setPayTable(payTable);
+            payTable.setEndDateMillis(new Date(publishedDateMillis-ONE_DAY));
+            payTableByMapper.setStartDateMillis(new Date(publishedDateMillis));
+            save(payTableByMapper);
+            return payTableByMapper;
         }
-
-        return payTable;
     }
 }
