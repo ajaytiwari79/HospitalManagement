@@ -6,7 +6,7 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 @QueryResult
-public class WTAAndExpertiesQueryResult {
+public class WTAAndExpertiseQueryResult {
     private WorkingTimeAgreement workingTimeAgreement;
     private Expertise expertise;
 
