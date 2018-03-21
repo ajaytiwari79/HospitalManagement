@@ -313,14 +313,16 @@ public class PayTableService extends UserBaseService {
     }
 
     public boolean publishPayTable(Long payTableId, Long publishedDateMillis) {
-        PayTable payTable = payTableGraphRepository.findOne(payTableId, 2);
+        PayTable payTable = payTableGraphRepository.findOne(payTableId, 1);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             throw new DataNotFoundByIdException("Invalid pay table id");
         }
         ObjectMapper objectMapper = new ObjectMapper();
-        PayTable payTableByMapper = objectMapper.convertValue(payTable, PayTable.class);
+        PayTable payTableByMapper = new PayTable();
+
+        payTableByMapper = objectMapper.convertValue(payTable, PayTable.class);
         PayTable payTableByBeanUtil = new PayTable();
-        BeanUtils.copyProperties(payTableByBeanUtil, payTable);
+        BeanUtils.copyProperties(payTable, payTableByBeanUtil);
         return true;
     }
 }

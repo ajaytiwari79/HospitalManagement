@@ -74,7 +74,7 @@ public class PayTableController {
     }
 
     @RequestMapping(value = "/pay_table/{payTableId}/pay_grade", method = GET)
-    public ResponseEntity<Map<String, Object>> getpayGridsByPayTableId(@PathVariable Long payTableId) {
+    public ResponseEntity<Map<String, Object>> getPayGridsByPayTableId(@PathVariable Long payTableId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayGridsByPayTableId(payTableId));
     }
 
@@ -90,9 +90,9 @@ public class PayTableController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.updatePayGradeInPayTable(payGradeId, payGradeDTO));
     }
 
-    @RequestMapping(value = "/pay_table/{payTableId}/pay_grade", method = GET)
-    public ResponseEntity<Map<String, Object>> publishPayTable(@PathVariable Long payTableId,@RequestParam Long publishedDateMillis) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.publishPayTable(payTableId,publishedDateMillis));
+    @RequestMapping(value = "/pay_table/{payTableId}/publish", method = GET)
+    public ResponseEntity<Map<String, Object>> publishPayTable(@PathVariable Long payTableId,@RequestParam Long publishedDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.publishPayTable(payTableId,publishedDate));
     }
 
 }
