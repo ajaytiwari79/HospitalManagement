@@ -56,6 +56,10 @@ public class AccessGroupService extends UserBaseService {
     private OrganizationService organizationService;
 
     public AccessGroup createAccessGroup(long organizationId, AccessGroup accessGroup) {
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroup.getName());
+        if ( isAccessGroupExistWithSameName ) {
+            throw new DuplicateDataException("Access Group already exists with name " +accessGroup.getName() );
+        }
         Organization organization = organizationGraphRepository.findOne(organizationId);
         if (organization == null) {
             return null;
@@ -80,13 +84,16 @@ public class AccessGroupService extends UserBaseService {
         return null;
     }
 
-    public AccessGroup updateAccessGroup(long accessGroupId, AccessGroupDTO accessGroupDTO) {
+    public AccessGroup updateAccessGroup(long accessGroupId, Long unitId, AccessGroupDTO accessGroupDTO) {
         AccessGroup accessGrpToUpdate = accessGroupRepository.findOne(accessGroupId);
-        if (Optional.ofNullable(accessGrpToUpdate).isPresent()) {
+        if ( !Optional.ofNullable(accessGrpToUpdate).isPresent()) {
             throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
         }
-        accessGrpToUpdate.setName(accessGrpToUpdate.getName());
-        accessGrpToUpdate.setRole(accessGrpToUpdate.getRole());
+        if( accessGroupRepository.isOrganizationAccessGroupExistWithNameExceptId(unitId, accessGroupDTO.getName(), accessGroupId) ){
+            throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
+        }
+        accessGrpToUpdate.setName(accessGroupDTO.getName());
+        accessGrpToUpdate.setRole(accessGroupDTO.getRole());
         save(accessGrpToUpdate);
         return accessGrpToUpdate;
     }
