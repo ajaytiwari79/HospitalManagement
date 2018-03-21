@@ -12,6 +12,7 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
 import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
+import com.kairos.persistence.model.query_wrapper.WTAAndExpertiesQueryResult;
 import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
@@ -71,6 +72,7 @@ import javax.inject.Inject;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 
@@ -252,7 +254,8 @@ public class OrganizationService extends UserBaseService {
          * when creating an organization linking all existing wta with this subtype to organization
          */
         List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
-        List<WorkingTimeAgreement> allWta = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
+        List<WTAAndExpertiesQueryResult> allWtaExpertiseQueryResults = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
+        List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
         linkWTAToOrganization(allWtaCopy, allWta);
         organization.setWorkingTimeAgreements(allWtaCopy);
         save(organization);
@@ -273,6 +276,15 @@ public class OrganizationService extends UserBaseService {
         orgResponse.put("orgData", organizationResponse(organization, orgDetails));
         orgResponse.put("permissions", accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
         return orgResponse;
+    }
+
+    List<WorkingTimeAgreement> getWTAWithExpertise(List<WTAAndExpertiesQueryResult> allWtaExpertiseQueryResults){
+        List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
+        for (WTAAndExpertiesQueryResult allWtaExpertiseQueryResult : allWtaExpertiseQueryResults) {
+            allWtaExpertiseQueryResult.getWorkingTimeAgreement().setExpertise(allWtaExpertiseQueryResult.getExpertise());
+            workingTimeAgreements.add(allWtaExpertiseQueryResult.getWorkingTimeAgreement());
+        }
+        return workingTimeAgreements;
     }
 
 
