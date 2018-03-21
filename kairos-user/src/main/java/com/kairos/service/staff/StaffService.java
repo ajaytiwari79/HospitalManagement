@@ -1001,11 +1001,12 @@ public class StaffService extends UserBaseService {
         employment.setStaff(staff);
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(unit);
+        unitPermission.setAccessGroup(accessGroup);
         //set permission in unit employment
-        AccessPermission accessPermission = new AccessPermission(accessGroup);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
-        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
+//        AccessPermission accessPermission = new AccessPermission(accessGroup);
+//        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
+//        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+//        accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
         employment.getUnitPermissions().add(unitPermission);
         save(employment);
 
