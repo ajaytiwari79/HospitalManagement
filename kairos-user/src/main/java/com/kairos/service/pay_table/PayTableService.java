@@ -1,7 +1,6 @@
 package com.kairos.service.pay_table;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
@@ -22,7 +21,6 @@ import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGrap
 import com.kairos.response.dto.web.pay_table.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
-import org.apache.commons.lang3.SerializationUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -242,7 +240,7 @@ public class PayTableService extends UserBaseService {
         });
         payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
         PayGradeQueryResult payGradeQueryResult =
-                new PayGradeQueryResult(payTableId, payGrade.getPayGradeLevel(), payGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), payGrade.isActive());
+                new PayGradeQueryResult(payTableId, payGrade.getPayGradeLevel(), payGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), payGrade.isPublished());
         return payGradeQueryResult;
     }
 
@@ -250,7 +248,7 @@ public class PayTableService extends UserBaseService {
         List<PayTableMatrixDTO> payGradeMatrices = new ArrayList<>();
         payGradePayGroupAreaRelationShips.forEach(currentPayGroupArea -> {
             PayTableMatrixDTO payTableMatrixDTO =
-                    new PayTableMatrixDTO(currentPayGroupArea.getPayGroupArea().getId(), currentPayGroupArea.getPayGroupAreaAmount(), currentPayGroupArea.getId());
+                    new PayTableMatrixDTO(currentPayGroupArea.getPayGroupArea().getId(), currentPayGroupArea.getPayGroupAreaAmount(), currentPayGroupArea.getId(), currentPayGroupArea.getState());
             payGradeMatrices.add(payTableMatrixDTO);
         });
         return payGradeMatrices;
@@ -290,19 +288,31 @@ public class PayTableService extends UserBaseService {
         }
         List<Long> relationshipIds = payGradeDTO.getPayTableMatrix().stream().map(PayTableMatrixDTO::getId).collect(Collectors.toList());
         Iterable<PayGradePayGroupAreaRelationShip> payGradeData = payTableRelationShipGraphRepository.findAllById(relationshipIds);
+        for (PayTableMatrixDTO currentPayTable : payGradeDTO.getPayTableMatrix()) {
 
-        for (int i = 0; i < payGradeDTO.getPayTableMatrix().size(); i++) {
             // Rare case
-            if (payGradeDTO.getPayTableMatrix().get(i).getId() == null) { // this is a new pay group area which is added after creation and now user is setting value on that
-                PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(payGradeDTO.getPayTableMatrix().get(i).getPayGroupAreaId());
+            if (currentPayTable.getId() == null) { // this is a new pay group area which is added after creation and now user is setting value on that
+                PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(currentPayTable.getPayGroupAreaId());
                 PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
-                        = new PayGradePayGroupAreaRelationShip(payGrade, payGroupArea, payGradeDTO.getPayTableMatrix().get(i).getPayGroupAreaAmount());
+                        = new PayGradePayGroupAreaRelationShip(payGrade, payGroupArea, currentPayTable.getPayGroupAreaAmount());
                 payTableRelationShipGraphRepository.save(payGradePayGroupAreaRelationShip);
-                payGradeDTO.getPayTableMatrix().get(i).setId(payGradePayGroupAreaRelationShip.getId());
+                currentPayTable.setId(payGradePayGroupAreaRelationShip.getId());
             } else {
                 for (PayGradePayGroupAreaRelationShip currentPayGradeData : payGradeData) {
-                    if (currentPayGradeData.getId().equals(payGradeDTO.getPayTableMatrix().get(i).getId())) {
-                        currentPayGradeData.setPayGroupAreaAmount(payGradeDTO.getPayTableMatrix().get(i).getPayGroupAreaAmount());
+                    if (currentPayGradeData.getId().equals(currentPayTable.getId()) && !currentPayGradeData.getPayGroupAreaAmount().equals(currentPayTable.getPayGroupAreaAmount())) {
+                        logger.info("user has changed Amount {} from {}", currentPayTable.getPayGroupAreaAmount(), currentPayGradeData.getPayGroupAreaAmount());
+                        // The state was published and the amount is changed so we are now adding/checking weather any already relation exist or not
+                        if (currentPayTable.getState().equals(PayGradeStateEnum.PUBLISHED)) {
+                            logger.info(currentPayTable.getState().toString(), "PUBLISH");
+
+                            PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
+                                    = new PayGradePayGroupAreaRelationShip(payGrade, currentPayGradeData.getPayGroupArea(), currentPayTable.getPayGroupAreaAmount());
+                            payTableRelationShipGraphRepository.save(payGradePayGroupAreaRelationShip);
+                            currentPayTable.setId(payGradePayGroupAreaRelationShip.getId());
+                            currentPayTable.setState(PayGradeStateEnum.DRAFT);
+
+                        } else if (PayGradeStateEnum.DRAFT.equals(currentPayTable.getState()))
+                            currentPayGradeData.setPayGroupAreaAmount(currentPayTable.getPayGroupAreaAmount());
                     }
                 }
             }
@@ -312,17 +322,27 @@ public class PayTableService extends UserBaseService {
         return payGradeDTO;
     }
 
-    public boolean publishPayTable(Long payTableId, Long publishedDateMillis) {
+    public PayTable publishPayTable(Long payTableId, Long publishedDateMillis) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId, 1);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             throw new DataNotFoundByIdException("Invalid pay table id");
         }
-        ObjectMapper objectMapper = new ObjectMapper();
-        PayTable payTableByMapper = new PayTable();
+        if (!payTable.isPublished()) {  // payTable is not active very first time so we need to make active paytable and its all payGrades as well
+            payTable.setPublished(true);
+            for (PayGrade currentPayGrade : payTable.getPayGrades()) {
+                currentPayGrade.setPublished(true);
+            }
+            payTableGraphRepository.changeStateOfRelationShip(payTableId,PayGradeStateEnum.PUBLISHED);
+            save(payTable);
+        } else {                   // PayTable is already active might be any paygrade is not active we need to active that
 
-        payTableByMapper = objectMapper.convertValue(payTable, PayTable.class);
-        PayTable payTableByBeanUtil = new PayTable();
-        BeanUtils.copyProperties(payTable, payTableByBeanUtil);
-        return true;
+            ObjectMapper objectMapper = new ObjectMapper();
+            PayTable payTableByMapper = new PayTable();
+            payTableByMapper = objectMapper.convertValue(payTable, PayTable.class);
+            PayTable payTableByBeanUtil = new PayTable();
+            BeanUtils.copyProperties(payTable, payTableByBeanUtil);
+        }
+
+        return payTable;
     }
 }

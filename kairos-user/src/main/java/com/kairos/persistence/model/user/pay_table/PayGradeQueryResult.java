@@ -6,6 +6,7 @@ import com.kairos.response.dto.web.pay_table.PayTableMatrixDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by vipul on 16/3/18.
@@ -17,7 +18,7 @@ public class PayGradeQueryResult {
     private Long payTableId;
     private Long payGradeLevel;
     private Long payGradeId;
-    private Boolean active;
+    private Boolean published;
     private List<PayTableMatrixDTO> payTableMatrix;
 
     public PayGradeQueryResult() {
@@ -56,19 +57,21 @@ public class PayGradeQueryResult {
         this.payTableMatrix = payTableMatrix;
     }
 
-    public Boolean getActive() {
-        return active;
+    public Boolean getPublished() {
+        return published;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 
-    public PayGradeQueryResult(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayTableMatrixDTO> payTableMatrix, Boolean active) {
+    public PayGradeQueryResult(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayTableMatrixDTO> payTableMatrix, Boolean published) {
         this.payTableId = payTableId;
         this.payGradeLevel = payGradeLevel;
         this.payGradeId = payGradeId;
         this.payTableMatrix = payTableMatrix;
-        this.active = active;
+        this.published = published;
     }
+
+
 }

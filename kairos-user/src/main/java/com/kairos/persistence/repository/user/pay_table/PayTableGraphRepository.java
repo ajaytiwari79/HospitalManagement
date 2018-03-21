@@ -6,6 +6,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -15,8 +16,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, Long> {
 
-    @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,active:true}) where id(level)={0} AND id(payTable)<>{1}" +
-            " RETURN id(payTable) as id,payTable.name as name,payTable.active as active,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName")
+    @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,published:true}) where id(level)={0} AND id(payTable)<>{1}" +
+            " RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName")
     List<PayTableQueryResult> findPayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
 
     @Query("MATCH (c:Country) where id(c)={0}\n" +
@@ -28,7 +29,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     @Query("MATCH (c:Country) where id(c)={0} \n" +
             "MATCH(c)-[:HAS_LEVEL]->(level:Level{isEnabled:true})\n" +
             "OPTIONAL MATCH (level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false})\n" +
-            "with level,Case when payTable IS NOT NULL THEN collect({id:id(payTable),name:payTable.name,active:payTable.active,startDateMillis:payTable.startDateMillis,endDateMillis:payTable.endDateMillis,description:payTable.description,shortName:payTable.shortName}) else [] end as payTables\n" +
+            "with level,Case when payTable IS NOT NULL THEN collect({id:id(payTable),name:payTable.name,published:payTable.published,startDateMillis:payTable.startDateMillis,endDateMillis:payTable.endDateMillis,description:payTable.description,shortName:payTable.shortName}) else [] end as payTables\n" +
             "with level,payTables \n OPTIONAL MATCH  (level:Level)-[:IN_LEVEL]-(payGroupArea:PayGroupArea{deleted:false})\n" +
             "return id(level) as id,level.name as name ,level.description as description, Case when payGroupArea IS NOT NULL THEN \n" +
             "collect({ payGroupAreaId:id(payGroupArea),name:payGroupArea.name}) else [] end as payGroupAreas,payTables as payTables")
@@ -39,10 +40,14 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             " RETURN case when payGradeCount>0 THEN  true ELSE false END as response")
     Boolean checkPayGradeLevelAlreadyExists(Long payTableId, Long payGradeLevel);
 
-    @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false,active:true}) where id(payTable)={0} \n" +
+    @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false}) where id(payTable)={0} \n" +
             "Match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea{deleted:false})\n" +
-            "return id(payTable) as payTableId,id(payGrade) as payGradeId,payGrade.payGradeLevel as payGradeLevel,payGrade.active as active,collect({id:id(rel),payGroupAreaId:id(pga),payGroupAreaAmount:rel.payGroupAreaAmount}) as payTableMatrix")
+            "return id(payTable) as payTableId,id(payGrade) as payGradeId,payGrade.payGradeLevel as payGradeLevel,payGrade.published as published," +
+            "collect({id:id(rel),payGroupAreaId:id(pga),state:rel.state,payGroupAreaAmount:rel.payGroupAreaAmount}) as payTableMatrix")
     List<PayGradeQueryResult> getPayGridsByPayTableId(Long payTableId);
 
-
+    @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false}) where id(payTable)={0} \n" +
+            "Match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea{deleted:false})\n" +
+            "set rel.state={1}")
+    void changeStateOfRelationShip(Long payTableId, PayGradeStateEnum stateEnum);
 }

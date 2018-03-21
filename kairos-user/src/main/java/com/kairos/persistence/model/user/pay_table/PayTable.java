@@ -27,7 +27,7 @@ public class PayTable extends UserBaseEntity {
     @Relationship(type = HAS_PAY_GRADE)
     private List<PayGrade> payGrades;
     private String description;
-    private boolean active;
+    private boolean published;
 
     @Relationship(type = HAS_PAY_TABLE)
     private PayTable payTable;
@@ -94,12 +94,12 @@ public class PayTable extends UserBaseEntity {
         this.description = description;
     }
 
-    public boolean isActive() {
-        return active;
+    public boolean isPublished() {
+        return published;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 
     public PayTable getPayTable() {
