@@ -170,8 +170,14 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     @Query("MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} AND LOWER(a.name) = LOWER({1}) AND r.organizationCategory={2} return COUNT(a)>0 ")
     Boolean isCountryAccessGroupExistWithName(Long countryId, String name, String orgCategory);
 
+    @Query("MATCH (o:Organization)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(a:AccessGroup{deleted:false}) WHERE id(o)={0} AND LOWER(a.name) = LOWER({1}) return COUNT(a)>0 ")
+    Boolean isOrganizationAccessGroupExistWithName(Long orgId, String name);
+
     @Query("MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} AND LOWER(a.name) = LOWER({1}) AND r.organizationCategory={2} AND NOT(id(a) = {3}) return COUNT(a)>0 ")
     Boolean isCountryAccessGroupExistWithNameExceptId(Long countryId, String name, String orgCategory, Long accessGroupId);
+
+    @Query("MATCH (o:Organization)-[r:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]-(a:AccessGroup{deleted:false}) WHERE id(o)={0} AND LOWER(a.name) = LOWER({1}) AND NOT(id(a) = {2}) return COUNT(a)>0 ")
+    Boolean isOrganizationAccessGroupExistWithNameExceptId(Long orgId, String name, Long accessGroupId);
 
     @Query("OPTIONAL MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'HUB'}]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} WITH COUNT(r) as hubCount\n" +
             "OPTIONAL MATCH (c:Country)-[r:"+HAS_ACCESS_GROUP+"{organizationCategory:'UNION'}]-(a:AccessGroup{deleted:false}) WHERE id(c)={0} WITH COUNT(r) as unionCount, hubCount\n" +
@@ -179,7 +185,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     AccessGroupCountQueryResult getListOfOrgCategoryWithCountryAccessGroupCount(Long countryId);
 
     @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} \n" +
-            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted")
+            "RETURN id(ag) as id, ag.name as name, ag.description as description, ag.typeOfTaskGiver as typeOfTaskGiver, ag.deleted as deleted, ag.role as role")
     List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategory(Long countryId, String orgCategory);
 
     @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false}) WHERE id(c)={0} AND r.organizationCategory={1} RETURN ag")

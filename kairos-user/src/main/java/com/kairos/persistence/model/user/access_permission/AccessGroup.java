@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Property;
+import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -21,10 +23,16 @@ public class AccessGroup extends UserBaseEntity {
     private boolean typeOfTaskGiver;
     private String description;
 
-    public AccessGroup(String name, String description) {
+    @Property(name = "role")
+    @EnumString(AccessGroupRole.class)
+    private AccessGroupRole role;
+
+    public AccessGroup(String name, String description, AccessGroupRole role) {
         this.name = name;
         this.description = description;
+        this.role = role;
     }
+
     public AccessGroup(){}
 
     public void setName(String name) {
@@ -58,5 +66,13 @@ public class AccessGroup extends UserBaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public AccessGroupRole getRole() {
+        return role;
+    }
+
+    public void setRole(AccessGroupRole role) {
+        this.role = role;
     }
 }
