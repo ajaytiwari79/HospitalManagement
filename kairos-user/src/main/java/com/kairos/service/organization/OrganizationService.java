@@ -27,6 +27,7 @@ import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
+import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
@@ -182,6 +183,8 @@ public class OrganizationService extends UserBaseService {
     private WTAService wtaService;
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
+    @Inject
+    CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -255,6 +258,7 @@ public class OrganizationService extends UserBaseService {
         List<WorkingTimeAgreement> allWta = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
         linkWTAToOrganization(allWtaCopy, allWta);
         organization.setWorkingTimeAgreements(allWtaCopy);
+        organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
 
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
@@ -762,7 +766,7 @@ public class OrganizationService extends UserBaseService {
     public Map<String, Object> getManageHierarchyData(long unitId) {
 
         Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
+        if (!Optional.ofNullable(organization).isPresent()) {
             throw new InternalError("organization is null");
         }
 
@@ -775,7 +779,7 @@ public class OrganizationService extends UserBaseService {
         List<Map<String, Object>> groups = organizationGraphRepository.getGroups(unitId);
         response.put("groups", groups.size() != 0 ? groups.get(0).get("groups") : Collections.emptyList());
 
-        if (countryId != null) {
+        if (Optional.ofNullable(countryId).isPresent()) {
             response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         }
 
@@ -785,14 +789,7 @@ public class OrganizationService extends UserBaseService {
             organizationTypesForUnit.add((Map<String, Object>) organizationType.get("data"));
         }
 
-        List<Map<String, Object>> businessTypes = new ArrayList<>();
-        for (BusinessType businessType : organization.getBusinessTypes()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", businessType.getId());
-            map.put("name", businessType.getName());
-            businessTypes.add(map);
-        }
-
+        List<BusinessType> businessTypes=businessTypeGraphRepository.findBusinesTypesByCountry(countryId);
         response.put("organizationTypes", organizationTypesForUnit);
         response.put("businessTypes", businessTypes);
         response.put("level", organization.getLevel());
