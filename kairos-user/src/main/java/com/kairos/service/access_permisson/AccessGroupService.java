@@ -516,4 +516,8 @@ public class AccessGroupService extends UserBaseService {
     List<Long> getAccessPageIdsByAccessGroup(Long accessGroupId){
        return accessGroupRepository.getAccessPageIdsByAccessGroup(accessGroupId);
     }
+
+    Long getAccessPageIdByAccessGroup(Long accessGroupId){
+        return accessGroupRepository.getAccessPageIdByAccessGroup(accessGroupId);
+    }
 }
