@@ -25,34 +25,28 @@ public class CTARuleTemplate extends RuleTemplate{
 
 //    private CTARuleTemplateType ruleTemplateType;
     private String ruleTemplateType;
-    private String payrollType; //Ok
-    private String payrollSystem; //Ok
-    private CalculationUnit calculationUnit; //OK
+    private String payrollType;
+    private String payrollSystem;
+    private CalculationUnit calculationUnit;
     @Relationship(type = HAS_COMPENSATION_TABLE)
-    private CompensationTable compensationTable; // Its clear need to save array to fetch value index based
+    private CompensationTable compensationTable;
     @Relationship(type = BELONGS_TO)
     private CalculateValueAgainst calculateValueAgainst;
-    private ApprovalWorkFlow approvalWorkFlow; // Why needs to get approval
-    @Relationship(type = BELONGS_TO)
-    List<CTARuleTemplateDayType>calculateOnDayTypes=new ArrayList<>(); // Need to confirm, Can have different values for dayType and countryHoliday
+    private ApprovalWorkFlow approvalWorkFlow;
+//    @Relationship(type = BELONGS_TO)
+//    List<CTARuleTemplateDayType>calculateOnDayTypes=new ArrayList<>(); // Need to confirm, Can have different values for dayType and countryHoliday
     @Relationship(type = BELONGS_TO)
     private List<CTARuleTemplatePhaseInfo>phaseInfo=new ArrayList<>(); //Query beforeStart
     private BudgetType budgetType;
-    /*@Relationship(type = HAS_ACCESS_GROUP)
-    private List<AccessGroup> calculateValueIfPlanned=new ArrayList<>();*/
 
     private List<CalculateValueIfPlanned> calculateValueIfPlanned=new ArrayList<>();
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
 
-    private List<EmploymentType> employmentTypes=new ArrayList<>(); //OK
-//    @Relationship(type = BELONGS_TO)
-//    private ActivityType activityType;  // Remove it, No need to configure activity/activityType when we are having time type
+    private List<EmploymentType> employmentTypes=new ArrayList<>();
     private PlanningCategory planningCategory;
     private List<StaffFunction> staffFunctions=new ArrayList<>();
     @Relationship(type = BELONGS_TO)
     private PlannedTimeWithFactor plannedTimeWithFactor;
-    @Relationship(type = HAS_TIME_TYPES)
-    private List<TimeType>timeTypes=new ArrayList<>();
     @Relationship(type = BELONGS_TO)
     private User createdBy;
     @Relationship(type = BELONGS_TO)
@@ -62,6 +56,7 @@ public class CTARuleTemplate extends RuleTemplate{
     private List<Long> activityIds;
     private Long timeTypeId;
     private Long plannedTimeId;
+    private List<Long> dayTypeIds;
 
     public CTARuleTemplate() {
 
@@ -202,13 +197,6 @@ public class CTARuleTemplate extends RuleTemplate{
         this.approvalWorkFlow = approvalWorkFlow;
     }
 
-    public List<CTARuleTemplateDayType> getCalculateOnDayTypes() {
-        return calculateOnDayTypes;
-    }
-
-    public void setCalculateOnDayTypes(List<CTARuleTemplateDayType> calculateOnDayTypes) {
-        this.calculateOnDayTypes = calculateOnDayTypes;
-    }
     public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
         return phaseInfo;
     }
@@ -280,20 +268,20 @@ public class CTARuleTemplate extends RuleTemplate{
         this.ruleTemplateType = ruleTemplateType;
     }*/
 
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
+    }
+
     public String getRuleTemplateType() {
         return ruleTemplateType;
     }
 
     public void setRuleTemplateType(String ruleTemplateType) {
         this.ruleTemplateType = ruleTemplateType;
-    }
-
-    public List<TimeType> getTimeTypes() {
-        return timeTypes;
-    }
-
-    public void setTimeTypes(List<TimeType> timeTypes) {
-        this.timeTypes = timeTypes;
     }
 
     public User getCreatedBy() {
@@ -339,7 +327,6 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append(planningCategory, that.planningCategory)
                 .append(staffFunctions, that.staffFunctions)
                 .append(plannedTimeWithFactor, that.plannedTimeWithFactor)
-                .append(timeTypes, that.timeTypes)
                 .append(createdBy, that.createdBy)
                 .append(lastModifiedBy, that.lastModifiedBy)
                 .isEquals();
@@ -361,7 +348,6 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append(planningCategory)
                 .append(staffFunctions)
                 .append(plannedTimeWithFactor)
-                .append(timeTypes)
                 .append(createdBy)
                 .append(lastModifiedBy)
                 .toHashCode();
@@ -383,7 +369,6 @@ public class CTARuleTemplate extends RuleTemplate{
                 .append("planningCategory", planningCategory)
                 .append("staffFunction", staffFunctions)
                 .append("plannedTimeWithFactor", plannedTimeWithFactor)
-                .append("timeTypes", timeTypes)
                 .append("createdBy", createdBy)
                 .append("lastModifiedBy", lastModifiedBy)
                 .toString();

@@ -4,13 +4,13 @@ import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
-import com.kairos.persistence.model.user.pay_table.PayLevelUpdateDTO;
-import com.kairos.persistence.model.user.pay_table.PayTable;
-import com.kairos.persistence.model.user.pay_table.PayTableQueryResult;
 import com.kairos.persistence.model.user.pay_table.OrganizationLevelPayTableDTO;
+import com.kairos.persistence.model.user.pay_table.PayTableQueryResult;
+import com.kairos.response.dto.web.pay_table.PayTableUpdateDTO;
 import com.kairos.response.dto.web.pay_table.PayTableDTO;
 import com.kairos.response.dto.web.pay_table.PayTableResponseWrapper;
 import com.kairos.util.DateUtil;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,9 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import static com.kairos.util.DateUtil.ONLY_DATE;
@@ -49,6 +47,7 @@ public class PayTableServiceIntegrationTest {
     static private String baseUrlWithCountry;
     Long municipalityId = 1032L;
     Long organizationLevel = 2942L;
+    static DateTime currentDate;
 
 
     private static final DateFormat df = new SimpleDateFormat(ONLY_DATE);
@@ -56,6 +55,9 @@ public class PayTableServiceIntegrationTest {
     @Before
     public void setUp() throws Exception {
         baseUrlWithCountry = getBaseUrl(24L, 4L, null);
+        currentDate = new DateTime();
+        currentDate.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+
     }
 
     @Test
@@ -109,26 +111,19 @@ public class PayTableServiceIntegrationTest {
     @Test
     @OrderTest(order = 3)
     public void updatePayLevel() {
-        Date startDate;
-        Date endDate;
-        try {
-            startDate = df.parse("2018-01-12");
-        } catch (ParseException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-        PayLevelUpdateDTO payLevelUpdateDTO = new PayLevelUpdateDTO("Test pay level", startDate, null);
-        HttpEntity<PayLevelUpdateDTO> entity = new HttpEntity<>(payLevelUpdateDTO);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTable>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTable>>() {
+        PayTableUpdateDTO payTableUpdateDTO = new PayTableUpdateDTO("Test pay level", "SF", "By test", currentDate.toDate(), null, organizationLevel);
+        HttpEntity<PayTableUpdateDTO> entity = new HttpEntity<>(payTableUpdateDTO);
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableQueryResult>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableQueryResult>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<PayTable>> response = restTemplate.exchange(
-                baseUrlWithCountry + "/pay_table/" + payTableId,
+        ResponseEntity<RestTemplateResponseEnvelope<PayTableQueryResult>> response = restTemplate.exchange(
+                baseUrlWithCountry + "/pay_table/" + 2958,
                 HttpMethod.PUT, entity, typeReference);
-        RestTemplateResponseEnvelope<PayTable> responseBody = response.getBody();
+        RestTemplateResponseEnvelope<PayTableQueryResult> responseBody = response.getBody();
         payTableId = responseBody.getData().getId();
         Assert.assertEquals(200, response.getStatusCodeValue());
         Assert.assertNotNull(payTableId);
-        Assert.assertEquals(responseBody.getData().getStartDateMillis(), startDate);
     }
 
 
