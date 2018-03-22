@@ -458,6 +458,8 @@ public class CountryService extends UserBaseService {
 
          }
 
+        List<ActivityCategory> acivitityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId);
+
          List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
          List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
          List<TimeTypeDTO> timeTypes= timeTypeRestClient.getAllTimeTypes(countryId);
@@ -487,6 +489,7 @@ public class CountryService extends UserBaseService {
             ctaRuleTemplateDefaultDataWrapper.setDayTypes(dayTypeDTOS);
 
             ctaRuleTemplateDefaultDataWrapper.setActivityTypes(activityTypeDTOS);
+            ctaRuleTemplateDefaultDataWrapper.setAcivitityCategories(acivitityCategories);
 
             ctaRuleTemplateDefaultDataWrapper.setHolidayMapList(this.getAllCountryAllHolidaysByCountryId(countryId));
          return ctaRuleTemplateDefaultDataWrapper;

@@ -1,6 +1,7 @@
 package com.kairos.client.activity_types;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.response.dto.web.cta.ActivityCategory;
 import com.kairos.response.dto.web.cta.ActivityTypeDTO;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
@@ -41,6 +42,33 @@ public class ActivityTypesRestClient {
                             null, typeReference,countryId);
 
             RestTemplateResponseEnvelope<List<ActivityTypeDTO>> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+
+    }
+
+    public List<ActivityCategory> getActivityCategoriesForCountry (Long countryId){
+
+        final String baseUrl=getBaseUrl(false);
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityCategory>>> typeReference =
+                    new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityCategory>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<ActivityCategory>>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/country/{countryId}/activity/activity_categories",
+                            HttpMethod.GET,
+                            null, typeReference,countryId);
+
+            RestTemplateResponseEnvelope<List<ActivityCategory>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
