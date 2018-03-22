@@ -458,7 +458,7 @@ public class CountryService extends UserBaseService {
 
          }
 
-        List<ActivityCategory> acivitityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId);
+        List<ActivityCategoryDTO> acivitityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId);
 
          List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
          List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
