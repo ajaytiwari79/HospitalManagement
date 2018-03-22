@@ -135,7 +135,7 @@ public class CountryHolidayCalenderService extends UserBaseService {
     }
 
 
-    public Map<String, Object> createHolidayCalenderByCountryId(Long countryId, Map<String,Object> data) {
+    public Map<String, Object> createHolidayCalenderByCountryId(Long countryId, Map<String,Object> data) throws Exception {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
             CountryHolidayCalender countryHolidayCalender = new CountryHolidayCalender();
@@ -145,7 +145,10 @@ public class CountryHolidayCalenderService extends UserBaseService {
 
                 if(dayType!=null){
 
-                    countryHolidayCalender.setHolidayDate(Long.valueOf(String.valueOf(data.get("holidayDate"))));
+                  //  countryHolidayCalender.setHolidayDate(Long.valueOf(String.valueOf(data.get("holidayDate"))));
+
+                    String holidayDate = (String)(data.get("holidayDate"));
+                    countryHolidayCalender.setHolidayDate(DateUtil.getIsoDateInLong(holidayDate));
                     countryHolidayCalender.setDescription(String.valueOf(data.get("description")));
                     countryHolidayCalender.setHolidayTitle((String) data.get("text"));
                     countryHolidayCalender.setDayType(dayType);
