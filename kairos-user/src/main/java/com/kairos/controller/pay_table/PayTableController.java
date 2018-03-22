@@ -90,7 +90,7 @@ public class PayTableController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.updatePayGradeInPayTable(payGradeId, payGradeDTO));
     }
 
-    @RequestMapping(value = "/pay_table/{payTableId}/publish", method = GET)
+    @RequestMapping(value = "/pay_table/{payTableId}/publish", method = POST)
     public ResponseEntity<Map<String, Object>> publishPayTable(@PathVariable Long payTableId,@RequestParam Long publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.publishPayTable(payTableId,publishedDate));
     }

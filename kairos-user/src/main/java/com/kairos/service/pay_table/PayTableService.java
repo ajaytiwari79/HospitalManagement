@@ -326,7 +326,7 @@ public class PayTableService extends UserBaseService {
     }
 
     public PayTable publishPayTable(Long payTableId, Long publishedDateMillis) {
-        PayTable payTable = payTableGraphRepository.findOne(payTableId, 1);
+        PayTable payTable = payTableGraphRepository.findOne(payTableId);
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             throw new DataNotFoundByIdException("Invalid pay table id");
         }
@@ -339,6 +339,7 @@ public class PayTableService extends UserBaseService {
             save(payTable);
             return payTable;
         } else { // PayTable is already active might be any pay grade is not active we need to active that and create a new Paytable
+
             PayTable payTableByMapper = new PayTable();
             BeanUtils.copyProperties(payTable, payTableByMapper);
             payTableByMapper.setId(null);
