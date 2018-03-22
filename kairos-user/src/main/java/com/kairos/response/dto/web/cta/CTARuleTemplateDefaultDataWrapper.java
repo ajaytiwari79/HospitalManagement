@@ -18,7 +18,7 @@ public class CTARuleTemplateDefaultDataWrapper {
     private List<PresenceTypeDTO> plannedTime=new ArrayList<>();
     private List<Map<String, Object>>currencies=new ArrayList<>();
     private List<Map<String, Object>>holidayMapList=new ArrayList<>();
-
+    List<ActivityCategory> activityCategories;
 
     public CTARuleTemplateDefaultDataWrapper() {
         //default
@@ -95,4 +95,14 @@ public class CTARuleTemplateDefaultDataWrapper {
     public void setPlannedTime(List<PresenceTypeDTO> plannedTime) {
         this.plannedTime = plannedTime;
     }
+
+    public List<ActivityCategory> getActivityCategories() {
+        return activityCategories;
+    }
+
+    public void setActivityCategories(List<ActivityCategory> activityCategories) {
+        this.activityCategories = activityCategories;
+    }
+
+
 }
