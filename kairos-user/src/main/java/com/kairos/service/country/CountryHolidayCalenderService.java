@@ -145,10 +145,7 @@ public class CountryHolidayCalenderService extends UserBaseService {
 
                 if(dayType!=null){
 
-                  //  countryHolidayCalender.setHolidayDate(Long.valueOf(String.valueOf(data.get("holidayDate"))));
-
-                    String holidayDate = (String)(data.get("holidayDate"));
-                    countryHolidayCalender.setHolidayDate(DateUtil.getIsoDateInLong(holidayDate));
+                    countryHolidayCalender.setHolidayDate(Long.valueOf(String.valueOf(data.get("holidayDate"))));
                     countryHolidayCalender.setDescription(String.valueOf(data.get("description")));
                     countryHolidayCalender.setHolidayTitle((String) data.get("text"));
                     countryHolidayCalender.setDayType(dayType);
