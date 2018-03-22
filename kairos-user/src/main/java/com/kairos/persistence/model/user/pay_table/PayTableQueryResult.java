@@ -98,8 +98,9 @@ public class PayTableQueryResult {
         this.published = published;
     }
 
-    public PayTableQueryResult(String name, String shortName, String description, Long startDateMillis, Date endDateMillis) {
+    public PayTableQueryResult(String name, String shortName, String description, Long startDateMillis, Date endDateMillis, Boolean published) {
         this.name = name;
+        this.published = published;
         this.description = description;
         this.shortName = shortName;
         this.startDateMillis = startDateMillis;

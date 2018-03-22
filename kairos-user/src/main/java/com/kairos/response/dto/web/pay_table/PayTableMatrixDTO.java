@@ -2,6 +2,7 @@ package com.kairos.response.dto.web.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.user.pay_table.PayGradeStateEnum;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import java.util.Objects;
  * Created by vipul on 16/3/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@QueryResult
 public class PayTableMatrixDTO {
     @NotNull(message = "Pay Group Area can not be null")
     private Long payGroupAreaId;
@@ -59,19 +61,18 @@ public class PayTableMatrixDTO {
         this.payGroupAreaId = payGroupAreaId;
         this.payGroupAreaAmount = payGroupAreaAmount;
         this.id = id;
-        this.state=payGradeStateEnum;
+        this.state = payGradeStateEnum;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PayTableMatrixDTO)) return false;
-        PayTableMatrixDTO that = (PayTableMatrixDTO) o;
-        return Objects.equals(getPayGroupAreaId(), that.getPayGroupAreaId());
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("PayTableMatrixDTO{");
+        sb.append("payGroupAreaId=").append(payGroupAreaId);
+        sb.append(", payGroupAreaAmount=").append(payGroupAreaAmount);
+        sb.append(", state=").append(state);
+        sb.append('}');
+        return sb.toString();
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getPayGroupAreaId());
-    }
+
 }

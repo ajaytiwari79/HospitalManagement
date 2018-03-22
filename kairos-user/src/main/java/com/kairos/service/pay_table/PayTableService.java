@@ -1,6 +1,5 @@
 package com.kairos.service.pay_table;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
@@ -102,7 +101,7 @@ public class PayTableService extends UserBaseService {
         validatePayLevel(payTables, payTableDTO);
         save(payTable);
 
-        PayTableQueryResult payTableQueryResult = new PayTableQueryResult(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis());
+        PayTableQueryResult payTableQueryResult = new PayTableQueryResult(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis(), payTable.isPublished());
         payTableQueryResult.setId(payTable.getId());
         payTableQueryResult.setLevel(level);
         return payTableQueryResult;
@@ -182,19 +181,22 @@ public class PayTableService extends UserBaseService {
         if (!Optional.ofNullable(payTable).isPresent()) {
             throw new DataNotFoundByIdException("Invalid pay grade id");
         }
+        // if  name or short name is changes then only we are checking its name existance
         // skipped to current pay table it is checking weather any other payTable has same name or short name in current organization level
-        Boolean isAlreadyExists = payTableGraphRepository.
-                checkPayTableNameAlreadyExitsByNameOrShortName(countryId, payTableId, "(?i)" + payTableDTO.getName().trim(),
-                        "(?i)" + payTableDTO.getShortName().trim());
-        if (isAlreadyExists) {
-            throw new DuplicateDataException("Name " + payTableDTO.getName() + "or short Name " + payTableDTO.getShortName() + " already Exist in country " + countryId);
+        if (!payTableDTO.getName().trim().equalsIgnoreCase(payTable.getName()) || !payTableDTO.getShortName().trim().equalsIgnoreCase(payTable.getShortName())) {
+            Boolean isAlreadyExists = payTableGraphRepository.
+                    checkPayTableNameAlreadyExitsByNameOrShortName(countryId, payTableId, "(?i)" + payTableDTO.getName().trim(),
+                            "(?i)" + payTableDTO.getShortName().trim());
+            if (isAlreadyExists) {
+                throw new DuplicateDataException("Name " + payTableDTO.getName() + "or short Name " + payTableDTO.getShortName() + " already Exist in country " + countryId);
+            }
         }
         payTable.setName(payTableDTO.getName().trim());
         payTable.setShortName(payTableDTO.getShortName().trim());
         payTable.setDescription(payTableDTO.getDescription());
         prepareDates(payTable, payTableDTO);
         save(payTable);
-        PayTableQueryResult payTableQueryResult = new PayTableQueryResult(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis());
+        PayTableQueryResult payTableQueryResult = new PayTableQueryResult(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis(), payTable.isPublished());
         payTableQueryResult.setId(payTable.getId());
         return payTableQueryResult;
     }
@@ -329,7 +331,7 @@ public class PayTableService extends UserBaseService {
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             throw new DataNotFoundByIdException("Invalid pay table id");
         }
-        if (!payTable.isPublished()) {  // payTable is not active very first time so we need to make active paytable and its all payGrades as well
+        if (!payTable.isPublished()) {  // payTable is not active very first time so we need to make active pay table and its all payGrades as well
             payTable.setPublished(true);
             for (PayGrade currentPayGrade : payTable.getPayGrades()) {
                 currentPayGrade.setPublished(true);
@@ -337,15 +339,38 @@ public class PayTableService extends UserBaseService {
             payTableGraphRepository.changeStateOfRelationShip(payTableId, PayGradeStateEnum.PUBLISHED);
             save(payTable);
             return payTable;
-        } else {                   // PayTable is already active might be any paygrade is not active we need to active that and create a new Paytable
+        } else { // PayTable is already active might be any pay grade is not active we need to active that and create a new Paytable
             PayTable payTableByMapper = new PayTable();
             BeanUtils.copyProperties(payTable, payTableByMapper);
             payTableByMapper.setId(null);
             payTableByMapper.setPayTable(payTable);
-            payTable.setEndDateMillis(new Date(publishedDateMillis-ONE_DAY));
+            payTable.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
             payTableByMapper.setStartDateMillis(new Date(publishedDateMillis));
+            payTableByMapper.setPayGrades(null);
+            copyPayGrades(payTable.getPayGrades(), payTableByMapper);
             save(payTableByMapper);
+            payTableGraphRepository.removeAllDraftNodesByPayTableId(payTableId);
+            //removing to send this in FE
+            payTableByMapper.setPayTable(null);
             return payTableByMapper;
         }
+    }
+
+    private void copyPayGrades(List<PayGrade> payGrades, PayTable payTableByMapper) {
+        List<PayGrade> payGradesObjects = new ArrayList<>();
+        for (PayGrade currentPayGrade : payGrades) {
+            PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), true);
+            List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
+            HashSet<PayTableMatrixQueryResult> payTableMatrix = payGradeGraphRepository.getPayGradeMatrixByPayGradeId(currentPayGrade.getId());
+            payTableMatrix.forEach(currentObj -> {
+                PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
+                        = new PayGradePayGroupAreaRelationShip(newPayGrade, new PayGroupArea(currentObj.getPayGroupAreaId(), currentObj.getPayGroupAreaName()), currentObj.getPayGroupAreaAmount());
+                payGradePayGroupAreaRelationShip.setState(PayGradeStateEnum.PUBLISHED); // making the new Object as published
+                payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
+            });
+            payTableRelationShipGraphRepository.saveAll(payGradePayGroupAreaRelationShips);
+            payGradesObjects.add(newPayGrade);
+        }
+        payTableByMapper.setPayGrades(payGradesObjects);
     }
 }

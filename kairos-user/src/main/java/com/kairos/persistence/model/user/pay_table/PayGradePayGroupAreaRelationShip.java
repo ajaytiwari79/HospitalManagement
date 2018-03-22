@@ -65,4 +65,5 @@ public class PayGradePayGroupAreaRelationShip extends UserBaseEntity {
         this.payGroupAreaAmount = payGroupAreaAmount;
         this.state = PayGradeStateEnum.DRAFT;
     }
+
 }

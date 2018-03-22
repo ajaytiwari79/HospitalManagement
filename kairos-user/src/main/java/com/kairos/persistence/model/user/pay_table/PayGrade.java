@@ -34,4 +34,9 @@ public class PayGrade extends UserBaseEntity {
     public void setPayGradeLevel(Long payGradeLevel) {
         this.payGradeLevel = payGradeLevel;
     }
+
+    public PayGrade(Long payGradeLevel, boolean published) {
+        this.payGradeLevel = payGradeLevel;
+        this.published = published;
+    }
 }

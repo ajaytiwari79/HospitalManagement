@@ -6,7 +6,6 @@ import com.kairos.response.dto.web.pay_table.PayTableMatrixDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Created by vipul on 16/3/18.

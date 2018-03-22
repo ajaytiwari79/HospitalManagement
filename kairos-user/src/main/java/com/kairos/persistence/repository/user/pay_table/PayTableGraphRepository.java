@@ -50,4 +50,10 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "Match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea{deleted:false})\n" +
             "set rel.state={1}")
     void changeStateOfRelationShip(Long payTableId, PayGradeStateEnum stateEnum);
+
+    @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false}) where id(payTable)={0} \n" +
+            "Match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "{state:'DRAFT'}]-(pga:PayGroupArea{deleted:false})\n" +
+            "detach delete rel")
+    void removeAllDraftNodesByPayTableId(Long payTableId);
+
 }
