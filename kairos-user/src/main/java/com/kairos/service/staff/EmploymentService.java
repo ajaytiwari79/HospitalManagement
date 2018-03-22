@@ -156,6 +156,33 @@ public class EmploymentService extends UserBaseService {
         if (created) {
 
             unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId, accessGroupId);
+            if(Optional.ofNullable(unitPermission).isPresent() && unitPermissionGraphRepository.checkUnitPermissionLinkedWithAccessGroup(unitPermission.getId(), accessGroupId)) {
+                throw new DataNotFoundByIdException("Unit permission already exist for Access Group" + staffId);
+            } else if(!Optional.ofNullable(unitPermission).isPresent()){
+                unitPermission = new UnitPermission();
+                unitPermission.setOrganization(unit);
+                unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+            }
+            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
+//            unitPermission = new UnitPermission();
+//            unitPermission.setOrganization(unit);
+//            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+            unitPermission.setAccessGroup(accessGroup);
+            employment.getUnitPermissions().add(unitPermission);
+            employmentGraphRepository.save(employment);
+//            AccessPermission accessPermission = new AccessPermission(accessGroup);
+//            accessPermissionGraphRepository.save(accessPermission);
+            logger.info(unitPermission.getId() + " Currently created Unit Permission ");
+//            unitPermissionGraphRepository.linkUnitPermissionWithAccessPermission(unitPermission.getId(), accessPermission.getId());
+//            accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroupId);
+//            accessPageQueryResults = getAccessPages(accessPermission);
+//            response.put("accessPage", accessPageQueryResults);
+            response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
+            response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
+            response.put("id", unitPermission.getId());
+
+
+            /*unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId);
             if (Optional.ofNullable(unitPermission).isPresent()) {
                 throw new DataNotFoundByIdException("Unit permission already exist" + staffId);
             }
@@ -174,7 +201,7 @@ public class EmploymentService extends UserBaseService {
             response.put("accessPage", accessPageQueryResults);
             response.put("startDate", DateConverter.getDate(unitPermission.getStartDate()));
             response.put("endDate", DateConverter.getDate(unitPermission.getEndDate()));
-            response.put("id", unitPermission.getId());
+            response.put("id", unitPermission.getId());*/
 
         } else {
             // need to remove unit permission

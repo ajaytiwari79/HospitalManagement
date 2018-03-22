@@ -115,19 +115,19 @@ public class AccessPageService extends UserBaseService {
         if( !Optional.ofNullable(tabId).isPresent() ){
             return false;
         }
+
+        Boolean isKairosHub = orgCategoryTabAccessDTO.getOrganizationCategory().equals(OrganizationCategory.HUB) ? true : false;
+        Boolean isUnion = orgCategoryTabAccessDTO.getOrganizationCategory().equals(OrganizationCategory.UNION) ? true : false;
+
+        if(orgCategoryTabAccessDTO.isAccessStatus()){
+            accessGroupRepository.addAccessPageRelationshipForCountryAccessGroups(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
+            accessGroupRepository.addAccessPageRelationshipForOrganizationAccessGroups(tabId, countryId, isKairosHub, isUnion);
+        } else {
+            accessGroupRepository.removeAccessPageRelationshipForCountryAccessGroup(tabId, countryId,orgCategoryTabAccessDTO.getOrganizationCategory().toString() );
+            accessGroupRepository.removeAccessPageRelationshipForOrganizationAccessGroup(tabId, countryId, isKairosHub, isUnion);
+        }
         return accessPageRepository.updateAccessStatusOfCountryByCategory(tabId, countryId, orgCategoryTabAccessDTO.getOrganizationCategory().toString(), orgCategoryTabAccessDTO.isAccessStatus());
-        /*switch (orgCategoryTabAccessDTO.getOrganizationCategory()){
-            case HUB: {
-                return accessPageRepository.updateAccessStatusForHubOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
-            }
-            case ORGANIZATION: {
-                return accessPageRepository.updateAccessStatusForOrganizationOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
-            }
-            case UNION: {
-                return accessPageRepository.updateAccessStatusForUnionOfCountry(tabId, countryId, orgCategoryTabAccessDTO.isAccessStatus());
-            }
-        }*/
-//        return false;
+
     }
 
     public void createAccessPageByXml(Tab tab){

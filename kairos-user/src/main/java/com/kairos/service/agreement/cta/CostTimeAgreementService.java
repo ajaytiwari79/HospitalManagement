@@ -13,6 +13,7 @@ import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
+import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -22,14 +23,15 @@ import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategory
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.*;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
-import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +76,8 @@ public class CostTimeAgreementService extends UserBaseService {
     private @Inject OrganizationTypeGraphRepository organizationTypeRepository;
     private @Inject OrganizationService organizationService;
     private @Inject ActivityTypesRestClient activityTypesRestClient;
+    private @Inject UnitPositionGraphRepository unitPositionGraphRepository;
+    private @Inject UnitPositionService unitPositionService;
 
 
     public boolean isDefaultCTARuleTemplateExists(){
@@ -515,7 +519,7 @@ public class CostTimeAgreementService extends UserBaseService {
             return  expertise;
         };
 
-        Future<Optional<Expertise>>expertiseFuture=asynchronousService.executeAsynchronously(expertiseCallable);
+        Future<Optional<Expertise>> expertiseFuture=asynchronousService.executeAsynchronously(expertiseCallable);
 
               // Get Rule Templates
         Callable<List<RuleTemplate>> ctaRuleTemplatesCallable=()-> {
@@ -535,14 +539,14 @@ public class CostTimeAgreementService extends UserBaseService {
             }
             return ruleTemplates;
         };
-        Future<List<RuleTemplate>>ctaRuleTemplatesFuture=asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
+        Future<List<RuleTemplate>> ctaRuleTemplatesFuture=asynchronousService.executeAsynchronously(ctaRuleTemplatesCallable);
 
         // Get Organization Type
         Callable<Optional<OrganizationType>> OrganizationTypesListCallable=()->{
             Optional<OrganizationType> organizationType=organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationType());
             return  organizationType;
         };
-        Future<Optional<OrganizationType>>organizationTypesFuture=asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
+        Future<Optional<OrganizationType>> organizationTypesFuture=asynchronousService.executeAsynchronously(OrganizationTypesListCallable);
 
 
         // Get Organization Sub Type
@@ -550,13 +554,15 @@ public class CostTimeAgreementService extends UserBaseService {
             Optional<OrganizationType> organizationType=organizationTypeGraphRepository.findById(collectiveTimeAgreementDTO.getOrganizationSubType());
             return  organizationType;
         };
-        Future<Optional<OrganizationType>>organizationSubTypesFuture=asynchronousService.executeAsynchronously(OrganizationSubTypesListCallable);
+        Future<Optional<OrganizationType>> organizationSubTypesFuture=asynchronousService.executeAsynchronously(OrganizationSubTypesListCallable);
 
         //set data
          if(expertiseFuture.get().isPresent())
              costTimeAgreement.setExpertise(expertiseFuture.get().get());
-        costTimeAgreement.setOrganizationType(organizationTypesFuture.get().get());
-        costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
+        if(organizationTypesFuture.get().isPresent())
+            costTimeAgreement.setOrganizationType(organizationTypesFuture.get().get());
+        if(organizationSubTypesFuture.get().isPresent())
+            costTimeAgreement.setOrganizationSubType(organizationSubTypesFuture.get().get());
         costTimeAgreement.setRuleTemplates(ctaRuleTemplatesFuture.get());
         costTimeAgreement.setStartDateMillis(collectiveTimeAgreementDTO.getStartDateMillis());
         costTimeAgreement.setEndDateMillis(collectiveTimeAgreementDTO.getEndDateMillis());
@@ -747,7 +753,6 @@ public class CostTimeAgreementService extends UserBaseService {
         return true;
     }
 
-
     public List<ExpertiseTagDTO> getExpertiseForOrgCTA(long unitId) {
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
@@ -756,5 +761,58 @@ public class CostTimeAgreementService extends UserBaseService {
     public Long getCTAIdByNameAndCountry(String name, Long countryId){
         CostTimeAgreement cta = collectiveTimeAgreementGraphRepository.getCTAIdByCountryAndName(countryId, name);
         return  (Optional.ofNullable(cta).isPresent()) ? null : cta.getId();
+    }
+
+    public CTAListQueryResult getUnitPositionCTA(Long unitId, Long unitEmploymentPositionId) {
+        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitEmploymentPositionId);
+        if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {
+            throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitEmploymentPositionId);
+        }
+        CTAListQueryResult cta = collectiveTimeAgreementGraphRepository.getCTAByUnitPositionId(unitEmploymentPositionId);
+        return cta;
+    }
+
+    public CollectiveTimeAgreementDTO createCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+        UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
+        if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {
+            throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitPositionId);
+        }
+        CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
+        collectiveTimeAgreementDTO.setId(null);
+
+        BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
+
+        costTimeAgreement.setId(null);
+        CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, false, null);
+
+        // Wait until they are all done
+        CompletableFuture.allOf(hasUpdated).join();
+
+        CostTimeAgreement oldCTA = collectiveTimeAgreementGraphRepository.getLinkedCTAWithUnitPosition(unitPositionId);
+        collectiveTimeAgreementGraphRepository.detachCTAFromUnitPosition(unitPositionId);
+
+        costTimeAgreement.setParent(oldCTA);
+        unitPosition.setCta(costTimeAgreement);
+        unitPositionService.save(unitPosition);
+
+        collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
+        return collectiveTimeAgreementDTO;
+    }
+
+    public CostTimeAgreement getCTALinkedWithUnitPosition(Long unitPositionId){
+        return unitPositionGraphRepository.getCTALinkedWithUnitPosition(unitPositionId);
+    }
+
+    public Long getExpertiseIdOfCTA(Long ctaId){
+        return collectiveTimeAgreementGraphRepository.getExpertiseOfCTA(ctaId);
+    }
+
+    public Long getOrgTypeOfCTA(Long ctaId){
+        return collectiveTimeAgreementGraphRepository.getOrgTypeOfCTA(ctaId);
+    }
+
+    public Long getOrgSubTypeOfCTA(Long ctaId){
+        return collectiveTimeAgreementGraphRepository.getOrgSubTypeOfCTA(ctaId);
     }
 }

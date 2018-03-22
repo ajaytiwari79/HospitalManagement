@@ -474,7 +474,7 @@ public class UnitPositionService extends UserBaseService {
 
     public TimebankWrapper getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
-        CTAListQueryResult ctaRuleTemplateQueryResults = costTimeAgreementGraphRepository.getCtaByUnitPositionId(unitPositionId);
+        CTAListQueryResult ctaRuleTemplateQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         TimebankWrapper timebankWrapper = new TimebankWrapper(unitPositionId);
         timebankWrapper.setStaffId(unitPosition.getStaff().getId());
@@ -599,6 +599,13 @@ public class UnitPositionService extends UserBaseService {
 
         return true;
     }
+
+
+    // For Test Cases
+    public UnitPosition getDefaultUnitPositionByOrg(Long orgId){
+        return unitPositionGraphRepository.getDefaultUnitPositionByOrg(orgId);
+    }
+
 
 
 }

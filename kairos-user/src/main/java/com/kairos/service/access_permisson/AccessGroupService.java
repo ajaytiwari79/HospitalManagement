@@ -56,6 +56,10 @@ public class AccessGroupService extends UserBaseService {
     private OrganizationService organizationService;
 
     public AccessGroup createAccessGroup(long organizationId, AccessGroup accessGroup) {
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroup.getName());
+        if ( isAccessGroupExistWithSameName ) {
+            throw new DuplicateDataException("Access Group already exists with name " +accessGroup.getName() );
+        }
         Organization organization = organizationGraphRepository.findOne(organizationId);
         if (organization == null) {
             return null;
@@ -80,12 +84,16 @@ public class AccessGroupService extends UserBaseService {
         return null;
     }
 
-    public AccessGroup updateAccessGroup(long accessGroupId, AccessGroupDTO accessGroupDTO) {
+    public AccessGroup updateAccessGroup(long accessGroupId, Long unitId, AccessGroupDTO accessGroupDTO) {
         AccessGroup accessGrpToUpdate = accessGroupRepository.findOne(accessGroupId);
-        if (Optional.ofNullable(accessGrpToUpdate).isPresent()) {
+        if ( !Optional.ofNullable(accessGrpToUpdate).isPresent()) {
             throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
         }
-        accessGrpToUpdate.setName(accessGrpToUpdate.getName());
+        if( accessGroupRepository.isOrganizationAccessGroupExistWithNameExceptId(unitId, accessGroupDTO.getName(), accessGroupId) ){
+            throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
+        }
+        accessGrpToUpdate.setName(accessGroupDTO.getName());
+        accessGrpToUpdate.setRole(accessGroupDTO.getRole());
         save(accessGrpToUpdate);
         return accessGrpToUpdate;
     }
@@ -132,7 +140,7 @@ public class AccessGroupService extends UserBaseService {
             List<AccessGroup> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, getOrganizationCategory(organization.isUnion(), organization.isKairosHub()).toString());
             accessGroupList = new ArrayList<>(countryAccessGroups.size());
             for (AccessGroup countryAccessGroup : countryAccessGroups){
-                AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription());
+                AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole());
                 accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
                 accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
                 save(accessGroup);
@@ -233,11 +241,11 @@ public class AccessGroupService extends UserBaseService {
         }
 
         List<Map<String, Object>> accessPages;
-        if(parent == null){
-            accessPages = accessPageRepository.getAccessPageByAccessGroup(unitId,unitId,staffId,accessGroupId);
-        } else {
-            accessPages = accessPageRepository.getAccessPageByAccessGroup(parent.getId(),unitId,staffId,accessGroupId);
-        }
+
+        accessPages = accessPageRepository.getAccessPagePermissionOfStaff(
+                (Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)
+                ,unitId,staffId,accessGroupId);
+
         ObjectMapper objectMapper = new ObjectMapper();
         List<AccessPageQueryResult> queryResults = new ArrayList<>();
         for (Map<String, Object> accessPage : accessPages) {
@@ -255,7 +263,7 @@ public class AccessGroupService extends UserBaseService {
         return modules;
     }
 
-    public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessGroupIds,boolean isSelected, Long countryId) {
+    public Boolean setAccessPagePermissions(long accessGroupId, List<Long> accessPageIds,boolean isSelected, Long countryId) {
         // Check if access group is of country
         if(Optional.ofNullable(countryId).isPresent()){
             AccessGroup accessGroup = accessGroupRepository.findCountryAccessGroupById(accessGroupId, countryId);
@@ -265,7 +273,10 @@ public class AccessGroupService extends UserBaseService {
         }
         long creationDate = DateUtil.getCurrentDate().getTime();
         long lastModificationDate = DateUtil.getCurrentDate().getTime();
-        accessGroupRepository.updateAccessPagePermission(accessGroupId,accessGroupIds,isSelected,creationDate,lastModificationDate);
+        Boolean read =  isSelected;
+        Boolean write =  isSelected;
+
+        accessGroupRepository.updateAccessPagePermission(accessGroupId,accessPageIds,isSelected,creationDate,lastModificationDate, read, write);
         return true;
     }
 
@@ -310,7 +321,7 @@ public class AccessGroupService extends UserBaseService {
         return accessGroupRepository.getAccessPermissions(staffId);
     }
 
-    public void assignPermission(long accessGroupId,AccessPermissionDTO accessPermissionDTO){
+    public void assignPermission(long accessGroupId,AccessPermissionDTO accessPermissionDTO, Boolean updateChildren){
 
         Organization unit = organizationGraphRepository.findOne(accessPermissionDTO.getUnitId(),0);
         if(unit == null){
@@ -322,10 +333,38 @@ public class AccessGroupService extends UserBaseService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-        if(parent == null){
-            accessGroupRepository.setPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
+        AccessPageQueryResult readAndWritePermissionForAccessGroup = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPermissionDTO.getPageId());
+
+        AccessPageQueryResult  customReadAndWritePermissionForAccessGroup = accessPageRepository.getCustomPermissionOfTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessPermissionDTO.getPageId());
+        Boolean savedReadCheck = readAndWritePermissionForAccessGroup.isRead();
+        Boolean savedWriteCheck = readAndWritePermissionForAccessGroup.isWrite();
+        if( Optional.ofNullable(customReadAndWritePermissionForAccessGroup).isPresent()){
+            savedReadCheck = customReadAndWritePermissionForAccessGroup.isRead();
+            savedWriteCheck = customReadAndWritePermissionForAccessGroup.isWrite();
+        }
+
+        Boolean write = accessPermissionDTO.isWrite();
+        Boolean read = accessPermissionDTO.isRead();
+
+        // If change has been done in read and if it is false then set write as false too
+        if(savedReadCheck != read && !read){
+            write = false;
+        }
+        // If change has been done in write and if it is true then set read as true too
+        else if(savedWriteCheck != write && write){
+            read = true;
+        }
+
+        // Check if new permissions are different then of Access Group
+        if(Optional.ofNullable(readAndWritePermissionForAccessGroup).isPresent() && readAndWritePermissionForAccessGroup.isRead() == read  && readAndWritePermissionForAccessGroup.isWrite() == write){
+            // CHECK if custom permission exist and then delete
+            accessGroupRepository.deleteCustomPermissionForTab(unit.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),read,write);
         } else {
-            accessGroupRepository.setPermissionForTab(parent.getId(),accessPermissionDTO.getStaffId(),unit.getId(),accessGroupId,accessPermissionDTO.getPageId(),accessPermissionDTO.isRead(),accessPermissionDTO.isWrite());
+            if(updateChildren) {
+                accessGroupRepository.setCustomPermissionForTabAndChildren((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
+            } else {
+                accessGroupRepository.setCustomPermissionForTab((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
+            }
         }
     }
 
@@ -338,6 +377,29 @@ public class AccessGroupService extends UserBaseService {
     }
 
 
+    public Boolean updatePermissionsForAccessTabsOfAccessGroup(Long accessGroupId, Long accessPageId, AccessPermissionDTO accessPermissionDTO, Boolean updateChildren){
+
+        AccessPageQueryResult readAndWritePermissionOfAccessPage = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, accessPageId);
+
+        Boolean write = accessPermissionDTO.isWrite();
+        Boolean read = accessPermissionDTO.isRead();
+
+        // If change has been done in read and if it is false then set write as false too
+        if(readAndWritePermissionOfAccessPage.isRead() != read && !read){
+            write = false;
+        }
+        // If change has been done in write and if it is true then set read as true too
+        else if (readAndWritePermissionOfAccessPage.isWrite() != write && write){
+            read = true;
+        }
+        if(updateChildren){
+            // Update read/write permission of tab and its children
+            return accessGroupRepository.updatePermissionsForAccessTabsAndChildrenOfAccessGroup(accessPageId, accessGroupId, read, write);
+        } else {
+            // Update read/write permission of tab itself
+            return accessGroupRepository.updatePermissionsForAccessTabOfAccessGroup(accessPageId, accessGroupId, accessPermissionDTO.isRead(), accessPermissionDTO.isWrite());
+        }
+    }
 
     /***** Access group - COUNTRY LEVEL - STARTS HERE ******************/
 
@@ -364,7 +426,7 @@ public class AccessGroupService extends UserBaseService {
         if ( isAccessGroupExistWithSameName ) {
             throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
         }
-        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName(), accessGroupDTO.getDescription());
+        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName(), accessGroupDTO.getDescription(), accessGroupDTO.getRole());
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
@@ -392,6 +454,7 @@ public class AccessGroupService extends UserBaseService {
         accessGrpToUpdate.setName(accessGroupDTO.getName());
         accessGrpToUpdate.setDescription(accessGroupDTO.getDescription());
         accessGrpToUpdate.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+        accessGrpToUpdate.setRole(accessGroupDTO.getRole());
         save(accessGrpToUpdate);
         return accessGrpToUpdate;
 
@@ -445,5 +508,9 @@ public class AccessGroupService extends UserBaseService {
     // For Test Cases
     List<Long> getAccessPageIdsByAccessGroup(Long accessGroupId){
        return accessGroupRepository.getAccessPageIdsByAccessGroup(accessGroupId);
+    }
+
+    Long getAccessPageIdByAccessGroup(Long accessGroupId){
+        return accessGroupRepository.getAccessPageIdByAccessGroup(accessGroupId);
     }
 }

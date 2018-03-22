@@ -14,7 +14,9 @@ import javax.validation.Valid;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 @RequestMapping(API_ORGANIZATION_URL)
 @RestController
@@ -93,4 +95,17 @@ public class CostTimeAgreementController {
     public ResponseEntity<Map<String, Object>> getExpertiseForCTA(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getExpertiseForOrgCTA(unitId));
     }
+
+    @ApiOperation(value = "Update Unit Position's CTA")
+    @PutMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta/{ctaId}")
+    public ResponseEntity<Map<String, Object>> updateUnitPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId, @PathVariable Long ctaId, @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.createCostTimeAgreementForUnitPosition(unitId, unitPositionId, ctaId, collectiveTimeAgreementDTO));
+    }
+
+    @ApiOperation(value = "get unit_position's CTA")
+    @GetMapping(value = UNIT_URL+"/unit_position/{unitPositionId}/cta")
+    public ResponseEntity<Map<String, Object>> getUnitEmploymentPositionCTA(@PathVariable Long unitPositionId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getUnitPositionCTA(unitId, unitPositionId));
+    }
+
 }
