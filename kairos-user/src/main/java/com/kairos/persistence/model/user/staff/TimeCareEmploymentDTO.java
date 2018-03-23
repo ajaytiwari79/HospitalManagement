@@ -39,6 +39,9 @@ public class TimeCareEmploymentDTO{
     @JacksonXmlProperty
     private String EmpNo;
 
+    public TimeCareEmploymentDTO(){
+        // default constructor
+    }
     public String getId() {
         return Id;
     }
