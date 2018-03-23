@@ -47,7 +47,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     List<PayGradeQueryResult> getPayGridsByPayTableId(Long payTableId);
 
     @Query("MATCH (payTable:PayTable{deleted:false})-[rel:" + HAS_TEMP_PAY_TABLE + "]-(payTable1:PayTable{deleted:false}) where id(payTable)={0} \n" +
-            " set payTable.endDateMillis={1} set payTable.hasTempCopy=false set payTable.published=true detach delete r")
+            " set payTable.endDateMillis={1} set payTable.hasTempCopy=false set payTable.published=true detach delete rel")
     void changeStateOfRelationShip(Long payTableId ,Long endDateMillis);
 
     @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_TEMP_PAY_TABLE + "]-(payTable1:PayTable{deleted:false}) where id(payTable)={0} \n" +

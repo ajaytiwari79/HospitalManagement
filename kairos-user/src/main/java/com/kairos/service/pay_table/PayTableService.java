@@ -253,6 +253,7 @@ public class PayTableService extends UserBaseService {
             payGradeQueryResults.add(payGradeQueryResult);
         }
         payTableByMapper.setPayGrades(payGradesObjects);
+        save(payTableByMapper);
         // Adding new Grade in PayTable
 
         return payGradeQueryResults;
