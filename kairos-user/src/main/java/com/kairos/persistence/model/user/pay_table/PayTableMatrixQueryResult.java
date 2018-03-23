@@ -15,7 +15,7 @@ public class PayTableMatrixQueryResult {
     private Long payGroupAreaId;
     private String payGroupAreaName;
     private BigDecimal payGroupAreaAmount;
-    private PayGradeStateEnum state;
+
 
     public PayTableMatrixQueryResult() {
     }
@@ -36,13 +36,6 @@ public class PayTableMatrixQueryResult {
         this.payGroupAreaAmount = payGroupAreaAmount;
     }
 
-    public PayGradeStateEnum getState() {
-        return state;
-    }
-
-    public void setState(PayGradeStateEnum state) {
-        this.state = state;
-    }
 
     public String getPayGroupAreaName() {
         return payGroupAreaName;

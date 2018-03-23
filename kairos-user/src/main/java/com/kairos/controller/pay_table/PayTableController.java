@@ -86,8 +86,8 @@ public class PayTableController {
 
     // THIS API is used to update a row of payGrade matrix of a payTable.
     @RequestMapping(value = "/pay_table/{payTableId}/pay_grade/{payGradeId}", method = PUT)
-    public ResponseEntity<Map<String, Object>> updatePayGradeInPayTable(@PathVariable Long payGradeId, @Validated @RequestBody PayGradeDTO payGradeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.updatePayGradeInPayTable(payGradeId, payGradeDTO));
+    public ResponseEntity<Map<String, Object>> updatePayGradeInPayTable(@PathVariable Long payTableId,@PathVariable Long payGradeId, @Validated @RequestBody PayGradeDTO payGradeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.updatePayGradeInPayTable(payTableId,payGradeId, payGradeDTO));
     }
 
     @RequestMapping(value = "/pay_table/{payTableId}/publish", method = POST)

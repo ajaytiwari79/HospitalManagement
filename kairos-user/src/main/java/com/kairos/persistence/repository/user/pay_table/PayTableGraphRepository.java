@@ -21,14 +21,14 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     List<PayTableQueryResult> findPayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
 
     @Query("MATCH (c:Country) where id(c)={0}\n" +
-            " MATCH(c)-[:HAS_LEVEL]->(level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false}) where (payTable.name =~{2} OR payTable.shortName=~{3}) AND id(payTable)<>{1} " +
+            " MATCH(c)-[:HAS_LEVEL]->(level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false}) where (payTable.name =~{2} OR payTable.shortName=~{3}) AND id(payTable)<>{1} " +
             " with count(payTable) as payTableCount\n" +
             " RETURN case when payTableCount>0 THEN  true ELSE false END as response")
     Boolean checkPayTableNameAlreadyExitsByNameOrShortName(Long countryId, Long currentPayTableId, String payTableName, String payTableShortName);
 
     @Query("MATCH (c:Country) where id(c)={0} \n" +
             "MATCH(c)-[:HAS_LEVEL]->(level:Level{isEnabled:true})\n" +
-            "OPTIONAL MATCH (level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false})\n" +
+            "OPTIONAL MATCH (level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false})\n" +
             "with level,Case when payTable IS NOT NULL THEN collect({id:id(payTable),name:payTable.name,published:payTable.published,startDateMillis:payTable.startDateMillis,endDateMillis:payTable.endDateMillis,description:payTable.description,shortName:payTable.shortName}) else [] end as payTables\n" +
             "with level,payTables \n OPTIONAL MATCH  (level:Level)-[:IN_LEVEL]-(payGroupArea:PayGroupArea{deleted:false})\n" +
             "return id(level) as id,level.name as name ,level.description as description, Case when payGroupArea IS NOT NULL THEN \n" +
@@ -46,14 +46,12 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "collect({id:id(rel),payGroupAreaId:id(pga),state:rel.state,payGroupAreaAmount:rel.payGroupAreaAmount}) as payTableMatrix")
     List<PayGradeQueryResult> getPayGridsByPayTableId(Long payTableId);
 
-    @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false}) where id(payTable)={0} \n" +
-            "Match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea{deleted:false})\n" +
-            "set rel.state={1}")
-    void changeStateOfRelationShip(Long payTableId, PayGradeStateEnum stateEnum);
+    @Query("MATCH (payTable:PayTable{deleted:false})-[rel:" + HAS_TEMP_PAY_TABLE + "]-(payTable1:PayTable{deleted:false}) where id(payTable)={0} \n" +
+            " set payTable.endDateMillis={1} set payTable.hasTempCopy=false set payTable.published=true detach delete r")
+    void changeStateOfRelationShip(Long payTableId ,Long endDateMillis);
 
-    @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false}) where id(payTable)={0} \n" +
-            "Match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "{state:'DRAFT'}]-(pga:PayGroupArea{deleted:false})\n" +
-            "detach delete rel")
-    void removeAllDraftNodesByPayTableId(Long payTableId);
+    @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_TEMP_PAY_TABLE + "]-(payTable1:PayTable{deleted:false}) where id(payTable)={0} \n" +
+            "return payTable1")
+    PayTable getPermanentPayTableByPayTableId(Long payTableId);
 
 }

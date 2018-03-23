@@ -1,12 +1,10 @@
 package com.kairos.response.dto.web.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.user.pay_table.PayGradeStateEnum;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.Objects;
 
 /**
  * Created by vipul on 16/3/18.
@@ -19,7 +17,7 @@ public class PayTableMatrixDTO {
     @NotNull(message = "Pay Grade value can not be null")
     private BigDecimal payGroupAreaAmount;
     private Long id;
-    private PayGradeStateEnum state;
+
 
     public PayTableMatrixDTO() {
         //default cons
@@ -49,19 +47,12 @@ public class PayTableMatrixDTO {
         this.id = id;
     }
 
-    public PayGradeStateEnum getState() {
-        return state;
-    }
 
-    public void setState(PayGradeStateEnum state) {
-        this.state = state;
-    }
-
-    public PayTableMatrixDTO(Long payGroupAreaId, BigDecimal payGroupAreaAmount, Long id, PayGradeStateEnum payGradeStateEnum) {
+    public PayTableMatrixDTO(Long payGroupAreaId, BigDecimal payGroupAreaAmount, Long id) {
         this.payGroupAreaId = payGroupAreaId;
         this.payGroupAreaAmount = payGroupAreaAmount;
         this.id = id;
-        this.state = payGradeStateEnum;
+
     }
 
     @Override
@@ -69,7 +60,6 @@ public class PayTableMatrixDTO {
         final StringBuffer sb = new StringBuffer("PayTableMatrixDTO{");
         sb.append("payGroupAreaId=").append(payGroupAreaId);
         sb.append(", payGroupAreaAmount=").append(payGroupAreaAmount);
-        sb.append(", state=").append(state);
         sb.append('}');
         return sb.toString();
     }

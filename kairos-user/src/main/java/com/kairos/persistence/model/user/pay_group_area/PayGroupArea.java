@@ -42,6 +42,10 @@ public class PayGroupArea extends UserBaseEntity {
         this.name = name;
         this.id = id;
     }
+    public PayGroupArea(Long id) {
+
+        this.id = id;
+    }
 
     public String getName() {
         return name;
