@@ -18,7 +18,7 @@ public class PayGradeResponse {
     private Long payGradeLevel;
     private Long payGradeId;
     private Boolean published;
-    private List<PayGroupAreaDTO> payTableMatrix;
+    private List<PayGroupAreaDTO> payGroupAreas;
 
     public PayGradeResponse() {
         //default
@@ -48,12 +48,12 @@ public class PayGradeResponse {
         this.payGradeId = payGradeId;
     }
 
-    public List<PayGroupAreaDTO> getPayTableMatrix() {
-        return payTableMatrix;
+    public List<PayGroupAreaDTO> getPayGroupAreas() {
+        return payGroupAreas;
     }
 
-    public void setPayTableMatrix(List<PayGroupAreaDTO> payTableMatrix) {
-        this.payTableMatrix = payTableMatrix;
+    public void setPayGroupAreas(List<PayGroupAreaDTO> payGroupAreas) {
+        this.payGroupAreas = payGroupAreas;
     }
 
     public Boolean getPublished() {
@@ -64,11 +64,11 @@ public class PayGradeResponse {
         this.published = published;
     }
 
-    public PayGradeResponse(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayGroupAreaDTO> payTableMatrix, Boolean published) {
+    public PayGradeResponse(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayGroupAreaDTO> payGroupAreas, Boolean published) {
         this.payTableId = payTableId;
         this.payGradeLevel = payGradeLevel;
         this.payGradeId = payGradeId;
-        this.payTableMatrix = payTableMatrix;
+        this.payGroupAreas = payGroupAreas;
         this.published = published;
     }
 

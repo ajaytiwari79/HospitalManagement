@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @Repository
 public interface PayGradeGraphRepository extends Neo4jBaseRepository<PayGrade, Long> {
     @Query("MATCH (payGrade:PayGrade) where id(payGrade)={0}\n" +
-            "OPTIONAL match(payGrade)-[rel:HAS_PAY_GROUP_AREA]-(pga:PayGroupArea)\n" +
+            "OPTIONAL match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
             "detach delete rel\n" +
             "set payGrade.deleted=true")
     void removeAllPayGroupAreasFromPayGrade(Long payGradeId);

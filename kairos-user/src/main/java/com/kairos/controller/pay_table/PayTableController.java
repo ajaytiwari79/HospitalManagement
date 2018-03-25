@@ -75,7 +75,7 @@ public class PayTableController {
 
     @RequestMapping(value = "/pay_table/{payTableId}/pay_grade", method = GET)
     public ResponseEntity<Map<String, Object>> getPayGridsByPayTableId(@PathVariable Long payTableId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayGridsByPayTableId(payTableId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayGradesByPayTableId(payTableId));
     }
 
     // THIS API is used to delete a particular  payGrade from a payTable
