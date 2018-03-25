@@ -22,7 +22,7 @@ public interface PayGradeGraphRepository extends Neo4jBaseRepository<PayGrade, L
     void removeAllPayGroupAreasFromPayGrade(Long payGradeId);
 
     @Query("Match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea{deleted:false}) where id(payGrade)={0} \n" +
-            "return id(pga) as payGroupAreaId,pga.name as payGroupAreaName,rel.state as state,rel.payGroupAreaAmount as payGroupAreaAmount  ORDER BY  rel.state")
+            "return id(pga) as payGroupAreaId,pga.name as payGroupAreaName,rel.payGroupAreaAmount as payGroupAreaAmount  ORDER BY  rel.state")
     HashSet<PayTableMatrixQueryResult> getPayGradeMatrixByPayGradeId(Long PayGradeId);
 
 }
