@@ -11,7 +11,7 @@ import java.math.BigDecimal;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
-public class PayTableMatrixDTO {
+public class PayGroupAreaDTO {
     @NotNull(message = "Pay Group Area can not be null")
     private Long payGroupAreaId;
     @NotNull(message = "Pay Grade value can not be null")
@@ -19,7 +19,7 @@ public class PayTableMatrixDTO {
     private Long id;
 
 
-    public PayTableMatrixDTO() {
+    public PayGroupAreaDTO() {
         //default cons
     }
 
@@ -48,7 +48,7 @@ public class PayTableMatrixDTO {
     }
 
 
-    public PayTableMatrixDTO(Long payGroupAreaId, BigDecimal payGroupAreaAmount, Long id) {
+    public PayGroupAreaDTO(Long payGroupAreaId, BigDecimal payGroupAreaAmount, Long id) {
         this.payGroupAreaId = payGroupAreaId;
         this.payGroupAreaAmount = payGroupAreaAmount;
         this.id = id;

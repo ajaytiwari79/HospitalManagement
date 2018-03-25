@@ -15,7 +15,7 @@ public class PayGradeDTO {
     @NotNull(message = "Pay Grade Level can not be null")
     private Long payGradeLevel;
     private Long payGradeId;
-    private List<PayTableMatrixDTO> payTableMatrix;
+    private List<PayGroupAreaDTO> payTableMatrix;
 
     public PayGradeDTO() {
         // default
@@ -37,11 +37,11 @@ public class PayGradeDTO {
         this.payGradeLevel = payGradeLevel;
     }
 
-    public List<PayTableMatrixDTO> getPayTableMatrix() {
+    public List<PayGroupAreaDTO> getPayTableMatrix() {
         return payTableMatrix;
     }
 
-    public void setPayTableMatrix(List<PayTableMatrixDTO> payTableMatrix) {
+    public void setPayTableMatrix(List<PayGroupAreaDTO> payTableMatrix) {
         this.payTableMatrix = payTableMatrix;
     }
 

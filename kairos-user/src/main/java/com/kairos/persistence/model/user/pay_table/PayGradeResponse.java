@@ -2,7 +2,7 @@ package com.kairos.persistence.model.user.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.response.dto.web.pay_table.PayTableMatrixDTO;
+import com.kairos.response.dto.web.pay_table.PayGroupAreaDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -13,14 +13,14 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-public class PayGradeQueryResult {
+public class PayGradeResponse {
     private Long payTableId;
     private Long payGradeLevel;
     private Long payGradeId;
     private Boolean published;
-    private List<PayTableMatrixDTO> payTableMatrix;
+    private List<PayGroupAreaDTO> payTableMatrix;
 
-    public PayGradeQueryResult() {
+    public PayGradeResponse() {
         //default
     }
 
@@ -48,11 +48,11 @@ public class PayGradeQueryResult {
         this.payGradeId = payGradeId;
     }
 
-    public List<PayTableMatrixDTO> getPayTableMatrix() {
+    public List<PayGroupAreaDTO> getPayTableMatrix() {
         return payTableMatrix;
     }
 
-    public void setPayTableMatrix(List<PayTableMatrixDTO> payTableMatrix) {
+    public void setPayTableMatrix(List<PayGroupAreaDTO> payTableMatrix) {
         this.payTableMatrix = payTableMatrix;
     }
 
@@ -64,7 +64,7 @@ public class PayGradeQueryResult {
         this.published = published;
     }
 
-    public PayGradeQueryResult(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayTableMatrixDTO> payTableMatrix, Boolean published) {
+    public PayGradeResponse(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayGroupAreaDTO> payTableMatrix, Boolean published) {
         this.payTableId = payTableId;
         this.payGradeLevel = payGradeLevel;
         this.payGradeId = payGradeId;

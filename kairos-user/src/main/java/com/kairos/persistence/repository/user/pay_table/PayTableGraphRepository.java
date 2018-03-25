@@ -6,7 +6,6 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -18,7 +17,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
 
     @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,published:true}) where id(level)={0} AND id(payTable)<>{1}" +
             " RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName")
-    List<PayTableQueryResult> findPayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
+    List<PayTableResponse> findPayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
 
     @Query("MATCH (c:Country) where id(c)={0}\n" +
             " MATCH(c)-[:HAS_LEVEL]->(level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false}) where (payTable.name =~{2} OR payTable.shortName=~{3}) AND id(payTable)<>{1} " +
@@ -44,7 +43,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "Match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea{deleted:false})\n" +
             "return id(payTable) as payTableId,id(payGrade) as payGradeId,payGrade.payGradeLevel as payGradeLevel,payGrade.published as published," +
             "collect({id:id(rel),payGroupAreaId:id(pga),state:rel.state,payGroupAreaAmount:rel.payGroupAreaAmount}) as payTableMatrix")
-    List<PayGradeQueryResult> getPayGridsByPayTableId(Long payTableId);
+    List<PayGradeResponse> getPayGridsByPayTableId(Long payTableId);
 
     @Query("MATCH (payTable:PayTable{deleted:false})-[rel:" + HAS_TEMP_PAY_TABLE + "]-(payTable1:PayTable{deleted:false}) where id(payTable)={0} \n" +
             " set payTable.endDateMillis={1} set payTable.hasTempCopy=false set payTable.published=true detach delete rel")
