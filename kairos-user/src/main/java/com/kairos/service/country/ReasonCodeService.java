@@ -51,13 +51,13 @@ public class ReasonCodeService extends UserBaseEntity {
     }
 
     public ReasonCodeResponseDTO updateReasonCode(long countryId,ReasonCodeDTO reasonCodeDTO){
-        ReasonCode reasonCode=reasonCodeGraphRepository.findOne(reasonCodeDTO.getId());
-        if(!Optional.ofNullable(reasonCode).isPresent() || reasonCode.isDeleted() == true){
-            throw new DataNotFoundByIdException("Invalid ReasonCode: "+reasonCodeDTO.getId());
-        }
         boolean isNameAlreadyExists=reasonCodeGraphRepository.findByNameExcludingCurrent(countryId,reasonCodeDTO.getId(),"(?i)"+reasonCodeDTO.getName().trim(),reasonCodeDTO.getReasonCodeType());
         if(isNameAlreadyExists){
             throw new DuplicateDataException("ReasonCode already exists: "+reasonCodeDTO.getName());
+        }
+        ReasonCode reasonCode=reasonCodeGraphRepository.findOne(reasonCodeDTO.getId());
+        if(!Optional.ofNullable(reasonCode).isPresent() || reasonCode.isDeleted() == true){
+            throw new DataNotFoundByIdException("Invalid ReasonCode: "+reasonCodeDTO.getId());
         }
         reasonCode.setName(reasonCodeDTO.getName().trim());
         reasonCode.setCode(reasonCodeDTO.getCode());
