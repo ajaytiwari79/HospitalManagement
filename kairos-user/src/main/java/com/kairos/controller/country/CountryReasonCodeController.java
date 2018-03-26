@@ -55,7 +55,7 @@ public class CountryReasonCodeController {
     @ApiOperation(value = "Delete ReasonCode by reasonCodeId")
     @RequestMapping(value = COUNTRY_URL + "/reason_code/{reasonCodeId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteReasonCode(@PathVariable long reasonCodeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCode(reasonCodeId));
+    public ResponseEntity<Map<String, Object>> deleteReasonCode(@PathVariable long countryId, @PathVariable long reasonCodeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.deleteReasonCode(countryId,reasonCodeId));
     }
 }

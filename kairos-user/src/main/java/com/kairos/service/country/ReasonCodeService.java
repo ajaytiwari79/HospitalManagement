@@ -55,8 +55,8 @@ public class ReasonCodeService extends UserBaseEntity {
         if(isNameAlreadyExists){
             throw new DuplicateDataException("ReasonCode already exists: "+reasonCodeDTO.getName());
         }
-        ReasonCode reasonCode=reasonCodeGraphRepository.findOne(reasonCodeDTO.getId());
-        if(!Optional.ofNullable(reasonCode).isPresent() || reasonCode.isDeleted() == true){
+        ReasonCode reasonCode=reasonCodeGraphRepository.findByCountryAndReasonCode(countryId,reasonCodeDTO.getId());
+        if(!Optional.ofNullable(reasonCode).isPresent()){
             throw new DataNotFoundByIdException("Invalid ReasonCode: "+reasonCodeDTO.getId());
         }
         reasonCode.setName(reasonCodeDTO.getName().trim());
@@ -66,9 +66,9 @@ public class ReasonCodeService extends UserBaseEntity {
         ReasonCodeResponseDTO reasonCodeResponseDTO=new ReasonCodeResponseDTO(reasonCode.getId(),reasonCode.getName(),reasonCode.getCode(),reasonCode.getDescription(),reasonCode.getReasonCodeType());
         return reasonCodeResponseDTO;
     }
-    public boolean deleteReasonCode(long reasonCodeId){
-        ReasonCode reasonCode=reasonCodeGraphRepository.findOne(reasonCodeId);
-        if(!Optional.ofNullable(reasonCode).isPresent() || reasonCode.isDeleted() == true){
+    public boolean deleteReasonCode(long countryId,long reasonCodeId){
+        ReasonCode reasonCode=reasonCodeGraphRepository.findByCountryAndReasonCode(countryId,reasonCodeId);
+        if(!Optional.ofNullable(reasonCode).isPresent()){
             throw new DataNotFoundByIdException("Invalid ReasonCode: "+reasonCodeId);
         }
         reasonCode.setDeleted(true);
