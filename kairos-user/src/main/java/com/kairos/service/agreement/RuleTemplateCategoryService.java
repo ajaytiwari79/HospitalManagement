@@ -118,15 +118,18 @@ public class RuleTemplateCategoryService extends UserBaseService {
         if (countryService.getCountryById(countryId) == null) {
             throw new DataNotFoundByIdException("Country does not exist");
         }
-
-
-        RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
-        if (ruleTemplateCategoryObj.getName() == ruleTemplateCategory.getName()) {
-            throw new DuplicateDataException("Can't update, rule template ruleTemplateCategory name already in country");
-        }
-        if (ruleTemplateCategoryObj.getName().equals("NONE")) {
+        if (ruleTemplateCategory.getName().equals("NONE")) {
             throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
         }
+
+        boolean isAlreadyExists=ruleTemplateCategoryGraphRepository.findByNameExcludingCurrent(countryId,CTA,"(?i)" + ruleTemplateCategory.getName().trim(),templateCategoryId);
+        if(isAlreadyExists){
+            throw new DuplicateDataException("ruleTemplateCategory name already  exists "+ruleTemplateCategory.getName());
+        }
+        RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
+        if (ruleTemplateCategoryObj.getName().equals("NONE")) {
+              throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
+            }
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategory.getDescription());
         save(ruleTemplateCategoryObj);
