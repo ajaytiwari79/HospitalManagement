@@ -1,8 +1,10 @@
 package com.kairos.service.country;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.ReasonCodeType;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
@@ -44,8 +46,8 @@ public class ReasonCodeService extends UserBaseEntity {
         return new ReasonCodeDTO(reasonCode.getId(),reasonCode.getName(),reasonCode.getCode(),reasonCode.getDescription(),reasonCode.getReasonCodeType());
     }
 
-    public List<ReasonCodeResponseDTO> getReasonCodes(long countryId){
-       return reasonCodeGraphRepository.findReasonCodesByCountry(countryId);
+    public List<ReasonCodeResponseDTO> getReasonCodes(long countryId, ReasonCodeType reasonCodeType){
+        return reasonCodeGraphRepository.findReasonCodesByCountry(countryId,reasonCodeType);
     }
 
     public ReasonCodeResponseDTO updateReasonCode(long countryId,ReasonCodeDTO reasonCodeDTO){
