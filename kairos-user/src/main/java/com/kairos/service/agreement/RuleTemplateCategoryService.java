@@ -128,8 +128,8 @@ public class RuleTemplateCategoryService extends UserBaseService {
         }
         RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if (ruleTemplateCategoryObj.getName().equals("NONE")) {
-              throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
-            }
+            throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
+        }
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategory.getDescription());
         save(ruleTemplateCategoryObj);
