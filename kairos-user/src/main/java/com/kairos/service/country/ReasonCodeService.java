@@ -51,10 +51,6 @@ public class ReasonCodeService extends UserBaseEntity {
     }
 
     public ReasonCodeResponseDTO updateReasonCode(long countryId,ReasonCodeDTO reasonCodeDTO){
-        Country country = countryGraphRepository.findOne(countryId);
-        if(!Optional.ofNullable(country).isPresent()){
-            throw new DataNotFoundByIdException("Country not found: "+countryId);
-        }
         ReasonCode reasonCode=reasonCodeGraphRepository.findOne(reasonCodeDTO.getId());
         if(!Optional.ofNullable(reasonCode).isPresent() || reasonCode.isDeleted() == true){
             throw new DataNotFoundByIdException("Invalid ReasonCode: "+reasonCodeDTO.getId());
