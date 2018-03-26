@@ -61,7 +61,7 @@ public class ReasonCodeService extends UserBaseEntity {
         if(isNameAlreadyExists){
             throw new DuplicateDataException("ReasonCode already exists: "+reasonCodeDTO.getName());
         }
-        reasonCode.setName(reasonCodeDTO.getName());
+        reasonCode.setName(reasonCodeDTO.getName().trim());
         reasonCode.setCode(reasonCodeDTO.getCode());
         reasonCode.setDescription(reasonCodeDTO.getDescription());
         reasonCodeGraphRepository.save(reasonCode);
