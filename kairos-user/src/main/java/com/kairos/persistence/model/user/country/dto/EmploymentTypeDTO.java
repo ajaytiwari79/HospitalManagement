@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.joda.time.DateTime;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 /**
  * Created by prerna on 7/11/17.
@@ -20,6 +23,9 @@ public class EmploymentTypeDTO extends UserBaseEntity {
     private boolean allowedForContactPerson;
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
+    private boolean permanent;
+    private boolean temporary;
+    private boolean guest;
 
     public String getName() {
         return name;
@@ -61,6 +67,30 @@ public class EmploymentTypeDTO extends UserBaseEntity {
         this.allowedForFlexPool = allowedForFlexPool;
     }
 
+    public boolean isPermanent() {
+        return permanent;
+    }
+
+    public void setPermanent(boolean permanent) {
+        this.permanent = permanent;
+    }
+
+    public boolean isTemporary() {
+        return temporary;
+    }
+
+    public void setTemporary(boolean temporary) {
+        this.temporary = temporary;
+    }
+
+    public boolean isGuest() {
+        return guest;
+    }
+
+    public void setGuest(boolean guest) {
+        this.guest = guest;
+    }
+
     public EmploymentType generateEmploymentTypeFromEmploymentTypeDTO() {
         EmploymentType employmentType = new EmploymentType();
         employmentType.setName(this.getName());
@@ -70,4 +100,14 @@ public class EmploymentTypeDTO extends UserBaseEntity {
         employmentType.setAllowedForFlexPool(this.isAllowedForFlexPool());
         return employmentType;
     }
+    @AssertTrue(message = "At least one field should be selected")
+    public boolean isValid() {
+
+        if (allowedForContactPerson || allowedForShiftPlan || allowedForFlexPool || permanent || temporary ||guest) {
+            return true;
+        }
+
+        return true;
+    }
+
 }

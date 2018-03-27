@@ -24,6 +24,10 @@ public class EmploymentType extends UserBaseEntity {
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
     private boolean deleted = false;
+    private boolean permanent;
+    private boolean temporary;
+    private boolean guest;
+
 
     public String getName() {
         return name;
@@ -72,4 +76,29 @@ public class EmploymentType extends UserBaseEntity {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
+
+    public boolean isPermanent() {
+        return permanent;
+    }
+
+    public void setPermanent(boolean permanent) {
+        this.permanent = permanent;
+    }
+
+    public boolean isTemporary() {
+        return temporary;
+    }
+
+    public void setTemporary(boolean temporary) {
+        this.temporary = temporary;
+    }
+
+    public boolean isGuest() {
+        return guest;
+    }
+
+    public void setGuest(boolean guest) {
+        this.guest = guest;
+    }
+
 }
