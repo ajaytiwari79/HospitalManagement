@@ -228,17 +228,17 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     List<Map<String, Object>> getStaffSkillInfo(long staffId, List<Long> skillId, long unitId);
 
     @Query("Match (staff:Staff) where id(staff)={0} with staff\n" +
-            "Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) where id(expertise)={1} with staff,skill\n" +
+            "Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) where id(expertise) IN {1} with staff,skill\n" +
             "MERGE (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)\n" +
             "ON CREATE SET r.creationDate ={2},r.lastModificationDate ={3},r.isEnabled=true,r.skillLevel={4}\n" +
             "ON MATCH SET r.lastModificationDate = {3},r.skillLevel={4},r.isEnabled=true")
-    void updateSkillsByExpertise(long staffId, long expertiseId, long creationDate, long lastModificationDate, Skill.SkillLevel skillLevel);
+    void updateSkillsByExpertise(long staffId, List<Long> expertiseId, long creationDate, long lastModificationDate, Skill.SkillLevel skillLevel);
 
     @Query("Match (staff:Staff) where id(staff)={0} with staff\n" +
-            "Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) where id(expertise)={1} with staff,skill\n" +
+            "Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) where id(expertise) IN {1} with staff,skill\n" +
             "Match (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)\n" +
             "set r.isEnabled=false")
-    void removeSkillsByExpertise(long staffId, long expertiseId);
+    void removeSkillsByExpertise(long staffId, List<Long> expertiseIds);
 
     @Query("MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment) where id(organization)={0} with employment\n" +
             "OPTIONAL MATCH (staff:Staff)<-[:BELONGS_TO]-(employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={1} with unitPermission, staff\n" +

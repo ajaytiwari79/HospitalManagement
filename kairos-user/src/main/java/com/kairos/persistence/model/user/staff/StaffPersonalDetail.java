@@ -4,6 +4,7 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Created by prabjot on 10/1/17.
@@ -20,7 +21,7 @@ public class StaffPersonalDetail {
     private String inactiveFrom;
     private StaffStatusEnum currentStatus;
     private long languageId;
-    private long expertiseId;
+    private List<Long> expertiseId;
    // @NotEmpty(message = "error.cprnumber.notnull") @NotNull(message = "error.cprnumber.notnull")
     private String cprNumber;
    // @NotEmpty(message = "error.Staff.familyname.notnull") @NotNull(message = "error.Staff.familyname.notnull")
@@ -94,11 +95,11 @@ public class StaffPersonalDetail {
         this.languageId = languageId;
     }
 
-    public long getExpertiseId() {
+    public List<Long> getExpertiseId() {
         return expertiseId;
     }
 
-    public void setExpertiseId(long expertiseId) {
+    public void setExpertiseId(List<Long> expertiseId) {
         this.expertiseId = expertiseId;
     }
 

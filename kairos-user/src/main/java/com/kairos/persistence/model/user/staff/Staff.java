@@ -17,6 +17,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -63,7 +64,7 @@ public class Staff extends UserBaseEntity {
     private Language language;
 
     @Relationship(type = HAS_EXPERTISE_IN)
-    Expertise expertise;
+    List<Expertise> expertise;
 
     @Relationship(type = HAS_CONTACT_DETAIL)
     private ContactDetail contactDetail;
@@ -202,7 +203,7 @@ public class Staff extends UserBaseEntity {
         return visitourId;
     }
 
-    public Expertise getExpertise() {
+    public List<Expertise> getExpertise() {
         return expertise;
     }
 
@@ -210,7 +211,7 @@ public class Staff extends UserBaseEntity {
         this.visitourId = visitourId;
     }
 
-    public void setExpertise(Expertise expertise) {
+    public void setExpertise(List<Expertise> expertise) {
         this.expertise = expertise;
     }
 
@@ -322,8 +323,7 @@ public class Staff extends UserBaseEntity {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("staffId", this.getId());
         map.put("staffName", this.getFirstName() + "   " + this.getLastName());
-        map.put("expertiseId", getExpertise().getId());
-        map.put("expertiseName", getExpertise().getName());
+        map.put("expertiseList", getExpertise());
         return map;
     }
 

@@ -10,6 +10,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
+import com.kairos.response.dto.web.pay_table.PayTableMatrixDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.util.DateUtil;
@@ -22,6 +23,7 @@ import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by prabjot on 28/10/16.
@@ -83,9 +85,9 @@ public class ExpertiseService extends UserBaseService {
     }
 
 
-    public Map<String,Object> setExpertiseToStaff( Long staffId,Long expertiseId) {
+    public Map<String,Object> setExpertiseToStaff( Long staffId, List<Long> expertiseIds) {
         Staff currentStaff= staffGraphRepository.findOne(staffId);
-        currentStaff.setExpertise(expertiseGraphRepository.findOne(expertiseId));
+        currentStaff.setExpertise(expertiseGraphRepository.getExpertisesByIdsIn(expertiseIds));
         Staff staff = staffGraphRepository.save(currentStaff);
         return  staff.retrieveExpertiseDetails();
     }
