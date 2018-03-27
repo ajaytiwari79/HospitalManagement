@@ -31,7 +31,7 @@ public class Staff extends UserBaseEntity {
 
     String generalNote;
     String reqFromPerson;
-    private long employedSince;
+    private Long employedSince;
     private String cardNumber;
     private boolean copyKariosMailToLogin;
     private String sendNotificationBy;
@@ -55,7 +55,7 @@ public class Staff extends UserBaseEntity {
 
     private String nationalInsuranceNumber;
     private StaffStatusEnum currentStatus;
-    private long inactiveFrom;
+    private Long inactiveFrom;
     long organizationId;
     private long visitourId;
     private String cprNumber;
@@ -108,7 +108,7 @@ public class Staff extends UserBaseEntity {
     public Staff() {
     }
 
-    public Staff(long employedSince, String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, long inactiveFrom, String cprNumber) {
+    public Staff(Long employedSince, String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
         this.employedSince = employedSince;
         this.email = email;
         this.userName = userName;
@@ -136,11 +136,11 @@ public class Staff extends UserBaseEntity {
         this.externalId = externalId;
     }
 
-    public long getInactiveFrom() {
+    public Long getInactiveFrom() {
         return inactiveFrom;
     }
 
-    public void setInactiveFrom(long inactiveFrom) {
+    public void setInactiveFrom(Long inactiveFrom) {
         this.inactiveFrom = inactiveFrom;
     }
 
@@ -150,11 +150,11 @@ public class Staff extends UserBaseEntity {
     }
 
 
-    public long getEmployedSince() {
+    public Long getEmployedSince() {
         return employedSince;
     }
 
-    public void setEmployedSince(long employedSince) {
+    public void setEmployedSince(Long employedSince) {
         this.employedSince = employedSince;
     }
 
