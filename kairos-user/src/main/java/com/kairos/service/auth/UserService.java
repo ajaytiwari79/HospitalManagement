@@ -359,16 +359,11 @@ public class UserService extends UserBaseService {
         return true;
     }
 
-    /**
-     * @param organizationId
-     * @return UserPermissionDTO
-     * This method returns list of permissions with last selected organization by user
-     */
-    public UserPermissionDTO getUserPermissions(long organizationId){
+    public UserOrganizationsDTO getLoggedInUserOrganizations() {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        UserPermissionDTO userPermissionDTO = new UserPermissionDTO(getPermissions(organizationId),
+        UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
                 currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId());
-        return userPermissionDTO;
+        return userOrganizationsDTO;
     }
 
     /**

@@ -1,37 +1,39 @@
 package com.kairos.persistence.model.user.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by prerna on 27/3/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserPermissionDTO {
-    private Set<HashMap<String, Object>> permissions;
+public class UserOrganizationsDTO {
+    private List<OrganizationWrapper> organizations;
 
     private Long lastSelectedChildOrgId;
 
     private Long lastSelectedParentOrgId;
 
-    public UserPermissionDTO(){
+    public UserOrganizationsDTO(){
         // default constructor
     }
 
-    public UserPermissionDTO(Set<HashMap<String, Object>> permissions, Long lastSelectedChildOrgId, Long lastSelectedParentOrgId){
-        this.permissions = permissions;
+    public UserOrganizationsDTO(List<OrganizationWrapper> organizations, Long lastSelectedChildOrgId, Long lastSelectedParentOrgId){
+        this.organizations = organizations;
         this.lastSelectedChildOrgId = lastSelectedChildOrgId;
         this.lastSelectedParentOrgId = lastSelectedParentOrgId;
     }
 
-    public Set<HashMap<String, Object>> getPermissions() {
-        return permissions;
+    public List<OrganizationWrapper> getOrganizations() {
+        return organizations;
     }
 
-    public void setPermissions(Set<HashMap<String, Object>> permissions) {
-        this.permissions = permissions;
+    public void setOrganizations(List<OrganizationWrapper> organizations) {
+        this.organizations = organizations;
     }
 
     public Long getLastSelectedChildOrgId() {

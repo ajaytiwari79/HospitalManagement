@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
@@ -166,12 +165,12 @@ public class AuthController {
 
     @RequestMapping(value = "/user/organizations", method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getCurrentUserOrganizationList() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getOrganizations(UserContext.getUserDetails().getId()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getLoggedInUserOrganizations());
     }
 
     @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/permissions", method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long organizationId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getUserPermissions(organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
     }
 
     @PreAuthorize("hasPermission()")
