@@ -2,14 +2,12 @@ package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.user.pay_table.FutureDate;
-import org.joda.time.DateTime;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
-import javax.validation.constraints.AssertTrue;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by prerna on 14/11/17.
@@ -34,7 +32,7 @@ public class CountryExpertiseDTO {
     private Date endDateMillis;
 
     @NotNull(message = "Level can not be null")
-    private Long OrganizationLevelId;
+    private Long organizationLevelId;
 
     @NotNull(message = "services can not be null")
     private Long serviceId;
@@ -46,8 +44,10 @@ public class CountryExpertiseDTO {
 
     @NotNull(message = "PayTable can not be null")
     private Long payTableId;
+    @NotNull(message = "Paid Out Frequency can not be null")
     private PaidOutFrequencyEnum paidOutFrequency;
-    private List<SeniorityLevelDTO> seniorityLevel;
+    @Valid
+    private SeniorityLevelDTO seniorityLevel;
     private List<Long> tags;
 
 
@@ -103,11 +103,11 @@ public class CountryExpertiseDTO {
     }
 
     public Long getOrganizationLevelId() {
-        return OrganizationLevelId;
+        return organizationLevelId;
     }
 
     public void setOrganizationLevelId(Long organizationLevelId) {
-        OrganizationLevelId = organizationLevelId;
+        this.organizationLevelId = organizationLevelId;
     }
 
     public Long getServiceId() {
@@ -150,11 +150,11 @@ public class CountryExpertiseDTO {
         this.paidOutFrequency = paidOutFrequency;
     }
 
-    public List<SeniorityLevelDTO> getSeniorityLevel() {
+    public SeniorityLevelDTO getSeniorityLevel() {
         return seniorityLevel;
     }
 
-    public void setSeniorityLevel(List<SeniorityLevelDTO> seniorityLevel) {
+    public void setSeniorityLevel(SeniorityLevelDTO seniorityLevel) {
         this.seniorityLevel = seniorityLevel;
     }
 

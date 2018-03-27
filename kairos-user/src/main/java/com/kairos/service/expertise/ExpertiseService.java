@@ -1,29 +1,36 @@
 package com.kairos.service.expertise;
 
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
-import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
-import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
+import com.kairos.persistence.model.user.expertise.*;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
+import com.kairos.persistence.model.user.pay_table.PayGrade;
+import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
+import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
+import com.kairos.response.dto.web.experties.SeniorityLevelDTO;
 import com.kairos.response.dto.web.experties.UnionServiceWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.util.DateUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,20 +54,103 @@ public class ExpertiseService extends UserBaseService {
     OrganizationGraphRepository organizationGraphRepository;
     @Inject
     OrganizationServiceService organizationService;
+    @Inject
+    OrganizationServiceRepository organizationServiceRepository;
+    @Inject
+    private PayTableGraphRepository payTableGraphRepository;
+    @Inject
+    private PayGroupAreaGraphRepository payGroupAreaGraphRepository;
+
 
     public Map<String, Object> saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        if (country == null) {
-            return null;
+        if (!Optional.ofNullable(country).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid country Id");
         }
-        Expertise expertise = new Expertise();
-        expertise.setName(expertiseDTO.getName());
-        expertise.setDescription(expertiseDTO.getDescription());
-        expertise.setCountry(country);
-        expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
+        Expertise expertise = null;
+        if (!Optional.ofNullable(expertiseDTO.getId()).isPresent()) {
+            expertise = new Expertise();
+            expertise.setCountry(country);
+            prepareExpertise(expertise, expertiseDTO, countryId);
+            expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
+        } else {
+            // Expertise is already created only need to add Sr level
+            expertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
+            if (!Optional.ofNullable(expertise).isPresent()) {
+                throw new DataNotFoundByIdException("Invalid expertise Id");
+            }
+            addSeniorityLevelInExpertise(expertise, expertiseDTO.getSeniorityLevel());
+        }
+
+
         save(expertise);
         return expertise.retrieveDetails();
     }
+
+    private void prepareExpertise(Expertise expertise, CountryExpertiseDTO expertiseDTO, Long countryId) {
+        expertise.setName(expertiseDTO.getName().trim());
+        expertise.setDescription(expertiseDTO.getDescription());
+        expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
+        expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
+        Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
+        if (!Optional.ofNullable(level).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid level id " + expertiseDTO.getOrganizationLevelId());
+        }
+        expertise.setOrganizationLevel(level);
+
+        OrganizationService organizationService = organizationServiceRepository.findOne(expertiseDTO.getServiceId());
+        if (!Optional.ofNullable(organizationService).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid service id " + expertiseDTO.getServiceId());
+        }
+        expertise.setOrganizationService(organizationService);
+        Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(expertiseDTO.getUnionId());
+        if (!Optional.ofNullable(union).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid union id " + expertiseDTO.getUnionId());
+        }
+        expertise.setUnion(union);
+        expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
+        expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
+        PayTable payTable = payTableGraphRepository.findOne(expertiseDTO.getPayTableId());
+        if (!Optional.ofNullable(payTable).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid pay Table id " + expertiseDTO.getPayTableId());
+        }
+        expertise.setPayTable(payTable);
+        expertise.setPaidOutFrequency(expertiseDTO.getPaidOutFrequency());
+        if (expertiseDTO.getSeniorityLevel() != null) {
+            addSeniorityLevelInExpertise(expertise, expertiseDTO.getSeniorityLevel());
+        }
+
+    }
+
+    private void addSeniorityLevelInExpertise(Expertise expertise, SeniorityLevelDTO seniorityLevelDTO) {
+        SeniorityLevel seniorityLevel = new SeniorityLevel();
+        if (seniorityLevelDTO.getMoreThan() != null)
+            seniorityLevel.setMoreThan(seniorityLevelDTO.getMoreThan());
+        else {
+            seniorityLevel.setFrom(seniorityLevelDTO.getFrom());
+            seniorityLevel.setTo(seniorityLevelDTO.getTo());
+        }
+        seniorityLevel.setBasePayGrade(seniorityLevelDTO.getBasePayGrade());
+        seniorityLevel.setPensionPercentage(seniorityLevelDTO.getPensionPercentage());
+        seniorityLevel.setFreeChoicePercentage(seniorityLevelDTO.getFreeChoicePercentage());
+        seniorityLevel.setFreeChoiceToPension(seniorityLevelDTO.getFreeChoiceToPension());
+        if (!seniorityLevelDTO.getPayGroupAreas().isEmpty()) {
+            List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(seniorityLevelDTO.getPayGroupAreas());
+            if (payGroupAreas.size() != seniorityLevelDTO.getPayGroupAreas().size())
+                throw new ActionNotPermittedException("Unable to get all payGroup Areas");
+            seniorityLevel.setPayGroupAreas(payGroupAreas);
+        }
+        if (!Optional.ofNullable(expertise.getSeniorityLevel()).isPresent()) {
+            List<SeniorityLevel> seniorityLevels = new ArrayList<>(1);
+            seniorityLevels.add(seniorityLevel);
+            expertise.setSeniorityLevel(seniorityLevels);
+        } else {
+            expertise.getSeniorityLevel().add(seniorityLevel);
+        }
+
+
+    }
+
 
     public List<ExpertiseTagDTO> getAllExpertise(long countryId) {
         return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);

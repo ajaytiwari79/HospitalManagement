@@ -1,40 +1,31 @@
-package com.kairos.response.dto.web.experties;
+package com.kairos.persistence.model.user.expertise;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
+import com.kairos.response.dto.web.experties.FunctionsDTO;
+import org.neo4j.ogm.annotation.NodeEntity;
 
-import javax.validation.constraints.AssertTrue;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * Created by vipul on 27/3/18.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SeniorityLevelDTO {
+@NodeEntity
+public class SeniorityLevel extends UserBaseEntity {
     private Integer from;
     private Integer to;
     private Integer moreThan;
     private List<FunctionsDTO> functions;
     private Integer basePayGrade;  // this is payGrade Id which is coming from payTable
-    private Set<Long> payGroupAreas;// applicable payGroup areas
+    private List<PayGroupArea> payGroupAreas;// applicable payGroup areas
     // TODO We are unclear about this just adding and make sure this will utilize in future.
     private BigDecimal pensionPercentage;
     private BigDecimal freeChoicePercentage;
     private BigDecimal freeChoiceToPension;
 
-
-    public SeniorityLevelDTO() {
-        // default
-    }
-
-    public Set<Long> getPayGroupAreas() {
-        return payGroupAreas;
-    }
-
-    public void setPayGroupAreas(Set<Long> payGroupAreas) {
-        this.payGroupAreas = payGroupAreas;
+    public SeniorityLevel() {
+        // de
     }
 
     public Integer getFrom() {
@@ -77,6 +68,14 @@ public class SeniorityLevelDTO {
         this.basePayGrade = basePayGrade;
     }
 
+    public List<PayGroupArea> getPayGroupAreas() {
+        return payGroupAreas;
+    }
+
+    public void setPayGroupAreas(List<PayGroupArea> payGroupAreas) {
+        this.payGroupAreas = payGroupAreas;
+    }
+
     public BigDecimal getPensionPercentage() {
         return pensionPercentage;
     }
@@ -100,17 +99,4 @@ public class SeniorityLevelDTO {
     public void setFreeChoiceToPension(BigDecimal freeChoiceToPension) {
         this.freeChoiceToPension = freeChoiceToPension;
     }
-
-    // from 2-4(to)
-//    @AssertTrue(message = "Incorrect interval")
-//    public boolean isValid() {
-//        if (!Optional.ofNullable(this.from).isPresent()) {
-//            return false;
-//        }
-//        if (Optional.ofNullable(this.to).isPresent()) {
-//            if (this.to < this.from)
-//                return false;
-//        }
-//        return true;
-//    }
 }
