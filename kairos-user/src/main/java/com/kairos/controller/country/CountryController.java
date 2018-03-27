@@ -326,35 +326,6 @@ public class CountryController {
     }
 
 
-    // Expertise
-    @ApiOperation(value = "Create Expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId, @Validated @RequestBody CountryExpertiseDTO expertise) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, expertiseService.saveExpertise(countryId, expertise));
-    }
-
-    @ApiOperation(value = "Get Available expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.GET)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllExpertise(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getAllExpertise(countryId));
-    }
-
-    @ApiOperation(value = "Update expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.PUT)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateExpertise(@RequestBody @Validated CountryExpertiseDTO expertise) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(expertise));
-    }
-
-    @ApiOperation(value = "Delete expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.DELETE)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteExpertise(@PathVariable long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.deleteExpertise(expertiseId));
-    }
-
 
     // Organization: Create Parent Level Organization
     @ApiOperation(value = "Add a Parent Organization")

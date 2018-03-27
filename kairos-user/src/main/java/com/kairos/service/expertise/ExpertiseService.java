@@ -1,17 +1,24 @@
 package com.kairos.service.expertise;
+
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
+import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
+import com.kairos.response.dto.web.experties.UnionServiceWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
+import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +29,7 @@ import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by prabjot on 28/10/16.
@@ -32,18 +40,22 @@ public class ExpertiseService extends UserBaseService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
-    CountryGraphRepository countryGraphRepository;
+    private CountryGraphRepository countryGraphRepository;
     @Inject
-    ExpertiseGraphRepository expertiseGraphRepository;
+    private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
-    StaffGraphRepository staffGraphRepository;
+    private TagService tagService;
     @Inject
-    TagService tagService;
+    private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
 
+    @Inject
+    private OrganizationServiceService organizationService;
 
     public Map<String, Object> saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        if (country == null){
+        if (country == null) {
             return null;
         }
         Expertise expertise = new Expertise();
@@ -83,62 +95,74 @@ public class ExpertiseService extends UserBaseService {
     }
 
 
-    public Map<String,Object> setExpertiseToStaff( Long staffId,Long expertiseId) {
-        Staff currentStaff= staffGraphRepository.findOne(staffId);
+    public Map<String, Object> setExpertiseToStaff(Long staffId, Long expertiseId) {
+        Staff currentStaff = staffGraphRepository.findOne(staffId);
         currentStaff.setExpertise(expertiseGraphRepository.findOne(expertiseId));
         Staff staff = staffGraphRepository.save(currentStaff);
-        return  staff.retrieveExpertiseDetails();
+        return staff.retrieveExpertiseDetails();
     }
 
     public Map<String, Object> getExpertiseToStaff(Long staffId) {
         Staff staff = staffGraphRepository.findOne(staffId);
-        if (staff.getExpertise()==null){
+        if (staff.getExpertise() == null) {
             return null;
         }
         return staff.retrieveExpertiseDetails();
     }
 
     /**
+     * @param expertiseId
+     * @param skillIds
+     * @param isSelected
      * @author prabjot
      * this method will update the relationship of expertise and skill based on parameter {isSelected},if parameter value is true
      * new relationship b/w expertise and skill will be created or updated(if relationship already exist) if parameter value is false
      * then relationship will be inactive (isEnabled param of relationship will set to false)
-     * @param expertiseId
-     * @param skillIds
-     * @param isSelected
      */
-    public void addSkillInExpertise(long expertiseId,List<Long> skillIds,boolean isSelected){
+    public void addSkillInExpertise(long expertiseId, List<Long> skillIds, boolean isSelected) {
 
-        if(isSelected){
-            for(long skillId : skillIds){
-                if(expertiseGraphRepository.expertiseHasAlreadySkill(expertiseId,skillId) == 0){
-                    expertiseGraphRepository.addSkillInExpertise(expertiseId,skillId, DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
+        if (isSelected) {
+            for (long skillId : skillIds) {
+                if (expertiseGraphRepository.expertiseHasAlreadySkill(expertiseId, skillId) == 0) {
+                    expertiseGraphRepository.addSkillInExpertise(expertiseId, skillId, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
                 } else {
-                    expertiseGraphRepository.updateExpertiseSkill(expertiseId,skillId,DateUtil.getCurrentDate().getTime());
+                    expertiseGraphRepository.updateExpertiseSkill(expertiseId, skillId, DateUtil.getCurrentDate().getTime());
                 }
             }
         } else {
-            expertiseGraphRepository.deleteExpertiseSkill(expertiseId,skillIds,DateUtil.getCurrentDate().getTime());
+            expertiseGraphRepository.deleteExpertiseSkill(expertiseId, skillIds, DateUtil.getCurrentDate().getTime());
         }
     }
 
     /**
      * to get skills of expertise,data will be in form of tree hierarchy
+     *
      * @param expertiseId
      * @param countryId
      * @return
      */
-    public List<Map<String,Object>> getExpertiseSkills(long expertiseId,long countryId){
+    public List<Map<String, Object>> getExpertiseSkills(long expertiseId, long countryId) {
 
-        ExpertiseSkillQueryResult expertiseSkillQueryResult = expertiseGraphRepository.getExpertiseSkills(expertiseId,countryId);
+        ExpertiseSkillQueryResult expertiseSkillQueryResult = expertiseGraphRepository.getExpertiseSkills(expertiseId, countryId);
         return expertiseSkillQueryResult.getSkills();
     }
 
-    public List<ExpertiseDTO> getAllFreeExpertise(List<Long> expertiseIds){
+    public List<ExpertiseDTO> getAllFreeExpertise(List<Long> expertiseIds) {
         return expertiseGraphRepository.getAllFreeExpertises(expertiseIds);
     }
 
-    public Expertise getExpertiseByCountryId(Long countryId){
+    public Expertise getExpertiseByCountryId(Long countryId) {
         return expertiseGraphRepository.getExpertiesByCountry(countryId);
+    }
+
+    public UnionServiceWrapper getUnionsAndService(Long countryId) {
+        Country country = countryGraphRepository.findOne(countryId);
+        if (!Optional.ofNullable(country).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid country Id");
+        }
+        UnionServiceWrapper unionServiceWrapper = new UnionServiceWrapper();
+        unionServiceWrapper.setServices(organizationService.getAllOrganizationService(countryId));
+        unionServiceWrapper.setUnions(organizationGraphRepository.findAllUnionsByCountryId(countryId));
+        return unionServiceWrapper;
     }
 }

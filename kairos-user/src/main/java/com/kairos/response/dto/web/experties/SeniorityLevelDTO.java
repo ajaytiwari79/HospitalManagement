@@ -1,5 +1,7 @@
 package com.kairos.response.dto.web.experties;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.validation.constraints.AssertTrue;
 import java.math.BigDecimal;
 import java.util.List;
@@ -8,17 +10,19 @@ import java.util.Optional;
 /**
  * Created by vipul on 27/3/18.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SeniorityLevelDTO {
-
     private Integer from;
     private Integer to;
     private Integer moreThan;
     private List<FunctionsDTO> functions;
-    private Integer basePayGrade;
+    private Integer basePayGrade;  // this is payGrade Id which is coming from payTable
+    private List<Long> payGroupAreas;
+    // TODO We are unclear about this just adding and make sure this will utilize in future.
     private BigDecimal pensionPercentage;
     private BigDecimal freeChoicePercentage;
     private BigDecimal freeChoiceToPension;
-    private List<Long> payGroupAreas;
+
 
     public SeniorityLevelDTO() {
     }

@@ -1,13 +1,12 @@
 package com.kairos.response.dto.web.experties;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.user.pay_table.FutureDate;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -15,13 +14,16 @@ import java.util.Optional;
 /**
  * Created by prerna on 14/11/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CountryExpertiseDTO {
+
     private Long id;
 
-    @NotEmpty(message = "error.Expertise.name.notEmpty")
     @NotNull(message = "error.Expertise.name.notnull")
     private String name;
+
     private String description;
+
     @NotNull(message = "Start date can't be null")
     @DateLong
     @FutureDate
@@ -30,18 +32,22 @@ public class CountryExpertiseDTO {
     @FutureDate
     @DateLong
     private Date endDateMillis;
+
     @NotNull(message = "Level can not be null")
     private Long OrganizationLevelId;
+
     @NotNull(message = "services can not be null")
     private Long serviceId;
+
     @NotNull(message = "union can not be null")
     private Long unionId;
     private int fullTimeWeeklyMinutes = 2220; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
+
     @NotNull(message = "PayTable can not be null")
     private Long payTableId;
     private PaidOutFrequencyEnum paidOutFrequency;
-    private SeniorityLevelDTO seniorityLevel;
+    private List<SeniorityLevelDTO> seniorityLevel;
     private List<Long> tags;
 
 
@@ -144,11 +150,11 @@ public class CountryExpertiseDTO {
         this.paidOutFrequency = paidOutFrequency;
     }
 
-    public SeniorityLevelDTO getSeniorityLevel() {
+    public List<SeniorityLevelDTO> getSeniorityLevel() {
         return seniorityLevel;
     }
 
-    public void setSeniorityLevel(SeniorityLevelDTO seniorityLevel) {
+    public void setSeniorityLevel(List<SeniorityLevelDTO> seniorityLevel) {
         this.seniorityLevel = seniorityLevel;
     }
 
