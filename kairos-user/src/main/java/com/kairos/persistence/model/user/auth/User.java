@@ -37,6 +37,8 @@ public class User extends UserBaseEntity {
     protected String lastName;
     protected Gender gender;
     private String email;
+    private Long lastSelectedParentOrgId;
+    private Long lastSelectedChildOrgId;
 
     //uniqueness of user
     private String timeCareExternalId;
@@ -413,5 +415,21 @@ public class User extends UserBaseEntity {
 
     public void setHubMember(Boolean hubMember) {
         this.hubMember = hubMember;
+    }
+
+    public Long getLastSelectedParentOrgId() {
+        return lastSelectedParentOrgId;
+    }
+
+    public void setLastSelectedParentOrgId(Long lastSelectedParentOrgId) {
+        this.lastSelectedParentOrgId = lastSelectedParentOrgId;
+    }
+
+    public Long getLastSelectedChildOrgId() {
+        return lastSelectedChildOrgId;
+    }
+
+    public void setLastSelectedChildOrgId(Long lastSelectedChildOrgId) {
+        this.lastSelectedChildOrgId = lastSelectedChildOrgId;
     }
 }

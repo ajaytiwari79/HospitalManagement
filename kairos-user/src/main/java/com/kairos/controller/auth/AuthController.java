@@ -1,6 +1,7 @@
 package com.kairos.controller.auth;
 
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.auth.OrganizationSelectionDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.response.dto.web.FirstTimePasswordUpdateDTO;
 import com.kairos.service.auth.UserService;
@@ -170,7 +171,7 @@ public class AuthController {
 
     @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/permissions", method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getPermissions(@PathVariable long organizationId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getUserPermissions(organizationId));
     }
 
     @PreAuthorize("hasPermission()")
@@ -183,5 +184,10 @@ public class AuthController {
         userInfo.put("user12", user.getPrincipal());
 
         return userInfo;
+    }
+
+    @RequestMapping(value = "/user/selected_organizations", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String,Object>> updateLastOrganizationSelectedByUser(@Valid @RequestBody OrganizationSelectionDTO organizationSelectionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateLastSelectedChildAndParentId(organizationSelectionDTO));
     }
 }
