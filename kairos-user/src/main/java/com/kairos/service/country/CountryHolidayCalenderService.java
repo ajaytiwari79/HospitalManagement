@@ -135,7 +135,7 @@ public class CountryHolidayCalenderService extends UserBaseService {
     }
 
 
-    public Map<String, Object> createHolidayCalenderByCountryId(Long countryId, Map<String,Object> data) {
+    public Map<String, Object> createHolidayCalenderByCountryId(Long countryId, Map<String,Object> data) throws Exception {
         Country country = countryGraphRepository.findOne(countryId);
         if (country != null) {
             CountryHolidayCalender countryHolidayCalender = new CountryHolidayCalender();

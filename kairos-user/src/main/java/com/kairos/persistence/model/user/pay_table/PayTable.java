@@ -27,6 +27,12 @@ public class PayTable extends UserBaseEntity {
     @Relationship(type = HAS_PAY_GRADE)
     private List<PayGrade> payGrades;
     private String description;
+    private boolean active;
+
+    @Relationship(type = HAS_PAY_TABLE)
+    private PayTable payTable;
+
+    //
     public PayTable() {
         //default constructor
     }
@@ -88,12 +94,29 @@ public class PayTable extends UserBaseEntity {
         this.description = description;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public PayTable getPayTable() {
+        return payTable;
+    }
+
+    public void setPayTable(PayTable payTable) {
+        this.payTable = payTable;
+    }
+
     public PayTable(String name, String shortName, String description, Level level, Date startDateMillis, Date endDateMillis) {
         this.name = name;
-        this.description=description;
+        this.description = description;
         this.shortName = shortName;
         this.level = level;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
     }
+
 }

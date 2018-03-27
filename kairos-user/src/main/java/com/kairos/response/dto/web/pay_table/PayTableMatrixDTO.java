@@ -3,6 +3,7 @@ package com.kairos.response.dto.web.pay_table;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 /**
  * Created by vipul on 16/3/18.
@@ -12,7 +13,7 @@ public class PayTableMatrixDTO {
     @NotNull(message = "Pay Group Area can not be null")
     private Long payGroupAreaId;
     @NotNull(message = "Pay Grade value can not be null")
-    private Long payGradeValue;
+    private BigDecimal payGroupAreaAmount;
     private Long id;
 
     public PayTableMatrixDTO() {
@@ -27,12 +28,12 @@ public class PayTableMatrixDTO {
         this.payGroupAreaId = payGroupAreaId;
     }
 
-    public Long getPayGradeValue() {
-        return payGradeValue;
+    public BigDecimal getPayGroupAreaAmount() {
+        return payGroupAreaAmount;
     }
 
-    public void setPayGradeValue(Long payGradeValue) {
-        this.payGradeValue = payGradeValue;
+    public void setPayGroupAreaAmount(BigDecimal payGroupAreaAmount) {
+        this.payGroupAreaAmount = payGroupAreaAmount;
     }
 
     public Long getId() {
@@ -43,9 +44,9 @@ public class PayTableMatrixDTO {
         this.id = id;
     }
 
-    public PayTableMatrixDTO(Long payGroupAreaId, Long payGradeValue, Long id) {
+    public PayTableMatrixDTO(Long payGroupAreaId, BigDecimal payGroupAreaAmount, Long id) {
         this.payGroupAreaId = payGroupAreaId;
-        this.payGradeValue = payGradeValue;
+        this.payGroupAreaAmount = payGroupAreaAmount;
         this.id = id;
     }
 }

@@ -616,7 +616,7 @@ public class SkillService extends UserBaseService {
 
 
         List<Skill> skillsByExternalIds = (externalIds.isEmpty()) ? new ArrayList<>() :
-                skillGraphRepository.findByExternalIdIn(externalIds);
+                skillGraphRepository.findByExternalIdInAndIsEnabledTrue(externalIds);
 
         SkillCategory skillCategory = skillCategoryGraphRepository.findByNameIgnoreCaseAndIsEnabledTrue(countryId,"(?i)"+SKILL_CATEGORY_FOR_TIME_CARE);
         if (!Optional.ofNullable(skillCategory).isPresent()) {

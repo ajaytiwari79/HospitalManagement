@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * Created by vipul on 19/3/18.
  */
-public class PayGradeUpdateDTO {
+public class PayTableUpdateDTO {
     private Long id;
     @NotNull(message = "name can't be null")
     private String name;
@@ -24,7 +24,7 @@ public class PayGradeUpdateDTO {
     @NotNull(message = "Level can not be null")
     private Long levelId;
 
-    public PayGradeUpdateDTO() {
+    public PayTableUpdateDTO() {
         //Default cons
     }
 
@@ -84,7 +84,7 @@ public class PayGradeUpdateDTO {
         this.levelId = levelId;
     }
 
-    public PayGradeUpdateDTO(String name, String shortName, String description, Date startDateMillis, Date endDateMillis,Long levelId) {
+    public PayTableUpdateDTO(String name, String shortName, String description, Date startDateMillis, Date endDateMillis, Long levelId) {
         this.name = name;
         this.shortName = shortName;
         this.description = description;
