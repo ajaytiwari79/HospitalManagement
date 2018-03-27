@@ -10,8 +10,7 @@ import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
-import com.kairos.response.dto.web.FunctionDTO;
-import com.kairos.persistence.model.user.country.FunctionResponseDTO;
+import com.kairos.persistence.model.user.country.FunctionDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
@@ -32,7 +31,7 @@ public class FunctionService extends UserBaseEntity{
 
     @Inject OrganizationGraphRepository organizationGraphRepository;
 
-    public FunctionResponseDTO createFunction(Long countryId, FunctionDTO functionDTO){
+    public FunctionDTO createFunction(Long countryId, com.kairos.response.dto.web.FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
             throw new DataNotFoundByIdException("Country not found: "+countryId);
@@ -51,22 +50,22 @@ public class FunctionService extends UserBaseEntity{
         }
         Function function=new Function(functionDTO.getName(),functionDTO.getDescription(),functionDTO.getStartDate(),functionDTO.getEndDate(),unions,levels,country);
         functionGraphRepository.save(function);
-        FunctionResponseDTO functionResponseDTO=new FunctionResponseDTO(function.getId(),function.getName(),function.getDescription(),
+        FunctionDTO functionResponseDTO=new FunctionDTO(function.getId(),function.getName(),function.getDescription(),
                 function.getStartDate(),function.getEndDate(),function.getUnions(),function.getOrganizationLevels());
 
         return functionResponseDTO;
     }
 
-    public List<FunctionResponseDTO> getFunctions(long countryId){
+    public List<FunctionDTO> getFunctionsByCountry(long countryId){
         return functionGraphRepository.findFunctionsByCountry(countryId);
 
     }
-    public List<FunctionResponseDTO> getFunctionsIdName(long countryId){
-        return functionGraphRepository.findFunctionsIdNameByCountry(countryId);
+    public List<FunctionDTO> getFunctionsIdAndNameByCountry(long countryId){
+        return functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
 
     }
 
-    public FunctionResponseDTO updateFunction(Long countryId,FunctionDTO functionDTO){
+    public FunctionDTO updateFunction(Long countryId, com.kairos.response.dto.web.FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){
             throw new DataNotFoundByIdException("Country not found: "+countryId);
@@ -95,7 +94,7 @@ public class FunctionService extends UserBaseEntity{
         function.setUnions(unions);
         function.setOrganizationLevels(levels);
         functionGraphRepository.save(function);
-        FunctionResponseDTO functionResponseDTO=new FunctionResponseDTO(function.getId(),function.getName(),function.getDescription(),
+        FunctionDTO functionResponseDTO=new FunctionDTO(function.getId(),function.getName(),function.getDescription(),
                 function.getStartDate(),function.getEndDate(),function.getUnions(),function.getOrganizationLevels());
 
         return functionResponseDTO;

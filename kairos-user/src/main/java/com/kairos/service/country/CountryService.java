@@ -467,13 +467,13 @@ public class CountryService extends UserBaseService {
          List<PresenceTypeDTO> plannedTime= presenceTypeService.getAllPresenceTypeByCountry(countryId);
          List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
          List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
-         List<FunctionResponseDTO> functionsList = functionService.getFunctionsIdName(countryId);
+         List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
 
          //wrap data into wrapper class
          CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper=new CTARuleTemplateDefaultDataWrapper();
          ctaRuleTemplateDefaultDataWrapper.setCurrencies(currencies);
          ctaRuleTemplateDefaultDataWrapper.setPhases(phases);
-        ctaRuleTemplateDefaultDataWrapper.setFunctionDtoList(functionsList);
+        ctaRuleTemplateDefaultDataWrapper.setFunctions(functions);
 
          List<EmploymentTypeDTO> employmentTypeDTOS =employmentTypes.stream().map(employmentType -> {
                 EmploymentTypeDTO employmentTypeDTO=new EmploymentTypeDTO();
