@@ -155,6 +155,7 @@ public class StaffService extends UserBaseService {
     private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
     private UnitPositionService unitPositionService;
+    @Inject StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -208,8 +209,16 @@ public class StaffService extends UserBaseService {
         if (objectToUpdate == null) {
             throw new InternalError("Staff can't null");
         }
+        staffExpertiseRelationShipGraphRepository.unlinkPreviousExpertise(staffId);
+        for(int i=0;i<staffPersonalDetail.getStaffExperienceInExpertise().size();i++){
+                Expertise expertise = expertiseGraphRepository.findOne(staffPersonalDetail.getStaffExperienceInExpertise().get(i).getExpertiseId());
+                StaffExpertiseRelationShip staffExpertiseRelationShip
+                        = new StaffExpertiseRelationShip(objectToUpdate, expertise, staffPersonalDetail.getStaffExperienceInExpertise().get(i).getRelevantExperienceInMonths());
+                staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
+                staffPersonalDetail.getStaffExperienceInExpertise().get(i).setId(staffExpertiseRelationShip.getId());
+        }
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
-        List<Expertise> expertise = expertiseGraphRepository.getExpertisesByIdsIn(staffPersonalDetail.getExpertiseId());
+        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseId());
         List<Expertise> oldExpertise = objectToUpdate.getExpertise();
         objectToUpdate.setLanguage(language);
         objectToUpdate.setExpertise(expertise);
@@ -439,7 +448,7 @@ public class StaffService extends UserBaseService {
         if (staff == null) {
             return null;
         }
-        List<Expertise> expertise = expertiseGraphRepository.getExpertisesByIdsIn(expertiseIds);
+        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds);
         if (expertise != null) {
             staff.setExpertise(expertise);
             staffGraphRepository.save(staff);

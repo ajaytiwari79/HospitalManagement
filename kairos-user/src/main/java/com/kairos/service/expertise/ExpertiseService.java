@@ -87,7 +87,7 @@ public class ExpertiseService extends UserBaseService {
 
     public Map<String,Object> setExpertiseToStaff( Long staffId, List<Long> expertiseIds) {
         Staff currentStaff= staffGraphRepository.findOne(staffId);
-        currentStaff.setExpertise(expertiseGraphRepository.getExpertisesByIdsIn(expertiseIds));
+        currentStaff.setExpertise(expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds));
         Staff staff = staffGraphRepository.save(currentStaff);
         return  staff.retrieveExpertiseDetails();
     }

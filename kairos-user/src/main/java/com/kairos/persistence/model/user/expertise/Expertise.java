@@ -37,8 +37,6 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     Country country;
 
-    private int yearOfExperience;
-
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
 
@@ -87,25 +85,16 @@ public class Expertise extends UserBaseEntity {
         return name;
     }
 
-    public int getYearOfExperience() {
-        return yearOfExperience;
-    }
-
-    public void setYearOfExperience(int yearOfExperience) {
-        this.yearOfExperience = yearOfExperience;
-    }
-
     public Expertise(){}
 
-    public Expertise(Long id,@NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description,int yearOfExperience) {
+    public Expertise(Long id,@NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description) {
         this.name = name;
         this.id=id;
         this.description = description;
-        this.yearOfExperience=yearOfExperience;
     }
 
     public Expertise retrieveBasicDetails() {
-       Expertise expertise = new Expertise(this.id,this.name,this.description,this.yearOfExperience);
+       Expertise expertise = new Expertise(this.id,this.name,this.description);
        return expertise;
     }
     public Map<String, Object> retrieveDetails() {

@@ -22,6 +22,7 @@ public class StaffPersonalDetail {
     private StaffStatusEnum currentStatus;
     private long languageId;
     private List<Long> expertiseId;
+    private List<StaffExperienceInExpertiseDTO> staffExperienceInExpertise;
    // @NotEmpty(message = "error.cprnumber.notnull") @NotNull(message = "error.cprnumber.notnull")
     private String cprNumber;
    // @NotEmpty(message = "error.Staff.familyname.notnull") @NotNull(message = "error.Staff.familyname.notnull")
@@ -205,5 +206,13 @@ public class StaffPersonalDetail {
 
     public void setCurrentStatus(StaffStatusEnum currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    public List<StaffExperienceInExpertiseDTO> getStaffExperienceInExpertise() {
+        return staffExperienceInExpertise;
+    }
+
+    public void setStaffExperienceInExpertise(List<StaffExperienceInExpertiseDTO> staffExperienceInExpertise) {
+        this.staffExperienceInExpertise = staffExperienceInExpertise;
     }
 }
