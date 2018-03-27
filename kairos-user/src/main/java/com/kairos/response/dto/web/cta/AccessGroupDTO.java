@@ -1,5 +1,6 @@
 package com.kairos.response.dto.web.cta;
 
+import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ public class AccessGroupDTO {
     @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;
     private String description;
+    private AccessGroupRole role;
 
     public AccessGroupDTO() {
         //default constructor
@@ -41,5 +43,13 @@ public class AccessGroupDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public AccessGroupRole getRole() {
+        return role;
+    }
+
+    public void setRole(AccessGroupRole role) {
+        this.role = role;
     }
 }

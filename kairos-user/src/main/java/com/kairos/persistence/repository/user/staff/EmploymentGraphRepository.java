@@ -24,7 +24,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 
     @Query("Match (organization:Organization),(accessGroup:AccessGroup),(staff:Staff) where id(organization)={1} AND id(accessGroup)={2} AND id(staff) ={0} with organization,accessGroup,staff\n" +
             "Match (staff)<-[:"+BELONGS_TO+"]-(employment:Employment)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitPermission:UnitPermission) with unitPermission,organization,accessGroup\n" +
-            "Match (organization)<-[:"+ APPLICABLE_IN_UNIT +"]-(unitPermission)-[:"+HAS_ACCESS_PERMISSION+"{isEnabled:true}]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) with distinct unitPermission,organization\n" +
+            "Match (organization)<-[:"+ APPLICABLE_IN_UNIT +"]-(unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) with distinct unitPermission,organization\n" +
             "return {id:id(unitPermission),startDate:unitPermission.startDate,endDate:unitPermission.endDate,organizationId:id(organization),status:unitPermission.employmentStatus} as data")
     Map<String,Object> getEmploymentOfParticularRole(long staffId, long organizationId, long accessGroupId);
 

@@ -136,4 +136,12 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "return cta LIMIT 1")
     CostTimeAgreement getOneDefaultCTA(Long organizationId, Long expertiseId);
 
+
+    // For test cases
+    @Query("match (cta:CostTimeAgreement{deleted:false})<-[:"+HAS_CTA+"]-(unitPosition:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(o:Organization) where id(o)={0} RETURN unitPosition LIMIT 1")
+    UnitPosition getDefaultUnitPositionByOrg(Long unitId);
+
+    @Query("match (cta:CostTimeAgreement{deleted:false})-[:"+HAS_CTA+"]-(unitPosition:UnitPosition) where id(unitPosition)={0} RETURN cta")
+    CostTimeAgreement getCTALinkedWithUnitPosition(Long unitPositionId);
+
 }

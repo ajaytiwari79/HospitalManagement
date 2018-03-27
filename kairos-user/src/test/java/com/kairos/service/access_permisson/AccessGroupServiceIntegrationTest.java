@@ -9,7 +9,9 @@ import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessGroupPermissionDTO;
+import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.user.access_permission.AccessPermissionDTO;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.response.dto.web.access_group.CountryAccessGroupDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
@@ -33,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import javax.inject.Inject;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by prerna on 5/3/18.
@@ -76,7 +79,7 @@ public class AccessGroupServiceIntegrationTest {
     public void createCountryAccessGroup() throws Exception {
 
         String baseUrl=getBaseUrl(organizationId,countryId, null);
-        CountryAccessGroupDTO accessGroupDTO = new CountryAccessGroupDTO(nameOfAccessGroup, null, category);
+        CountryAccessGroupDTO accessGroupDTO = new CountryAccessGroupDTO(nameOfAccessGroup, null, category, AccessGroupRole.STAFF);
         logger.info("Access Group name : "+accessGroupDTO.getName());
         HttpEntity<CountryAccessGroupDTO> requestBodyData = new HttpEntity<>(accessGroupDTO);
 
@@ -107,7 +110,7 @@ public class AccessGroupServiceIntegrationTest {
             AccessGroup accessGroup = accessGroupService.getCountryAccessGroupByName(countryId, category, nameOfAccessGroup);
             createdAccessGroupId = accessGroup.getId();
         }
-        CountryAccessGroupDTO accessGroupDTO = new CountryAccessGroupDTO(nameOfAccessGroup, null, OrganizationCategory.HUB);
+        CountryAccessGroupDTO accessGroupDTO = new CountryAccessGroupDTO(nameOfAccessGroup, null, OrganizationCategory.HUB, AccessGroupRole.STAFF);
 
         HttpEntity<CountryAccessGroupDTO> requestBodyData = new HttpEntity<>(accessGroupDTO);
 
@@ -236,6 +239,48 @@ public class AccessGroupServiceIntegrationTest {
 
         ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = restTemplate.exchange(
                 baseUrl+"/access_group/"+ createdAccessGroupId +"/access_page",
+                HttpMethod.PUT, requestBodyData, resTypeReference);
+
+        logger.info("STATUS CODE ---------------------> {}",response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) ||
+                HttpStatus.CONFLICT.equals(response.getStatusCode()) );
+    }
+
+
+    @Test
+    @OrderTest(order = 8)
+    public void updatePermissionsForAccessTabsOfAccessGroup() throws Exception {
+
+        String baseUrl=getBaseUrl(organizationId,countryId, null);
+
+        if( !Optional.ofNullable(createdAccessGroupId).isPresent()){
+            logger.info("Access Group Id is null");
+            AccessGroup accessGroup = accessGroupService.getCountryAccessGroupByName(countryId, category, nameOfAccessGroup);
+            createdAccessGroupId = accessGroup.getId();
+            if( !Optional.ofNullable(createdAccessGroupId).isPresent() ){
+                logger.info("Could not find Access Group");
+                return;
+            }
+        }
+        AccessPermissionDTO accessGroupPermissionDTO = new AccessPermissionDTO();
+        accessGroupPermissionDTO.setRead(true);
+        accessGroupPermissionDTO.setWrite(true);
+        Long accessPageId = accessGroupService.getAccessPageIdByAccessGroup(createdAccessGroupId);
+        if(accessPageId == null){
+            logger.info("No access page linked with Access Group");
+            return;
+        }
+//        accessGroupPermissionDTO.setAccessPageIds(accessGroupService.getAccessPageIdsByAccessGroup(createdAccessGroupId));
+
+        HttpEntity<AccessPermissionDTO> requestBodyData = new HttpEntity<>(accessGroupPermissionDTO);
+
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> resTypeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+                };
+
+        ResponseEntity<RestTemplateResponseEnvelope<Boolean>> response = restTemplate.exchange(
+                baseUrl+"/access_group/"+ createdAccessGroupId +"/access_page/"+accessPageId+"?updateChildren=false",
                 HttpMethod.PUT, requestBodyData, resTypeReference);
 
         logger.info("STATUS CODE ---------------------> {}",response.getStatusCode());
