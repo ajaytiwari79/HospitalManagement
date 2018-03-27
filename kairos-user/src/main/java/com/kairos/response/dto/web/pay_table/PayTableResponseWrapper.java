@@ -12,7 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PayTableResponseWrapper {
     private List<PayGroupAreaQueryResult> payGroupArea;
-    private List<PayTableQueryResult> payTables;
+    private PayTableQueryResult payTables;
 
     public PayTableResponseWrapper() {
     }
@@ -25,15 +25,15 @@ public class PayTableResponseWrapper {
         this.payGroupArea = payGroupArea;
     }
 
-    public List<PayTableQueryResult> getPayTables() {
+    public PayTableQueryResult getPayTables() {
         return payTables;
     }
 
-    public void setPayTables(List<PayTableQueryResult> payTables) {
+    public void setPayTables(PayTableQueryResult payTables) {
         this.payTables = payTables;
     }
 
-    public PayTableResponseWrapper(List<PayGroupAreaQueryResult> payGroupArea, List<PayTableQueryResult> payTables) {
+    public PayTableResponseWrapper(List<PayGroupAreaQueryResult> payGroupArea, PayTableQueryResult payTables) {
         this.payGroupArea = payGroupArea;
         this.payTables = payTables;
     }

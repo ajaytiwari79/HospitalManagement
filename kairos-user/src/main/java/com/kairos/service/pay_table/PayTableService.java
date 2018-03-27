@@ -8,6 +8,7 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
+import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.pay_table.*;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -57,33 +58,34 @@ public class PayTableService extends UserBaseService {
     private Logger logger = LoggerFactory.getLogger(PayTableService.class);
 
 
-    public PayTableQueryResult getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, Long startDate) {
+    public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, Long startDate) {
         Level level = countryGraphRepository.getLevel(countryId, organizationLevelId);
         if (!Optional.ofNullable(level).isPresent()) {
             throw new DataNotFoundByIdException("Invalid level in country");
         }
-
+        List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
         List<PayTableQueryResult> payTableQueryResults = payTableGraphRepository.findActivePayTableByOrganizationLevel(organizationLevelId, startDate);
         PayTableQueryResult result = null;
         if (payTableQueryResults.size() > 1) {
             // multiple payTables are found NOW need to filter by date
-            logger.info("{}", payTableQueryResults.size());
-            for (PayTableQueryResult curentPayTable : payTableQueryResults) {
-                if (Optional.ofNullable(curentPayTable.getEndDateMillis()).isPresent() &&
-                        (new DateTime(curentPayTable.getEndDateMillis()).isAfter(new DateTime(startDate)) || new DateTime(curentPayTable.getEndDateMillis()).isEqual(new DateTime(startDate)))
-                        && (new DateTime(curentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(curentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
-                    result = curentPayTable;
+            for (PayTableQueryResult currentPayTable : payTableQueryResults) {
+                if (Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
+                        (new DateTime(currentPayTable.getEndDateMillis()).isAfter(new DateTime(startDate)) || new DateTime(currentPayTable.getEndDateMillis()).isEqual(new DateTime(startDate)))
+                        && (new DateTime(currentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(currentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
+                    result = currentPayTable;
                     break;
                 }
-                if (!Optional.ofNullable(curentPayTable.getEndDateMillis()).isPresent() &&
-                        (new DateTime(curentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(curentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
-                    result = curentPayTable;
+                if (!Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
+                        (new DateTime(currentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(currentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
+                    result = currentPayTable;
                     break;
                 }
             }
         } else if (payTableQueryResults.size() == 1)
             result = payTableQueryResults.get(0);
-        return result;
+
+        PayTableResponseWrapper payTableResponseWrapper = new PayTableResponseWrapper(payGroupAreaQueryResults, result);
+        return payTableResponseWrapper;
 
     }
 
