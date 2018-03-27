@@ -1,7 +1,6 @@
 package com.kairos.service.pay_table;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
@@ -9,7 +8,6 @@ import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
-import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.pay_table.*;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -22,7 +20,6 @@ import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGrap
 import com.kairos.response.dto.web.pay_table.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
-import org.apache.commons.lang3.SerializationUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
@@ -60,14 +57,33 @@ public class PayTableService extends UserBaseService {
     private Logger logger = LoggerFactory.getLogger(PayTableService.class);
 
 
-    public PayTableQueryResult getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId,Long startDate) {
+    public PayTableQueryResult getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, Long startDate) {
         Level level = countryGraphRepository.getLevel(countryId, organizationLevelId);
         if (!Optional.ofNullable(level).isPresent()) {
             throw new DataNotFoundByIdException("Invalid level in country");
         }
 
-        PayTableQueryResult payTable = payTableGraphRepository.findActivePayTableByOrganizationLevel(organizationLevelId, startDate);
-        return payTable;
+        List<PayTableQueryResult> payTableQueryResults = payTableGraphRepository.findActivePayTableByOrganizationLevel(organizationLevelId, startDate);
+        PayTableQueryResult result = null;
+        if (payTableQueryResults.size() > 1) {
+            // multiple payTables are found NOW need to filter by date
+            logger.info("{}", payTableQueryResults.size());
+            for (PayTableQueryResult curentPayTable : payTableQueryResults) {
+                if (Optional.ofNullable(curentPayTable.getEndDateMillis()).isPresent() &&
+                        (new DateTime(curentPayTable.getEndDateMillis()).isAfter(new DateTime(startDate)) || new DateTime(curentPayTable.getEndDateMillis()).isEqual(new DateTime(startDate)))
+                        && (new DateTime(curentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(curentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
+                    result = curentPayTable;
+                    break;
+                }
+                if (!Optional.ofNullable(curentPayTable.getEndDateMillis()).isPresent() &&
+                        (new DateTime(curentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(curentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
+                    result = curentPayTable;
+                    break;
+                }
+            }
+        } else if (payTableQueryResults.size() == 1)
+            result = payTableQueryResults.get(0);
+        return result;
 
     }
 

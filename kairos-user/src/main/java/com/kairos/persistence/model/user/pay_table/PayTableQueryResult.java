@@ -4,6 +4,7 @@ import com.kairos.persistence.model.organization.Level;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * Created by vipul on 15/3/18.
  */
 @QueryResult
-public class PayTableQueryResult {
+public class PayTableQueryResult implements Comparable<PayTableQueryResult> {
     private Long id;
     private String name;
     private String shortName;
@@ -117,5 +118,13 @@ public class PayTableQueryResult {
         sb.append(", description='").append(description).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+
+    @Override
+    public int compareTo(PayTableQueryResult payTableQueryResult) {
+        Long compareQuantity = ((PayTableQueryResult) payTableQueryResult).getStartDateMillis();
+        //ascending order
+        return this.getStartDateMillis().compareTo(compareQuantity);
     }
 }
