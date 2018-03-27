@@ -3,6 +3,7 @@ package com.kairos.response.dto.web.cta;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.agreement.cta.CalculateValueIfPlanned;
+import com.kairos.persistence.model.user.country.FunctionResponseDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +19,23 @@ public class CTARuleTemplateDefaultDataWrapper {
     private List<PresenceTypeDTO> plannedTime=new ArrayList<>();
     private List<Map<String, Object>>currencies=new ArrayList<>();
     private List<Map<String, Object>>holidayMapList=new ArrayList<>();
+
+
+
+    private List<FunctionResponseDTO> functionDtoList = new ArrayList<FunctionResponseDTO>();
     List<ActivityCategoryDTO> activityCategories;
 
     public CTARuleTemplateDefaultDataWrapper() {
         //default
     }
 
+    public List<FunctionResponseDTO> getFunctionDtoList() {
+        return functionDtoList;
+    }
+
+    public void setFunctionDtoList(List<FunctionResponseDTO> functionDtoList) {
+        this.functionDtoList = functionDtoList;
+    }
     public List<CalculateValueIfPlanned> getCalculateValueIfPlanned() {
         return calculateValueIfPlanned;
     }

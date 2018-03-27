@@ -61,6 +61,11 @@ public class FunctionService extends UserBaseEntity{
         return functionGraphRepository.findFunctionsByCountry(countryId);
 
     }
+    public List<FunctionResponseDTO> getFunctionsIdName(long countryId){
+        return functionGraphRepository.findFunctionsIdNameByCountry(countryId);
+
+    }
+
     public FunctionResponseDTO updateFunction(Long countryId,FunctionDTO functionDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if(!Optional.ofNullable(country).isPresent()){

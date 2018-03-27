@@ -20,6 +20,10 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function,Lo
             "function.startDate as startDate,function.endDate as endDate,unions,organizationLevels")
     List<FunctionResponseDTO> findFunctionsByCountry(long countryId);
 
+    @Query("MATCH (country:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(country)={0} return id(function) as id,function.name as name")
+    List<FunctionResponseDTO> findFunctionsIdNameByCountry(long countryId);
+
+
     @Query("MATCH (c:Country)-[:BELONGS_TO]-(fun:Function{deleted:false}) where id(c)={0} AND LOWER(fun.name)=LOWER({1}) return fun")
     Function findByNameIgnoreCase(Long countryId,String name);
 
