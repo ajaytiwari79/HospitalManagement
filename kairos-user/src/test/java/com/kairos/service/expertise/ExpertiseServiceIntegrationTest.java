@@ -1,5 +1,4 @@
 package com.kairos.service.expertise;
-
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTestRunner;
@@ -18,16 +17,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-
-import static org.junit.Assert.*;
-
 /**
  * Created by vipul on 27/3/18.
  */
 @RunWith(OrderTestRunner.class)
 @SpringBootTest(classes = UserServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class ExpertiseServiceTest {
+public class ExpertiseServiceIntegrationTest {
+
     @Value("${server.host.http.url}")
     private String url;
     @Autowired

@@ -45,4 +45,8 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     List<PayGradeQueryResult> getPayGridsByPayTableId(Long payTableId);
 
 
+    @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,active:true}) where id(level)={0}" +
+            " RETURN id(payTable) as id,payTable.name as name,payTable.active as active,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName")
+    PayTableQueryResult findActivePayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
+
 }

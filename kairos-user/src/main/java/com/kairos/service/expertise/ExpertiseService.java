@@ -2,7 +2,6 @@ package com.kairos.service.expertise;
 
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
-import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
@@ -17,7 +16,6 @@ import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
 import com.kairos.response.dto.web.experties.UnionServiceWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
-import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.util.DateUtil;
 import org.slf4j.Logger;
@@ -26,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,21 +34,19 @@ import java.util.Optional;
 @Service
 @Transactional
 public class ExpertiseService extends UserBaseService {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
-    private CountryGraphRepository countryGraphRepository;
+    CountryGraphRepository countryGraphRepository;
     @Inject
-    private ExpertiseGraphRepository expertiseGraphRepository;
+    ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
-    private TagService tagService;
+    TagService tagService;
     @Inject
-    private StaffGraphRepository staffGraphRepository;
+    StaffGraphRepository staffGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
-
+    OrganizationGraphRepository organizationGraphRepository;
     @Inject
-    private OrganizationServiceService organizationService;
+    OrganizationServiceService organizationService;
 
     public Map<String, Object> saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -163,6 +158,7 @@ public class ExpertiseService extends UserBaseService {
         UnionServiceWrapper unionServiceWrapper = new UnionServiceWrapper();
         unionServiceWrapper.setServices(organizationService.getAllOrganizationService(countryId));
         unionServiceWrapper.setUnions(organizationGraphRepository.findAllUnionsByCountryId(countryId));
+        unionServiceWrapper.setOrganizationLevels(countryGraphRepository.getLevelsByCountry(countryId));
         return unionServiceWrapper;
     }
 }

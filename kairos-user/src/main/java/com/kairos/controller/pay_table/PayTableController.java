@@ -33,9 +33,9 @@ public class PayTableController {
     //TODO
     // NOT used currently need to change the filter criteria by date
     @RequestMapping(value = "/pay_table_data", method = GET)
-    public ResponseEntity<Map<String, Object>> getPayTablesByOrganizationLevel(@PathVariable Long countryId,
+    public ResponseEntity<Map<String, Object>> getPayTablesByOrganizationLevel(@PathVariable Long countryId,@RequestParam Long startDate,
                                                                                @RequestParam Long organizationLevel) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayTablesByOrganizationLevel(countryId, organizationLevel));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayTablesByOrganizationLevel(countryId, organizationLevel,startDate));
     }
 
     @RequestMapping(value = "/organization_level_pay_table", method = GET)

@@ -100,15 +100,15 @@ public class SeniorityLevelDTO {
     }
 
     // from 2-4(to)
-    @AssertTrue(message = "Incorrect interval")
-    public boolean isValid() {
-        if (!Optional.ofNullable(this.from).isPresent()) {
-            return false;
-        }
-        if (Optional.ofNullable(this.to).isPresent()) {
-            if (this.to < this.from)
-                return false;
-        }
-        return true;
-    }
+//    @AssertTrue(message = "Incorrect interval")
+//    public boolean isValid() {
+//        if (!Optional.ofNullable(this.from).isPresent()) {
+//            return false;
+//        }
+//        if (Optional.ofNullable(this.to).isPresent()) {
+//            if (this.to < this.from)
+//                return false;
+//        }
+//        return true;
+//    }
 }

@@ -2,6 +2,7 @@ package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.controller.organization_service.OrganizationServiceController;
+import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
@@ -14,8 +15,17 @@ import java.util.List;
 public class UnionServiceWrapper {
     private List<UnionQueryResult> unions;
     private List<Object> services;
+    List<Level> organizationLevels;
 
     public UnionServiceWrapper() {
+    }
+
+    public List<Level> getOrganizationLevels() {
+        return organizationLevels;
+    }
+
+    public void setOrganizationLevels(List<Level> organizationLevels) {
+        this.organizationLevels = organizationLevels;
     }
 
     public List<UnionQueryResult> getUnions() {

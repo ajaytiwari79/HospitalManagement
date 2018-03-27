@@ -60,15 +60,14 @@ public class PayTableService extends UserBaseService {
     private Logger logger = LoggerFactory.getLogger(PayTableService.class);
 
 
-    public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId) {
+    public PayTableQueryResult getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId,Long startDate) {
         Level level = countryGraphRepository.getLevel(countryId, organizationLevelId);
         if (!Optional.ofNullable(level).isPresent()) {
             throw new DataNotFoundByIdException("Invalid level in country");
         }
-        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
-        List<PayTableQueryResult> payTables = payTableGraphRepository.findPayTableByOrganizationLevel(organizationLevelId, -1L);
-        PayTableResponseWrapper responseWrapper = new PayTableResponseWrapper(payGroupAreas, payTables);
-        return responseWrapper;
+
+        PayTableQueryResult payTable = payTableGraphRepository.findActivePayTableByOrganizationLevel(organizationLevelId, startDate);
+        return payTable;
 
     }
 
