@@ -5,6 +5,7 @@ import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import com.kairos.response.dto.web.experties.SeniorityLevelDTO;
@@ -28,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by vipul on 27/3/18.
@@ -78,11 +80,11 @@ public class ExpertiseServiceIntegrationTest {
     @Test
     @OrderTest(order = 2)
     public void addSeniorityLevelInExpertise() throws Exception {
-        expertiseId=2955L;
+        expertiseId = 2955L;
         SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO(6, 1, new BigDecimal(1.5), new BigDecimal(2.5), new BigDecimal(5.6));
         CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, serviceId
                 , unionId, 12, 12, payTableId, PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
-    expertiseDTO.setId(expertiseId);
+        expertiseDTO.setId(expertiseId);
         HttpEntity<CountryExpertiseDTO> entity = new HttpEntity<>(expertiseDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>>() {
@@ -97,9 +99,20 @@ public class ExpertiseServiceIntegrationTest {
         Assert.assertNotNull(expertiseId);
     }
 
-    @Ignore
+
     @Test
+    @OrderTest(order = 3)
     public void getAllExpertise() throws Exception {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ExpertiseQueryResult>>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ExpertiseQueryResult>>>() {
+                };
+        ResponseEntity<RestTemplateResponseEnvelope<List<ExpertiseQueryResult>>> response = restTemplate.exchange(
+                baseUrlWithCountry + "/expertise",
+                HttpMethod.GET, null, typeReference);
+        RestTemplateResponseEnvelope<List<ExpertiseQueryResult>> responseBody = response.getBody();
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assert.assertNotNull(responseBody.getData());
+
 
     }
 
