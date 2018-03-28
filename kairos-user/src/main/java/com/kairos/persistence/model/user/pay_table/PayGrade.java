@@ -1,11 +1,7 @@
 package com.kairos.persistence.model.user.pay_table;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import org.neo4j.ogm.annotation.NodeEntity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by prabjot on 21/12/17.
@@ -14,7 +10,7 @@ import java.util.List;
 public class PayGrade extends UserBaseEntity {
 
     private Long payGradeLevel;
-    private boolean active;
+    private boolean published;
 
     public PayGrade() {
     }
@@ -23,12 +19,12 @@ public class PayGrade extends UserBaseEntity {
         this.payGradeLevel = payGradeLevel;
     }
 
-    public boolean isActive() {
-        return active;
+    public boolean isPublished() {
+        return published;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 
     public Long getPayGradeLevel() {
@@ -37,5 +33,10 @@ public class PayGrade extends UserBaseEntity {
 
     public void setPayGradeLevel(Long payGradeLevel) {
         this.payGradeLevel = payGradeLevel;
+    }
+
+    public PayGrade(Long payGradeLevel, boolean published) {
+        this.payGradeLevel = payGradeLevel;
+        this.published = published;
     }
 }

@@ -454,7 +454,7 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
-    private UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition) {
+    public UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition) {
         UnitPositionQueryResult
                 result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),

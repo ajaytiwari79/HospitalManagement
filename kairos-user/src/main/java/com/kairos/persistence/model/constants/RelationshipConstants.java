@@ -223,7 +223,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_MUNICIPALITY = "HAS_MUNICIPALITY";
     public final static String IN_LEVEL = "IN_LEVEL";
     public final static String HAS_PAY_GRADE = "HAS_PAY_GRADE";
-    public final static String HAS_PAY_TABLE = "HAS_PAY_TABLE";
+    public final static String HAS_TEMP_PAY_TABLE = "HAS_TEMP_PAY_TABLE";
     public final static String HAS_PAY_GROUP_AREA = "HAS_PAY_GROUP_AREA";
 
     /**
