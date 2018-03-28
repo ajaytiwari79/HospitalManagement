@@ -6,6 +6,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pavan on 13/3/18.
@@ -25,4 +26,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function,Lo
 
     @Query("MATCH (country:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(country)={0} AND id(function) <> {1} AND LOWER(function.name)=LOWER({2}) return function")
     Function findByNameExcludingCurrent(Long countryId,Long functionId,String name);
+
+    @Query("MATCH(fun:Function{deleted:false}) where id(fun) IN {0} return fun")
+    List<Function> findAllFunctionsById(Set<Long> functionIds);
 }

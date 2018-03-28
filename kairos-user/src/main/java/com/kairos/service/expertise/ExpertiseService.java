@@ -7,19 +7,22 @@ import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
-import com.kairos.persistence.model.user.pay_table.PayGrade;
 import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.expertise.SeniorityLevelFunctionRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
+import com.kairos.response.dto.web.experties.FunctionsDTO;
 import com.kairos.response.dto.web.experties.SeniorityLevelDTO;
 import com.kairos.response.dto.web.experties.UnionServiceWrapper;
 import com.kairos.service.UserBaseService;
@@ -30,10 +33,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by prabjot on 28/10/16.
@@ -60,7 +61,11 @@ public class ExpertiseService extends UserBaseService {
     private PayTableGraphRepository payTableGraphRepository;
     @Inject
     private PayGroupAreaGraphRepository payGroupAreaGraphRepository;
+    @Inject
+    private FunctionGraphRepository functionGraphRepository;
 
+    @Inject
+    private SeniorityLevelFunctionRelationshipGraphRepository seniorityLevelFunctionRelationshipGraphRepository;
 
     public Expertise saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -81,9 +86,8 @@ public class ExpertiseService extends UserBaseService {
             }
             addSeniorityLevelInExpertise(expertise, expertiseDTO.getSeniorityLevel());
         }
-
-
         save(expertise);
+
         return expertise;
     }
 
@@ -123,7 +127,21 @@ public class ExpertiseService extends UserBaseService {
     }
 
     private void addSeniorityLevelInExpertise(Expertise expertise, SeniorityLevelDTO seniorityLevelDTO) {
+        Set<Long> functionIds = seniorityLevelDTO.getFunctions().stream().map(FunctionsDTO::getFunctionId).collect(Collectors.toSet());
+
+        List<Function> functions = functionGraphRepository.findAllFunctionsById(functionIds);
+        if (functions.size() != functionIds.size()) {
+            throw new ActionNotPermittedException("unable to get all functions");
+        }
+
         SeniorityLevel seniorityLevel = new SeniorityLevel();
+        if (Optional.ofNullable(seniorityLevelDTO.getPayGroupAreas()).isPresent() && !seniorityLevelDTO.getPayGroupAreas().isEmpty()) {
+            List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(seniorityLevelDTO.getPayGroupAreas());
+            if (payGroupAreas.size() != seniorityLevelDTO.getPayGroupAreas().size())
+                throw new ActionNotPermittedException("Unable to get all payGroup Areas");
+            seniorityLevel.setPayGroupAreas(payGroupAreas);
+        }
+
         if (seniorityLevelDTO.getMoreThan() != null)
             seniorityLevel.setMoreThan(seniorityLevelDTO.getMoreThan());
         else {
@@ -135,12 +153,7 @@ public class ExpertiseService extends UserBaseService {
         seniorityLevel.setFreeChoicePercentage(seniorityLevelDTO.getFreeChoicePercentage());
         seniorityLevel.setFreeChoiceToPension(seniorityLevelDTO.getFreeChoiceToPension());
 
-        if (Optional.ofNullable(seniorityLevelDTO.getPayGroupAreas()).isPresent() && !seniorityLevelDTO.getPayGroupAreas().isEmpty()) {
-            List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(seniorityLevelDTO.getPayGroupAreas());
-            if (payGroupAreas.size() != seniorityLevelDTO.getPayGroupAreas().size())
-                throw new ActionNotPermittedException("Unable to get all payGroup Areas");
-            seniorityLevel.setPayGroupAreas(payGroupAreas);
-        }
+
         if (!Optional.ofNullable(expertise.getSeniorityLevel()).isPresent()) {
             List<SeniorityLevel> seniorityLevels = new ArrayList<>(1);
             seniorityLevels.add(seniorityLevel);
@@ -148,8 +161,13 @@ public class ExpertiseService extends UserBaseService {
         } else {
             expertise.getSeniorityLevel().add(seniorityLevel);
         }
-
-
+        List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList<>();
+        for (FunctionsDTO functionDTO : seniorityLevelDTO.getFunctions()) {
+            Function currentFunction = functions.stream().filter(f -> f.getId().equals(functionDTO.getFunctionId())).findFirst().get();
+            SeniorityLevelFunctionsRelationship functionsRelationship = new SeniorityLevelFunctionsRelationship(seniorityLevel, currentFunction, functionDTO.getAmount());
+            seniorityLevelFunctionsRelationships.add(functionsRelationship);
+        }
+        seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
     }
 
 
