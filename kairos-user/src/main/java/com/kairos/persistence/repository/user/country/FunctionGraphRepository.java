@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ORGANIZATION_LEVEL;
+
 /**
  * Created by pavan on 13/3/18.
  */
@@ -33,4 +35,8 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function,Lo
 
     @Query("MATCH(fun:Function{deleted:false}) where id(fun) IN {0} return fun")
     List<Function> findAllFunctionsById(Set<Long> functionIds);
+
+    @Query("MATCH (level:Level)<-[:"+HAS_ORGANIZATION_LEVEL+"]-(function:Function{deleted:false}) where id(level)={0} return id(function) as id,function.name as name")
+    List<FunctionDTO> getFunctionsByOrganizationLevel(Long organizationLevelId);
+
 }

@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.pay_table.PayTableResponse;
 
@@ -13,6 +14,7 @@ import java.util.List;
 public class PayTableResponseWrapper {
     private List<PayGroupAreaQueryResult> payGroupArea;
     private PayTableResponse payTables;
+    private List<FunctionDTO> functions;
 
     public PayTableResponseWrapper() {
         // default cons
@@ -34,8 +36,16 @@ public class PayTableResponseWrapper {
         this.payGroupArea = payGroupArea;
     }
 
-    public PayTableResponseWrapper(List<PayGroupAreaQueryResult> payGroupArea, PayTableResponse payTables) {
+    public List<FunctionDTO> getFunctions() {
+        return functions;
+    }
 
+    public void setFunctions(List<FunctionDTO> functions) {
+        this.functions = functions;
+    }
+
+    public PayTableResponseWrapper(List<PayGroupAreaQueryResult> payGroupArea, PayTableResponse payTables, List<FunctionDTO> functions) {
+        this.functions = functions;
         this.payGroupArea = payGroupArea;
         this.payTables = payTables;
     }
