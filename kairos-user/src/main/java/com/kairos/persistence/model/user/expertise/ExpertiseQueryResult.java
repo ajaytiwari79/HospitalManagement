@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.expertise;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
@@ -15,6 +16,7 @@ import java.util.Map;
  * Created by vipul on 28/3/18.
  */
 @QueryResult
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExpertiseQueryResult {
     private String name;
     private String description;
