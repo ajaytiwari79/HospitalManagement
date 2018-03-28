@@ -1,6 +1,5 @@
 package com.kairos.response.dto.web;
 
-import com.kairos.persistence.model.organization.Level;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;

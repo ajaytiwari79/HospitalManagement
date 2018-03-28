@@ -60,8 +60,6 @@ public class FixedValue extends UserBaseEntity {
         this.currencyId = currencyId;
     }
 
-    public  enum Type{
-        PER_DAY,PER_ACTIVITY,PER_TASK;
-    }
+
 
 }
