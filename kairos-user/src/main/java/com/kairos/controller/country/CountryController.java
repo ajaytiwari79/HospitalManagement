@@ -1161,7 +1161,7 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/functions", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getFunctions(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctions(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsByCountry(countryId));
 
     }
 

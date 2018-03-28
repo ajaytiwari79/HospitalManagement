@@ -50,9 +50,11 @@ public class PayGradePayGroupAreaRelationShip extends UserBaseEntity {
         this.payGroupAreaAmount = payGroupAreaAmount;
     }
 
+
     public PayGradePayGroupAreaRelationShip(PayGrade payGrade, PayGroupArea payGroupArea, BigDecimal payGroupAreaAmount) {
         this.payGrade = payGrade;
         this.payGroupArea = payGroupArea;
         this.payGroupAreaAmount = payGroupAreaAmount;
     }
+
 }
