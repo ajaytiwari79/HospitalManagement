@@ -30,7 +30,7 @@ public class CTARuleTemplateDTO {
     private CompensationTable compensationTable;
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-    private List<CTARuleTemplateDayTypeDTO>calculateOnDayTypes=new ArrayList<>();
+//    private List<CTARuleTemplateDayTypeDTO>calculateOnDayTypes=new ArrayList<>();
     private List<CTARuleTemplatePhaseInfo> phaseInfo=new ArrayList<>();
     private BudgetType budgetType;
     private List<CalculateValueIfPlanned> calculateValueIfPlanned =new ArrayList<>();
@@ -45,6 +45,8 @@ public class CTARuleTemplateDTO {
     private List<Long> activityIds;
     private Long timeTypeId;
     private Long plannedTimeId;
+
+    private List<Long> dayTypeIds;
 
     public CTARuleTemplateDTO() {
     }
@@ -144,13 +146,13 @@ public class CTARuleTemplateDTO {
         this.approvalWorkFlow = approvalWorkFlow;
     }
 
-    public List<CTARuleTemplateDayTypeDTO> getCalculateOnDayTypes() {
+    /*public List<CTARuleTemplateDayTypeDTO> getCalculateOnDayTypes() {
         return calculateOnDayTypes;
     }
 
     public void setCalculateOnDayTypes(List<CTARuleTemplateDayTypeDTO> calculateOnDayTypes) {
         this.calculateOnDayTypes = calculateOnDayTypes;
-    }
+    }*/
 
     public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
         return phaseInfo;
@@ -189,6 +191,14 @@ public class CTARuleTemplateDTO {
     public void setActivityType(ActivityType activityType) {
         this.activityType = activityType;
     }*/
+
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
+    }
+
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
+    }
 
     public PlanningCategory getPlanningCategory() {
         return planningCategory;
@@ -262,9 +272,6 @@ public class CTARuleTemplateDTO {
         this.getCompensationTable().setId(null);
         this.getCalculateValueAgainst().getFixedValue().setId(null);
         this.getCalculateValueAgainst().setId(null);
-        for (CTARuleTemplateDayTypeDTO ctaRuleTemplateDayType : this.getCalculateOnDayTypes()) {
-            ctaRuleTemplateDayType.setId(null);
-        }
 
         for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : this.getPhaseInfo()) {
             ctaRuleTemplatePhaseInfo.setId(null);
@@ -300,7 +307,6 @@ public class CTARuleTemplateDTO {
                 .append("compensationTable", compensationTable)
                 .append("calculateValueAgainst", calculateValueAgainst)
                 .append("approvalWorkFlow", approvalWorkFlow)
-                .append("ctaRuleTemplateDayTypeDTO", calculateOnDayTypes)
                 .append("phaseInfo", phaseInfo)
                 .append("budgetType", budgetType)
                 .append("calculateValueIfPlanned", calculateValueIfPlanned)

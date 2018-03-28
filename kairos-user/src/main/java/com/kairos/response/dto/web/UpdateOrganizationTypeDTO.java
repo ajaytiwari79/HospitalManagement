@@ -17,7 +17,7 @@ public class UpdateOrganizationTypeDTO {
     @NotEmpty(message = "error.OrganizationType.name.notEmpty") @NotNull(message = "error.OrganizationType.name.notnull")
     private String name;
 
-    private List<Level> levelsToUpdate;
+    private List<Long> levelsToUpdate;
 
     private List<Long> levelsToDelete;
 
@@ -25,7 +25,7 @@ public class UpdateOrganizationTypeDTO {
         //default constructor
     }
 
-    public UpdateOrganizationTypeDTO(String name, List<Level> levelsToUpdate, List<Long> levelsToDelete) {
+    public UpdateOrganizationTypeDTO(String name, List<Long> levelsToUpdate, List<Long> levelsToDelete) {
         this.name = name;
         this.levelsToUpdate = levelsToUpdate;
         this.levelsToDelete = levelsToDelete;
@@ -47,11 +47,11 @@ public class UpdateOrganizationTypeDTO {
         this.name = name;
     }
 
-    public List<Level> getLevelsToUpdate() {
+    public List<Long> getLevelsToUpdate() {
         return Optional.ofNullable(levelsToUpdate).orElse(new ArrayList<>());
     }
 
-    public void setLevelsToUpdate(List<Level> levelsToUpdate) {
+    public void setLevelsToUpdate(List<Long> levelsToUpdate) {
         this.levelsToUpdate = levelsToUpdate;
     }
 

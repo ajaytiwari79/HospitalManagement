@@ -13,6 +13,7 @@ public class AccessGroupQueryResult {
     private boolean deleted;
     private boolean typeOfTaskGiver;
     private String description;
+    private String role;
 
     public long getId() {
         return id;
@@ -52,5 +53,13 @@ public class AccessGroupQueryResult {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

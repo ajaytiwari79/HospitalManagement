@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -86,10 +86,11 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "return collect({id:id(expertise),name:expertise.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as expertise")
     OrgTypeExpertiseQueryResult getExpertiseOfOrganizationType(long countryId, long orgTypeId);
 
-    @Query("match(ost:OrganizationType) where  id(ost) in {0} \n" +
-            "match(workingTimeAgreement:WorkingTimeAgreement{deleted:false})-[:"+BELONGS_TO_ORG_SUB_TYPE+"]->(ost)\n" +
-            "return workingTimeAgreement")
-    List<WorkingTimeAgreement> getAllWTAByOrganiationSubType(List<Long> organizationSubTypeIds);
+    @Query("match(ost:OrganizationType) where  id(ost) in {0} match(workingTimeAgreement:WorkingTimeAgreement{deleted:false})-[:BELONGS_TO_ORG_SUB_TYPE]->(ost)\n" +
+            "MATCH(workingTimeAgreement)-[:HAS_EXPERTISE_IN]-(expertise:Expertise)\n" +
+            "return workingTimeAgreement,expertise")
+    List<WTAAndExpertiseQueryResult> getAllWTAByOrganiationSubType(List<Long> organizationSubTypeIds);
+
 
     @Query("Match (n:Organization{isEnable:true})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
     List<Organization> getOrganizationsByOrganizationType(long orgTypeId);
@@ -134,5 +135,12 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
 
     @Query("Match (n:Organization{isEnable:true,isKairosHub:{1}})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
     List<Organization> getOrganizationsByOrganizationTypeAndIsKairosHub(long orgTypeId, boolean isKairosHub);
+
+    @Query("match(country:Country) where id(country)={0} \n"+
+            "match(country)<-[:" + BELONGS_TO + "]-(orgType:OrganizationType{isEnable:true}) WHERE LOWER(orgType.name)=LOWER({1}) return orgType")
+    OrganizationType findByName(Long countryId,String name);
+
+    @Query("Match (ot:OrganizationType{isEnable:true})-[rel:" + HAS_LEVEL + "]->(level:Level{deleted:false}) where id(ot)={0} AND id(level) IN {1} DETACH DELETE rel")
+    void removeLevelRelationshipFromOrganizationType(Long organizationTypeId,List<Long> levelIds);
 
 }
