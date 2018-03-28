@@ -178,8 +178,8 @@ public class ExpertiseService extends UserBaseService {
     }
 
 
-    public List<ExpertiseTagDTO> getAllExpertise(long countryId) {
-        return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
+    public List<ExpertiseQueryResult> getAllExpertise(long countryId) {
+        return expertiseGraphRepository.getAllExpertiseByCountryId(countryId);
     }
 
 

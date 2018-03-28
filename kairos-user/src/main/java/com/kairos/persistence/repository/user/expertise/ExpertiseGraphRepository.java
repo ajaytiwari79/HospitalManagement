@@ -1,14 +1,12 @@
 package com.kairos.persistence.repository.user.expertise;
 
-import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
-import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
-import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
+import com.kairos.persistence.model.user.expertise.*;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -74,4 +72,14 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("match (e:Expertise{isEnabled:true})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} AND id(e) = {1} return e")
     Expertise getExpertiesOfCountry(Long countryId, Long expertiseId);
 
+    //TODO need to add publish filter as well
+    @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false}) where id(country) = {0}" +
+            "optional match(expertise)-[:SUPPORTS_SERVICE]-(orService:OrganizationService)\n" +
+            "optional match(expertise)-[:IN_ORGANIZATION_LEVEL]-(level:Level)\n" +
+            "optional match(expertise)-[:HAS_PAY_TABLE]-(payTable:PayTable)\n" +
+            "optional match(expertise)-[:SUPPORTS_UNION]-(union:Organization)\n" +
+            "return expertise.name as name ,id(expertise) as id,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis ," +
+            "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.description as description ,expertise.published as published," +
+            "{id:id(orService),name:orService.name} as organizationService,{id:id(level),name:level.name} as organizationLevel,{id:id(payTable),name:payTable.name} as payTable,{id:id(union),name:union.name} as union")
+    List<ExpertiseQueryResult> getAllExpertiseByCountryId(long countryId);
 }
