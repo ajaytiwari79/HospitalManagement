@@ -4,9 +4,12 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.response.dto.web.experties.FunctionsDTO;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PAY_GROUP_AREA;
 
 /**
  * Created by vipul on 27/3/18.
@@ -18,6 +21,7 @@ public class SeniorityLevel extends UserBaseEntity {
     private Integer moreThan;
     private List<FunctionsDTO> functions;
     private Integer basePayGrade;  // this is payGrade Id which is coming from payTable
+    @Relationship(type = HAS_PAY_GROUP_AREA)
     private List<PayGroupArea> payGroupAreas;// applicable payGroup areas
     // TODO We are unclear about this just adding and make sure this will utilize in future.
     private BigDecimal pensionPercentage;

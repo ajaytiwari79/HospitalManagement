@@ -8,6 +8,7 @@ import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +32,7 @@ public class ExpertiseQueryResult {
     //TODO in current unwinded property cant be set to any nested domain to QueryResult DTO , We will change if in feature this will handle
     private Map<String, Object> union;
     private Map<String, Object> payTable;
-
+    private List<Map<String, Object>> seniorityLevel;
 
     public String getName() {
         return name;
@@ -135,6 +136,14 @@ public class ExpertiseQueryResult {
 
     public void setPayTable(Map<String, Object> payTable) {
         this.payTable = payTable;
+    }
+
+    public List<Map<String, Object>> getSeniorityLevel() {
+        return seniorityLevel;
+    }
+
+    public void setSeniorityLevel(List<Map<String, Object>> seniorityLevel) {
+        this.seniorityLevel = seniorityLevel;
     }
 
     public ExpertiseQueryResult() {
