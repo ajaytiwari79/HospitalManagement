@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static org.neo4j.ogm.annotation.Relationship.INCOMING;
 
 /**
  * Created by prabjot on 21/12/17.
@@ -27,6 +28,13 @@ public class PayTable extends UserBaseEntity {
     @Relationship(type = HAS_PAY_GRADE)
     private List<PayGrade> payGrades;
     private String description;
+    private boolean published;
+    private boolean hasTempCopy;
+
+    @Relationship(type = HAS_TEMP_PAY_TABLE, direction = INCOMING)
+    private PayTable payTable;
+
+    //
     public PayTable() {
         //default constructor
     }
@@ -88,12 +96,36 @@ public class PayTable extends UserBaseEntity {
         this.description = description;
     }
 
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
+    public PayTable getPayTable() {
+        return payTable;
+    }
+
+    public void setPayTable(PayTable payTable) {
+        this.payTable = payTable;
+    }
+
     public PayTable(String name, String shortName, String description, Level level, Date startDateMillis, Date endDateMillis) {
         this.name = name;
-        this.description=description;
+        this.description = description;
         this.shortName = shortName;
         this.level = level;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
+    }
+
+    public boolean isHasTempCopy() {
+        return hasTempCopy;
+    }
+
+    public void setHasTempCopy(boolean hasTempCopy) {
+        this.hasTempCopy = hasTempCopy;
     }
 }

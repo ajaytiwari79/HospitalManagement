@@ -41,7 +41,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("MATCH (u:User) WHERE id(u) = {0} SET org.isDeleted = true ")
     void safeDelete(Long aLong);
 
-    @Query("Match (organization:Organization)-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with organization\n" +
+    @Query("Match (organization:Organization{isEnable:true})-[:"+HAS_EMPLOYMENTS+"]->(employment:Employment)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(user)={0} with organization\n" +
             "return id(organization) as id,organization.name as name,organization.isKairosHub as isKairosHub")
     List<OrganizationWrapper> getOrganizations(long userId);
 
@@ -69,4 +69,8 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     @Query("Match (staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(staff)={0} return user")
     User getUserByStaffId(Long staffId);
+
+    @Query("MATCH (u:User),(ag:AccessGroup) WHERE id(u) = {0} AND ag.name='AG_COUNTRY_ADMIN' WITH u,ag\n" +
+            "MATCH (ag)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(org:Organization)-[:HAS_EMPLOYMENTS]-(e:Employment)-[:BELONGS_TO]-(s:Staff)-[r:BELONGS_TO]-(u)  RETURN COUNT(u)>0")
+    Boolean checkIfUserIsCountryAdmin(Long userId);
 }

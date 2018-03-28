@@ -6,6 +6,8 @@ import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
+import java.math.BigDecimal;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PAY_GROUP_AREA;
 
 /**
@@ -18,7 +20,8 @@ public class PayGradePayGroupAreaRelationShip extends UserBaseEntity {
     @EndNode
     private PayGroupArea payGroupArea;
 
-    private Long payGradeValue;
+
+    private BigDecimal payGroupAreaAmount;
 
     public PayGradePayGroupAreaRelationShip() {
     }
@@ -39,17 +42,19 @@ public class PayGradePayGroupAreaRelationShip extends UserBaseEntity {
         this.payGrade = payGrade;
     }
 
-    public Long getPayGradeValue() {
-        return payGradeValue;
+    public BigDecimal getPayGroupAreaAmount() {
+        return payGroupAreaAmount;
     }
 
-    public void setPayGradeValue(Long payGradeValue) {
-        this.payGradeValue = payGradeValue;
+    public void setPayGroupAreaAmount(BigDecimal payGroupAreaAmount) {
+        this.payGroupAreaAmount = payGroupAreaAmount;
     }
 
-    public PayGradePayGroupAreaRelationShip(PayGrade payGrade, PayGroupArea payGroupArea, Long payGradeValue) {
+
+    public PayGradePayGroupAreaRelationShip(PayGrade payGrade, PayGroupArea payGroupArea, BigDecimal payGroupAreaAmount) {
         this.payGrade = payGrade;
         this.payGroupArea = payGroupArea;
-        this.payGradeValue = payGradeValue;
+        this.payGroupAreaAmount = payGroupAreaAmount;
     }
+
 }

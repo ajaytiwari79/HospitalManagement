@@ -142,7 +142,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
   * */
     public Map<String, Object> updateRuleTemplateCategory(RuleTemplateDTO ruleTemplateDTO, long countryId) {
         Map<String, Object> response = new HashMap();
-        if (ruleTemplateDTO.getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.CTA)) {
+        if (ruleTemplateDTO.getRuleTemplateCategoryType().equals(RuleTemplateCategoryType.CTA.name())) {
             response = changeCTARuleTemplateCategory(countryId, ruleTemplateDTO);
         } else {
             response = changeWTARuleTemplateCategory(countryId, ruleTemplateDTO);

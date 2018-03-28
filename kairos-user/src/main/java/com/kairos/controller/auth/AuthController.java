@@ -1,6 +1,7 @@
 package com.kairos.controller.auth;
 
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.user.auth.OrganizationSelectionDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.response.dto.web.FirstTimePasswordUpdateDTO;
 import com.kairos.service.auth.UserService;
@@ -24,7 +25,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
@@ -165,7 +165,7 @@ public class AuthController {
 
     @RequestMapping(value = "/user/organizations", method = RequestMethod.GET)
     public ResponseEntity<Map<String,Object>> getCurrentUserOrganizationList() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getOrganizations(UserContext.getUserDetails().getId()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getLoggedInUserOrganizations());
     }
 
     @RequestMapping(value = PARENT_ORGANIZATION_URL+ "/user/permissions", method = RequestMethod.GET)
@@ -183,5 +183,10 @@ public class AuthController {
         userInfo.put("user12", user.getPrincipal());
 
         return userInfo;
+    }
+
+    @RequestMapping(value = "/user/selected_organizations", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String,Object>> updateLastOrganizationSelectedByUser(@Valid @RequestBody OrganizationSelectionDTO organizationSelectionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateLastSelectedChildAndParentId(organizationSelectionDTO));
     }
 }

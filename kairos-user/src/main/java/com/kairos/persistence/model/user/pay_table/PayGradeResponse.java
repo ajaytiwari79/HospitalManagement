@@ -2,7 +2,7 @@ package com.kairos.persistence.model.user.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.response.dto.web.pay_table.PayGradeMatrixDTO;
+import com.kairos.response.dto.web.pay_table.PayGroupAreaDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -13,12 +13,16 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-public class PayGradeQueryResult {
+public class PayGradeResponse {
     private Long payTableId;
     private Long payGradeLevel;
     private Long payGradeId;
-    private List<PayGradeMatrixDTO> payGrades;
+    private Boolean published;
+    private List<PayGroupAreaDTO> payGroupAreas;
 
+    public PayGradeResponse() {
+        //default
+    }
 
     public Long getPayTableId() {
         return payTableId;
@@ -44,18 +48,29 @@ public class PayGradeQueryResult {
         this.payGradeId = payGradeId;
     }
 
-    public List<PayGradeMatrixDTO> getPayGrades() {
-        return payGrades;
+    public List<PayGroupAreaDTO> getPayGroupAreas() {
+        return payGroupAreas;
     }
 
-    public void setPayGrades(List<PayGradeMatrixDTO> payGrades) {
-        this.payGrades = payGrades;
+    public void setPayGroupAreas(List<PayGroupAreaDTO> payGroupAreas) {
+        this.payGroupAreas = payGroupAreas;
     }
 
-    public PayGradeQueryResult(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayGradeMatrixDTO> payGrades) {
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
+    }
+
+    public PayGradeResponse(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayGroupAreaDTO> payGroupAreas, Boolean published) {
         this.payTableId = payTableId;
         this.payGradeLevel = payGradeLevel;
         this.payGradeId = payGradeId;
-        this.payGrades = payGrades;
+        this.payGroupAreas = payGroupAreas;
+        this.published = published;
     }
+
+
 }

@@ -148,6 +148,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_WAGES = "HAS_WAGES";
     public final static String HAS_ACCESS_PAGE_PERMISSION = "HAS_ACCESS_PAGE_PERMISSION";
     public final static String HAS_ACCESS_GROUP = "HAS_ACCESS_GROUP";
+    public final static String HAS_CUSTOMIZED_PERMISSION = "HAS_CUSTOMIZED_PERMISSION";
     public final static String HAS_ACCESS_PERMISSION = "HAS_ACCESS_PERMISSION";
     public final static String HAS_SUB_TYPE = "HAS_SUB_TYPE";
     public final static String HAS_REGIONS = "HAS_REGIONS";
@@ -216,10 +217,13 @@ public abstract class RelationshipConstants {
 
     public final static String IN_UNIT = "IN_UNIT";
     public final static String HAS_ACCESS_FOR_ORG_CATEGORY = "HAS_ACCESS_FOR_ORG_CATEGORY";
+    public final static String HAS_UNION = "HAS_UNION";
+    public final static String HAS_ORGANIZATION_LEVEL = "HAS_ORGANIZATION_LEVEL";
+
     public final static String HAS_MUNICIPALITY = "HAS_MUNICIPALITY";
     public final static String IN_LEVEL = "IN_LEVEL";
     public final static String HAS_PAY_GRADE = "HAS_PAY_GRADE";
-
+    public final static String HAS_TEMP_PAY_TABLE = "HAS_TEMP_PAY_TABLE";
     public final static String HAS_PAY_GROUP_AREA = "HAS_PAY_GROUP_AREA";
 
     /**

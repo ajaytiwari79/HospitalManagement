@@ -11,12 +11,12 @@ import com.kairos.client.PhaseRestClient;
 import com.kairos.client.activity_types.ActivityTypesRestClient;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -25,6 +25,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
+import com.kairos.response.dto.web.OrganizationLevelAndUnionWrapper;
 import com.kairos.response.dto.web.cta.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -104,6 +105,7 @@ public class CountryService extends UserBaseService {
     private @Autowired ActivityTypesRestClient activityTypesRestClient;
     private @Inject OrganizationService organizationService;
     private @Inject PresenceTypeService presenceTypeService;
+    private @Autowired FunctionService functionService;
 
 
     /**
@@ -457,17 +459,21 @@ public class CountryService extends UserBaseService {
 
          }
 
+        List<ActivityCategoryDTO> activityCategories = activityTypesRestClient.getActivityCategoriesForCountry(countryId);
+
          List<Map<String,Object>> currencies=currencyService.getCurrencies(countryId);
          List<EmploymentType> employmentTypes=employmentTypeService.getEmploymentTypeList(countryId,false);
          List<TimeTypeDTO> timeTypes= timeTypeRestClient.getAllTimeTypes(countryId);
          List<PresenceTypeDTO> plannedTime= presenceTypeService.getAllPresenceTypeByCountry(countryId);
          List<DayType> dayTypes=dayTypeService.getAllDayTypeByCountryId(countryId);
          List<PhaseDTO> phases = phaseRestClient.getPhases(countryId);
+         List<FunctionDTO> functions = functionService.getFunctionsIdAndNameByCountry(countryId);
 
          //wrap data into wrapper class
          CTARuleTemplateDefaultDataWrapper ctaRuleTemplateDefaultDataWrapper=new CTARuleTemplateDefaultDataWrapper();
          ctaRuleTemplateDefaultDataWrapper.setCurrencies(currencies);
          ctaRuleTemplateDefaultDataWrapper.setPhases(phases);
+        ctaRuleTemplateDefaultDataWrapper.setFunctions(functions);
 
          List<EmploymentTypeDTO> employmentTypeDTOS =employmentTypes.stream().map(employmentType -> {
                 EmploymentTypeDTO employmentTypeDTO=new EmploymentTypeDTO();
@@ -486,9 +492,18 @@ public class CountryService extends UserBaseService {
             ctaRuleTemplateDefaultDataWrapper.setDayTypes(dayTypeDTOS);
 
             ctaRuleTemplateDefaultDataWrapper.setActivityTypes(activityTypeDTOS);
+            ctaRuleTemplateDefaultDataWrapper.setActivityCategories(activityCategories);
 
             ctaRuleTemplateDefaultDataWrapper.setHolidayMapList(this.getAllCountryAllHolidaysByCountryId(countryId));
          return ctaRuleTemplateDefaultDataWrapper;
+    }
+
+    // For getting all OrganizationLevel and Unions
+    public OrganizationLevelAndUnionWrapper getUnionAndOrganizationLevels(Long countryId){
+        List<UnionQueryResult> unions=organizationGraphRepository.findAllUnionsByCountryId(countryId);
+        List<Level> organizationLevels=countryGraphRepository.getLevelsByCountry(countryId);
+        OrganizationLevelAndUnionWrapper organizationLevelAndUnionWrapper =new OrganizationLevelAndUnionWrapper(unions,organizationLevels);
+        return organizationLevelAndUnionWrapper;
     }
 
 
