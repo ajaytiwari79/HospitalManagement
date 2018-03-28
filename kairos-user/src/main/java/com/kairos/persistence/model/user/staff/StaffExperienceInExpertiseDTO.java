@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffExperienceInExpertiseDTO {
     private Long id;
+    private String name;
     private Long expertiseId;
     private Integer relevantExperienceInMonths;
 
@@ -22,6 +23,14 @@ public class StaffExperienceInExpertiseDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Long getExpertiseId() {

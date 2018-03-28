@@ -210,15 +210,15 @@ public class StaffService extends UserBaseService {
             throw new InternalError("Staff can't null");
         }
         staffExpertiseRelationShipGraphRepository.unlinkPreviousExpertise(staffId);
-        for(int i=0;i<staffPersonalDetail.getStaffExperienceInExpertise().size();i++){
-                Expertise expertise = expertiseGraphRepository.findOne(staffPersonalDetail.getStaffExperienceInExpertise().get(i).getExpertiseId());
+        for(int i=0;i<staffPersonalDetail.getExpertiseWithExperience().size();i++){
+                Expertise expertise = expertiseGraphRepository.findOne(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
                 StaffExpertiseRelationShip staffExpertiseRelationShip
-                        = new StaffExpertiseRelationShip(objectToUpdate, expertise, staffPersonalDetail.getStaffExperienceInExpertise().get(i).getRelevantExperienceInMonths());
+                        = new StaffExpertiseRelationShip(objectToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
                 staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
-                staffPersonalDetail.getStaffExperienceInExpertise().get(i).setId(staffExpertiseRelationShip.getId());
+                staffPersonalDetail.getExpertiseWithExperience().get(i).setId(staffExpertiseRelationShip.getId());
         }
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
-        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseId());
+        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
         List<Expertise> oldExpertise = objectToUpdate.getExpertise();
         objectToUpdate.setLanguage(language);
         objectToUpdate.setExpertise(expertise);
@@ -237,6 +237,8 @@ public class StaffService extends UserBaseService {
         objectToUpdate.setCostHourOvertime(staffPersonalDetail.getCostHourOvertime());
         objectToUpdate.setCapacity(staffPersonalDetail.getCapacity());
         objectToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
+        staffPersonalDetail.setExpertiseIds(staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO ::getExpertiseId).collect(Collectors.toList()));
+
 
         if (staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
             objectToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());

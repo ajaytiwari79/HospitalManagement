@@ -399,6 +399,7 @@ public class UnitPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid Staff Id" + staffId);
         }
         Organization organization = organizationService.getOrganizationDetail(id, type);
+
 //        Organization parentOrganization;
 //        UnitPermission unitPermission;
 //        if (!organization.isParentOrganization()) {

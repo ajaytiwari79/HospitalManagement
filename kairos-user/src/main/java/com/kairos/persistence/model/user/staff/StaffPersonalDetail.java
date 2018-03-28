@@ -21,8 +21,8 @@ public class StaffPersonalDetail {
     private String inactiveFrom;
     private StaffStatusEnum currentStatus;
     private long languageId;
-    private List<Long> expertiseId;
-    private List<StaffExperienceInExpertiseDTO> staffExperienceInExpertise;
+    private List<Long> expertiseIds;
+    private List<StaffExperienceInExpertiseDTO> expertiseWithExperience;
    // @NotEmpty(message = "error.cprnumber.notnull") @NotNull(message = "error.cprnumber.notnull")
     private String cprNumber;
    // @NotEmpty(message = "error.Staff.familyname.notnull") @NotNull(message = "error.Staff.familyname.notnull")
@@ -96,12 +96,12 @@ public class StaffPersonalDetail {
         this.languageId = languageId;
     }
 
-    public List<Long> getExpertiseId() {
-        return expertiseId;
+    public List<Long> getExpertiseIds() {
+        return expertiseIds;
     }
 
-    public void setExpertiseId(List<Long> expertiseId) {
-        this.expertiseId = expertiseId;
+    public void setExpertiseIds(List<Long> expertiseIds) {
+        this.expertiseIds = expertiseIds;
     }
 
     public String getCprNumber() {
@@ -208,11 +208,11 @@ public class StaffPersonalDetail {
         this.currentStatus = currentStatus;
     }
 
-    public List<StaffExperienceInExpertiseDTO> getStaffExperienceInExpertise() {
-        return staffExperienceInExpertise;
+    public List<StaffExperienceInExpertiseDTO> getExpertiseWithExperience() {
+        return expertiseWithExperience;
     }
 
-    public void setStaffExperienceInExpertise(List<StaffExperienceInExpertiseDTO> staffExperienceInExpertise) {
-        this.staffExperienceInExpertise = staffExperienceInExpertise;
+    public void setExpertiseWithExperience(List<StaffExperienceInExpertiseDTO> expertiseWithExperience) {
+        this.expertiseWithExperience = expertiseWithExperience;
     }
 }
