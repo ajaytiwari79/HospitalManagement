@@ -115,9 +115,9 @@ public class StaffCreationPOJOData {
         this.engineerTypeId = engineerTypeId;
     }
 
-    public long getEmployedSince() {
+    public Long getEmployedSince() {
         if(employedSince == null)
-            return 0;
+            return null;
         return employedSince.getTime();
     }
 
@@ -125,9 +125,9 @@ public class StaffCreationPOJOData {
         this.employedSince = employedSince;
     }
 
-    public long getInactiveFrom() {
+    public Long getInactiveFrom() {
         if(inactiveFrom == null)
-            return 0;
+            return null;
         return inactiveFrom.getTime();
     }
 

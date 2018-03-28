@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.pay_table;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -12,7 +13,8 @@ import java.util.List;
  * Created by vipul on 15/3/18.
  */
 @QueryResult
-public class PayTableQueryResult implements Comparable<PayTableQueryResult> {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class PayTableResponse implements Comparable<PayTableResponse> {
     private Long id;
     private String name;
     private String shortName;
@@ -22,9 +24,9 @@ public class PayTableQueryResult implements Comparable<PayTableQueryResult> {
     private Level level;
     private List<PayGrade> payGrades;
     private String description;
-    private Boolean active;
+    private Boolean published;
 
-    public PayTableQueryResult() {
+    public PayTableResponse() {
     }
 
     public Long getId() {
@@ -91,16 +93,17 @@ public class PayTableQueryResult implements Comparable<PayTableQueryResult> {
         this.description = description;
     }
 
-    public Boolean getActive() {
-        return active;
+    public Boolean getPublished() {
+        return published;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 
-    public PayTableQueryResult(String name, String shortName, String description, Long startDateMillis, Date endDateMillis) {
+    public PayTableResponse(String name, String shortName, String description, Long startDateMillis, Date endDateMillis, Boolean published) {
         this.name = name;
+        this.published = published;
         this.description = description;
         this.shortName = shortName;
         this.startDateMillis = startDateMillis;
@@ -122,8 +125,8 @@ public class PayTableQueryResult implements Comparable<PayTableQueryResult> {
 
 
     @Override
-    public int compareTo(PayTableQueryResult payTableQueryResult) {
-        Long compareQuantity = ((PayTableQueryResult) payTableQueryResult).getStartDateMillis();
+    public int compareTo(PayTableResponse payTableResponse) {
+        Long compareQuantity = ((PayTableResponse) payTableResponse).getStartDateMillis();
         //ascending order
         return this.getStartDateMillis().compareTo(compareQuantity);
     }

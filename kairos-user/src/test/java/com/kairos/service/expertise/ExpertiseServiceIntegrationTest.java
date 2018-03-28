@@ -62,13 +62,13 @@ public class ExpertiseServiceIntegrationTest {
         CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, serviceId
                 , unionId, 12, 12, payTableId, PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
         HttpEntity<CountryExpertiseDTO> entity = new HttpEntity<>(expertiseDTO);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<Expertise>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<CountryExpertiseDTO>> response = restTemplate.exchange(
                 baseUrlWithCountry + "/expertise",
                 HttpMethod.POST, entity, typeReference);
-        RestTemplateResponseEnvelope<Expertise> responseBody = response.getBody();
+        RestTemplateResponseEnvelope<CountryExpertiseDTO> responseBody = response.getBody();
 
         expertiseId = responseBody.getData().getId();
         Assert.assertEquals(201, response.getStatusCodeValue());
@@ -78,16 +78,19 @@ public class ExpertiseServiceIntegrationTest {
     @Test
     @OrderTest(order = 2)
     public void addSeniorityLevelInExpertise() throws Exception {
+        expertiseId=2955L;
         SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO(6, 1, new BigDecimal(1.5), new BigDecimal(2.5), new BigDecimal(5.6));
-        CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO(expertiseId, seniorityLevelDTO);
+        CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, serviceId
+                , unionId, 12, 12, payTableId, PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
+    expertiseDTO.setId(expertiseId);
         HttpEntity<CountryExpertiseDTO> entity = new HttpEntity<>(expertiseDTO);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<Expertise>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<Expertise>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<CountryExpertiseDTO>> response = restTemplate.exchange(
                 baseUrlWithCountry + "/expertise",
                 HttpMethod.POST, entity, typeReference);
-        RestTemplateResponseEnvelope<Expertise> responseBody = response.getBody();
+        RestTemplateResponseEnvelope<CountryExpertiseDTO> responseBody = response.getBody();
 
         expertiseId = responseBody.getData().getId();
         Assert.assertEquals(201, response.getStatusCodeValue());

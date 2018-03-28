@@ -12,6 +12,7 @@ import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
+import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
 import com.kairos.service.agreement.cta.CostTimeAgreementService;
@@ -326,17 +327,17 @@ public class CostTimeAgreementServiceTest {
 
         String baseUrl = getBaseUrl(organizationId, null);
         HttpEntity<CollectiveTimeAgreementDTO> requestBodyData = new HttpEntity<>(collectiveTimeAgreementDTO);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionQueryResult>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionQueryResult>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<UnitPositionQueryResult>> response = restTemplate.exchange(
                 baseUrl + "/unit/"+organizationId+"/unit_position/"+unitPositionId+"/cta/"+ctaLinkedWithUnitPosition.getId(),
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 
     @Test
-    public void getMainTabs() throws Exception {
+    public void getCTALinkedWithUnitPosition() throws Exception {
 
         String baseUrl=getBaseUrl(organizationId,null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAListQueryResult>> resTypeReference =

@@ -15,8 +15,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-
-public class FunctionResponseDTO {
+public class FunctionDTO {
     private Long id;
     private String name;
     private String description;
@@ -29,11 +28,11 @@ public class FunctionResponseDTO {
 
 
 
-    public FunctionResponseDTO() {
+    public FunctionDTO() {
         //Default Constructor
     }
 
-    public FunctionResponseDTO(Long id, String name, String description, Date startDate, Date endDate, List<Organization> unions, List<Level> organizationLevels) {
+    public FunctionDTO(Long id, String name, String description, Date startDate, Date endDate, List<Organization> unions, List<Level> organizationLevels) {
         this.id = id;
         this.name = name;
         this.description = description;

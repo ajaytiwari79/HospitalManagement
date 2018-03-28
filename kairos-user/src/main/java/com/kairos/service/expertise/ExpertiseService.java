@@ -137,12 +137,19 @@ public class ExpertiseService extends UserBaseService {
     }
 
     private SeniorityLevel addSeniorityLevelInExpertise(Expertise expertise, SeniorityLevel seniorityLevel, SeniorityLevelDTO seniorityLevelDTO) {
-        Set<Long> functionIds = seniorityLevelDTO.getFunctions().stream().map(FunctionsDTO::getFunctionId).collect(Collectors.toSet());
-        List<Function> functions = functionGraphRepository.findAllFunctionsById(functionIds);
-        if (functions.size() != functionIds.size()) {
-            throw new ActionNotPermittedException("unable to get all functions");
+        List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList<>();
+        if (Optional.ofNullable(seniorityLevelDTO.getFunctions()).isPresent() && !seniorityLevelDTO.getFunctions().isEmpty()) {
+            Set<Long> functionIds = seniorityLevelDTO.getFunctions().stream().map(FunctionsDTO::getFunctionId).collect(Collectors.toSet());
+            List<Function> functions = functionGraphRepository.findAllFunctionsById(functionIds);
+            if (functions.size() != functionIds.size()) {
+                throw new ActionNotPermittedException("unable to get all functions");
+            }
+            for (FunctionsDTO functionDTO : seniorityLevelDTO.getFunctions()) {
+                Function currentFunction = functions.stream().filter(f -> f.getId().equals(functionDTO.getFunctionId())).findFirst().get();
+                SeniorityLevelFunctionsRelationship functionsRelationship = new SeniorityLevelFunctionsRelationship(seniorityLevel, currentFunction, functionDTO.getAmount());
+                seniorityLevelFunctionsRelationships.add(functionsRelationship);
+            }
         }
-
         if (Optional.ofNullable(seniorityLevelDTO.getPayGroupAreas()).isPresent() && !seniorityLevelDTO.getPayGroupAreas().isEmpty()) {
             List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(seniorityLevelDTO.getPayGroupAreas());
             if (payGroupAreas.size() != seniorityLevelDTO.getPayGroupAreas().size())
@@ -166,13 +173,6 @@ public class ExpertiseService extends UserBaseService {
         } else {
             expertise.getSeniorityLevel().add(seniorityLevel);
         }
-        List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList<>();
-        for (FunctionsDTO functionDTO : seniorityLevelDTO.getFunctions()) {
-            Function currentFunction = functions.stream().filter(f -> f.getId().equals(functionDTO.getFunctionId())).findFirst().get();
-            SeniorityLevelFunctionsRelationship functionsRelationship = new SeniorityLevelFunctionsRelationship(seniorityLevel, currentFunction, functionDTO.getAmount());
-            seniorityLevelFunctionsRelationships.add(functionsRelationship);
-        }
-
         seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
         return seniorityLevel;
     }
