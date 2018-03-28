@@ -67,7 +67,7 @@ public class ExpertiseService extends UserBaseService {
     @Inject
     private SeniorityLevelFunctionRelationshipGraphRepository seniorityLevelFunctionRelationshipGraphRepository;
 
-    public Expertise saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
+    public CountryExpertiseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid country Id");
@@ -84,11 +84,13 @@ public class ExpertiseService extends UserBaseService {
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid expertise Id");
             }
-            addSeniorityLevelInExpertise(expertise, expertiseDTO.getSeniorityLevel());
+            SeniorityLevel seniorityLevel = new SeniorityLevel();
+            addSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+            save(expertise);
+            expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
         }
-        save(expertise);
 
-        return expertise;
+        return expertiseDTO;
     }
 
     private void prepareExpertise(Expertise expertise, CountryExpertiseDTO expertiseDTO, Long countryId) {
@@ -101,7 +103,6 @@ public class ExpertiseService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid level id " + expertiseDTO.getOrganizationLevelId());
         }
         expertise.setOrganizationLevel(level);
-
         OrganizationService organizationService = organizationServiceRepository.findOne(expertiseDTO.getServiceId());
         if (!Optional.ofNullable(organizationService).isPresent()) {
             throw new DataNotFoundByIdException("Invalid service id " + expertiseDTO.getServiceId());
@@ -120,28 +121,34 @@ public class ExpertiseService extends UserBaseService {
         }
         expertise.setPayTable(payTable);
         expertise.setPaidOutFrequency(expertiseDTO.getPaidOutFrequency());
+        SeniorityLevel seniorityLevel = null;
         if (expertiseDTO.getSeniorityLevel() != null) {
-            addSeniorityLevelInExpertise(expertise, expertiseDTO.getSeniorityLevel());
+            seniorityLevel = new SeniorityLevel();
+            seniorityLevel = addSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+
+        }
+        save(expertise);
+        expertiseDTO.setId(expertise.getId());
+        expertiseDTO.setPublished(expertise.isPublished());
+        if (expertiseDTO.getSeniorityLevel() != null) {
+            expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
         }
 
     }
 
-    private void addSeniorityLevelInExpertise(Expertise expertise, SeniorityLevelDTO seniorityLevelDTO) {
+    private SeniorityLevel addSeniorityLevelInExpertise(Expertise expertise, SeniorityLevel seniorityLevel, SeniorityLevelDTO seniorityLevelDTO) {
         Set<Long> functionIds = seniorityLevelDTO.getFunctions().stream().map(FunctionsDTO::getFunctionId).collect(Collectors.toSet());
-
         List<Function> functions = functionGraphRepository.findAllFunctionsById(functionIds);
         if (functions.size() != functionIds.size()) {
             throw new ActionNotPermittedException("unable to get all functions");
         }
 
-        SeniorityLevel seniorityLevel = new SeniorityLevel();
         if (Optional.ofNullable(seniorityLevelDTO.getPayGroupAreas()).isPresent() && !seniorityLevelDTO.getPayGroupAreas().isEmpty()) {
             List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(seniorityLevelDTO.getPayGroupAreas());
             if (payGroupAreas.size() != seniorityLevelDTO.getPayGroupAreas().size())
                 throw new ActionNotPermittedException("Unable to get all payGroup Areas");
             seniorityLevel.setPayGroupAreas(payGroupAreas);
         }
-
         if (seniorityLevelDTO.getMoreThan() != null)
             seniorityLevel.setMoreThan(seniorityLevelDTO.getMoreThan());
         else {
@@ -152,8 +159,6 @@ public class ExpertiseService extends UserBaseService {
         seniorityLevel.setPensionPercentage(seniorityLevelDTO.getPensionPercentage());
         seniorityLevel.setFreeChoicePercentage(seniorityLevelDTO.getFreeChoicePercentage());
         seniorityLevel.setFreeChoiceToPension(seniorityLevelDTO.getFreeChoiceToPension());
-
-
         if (!Optional.ofNullable(expertise.getSeniorityLevel()).isPresent()) {
             List<SeniorityLevel> seniorityLevels = new ArrayList<>(1);
             seniorityLevels.add(seniorityLevel);
@@ -167,7 +172,9 @@ public class ExpertiseService extends UserBaseService {
             SeniorityLevelFunctionsRelationship functionsRelationship = new SeniorityLevelFunctionsRelationship(seniorityLevel, currentFunction, functionDTO.getAmount());
             seniorityLevelFunctionsRelationships.add(functionsRelationship);
         }
+
         seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
+        return seniorityLevel;
     }
 
 

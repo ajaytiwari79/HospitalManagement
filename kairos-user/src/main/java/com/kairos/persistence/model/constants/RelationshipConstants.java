@@ -229,9 +229,7 @@ public abstract class RelationshipConstants {
     public final static String SUPPORTS_UNION = "SUPPORTS_UNION";
     public final static String SUPPORTS_SERVICE = "SUPPORTS_SERVICE";
     public final static String HAS_FUNCTION = "HAS_FUNCTION";
-
-
-
+    public final static String HAS_DRAFT_EXPERTISE = "HAS_DRAFT_EXPERTISE";
 
 
     /**

@@ -61,6 +61,13 @@ public class Expertise extends UserBaseEntity {
     private PayTable payTable;
 
     private PaidOutFrequencyEnum paidOutFrequency;
+
+    @Relationship(type = HAS_DRAFT_EXPERTISE)
+    private Expertise expertise;
+    private boolean published;
+    private boolean hasDraftCopy;
+
+
     @Relationship(type = FOR_SENIORITY_LEVEL)
     private List<SeniorityLevel> seniorityLevel;
 
@@ -183,6 +190,30 @@ public class Expertise extends UserBaseEntity {
 
     public void setSeniorityLevel(List<SeniorityLevel> seniorityLevel) {
         this.seniorityLevel = seniorityLevel;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
+    public boolean isHasDraftCopy() {
+        return hasDraftCopy;
+    }
+
+    public void setHasDraftCopy(boolean hasDraftCopy) {
+        this.hasDraftCopy = hasDraftCopy;
+    }
+
+    public Expertise getExpertise() {
+        return expertise;
+    }
+
+    public void setExpertise(Expertise expertise) {
+        this.expertise = expertise;
     }
 
     public Expertise() {

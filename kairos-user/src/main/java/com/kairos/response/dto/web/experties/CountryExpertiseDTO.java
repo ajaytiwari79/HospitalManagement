@@ -52,6 +52,15 @@ public class CountryExpertiseDTO {
     @Valid
     private SeniorityLevelDTO seniorityLevel;
     private List<Long> tags;
+    private Boolean published;
+
+    public Boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
+    }
 
 
     public CountryExpertiseDTO() {

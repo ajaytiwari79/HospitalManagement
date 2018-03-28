@@ -13,6 +13,7 @@ import java.util.Set;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SeniorityLevelDTO {
+    private  Long id;
     private Integer from;
     private Integer to;
     private Integer moreThan;
@@ -27,6 +28,14 @@ public class SeniorityLevelDTO {
 
     public SeniorityLevelDTO() {
         // default
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Set<Long> getPayGroupAreas() {
