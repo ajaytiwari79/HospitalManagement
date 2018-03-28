@@ -11,7 +11,7 @@ import java.util.List;
  * Created by vipul on 15/3/18.
  */
 @QueryResult
-public class PayTableQueryResult {
+public class PayTableResponse {
     private Long id;
     private String name;
     private String shortName;
@@ -21,9 +21,9 @@ public class PayTableQueryResult {
     private Level level;
     private List<PayGrade> payGrades;
     private String description;
-    private Boolean active;
+    private Boolean published;
 
-    public PayTableQueryResult() {
+    public PayTableResponse() {
     }
 
     public Long getId() {
@@ -90,16 +90,17 @@ public class PayTableQueryResult {
         this.description = description;
     }
 
-    public Boolean getActive() {
-        return active;
+    public Boolean getPublished() {
+        return published;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 
-    public PayTableQueryResult(String name, String shortName, String description, Long startDateMillis, Date endDateMillis) {
+    public PayTableResponse(String name, String shortName, String description, Long startDateMillis, Date endDateMillis, Boolean published) {
         this.name = name;
+        this.published = published;
         this.description = description;
         this.shortName = shortName;
         this.startDateMillis = startDateMillis;

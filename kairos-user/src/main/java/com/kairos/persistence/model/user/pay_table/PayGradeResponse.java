@@ -2,7 +2,7 @@ package com.kairos.persistence.model.user.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.response.dto.web.pay_table.PayTableMatrixDTO;
+import com.kairos.response.dto.web.pay_table.PayGroupAreaDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -13,14 +13,14 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-public class PayGradeQueryResult {
+public class PayGradeResponse {
     private Long payTableId;
     private Long payGradeLevel;
     private Long payGradeId;
-    private Boolean active;
-    private List<PayTableMatrixDTO> payTableMatrix;
+    private Boolean published;
+    private List<PayGroupAreaDTO> payGroupAreas;
 
-    public PayGradeQueryResult() {
+    public PayGradeResponse() {
         //default
     }
 
@@ -48,27 +48,29 @@ public class PayGradeQueryResult {
         this.payGradeId = payGradeId;
     }
 
-    public List<PayTableMatrixDTO> getPayTableMatrix() {
-        return payTableMatrix;
+    public List<PayGroupAreaDTO> getPayGroupAreas() {
+        return payGroupAreas;
     }
 
-    public void setPayTableMatrix(List<PayTableMatrixDTO> payTableMatrix) {
-        this.payTableMatrix = payTableMatrix;
+    public void setPayGroupAreas(List<PayGroupAreaDTO> payGroupAreas) {
+        this.payGroupAreas = payGroupAreas;
     }
 
-    public Boolean getActive() {
-        return active;
+    public Boolean getPublished() {
+        return published;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 
-    public PayGradeQueryResult(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayTableMatrixDTO> payTableMatrix, Boolean active) {
+    public PayGradeResponse(Long payTableId, Long payGradeLevel, Long payGradeId, List<PayGroupAreaDTO> payGroupAreas, Boolean published) {
         this.payTableId = payTableId;
         this.payGradeLevel = payGradeLevel;
         this.payGradeId = payGradeId;
-        this.payTableMatrix = payTableMatrix;
-        this.active = active;
+        this.payGroupAreas = payGroupAreas;
+        this.published = published;
     }
+
+
 }
