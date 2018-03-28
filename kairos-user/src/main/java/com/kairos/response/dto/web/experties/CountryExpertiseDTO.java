@@ -2,12 +2,15 @@ package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.user.pay_table.FutureDate;
+import org.joda.time.DateTime;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by prerna on 14/11/17.
@@ -52,6 +55,11 @@ public class CountryExpertiseDTO {
 
 
     public CountryExpertiseDTO() {
+    }
+
+    public CountryExpertiseDTO(Long id, @Valid SeniorityLevelDTO seniorityLevel) {
+        this.id = id;
+        this.seniorityLevel = seniorityLevel;
     }
 
     public Long getId() {
@@ -166,17 +174,32 @@ public class CountryExpertiseDTO {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-//    @AssertTrue(message = "'start date' must be less than 'end date'.")
-//    public boolean isValid() {
-//        if (!Optional.ofNullable(this.startDateMillis).isPresent()) {
-//            return false;
-//        }
-//        if (Optional.ofNullable(this.endDateMillis).isPresent()) {
-//            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-//            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-//            boolean dateValue = (endDateAsUtc.isBefore(startDateAsUtc)) ? false : true;
-//            return dateValue;
-//        }
-//        return true;
-//    }
+    public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Long serviceId, @NotNull(message = "union can not be null") Long unionId, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @NotNull(message = "PayTable can not be null") Long payTableId, @NotNull(message = "Paid Out Frequency can not be null") PaidOutFrequencyEnum paidOutFrequency, @Valid SeniorityLevelDTO seniorityLevel) {
+        this.name = name;
+        this.description = description;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.organizationLevelId = organizationLevelId;
+        this.serviceId = serviceId;
+        this.unionId = unionId;
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+        this.payTableId = payTableId;
+        this.paidOutFrequency = paidOutFrequency;
+        this.seniorityLevel = seniorityLevel;
+    }
+
+    @AssertTrue(message = "'start date' must be less than 'end date'.")
+    public boolean isValid() {
+        if (!Optional.ofNullable(this.startDateMillis).isPresent()) {
+            return false;
+        }
+        if (Optional.ofNullable(this.endDateMillis).isPresent()) {
+            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            boolean dateValue = (endDateAsUtc.isBefore(startDateAsUtc)) ? false : true;
+            return dateValue;
+        }
+        return true;
+    }
 }

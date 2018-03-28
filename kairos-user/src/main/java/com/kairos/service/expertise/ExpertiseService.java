@@ -62,7 +62,7 @@ public class ExpertiseService extends UserBaseService {
     private PayGroupAreaGraphRepository payGroupAreaGraphRepository;
 
 
-    public Map<String, Object> saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
+    public Expertise saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid country Id");
@@ -84,7 +84,7 @@ public class ExpertiseService extends UserBaseService {
 
 
         save(expertise);
-        return expertise.retrieveDetails();
+        return expertise;
     }
 
     private void prepareExpertise(Expertise expertise, CountryExpertiseDTO expertiseDTO, Long countryId) {
@@ -134,7 +134,8 @@ public class ExpertiseService extends UserBaseService {
         seniorityLevel.setPensionPercentage(seniorityLevelDTO.getPensionPercentage());
         seniorityLevel.setFreeChoicePercentage(seniorityLevelDTO.getFreeChoicePercentage());
         seniorityLevel.setFreeChoiceToPension(seniorityLevelDTO.getFreeChoiceToPension());
-        if (!seniorityLevelDTO.getPayGroupAreas().isEmpty()) {
+
+        if (Optional.ofNullable(seniorityLevelDTO.getPayGroupAreas()).isPresent() && !seniorityLevelDTO.getPayGroupAreas().isEmpty()) {
             List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(seniorityLevelDTO.getPayGroupAreas());
             if (payGroupAreas.size() != seniorityLevelDTO.getPayGroupAreas().size())
                 throw new ActionNotPermittedException("Unable to get all payGroup Areas");

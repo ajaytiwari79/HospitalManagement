@@ -101,6 +101,25 @@ public class SeniorityLevelDTO {
         this.freeChoiceToPension = freeChoiceToPension;
     }
 
+    public SeniorityLevelDTO(Integer from, Integer to,  Integer basePayGrade, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension) {
+        this.from = from;
+        this.to = to;
+
+
+        this.basePayGrade = basePayGrade;
+
+        this.pensionPercentage = pensionPercentage;
+        this.freeChoicePercentage = freeChoicePercentage;
+        this.freeChoiceToPension = freeChoiceToPension;
+    }
+
+    public SeniorityLevelDTO(Integer moreThan, Integer basePayGrade, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension) {
+        this.moreThan = moreThan;
+        this.basePayGrade = basePayGrade;
+        this.pensionPercentage = pensionPercentage;
+        this.freeChoicePercentage = freeChoicePercentage;
+        this.freeChoiceToPension = freeChoiceToPension;
+    }
     // from 2-4(to)
 //    @AssertTrue(message = "Incorrect interval")
 //    public boolean isValid() {
