@@ -1165,9 +1165,9 @@ public class OrganizationController {
     @RequestMapping(value = "/unit/{unitId}/client/filters", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationClientsWithFilters(@PathVariable Long unitId, @RequestBody ClientFilterDTO clientFilterDTO,
-                                                                                 @RequestParam("start") String start, @RequestParam("moduleId") String moduleId) {
+                                                                                 @RequestParam("start") String start, @RequestParam("moduleId") String moduleId,@PathVariable Long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start, moduleId));
+                clientService.getOrganizationClientsWithFilter(unitId, clientFilterDTO, start, moduleId,organizationId));
     }
 
     @RequestMapping(value = UNIT_URL + "/dayTypebydate", method = RequestMethod.GET)
@@ -1181,30 +1181,30 @@ public class OrganizationController {
     @RequestMapping(value = "/addStaffFavouriteFilters", method = RequestMethod.POST)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addStaffFavouriteFilters(@RequestBody StaffFilterDTO staffFilterDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.addStaffFavouriteFilters(staffFilterDTO));
+    public ResponseEntity<Map<String, Object>> addStaffFavouriteFilters(@RequestBody StaffFilterDTO staffFilterDTO,@PathVariable long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.addStaffFavouriteFilters(staffFilterDTO,organizationId));
     }
 
 
     @RequestMapping(value = "/updateStaffFavouriteFilters", method = RequestMethod.POST)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateStaffFavouriteFilters(@RequestBody StaffFilterDTO staffFilterDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updateStaffFavouriteFilters(staffFilterDTO));
+    public ResponseEntity<Map<String, Object>> updateStaffFavouriteFilters(@PathVariable long organizationId, @RequestBody StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updateStaffFavouriteFilters(staffFilterDTO,organizationId));
     }
 
     @RequestMapping(value = "/removeStaffFavouriteFilters/{staffFavouriteFilterId}", method = RequestMethod.DELETE)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> removeStaffFavouriteFilters(@PathVariable Long staffFavouriteFilterId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.removeStaffFavouriteFilters(staffFavouriteFilterId));
+    public ResponseEntity<Map<String, Object>> removeStaffFavouriteFilters(@PathVariable Long staffFavouriteFilterId,@PathVariable long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.removeStaffFavouriteFilters(staffFavouriteFilterId,organizationId));
     }
 
     @RequestMapping(value = "/getStaffFavouriteFilters/{moduleId}", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffFavouriteFilters(@PathVariable String moduleId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffFavouriteFilters(moduleId));
+    public ResponseEntity<Map<String, Object>> getStaffFavouriteFilters(@PathVariable long organizationId, @PathVariable String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffFavouriteFilters(moduleId, organizationId));
     }
 
     // DayType
