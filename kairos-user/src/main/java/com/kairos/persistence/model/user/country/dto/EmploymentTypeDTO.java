@@ -98,16 +98,20 @@ public class EmploymentTypeDTO extends UserBaseEntity {
         employmentType.setAllowedForContactPerson(this.isAllowedForContactPerson());
         employmentType.setAllowedForShiftPlan(this.isAllowedForShiftPlan());
         employmentType.setAllowedForFlexPool(this.isAllowedForFlexPool());
+        employmentType.setPermanent(this.isPermanent());
+        employmentType.setTemporary(this.isTemporary());
+        employmentType.setGuest(this.isGuest());
+
         return employmentType;
     }
     @AssertTrue(message = "At least one field should be selected")
     public boolean isValid() {
 
-        if (allowedForContactPerson || allowedForShiftPlan || allowedForFlexPool || permanent || temporary ||guest) {
+        if (permanent || temporary ||guest) {
             return true;
         }
 
-        return true;
+        return false;
     }
 
 }
