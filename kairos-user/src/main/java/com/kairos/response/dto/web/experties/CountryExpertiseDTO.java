@@ -49,8 +49,11 @@ public class CountryExpertiseDTO {
     private Long payTableId;
     @NotNull(message = "Paid Out Frequency can not be null")
     private PaidOutFrequencyEnum paidOutFrequency;
+
     @Valid
     private SeniorityLevelDTO seniorityLevel;
+
+
     private List<Long> tags;
     private Boolean published;
 
@@ -181,6 +184,10 @@ public class CountryExpertiseDTO {
 
     public void setNumberOfWorkingDaysInWeek(Integer numberOfWorkingDaysInWeek) {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+    }
+
+    public Boolean getPublished() {
+        return published;
     }
 
     public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Long serviceId, @NotNull(message = "union can not be null") Long unionId, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @NotNull(message = "PayTable can not be null") Long payTableId, @NotNull(message = "Paid Out Frequency can not be null") PaidOutFrequencyEnum paidOutFrequency, @Valid SeniorityLevelDTO seniorityLevel) {

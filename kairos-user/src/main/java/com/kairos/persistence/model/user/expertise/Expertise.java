@@ -64,6 +64,7 @@ public class Expertise extends UserBaseEntity {
 
     @Relationship(type = HAS_DRAFT_EXPERTISE)
     private Expertise expertise;
+
     private boolean published;
     private boolean hasDraftCopy;
 

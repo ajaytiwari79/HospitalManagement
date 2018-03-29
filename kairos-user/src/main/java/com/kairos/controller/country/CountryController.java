@@ -908,6 +908,14 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, expertiseService.saveExpertise(countryId, expertise));
     }
 
+    // TODO REMOVE
+    @ApiOperation(value = "Create Expertise")
+    @RequestMapping(value = COUNTRY_URL + "/expertiseCopy", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createCopyOfExpertise(@PathVariable long countryId, @Validated @RequestBody CountryExpertiseDTO expertise) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, expertiseService.createCopyOfExpertise(null, expertise, countryId));
+    }
+
     @ApiOperation(value = "Get Available expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

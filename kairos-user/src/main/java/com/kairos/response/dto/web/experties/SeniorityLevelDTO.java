@@ -2,10 +2,8 @@ package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.validation.constraints.AssertTrue;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -19,7 +17,7 @@ public class SeniorityLevelDTO {
     private Integer moreThan;
     private List<FunctionsDTO> functions;
     private Integer basePayGrade;  // this is payGrade Id which is coming from payTable
-    private Set<Long> payGroupAreas;// applicable payGroup areas
+    private Set<Long> payGroupAreasIds;// applicable payGroup areas
     // TODO We are unclear about this just adding and make sure this will utilize in future.
     private BigDecimal pensionPercentage;
     private BigDecimal freeChoicePercentage;
@@ -38,12 +36,12 @@ public class SeniorityLevelDTO {
         this.id = id;
     }
 
-    public Set<Long> getPayGroupAreas() {
-        return payGroupAreas;
+    public Set<Long> getPayGroupAreasIds() {
+        return payGroupAreasIds;
     }
 
-    public void setPayGroupAreas(Set<Long> payGroupAreas) {
-        this.payGroupAreas = payGroupAreas;
+    public void setPayGroupAreasIds(Set<Long> payGroupAreasIds) {
+        this.payGroupAreasIds = payGroupAreasIds;
     }
 
     public Integer getFrom() {

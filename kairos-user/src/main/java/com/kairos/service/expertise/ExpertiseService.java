@@ -1,5 +1,6 @@
 package com.kairos.service.expertise;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
@@ -18,21 +19,21 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelFunctionRelationshipGraphRepository;
+import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
-import com.kairos.response.dto.web.experties.FunctionsDTO;
-import com.kairos.response.dto.web.experties.SeniorityLevelDTO;
-import com.kairos.response.dto.web.experties.UnionServiceWrapper;
+import com.kairos.response.dto.web.experties.*;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.util.DateUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,32 +67,152 @@ public class ExpertiseService extends UserBaseService {
 
     @Inject
     private SeniorityLevelFunctionRelationshipGraphRepository seniorityLevelFunctionRelationshipGraphRepository;
+    @Inject
+    ObjectMapper objectMapper;
+    @Inject
+    private SeniorityLevelGraphRepository seniorityLevelGraphRepository;
 
-    public CountryExpertiseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
+    public ExpertiseResponseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid country Id");
         }
+        ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
         Expertise expertise = null;
+
         if (!Optional.ofNullable(expertiseDTO.getId()).isPresent()) {
             expertise = new Expertise();
             expertise.setCountry(country);
             prepareExpertise(expertise, expertiseDTO, countryId);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
+            expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
+            expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
+
         } else {
             // Expertise is already created only need to add Sr level
             expertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid expertise Id");
             }
-            SeniorityLevel seniorityLevel = new SeniorityLevel();
-            addSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
-            save(expertise);
-            expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
+            if (expertise.isPublished()) {
+                // Expertise is already published Now we need to maintain a tempCopy of it.
+
+            } else {
+                SeniorityLevel seniorityLevel = new SeniorityLevel();
+                addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+                save(expertise);
+                expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
+                expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
+                expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
+            }
         }
 
-        return expertiseDTO;
+        return expertiseResponseDTO;
     }
+
+    public ExpertiseResponseDTO createCopyOfExpertise(Expertise expertise, CountryExpertiseDTO expertiseDTO, Long countryId) {
+        ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
+        expertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
+        Expertise copiedExpertise = new Expertise();
+        BeanUtils.copyProperties(expertise, copiedExpertise);
+        copiedExpertise.setId(null);
+        expertise.setHasDraftCopy(true);
+        copiedExpertise.setExpertise(expertise);
+        copiedExpertise.setSeniorityLevel(null);
+        List<SeniorityLevelDTO> seniorityLevelDTOList = copySeniorityLevelInExpertise(copiedExpertise, expertise.getSeniorityLevel(), expertiseDTO);
+
+        expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
+        expertiseResponseDTO.setId(copiedExpertise.getId());
+        expertiseResponseDTO.setPublished(false);
+        expertiseResponseDTO.setSeniorityLevels(seniorityLevelDTOList);
+        return expertiseResponseDTO;
+    }
+
+
+    /* Add previously added seniority level in current.
+        This method is used to to copy sr level from and expertise and add in another expertise.
+*/
+    private List<SeniorityLevelDTO> copySeniorityLevelInExpertise(Expertise expertise, List<SeniorityLevel> seniorityLevels, CountryExpertiseDTO expertiseDTO) {
+        List<SeniorityLevelDTO> seniorityLevelResponse = new ArrayList<>();
+        //  Adding the currently added Sr level in expertise.
+        SeniorityLevel seniorityLevel = new SeniorityLevel();
+
+        addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+        expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
+        seniorityLevelResponse.add(expertiseDTO.getSeniorityLevel());
+
+
+        List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList<>();
+        // Iterating on all object from DB and now copying to new Object
+        for (SeniorityLevel seniorityLevelFromDB : seniorityLevels) {
+
+            seniorityLevel = new SeniorityLevel();
+            BeanUtils.copyProperties(seniorityLevelFromDB, seniorityLevel);
+            seniorityLevel.setId(null);
+            FunctionAndSeniorityLevelQueryResult functionAndSeniorityLevel = seniorityLevelGraphRepository.getFunctionAndPayGroupAreaBySeniorityLevelId(seniorityLevelFromDB.getId());
+
+            // TODO java.lang.ClassCastException: java.util.Collections$UnmodifiableMap cannot be cast to com.kairos.response.dto.web.experties.FunctionsDTO
+
+            if (Optional.ofNullable(functionAndSeniorityLevel.getFunctions()).isPresent() && !functionAndSeniorityLevel.getFunctions().isEmpty()) {
+
+                for (Map<String, Object> currentObje : functionAndSeniorityLevel.getFunctions()) {
+                    BigDecimal functionAmount = new BigDecimal(currentObje.get("amount").toString());
+                    Long currentFunctionId = (Long) currentObje.get("functionId");
+                    SeniorityLevelFunctionsRelationship functionsRelationship = new SeniorityLevelFunctionsRelationship(seniorityLevel, new Function(currentFunctionId), functionAmount);
+                    seniorityLevelFunctionsRelationships.add(functionsRelationship);
+                }
+            }
+
+            if (Optional.ofNullable(functionAndSeniorityLevel.getPayGroupAreas()).isPresent() && !functionAndSeniorityLevel.getPayGroupAreas().isEmpty()) {
+                seniorityLevel.setPayGroupAreas(functionAndSeniorityLevel.getPayGroupAreas());
+            }
+
+            if (seniorityLevelFromDB.getMoreThan() != null)
+                seniorityLevel.setMoreThan(seniorityLevelFromDB.getMoreThan());
+            else {
+                seniorityLevel.setFrom(seniorityLevelFromDB.getFrom());
+                seniorityLevel.setTo(seniorityLevelFromDB.getTo());
+            }
+            seniorityLevel.setBasePayGrade(seniorityLevelFromDB.getBasePayGrade());
+            seniorityLevel.setPensionPercentage(seniorityLevelFromDB.getPensionPercentage());
+            seniorityLevel.setFreeChoicePercentage(seniorityLevelFromDB.getFreeChoicePercentage());
+            seniorityLevel.setFreeChoiceToPension(seniorityLevelFromDB.getFreeChoiceToPension());
+
+            expertise.getSeniorityLevel().add(seniorityLevel);
+            seniorityLevelResponse.add(getSeniorityLevelResponse(seniorityLevel, functionAndSeniorityLevel));
+
+        }
+        save(expertise);
+        seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
+
+
+        return seniorityLevelResponse;
+
+    }
+
+    /*This method is responsible for generating SL response */
+    private SeniorityLevelDTO getSeniorityLevelResponse(SeniorityLevel seniorityLevel, FunctionAndSeniorityLevelQueryResult functionAndSeniorityLevel) {
+        SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO();
+        ObjectMapper objectMapper = new ObjectMapper();
+        seniorityLevelDTO = objectMapper.convertValue(seniorityLevel, SeniorityLevelDTO.class);
+        if (Optional.ofNullable(functionAndSeniorityLevel.getPayGroupAreas()).isPresent() && !functionAndSeniorityLevel.getPayGroupAreas().isEmpty()) {
+            Set<Long> payGroupAreasId = functionAndSeniorityLevel.getPayGroupAreas().stream().map(PayGroupArea::getId).collect(Collectors.toSet());
+            seniorityLevelDTO.setPayGroupAreasIds(payGroupAreasId);
+        }
+
+        if (Optional.ofNullable(functionAndSeniorityLevel.getFunctions()).isPresent() && !functionAndSeniorityLevel.getFunctions().isEmpty()) {
+            List<FunctionsDTO> allFunctions = new ArrayList<>();
+            for (Map<String, Object> currentObje : functionAndSeniorityLevel.getFunctions()) {
+                BigDecimal functionAmount = new BigDecimal(currentObje.get("amount").toString());
+                Long currentFunctionId = (Long) currentObje.get("functionId");
+                FunctionsDTO function = new FunctionsDTO(functionAmount, currentFunctionId);
+                allFunctions.add(function);
+            }
+            seniorityLevelDTO.setFunctions(allFunctions);
+        }
+        return seniorityLevelDTO;
+    }
+
 
     private void prepareExpertise(Expertise expertise, CountryExpertiseDTO expertiseDTO, Long countryId) {
         expertise.setName(expertiseDTO.getName().trim());
@@ -124,7 +245,7 @@ public class ExpertiseService extends UserBaseService {
         SeniorityLevel seniorityLevel = null;
         if (expertiseDTO.getSeniorityLevel() != null) {
             seniorityLevel = new SeniorityLevel();
-            seniorityLevel = addSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+            seniorityLevel = addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
 
         }
         save(expertise);
@@ -136,7 +257,7 @@ public class ExpertiseService extends UserBaseService {
 
     }
 
-    private SeniorityLevel addSeniorityLevelInExpertise(Expertise expertise, SeniorityLevel seniorityLevel, SeniorityLevelDTO seniorityLevelDTO) {
+    private SeniorityLevel addNewSeniorityLevelInExpertise(Expertise expertise, SeniorityLevel seniorityLevel, SeniorityLevelDTO seniorityLevelDTO) {
         List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList<>();
         if (Optional.ofNullable(seniorityLevelDTO.getFunctions()).isPresent() && !seniorityLevelDTO.getFunctions().isEmpty()) {
             Set<Long> functionIds = seniorityLevelDTO.getFunctions().stream().map(FunctionsDTO::getFunctionId).collect(Collectors.toSet());
@@ -150,9 +271,9 @@ public class ExpertiseService extends UserBaseService {
                 seniorityLevelFunctionsRelationships.add(functionsRelationship);
             }
         }
-        if (Optional.ofNullable(seniorityLevelDTO.getPayGroupAreas()).isPresent() && !seniorityLevelDTO.getPayGroupAreas().isEmpty()) {
-            List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(seniorityLevelDTO.getPayGroupAreas());
-            if (payGroupAreas.size() != seniorityLevelDTO.getPayGroupAreas().size())
+        if (Optional.ofNullable(seniorityLevelDTO.getPayGroupAreasIds()).isPresent() && !seniorityLevelDTO.getPayGroupAreasIds().isEmpty()) {
+            List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(seniorityLevelDTO.getPayGroupAreasIds());
+            if (payGroupAreas.size() != seniorityLevelDTO.getPayGroupAreasIds().size())
                 throw new ActionNotPermittedException("Unable to get all payGroup Areas");
             seniorityLevel.setPayGroupAreas(payGroupAreas);
         }
