@@ -1,11 +1,13 @@
 package com.kairos.persistence.model.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
  * Created by pavan on 27/3/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@QueryResult
 public class StaffExperienceInExpertiseDTO {
     private Long id;
     private String name;

@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.staff;
 
+import com.kairos.persistence.model.user.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.user.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -15,4 +16,9 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
     @Query("MATCH(staff:Staff)-[rel:STAFF_HAS_EXPERTISE]-(expertise:Expertise) where id(staff) = {0} " +
             "DETACH delete rel")
     void unlinkPreviousExpertise(Long staffId);
+
+
+    @Query("MATCH (staff:Staff)-[rel:STAFF_HAS_EXPERTISE]->(expertise:Expertise) where id(staff) = {0}" +
+            " return id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.relevantExperienceInMonths as relevantExperienceInMonths ")
+    List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffId(Long staffId);
 }

@@ -1,4 +1,5 @@
 package com.kairos.service.expertise;
+
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -10,7 +11,6 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
-import com.kairos.response.dto.web.pay_table.PayTableMatrixDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.util.DateUtil;
@@ -20,10 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by prabjot on 28/10/16.

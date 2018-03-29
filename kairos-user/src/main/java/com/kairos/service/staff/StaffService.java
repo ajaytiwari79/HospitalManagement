@@ -309,11 +309,13 @@ public class StaffService extends UserBaseService {
         map.put("currentStatus", staff.getCurrentStatus());
         map.put("signature", staff.getSignature());
         map.put("inactiveFrom", DateConverter.getDate(staff.getInactiveFrom()));
-        map.put("expertiseId", staffGraphRepository.getExpertiseId(staff.getId()));
         map.put("languageId", staffGraphRepository.getLanguageId(staff.getId()));
         map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));
         map.put("cprNumber", staff.getCprNumber());
         map.put("careOfName", staff.getCareOfName());
+        List<StaffExperienceInExpertiseDTO> expertiseWithExperience=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffId(staff.getId());
+        map.put("expertiseIds",expertiseWithExperience.stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
+        map.put("expertiseWithExperience",expertiseWithExperience);
 
         // Visitour Speed Profile
         map.put("speedPercent", staff.getSpeedPercent());
