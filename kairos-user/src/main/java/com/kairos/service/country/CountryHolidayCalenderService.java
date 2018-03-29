@@ -71,7 +71,7 @@ public class CountryHolidayCalenderService extends UserBaseService {
      * @param countryHolidayCalender
      * @return
      */
-    public Map<String, Object> updateCountryCalender(Map<String,Object> countryHolidayCalender){
+    public Map<String, Object> updateCountryCalender(Map<String,Object> countryHolidayCalender) throws Exception{
         logger.info("Data Received: "+countryHolidayCalender);
         Long id = Long.valueOf(String.valueOf(countryHolidayCalender.get("id")));
         CountryHolidayCalender calender = countryHolidayCalenderGraphRepository.findOne(id);
@@ -81,7 +81,9 @@ public class CountryHolidayCalenderService extends UserBaseService {
 
             if (dayType!=null){
                 dayType.setColorCode(String.valueOf(countryHolidayCalender.get("colorCode")));
-                calender.setHolidayDate(Long.valueOf(String.valueOf(countryHolidayCalender.get("holidayDate"))));
+                String holidayDate = (String)(countryHolidayCalender.get("holidayDate"));
+                calender.setHolidayDate(DateUtil.getIsoDateInLong(holidayDate));
+                //calender.setHolidayDate(Long.valueOf(String.valueOf(countryHolidayCalender.get("holidayDate"))));
                 calender.setHolidayTitle((String) countryHolidayCalender.get("text"));
                 calender.setDescription((String) countryHolidayCalender.get("description"));
                 calender.setDayType(dayType);
