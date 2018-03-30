@@ -198,4 +198,10 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "id(org) as unitId " )
     List<UnitPositionQueryResult> getAllUnitPositionsByUser(long userId);
 
+    @Query("MATCH(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(subOrg:Organization) where id(unitPosition)={0} " +
+            "MATCH(unitPosition)<-[:" + BELONGS_TO_STAFF + "]-(staff:Staff) " +
+            "MATCH(staff)<-[:" + BELONGS_TO + "]-(employment:Employment) " +
+            "MATCH(employment)<-[:" +HAS_EMPLOYMENTS + "]-(org:Organization) " +
+            "RETURN id(subOrg) as unitId,id(org) as parentUnitId")
+    UnitPositionQueryResult getUnitIdAndParentUnitIdByUnitPositionId(Long unitPositionId);
 }

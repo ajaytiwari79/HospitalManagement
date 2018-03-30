@@ -39,6 +39,7 @@ public class UnitPositionDTO {
     // private Long expiryDate;
 
     private Long unionId;
+    private Long parentUnitId;
 
     //@NotNull(message = "unitId  is required for position")
     //@Range(min = 0, message = "unit Id  is required for position")
@@ -238,5 +239,13 @@ public class UnitPositionDTO {
 
     public void setTimeCareExternalId(Long timeCareExternalId) {
         this.timeCareExternalId = timeCareExternalId;
+    }
+
+    public Long getParentUnitId() {
+        return parentUnitId;
+    }
+
+    public void setParentUnitId(Long parentUnitId) {
+        this.parentUnitId = parentUnitId;
     }
 }

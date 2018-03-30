@@ -462,11 +462,15 @@ public class UnitPositionService extends UserBaseService {
 
 
     public UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition) {
-        UnitPositionQueryResult
-                result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
+        UnitPositionQueryResult unitPositionQueryResult=unitPositionGraphRepository.getUnitIdAndParentUnitIdByUnitPositionId(unitPosition.getId());
+        UnitPositionQueryResult  result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
                 unitPosition.getId(), unitPosition.getEmploymentType(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
                 unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), unitPosition.getWorkingTimeAgreement());
+        result.setUnitId(unitPositionQueryResult.getUnitId());
+        result.setParentUnitId(unitPositionQueryResult.getParentUnitId());
+
+
         return result;
     }
 
