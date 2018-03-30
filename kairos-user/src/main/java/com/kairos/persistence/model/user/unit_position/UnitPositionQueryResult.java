@@ -38,6 +38,8 @@ public class UnitPositionQueryResult {
     private CostTimeAgreement costTimeAgreement;
     private Organization union;
     private Long lastWorkingDateMillis;
+    private Long parentUnitId;
+    private Long unitId;
 
     public int getWorkingDaysInWeek() {
         return workingDaysInWeek;
@@ -189,6 +191,21 @@ public class UnitPositionQueryResult {
         this.lastWorkingDateMillis = lastWorkingDateMillis;
     }
 
+    public Long getParentUnitId() {
+        return parentUnitId;
+    }
+
+    public void setParentUnitId(Long parentUnitId) {
+        this.parentUnitId = parentUnitId;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
 
     public UnitPositionQueryResult() {
         //default cons

@@ -133,6 +133,7 @@ public abstract class RelationshipConstants {
     public static final String HAS_ORGANIZATION_SERVICES = "HAS_ORGANIZATION_SERVICES";
     public static final String CIVILIAN_STATUS = "CIVILIAN_STATUS";
     public static final String HAS_EXPERTISE_IN = "HAS_EXPERTISE_IN";
+    public static final String STAFF_HAS_EXPERTISE = "STAFF_HAS_EXPERTISE";
 
 
     public final static String SERVED_BY_STAFF = "SERVED_BY_STAFF";
