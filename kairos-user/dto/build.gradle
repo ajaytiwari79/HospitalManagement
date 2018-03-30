@@ -7,10 +7,10 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    maven { url "http://localhost:8080/repository/local.kairos/"
+    maven { url "http://172.30.5.250:8080/repository/kairos.dependency.repo/"
         credentials {
             username = "admin"
-            password = "admin2"
+            password = "ZSxvd897GHJKJy7gjGH"
         }}
 }
 
@@ -49,10 +49,10 @@ publishing {
 }
 publishing {
     repositories {
-        maven { url "http://localhost:8080/repository/local.kairos/"
+        maven { url "http://172.30.5.250:8080/repository/kairos.dependency.repo/"
             credentials {
                 username = "admin"
-                password = "admin2"
+                password = "ZSxvd897GHJKJy7gjGH"
             }}
     }
 }
