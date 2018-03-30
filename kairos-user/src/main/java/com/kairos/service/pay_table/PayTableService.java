@@ -517,8 +517,6 @@ public class PayTableService extends UserBaseService {
             response.add(parentPayTable);
 
         }
-
         return response;
-
     }
 }

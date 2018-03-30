@@ -29,11 +29,11 @@ public class ExpertiseQueryResult {
     private PaidOutFrequencyEnum paidOutFrequency;
 
 
-    private Map<String, Object> organizationLevel;
-    private Map<String, Object> organizationService;
+    private Level organizationLevel;
+    private OrganizationService organizationService;
     //TODO in current unwinded property cant be set to any nested domain to QueryResult DTO , We will change if in feature this will handle
-    private Map<String, Object> union;
-    private Map<String, Object> payTable;
+    private Organization union;
+    private PayTable payTable;
     private List<Map<String, Object>> seniorityLevel;
 
     public String getName() {
@@ -108,35 +108,35 @@ public class ExpertiseQueryResult {
         this.paidOutFrequency = paidOutFrequency;
     }
 
-    public Map<String, Object> getOrganizationLevel() {
+    public Level getOrganizationLevel() {
         return organizationLevel;
     }
 
-    public void setOrganizationLevel(Map<String, Object> organizationLevel) {
+    public void setOrganizationLevel(Level organizationLevel) {
         this.organizationLevel = organizationLevel;
     }
 
-    public Map<String, Object> getOrganizationService() {
+    public OrganizationService getOrganizationService() {
         return organizationService;
     }
 
-    public void setOrganizationService(Map<String, Object> organizationService) {
+    public void setOrganizationService(OrganizationService organizationService) {
         this.organizationService = organizationService;
     }
 
-    public Map<String, Object> getUnion() {
+    public Organization getUnion() {
         return union;
     }
 
-    public void setUnion(Map<String, Object> union) {
+    public void setUnion(Organization union) {
         this.union = union;
     }
 
-    public Map<String, Object> getPayTable() {
+    public PayTable getPayTable() {
         return payTable;
     }
 
-    public void setPayTable(Map<String, Object> payTable) {
+    public void setPayTable(PayTable payTable) {
         this.payTable = payTable;
     }
 

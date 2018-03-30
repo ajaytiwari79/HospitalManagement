@@ -142,9 +142,9 @@ public class ExpertiseService extends UserBaseService {
         seniorityLevelResponse.add(expertiseDTO.getSeniorityLevel());
 
 
-        List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList<>();
         // Iterating on all object from DB and now copying to new Object
         for (SeniorityLevel seniorityLevelFromDB : seniorityLevels) {
+            List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList<>();
 
             seniorityLevel = new SeniorityLevel();
             BeanUtils.copyProperties(seniorityLevelFromDB, seniorityLevel);
@@ -155,10 +155,12 @@ public class ExpertiseService extends UserBaseService {
 
             if (Optional.ofNullable(functionAndSeniorityLevel.getFunctions()).isPresent() && !functionAndSeniorityLevel.getFunctions().isEmpty()) {
 
-                for (Map<String, Object> currentObje : functionAndSeniorityLevel.getFunctions()) {
-                    BigDecimal functionAmount = new BigDecimal(currentObje.get("amount").toString());
-                    Long currentFunctionId = (Long) currentObje.get("functionId");
-                    SeniorityLevelFunctionsRelationship functionsRelationship = new SeniorityLevelFunctionsRelationship(seniorityLevel, new Function(currentFunctionId), functionAmount);
+
+                for (Map<String, Object> currentObject : functionAndSeniorityLevel.getFunctions()) {
+                    BigDecimal functionAmount = new BigDecimal(currentObject.get("amount").toString());
+                    Function currentFunction = new Function();
+                    convertToFunctionObjectFromMap(currentFunction, currentObject);
+                    SeniorityLevelFunctionsRelationship functionsRelationship = new SeniorityLevelFunctionsRelationship(seniorityLevel, currentFunction, functionAmount);
                     seniorityLevelFunctionsRelationships.add(functionsRelationship);
                 }
             }
@@ -179,14 +181,25 @@ public class ExpertiseService extends UserBaseService {
             seniorityLevel.setFreeChoiceToPension(seniorityLevelFromDB.getFreeChoiceToPension());
 
             expertise.getSeniorityLevel().add(seniorityLevel);
+            seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
             seniorityLevelResponse.add(getSeniorityLevelResponse(seniorityLevel, functionAndSeniorityLevel));
 
         }
-        save(expertise);
-        seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
+          save(expertise);
 
 
         return seniorityLevelResponse;
+
+    }
+
+    private void convertToFunctionObjectFromMap(Function currentFunction, Map<String, Object> currentObject) {
+        currentFunction.setName(currentObject.get("name").toString());
+        currentFunction.setDescription(currentObject.get("description").toString());
+        Long startDateMillis = new Long(currentObject.get("startDate").toString());
+        currentFunction.setStartDate(new Date(startDateMillis));
+        Long endDateMillis = (currentObject.get("endDate") != null) ? new Long(currentObject.get("endDate").toString()) : null;
+        currentFunction.setEndDate((endDateMillis != null) ? new Date(endDateMillis) : null);
+        currentFunction.setId((Long) currentObject.get("functionId")); // setting the ID so that no new NODE is created
 
     }
 
@@ -316,16 +329,45 @@ public class ExpertiseService extends UserBaseService {
         return currentExpertise.retrieveDetails();
     }
 
-    public boolean deleteExpertise(long expertiseId) {
+    public boolean deleteExpertise(Long expertiseId) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
-        if (expertise != null) {
-            expertise.setEnabled(false);
-            save(expertise);
-            return true;
+        if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
+            throw new DataNotFoundByIdException("Invalid expertise Id");
         }
-        return false;
+        if (expertise.isPublished()) {
+            throw new ActionNotPermittedException("Expertise can't be removed, Its already published");
+
+        }
+        expertise.setDeleted(true);
+        if (Optional.ofNullable(expertise.getSeniorityLevel()).isPresent() && !expertise.getSeniorityLevel().isEmpty()) {
+            for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel())
+                seniorityLevel.setDeleted(true);
+        }
+        save(expertise);
+        return true;
     }
 
+
+    public boolean removeSeniorityLevelFromExpertise(Long expertiseId, Long seniorityLevelId) {
+        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
+        if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
+            throw new DataNotFoundByIdException("Invalid expertise Id");
+        }
+        if (expertise.isPublished()) {
+            throw new ActionNotPermittedException("SeniorityLevelId can't be removed, expertise is already published");
+
+        }
+
+        if (Optional.ofNullable(expertise.getSeniorityLevel()).isPresent() && !expertise.getSeniorityLevel().isEmpty()) {
+            for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel())
+                if (seniorityLevel.getId().equals(seniorityLevelId)) {
+                    seniorityLevel.setDeleted(true);
+                    break;
+                }
+        }
+        save(expertise);
+        return true;
+    }
 
     public Map<String, Object> setExpertiseToStaff(Long staffId, Long expertiseId) {
         Staff currentStaff = staffGraphRepository.findOne(staffId);
@@ -398,4 +440,38 @@ public class ExpertiseService extends UserBaseService {
         unionServiceWrapper.setOrganizationLevels(countryGraphRepository.getLevelsByCountry(countryId));
         return unionServiceWrapper;
     }
+
+    /*This metthod is used to publish an expertise
+    * */
+    public List<Expertise> publishExpertise(Long expertiseId, Long publishedDateMillis) {
+        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
+        if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
+            throw new DataNotFoundByIdException("Invalid expertise id");
+        }
+        if (expertise.isPublished()) {
+            throw new ActionNotPermittedException("expertise is already published");
+        }
+        expertise.setPublished(true);
+        expertise.setStartDateMillis(new Date(publishedDateMillis));
+        for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel()) {
+            seniorityLevel.setPublished(true);
+        }
+        save(expertise);
+        List<Expertise> response = new ArrayList<>();
+        response.add(expertise);
+//        PayTable parentPayTable = payTableGraphRepository.getPermanentPayTableByPayTableId(expertiseId);
+//        if (Optional.ofNullable(parentPayTable).isPresent()) {
+//            expertise.setStartDateMillis(new Date(publishedDateMillis));
+//            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDateMillis - ONE_DAY);
+//            parentPayTable.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
+//            parentPayTable.setHasTempCopy(false);
+//            payTable.setPublished(true);
+//            parentPayTable.setPayTable(null);
+//            response.add(parentPayTable);
+//
+//        }
+        return response;
+    }
+
+
 }

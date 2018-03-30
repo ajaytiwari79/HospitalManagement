@@ -16,14 +16,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExpertiseResponseDTO {
     private Long id;
-
-
     private String name;
-
     private String description;
     @DateLong
     private Date startDateMillis;
-
     @DateLong
     private Date endDateMillis;
     private Long organizationLevelId;
@@ -31,10 +27,7 @@ public class ExpertiseResponseDTO {
     private Long unionId;
     private int fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
-
-
     private Long payTableId;
-
     private PaidOutFrequencyEnum paidOutFrequency;
     private List<SeniorityLevelDTO> seniorityLevels = new ArrayList<>();
     private List<Long> tags;

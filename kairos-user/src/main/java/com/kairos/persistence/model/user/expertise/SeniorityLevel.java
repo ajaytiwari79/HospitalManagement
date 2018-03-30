@@ -27,9 +27,18 @@ public class SeniorityLevel extends UserBaseEntity {
     private BigDecimal pensionPercentage;
     private BigDecimal freeChoicePercentage;
     private BigDecimal freeChoiceToPension;
+    private boolean published;
 
     public SeniorityLevel() {
         // de
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 
     public Integer getFrom() {
