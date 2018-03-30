@@ -285,7 +285,7 @@ public class StaffController {
      * every staff will have one expertise at time
      *
      * @param staffId
-     * @param expertiseId
+     * @param expertiseIds
      * @return
      */
     @RequestMapping(value = "/{staffId}/expertise/{expertiseId}", method = RequestMethod.POST)
