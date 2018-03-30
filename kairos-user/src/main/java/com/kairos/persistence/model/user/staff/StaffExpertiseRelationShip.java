@@ -7,7 +7,10 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.util.Date;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EXPERTISE_IN;
 import static com.kairos.persistence.model.constants.RelationshipConstants.STAFF_HAS_EXPERTISE;
@@ -26,6 +29,8 @@ public class StaffExpertiseRelationShip extends UserBaseEntity{
     @EndNode
     private Expertise expertise;
     private Integer relevantExperienceInMonths;
+    @DateLong
+    private Date expertiseStartDate;
 
     public StaffExpertiseRelationShip() {
         //Default Constructor
@@ -55,11 +60,22 @@ public class StaffExpertiseRelationShip extends UserBaseEntity{
         this.relevantExperienceInMonths = relevantExperienceInMonths;
     }
 
-    public StaffExpertiseRelationShip(Staff staff, Expertise expertise, Integer relevantExperienceInMonths) {
+    public Date getExpertiseStartDate() {
+        return expertiseStartDate;
+    }
+
+    public void setExpertiseStartDate(Date expertiseStartDate) {
+        this.expertiseStartDate = expertiseStartDate;
+    }
+
+    public StaffExpertiseRelationShip(Long id,Staff staff, Expertise expertise, Integer relevantExperienceInMonths,Date expertiseStartDate) {
+        this.id=id;
         this.staff = staff;
         this.expertise = expertise;
         this.relevantExperienceInMonths = relevantExperienceInMonths;
+        this.expertiseStartDate=expertiseStartDate;
     }
+
 
     @Override
     public String toString() {

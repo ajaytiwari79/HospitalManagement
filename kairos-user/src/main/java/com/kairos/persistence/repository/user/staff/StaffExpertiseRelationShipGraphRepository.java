@@ -13,12 +13,12 @@ import java.util.List;
  */
 @Repository
 public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepository<StaffExpertiseRelationShip, Long> {
-    @Query("MATCH(staff:Staff)-[rel:STAFF_HAS_EXPERTISE]-(expertise:Expertise) where id(staff) = {0} " +
-            "DETACH delete rel")
-    void unlinkPreviousExpertise(Long staffId);
-
 
     @Query("MATCH (staff:Staff)-[rel:STAFF_HAS_EXPERTISE]->(expertise:Expertise) where id(staff) = {0}" +
             " return id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.relevantExperienceInMonths as relevantExperienceInMonths ")
     List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffId(Long staffId);
+
+    @Query("MATCH (staff:Staff)-[rel:STAFF_HAS_EXPERTISE]->(expertise:Expertise) where id(staff) = {0} AND id(expertise)={1}" +
+            " return id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.relevantExperienceInMonths as relevantExperienceInMonths, rel.expertiseStartDate as expertiseStartDate")
+    StaffExperienceInExpertiseDTO getExpertiseWithExperienceByStaffIdAndExpertiseId(Long staffId,Long expertiseId);
 }

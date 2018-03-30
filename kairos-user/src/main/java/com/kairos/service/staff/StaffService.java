@@ -209,13 +209,21 @@ public class StaffService extends UserBaseService {
         if (objectToUpdate == null) {
             throw new InternalError("Staff can't null");
         }
-        staffExpertiseRelationShipGraphRepository.unlinkPreviousExpertise(staffId);
         for(int i=0;i<staffPersonalDetail.getExpertiseWithExperience().size();i++){
-                Expertise expertise = expertiseGraphRepository.findOne(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
-                StaffExpertiseRelationShip staffExpertiseRelationShip
-                        = new StaffExpertiseRelationShip(objectToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths());
-                staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
-                staffPersonalDetail.getExpertiseWithExperience().get(i).setId(staffExpertiseRelationShip.getId());
+            Expertise expertise = expertiseGraphRepository.findOne(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+            StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId,staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+            Date expertiseStartDate;
+            Long id=null;
+            if(Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent()){
+                 expertiseStartDate=  staffExperienceInExpertiseDTO.getExpertiseStartDate();
+                 id=staffExperienceInExpertiseDTO.getId();
+            }
+            else
+                expertiseStartDate=DateUtil.getCurrentDate();
+
+            StaffExpertiseRelationShip staffExpertiseRelationShip=new StaffExpertiseRelationShip(id,objectToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(),expertiseStartDate);
+            staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
+            staffPersonalDetail.getExpertiseWithExperience().get(i).setId(staffExpertiseRelationShip.getId());
         }
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());

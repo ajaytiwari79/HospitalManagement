@@ -1,7 +1,10 @@
 package com.kairos.persistence.model.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.util.Date;
 
 /**
  * Created by pavan on 27/3/18.
@@ -13,6 +16,8 @@ public class StaffExperienceInExpertiseDTO {
     private String name;
     private Long expertiseId;
     private Integer relevantExperienceInMonths;
+    @DateLong
+    private Date expertiseStartDate;
 
 
     public StaffExperienceInExpertiseDTO() {
@@ -51,5 +56,19 @@ public class StaffExperienceInExpertiseDTO {
         this.relevantExperienceInMonths = relevantExperienceInMonths;
     }
 
+    public Date getExpertiseStartDate() {
+        return expertiseStartDate;
+    }
 
+    public void setExpertiseStartDate(Date expertiseStartDate) {
+        this.expertiseStartDate = expertiseStartDate;
+    }
+
+    public StaffExperienceInExpertiseDTO(Long id, String name, Long expertiseId, Integer relevantExperienceInMonths, Date expertiseStartDate) {
+        this.id = id;
+        this.name = name;
+        this.expertiseId = expertiseId;
+        this.relevantExperienceInMonths = relevantExperienceInMonths;
+        this.expertiseStartDate = expertiseStartDate;
+    }
 }
