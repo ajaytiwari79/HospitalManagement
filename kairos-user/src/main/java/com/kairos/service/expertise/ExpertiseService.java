@@ -335,8 +335,10 @@ public class ExpertiseService extends UserBaseService {
         ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
         if (currentExpertise.isPublished()) {
             // current is published now we need to create a copy and update in that and return the updated copy
+
         } else {
             // update in current expertise :)
+
             updateCurrentExpertise(countryId, currentExpertise, expertiseDTO, seniorityLevelToUpdate);
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
@@ -380,16 +382,11 @@ public class ExpertiseService extends UserBaseService {
             }
             expertise.setPayTable(payTable);
         }
-
         expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
         expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
-
-
         expertise.setPaidOutFrequency(expertiseDTO.getPaidOutFrequency());
         if (expertiseDTO.getSeniorityLevel() != null) {
             FunctionAndSeniorityLevelQueryResult functionAndSeniorityLevel = seniorityLevelGraphRepository.getFunctionAndPayGroupAreaBySeniorityLevelId(seniorityLevel.getId());
-
-
             if (Optional.ofNullable(expertiseDTO.getSeniorityLevel().getFunctions()).isPresent()) {
                 List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList();
                 seniorityLevelGraphRepository.removeAllPreviousFunctionsFromSeniorityLevel(expertiseDTO.getSeniorityLevel().getId());
@@ -400,9 +397,7 @@ public class ExpertiseService extends UserBaseService {
                     SeniorityLevelFunctionsRelationship functionsRelationship = new SeniorityLevelFunctionsRelationship(seniorityLevel, currentFunction, functionDTO.getAmount());
                     seniorityLevelFunctionsRelationships.add(functionsRelationship);
                 }
-
                 seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
-
             }
 
             if (Optional.ofNullable(expertiseDTO.getSeniorityLevel().getPayGroupAreasIds()).isPresent()) {
@@ -422,7 +417,6 @@ public class ExpertiseService extends UserBaseService {
 
                 }
             }
-
             if (expertiseDTO.getSeniorityLevel().getMoreThan() != null) {
                 seniorityLevel.setMoreThan(expertiseDTO.getSeniorityLevel().getMoreThan());
                 seniorityLevel.setFrom(null);
@@ -436,16 +430,10 @@ public class ExpertiseService extends UserBaseService {
             seniorityLevel.setPensionPercentage(expertiseDTO.getSeniorityLevel().getPensionPercentage());
             seniorityLevel.setFreeChoicePercentage(expertiseDTO.getSeniorityLevel().getFreeChoicePercentage());
             seniorityLevel.setFreeChoiceToPension(expertiseDTO.getSeniorityLevel().getFreeChoiceToPension());
-
-            //seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
-
-            //   seniorityLevel = addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
-
         }
         save(expertise);
         expertiseDTO.setId(expertise.getId());
         expertiseDTO.setPublished(expertise.isPublished());
-
     }
 
     public boolean deleteExpertise(Long expertiseId) {
