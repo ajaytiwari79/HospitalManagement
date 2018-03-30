@@ -63,8 +63,6 @@ public class Staff extends UserBaseEntity {
     private String visitourTeamId;
     private Language language;
 
-    @Relationship(type = HAS_EXPERTISE_IN)
-    List<Expertise> expertise;
 
     @Relationship(type = HAS_CONTACT_DETAIL)
     private ContactDetail contactDetail;
@@ -203,16 +201,8 @@ public class Staff extends UserBaseEntity {
         return visitourId;
     }
 
-    public List<Expertise> getExpertise() {
-        return expertise;
-    }
-
     public void setVisitourId(long visitourId) {
         this.visitourId = visitourId;
-    }
-
-    public void setExpertise(List<Expertise> expertise) {
-        this.expertise = expertise;
     }
 
     public String getPassword() {
@@ -317,14 +307,6 @@ public class Staff extends UserBaseEntity {
 
     public void setReqFromPerson(String reqFromPerson) {
         this.reqFromPerson = reqFromPerson;
-    }
-
-    public Map<String, Object> retrieveExpertiseDetails() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("staffId", this.getId());
-        map.put("staffName", this.getFirstName() + "   " + this.getLastName());
-        map.put("expertiseList", getExpertise());
-        return map;
     }
 
     public long getOrganizationId() {

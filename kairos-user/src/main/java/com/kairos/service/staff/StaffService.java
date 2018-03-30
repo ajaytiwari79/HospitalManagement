@@ -209,6 +209,7 @@ public class StaffService extends UserBaseService {
         if (objectToUpdate == null) {
             throw new InternalError("Staff can't null");
         }
+        staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId,staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO ::getExpertiseId).collect(Collectors.toList()));
         for(int i=0;i<staffPersonalDetail.getExpertiseWithExperience().size();i++){
             Expertise expertise = expertiseGraphRepository.findOne(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
             StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId,staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
@@ -227,9 +228,8 @@ public class StaffService extends UserBaseService {
         }
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
-        List<Expertise> oldExpertise = objectToUpdate.getExpertise();
+        List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(objectToUpdate.getId());
         objectToUpdate.setLanguage(language);
-        objectToUpdate.setExpertise(expertise);
         objectToUpdate.setFirstName(staffPersonalDetail.getFirstName());
         objectToUpdate.setLastName(staffPersonalDetail.getLastName());
         objectToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());
@@ -461,11 +461,17 @@ public class StaffService extends UserBaseService {
         if (staff == null) {
             return null;
         }
+        List<StaffExpertiseRelationShip> staffExpertiseRelationShips=new ArrayList<>();
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds);
-        if (expertise != null) {
-            staff.setExpertise(expertise);
-            staffGraphRepository.save(staff);
+        for(Expertise currentExpertise:expertise){
+            StaffExpertiseRelationShip staffExpertiseRelationShip=new StaffExpertiseRelationShip(staff,currentExpertise,0,DateUtil.getCurrentDate());
+            staffExpertiseRelationShips.add(staffExpertiseRelationShip);
         }
+//        if (expertise != null) {
+//            staff.setExpertise(expertise);
+//            staffGraphRepository.save(staff);
+//        }
+        staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
         return staff;
     }
 
@@ -476,7 +482,7 @@ public class StaffService extends UserBaseService {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("allExpertise", expertiseGraphRepository.getAllExpertiseByCountry(countryId));
-        map.put("myExpertise", staff.getExpertise().stream().map(Expertise::getId).collect(Collectors.toList()));
+        map.put("myExpertise", staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffId).stream().map(Expertise::getId).collect(Collectors.toList()));
         return map;
     }
 

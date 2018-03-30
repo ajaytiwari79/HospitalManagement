@@ -314,7 +314,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     @Query("MATCH (staff:Staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) where id(staff)={0} return id(engineerType)")
     Long getEngineerTypeId(Long staffId);
 
-    @Query("MATCH (staff:Staff)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) where id(staff)={0} return id(expertise)")
+    @Query("MATCH (staff:Staff)-[:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff)={0} return id(expertise)")
     List<Long> getExpertiseIds(Long staffId);
 
     @Query("MATCH (staff:Staff)-[:LANGUAGE]->(language:Language) where id(staff)={0} return id(language)")
@@ -373,7 +373,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     Staff findStaffByExternalId(Long externalId, Long organizationId);
 
 
-    @Query("MATCH (staff:Staff)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) where id(expertise) IN {1} return staff")
+    @Query("MATCH (staff:Staff)-[:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(expertise) IN {1} return staff")
     List<Staff> getStaffByExperties(Long unitId, List<Long> expertiesIds);
 
     @Query("Match (staff:Staff) where id(staff) IN {0} with staff\n" +

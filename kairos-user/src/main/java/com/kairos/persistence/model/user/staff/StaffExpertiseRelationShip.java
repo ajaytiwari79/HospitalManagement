@@ -76,6 +76,12 @@ public class StaffExpertiseRelationShip extends UserBaseEntity{
         this.expertiseStartDate=expertiseStartDate;
     }
 
+    public StaffExpertiseRelationShip(Staff staff, Expertise expertise, Integer relevantExperienceInMonths, Date expertiseStartDate) {
+        this.staff = staff;
+        this.expertise = expertise;
+        this.relevantExperienceInMonths = relevantExperienceInMonths;
+        this.expertiseStartDate = expertiseStartDate;
+    }
 
     @Override
     public String toString() {
