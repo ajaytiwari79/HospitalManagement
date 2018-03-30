@@ -17,6 +17,7 @@ import com.kairos.response.dto.web.FunctionDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
+import com.kairos.response.dto.web.experties.ExpertiseUpdateDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.*;
@@ -933,8 +934,8 @@ public class CountryController {
     @ApiOperation(value = "Update expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateExpertise(@RequestBody @Validated CountryExpertiseDTO expertise) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(expertise));
+    public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable long countryId,@RequestBody @Validated ExpertiseUpdateDTO expertise) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(countryId,expertise));
     }
 
     @ApiOperation(value = "Delete expertise")

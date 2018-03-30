@@ -154,8 +154,6 @@ public class ExpertiseService extends UserBaseService {
             // TODO java.lang.ClassCastException: java.util.Collections$UnmodifiableMap cannot be cast to com.kairos.response.dto.web.experties.FunctionsDTO
 
             if (Optional.ofNullable(functionAndSeniorityLevel.getFunctions()).isPresent() && !functionAndSeniorityLevel.getFunctions().isEmpty()) {
-
-
                 for (Map<String, Object> currentObject : functionAndSeniorityLevel.getFunctions()) {
                     BigDecimal functionAmount = new BigDecimal(currentObject.get("amount").toString());
                     Function currentFunction = new Function();
@@ -169,7 +167,7 @@ public class ExpertiseService extends UserBaseService {
                 seniorityLevel.setPayGroupAreas(functionAndSeniorityLevel.getPayGroupAreas());
             }
 
-            if (seniorityLevelFromDB.getMoreThan() != null)
+            if (Optional.ofNullable(seniorityLevelFromDB.getMoreThan()).isPresent())
                 seniorityLevel.setMoreThan(seniorityLevelFromDB.getMoreThan());
             else {
                 seniorityLevel.setFrom(seniorityLevelFromDB.getFrom());
@@ -185,7 +183,7 @@ public class ExpertiseService extends UserBaseService {
             seniorityLevelResponse.add(getSeniorityLevelResponse(seniorityLevel, functionAndSeniorityLevel));
 
         }
-          save(expertise);
+        save(expertise);
 
 
         return seniorityLevelResponse;
@@ -317,16 +315,137 @@ public class ExpertiseService extends UserBaseService {
     }
 
 
-    public Map<String, Object> updateExpertise(CountryExpertiseDTO expertiseDTO) {
+    public ExpertiseResponseDTO updateExpertise(Long countryId, ExpertiseUpdateDTO expertiseDTO) {
         Expertise currentExpertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
-        if (currentExpertise == null) {
-            return null;
+        if (!Optional.ofNullable(currentExpertise).isPresent() || currentExpertise.isDeleted()) {
+            throw new DataNotFoundByIdException("Invalid expertise Id");
         }
-        currentExpertise.setName(expertiseDTO.getName());
-        currentExpertise.setDescription(expertiseDTO.getDescription());
-        currentExpertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
-        save(currentExpertise);
-        return currentExpertise.retrieveDetails();
+
+        SeniorityLevel seniorityLevelToUpdate = null;
+        if (Optional.ofNullable(currentExpertise.getSeniorityLevel()).isPresent() && !currentExpertise.getSeniorityLevel().isEmpty()) {
+            for (SeniorityLevel seniorityLevel : currentExpertise.getSeniorityLevel())
+                if (seniorityLevel.getId().equals(expertiseDTO.getSeniorityLevel().getId())) {
+                    seniorityLevelToUpdate = seniorityLevel;
+                    break;
+                }
+        }
+        if (!Optional.ofNullable(seniorityLevelToUpdate).isPresent()) {
+            throw new DataNotFoundByIdException("Seniority Level not found in expertise" + expertiseDTO.getSeniorityLevel().getId());
+        }
+        ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
+        if (currentExpertise.isPublished()) {
+            // current is published now we need to create a copy and update in that and return the updated copy
+        } else {
+            // update in current expertise :)
+            updateCurrentExpertise(countryId, currentExpertise, expertiseDTO, seniorityLevelToUpdate);
+            expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
+            expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
+
+
+        }
+        return expertiseResponseDTO;
+    }
+
+    private void updateCurrentExpertise(Long countryId, Expertise expertise, ExpertiseUpdateDTO expertiseDTO, SeniorityLevel seniorityLevel) {
+        expertise.setName(expertiseDTO.getName().trim());
+        expertise.setDescription(expertiseDTO.getDescription());
+        expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
+        expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
+        if (!expertise.getOrganizationLevel().getId().equals(expertiseDTO.getOrganizationLevelId())) {
+            Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
+            if (!Optional.ofNullable(level).isPresent()) {
+                throw new DataNotFoundByIdException("Invalid level id " + expertiseDTO.getOrganizationLevelId());
+            }
+            expertise.setOrganizationLevel(level);
+        }
+        if (!expertise.getOrganizationService().getId().equals(expertiseDTO.getServiceId())) {
+            OrganizationService organizationService = organizationServiceRepository.findOne(expertiseDTO.getServiceId());
+            if (!Optional.ofNullable(organizationService).isPresent()) {
+                throw new DataNotFoundByIdException("Invalid service id " + expertiseDTO.getServiceId());
+            }
+            expertise.setOrganizationService(organizationService);
+
+        }
+        if (!expertise.getUnion().getId().equals(expertiseDTO.getUnionId())) {
+            Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(expertiseDTO.getUnionId());
+            if (!Optional.ofNullable(union).isPresent()) {
+                throw new DataNotFoundByIdException("Invalid union id " + expertiseDTO.getUnionId());
+            }
+            expertise.setUnion(union);
+        }
+        if (!expertise.getPayTable().getId().equals(expertiseDTO.getPayTableId())) {
+            PayTable payTable = payTableGraphRepository.findOne(expertiseDTO.getPayTableId());
+            if (!Optional.ofNullable(payTable).isPresent()) {
+                throw new DataNotFoundByIdException("Invalid pay Table id " + expertiseDTO.getPayTableId());
+            }
+            expertise.setPayTable(payTable);
+        }
+
+        expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
+        expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
+
+
+        expertise.setPaidOutFrequency(expertiseDTO.getPaidOutFrequency());
+        if (expertiseDTO.getSeniorityLevel() != null) {
+            FunctionAndSeniorityLevelQueryResult functionAndSeniorityLevel = seniorityLevelGraphRepository.getFunctionAndPayGroupAreaBySeniorityLevelId(seniorityLevel.getId());
+
+
+            if (Optional.ofNullable(expertiseDTO.getSeniorityLevel().getFunctions()).isPresent()) {
+                List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList();
+                seniorityLevelGraphRepository.removeAllPreviousFunctionsFromSeniorityLevel(expertiseDTO.getSeniorityLevel().getId());
+                Set<Long> functionIds = expertiseDTO.getSeniorityLevel().getFunctions().stream().map(FunctionsDTO::getFunctionId).collect(Collectors.toSet());
+                List<Function> functions = functionGraphRepository.findAllFunctionsById(functionIds);
+                for (FunctionsDTO functionDTO : expertiseDTO.getSeniorityLevel().getFunctions()) {
+                    Function currentFunction = functions.stream().filter(f -> f.getId().equals(functionDTO.getFunctionId())).findFirst().get();
+                    SeniorityLevelFunctionsRelationship functionsRelationship = new SeniorityLevelFunctionsRelationship(seniorityLevel, currentFunction, functionDTO.getAmount());
+                    seniorityLevelFunctionsRelationships.add(functionsRelationship);
+                }
+
+                seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
+
+            }
+
+            if (Optional.ofNullable(expertiseDTO.getSeniorityLevel().getPayGroupAreasIds()).isPresent()) {
+                Set<Long> previousPayGroups = functionAndSeniorityLevel.getPayGroupAreas() != null ? functionAndSeniorityLevel.getPayGroupAreas().stream().map(PayGroupArea::getId).collect(Collectors.toSet()) : Collections.emptySet();
+                if (expertiseDTO.getSeniorityLevel().getPayGroupAreasIds().isEmpty()) {
+                    // user removed all PayGroupAreas
+                    if (!previousPayGroups.isEmpty())
+                        seniorityLevelGraphRepository.removeAllPreviousPayGroupAreaFromSeniorityLevel(expertiseDTO.getSeniorityLevel().getId());
+                } else {
+                    if (!expertiseDTO.getSeniorityLevel().getPayGroupAreasIds().equals(previousPayGroups)) {
+                        seniorityLevelGraphRepository.removeAllPreviousPayGroupAreaFromSeniorityLevel(expertiseDTO.getSeniorityLevel().getId());
+                        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(expertiseDTO.getSeniorityLevel().getPayGroupAreasIds());
+                        if (payGroupAreas.size() != expertiseDTO.getSeniorityLevel().getPayGroupAreasIds().size())
+                            throw new ActionNotPermittedException("Unable to get all payGroup Areas");
+                        seniorityLevel.setPayGroupAreas(payGroupAreas);
+                    }
+
+                }
+            }
+
+            if (expertiseDTO.getSeniorityLevel().getMoreThan() != null) {
+                seniorityLevel.setMoreThan(expertiseDTO.getSeniorityLevel().getMoreThan());
+                seniorityLevel.setFrom(null);
+                seniorityLevel.setTo(null);
+            } else {
+                seniorityLevel.setFrom(expertiseDTO.getSeniorityLevel().getFrom());
+                seniorityLevel.setTo(expertiseDTO.getSeniorityLevel().getTo());
+                seniorityLevel.setMoreThan(null);
+            }
+            seniorityLevel.setBasePayGrade(expertiseDTO.getSeniorityLevel().getBasePayGrade());
+            seniorityLevel.setPensionPercentage(expertiseDTO.getSeniorityLevel().getPensionPercentage());
+            seniorityLevel.setFreeChoicePercentage(expertiseDTO.getSeniorityLevel().getFreeChoicePercentage());
+            seniorityLevel.setFreeChoiceToPension(expertiseDTO.getSeniorityLevel().getFreeChoiceToPension());
+
+            //seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
+
+            //   seniorityLevel = addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+
+        }
+        save(expertise);
+        expertiseDTO.setId(expertise.getId());
+        expertiseDTO.setPublished(expertise.isPublished());
+
     }
 
     public boolean deleteExpertise(Long expertiseId) {
