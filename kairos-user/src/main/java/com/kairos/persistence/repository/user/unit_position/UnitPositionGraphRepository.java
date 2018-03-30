@@ -132,7 +132,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("Match (org:Organization) where id(org)={0}\n" +
             "Match (e:Expertise) where id(e)={1}\n" +
-            "OPTIONAL MATCH (org)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e)\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement{deleted:false})-[:" + HAS_EXPERTISE_IN + "]->(e) \n" +
             "return cta LIMIT 1")
     CostTimeAgreement getOneDefaultCTA(Long organizationId, Long expertiseId);
 
@@ -149,7 +149,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
             "with staff,employment,org \n" +
             "match(org)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization) with org,subOrg,staff,employment \n" +
-            "optional match(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition) with unitPosition,org,subOrg,staff,employment \n" +
+            "optional match(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false}) with unitPosition,org,subOrg,staff,employment \n" +
             "match(unitPosition)-[:HAS_EXPERTISE_IN ]->(expertise:Expertise) \n" +
             "match(unitPosition)-[:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
@@ -175,7 +175,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "with staff \n" +
             "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
             "with staff,employment,org \n" +
-            "optional match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition) with unitPosition,org,staff,employment \n" +
+            "optional match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false}) with unitPosition,org,staff,employment \n" +
             "match(unitPosition)-[:HAS_EXPERTISE_IN ]->(expertise:Expertise) \n" +
             "match(unitPosition)-[:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +

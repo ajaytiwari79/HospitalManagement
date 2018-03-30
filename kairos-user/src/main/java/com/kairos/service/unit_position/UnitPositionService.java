@@ -369,11 +369,9 @@ public class UnitPositionService extends UserBaseService {
         }
 
         if (Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) {
-
             if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
                 throw new ActionNotPermittedException("Start date can't be less than End Date ");
             }
-            oldUnitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
         }
         if (Optional.ofNullable(unitPositionDTO.getLastWorkingDateMillis()).isPresent()) {
             if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getLastWorkingDateMillis()) {
@@ -382,6 +380,8 @@ public class UnitPositionService extends UserBaseService {
             oldUnitPosition.setLastWorkingDateMillis(unitPositionDTO.getLastWorkingDateMillis());
         }
         oldUnitPosition.setStartDateMillis(unitPositionDTO.getStartDateMillis());
+        oldUnitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
+
 
 
         oldUnitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
