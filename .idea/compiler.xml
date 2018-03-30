@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="dto_main" target="1.8" />
+      <module name="dto_test" target="1.8" />
+      <module name="kairos-user_main" target="1.8" />
+      <module name="kairos-user_test" target="1.8" />
+      <module name="kairosActivity_main" target="1.8" />
+      <module name="kairosActivity_test" target="1.8" />
+      <module name="kairosUser_main" target="1.8" />
+      <module name="kairosUser_test" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

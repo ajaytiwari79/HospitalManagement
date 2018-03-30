@@ -1,1 +1,0 @@
-match(o:Organization)  set o.union=false  return count(o);
