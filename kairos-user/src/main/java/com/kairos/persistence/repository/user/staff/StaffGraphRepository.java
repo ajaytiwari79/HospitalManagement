@@ -228,17 +228,17 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     List<Map<String, Object>> getStaffSkillInfo(long staffId, List<Long> skillId, long unitId);
 
     @Query("Match (staff:Staff) where id(staff)={0} with staff\n" +
-            "Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) where id(expertise)={1} with staff,skill\n" +
+            "Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) where id(expertise) IN {1} with staff,skill\n" +
             "MERGE (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)\n" +
             "ON CREATE SET r.creationDate ={2},r.lastModificationDate ={3},r.isEnabled=true,r.skillLevel={4}\n" +
             "ON MATCH SET r.lastModificationDate = {3},r.skillLevel={4},r.isEnabled=true")
-    void updateSkillsByExpertise(long staffId, long expertiseId, long creationDate, long lastModificationDate, Skill.SkillLevel skillLevel);
+    void updateSkillsByExpertise(long staffId, List<Long> expertiseId, long creationDate, long lastModificationDate, Skill.SkillLevel skillLevel);
 
     @Query("Match (staff:Staff) where id(staff)={0} with staff\n" +
-            "Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) where id(expertise)={1} with staff,skill\n" +
+            "Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) where id(expertise) IN {1} with staff,skill\n" +
             "Match (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)\n" +
             "set r.isEnabled=false")
-    void removeSkillsByExpertise(long staffId, long expertiseId);
+    void removeSkillsByExpertise(long staffId, List<Long> expertiseIds);
 
     @Query("MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]->(employment:Employment) where id(organization)={0} with employment\n" +
             "OPTIONAL MATCH (staff:Staff)<-[:BELONGS_TO]-(employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={1} with unitPermission, staff\n" +
@@ -314,8 +314,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     @Query("MATCH (staff:Staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) where id(staff)={0} return id(engineerType)")
     Long getEngineerTypeId(Long staffId);
 
-    @Query("MATCH (staff:Staff)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) where id(staff)={0} return id(expertise)")
-    Long getExpertiseId(Long staffId);
+    @Query("MATCH (staff:Staff)-[:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff)={0} return id(expertise)")
+    List<Long> getExpertiseIds(Long staffId);
 
     @Query("MATCH (staff:Staff)-[:LANGUAGE]->(language:Language) where id(staff)={0} return id(language)")
     Long getLanguageId(Long staffId);
@@ -373,7 +373,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     Staff findStaffByExternalId(Long externalId, Long organizationId);
 
 
-    @Query("MATCH (staff:Staff)-[:HAS_EXPERTISE_IN]->(expertise:Expertise) where id(expertise) IN {1} return staff")
+    @Query("MATCH (staff:Staff)-[:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(expertise) IN {1} return staff")
     List<Staff> getStaffByExperties(Long unitId, List<Long> expertiesIds);
 
     @Query("Match (staff:Staff) where id(staff) IN {0} with staff\n" +
@@ -386,4 +386,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false}) where staff.externalId={0} AND unitPosition.timeCareExternalId={1} " +
             "return unitPosition,staff ")
     StaffUnitPositionWrapper getStaff(Long externalId, Long timeCareExternalId);
+
+
 }

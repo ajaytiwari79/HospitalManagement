@@ -1,4 +1,5 @@
 package com.kairos.service.expertise;
+
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -6,8 +7,10 @@ import com.kairos.persistence.model.user.expertise.ExpertiseDTO;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
 import com.kairos.service.UserBaseService;
@@ -19,7 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +43,8 @@ public class ExpertiseService extends UserBaseService {
     StaffGraphRepository staffGraphRepository;
     @Inject
     TagService tagService;
+    @Inject
+    StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
 
 
     public Map<String, Object> saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
@@ -83,19 +89,25 @@ public class ExpertiseService extends UserBaseService {
     }
 
 
-    public Map<String,Object> setExpertiseToStaff( Long staffId,Long expertiseId) {
+    public Map<String,Object> setExpertiseToStaff( Long staffId, List<Long> expertiseIds) {
         Staff currentStaff= staffGraphRepository.findOne(staffId);
-        currentStaff.setExpertise(expertiseGraphRepository.findOne(expertiseId));
-        Staff staff = staffGraphRepository.save(currentStaff);
-        return  staff.retrieveExpertiseDetails();
+        List<StaffExpertiseRelationShip> staffExpertiseRelationShips=new ArrayList<>();
+        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds);
+        for(Expertise currentExpertise:expertise){
+            StaffExpertiseRelationShip staffExpertiseRelationShip=new StaffExpertiseRelationShip(currentStaff,currentExpertise,0,DateUtil.getCurrentDate());
+            staffExpertiseRelationShips.add(staffExpertiseRelationShip);
+        }
+        staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
+        return retrieveExpertiseDetails(currentStaff);
+//        currentStaff.setExpertise(expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds));
+//        Staff staff = staffGraphRepository.save(currentStaff);
+//        return  staff.retrieveExpertiseDetails();
     }
 
     public Map<String, Object> getExpertiseToStaff(Long staffId) {
+        //staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffId);
         Staff staff = staffGraphRepository.findOne(staffId);
-        if (staff.getExpertise()==null){
-            return null;
-        }
-        return staff.retrieveExpertiseDetails();
+        return retrieveExpertiseDetails(staff);
     }
 
     /**
@@ -140,5 +152,12 @@ public class ExpertiseService extends UserBaseService {
 
     public Expertise getExpertiseByCountryId(Long countryId){
         return expertiseGraphRepository.getExpertiesByCountry(countryId);
+    }
+    public Map<String, Object> retrieveExpertiseDetails(Staff staff) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("staffId", staff.getId());
+        map.put("staffName", staff.getFirstName() + "   " + staff.getLastName());
+        map.put("expertiseList", staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staff.getId()));
+        return map;
     }
 }

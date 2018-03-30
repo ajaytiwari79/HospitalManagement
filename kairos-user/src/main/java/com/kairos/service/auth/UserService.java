@@ -4,9 +4,7 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.user.auth.TabPermission;
-import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.auth.UserAuthentication;
+import com.kairos.persistence.model.user.auth.*;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -361,6 +359,13 @@ public class UserService extends UserBaseService {
         return true;
     }
 
+    public UserOrganizationsDTO getLoggedInUserOrganizations() {
+        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        UserOrganizationsDTO userOrganizationsDTO = new UserOrganizationsDTO(userGraphRepository.getOrganizations(UserContext.getUserDetails().getId()),
+                currentUser.getLastSelectedChildOrgId(), currentUser.getLastSelectedParentOrgId());
+        return userOrganizationsDTO;
+    }
+
     /**
      * @param organizationId
      * @return list of permissions.
@@ -374,10 +379,11 @@ public class UserService extends UserBaseService {
         }
 
         long loggedinUserId = UserContext.getUserDetails().getId();
+        Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId);
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
 
 
-        List<AccessPageQueryResult> mainModulePermissions = (organization.isKairosHub()) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
+        List<AccessPageQueryResult> mainModulePermissions = (organization.isKairosHub() || isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
                 accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
         Set<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
         // USER HAS NO main module permission check his permission in current unit only via parent employment id
@@ -393,7 +399,7 @@ public class UserService extends UserBaseService {
         Map<String, Object> unitPermissionMap;
         for (Organization unit : units) {
             List<AccessPageQueryResult> accessPageQueryResults;
-            if (organization.isKairosHub()) {
+            if (organization.isKairosHub() || isCountryAdmin) {
                 accessPageQueryResults = accessPageRepository.getTabsPermissionForHubMember();
             } else {
                 accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId,parentOrganization.getId());
@@ -557,4 +563,15 @@ public class UserService extends UserBaseService {
         return permissionList;
     }
 
+    public Boolean updateLastSelectedChildAndParentId(OrganizationSelectionDTO organizationSelectionDTO){
+        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        if(Optional.ofNullable(organizationSelectionDTO.getLastSelectedParentOrgId()).isPresent()){
+            currentUser.setLastSelectedParentOrgId(organizationSelectionDTO.getLastSelectedParentOrgId());
+        }
+        if(Optional.ofNullable(organizationSelectionDTO.getLastSelectedChildOrgId()).isPresent()){
+            currentUser.setLastSelectedChildOrgId(organizationSelectionDTO.getLastSelectedChildOrgId());
+        }
+       save(currentUser);
+        return true;
+    }
 }

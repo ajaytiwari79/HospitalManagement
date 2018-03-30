@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -31,13 +32,13 @@ public class ExpertiseController {
     @ApiOperation(value = "Assign Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> setExpertiseToStaff(@PathVariable Long staffId, @RequestBody Map<String, Object> expertise) {
-        Long expertiseId = Long.valueOf(expertise.get("id").toString());
-        Map<String, Object> expertiseObj = expertiseService.setExpertiseToStaff(staffId, expertiseId);
+    public ResponseEntity<Map<String, Object>> setExpertiseToStaff(@PathVariable Long staffId, @RequestBody List<Long> expertiseIds) {
+
+        Map<String, Object> expertiseObj = expertiseService.setExpertiseToStaff(staffId, expertiseIds);
         if (expertiseObj == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, expertiseObj);
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertise);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseIds);
     }
 
     @ApiOperation(value = "Get Staff expertise")

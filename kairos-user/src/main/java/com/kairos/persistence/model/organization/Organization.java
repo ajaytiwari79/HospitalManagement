@@ -66,7 +66,7 @@ public class Organization extends UserBaseEntity {
     private String costCenterName;
     private String shortName;
     private String webSiteUrl;
-    private long clientSince;
+    private Long clientSince;
     private String cvrNumber;
     private String pNumber;
 
@@ -519,7 +519,7 @@ public class Organization extends UserBaseEntity {
         this.webSiteUrl = webSiteUrl;
     }
 
-    public void setClientSince(long clientSince) {
+    public void setClientSince(Long clientSince) {
         this.clientSince = clientSince;
     }
 
@@ -531,7 +531,7 @@ public class Organization extends UserBaseEntity {
         return webSiteUrl;
     }
 
-    public long getClientSince() {
+    public Long getClientSince() {
         return clientSince;
     }
 

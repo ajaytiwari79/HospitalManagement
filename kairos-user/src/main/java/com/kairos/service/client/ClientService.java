@@ -1600,7 +1600,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
      * @return
      * @auther Anil maurya
      */
-    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip, String moduleId) {
+    public Map<String, Object> getOrganizationClientsWithFilter(Long organizationId, ClientFilterDTO clientFilterDTO, String skip, String moduleId,long parentOrganizationId) {
         Map<String, Object> response = new HashMap<>();
         List<Long> citizenIds = new ArrayList<>();
         if (!clientFilterDTO.getServicesTypes().isEmpty() || !clientFilterDTO.getTimeSlots().isEmpty() || !clientFilterDTO.getTaskTypes().isEmpty() || clientFilterDTO.isNewDemands()){
@@ -1628,7 +1628,7 @@ List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refact
 
       mapList.addAll( organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, organizationId, imagePath, skip,moduleId));
 
-        Staff staff = staffGraphRepository.getByUser(UserContext.getUserDetails().getId());
+        Staff staff = staffGraphRepository.getStaffByUserId(UserContext.getUserDetails().getId(),parentOrganizationId);
         //anil maurya move some business logic in task demand service (task micro service )
         Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), organizationId, mapList);
         response.putAll(responseFromTask);

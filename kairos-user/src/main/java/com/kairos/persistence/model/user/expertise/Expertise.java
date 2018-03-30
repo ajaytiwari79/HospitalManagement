@@ -81,12 +81,11 @@ public class Expertise extends UserBaseEntity {
         this.tags = tags;
     }
 
-    public Expertise(){}
-
-
     public String getName() {
         return name;
     }
+
+    public Expertise(){}
 
     public Expertise(Long id,@NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description) {
         this.name = name;

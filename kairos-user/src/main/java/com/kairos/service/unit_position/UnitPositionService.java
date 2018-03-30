@@ -14,6 +14,7 @@ import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.persistence.model.user.country.EmploymentType;
 
@@ -31,6 +32,7 @@ import com.kairos.persistence.model.user.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
@@ -105,6 +107,8 @@ public class UnitPositionService extends UserBaseService {
     private ClientGraphRepository clientGraphRepository;
     @Inject
     private TimeBankRestClient timeBankRestClient;
+    @Inject
+    UserGraphRepository userGraphRepository;
 
 
     public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
@@ -365,11 +369,9 @@ public class UnitPositionService extends UserBaseService {
         }
 
         if (Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) {
-
             if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
                 throw new ActionNotPermittedException("Start date can't be less than End Date ");
             }
-            oldUnitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
         }
         if (Optional.ofNullable(unitPositionDTO.getLastWorkingDateMillis()).isPresent()) {
             if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getLastWorkingDateMillis()) {
@@ -378,6 +380,8 @@ public class UnitPositionService extends UserBaseService {
             oldUnitPosition.setLastWorkingDateMillis(unitPositionDTO.getLastWorkingDateMillis());
         }
         oldUnitPosition.setStartDateMillis(unitPositionDTO.getStartDateMillis());
+        oldUnitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
+
 
 
         oldUnitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
@@ -398,7 +402,11 @@ public class UnitPositionService extends UserBaseService {
         if (!Optional.ofNullable(staff).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Staff Id" + staffId);
         }
-        Organization organization = organizationService.getOrganizationDetail(id, type);
+
+        User user=userGraphRepository.getUserByStaffId(staffId);
+        return unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId());
+
+      // TODO  Organization organization = organizationService.getOrganizationDetail(id, type);
 //        Organization parentOrganization;
 //        UnitPermission unitPermission;
 //        if (!organization.isParentOrganization()) {
@@ -411,7 +419,7 @@ public class UnitPositionService extends UserBaseService {
 //            logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", staffId, organization.getId());
 //            throw new DataNotFoundByIdException("unable to get unit employment  of staff");
 //        }
-        return unitPositionGraphRepository.getAllUnitPositionsByStaff(organization.getId(), staffId);
+       //TODO  return unitPositionGraphRepository.getAllUnitPositionsByStaff(organization.getId(), staffId);
     }
 
     public PositionCtaWtaQueryResult getCtaAndWtaByExpertiseId(Long unitId, Long expertiseId) {
@@ -454,12 +462,16 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
-    private UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition) {
-        UnitPositionQueryResult
-                result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
+    public UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition) {
+        UnitPositionQueryResult unitPositionQueryResult=unitPositionGraphRepository.getUnitIdAndParentUnitIdByUnitPositionId(unitPosition.getId());
+        UnitPositionQueryResult  result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
                 unitPosition.getId(), unitPosition.getEmploymentType(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
                 unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), unitPosition.getWorkingTimeAgreement());
+        result.setUnitId(unitPositionQueryResult.getUnitId());
+        result.setParentUnitId(unitPositionQueryResult.getParentUnitId());
+
+
         return result;
     }
 
