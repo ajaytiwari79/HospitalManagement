@@ -76,7 +76,7 @@ public class CountryHolidayCalenderController {
     }
     @RequestMapping(value = "/holiday",method = RequestMethod.PUT)
     @ApiOperation("Update a new CountryHolidayCalenderController holiday by id")
-    ResponseEntity<Map<String, Object>> updateCountryCalender(@RequestBody Map<String,Object> countryHolidayCalender){
+    ResponseEntity<Map<String, Object>> updateCountryCalender(@RequestBody Map<String,Object> countryHolidayCalender) throws Exception{
         return ResponseHandler.generateResponse(HttpStatus.OK,true,countryHolidayCalenderService.updateCountryCalender(countryHolidayCalender));
     }
     @RequestMapping(value = "holiday/{holidayId}",method = RequestMethod.DELETE)

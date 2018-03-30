@@ -44,7 +44,7 @@ public class CTARuleTemplate extends RuleTemplate{
 
     private List<EmploymentType> employmentTypes=new ArrayList<>();
     private PlanningCategory planningCategory;
-    private List<StaffFunction> staffFunctions=new ArrayList<>();
+    private List<Long> staffFunctions=new ArrayList<>();
     @Relationship(type = BELONGS_TO)
     private PlannedTimeWithFactor plannedTimeWithFactor;
     @Relationship(type = BELONGS_TO)
@@ -244,11 +244,11 @@ public class CTARuleTemplate extends RuleTemplate{
         this.planningCategory = planningCategory;
     }
 
-    public List<StaffFunction> getStaffFunctions() {
+    public List<Long> getStaffFunctions() {
         return staffFunctions;
     }
 
-    public void setStaffFunctions(List<StaffFunction> staffFunctions) {
+    public void setStaffFunctions(List<Long> staffFunctions) {
         this.staffFunctions = staffFunctions;
     }
 
