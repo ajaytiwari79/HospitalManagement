@@ -37,6 +37,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static javax.management.timer.Timer.ONE_DAY;
+
 /**
  * Created by prabjot on 28/10/16.
  */
@@ -119,13 +121,14 @@ public class ExpertiseService extends UserBaseService {
         BeanUtils.copyProperties(expertise, copiedExpertise);
         copiedExpertise.setId(null);
         expertise.setHasDraftCopy(true);
+        copiedExpertise.setPublished(false);
         copiedExpertise.setExpertise(expertise);
         copiedExpertise.setSeniorityLevel(null);
 
         List<SeniorityLevelDTO> seniorityLevelDTOList = new ArrayList<>();
         //  Adding the currently added Sr level in expertise.
         SeniorityLevel seniorityLevel = new SeniorityLevel();
-        addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+        addNewSeniorityLevelInExpertise(copiedExpertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
         expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
         seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
 
@@ -347,7 +350,7 @@ public class ExpertiseService extends UserBaseService {
             copiedExpertise.setId(null);
             currentExpertise.setHasDraftCopy(true);
             copiedExpertise.setExpertise(currentExpertise);
-           // copiedExpertise.getSeniorityLevel().clear();
+            // copiedExpertise.getSeniorityLevel().clear();
             // Calling this function to get any updates or updated value from DTO.
             updateCurrentExpertise(countryId, copiedExpertise, expertiseDTO);
 
@@ -602,17 +605,16 @@ public class ExpertiseService extends UserBaseService {
         save(expertise);
         List<Expertise> response = new ArrayList<>();
         response.add(expertise);
-//        PayTable parentPayTable = payTableGraphRepository.getPermanentPayTableByPayTableId(expertiseId);
-//        if (Optional.ofNullable(parentPayTable).isPresent()) {
-//            expertise.setStartDateMillis(new Date(publishedDateMillis));
-//            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDateMillis - ONE_DAY);
-//            parentPayTable.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
-//            parentPayTable.setHasTempCopy(false);
-//            payTable.setPublished(true);
-//            parentPayTable.setPayTable(null);
-//            response.add(parentPayTable);
+        Expertise parentExpertise = expertiseGraphRepository.getParentExpertiseById(expertiseId);
+        if (Optional.ofNullable(parentExpertise).isPresent()) {
+            expertiseGraphRepository.changeStateOfRelationShip(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
+            parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
+            parentExpertise.setHasDraftCopy(false);
+            parentExpertise.setPublished(true);
+            parentExpertise.setExpertise(null);
+            response.add(parentExpertise);
 //
-//        }
+        }
         return response;
     }
 
