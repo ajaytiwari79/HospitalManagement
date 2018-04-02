@@ -4,6 +4,7 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Created by prabjot on 10/1/17.
@@ -20,7 +21,8 @@ public class StaffPersonalDetail {
     private String inactiveFrom;
     private StaffStatusEnum currentStatus;
     private long languageId;
-    private long expertiseId;
+    private List<Long> expertiseIds;
+    private List<StaffExperienceInExpertiseDTO> expertiseWithExperience;
    // @NotEmpty(message = "error.cprnumber.notnull") @NotNull(message = "error.cprnumber.notnull")
     private String cprNumber;
    // @NotEmpty(message = "error.Staff.familyname.notnull") @NotNull(message = "error.Staff.familyname.notnull")
@@ -94,12 +96,12 @@ public class StaffPersonalDetail {
         this.languageId = languageId;
     }
 
-    public long getExpertiseId() {
-        return expertiseId;
+    public List<Long> getExpertiseIds() {
+        return expertiseIds;
     }
 
-    public void setExpertiseId(long expertiseId) {
-        this.expertiseId = expertiseId;
+    public void setExpertiseIds(List<Long> expertiseIds) {
+        this.expertiseIds = expertiseIds;
     }
 
     public String getCprNumber() {
@@ -204,5 +206,13 @@ public class StaffPersonalDetail {
 
     public void setCurrentStatus(StaffStatusEnum currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    public List<StaffExperienceInExpertiseDTO> getExpertiseWithExperience() {
+        return expertiseWithExperience;
+    }
+
+    public void setExpertiseWithExperience(List<StaffExperienceInExpertiseDTO> expertiseWithExperience) {
+        this.expertiseWithExperience = expertiseWithExperience;
     }
 }

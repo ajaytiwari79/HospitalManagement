@@ -155,6 +155,7 @@ public class StaffService extends UserBaseService {
     private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
     private UnitPositionService unitPositionService;
+    @Inject StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -208,11 +209,27 @@ public class StaffService extends UserBaseService {
         if (objectToUpdate == null) {
             throw new InternalError("Staff can't null");
         }
+        staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId,staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO ::getExpertiseId).collect(Collectors.toList()));
+        for(int i=0;i<staffPersonalDetail.getExpertiseWithExperience().size();i++){
+            Expertise expertise = expertiseGraphRepository.findOne(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+            StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId,staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+            Date expertiseStartDate;
+            Long id=null;
+            if(Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent()){
+                 expertiseStartDate=  staffExperienceInExpertiseDTO.getExpertiseStartDate();
+                 id=staffExperienceInExpertiseDTO.getId();
+            }
+            else
+                expertiseStartDate=DateUtil.getCurrentDate();
+
+            StaffExpertiseRelationShip staffExpertiseRelationShip=new StaffExpertiseRelationShip(id,objectToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(),expertiseStartDate);
+            staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
+            staffPersonalDetail.getExpertiseWithExperience().get(i).setId(staffExpertiseRelationShip.getId());
+        }
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
-        Expertise expertise = expertiseGraphRepository.findOne(staffPersonalDetail.getExpertiseId());
-        Expertise oldExpertise = objectToUpdate.getExpertise();
+        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
+        List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(objectToUpdate.getId());
         objectToUpdate.setLanguage(language);
-        objectToUpdate.setExpertise(expertise);
         objectToUpdate.setFirstName(staffPersonalDetail.getFirstName());
         objectToUpdate.setLastName(staffPersonalDetail.getLastName());
         objectToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());
@@ -228,6 +245,8 @@ public class StaffService extends UserBaseService {
         objectToUpdate.setCostHourOvertime(staffPersonalDetail.getCostHourOvertime());
         objectToUpdate.setCapacity(staffPersonalDetail.getCapacity());
         objectToUpdate.setCareOfName(staffPersonalDetail.getCareOfName());
+        staffPersonalDetail.setExpertiseIds(staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO ::getExpertiseId).collect(Collectors.toList()));
+
 
         if (staffPersonalDetail.getCurrentStatus() == StaffStatusEnum.INACTIVE) {
             objectToUpdate.setInactiveFrom(DateConverter.parseDate(staffPersonalDetail.getInactiveFrom()).getTime());
@@ -235,10 +254,13 @@ public class StaffService extends UserBaseService {
         objectToUpdate.setSignature(staffPersonalDetail.getSignature());
         objectToUpdate.setContactDetail(staffPersonalDetail.getContactDetail());
         save(objectToUpdate);
+
         if (oldExpertise != null) {
-            staffGraphRepository.removeSkillsByExpertise(objectToUpdate.getId(), oldExpertise.getId());
+            List<Long> expertiseIds=oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
+            staffGraphRepository.removeSkillsByExpertise(objectToUpdate.getId(), expertiseIds);
         }
-        staffGraphRepository.updateSkillsByExpertise(objectToUpdate.getId(), expertise.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
+        List<Long> expertiseIds=expertise.stream().map(Expertise::getId).collect(Collectors.toList());
+        staffGraphRepository.updateSkillsByExpertise(objectToUpdate.getId(), expertiseIds, DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
 
         return staffPersonalDetail;
     }
@@ -294,12 +316,15 @@ public class StaffService extends UserBaseService {
         map.put("familyName", staff.getFamilyName());
         map.put("currentStatus", staff.getCurrentStatus());
         map.put("signature", staff.getSignature());
-        map.put("inactiveFrom", DateConverter.getDate(staff.getInactiveFrom()));
-        map.put("expertiseId", staffGraphRepository.getExpertiseId(staff.getId()));
+        Date inactiveFrom = Optional.ofNullable(staff.getInactiveFrom()).isPresent() ? DateConverter.getDate(staff.getInactiveFrom()) : null;
+        map.put("inactiveFrom", inactiveFrom);
         map.put("languageId", staffGraphRepository.getLanguageId(staff.getId()));
         map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));
         map.put("cprNumber", staff.getCprNumber());
         map.put("careOfName", staff.getCareOfName());
+        List<StaffExperienceInExpertiseDTO> expertiseWithExperience=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffId(staff.getId());
+        map.put("expertiseIds",expertiseWithExperience.stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
+        map.put("expertiseWithExperience",expertiseWithExperience);
 
         // Visitour Speed Profile
         map.put("speedPercent", staff.getSpeedPercent());
@@ -431,16 +456,22 @@ public class StaffService extends UserBaseService {
         }*/
     }
 
-    public Staff assignExpertiseToStaff(long staffId, long expertiseId) {
+    public Staff assignExpertiseToStaff(long staffId, List<Long> expertiseIds) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
             return null;
         }
-        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
-        if (expertise != null) {
-            staff.setExpertise(expertise);
-            staffGraphRepository.save(staff);
+        List<StaffExpertiseRelationShip> staffExpertiseRelationShips=new ArrayList<>();
+        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds);
+        for(Expertise currentExpertise:expertise){
+            StaffExpertiseRelationShip staffExpertiseRelationShip=new StaffExpertiseRelationShip(staff,currentExpertise,0,DateUtil.getCurrentDate());
+            staffExpertiseRelationShips.add(staffExpertiseRelationShip);
         }
+//        if (expertise != null) {
+//            staff.setExpertise(expertise);
+//            staffGraphRepository.save(staff);
+//        }
+        staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
         return staff;
     }
 
@@ -451,7 +482,7 @@ public class StaffService extends UserBaseService {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("allExpertise", expertiseGraphRepository.getAllExpertiseByCountry(countryId));
-        map.put("myExpertise", staff.getExpertise().getId());
+        map.put("myExpertise", staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffId).stream().map(Expertise::getId).collect(Collectors.toList()));
         return map;
     }
 

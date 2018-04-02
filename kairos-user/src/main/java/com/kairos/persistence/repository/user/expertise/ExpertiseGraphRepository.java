@@ -72,7 +72,10 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("match (e:Expertise{isEnabled:true})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} AND id(e) = {1} return e")
     Expertise getExpertiesOfCountry(Long countryId, Long expertiseId);
 
-    //TODO need to add publish filter as well
+
+
+
+        //TODO need to add publish filter as well
     @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,hasDraftCopy:false}) where id(country) = {0}" +
             "match(expertise)-[:" + SUPPORTS_SERVICE + "]-(orgService:OrganizationService)\n" +
             "match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
@@ -88,17 +91,14 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,basePayGrade:seniorityLevel.basePayGrade,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas})  END  as seniorityLevel")
-    List<ExpertiseQueryResult> getAllExpertiseByCountryId(long countryId);
+            List<ExpertiseQueryResult> getAllExpertiseByCountryId(long countryId);
 
 
-    @Query("match (expertise:Expertise)-[:" + HAS_DRAFT_EXPERTISE + "]->(parentExpertise:Expertise) where id(expertise) = {0}" +
-            "  return parentExpertise")
-    Expertise getParentExpertiseById(Long expertiseId);
 
     @Query("MATCH (expertise:Expertise)-[rel:" + HAS_DRAFT_EXPERTISE + "]-(parentExpertise:Expertise) where id(expertise)={0} \n" +
             " set expertise.endDateMillis={1} set expertise.hasDraftCopy=false set expertise.published=true detach delete rel")
     void setEndDateToExpertise(Long expertiseId, Long endDateMillis);
-    //List<ExpertiseQueryResult> ()
+
 
     @Query("match (e:Expertise)-[:" + HAS_DRAFT_EXPERTISE + "]->(expertise:Expertise) where id(e) = {0}" +
             "match(expertise)-[:" + SUPPORTS_SERVICE + "]-(orgService:OrganizationService)\n" +
@@ -115,6 +115,12 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,basePayGrade:seniorityLevel.basePayGrade,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas})  END  as seniorityLevel")
-    ExpertiseQueryResult getParentExpertiseByexpertiseId(Long expertiseId);
+    ExpertiseQueryResult getParentExpertiseByExpertiseId(Long expertiseId);
+
+
+    @Query("match (expertise:Expertise{isEnabled:true}) where id(expertise) IN {0} \n" +
+            "return id(expertise) as id,expertise.name as name,expertise.description as description")
+    List<Expertise> getExpertiseByIdsIn(List<Long> ids);
+
 
 }

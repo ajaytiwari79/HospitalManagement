@@ -285,14 +285,14 @@ public class StaffController {
      * every staff will have one expertise at time
      *
      * @param staffId
-     * @param expertiseId
+     * @param expertiseIds
      * @return
      */
     @RequestMapping(value = "/{staffId}/expertise/{expertiseId}", method = RequestMethod.POST)
     @ApiOperation("assign expertise to staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> assignExpertiseToStaff(@PathVariable long staffId, @PathVariable long expertiseId) {
-        Staff staff = staffService.assignExpertiseToStaff(staffId, expertiseId);
+    public ResponseEntity<Map<String, Object>> assignExpertiseToStaff(@PathVariable long staffId, @RequestBody List<Long> expertiseIds) {
+        Staff staff = staffService.assignExpertiseToStaff(staffId, expertiseIds);
         if (staff == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

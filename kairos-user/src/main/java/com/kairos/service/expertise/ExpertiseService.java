@@ -1,5 +1,6 @@
 package com.kairos.service.expertise;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -16,13 +17,18 @@ import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.model.user.staff.StaffExpertiseRelationShip;
+
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelFunctionRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
+
+import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.experties.*;
 import com.kairos.service.UserBaseService;
@@ -40,6 +46,11 @@ import java.util.stream.Collectors;
 
 import static javax.management.timer.Timer.ONE_DAY;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by prabjot on 28/10/16.
  */
@@ -51,8 +62,6 @@ public class ExpertiseService extends UserBaseService {
     CountryGraphRepository countryGraphRepository;
     @Inject
     ExpertiseGraphRepository expertiseGraphRepository;
-    @Inject
-    TagService tagService;
     @Inject
     StaffGraphRepository staffGraphRepository;
     @Inject
@@ -67,7 +76,10 @@ public class ExpertiseService extends UserBaseService {
     private PayGroupAreaGraphRepository payGroupAreaGraphRepository;
     @Inject
     private FunctionGraphRepository functionGraphRepository;
-
+    @Inject
+    TagService tagService;
+    @Inject
+    StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
     @Inject
     private SeniorityLevelFunctionRelationshipGraphRepository seniorityLevelFunctionRelationshipGraphRepository;
     @Inject
@@ -529,19 +541,26 @@ public class ExpertiseService extends UserBaseService {
         return true;
     }
 
-    public Map<String, Object> setExpertiseToStaff(Long staffId, Long expertiseId) {
+    public Map<String, Object> setExpertiseToStaff(Long staffId, List<Long> expertiseIds) {
         Staff currentStaff = staffGraphRepository.findOne(staffId);
-        currentStaff.setExpertise(expertiseGraphRepository.findOne(expertiseId));
-        Staff staff = staffGraphRepository.save(currentStaff);
-        return staff.retrieveExpertiseDetails();
+        List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
+        List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds);
+        for (Expertise currentExpertise : expertise) {
+            StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(currentStaff, currentExpertise, 0, DateUtil.getCurrentDate());
+            staffExpertiseRelationShips.add(staffExpertiseRelationShip);
+        }
+        staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
+        return retrieveExpertiseDetails(currentStaff);
+//        currentStaff.setExpertise(expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds));
+//        Staff staff = staffGraphRepository.save(currentStaff);
+//        return  staff.retrieveExpertiseDetails();
+
     }
 
     public Map<String, Object> getExpertiseToStaff(Long staffId) {
+        //staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffId);
         Staff staff = staffGraphRepository.findOne(staffId);
-        if (staff.getExpertise() == null) {
-            return null;
-        }
-        return staff.retrieveExpertiseDetails();
+        return retrieveExpertiseDetails(staff);
     }
 
     /**
@@ -553,6 +572,7 @@ public class ExpertiseService extends UserBaseService {
      * new relationship b/w expertise and skill will be created or updated(if relationship already exist) if parameter value is false
      * then relationship will be inactive (isEnabled param of relationship will set to false)
      */
+
     public void addSkillInExpertise(long expertiseId, List<Long> skillIds, boolean isSelected) {
 
         if (isSelected) {
@@ -589,6 +609,7 @@ public class ExpertiseService extends UserBaseService {
         return expertiseGraphRepository.getExpertiesByCountry(countryId);
     }
 
+
     public UnionServiceWrapper getUnionsAndService(Long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -601,7 +622,7 @@ public class ExpertiseService extends UserBaseService {
         return unionServiceWrapper;
     }
 
-    /*This metthod is used to publish an expertise
+    /*This method is used to publish an expertise
     * */
     public ExpertiseQueryResult publishExpertise(Long expertiseId, Long publishedDateMillis) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
@@ -617,7 +638,7 @@ public class ExpertiseService extends UserBaseService {
             seniorityLevel.setPublished(true);
         }
         save(expertise);
-        ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByexpertiseId(expertiseId);
+        ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
             expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
@@ -626,5 +647,13 @@ public class ExpertiseService extends UserBaseService {
         return parentExpertise;
     }
 
+
+    public Map<String, Object> retrieveExpertiseDetails(Staff staff) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("staffId", staff.getId());
+        map.put("staffName", staff.getFirstName() + "   " + staff.getLastName());
+        map.put("expertiseList", staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staff.getId()));
+        return map;
+    }
 
 }
