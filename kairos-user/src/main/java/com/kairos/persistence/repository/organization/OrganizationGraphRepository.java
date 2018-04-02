@@ -638,8 +638,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (n:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType)\n" +
             "WHERE id(n)={0} AND et.deleted={1}\n" +
             "return id(et) as id, et.name as name, et.description as description, \n" +
-            "et.allowedForContactPerson as allowedForContactPerson, et.allowedForShiftPlan as allowedForShiftPlan, et.allowedForFlexPool as allowedForFlexPool " +
-            "et.permanent as permanent et.temporary as temporary et.guest as guest ORDER BY et.name ASC")
+            "et.allowedForContactPerson as allowedForContactPerson, et.allowedForShiftPlan as allowedForShiftPlan, et.allowedForFlexPool as allowedForFlexPool ORDER BY et.name ASC")
     List<Map<String, Object>> getEmploymentTypeByOrganization(Long organizationId, Boolean isDeleted);
 
 

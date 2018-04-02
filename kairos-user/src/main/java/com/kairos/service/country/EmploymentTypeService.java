@@ -84,7 +84,7 @@ public class EmploymentTypeService extends UserBaseService {
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
-        boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,employmentTypeDTO.getName(),employmentTypeId);
+        boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,"(?i)"+employmentTypeDTO.getName().trim(),employmentTypeId);
         if(isAlreadyExists){
             throw new DuplicateDataException("EmploymentType already exists"+employmentTypeDTO.getName());
         }
