@@ -111,7 +111,8 @@ public class EmploymentService extends UserBaseService {
 
     public Map<String, Object> retrieveEmploymentDetails(Staff staff) {
         Map<String, Object> map = new HashMap<>();
-        map.put("employedSince", DateConverter.getDate(staff.getEmployedSince()));
+        Date employedSince = Optional.ofNullable(staff.getEmployedSince()).isPresent() ? DateConverter.getDate(staff.getEmployedSince()) : null;
+        map.put("employedSince", employedSince);
         map.put("cardNumber", staff.getCardNumber());
         map.put("sendNotificationBy", staff.getSendNotificationBy());
         map.put("copyKariosMailToLogin", staff.isCopyKariosMailToLogin());

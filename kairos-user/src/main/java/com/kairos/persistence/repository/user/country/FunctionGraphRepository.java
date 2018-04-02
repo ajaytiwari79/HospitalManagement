@@ -6,6 +6,9 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Set;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ORGANIZATION_LEVEL;
 
 /**
  * Created by pavan on 13/3/18.
@@ -29,4 +32,11 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function,Lo
 
     @Query("MATCH (country:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(country)={0} AND id(function) <> {1} AND LOWER(function.name)=LOWER({2}) return function")
     Function findByNameExcludingCurrent(Long countryId,Long functionId,String name);
+
+    @Query("MATCH(function:Function{deleted:false}) where id(function) IN {0} return function")
+    List<Function> findAllFunctionsById(Set<Long> functionIds);
+
+    @Query("MATCH (level:Level)<-[:"+HAS_ORGANIZATION_LEVEL+"]-(function:Function{deleted:false}) where id(level)={0} return id(function) as id,function.name as name")
+    List<FunctionDTO> getFunctionsByOrganizationLevel(Long organizationLevelId);
+
 }

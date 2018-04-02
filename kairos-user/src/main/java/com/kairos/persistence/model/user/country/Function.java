@@ -8,8 +8,10 @@ import com.kairos.persistence.model.organization.Organization;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
+
 import java.util.Date;
 import java.util.List;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -18,7 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
-public class Function extends UserBaseEntity{
+public class Function extends UserBaseEntity {
     private String name;
     private String description;
     @DateLong
@@ -37,6 +39,10 @@ public class Function extends UserBaseEntity{
 
     public Function() {
         //Default Constructor
+    }
+
+    public Function(Long id) {
+        this.id = id;
     }
 
     public Function(String name, String description, Date startDate, Date endDate, List<Organization> unions, List<Level> organizationLevels, Country country) {
