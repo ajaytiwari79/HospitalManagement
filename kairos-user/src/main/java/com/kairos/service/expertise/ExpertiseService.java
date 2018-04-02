@@ -16,7 +16,6 @@ import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.model.user.staff.StaffExpertiseRelationShip;
 
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -67,9 +66,7 @@ public class ExpertiseService extends UserBaseService {
     @Inject
     OrganizationGraphRepository organizationGraphRepository;
     @Inject
-    OrganizationServiceService organizationService;
-    @Inject
-    OrganizationServiceRepository organizationServiceRepository;
+    OrganizationServiceService organizationServiceService;
     @Inject
     private PayTableGraphRepository payTableGraphRepository;
     @Inject
@@ -261,7 +258,7 @@ public class ExpertiseService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid level id " + expertiseDTO.getOrganizationLevelId());
         }
         expertise.setOrganizationLevel(level);
-        OrganizationService organizationService = organizationServiceRepository.findOne(expertiseDTO.getServiceId());
+        OrganizationService organizationService = organizationServiceService.findOne(expertiseDTO.getServiceId());
         if (!Optional.ofNullable(organizationService).isPresent()) {
             throw new DataNotFoundByIdException("Invalid service id " + expertiseDTO.getServiceId());
         }
@@ -347,17 +344,13 @@ public class ExpertiseService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid expertise Id");
         }
 
-        SeniorityLevel seniorityLevelToUpdate = null;
-        if (Optional.ofNullable(currentExpertise.getSeniorityLevel()).isPresent() && !currentExpertise.getSeniorityLevel().isEmpty()) {
-            for (SeniorityLevel seniorityLevel : currentExpertise.getSeniorityLevel())
-                if (seniorityLevel.getId().equals(expertiseDTO.getSeniorityLevel().getId())) {
-                    seniorityLevelToUpdate = seniorityLevel;
-                    break;
-                }
-        }
+        Optional<SeniorityLevel> seniorityLevelToUpdate =
+        currentExpertise.getSeniorityLevel().stream().filter(seniorityLevel -> seniorityLevel.getId().equals(expertiseDTO.getSeniorityLevel().getId())).findFirst();
+
         if (!Optional.ofNullable(seniorityLevelToUpdate).isPresent()) {
             throw new DataNotFoundByIdException("Seniority Level not found in expertise" + expertiseDTO.getSeniorityLevel().getId());
         }
+
         Long basePayGradeCount = currentExpertise.getSeniorityLevel().stream().filter(seniorityLevelPredicate ->
                 seniorityLevelPredicate.getBasePayGrade().equals(expertiseDTO.getSeniorityLevel().getBasePayGrade())
                         && !seniorityLevelPredicate.getId().equals(expertiseDTO.getSeniorityLevel().getId())
@@ -391,14 +384,14 @@ public class ExpertiseService extends UserBaseService {
 
             // NOW WE need to add the other seniority level which exists in expertise
             // since we have already
-            seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, currentExpertise.getSeniorityLevel(), seniorityLevelToUpdate.getId()));
+            seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, currentExpertise.getSeniorityLevel(), seniorityLevelToUpdate.get().getId()));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setSeniorityLevels(seniorityLevelDTOList);
 
 
         } else {
             // update in current expertise :)
-            updateCurrentSeniorityLevel(expertiseDTO.getSeniorityLevel(), seniorityLevelToUpdate);
+            updateCurrentSeniorityLevel(expertiseDTO.getSeniorityLevel(), seniorityLevelToUpdate.get());
             updateCurrentExpertise(countryId, currentExpertise, expertiseDTO);
             save(currentExpertise);
             expertiseDTO.setId(currentExpertise.getId());
@@ -473,7 +466,7 @@ public class ExpertiseService extends UserBaseService {
             expertise.setOrganizationLevel(level);
         }
         if (!expertise.getOrganizationService().getId().equals(expertiseDTO.getServiceId())) {
-            OrganizationService organizationService = organizationServiceRepository.findOne(expertiseDTO.getServiceId());
+            OrganizationService organizationService = organizationServiceService.findOne(expertiseDTO.getServiceId());
             if (!Optional.ofNullable(organizationService).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid service id " + expertiseDTO.getServiceId());
             }
@@ -616,7 +609,7 @@ public class ExpertiseService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid country Id");
         }
         UnionServiceWrapper unionServiceWrapper = new UnionServiceWrapper();
-        unionServiceWrapper.setServices(organizationService.getAllOrganizationService(countryId));
+        unionServiceWrapper.setServices(organizationServiceService.getAllOrganizationService(countryId));
         unionServiceWrapper.setUnions(organizationGraphRepository.findAllUnionsByCountryId(countryId));
         unionServiceWrapper.setOrganizationLevels(countryGraphRepository.getLevelsByCountry(countryId));
         return unionServiceWrapper;

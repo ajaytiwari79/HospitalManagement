@@ -10,7 +10,6 @@ import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
 import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
-import com.kairos.response.dto.web.experties.SeniorityLevelDTO;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -52,7 +51,7 @@ public class Expertise extends UserBaseEntity {
     private Level organizationLevel;
     @Relationship(type = SUPPORTS_SERVICE)
     private OrganizationService organizationService;
-    @Relationship(type = SUPPORTS_UNION)
+    @Relationship(type = SUPPORTED_BY_UNION)
     private Organization union;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7

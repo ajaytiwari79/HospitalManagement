@@ -917,8 +917,8 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getAllExpertise(countryId));
     }
 
-    @ApiOperation(value = "Get all Details")
-    @RequestMapping(value = COUNTRY_URL + "/union_with_Service", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all union with Service")
+    @RequestMapping(value = COUNTRY_URL + "/union_with_service", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnionsAndService(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getUnionsAndService(countryId));

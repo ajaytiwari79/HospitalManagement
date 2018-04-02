@@ -33,7 +33,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function,Lo
     @Query("MATCH (country:Country)-[:BELONGS_TO]-(function:Function{deleted:false}) where id(country)={0} AND id(function) <> {1} AND LOWER(function.name)=LOWER({2}) return function")
     Function findByNameExcludingCurrent(Long countryId,Long functionId,String name);
 
-    @Query("MATCH(fun:Function{deleted:false}) where id(fun) IN {0} return fun")
+    @Query("MATCH(function:Function{deleted:false}) where id(function) IN {0} return function")
     List<Function> findAllFunctionsById(Set<Long> functionIds);
 
     @Query("MATCH (level:Level)<-[:"+HAS_ORGANIZATION_LEVEL+"]-(function:Function{deleted:false}) where id(level)={0} return id(function) as id,function.name as name")

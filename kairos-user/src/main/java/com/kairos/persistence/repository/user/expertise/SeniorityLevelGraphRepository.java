@@ -20,19 +20,19 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  */
 @Repository
 public interface SeniorityLevelGraphRepository extends Neo4jBaseRepository<SeniorityLevel, Long> {
-    @Query("match(s:SeniorityLevel) where id(s)={0}\n" +
-            "optional match(s)-[rel:" + HAS_FUNCTION + "]-(function:Function)\n" +
-            "optional match(s)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
+    @Query("match(seniorityLevel:SeniorityLevel) where id(s)={0}\n" +
+            "optional match(seniorityLevel)-[rel:" + HAS_FUNCTION + "]-(function:Function)\n" +
+            "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
             "return case when function IS NOT NULL then collect(distinct{functionId:id(function),name:function.name ,description:function.description," +
             "startDate:function.startDate ,endDate:function.endDate,amount:rel.amount})else [] end as functions,collect(DISTINCT pga) as payGroupAreas")
     FunctionAndSeniorityLevelQueryResult getFunctionAndPayGroupAreaBySeniorityLevelId(Long seniorityLevelId);
 
-    @Query("match(s:SeniorityLevel) where id(s)={0}\n" +
-            "match(s)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea) detach delete rel")
+    @Query("match(seniorityLevel:SeniorityLevel) where id(s)={0}\n" +
+            "match(seniorityLevel)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea) detach delete rel")
     void removeAllPreviousPayGroupAreaFromSeniorityLevel(Long seniorityLevelId);
 
-    @Query("match(s:SeniorityLevel) where id(s)={0}\n" +
-            "match(s)-[rel:" + HAS_FUNCTION + "]-(function:Function) detach delete rel\n")
+    @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={0}\n" +
+            "match(seniorityLevel)-[rel:" + HAS_FUNCTION + "]-(function:Function) detach delete rel\n")
     void removeAllPreviousFunctionsFromSeniorityLevel(Long seniorityLevelId);
 
     @Query("match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) \n" +

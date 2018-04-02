@@ -226,7 +226,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_TEMP_PAY_TABLE = "HAS_TEMP_PAY_TABLE";
     public final static String HAS_PAY_GROUP_AREA = "HAS_PAY_GROUP_AREA";
     public final static String FOR_SENIORITY_LEVEL = "FOR_SENIORITY_LEVEL";
-    public final static String SUPPORTS_UNION = "SUPPORTS_UNION";
+    public final static String SUPPORTED_BY_UNION = "SUPPORTED_BY_UNION";
     public final static String SUPPORTS_SERVICE = "SUPPORTS_SERVICE";
     public final static String HAS_FUNCTION = "HAS_FUNCTION";
     public final static String HAS_DRAFT_EXPERTISE = "HAS_DRAFT_EXPERTISE";

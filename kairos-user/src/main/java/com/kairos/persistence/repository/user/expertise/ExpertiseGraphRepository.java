@@ -6,7 +6,6 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -80,7 +79,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "match(expertise)-[:" + SUPPORTS_SERVICE + "]-(orgService:OrganizationService)\n" +
             "match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "match(expertise)-[:" + HAS_PAY_TABLE + "]-(payTable:PayTable)\n" +
-            "match(expertise)-[:" + SUPPORTS_UNION + "]-(union:Organization)\n" +
+            "match(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
             "match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) \n" +
             "optional match(seniorityLevel)-[rel:" + HAS_FUNCTION + "]->(functions:Function) \n" +
             "with expertise,payTable,union,level,orgService,seniorityLevel,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData  \n" +
@@ -104,7 +103,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "match(expertise)-[:" + SUPPORTS_SERVICE + "]-(orgService:OrganizationService)\n" +
             "match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "match(expertise)-[:" + HAS_PAY_TABLE + "]-(payTable:PayTable)\n" +
-            "match(expertise)-[:" + SUPPORTS_UNION + "]-(union:Organization)\n" +
+            "match(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
             "match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) \n" +
             "optional match(seniorityLevel)-[rel:" + HAS_FUNCTION + "]->(functions:Function) \n" +
             "with expertise,payTable,union,level,orgService,seniorityLevel,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData  \n" +
