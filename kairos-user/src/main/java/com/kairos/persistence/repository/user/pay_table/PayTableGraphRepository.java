@@ -47,10 +47,17 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
 
     @Query("MATCH (payTable:PayTable{deleted:false})-[rel:" + HAS_TEMP_PAY_TABLE + "]-(payTable1:PayTable{deleted:false}) where id(payTable)={0} \n" +
             " set payTable.endDateMillis={1} set payTable.hasTempCopy=false set payTable.published=true detach delete rel")
-    void changeStateOfRelationShip(Long payTableId ,Long endDateMillis);
+    void changeStateOfRelationShip(Long payTableId, Long endDateMillis);
 
     @Query("MATCH (payTable:PayTable{deleted:false})-[:" + HAS_TEMP_PAY_TABLE + "]-(payTable1:PayTable{deleted:false}) where id(payTable)={0} \n" +
             "return payTable1")
     PayTable getPermanentPayTableByPayTableId(Long payTableId);
+
+    @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,published:true}) where id(level)={0} AND payTable.startDateMillis >= {1}" +
+            "OPTIONAL MATCH(payTable)-[:" + HAS_PAY_GRADE + "]->(payGrade:PayGrade{deleted:false})\n" +
+            "RETURN id(payTable) as id,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis," +
+            " payTable.name as name ,collect({id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}) as payGrades")
+    List<PayTableResponse> findActivePayTableByOrganizationLevel(Long organizationLevelId, Long startDate);
+
 
 }

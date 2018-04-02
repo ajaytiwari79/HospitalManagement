@@ -71,7 +71,7 @@ public class PayTableServiceIntegrationTest {
                 HttpMethod.GET, null, typeReference);
         RestTemplateResponseEnvelope<PayTableResponseWrapper> responseBody = response.getBody();
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assert.assertEquals(false, responseBody.getData().getPayTables().isEmpty());
+        Assert.assertEquals(false, responseBody.getData().getPayTables());
     }
 
     @Test

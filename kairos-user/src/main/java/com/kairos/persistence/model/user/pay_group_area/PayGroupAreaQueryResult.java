@@ -12,6 +12,7 @@ import java.util.Date;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+
 @QueryResult
 public class PayGroupAreaQueryResult {
     private Long id;

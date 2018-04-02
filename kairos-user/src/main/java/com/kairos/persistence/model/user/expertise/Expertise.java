@@ -1,21 +1,24 @@
 package com.kairos.persistence.model.user.expertise;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
+import com.kairos.persistence.model.user.pay_table.PayTable;
+import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_TAG;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 
 /**
@@ -26,7 +29,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_T
 @NodeEntity
 public class Expertise extends UserBaseEntity {
 
-    @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull")
+    @NotEmpty(message = "error.Expertise.name.notEmpty")
+    @NotNull(message = "error.Expertise.name.notnull")
     private String name;
 
     //@NotEmpty(message = "error.Expertise.description.notEmpty") @NotNull(message = "error.Expertise.description.notnull")
@@ -39,6 +43,33 @@ public class Expertise extends UserBaseEntity {
 
     @Relationship(type = HAS_TAG)
     private List<Tag> tags = new ArrayList<>();
+    @DateLong
+    private Date startDateMillis;
+    @DateLong
+    private Date endDateMillis;
+    @Relationship(type = IN_ORGANIZATION_LEVEL)
+    private Level organizationLevel;
+    @Relationship(type = SUPPORTS_SERVICE)
+    private OrganizationService organizationService;
+    @Relationship(type = SUPPORTED_BY_UNION)
+    private Organization union;
+    private int fullTimeWeeklyMinutes; // This is equals to 37 hours
+    private Integer numberOfWorkingDaysInWeek; // 5 or 7
+
+    @Relationship(type = HAS_PAY_TABLE)
+    private PayTable payTable;
+
+    private PaidOutFrequencyEnum paidOutFrequency;
+
+    @Relationship(type = HAS_DRAFT_EXPERTISE)
+    private Expertise expertise;
+
+    private boolean published;
+    private boolean hasDraftCopy;
+
+
+    @Relationship(type = FOR_SENIORITY_LEVEL)
+    private List<SeniorityLevel> seniorityLevel;
 
     public String getDescription() {
         return description;
@@ -81,32 +112,142 @@ public class Expertise extends UserBaseEntity {
         this.tags = tags;
     }
 
+
+    public Date getStartDateMillis() {
+        return startDateMillis;
+    }
+
+    public void setStartDateMillis(Date startDateMillis) {
+        this.startDateMillis = startDateMillis;
+    }
+
+    public Date getEndDateMillis() {
+        return endDateMillis;
+    }
+
+    public void setEndDateMillis(Date endDateMillis) {
+        this.endDateMillis = endDateMillis;
+    }
+
+    public Level getOrganizationLevel() {
+        return organizationLevel;
+    }
+
+    public void setOrganizationLevel(Level organizationLevel) {
+        this.organizationLevel = organizationLevel;
+    }
+
+    public OrganizationService getOrganizationService() {
+        return organizationService;
+    }
+
+    public void setOrganizationService(OrganizationService organizationService) {
+        this.organizationService = organizationService;
+    }
+
+    public Organization getUnion() {
+        return union;
+    }
+
+    public void setUnion(Organization union) {
+        this.union = union;
+    }
+
+    public int getFullTimeWeeklyMinutes() {
+        return fullTimeWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+    }
+
+    public Integer getNumberOfWorkingDaysInWeek() {
+        return numberOfWorkingDaysInWeek;
+    }
+
+    public void setNumberOfWorkingDaysInWeek(Integer numberOfWorkingDaysInWeek) {
+        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+    }
+
+    public PayTable getPayTable() {
+        return payTable;
+    }
+
+    public void setPayTable(PayTable payTable) {
+        this.payTable = payTable;
+    }
+
+    public PaidOutFrequencyEnum getPaidOutFrequency() {
+        return paidOutFrequency;
+    }
+
+    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
+        this.paidOutFrequency = paidOutFrequency;
+    }
+
+    public List<SeniorityLevel> getSeniorityLevel() {
+        return seniorityLevel;
+    }
+
+    public void setSeniorityLevel(List<SeniorityLevel> seniorityLevel) {
+        this.seniorityLevel = seniorityLevel;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
+    public boolean isHasDraftCopy() {
+        return hasDraftCopy;
+    }
+
+    public void setHasDraftCopy(boolean hasDraftCopy) {
+        this.hasDraftCopy = hasDraftCopy;
+    }
+
+    public Expertise getExpertise() {
+        return expertise;
+    }
+
+    public void setExpertise(Expertise expertise) {
+        this.expertise = expertise;
+    }
+
+    public Expertise() {
+    }
+
+
     public String getName() {
         return name;
     }
 
-    public Expertise(){}
+
 
     public Expertise(Long id,@NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description) {
+
         this.name = name;
-        this.id=id;
+        this.id = id;
         this.description = description;
     }
 
     public Expertise retrieveBasicDetails() {
-       Expertise expertise = new Expertise(this.id,this.name,this.description);
-       return expertise;
-    }
-    public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
-        map.put("id",this.id);
-        map.put("name",this.name);
-        map.put("description",this.description);
-        map.put("country",this.country.getName());
-        map.put("lastModificationDate",this.getLastModificationDate());
-        map.put("creationDate",this.getCreationDate());
-        return map;
+        Expertise expertise = new Expertise(this.id, this.name, this.description);
+        return expertise;
     }
 
+    public Map<String, Object> retrieveDetails() {
+        Map<String, Object> map = new HashMap();
+        map.put("id", this.id);
+        map.put("name", this.name);
+        map.put("description", this.description);
+        map.put("country", this.country.getName());
+        map.put("lastModificationDate", this.getLastModificationDate());
+        map.put("creationDate", this.getCreationDate());
+        return map;
+    }
 
 }

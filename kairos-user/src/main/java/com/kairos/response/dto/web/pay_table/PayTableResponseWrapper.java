@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.pay_table.PayTableResponse;
 
@@ -12,9 +13,19 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PayTableResponseWrapper {
     private List<PayGroupAreaQueryResult> payGroupArea;
-    private List<PayTableResponse> payTables;
+    private PayTableResponse payTables;
+    private List<FunctionDTO> functions;
 
     public PayTableResponseWrapper() {
+        // default cons
+    }
+
+    public PayTableResponse getPayTables() {
+        return payTables;
+    }
+
+    public void setPayTables(PayTableResponse payTables) {
+        this.payTables = payTables;
     }
 
     public List<PayGroupAreaQueryResult> getPayGroupArea() {
@@ -25,15 +36,16 @@ public class PayTableResponseWrapper {
         this.payGroupArea = payGroupArea;
     }
 
-    public List<PayTableResponse> getPayTables() {
-        return payTables;
+    public List<FunctionDTO> getFunctions() {
+        return functions;
     }
 
-    public void setPayTables(List<PayTableResponse> payTables) {
-        this.payTables = payTables;
+    public void setFunctions(List<FunctionDTO> functions) {
+        this.functions = functions;
     }
 
-    public PayTableResponseWrapper(List<PayGroupAreaQueryResult> payGroupArea, List<PayTableResponse> payTables) {
+    public PayTableResponseWrapper(List<PayGroupAreaQueryResult> payGroupArea, PayTableResponse payTables, List<FunctionDTO> functions) {
+        this.functions = functions;
         this.payGroupArea = payGroupArea;
         this.payTables = payTables;
     }

@@ -52,13 +52,11 @@ public class OrganizationServiceService extends UserBaseService {
     private TeamGraphRepository teamGraphRepository;
 
 
-
-
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     public Map<String, Object> updateOrganizationService(long id, String name, String description) {
-       com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(id);
+        com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (organizationService == null) {
             return null;
         }
@@ -97,20 +95,20 @@ public class OrganizationServiceService extends UserBaseService {
         }
         organizationService.setEnabled(false);
         save(organizationService);
-        if (organizationServiceRepository.findOne(id).isEnabled()){
+        if (organizationServiceRepository.findOne(id).isEnabled()) {
             return false;
         }
         return true;
     }
 
-    public com.kairos.persistence.model.organization.OrganizationService addSubService(final long serviceId,com.kairos.persistence.model.organization.OrganizationService subService) {
+    public com.kairos.persistence.model.organization.OrganizationService addSubService(final long serviceId, com.kairos.persistence.model.organization.OrganizationService subService) {
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         if (organizationService == null) {
             return null;
         }
 
-        String name = "(?i)"+subService.getName();
-        if (organizationServiceRepository.checkDuplicateSubService(organizationService.getId(),name)!=null){
+        String name = "(?i)" + subService.getName();
+        if (organizationServiceRepository.checkDuplicateSubService(organizationService.getId(), name) != null) {
             logger.info("Can't create duplicate sub service in same category");
             return null;
         }
@@ -128,24 +126,24 @@ public class OrganizationServiceService extends UserBaseService {
         response.put("id", subService.getId());
         response.put("name", subService.getName());
         response.put("description", subService.getDescription());
-        logger.info("Sending Response: "+response);
+        logger.info("Sending Response: " + response);
 
         return subService;
 
     }
 
-    public Map<String, Object> addCountrySubService(final long serviceId,com.kairos.persistence.model.organization.OrganizationService subService) {
+    public Map<String, Object> addCountrySubService(final long serviceId, com.kairos.persistence.model.organization.OrganizationService subService) {
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(serviceId);
         if (organizationService == null) {
-            throw  new DataNotFoundByIdException("Can't find Organization Service with provided Id");
+            throw new DataNotFoundByIdException("Can't find Organization Service with provided Id");
         }
 
-        String name = "(?i)"+subService.getName();
-        if (organizationServiceRepository.checkDuplicateSubService(organizationService.getId(),name)!=null){
+        String name = "(?i)" + subService.getName();
+        if (organizationServiceRepository.checkDuplicateSubService(organizationService.getId(), name) != null) {
             throw new DuplicateDataException("Can't create duplicate sub service in same category");
         }
 
-        logger.info("Creating : "+subService.getName()+" In "+organizationService.getName());
+        logger.info("Creating : " + subService.getName() + " In " + organizationService.getName());
         List<com.kairos.persistence.model.organization.OrganizationService> subServicesList = organizationService.getOrganizationSubService();
 
         if (subServicesList != null) {
@@ -160,8 +158,8 @@ public class OrganizationServiceService extends UserBaseService {
 
     }
 
-    public OrganizationServiceQueryResult updateCustomNameOfService(long serviceId, long organizationId, String customName, String type){
-        if(type.equalsIgnoreCase("team")){
+    public OrganizationServiceQueryResult updateCustomNameOfService(long serviceId, long organizationId, String customName, String type) {
+        if (type.equalsIgnoreCase("team")) {
             return teamGraphRepository.addCustomNameOfServiceForTeam(serviceId, organizationId, customName);
         } else {
             return organizationGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
@@ -169,102 +167,104 @@ public class OrganizationServiceService extends UserBaseService {
 
     }
 
-    public OrganizationServiceQueryResult updateCustomNameOfSubService(long subServiceId,long organizationId, String customName, String type){
-        if(type.equalsIgnoreCase("team")){
+    public OrganizationServiceQueryResult updateCustomNameOfSubService(long subServiceId, long organizationId, String customName, String type) {
+        if (type.equalsIgnoreCase("team")) {
             return teamGraphRepository.addCustomNameOfSubServiceForTeam(organizationId, subServiceId, customName);
         } else {
             return organizationGraphRepository.addCustomNameOfSubServiceForOrganization(subServiceId, organizationId, customName);
         }
     }
 
-    public Boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId){
-        return organizationGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId,organizationId);
-    };
+    public Boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId) {
+        return organizationGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId, organizationId);
+    }
 
-    public Boolean addDefaultCustomNameRelationShipOfServiceForTeam(long subOrganizationServiceId, long teamId){
-        return teamGraphRepository.addCustomNameOfServiceForTeam(subOrganizationServiceId,teamId);
-    };
+    ;
 
-    public Map<String,Object> updateServiceToOrganization(long id, long organizationServiceId,boolean isSelected,String type) {
+    public Boolean addDefaultCustomNameRelationShipOfServiceForTeam(long subOrganizationServiceId, long teamId) {
+        return teamGraphRepository.addCustomNameOfServiceForTeam(subOrganizationServiceId, teamId);
+    }
+
+    ;
+
+    public Map<String, Object> updateServiceToOrganization(long id, long organizationServiceId, boolean isSelected, String type) {
 
         com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(organizationServiceId);
-        if(organizationService == null){
+        if (organizationService == null) {
             throw new InternalError("organization service is null");
         }
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization unit = organizationGraphRepository.findOne(id);
-            if(unit == null){
+            if (unit == null) {
                 throw new InternalError("Organization is null");
             }
 
-            if(isSelected){
-                logger.info("check if already exist-------> "+organizationGraphRepository.isServiceAlreadyExist(id,organizationService.getId()));
-                if(organizationGraphRepository.isServiceAlreadyExist(id,organizationService.getId()) == 0){
-                    organizationGraphRepository.addOrganizationServiceInUnit(id,Arrays.asList(organizationService.getId()), DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
-                }else {
-                    organizationGraphRepository.updateServiceFromOrganization(id,organizationService.getId());
+            if (isSelected) {
+                logger.info("check if already exist-------> " + organizationGraphRepository.isServiceAlreadyExist(id, organizationService.getId()));
+                if (organizationGraphRepository.isServiceAlreadyExist(id, organizationService.getId()) == 0) {
+                    organizationGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+                } else {
+                    organizationGraphRepository.updateServiceFromOrganization(id, organizationService.getId());
                 }
                 addDefaultCustomNameRelationShipOfServiceForOrganization(organizationService.getId(), id);
             } else {
-                organizationGraphRepository.removeServiceFromOrganization(id,organizationService.getId());
+                organizationGraphRepository.removeServiceFromOrganization(id, organizationService.getId());
             }
 //                        getServiceOfSubService
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
-            if(team == null){
+            if (team == null) {
                 throw new InternalError("team can not null");
             }
-            if(isSelected){
-                if(teamGraphRepository.countOfServices(id,organizationService.getId()) == 0){
-                    teamGraphRepository.addServiceInTeam(id,organizationService.getId(),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
-                }else {
-                    teamGraphRepository.updateOrganizationService(id,organizationServiceId,true,DateUtil.getCurrentDate().getTime());
+            if (isSelected) {
+                if (teamGraphRepository.countOfServices(id, organizationService.getId()) == 0) {
+                    teamGraphRepository.addServiceInTeam(id, organizationService.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+                } else {
+                    teamGraphRepository.updateOrganizationService(id, organizationServiceId, true, DateUtil.getCurrentDate().getTime());
                 }
-                addDefaultCustomNameRelationShipOfServiceForTeam(organizationService.getId(),id);
+                addDefaultCustomNameRelationShipOfServiceForTeam(organizationService.getId(), id);
             } else {
-                teamGraphRepository.updateOrganizationService(id,organizationServiceId,false,DateUtil.getCurrentDate().getTime());
+                teamGraphRepository.updateOrganizationService(id, organizationServiceId, false, DateUtil.getCurrentDate().getTime());
             }
 
         }
-        return organizationServiceData(id,type);
+        return organizationServiceData(id, type);
     }
-
 
 
     public List<Object> getOrgServicesByOrgType(long orgType) {
         List<Map<String, Object>> organizationServices = organizationServiceRepository.getOrgServicesByOrgType(orgType);
-        if (organizationServices!=null){
+        if (organizationServices != null) {
             List<Object> objectList = new ArrayList<>();
-            for (Map<String,Object> map: organizationServices){
-                Object o =  map.get("result");
+            for (Map<String, Object> map : organizationServices) {
+                Object o = map.get("result");
                 objectList.add(o);
             }
-            return  objectList;
+            return objectList;
         }
-        return  null;
+        return null;
     }
 
     public List<Object> linkOrgServiceWithOrgType(long orgTypeId, long serviceId) {
         OrganizationType organizationType = organizationTypeGraphRepository.findOne(orgTypeId);
-        List<Object> objectList  = new ArrayList<>();
-        if (organizationType!=null){
-            if (checkIfServiceExistsWithOrganizationType(orgTypeId,serviceId)!=0){
+        List<Object> objectList = new ArrayList<>();
+        if (organizationType != null) {
+            if (checkIfServiceExistsWithOrganizationType(orgTypeId, serviceId) != 0) {
                 logger.info("Already Selected now Deselecting ");
-                organizationTypeGraphRepository.deleteService(orgTypeId,serviceId);
-                List<Map<String,Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
-                for (Map<String,Object> map:  mapList) {
+                organizationTypeGraphRepository.deleteService(orgTypeId, serviceId);
+                List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
+                for (Map<String, Object> map : mapList) {
                     Object o = map.get("result");
                     objectList.add(o);
 
                 }
                 return objectList;
-            }
-            else {
+            } else {
                 logger.info("Not  Selected now Selecting ");
-                organizationTypeGraphRepository.selectService(orgTypeId,serviceId);
-                List<Map<String,Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
-                for (Map<String,Object> map:  mapList) {
+                organizationTypeGraphRepository.selectService(orgTypeId, serviceId);
+                List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
+                for (Map<String, Object> map : mapList) {
                     Object o = map.get("result");
                     objectList.add(o);
                 }
@@ -274,8 +274,8 @@ public class OrganizationServiceService extends UserBaseService {
         return null;
     }
 
-    private int checkIfServiceExistsWithOrganizationType(long orgTypeId,long serviceId)  {
-        return  organizationTypeGraphRepository.checkIfServiceExistsWithOrganizationType(orgTypeId,serviceId);
+    private int checkIfServiceExistsWithOrganizationType(long orgTypeId, long serviceId) {
+        return organizationTypeGraphRepository.checkIfServiceExistsWithOrganizationType(orgTypeId, serviceId);
 
     }
 
@@ -285,9 +285,9 @@ public class OrganizationServiceService extends UserBaseService {
         if (country == null) {
             return null;
         }
-        String name = "(?i)"+organizationService.getName();
-        com.kairos.persistence.model.organization.OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId,name);
-        if(organizationService1 != null){
+        String name = "(?i)" + organizationService.getName();
+        com.kairos.persistence.model.organization.OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId, name);
+        if (organizationService1 != null) {
             return organizationService1;
             //throw  new DuplicateDataException("Can't create organization service");
         }
@@ -304,10 +304,10 @@ public class OrganizationServiceService extends UserBaseService {
         if (country == null) {
             return null;
         }
-        String name = "(?i)"+organizationService.getName();
-        com.kairos.persistence.model.organization.OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId,name);
-        if(organizationService1 != null){
-            throw  new DuplicateDataException("Can't create organization service");
+        String name = "(?i)" + organizationService.getName();
+        com.kairos.persistence.model.organization.OrganizationService organizationService1 = organizationServiceRepository.checkDuplicateService(countryId, name);
+        if (organizationService1 != null) {
+            throw new DuplicateDataException("Can't create organization service");
         }
         List<com.kairos.persistence.model.organization.OrganizationService> organizationServices = country.getOrganizationServices();
         organizationServices = (organizationServices == null) ? new ArrayList<>() : organizationServices;
@@ -322,10 +322,10 @@ public class OrganizationServiceService extends UserBaseService {
     }
 
 
-    public Map<String,Object> organizationServiceData(long id,String type) {
+    public Map<String, Object> organizationServiceData(long id, String type) {
 
 
-        Map<String,Object> response = null;
+        Map<String, Object> response = null;
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 
@@ -333,22 +333,22 @@ public class OrganizationServiceService extends UserBaseService {
             if (organization == null) {
                 return null;
             }
-                Organization parent;
-                if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-                    parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
+            Organization parent;
+            if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+                parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
 
-                } else {
-                    parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
-                }
-                if (parent != null) {
-                    response = filterSkillData(organizationGraphRepository.getServicesForUnit(parent.getId(), id));
-                } else {
-                    response = filterSkillData(organizationGraphRepository.getServicesForParent(id));
-                }
+            } else {
+                parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
+            }
+            if (parent != null) {
+                response = filterSkillData(organizationGraphRepository.getServicesForUnit(parent.getId(), id));
+            } else {
+                response = filterSkillData(organizationGraphRepository.getServicesForParent(id));
+            }
 
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
-            if(team == null){
+            if (team == null) {
                 throw new InternalError("Team is null");
             }
             response = filterSkillData(teamGraphRepository.getOrganizationServicesOfTeam(id));
@@ -357,15 +357,15 @@ public class OrganizationServiceService extends UserBaseService {
         return response;
     }
 
-    private Map<String,Object> filterSkillData(List<Map<String,Object>> skillData){
-        Map<String,Object> response = new HashMap<>();
-        for(Map<String,Object> map : skillData){
+    private Map<String, Object> filterSkillData(List<Map<String, Object>> skillData) {
+        Map<String, Object> response = new HashMap<>();
+        for (Map<String, Object> map : skillData) {
 
-            if(((Map<String,Object>)map.get("data")).get("availableServices") != null){
-                response.put("availableServices",((Map<String,Object>)map.get("data")).get("availableServices"));
+            if (((Map<String, Object>) map.get("data")).get("availableServices") != null) {
+                response.put("availableServices", ((Map<String, Object>) map.get("data")).get("availableServices"));
             }
-            if(((Map<String,Object>)map.get("data")).get("selectedServices") != null){
-                response.put("selectedServices",((Map<String,Object>)map.get("data")).get("selectedServices"));
+            if (((Map<String, Object>) map.get("data")).get("selectedServices") != null) {
+                response.put("selectedServices", ((Map<String, Object>) map.get("data")).get("selectedServices"));
             }
         }
 
@@ -462,9 +462,9 @@ public class OrganizationServiceService extends UserBaseService {
         return organizationService;
     }
 
-    public Map<String,Object> organizationImportedServiceData(long id) {
+    public Map<String, Object> organizationImportedServiceData(long id) {
 
-        Map<String,Object> response = null;
+        Map<String, Object> response = null;
         Organization unit = organizationGraphRepository.findOne(id);
         if (unit == null) {
             return null;
@@ -488,8 +488,17 @@ public class OrganizationServiceService extends UserBaseService {
         return organizationService;
     }
 
-    public Country getCountryByOranizationid(long organizationServiceId){
+    public Country getCountryByOranizationid(long organizationServiceId) {
         return countryGraphRepository.getCountryByOrganizationService(organizationServiceId);
+    }
+
+
+    public com.kairos.persistence.model.organization.OrganizationService findOne(Long id) {
+        com.kairos.persistence.model.organization.OrganizationService organizationService = organizationServiceRepository.findOne(id);
+        if (!Optional.ofNullable(organizationService).isPresent()) {
+            throw new DataNotFoundByIdException("Unable to find organization Service");
+        }
+        return organizationService;
     }
 
 

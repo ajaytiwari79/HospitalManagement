@@ -43,8 +43,10 @@ import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD
  * Organization Domain & it's properties
  */
 //@JsonSerialize(using = OrganizationSerializer.class)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @NodeEntity
 public class Organization extends UserBaseEntity {
     private boolean isEnable = true;

@@ -1,9 +1,11 @@
 package com.kairos.persistence.model.user.pay_table;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -11,7 +13,8 @@ import java.util.List;
  * Created by vipul on 15/3/18.
  */
 @QueryResult
-public class PayTableResponse {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class PayTableResponse implements Comparable<PayTableResponse> {
     private Long id;
     private String name;
     private String shortName;
@@ -118,5 +121,13 @@ public class PayTableResponse {
         sb.append(", description='").append(description).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+
+    @Override
+    public int compareTo(PayTableResponse payTableResponse) {
+        Long compareQuantity = ((PayTableResponse) payTableResponse).getStartDateMillis();
+        //ascending order
+        return this.getStartDateMillis().compareTo(compareQuantity);
     }
 }
