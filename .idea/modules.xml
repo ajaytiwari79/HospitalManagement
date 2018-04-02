@@ -2,10 +2,17 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Kairos-kairos-user_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Kairos-kairos-user_main.iml" group="kairos-user" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Kairos-kairos-user_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Kairos-kairos-user_test.iml" group="kairos-user" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dto.iml" filepath="$PROJECT_DIR$/.idea/modules/dto.iml" group="dto" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dto_main.iml" filepath="$PROJECT_DIR$/.idea/modules/dto_main.iml" group="dto" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dto_test.iml" filepath="$PROJECT_DIR$/.idea/modules/dto_test.iml" group="dto" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kairos-user.iml" filepath="$PROJECT_DIR$/.idea/modules/kairos-user.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dto/kairos-user-dto_main.iml" filepath="$PROJECT_DIR$/.idea/modules/dto/kairos-user-dto_main.iml" group="dto" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dto/kairos-user-dto_test.iml" filepath="$PROJECT_DIR$/.idea/modules/dto/kairos-user-dto_test.iml" group="dto" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kairosActivity/kairos-user-kairosActivity_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kairosActivity/kairos-user-kairosActivity_main.iml" group="kairosActivity" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kairosActivity/kairos-user-kairosActivity_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kairosActivity/kairos-user-kairosActivity_test.iml" group="kairosActivity" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kairosUser/kairos-user-kairosUser_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kairosUser/kairos-user-kairosUser_test.iml" group="kairosUser" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kairos-user_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kairos-user_main.iml" group="kairos-user" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kairos-user_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kairos-user_test.iml" group="kairos-user" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kairosActivity.iml" filepath="$PROJECT_DIR$/.idea/modules/kairosActivity.iml" group="kairosActivity" />

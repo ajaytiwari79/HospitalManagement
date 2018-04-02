@@ -25,6 +25,10 @@ apply plugin: 'application'
 version = "$projectVersion-SNAPSHOT"
 sourceCompatibility = 1.8
 mainClassName = 'com.kairos.UserServiceApplication'
+
+applicationDefaultJvmArgs = ["-Xdiag"]
+
+
 repositories {
 	mavenCentral()
 	jcenter()
@@ -41,8 +45,6 @@ task wrapper(type: Wrapper) { gradleVersion = '4.1' }
 ext {
 	springCloudVersion = 'Finchley.M5'
 }
-
-
 dependencies {
 	compile project (':dto')
     //compile('org.kairos:dto:0.0.1-SNAPSHOT')
@@ -85,4 +87,29 @@ dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
+}
+configurations { c ->
+    println 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC $c'+configurations.compile.collect { it.getName() }.join(' ')
+}
+//Just for windows
+task pathingJar(type: Jar) {
+    dependsOn configurations.runtime
+    appendix = 'pathing'
+
+    doFirst {
+        manifest {
+            attributes "Class-Path": configurations.runtime.files.collect {
+                it.toURL().toString().replaceFirst(/file:\/+/, '/')
+            }.join(' ')
+        }
+    }
+}
+
+bootRun {
+    dependsOn pathingJar
+    doFirst {
+        println 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC'+ pathingJar.archivePath
+
+        classpath = files("$buildDir/classes/java/main", "$buildDir/resources/main", pathingJar.archivePath)
+    }
 }

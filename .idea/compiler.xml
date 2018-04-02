@@ -4,6 +4,13 @@
     <bytecodeTargetLevel>
       <module name="dto_main" target="1.8" />
       <module name="dto_test" target="1.8" />
+      <module name="Kairos-kairos-user_main" target="1.8" />
+      <module name="Kairos-kairos-user_test" target="1.8" />
+      <module name="kairos-user-dto_main" target="1.8" />
+      <module name="kairos-user-dto_test" target="1.8" />
+      <module name="kairos-user-kairosActivity_main" target="1.8" />
+      <module name="kairos-user-kairosActivity_test" target="1.8" />
+      <module name="kairos-user-kairosUser_test" target="1.8" />
       <module name="kairos-user_main" target="1.8" />
       <module name="kairos-user_test" target="1.8" />
       <module name="kairosActivity_main" target="1.8" />

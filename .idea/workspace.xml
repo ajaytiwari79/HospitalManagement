@@ -2,9 +2,638 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0caee40-a7be-4886-b830-cd68fe91a394" name="Default" comment="SubModules in one repo">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules/dto_main.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules/dto_test.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules/kairos-user_main.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules/kairos-user_test.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules/kairosActivity_main.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules/kairosActivity_test.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules/kairosUser/kairosUser_test.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/.gitignore" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/README.md" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/app-version.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/build.gradle" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/gradle.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/gradle/wrapper/gradle-wrapper.jar" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/gradle/wrapper/gradle-wrapper.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/gradlew" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/gradlew.bat" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/hs_err_pid29886.log" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/kairos-activity.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/out/production/resources/messages/messages.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/AppBootstrapListener.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/KairosActivityApplication.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/AbsenceTypeRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/ClientRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/ControlPanelRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/CountryRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/IntegrationRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/OrganizationRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/OrganizationServiceRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/SchedulerRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/SkillRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/StaffRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/TimeCareRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/TimeSlotRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/ClientStaffInfoDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/DayType.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/OrganizationSkillAndOrganizationTypesDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/Phase/PhaseDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/Phase/PhaseWeeklyDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/RepetitionType.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/RestTemplateResponseEnvelope.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/Shifts.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/TimeBankRestClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/TimeSlot.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/TimeSlotWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/activityType/PresenceTypeDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/activityType/PresenceTypeWithTimeTypeDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/activityType/TimeTypeDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/client/AbsenceTypes.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/client/Client.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/client/ClientExceptionCountWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/client/ClientOrganizationIds.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/client/ClientTemporaryAddress.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/client/Municipality.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/client/ZipCode.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/country/CountryDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/country/CountryHolidayCalender.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/organization/AddressDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/organization/OrganizationContactAddress.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/organization/OrganizationDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/organization/OrganizationLevel.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/organization/OrganizationPhaseDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/organization/OrganizationTypeDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/skill/Skill.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/skill/SkillCategory.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/skill/SkillLevel.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/AvailableCountries.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/ContactAddress.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/ContactDetail.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/CurrentAddress.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/CurrentAddressLinks.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/EventResource.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/EventType.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/GeoCoordinates.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/Grants.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/KMDShift.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/KMDTask.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/OrganizationStaffWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/PatientResourceList.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/SearchPostalDistrict.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/StaffAdditionalInfoDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/StaffDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/client/dto/staff/UnitPositionDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/LocalDateDeserializer.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/LocalDateSerializer.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/aop/MongoLoggingAspect.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/env/EnvConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/listener/SpringApplicationContext.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/listener/SpringApplicationContextListener.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/mail/SpringMailConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/mongo/MongoConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/mongo_converter/LocalDateReadConverter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/mongo_converter/LocalDateTimeReadConverter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/mongo_converter/LocalDateTimeWriteConverter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/mongo_converter/LocalDateWriteConverter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/mongo_converter/LocalTimeReadConverter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/mongo_converter/LocalTimeWriteConverter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/redis/RedisConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/scheduler/MyAsyncUncaughtExceptionHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/scheduler/SchedulerConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/security/CorsFilter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/security/CustomJwtAccessTokenConverter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/security/CustomMethodSecurityExpressionRoot.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/security/CustomOAuth2WebSecurityExpressionHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/security/MethodSecurityConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/security/ResourceServerConfiguration.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/swagger/SwaggerConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/web_socket/WebSocketConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/config/web_socket/WebSocketHeaderInterceptor.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/constants/ApiConstants.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/constants/AppConstants.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/constants/MongoConstant.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/constants/ResponseConstants.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/FLSVisitourChangeController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/absencePlanning/AbsencePlanningController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/absencePlanning/SecurityTestController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/activity/ActivityCategoryController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/activity/ActivityController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/activity/ShiftController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/activity/TimeTypeController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/activity_stream/NotificationController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/client_exception/ClientExceptionController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/country/CountryPhaseController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/exception_handler/CustomResponseEntityExceptionHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/exception_handler/ErrorMessage.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/exception_handler/FieldErrorDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/organization/OrganizationActivityController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/phase/PhaseController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/planner/PlannerController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/requestComponent/RequestComponentController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/restrcition_freuency/RestrictionFrequencyController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/staffing_level/StaffingLevelController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/staffing_level/StaffingLevelTemplateController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/table_settings/TableSettingController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/tag/TagController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/task/TaskController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/task/TaskDemandController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/task/TaskPackageController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/task/TaskTypeController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/timeBank/TimeBankController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/time_care/TimeCareController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/visitator/VisitatorController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/web_socket/AsyncUpdateDataController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/controller/web_socket/StaffingLevelGraphController.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/ActionNotPermittedException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/AddressNotVerifiedByTomTom.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/CitizenNotFoundException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/DataNotFoundByIdException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/DataNotFoundException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/DataNotModifiedException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/DuplicateDataException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/ExceptionTypeNotFoundException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/FlsCredentialException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/InvalidClientException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/InvalidRequestException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/InvalidTimeSlotException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/TaskDemandException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/TimeTypeLinkedException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/custom_exception/ZipCodeNotFound.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/enums/CitizenHealthStatus.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/enums/RuleTemplates.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/enums/TimeTypes.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/interceptor/ExtractOrganizationAndUnitInfoInterceptor.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/interceptor/InterceptorRegister.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/messaging/ReceivedTask.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/messaging/Receiver.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/messaging/wshandlers/CustomStompFrameHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/messaging/wshandlers/StaffingLevelGraphCustomStompFrameHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/messaging/wshandlers/StaffingLevelGraphStompClientWebSocketHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/messaging/wshandlers/StompClientWebSocketHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/enums/task_type/DelayPenalty.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/enums/task_type/TaskTypeEnum.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/CustomTimeScale.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/Activity.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/Shift.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/SubShifts.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/TimeType.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/ActivityCategory.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/ActivitySkill.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/BalanceSettingsActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/BonusActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/CTAAndWTASettingsActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/CommunicationActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/CompositeShiftActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/GeneralActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/IndividualPointsActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/NotesActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/OptaPlannerSettingActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/OrganizationMappingActivity.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/PhaseTemplateValue.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/RulesActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/SkillActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity/tabs/TimeCalculationActivityTab.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/activity_stream/Notification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/client_aggregator/ClientAggregator.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/client_aggregator/FourWeekFrequency.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/client_exception/ClientException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/client_exception/ClientExceptionCount.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/client_exception/ClientExceptionDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/client_exception/ClientExceptionType.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/common/MongoBaseEntity.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/common/MongoSequence.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/common/QueryResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/common/SequenceName.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/constants/ClientExceptionConstant.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/constants/RelationshipConstants.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/constants/TableSettingConstants.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/constants/TaskConstants.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/phase/Phase.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/restrcition_freuency/RestrictionFrequency.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/Day.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/StaffingLevel.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/StaffingLevelActivity.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/StaffingLevelDuration.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/StaffingLevelInterval.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/StaffingLevelSetting.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/StaffingLevelSkill.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/StaffingLevelTemplate.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/StaffingLevelTemplatePeriod.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/TimeCareStaffingLevelDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/staffing_level/TimeCareStaffingLevelIntervalDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/table_settings/TableConfiguration.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/table_settings/TableSetting.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/tag/MasterDataTypeEnum.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/tag/Tag.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task/SkillExpertise.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task/Task.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task/TaskAddress.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task/TaskExceptionWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task/TaskPackage.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task/TaskReport.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task/TaskStatus.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task/UnhandledTaskCount.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_demand/MonthlyFrequency.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_demand/TaskDemand.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_demand/TaskDemandValidator.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_demand/TaskDemandVisit.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_type/AbsencePlanningStatus.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_type/AddressCode.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_type/MapPointer.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_type/SlaPerDayInfo.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_type/TaskType.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_type/TaskTypeDefination.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_type/TaskTypeResource.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_type/TaskTypeSkill.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_type/TaskTypeSkillCategory.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/task_type/TaskTypeSlaConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/time_bank/DailyTimeBank.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/model/time_bank/TimeBankDistribution.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/query_result/EscalateTaskWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/query_result/EscalatedTasksWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/query_result/OrgTaskTypeAggregateResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/query_result/PhaseWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/query_result/StaffAssignedTasksWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/query_result/TaskCountWithAssignedUnit.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/query_result/TaskTypeAggregateResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/query_result/TaskWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/query_result/VisitatedHoursTasksCount.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/CustomTimeScaleRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/activity/ActivityCategoryRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/activity/ActivityMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/activity/ActivityMongoRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/activity/CustomActivityMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/activity/CustomShiftMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/activity/ShiftMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/activity/ShiftMongoRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/activity/TimeTypeMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/activity_stream/NotificationMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/client_aggregator/ClientAggregatorMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/client_aggregator/CustomClientAggregatorRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/client_exception/ClientExceptionMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/client_exception/ClientExceptionMongoRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/client_exception/ClientExceptionTypeMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/client_exception/CustomClientExceptionRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/common/CustomAggregationOperation.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/common/CustomAggregationQuery.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/common/MongoSequenceRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/custom_repository/MongoBaseRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/custom_repository/MongoBaseRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/phase/CustomPhaseMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/phase/PhaseMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/phase/PhaseMongoRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/repository_impl/ClientAggregatorMongoRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/repository_impl/CustomTaskTypeRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/repository_impl/TagMongoRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/repository_impl/TaskDemandMongoRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/repository_impl/TaskMongoRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/restrcition_freuency/RestrictionFrequencyRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/staffing_level/StaffingLevelCustomRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/staffing_level/StaffingLevelMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/staffing_level/StaffingLevelMongoRepositoryImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/staffing_level/StaffingLevelTemplateRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/table_settings/TableSettingMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/tag/CustomTagMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/tag/TagMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/ActualPlanningTaskQueryResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/CustomTaskDemandMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/CustomTaskMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/CustomTaskMongoTemplateRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/CustomTaskTypeRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/MapPointerMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/TaskDemandMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/TaskMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/TaskPackageMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/TaskReportMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/TaskTypeMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/task_type/TaskTypeSlaConfigMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/persistence/repository/time_bank/TimeBankMongoRepository.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ActivityResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ActivityWithCompositeDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ActivityWithUnitIdDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/AddressDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/BulDeleteTaskDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/BulkUpdateTaskDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ClientAggregatorDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ClientFilterDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ClientTemporaryAddressDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/CompositeActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ContactAddressDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ControlPanelDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/CreateTaskTypeDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/OrganizationClientWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/OrganizationTypeAndSubTypeDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/OrganizationTypeHierarchyQueryResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/PhaseActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/RequestComponent.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/RequestType.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ResponseEnvelope.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/ShiftQueryResultWithActivity.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/SkillActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/StaffTaskDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/TaskActiveUpdationDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/TaskAppointmentSuggestionDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/TaskClientExceptionWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/TaskDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/TaskDemandDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/TaskGanttDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/TaskRestrictionDto.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/TaskUpdateDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/TimeCareOrganizationDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/ActivityCategoryListDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/ActivityTabsWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/ActivityTagDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/ActivityWithCTAWTASettingsDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/ActivityWithSelectedDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/BalanceSettingActivityTabDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/BonusActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/CTAAndWTASettingsActivityTabDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/CommunicationActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/CompositeShiftActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/GeneralActivityTabDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/IndividualPointsActivityTabDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/NotesActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/OptaPlannerSettingActivityTabDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/OrganizationActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/OrganizationMappingActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/RulesActivityTabDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/TimeCalculationActivityDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/activity/TimeTypeDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/shift/EmploymentType.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/shift/Expertise.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/shift/PhaseTemplateValue.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/shift/RuleTemplateCategoryDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/shift/ShiftDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/shift/ShiftQueryResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/shift/StaffUnitEmploymentDetails.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/shift/WTAResponseDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/staffing_level/ShiftPlanningStaffingLevelDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/staffing_level/StaffingLevelDto.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/staffing_level/StaffingLevelGraphDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/staffing_level/StaffingLevelTemplateDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/staffing_level/StaffingLevelTemplatePeriod.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/staffing_level/StaffingLevelTimeSlotDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/tag/TagDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/task_type/TaskTypeCopyDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/task_type/TaskTypeResourceDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/task_type/TaskTypeResponseDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/task_type/TaskTypeSlaConfigDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/time_bank/CTAIntervalDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/time_bank/CTARuleTemplateDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/time_bank/CalculatedTimeBankByDateDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/time_bank/ScheduleTimeByTimeTypeDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/time_bank/TimeBankDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/time_bank/TimeBankDistributionDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/time_bank/TimeBankIntervalDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/time_bank/TimeTypeIntervalDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/response/dto/time_bank/TimebankWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/schedular/PhaseChangeScheduler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/serializers/MongoDateMapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/AppLogService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/CustomTimeScaleService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/MapPointerService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/MongoBaseService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/SmsService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/absencePlanning/AbsencePlanningService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/activity/ActivityCategoryService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/activity/ActivityService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/activity/ShiftService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/activity/TimeTypeService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/activity_stream/NotificationService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/aggregator/AggregatorService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/client_exception/ClientExceptionService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/event/NotificationEventListener.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/dynamic_change/FLSVisitourChangeService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/enums/FlsCallResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/enums/FlsRequestType.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/exceptions/scheduler/FlsCallException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/exceptions/scheduler/SchedulerException.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/logging/WebServiceLogging.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/schedule/FlsPayloadService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/schedule/Scheduler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/schedule/SchedulerImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/schedule/TaskConverterService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/webservice_config/FlsConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/webservice_config/WebServiceMessageSenderWithAuth.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/wsclient/FlsClient.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/fls_visitour/wsclient/FlsClientImpl.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/kmdNexus/AuthService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/logging/AppLog.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/logging/UserPojo.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/mail/MailService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/mail/MailTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/organization/OrganizationActivityService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/phase/DurationType.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/phase/PhaseService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/planner/PlannerService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/planner/RandomDateGeneratorService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/planner/TaskExceptionService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/planner/TasksMergingService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/requestComponent/RequestComponentService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/restrcition_freuency/RestrictionFrequencyService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/staffing_level/StaffingLevelService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/staffing_level/StaffingLevelTemplateService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/table_settings/TableSettingService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/tag/TagService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/task_type/TaskDemandService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/task_type/TaskDynamicReportService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/task_type/TaskPackageService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/task_type/TaskService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/task_type/TaskTypeService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/time_bank/TimeBankService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/tpa/TaskReportService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/tree_structure/TreeStructureService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/service/visitator/VisitatorService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/AbstractActivitySpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/AbstractTaskSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/ActivityDayTypeSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/ActivityEmploymentTypeSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/ActivityExpertiseSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/ActivitySpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/ActivityWTARulesSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/AndActivitySpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/AndSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/MergeTaskSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/OrSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/StaffActivityWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/StaffAndActivitySkillSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/StaffTypeSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/TaskDaySpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/TaskLocationSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/TaskSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/spec/TaskStaffTypeSpecification.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/ApiResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/ApplicationUtil.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/BadgeGenerator.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/BeanFactoryUtil.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/DateConverter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/DateUtils.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/DistanceCalculator.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/FileUtil.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/FlsUrlPaths.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/FormatUtil.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/IPAddressUtil.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/JsonUtils.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/Message.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/ProcessedMessage.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/RestClientUrlUtil.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/TaskDemandRequestWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/TaskDemandValidator.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/TaskDemandVisitWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/TaskUtil.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/TimeInterval.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/Tst.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/ValidationMessageDTO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/event/ShiftNotificationEvent.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/functional_interface/PerformCalculation.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/response/ResponseHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/ArrayOfChildShift.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/ChildShift.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/Contract.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/GetAllActivitiesResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/GetAllWorkPlacesResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/GetAllWorkPlacesResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/GetEmploymentByIdResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/GetEmploymentByIdResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/GetWorkShiftsFromWorkPlaceByIdResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/GetWorkShiftsFromWorkPlaceByIdResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/Person.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/Result.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/TaskReportWrapper.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/TimeCareActivity.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/Transstatus.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/timeCareShift/WorkPlace.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/time_bank/TimeBankCalculationService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/userContext/CurrentUserDetails.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/userContext/Gender.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/userContext/User.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/userContext/UserContext.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/userContext/UserContextFilter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/userContext/UserContextHolder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/userContext/UserContextInterceptor.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/validator/DatePattern.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/validator/DatePatternValidator.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/validator/ExistingStaffingLevel.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/util/validator/ExistingStaffingLevelValidator.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/com/kairos/activity/view_handler/json_view_handler/TaskTypeViewHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/Appointment.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/ArrayOfAppointment.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/ArrayOfAttachment.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/ArrayOfCallInfoRec.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/ArrayOfFixedCall.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/ArrayOfGeoCodeRec.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/ArrayOfNextCall.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/ArrayOfTrackPoint.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/Attachment.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/BreakResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/Breaks.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/Call.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/CallInfoRec.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/CallResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/Error.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/FieldManager.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/FieldManagerResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/FixSchedule.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/FixScheduleResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/FixedCall.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/GeoCodeRec.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/Geocode.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/GeocodeResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/MobileMessage.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/MobileMessageResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/NextCall.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/ObjectFactory.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/Optimize.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/OptimizeResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/ShowCallInfo.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/ShowCallInfoResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/TrackPoint.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/VisiTour.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/VisiTourSoap.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/WorkSchedule.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/WorkScheduleResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/java/de/tourenserver/package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/application-development.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/application-production.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/application-qa.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/application-test.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/application.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/bootstrap.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/client_secret.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/email-config.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/java-mail.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/logback-spring.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/messages/messages.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/public.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/scripts/20_FEB_KP_2356.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/scripts/24_JAN_2018_PhaseDrop.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/scripts/7_FEB_2018_KP_2226.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/static/sockjs.min.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/main/resources/static/stomp.min.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/KairosActivityApplicationTests.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/config/IntegrationTestConfig.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/config/OrderTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/config/OrderTestRunner.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/config/WebsocketEndpointIT.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/activity/ShiftServicejUnitTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/activity/ShiftTypeServiceTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/client_exception/ClientExceptionServiceIntegrationTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/organization/OrganizationTimeCareActivityServiceIntegrationTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/phase/PhaseServiceTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/phase/PhaseServiceUnitTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/staffing_level/StaffingLevelIntegrationTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/staffing_level/StaffingLevelServiceTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/staffing_level/StaffingLevelTemplateIT.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/staffing_level/Test.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/tag/TagServiceIntegrationTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/task/TaskServiceTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/timeBank/TimeBankServiceTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/time_bank/DailyTimeBankServiceTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/service/time_bank/TImeBankCalculationServiceTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/task_type/TaskTypeServiceIntegrationTest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/application-development.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/application-production.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/application-stag.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/application-test.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/application.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/bootstrap.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/client_secret.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/email-config.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/java-mail.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/logback-spring.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/src/test/resources/public.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/kairosActivity/visitour_change.log" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.0/fileContent/annotation-processors.bin" afterPath="$PROJECT_DIR$/.gradle/4.0/fileContent/annotation-processors.bin" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.0/fileContent/fileContent.lock" afterPath="$PROJECT_DIR$/.gradle/4.0/fileContent/fileContent.lock" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.0/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.0/fileHashes/fileHashes.bin" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.0/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.0/fileHashes/fileHashes.lock" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.0/fileHashes/resourceHashesCache.bin" afterPath="$PROJECT_DIR$/.gradle/4.0/fileHashes/resourceHashesCache.bin" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.0/taskHistory/fileSnapshots.bin" afterPath="$PROJECT_DIR$/.gradle/4.0/taskHistory/fileSnapshots.bin" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.0/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.0/taskHistory/taskHistory.bin" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.0/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.0/taskHistory/taskHistory.lock" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.1/fileContent/annotation-processors.bin" afterPath="$PROJECT_DIR$/.gradle/4.1/fileContent/annotation-processors.bin" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.1/fileContent/fileContent.lock" afterPath="$PROJECT_DIR$/.gradle/4.1/fileContent/fileContent.lock" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.1/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.1/fileHashes/fileHashes.bin" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.1/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.1/fileHashes/fileHashes.lock" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.1/fileHashes/resourceHashesCache.bin" afterPath="$PROJECT_DIR$/.gradle/4.1/fileHashes/resourceHashesCache.bin" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.1/taskHistory/fileSnapshots.bin" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/fileSnapshots.bin" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.bin" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.lock" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dto/build/libs/dto-0.0.1-SNAPSHOT.jar" afterPath="$PROJECT_DIR$/dto/build/libs/dto-0.0.1-SNAPSHOT.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/kairosActivity" afterPath="$PROJECT_DIR$/kairosActivity" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/dto.iml" afterPath="$PROJECT_DIR$/.idea/modules/dto.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/kairos-user.iml" afterPath="$PROJECT_DIR$/.idea/modules/kairos-user.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/kairosActivity.iml" afterPath="$PROJECT_DIR$/.idea/modules/kairosActivity.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/kairosUser/kairosUser.iml" afterPath="$PROJECT_DIR$/.idea/modules/kairosUser/kairosUser.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/kairosUser/kairosUser_main.iml" afterPath="$PROJECT_DIR$/.idea/modules/kairosUser/kairosUser_main.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/kairosUser/build.gradle" afterPath="$PROJECT_DIR$/kairosUser/build.gradle" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
@@ -65,22 +694,33 @@
             <expand>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="kairos-user" type="f1a62948:ProjectNode" />
+                <item name="kairosUser" type="f1a62948:ProjectNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="kairos-user" type="f1a62948:ProjectNode" />
-                <item name="kairos-user" type="2d1252cf:ModuleNode" />
+                <item name="kairosUser" type="f1a62948:ProjectNode" />
+                <item name=":kairosUser" type="2d1252cf:ModuleNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="kairos-user" type="f1a62948:ProjectNode" />
-                <item name="kairos-user" type="2d1252cf:ModuleNode" />
+                <item name="kairosUser" type="f1a62948:ProjectNode" />
+                <item name=":kairosUser" type="2d1252cf:ModuleNode" />
                 <item name="Source Sets" type="e897c970:GradleViewContributor$SourceSetsNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="kairosUser" type="f1a62948:ProjectNode" />
+                <item name=":kairosUser" type="2d1252cf:ModuleNode" />
+                <item name="Source Sets" type="e897c970:GradleViewContributor$SourceSetsNode" />
+                <item name="main" type="396b929e:GradleViewContributor$SourceSetNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="kairosUser" type="f1a62948:ProjectNode" />
+                <item name=":kairosUser" type="2d1252cf:ModuleNode" />
+                <item name="Source Sets" type="e897c970:GradleViewContributor$SourceSetsNode" />
+                <item name="main" type="396b929e:GradleViewContributor$SourceSetNode" />
+                <item name="Dependencies" type="6de06a37:ExternalSystemViewDefaultContributor$MyDependenciesNode" />
               </path>
             </expand>
             <select />
@@ -94,28 +734,38 @@
       <file leaf-file-name="application-development.properties" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/kairosActivity/src/main/resources/application-development.properties">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1819">
+            <state relative-caret-position="0">
               <caret line="107" column="34" lean-forward="false" selection-start-line="107" selection-start-column="25" selection-end-line="107" selection-end-column="34" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="WebsocketEndpointIT.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/config/WebsocketEndpointIT.java">
+      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/kairosUser/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="58" column="42" lean-forward="false" selection-start-line="58" selection-start-column="42" selection-end-line="58" selection-end-column="42" />
+            <state relative-caret-position="187">
+              <caret line="95" column="36" lean-forward="true" selection-start-line="95" selection-start-column="36" selection-end-line="95" selection-end-column="36" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/kairosUser/build.gradle">
+      <file leaf-file-name="WebMvcConfigurerAdapter.java" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-webmvc/5.0.2.RELEASE/27b1e2a994580e4ddca706ff1a4ca105afe823bb/spring-webmvc-5.0.2.RELEASE-sources.jar!/org/springframework/web/servlet/config/annotation/WebMvcConfigurerAdapter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="223">
-              <caret line="57" column="36" lean-forward="false" selection-start-line="57" selection-start-column="36" selection-end-line="57" selection-end-column="36" />
+            <state relative-caret-position="-272">
+              <caret line="31" column="65" lean-forward="true" selection-start-line="31" selection-start-column="65" selection-end-line="31" selection-end-column="65" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UserServiceApplication.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/kairosUser/src/main/java/com/kairos/UserServiceApplication.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="48" column="67" lean-forward="false" selection-start-line="48" selection-start-column="44" selection-end-line="48" selection-end-column="67" />
               <folding />
             </state>
           </provider>
@@ -124,28 +774,18 @@
       <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/kairosActivity/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="79" column="0" lean-forward="true" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
+            <state relative-caret-position="102">
+              <caret line="6" column="23" lean-forward="false" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="true">
+      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dto/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-102">
-              <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="application-development.properties" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/kairosUser/src/main/resources/application-development.properties">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="20" column="1" lean-forward="false" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
+            <state relative-caret-position="697">
+              <caret line="41" column="5" lean-forward="false" selection-start-line="41" selection-start-column="5" selection-end-line="41" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -157,6 +797,12 @@
     <findStrings>
       <find>compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')</find>
       <find>bootJar</find>
+      <find>springCloudVersion</find>
+      <find>192.168.6.96</find>
+      <find>gatlingRun</find>
+      <find>SNAPSHOT.jar</find>
+      <find>webmvc</find>
+      <find>spring-webmvc</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -167,13 +813,13 @@
     <option name="myGradleHomes">
       <map>
         <entry key="$PROJECT_DIR$" value="E:\Development\gradle\gradle-4.0-bin\gradle-4.0" />
-        <entry key="$PROJECT_DIR$/dto" value="E:\Development\gradle\gradle-4.0-bin\gradle-4.0" />
+        <entry key="$PROJECT_DIR$/kairosActivity" value="E:\Development\gradle\gradle-4.0-bin\gradle-4.0" />
       </map>
     </option>
     <option name="myGradleVersions">
       <map>
         <entry key="$PROJECT_DIR$" value="4.0" />
-        <entry key="$PROJECT_DIR$/dto" value="4.0" />
+        <entry key="$PROJECT_DIR$/kairosActivity" value="4.0" />
       </map>
     </option>
     <option name="availableProjects">
@@ -181,8 +827,8 @@
         <entry>
           <key>
             <ExternalProjectPojo>
-              <option name="name" value="dto" />
-              <option name="path" value="$PROJECT_DIR$/dto" />
+              <option name="name" value="kairos-user" />
+              <option name="path" value="$PROJECT_DIR$" />
             </ExternalProjectPojo>
           </key>
           <value>
@@ -209,8 +855,8 @@
         <entry>
           <key>
             <ExternalProjectPojo>
-              <option name="name" value="kairos-user" />
-              <option name="path" value="$PROJECT_DIR$" />
+              <option name="name" value="kairosActivity" />
+              <option name="path" value="$PROJECT_DIR$/kairosActivity" />
             </ExternalProjectPojo>
           </key>
           <value>
@@ -513,6 +1159,10 @@
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="startScripts" />
               </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="pathingJar" />
+              </ExternalTaskPojo>
             </list>
           </value>
         </entry>
@@ -520,14 +1170,14 @@
           <value>
             <list>
               <ExternalTaskPojo>
-                <option name="description" value="Publishes Maven publication 'mavenJava' to Maven repository 'maven'." />
+                <option name="description" value="Assembles the outputs of this project." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="publishMavenJavaPublicationToMavenRepository" />
+                <option name="name" value="assemble" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Displays the components produced by project ':dto'. [incubating]" />
+                <option name="description" value="Assembles and tests this project." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="components" />
+                <option name="name" value="build" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Assembles and tests this project and all projects that depend on it." />
@@ -535,9 +1185,19 @@
                 <option name="name" value="buildDependents" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Displays the sub-projects of project ':dto'." />
+                <option name="description" value="Displays all buildscript dependencies declared in project ':dto'." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="projects" />
+                <option name="name" value="buildEnvironment" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects it depends on." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="buildNeeded" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all checks." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="check" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Assembles main classes." />
@@ -545,24 +1205,39 @@
                 <option name="name" value="classes" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="description" value="Deletes the build directory." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="clean" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles main Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="compileJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles test Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="compileTestJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the components produced by project ':dto'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="components" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays all dependencies declared in project ':dto'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="dependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the insight into a specific dependency in project ':dto'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="dependencyInsight" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Displays the dependent components of components in project ':dto'. [incubating]" />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
                 <option name="name" value="dependentComponents" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays all buildscript dependencies declared in project ':dto'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="buildEnvironment" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles test classes." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="testClasses" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Generates Javadoc API documentation for the main source code." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="javadoc" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Generates the Maven POM file for publication 'mavenJava'." />
@@ -570,9 +1245,24 @@
                 <option name="name" value="generatePomFileForMavenJavaPublication" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="description" value="Displays a help message." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="help" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Installs the 'archives' artifacts into the local Maven repository." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="install" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Assembles a jar archive containing the main classes." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
                 <option name="name" value="jar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates Javadoc API documentation for the main source code." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="javadoc" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Displays the configuration model of project ':dto'. [incubating]" />
@@ -585,79 +1275,19 @@
                 <option name="name" value="processResources" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Displays the tasks runnable from project ':dto'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="tasks" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Publishes Maven publication 'mavenJava' to the local Maven repository." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="publishMavenJavaPublicationToMavenLocal" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Runs the unit tests." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="test" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Compiles main Java source." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="compileJava" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays the insight into a specific dependency in project ':dto'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="dependencyInsight" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Runs all checks." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="check" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles the outputs of this project." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="assemble" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Deletes the build directory." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="clean" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Compiles test Java source." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="compileTestJava" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays all dependencies declared in project ':dto'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="dependencies" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
                 <option name="description" value="Processes test resources." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
                 <option name="name" value="processTestResources" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Displays a help message." />
+                <option name="description" value="Displays the sub-projects of project ':dto'." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="help" />
+                <option name="name" value="projects" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Assembles and tests this project." />
+                <option name="description" value="Displays the properties of project ':dto'." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="build" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Installs the 'archives' artifacts into the local Maven repository." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="install" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles and tests this project and all projects it depends on." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="buildNeeded" />
+                <option name="name" value="properties" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Publishes all publications produced by this project." />
@@ -665,14 +1295,34 @@
                 <option name="name" value="publish" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="description" value="Publishes Maven publication 'mavenJava' to the local Maven repository." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="publishMavenJavaPublicationToMavenLocal" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Publishes Maven publication 'mavenJava' to Maven repository 'maven'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="publishMavenJavaPublicationToMavenRepository" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Publishes all Maven publications produced by this project to the local Maven cache." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
                 <option name="name" value="publishToMavenLocal" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Displays the properties of project ':dto'." />
+                <option name="description" value="Displays the tasks runnable from project ':dto'." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
-                <option name="name" value="properties" />
+                <option name="name" value="tasks" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs the unit tests." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="test" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles test classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dto" />
+                <option name="name" value="testClasses" />
               </ExternalTaskPojo>
             </list>
           </value>
@@ -681,166 +1331,9 @@
           <value>
             <list>
               <ExternalTaskPojo>
-                <option name="description" value="Assembles the outputs of this project." />
+                <option name="description" value="Displays the sub-projects of project ':kairosActivity'." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="assemble" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles the boot distributions" />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="assembleBootDist" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles the main distributions" />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="assembleDist" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Bundles the project as a distribution." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="bootDistTar" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Bundles the project as a distribution." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="bootDistZip" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles an executable jar archive containing the main classes and their dependencies." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="bootJar" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Runs this project as a Spring Boot application." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="bootRun" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Generates OS-specific start scripts to run the project as a Spring Boot application." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="bootStartScripts" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles and tests this project." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="build" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles and tests this project and all projects that depend on it." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="buildDependents" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays all buildscript dependencies declared in project ':kairosActivity'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="buildEnvironment" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles and tests this project and all projects it depends on." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="buildNeeded" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Runs all checks." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="check" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles main classes." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="classes" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Deletes the build directory." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="clean" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Cleans all Eclipse files." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="cleanEclipse" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="cleanEclipseClasspath" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="cleanEclipseJdt" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="cleanEclipseProject" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Compiles main Java source." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="compileJava" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Compiles test Java source." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="compileTestJava" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays the components produced by project ':kairosActivity'. [incubating]" />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="components" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays all dependencies declared in project ':kairosActivity'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="dependencies" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays the insight into a specific dependency in project ':kairosActivity'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="dependencyInsight" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays the dependency management declared in project ':kairosActivity'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="dependencyManagement" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays the dependent components of components in project ':kairosActivity'. [incubating]" />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="dependentComponents" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Bundles the project as a distribution." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="distTar" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Bundles the project as a distribution." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="distZip" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Generates all Eclipse files." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="eclipse" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Generates the Eclipse classpath file." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="eclipseClasspath" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Generates the Eclipse JDT settings file." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="eclipseJdt" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Generates the Eclipse project file." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="eclipseProject" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays a help message." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="help" />
+                <option name="name" value="projects" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Installs the project as a distribution as-is." />
@@ -848,19 +1341,38 @@
                 <option name="name" value="installBootDist" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Installs the project as a distribution as-is." />
+                <option name="description" value="Assembles the boot distributions" />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="installDist" />
+                <option name="name" value="assembleBootDist" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs this project as a JVM application" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="run" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="wrapper" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Creates OS specific scripts to run the project as a JVM application." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="startScripts" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles an executable jar archive containing the main classes and their dependencies." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="bootJar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates the Eclipse classpath file." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="eclipseClasspath" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Assembles a jar archive containing the main classes." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
                 <option name="name" value="jar" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Generates Javadoc API documentation for the main source code." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="javadoc" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Displays the configuration model of project ':kairosActivity'. [incubating]" />
@@ -873,34 +1385,14 @@
                 <option name="name" value="processResources" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Processes test resources." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="processTestResources" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays the sub-projects of project ':kairosActivity'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="projects" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays the properties of project ':kairosActivity'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="properties" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Runs this project as a JVM application" />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="run" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Creates OS specific scripts to run the project as a JVM application." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="startScripts" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
                 <option name="description" value="Displays the tasks runnable from project ':kairosActivity'." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
                 <option name="name" value="tasks" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles the main distributions" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="assembleDist" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Runs the unit tests." />
@@ -908,13 +1400,171 @@
                 <option name="name" value="test" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="description" value="Displays the dependency management declared in project ':kairosActivity'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="dependencyManagement" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles main Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="compileJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all checks." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="check" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays all dependencies declared in project ':kairosActivity'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="dependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates all Eclipse files." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="eclipse" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Processes test resources." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="processTestResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Bundles the project as a distribution." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="bootDistZip" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates the Eclipse JDT settings file." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="eclipseJdt" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Bundles the project as a distribution." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="bootDistTar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects it depends on." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="buildNeeded" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates the Eclipse project file." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="eclipseProject" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Bundles the project as a distribution." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="distTar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Bundles the project as a distribution." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="distZip" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the components produced by project ':kairosActivity'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="components" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects that depend on it." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="buildDependents" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="cleanEclipseClasspath" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Cleans all Eclipse files." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="cleanEclipse" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates OS-specific start scripts to run the project as a Spring Boot application." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="bootStartScripts" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles main classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="classes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the dependent components of components in project ':kairosActivity'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="dependentComponents" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays all buildscript dependencies declared in project ':kairosActivity'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="buildEnvironment" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="cleanEclipseProject" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Assembles test classes." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
                 <option name="name" value="testClasses" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="description" value="Generates Javadoc API documentation for the main source code." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
-                <option name="name" value="wrapper" />
+                <option name="name" value="javadoc" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Installs the project as a distribution as-is." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="installDist" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="cleanEclipseJdt" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs this project as a Spring Boot application." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="bootRun" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the insight into a specific dependency in project ':kairosActivity'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="dependencyInsight" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles the outputs of this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="assemble" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Deletes the build directory." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="clean" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles test Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="compileTestJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays a help message." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="help" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="build" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the properties of project ':kairosActivity'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosActivity" />
+                <option name="name" value="properties" />
               </ExternalTaskPojo>
             </list>
           </value>
@@ -1110,6 +1760,10 @@
                 <option name="name" value="model" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosUser" />
+                <option name="name" value="pathingJar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Processes main resources." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/kairosUser" />
                 <option name="name" value="processResources" />
@@ -1165,18 +1819,18 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="$PROJECT_DIR$" value="7611989262688" />
+        <entry key="$PROJECT_DIR$" value="7612513331633" />
         <entry key="$PROJECT_DIR$/build.gradle" value="4022412666" />
-        <entry key="$PROJECT_DIR$/dto" value="7611989262688" />
+        <entry key="$PROJECT_DIR$/dto" value="7612513331633" />
         <entry key="$PROJECT_DIR$/dto/build.gradle" value="1042840327" />
         <entry key="$PROJECT_DIR$/dto/settings.gradle" value="50549616" />
         <entry key="$PROJECT_DIR$/kairos-user/build.gradle" value="537195401" />
         <entry key="$PROJECT_DIR$/kairos-user/settings.gradle" value="4203595102" />
-        <entry key="$PROJECT_DIR$/kairosActivity" value="9126262711457" />
+        <entry key="$PROJECT_DIR$/kairosActivity" value="9126786780402" />
         <entry key="$PROJECT_DIR$/kairosActivity/build.gradle" value="1623564497" />
         <entry key="$PROJECT_DIR$/kairosActivity/settings.gradle" value="2224085570" />
-        <entry key="$PROJECT_DIR$/kairosUser" value="9126285075549" />
-        <entry key="$PROJECT_DIR$/kairosUser/build.gradle" value="909408570" />
+        <entry key="$PROJECT_DIR$/kairosUser" value="9126809144494" />
+        <entry key="$PROJECT_DIR$/kairosUser/build.gradle" value="2671961152" />
         <entry key="$PROJECT_DIR$/kairosUser/settings.gradle" value="3926426509" />
         <entry key="$PROJECT_DIR$/settings.gradle" value="1921505257" />
       </map>
@@ -1336,7 +1990,7 @@
             </ExternalProjectBuildClasspathPojo>
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/dto">
+        <entry key="$PROJECT_DIR$/kairosActivity">
           <value>
             <ExternalProjectBuildClasspathPojo>
               <option name="modulesBuildClasspath">
@@ -1475,8 +2129,8 @@
                   <option value="$PROJECT_DIR$/../../gradle/gradle-4.0-bin/gradle-4.0/lib/plugins/gradle-tooling-api-builders-4.0.jar" />
                   <option value="$PROJECT_DIR$/../../gradle/gradle-4.0-bin/gradle-4.0/lib/plugins/gradle-workers-4.0.jar" />
                   <option value="$PROJECT_DIR$/../../gradle/gradle-4.0-bin/gradle-4.0/lib/plugins/ivy-2.2.0.jar" />
-                  <option value="$PROJECT_DIR$/dto/buildSrc/src/main/java" />
-                  <option value="$PROJECT_DIR$/dto/buildSrc/src/main/groovy" />
+                  <option value="$PROJECT_DIR$/kairosActivity/buildSrc/src/main/java" />
+                  <option value="$PROJECT_DIR$/kairosActivity/buildSrc/src/main/groovy" />
                 </list>
               </option>
             </ExternalProjectBuildClasspathPojo>
@@ -1496,17 +2150,18 @@
         <option value="$PROJECT_DIR$/dto/src/main/java/com/kairos/persistence/model/enums/OrganizationCategory.java" />
         <option value="$PROJECT_DIR$/dto/build.gradle" />
         <option value="$PROJECT_DIR$/kairosUser/src/main/java/com/kairos/persistence/model/user/agreement/cta/FixedValue.java" />
-        <option value="$PROJECT_DIR$/kairosActivity/build.gradle" />
         <option value="$PROJECT_DIR$/dto/settings.gradle" />
         <option value="$PROJECT_DIR$/kairosActivity/settings.gradle" />
         <option value="$PROJECT_DIR$/kairosUser/settings.gradle" />
         <option value="$PROJECT_DIR$/settings.gradle" />
         <option value="$PROJECT_DIR$/build.gradle" />
-        <option value="$PROJECT_DIR$/kairosUser/build.gradle" />
         <option value="$PROJECT_DIR$/kairosUser/src/main/java/com/kairos/service/agreement/cta/CostTimeAgreementService.java" />
         <option value="$PROJECT_DIR$/kairosUser/src/test/java/com/kairos/cta/CostTimeAgreementServiceTest.java" />
         <option value="$PROJECT_DIR$/kairosUser/src/main/resources/application-development.properties" />
         <option value="$PROJECT_DIR$/kairosActivity/src/main/resources/application-development.properties" />
+        <option value="$PROJECT_DIR$/kairosActivity/build.gradle" />
+        <option value="$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/config/WebsocketEndpointIT.java" />
+        <option value="$PROJECT_DIR$/kairosUser/build.gradle" />
       </list>
     </option>
   </component>
@@ -1532,8 +2187,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -1541,22 +2196,12 @@
               <item name="kairos-user" type="b2602c69:ProjectViewProjectNode" />
               <item name="kairos-user" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
             </path>
-            <path>
-              <item name="kairos-user" type="b2602c69:ProjectViewProjectNode" />
-              <item name="kairos-user" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="dto" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-            </path>
-            <path>
-              <item name="kairos-user" type="b2602c69:ProjectViewProjectNode" />
-              <item name="kairos-user" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="kairosActivity" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
       <pane id="PackagesPane" />
+      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1585,7 +2230,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Gradle.kairosActivity [bootRun]">
+  <component name="RunManager" selected="Gradle.kairosUser [bootRun]">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="HTML_USED" value="false" />
       <option name="WIDTH" value="400" />
@@ -1696,23 +2341,6 @@
         <option name="vmOptions" value="" />
       </ExternalSystemSettings>
     </configuration>
-    <configuration name="dto [publish]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/dto" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="publish" />
-          </list>
-        </option>
-        <option name="vmOptions" value="" />
-      </ExternalSystemSettings>
-    </configuration>
     <configuration name="kairosActivity [bootRun]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -1747,7 +2375,25 @@
         <option name="vmOptions" value="" />
       </ExternalSystemSettings>
     </configuration>
-    <configuration name="kairosUser [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="kairosUser [bootRun -X]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/kairosUser" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--debug --stacktrace" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="bootRun" />
+            <option value="-X" />
+          </list>
+        </option>
+        <option name="vmOptions" value="" />
+      </ExternalSystemSettings>
+    </configuration>
+    <configuration name="kairosUser [bootRun]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/kairosUser" />
@@ -1758,26 +2404,26 @@
         </option>
         <option name="taskNames">
           <list>
-            <option value="build" />
+            <option value="bootRun" />
           </list>
         </option>
-        <option name="vmOptions" value="" />
+        <option name="vmOptions" value=" -Xdiag" />
       </ExternalSystemSettings>
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Gradle.kairosUser [build]" />
-      <item index="1" class="java.lang.String" itemvalue="Gradle.dto [publish]" />
-      <item index="2" class="java.lang.String" itemvalue="Gradle.dto [build]" />
-      <item index="3" class="java.lang.String" itemvalue="Gradle.kairosActivity [bootRun]" />
-      <item index="4" class="java.lang.String" itemvalue="Gradle.kairosActivity [build]" />
+      <item index="0" class="java.lang.String" itemvalue="Gradle.dto [build]" />
+      <item index="1" class="java.lang.String" itemvalue="Gradle.kairosActivity [bootRun]" />
+      <item index="2" class="java.lang.String" itemvalue="Gradle.kairosActivity [build]" />
+      <item index="3" class="java.lang.String" itemvalue="Gradle.kairosUser [bootRun]" />
+      <item index="4" class="java.lang.String" itemvalue="Gradle.kairosUser [bootRun -X]" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Gradle.kairosActivity [build]" />
-        <item index="1" class="java.lang.String" itemvalue="Gradle.kairosActivity [bootRun]" />
-        <item index="2" class="java.lang.String" itemvalue="Gradle.dto [build]" />
-        <item index="3" class="java.lang.String" itemvalue="Gradle.dto [publish]" />
-        <item index="4" class="java.lang.String" itemvalue="Gradle.kairosUser [build]" />
+        <item index="0" class="java.lang.String" itemvalue="Gradle.kairosUser [bootRun]" />
+        <item index="1" class="java.lang.String" itemvalue="Gradle.kairosUser [bootRun -X]" />
+        <item index="2" class="java.lang.String" itemvalue="Gradle.kairosActivity [build]" />
+        <item index="3" class="java.lang.String" itemvalue="Gradle.kairosActivity [bootRun]" />
+        <item index="4" class="java.lang.String" itemvalue="Gradle.dto [build]" />
       </list>
     </recent_temporary>
   </component>
@@ -1814,7 +2460,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1823,20 +2468,21 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5030257" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.60556465" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.58428806" sideWeight="0.4969743" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.58428806" sideWeight="0.4969743" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27155825" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2753404" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Gradle View" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39934534" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.7086743" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1844,8 +2490,38 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
     </layout>
+    <layout-to-restore>
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5030257" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.7086743" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.60556465" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.58428806" sideWeight="0.4969743" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2753404" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Gradle View" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
+    </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -1859,6 +2535,54 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/kairosActivity/src/main/resources/application-development.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1819">
+          <caret line="107" column="34" lean-forward="false" selection-start-line="107" selection-start-column="25" selection-end-line="107" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/config/WebsocketEndpointIT.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="986">
+          <caret line="58" column="42" lean-forward="false" selection-start-line="58" selection-start-column="42" selection-end-line="58" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kairosUser/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="969">
+          <caret line="57" column="36" lean-forward="false" selection-start-line="57" selection-start-column="36" selection-end-line="57" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kairosActivity/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1343">
+          <caret line="79" column="0" lean-forward="true" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kairosUser/src/main/resources/application-development.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="1" lean-forward="false" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dto/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/kairosActivity/src/main/resources/application-development.properties">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1819">
@@ -2069,57 +2793,93 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/kairosUser/src/main/resources/application-development.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" column="1" lean-forward="false" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/kairosActivity/src/main/resources/application-development.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1819">
+        <state relative-caret-position="0">
           <caret line="107" column="34" lean-forward="false" selection-start-line="107" selection-start-column="25" selection-end-line="107" selection-end-column="34" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/config/WebsocketEndpointIT.java">
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_131/src.zip!/java/lang/String.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="58" column="42" lean-forward="false" selection-start-line="58" selection-start-column="42" selection-end-line="58" selection-end-column="42" />
+        <state relative-caret-position="105">
+          <caret line="2176" column="18" lean-forward="false" selection-start-line="2176" selection-start-column="18" selection-end-line="2176" selection-end-column="18" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/kairosUser/build.gradle">
+    <entry file="file://$PROJECT_DIR$/kairosUser/src/main/resources/application-development.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="57" column="36" lean-forward="false" selection-start-line="57" selection-start-column="36" selection-end-line="57" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/kairosActivity/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="79" column="0" lean-forward="true" selection-start-line="79" selection-start-column="0" selection-end-line="79" selection-end-column="0" />
+        <state relative-caret-position="34">
+          <caret line="22" column="69" lean-forward="true" selection-start-line="22" selection-start-column="69" selection-end-line="22" selection-end-column="69" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dto/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-102">
-          <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+        <state relative-caret-position="697">
+          <caret line="41" column="5" lean-forward="false" selection-start-line="41" selection-start-column="5" selection-end-line="41" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kairosActivity/src/test/java/com/kairos/activity/config/WebsocketEndpointIT.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="63" column="22" lean-forward="false" selection-start-line="63" selection-start-column="22" selection-end-line="63" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kairosActivity/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="23" lean-forward="false" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kairosUser/kairos-user.userlibraries">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="194">
+          <caret line="599" column="52" lean-forward="false" selection-start-line="599" selection-start-column="52" selection-end-line="599" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-webmvc/5.0.2.RELEASE/27b1e2a994580e4ddca706ff1a4ca105afe823bb/spring-webmvc-5.0.2.RELEASE-sources.jar!/org/springframework/web/servlet/config/annotation/WebMvcConfigurerAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-272">
+          <caret line="31" column="65" lean-forward="true" selection-start-line="31" selection-start-column="65" selection-end-line="31" selection-end-column="65" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kairosUser/src/main/java/com/kairos/UserServiceApplication.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="48" column="67" lean-forward="false" selection-start-line="48" selection-start-column="44" selection-end-line="48" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kairosUser/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="95" column="36" lean-forward="true" selection-start-line="95" selection-start-column="36" selection-end-line="95" selection-end-column="36" />
           <folding />
         </state>
       </provider>
     </entry>
   </component>
   <component name="gradleExecuteTaskHistory">
-    <option value="$PROJECT_DIR$/kairosActivity" />
+    <option value="$PROJECT_DIR$/kairosUser" />
+    <option value="bootRun --stacktrace --debug" />
+    <option value="bootRun --stacktrace --debug -Xdiag" />
+    <option value="bootRun --stacktrace --info" />
+    <option value="bootRun --stacktrace" />
     <option value="bootRun" />
     <option value="build" />
     <option value="publish" />
