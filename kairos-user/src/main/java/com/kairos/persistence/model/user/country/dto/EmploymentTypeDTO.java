@@ -106,12 +106,7 @@ public class EmploymentTypeDTO extends UserBaseEntity {
     }
     @AssertTrue(message = "At least one field should be selected")
     public boolean isValid() {
-
-        if (permanent || temporary ||guest) {
-            return true;
-        }
-
-        return false;
+        return (permanent || temporary ||guest)?true:false;
     }
 
 }

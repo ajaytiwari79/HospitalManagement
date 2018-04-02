@@ -204,7 +204,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (country:Country)-[:HAS_RESOURCES]->(res:Vehicle{enabled:true}) where id(country)={0} return res")
     List<Vehicle> getResourcesByCountry(Long countryId);
 
-    @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND id(employmentType)={1} return employmentType")
+    @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} AND id(employmentType)={1} return employmentType")
     EmploymentType getEmploymentTypeByCountryAndEmploymentType(long countryId, long employmentTypeId);
 
     @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} return employmentType")
