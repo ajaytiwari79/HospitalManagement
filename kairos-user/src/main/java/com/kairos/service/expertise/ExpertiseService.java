@@ -3,6 +3,7 @@ package com.kairos.service.expertise;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -93,8 +94,13 @@ public class ExpertiseService extends UserBaseService {
         } else {
             // Expertise is already created only need to add Sr level
             expertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
+
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid expertise Id");
+            }
+            Long basePayGradeCount = expertise.getSeniorityLevel().stream().filter(basePayGrade -> basePayGrade.getBasePayGrade().equals(expertiseDTO.getSeniorityLevel().getBasePayGrade())).count();
+            if (basePayGradeCount > 0) {
+                throw new DuplicateDataException("base Pay grade already exist in expertise");
             }
             if (expertise.isPublished()) {
                 expertiseResponseDTO = createCopyOfExpertise(expertise, expertiseDTO, countryId);
@@ -340,6 +346,14 @@ public class ExpertiseService extends UserBaseService {
         if (!Optional.ofNullable(seniorityLevelToUpdate).isPresent()) {
             throw new DataNotFoundByIdException("Seniority Level not found in expertise" + expertiseDTO.getSeniorityLevel().getId());
         }
+        Long basePayGradeCount = currentExpertise.getSeniorityLevel().stream().filter(seniorityLevelPredicate ->
+                seniorityLevelPredicate.getBasePayGrade().equals(expertiseDTO.getSeniorityLevel().getBasePayGrade())
+                        && !seniorityLevelPredicate.getId().equals(expertiseDTO.getSeniorityLevel().getId())
+        ).count();
+        if (basePayGradeCount > 0) {
+            throw new DuplicateDataException("base Pay grade already exist in expertise");
+        }
+
         ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
         if (currentExpertise.isPublished()) {
 
@@ -589,7 +603,7 @@ public class ExpertiseService extends UserBaseService {
 
     /*This metthod is used to publish an expertise
     * */
-    public List<Expertise> publishExpertise(Long expertiseId, Long publishedDateMillis) {
+    public ExpertiseQueryResult publishExpertise(Long expertiseId, Long publishedDateMillis) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
             throw new DataNotFoundByIdException("Invalid expertise id");
@@ -603,19 +617,13 @@ public class ExpertiseService extends UserBaseService {
             seniorityLevel.setPublished(true);
         }
         save(expertise);
-        List<Expertise> response = new ArrayList<>();
-        response.add(expertise);
-        Expertise parentExpertise = expertiseGraphRepository.getParentExpertiseById(expertiseId);
+        ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByexpertiseId(expertiseId);
         if (Optional.ofNullable(parentExpertise).isPresent()) {
-            expertiseGraphRepository.changeStateOfRelationShip(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
-            parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
-            parentExpertise.setHasDraftCopy(false);
+            expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
+            parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
             parentExpertise.setPublished(true);
-            parentExpertise.setExpertise(null);
-            response.add(parentExpertise);
-//
         }
-        return response;
+        return parentExpertise;
     }
 
 
