@@ -2,6 +2,7 @@ package com.kairos.service.country;
 
 import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
@@ -67,6 +68,10 @@ public class EmploymentTypeService extends UserBaseService {
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
+        boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,"(?i)"+employmentTypeDTO.getName().trim(),-1L);
+        if(isAlreadyExists){
+            throw new DuplicateDataException("EmploymentType already exists"+employmentTypeDTO.getName());
+        }
         EmploymentType employmentTypeToCreate = employmentTypeDTO.generateEmploymentTypeFromEmploymentTypeDTO();
         country.addEmploymentType(employmentTypeToCreate);
         countryGraphRepository.save(country);
@@ -79,9 +84,12 @@ public class EmploymentTypeService extends UserBaseService {
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
+        boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,employmentTypeDTO.getName(),employmentTypeId);
+        if(isAlreadyExists){
+            throw new DuplicateDataException("EmploymentType already exists"+employmentTypeDTO.getName());
+        }
         EmploymentType employmentTypeToUpdate = countryGraphRepository.getEmploymentTypeByCountryAndEmploymentType(countryId, employmentTypeId);
         if (employmentTypeToUpdate == null) {
-//            logger.debug("Finding Employment Type by id::" + levelId);
             throw new DataNotFoundByIdException("Incorrect Employment Type id " + employmentTypeId);
         }
         employmentTypeToUpdate.setName(employmentTypeDTO.getName());

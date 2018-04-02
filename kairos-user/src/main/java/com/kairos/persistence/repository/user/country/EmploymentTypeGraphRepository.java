@@ -67,5 +67,9 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
         @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} return employmentType LIMIT 1")
         EmploymentType getOneEmploymentTypeByCountryId(Long countryId, Boolean isDeleted);
 
+        @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} AND employmentType.name=~{1} AND id(employmentType) <> {2} " +
+                "with count(employmentType) as employmentTypeCount return CASE when employmentTypeCount>0 THEN  true ELSE false END as response")
+        boolean findByNameExcludingCurrent(Long countryId,String name,Long employmentTypeId);
+
 
 }

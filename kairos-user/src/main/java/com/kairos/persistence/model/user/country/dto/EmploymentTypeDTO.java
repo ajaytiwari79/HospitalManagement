@@ -93,7 +93,7 @@ public class EmploymentTypeDTO extends UserBaseEntity {
 
     public EmploymentType generateEmploymentTypeFromEmploymentTypeDTO() {
         EmploymentType employmentType = new EmploymentType();
-        employmentType.setName(this.getName());
+        employmentType.setName(this.getName().trim());
         employmentType.setDescription(this.getDescription());
         employmentType.setAllowedForContactPerson(this.isAllowedForContactPerson());
         employmentType.setAllowedForShiftPlan(this.isAllowedForShiftPlan());
