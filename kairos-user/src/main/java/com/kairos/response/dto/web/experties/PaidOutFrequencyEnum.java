@@ -5,5 +5,5 @@ package com.kairos.response.dto.web.experties;
  */
 
 public enum PaidOutFrequencyEnum {
-    WEEKLY,MONTHLY,FORTNIGHT
+    WEEKLY,MONTHLY, FORTNIGHTLY
 }
