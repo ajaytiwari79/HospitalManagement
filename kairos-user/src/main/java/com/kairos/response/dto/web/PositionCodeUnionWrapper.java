@@ -2,6 +2,7 @@ package com.kairos.response.dto.web;
 
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
+import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 
 import java.util.List;
@@ -13,6 +14,7 @@ public class PositionCodeUnionWrapper {
     private List<PositionCode> positionCodes;
     private List<UnionResponseDTO> unions;
     private List<OrganizationBasicResponse> organizationHierarchy;
+    private List<ReasonCodeResponseDTO> reasonCodes;
 
     public PositionCodeUnionWrapper() {
     }
@@ -39,5 +41,20 @@ public class PositionCodeUnionWrapper {
 
     public void setOrganizationHierarchy(List<OrganizationBasicResponse> organizationHierarchy) {
         this.organizationHierarchy = organizationHierarchy;
+    }
+
+    public List<ReasonCodeResponseDTO> getReasonCodes() {
+        return reasonCodes;
+    }
+
+    public void setReasonCodes(List<ReasonCodeResponseDTO> reasonCodes) {
+        this.reasonCodes = reasonCodes;
+    }
+
+    public PositionCodeUnionWrapper(List<PositionCode> positionCodes, List<UnionResponseDTO> unions, List<OrganizationBasicResponse> organizationHierarchy, List<ReasonCodeResponseDTO> reasonCodes) {
+        this.positionCodes = positionCodes;
+        this.unions = unions;
+        this.organizationHierarchy = organizationHierarchy;
+        this.reasonCodes = reasonCodes;
     }
 }
