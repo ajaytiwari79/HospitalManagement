@@ -121,7 +121,7 @@ public class CostTimeAgreementServiceTest {
         ctaRuleTemplateDTO.setBudgetType(BudgetType.ACTIVITY_COST);
         ctaRuleTemplateDTO.setActivityTypeForCostCalculation(ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE);
         ctaRuleTemplateDTO.setPlanningCategory(PlanningCategory.DEVIATION_FROM_PLANNED);
-        ctaRuleTemplateDTO.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
+        //ctaRuleTemplateDTO.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
         ctaRuleTemplateDTO.setPlannedTimeWithFactor(PlannedTimeWithFactor.buildPlannedTimeWithFactor(10,true,AccountType.DUTYTIME_ACCOUNT));
 
         RuleTemplateCategory category = ruleTemplateCategoryService.getCTARuleTemplateCategoryOfCountryByName(countryId, "NONE");
