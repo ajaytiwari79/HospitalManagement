@@ -11,6 +11,8 @@ import java.util.Date;
  * Created by vipul on 12/3/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @QueryResult
 public class PayGroupAreaQueryResult {
     private Long id;
