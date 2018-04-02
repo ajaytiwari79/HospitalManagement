@@ -140,7 +140,7 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setUnit(organization);
         save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
-        timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(),id));
+        //timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(),id));
 
         return unitPositionQueryResult;
     }
