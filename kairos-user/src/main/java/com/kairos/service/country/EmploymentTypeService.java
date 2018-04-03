@@ -75,7 +75,7 @@ public class EmploymentTypeService extends UserBaseService {
 
         boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,"(?i)"+employmentTypeDTO.getName().trim(),-1L);
         if(isAlreadyExists){
-            throw new DuplicateDataException("EmploymentType already exists"+employmentTypeDTO.getName());
+            throw new DuplicateDataException("EmploymentType already exists: "+employmentTypeDTO.getName().trim());
         }
         EmploymentType employmentTypeToCreate = employmentTypeDTO.generateEmploymentTypeFromEmploymentTypeDTO();
         country.addEmploymentType(employmentTypeToCreate);
@@ -99,7 +99,7 @@ public class EmploymentTypeService extends UserBaseService {
         if(!employmentTypeDTO.getName().trim().equalsIgnoreCase(employmentTypeToUpdate.getName())){
             boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,"(?i)"+employmentTypeDTO.getName().trim(),employmentTypeId);
             if(isAlreadyExists){
-                throw new DuplicateDataException("EmploymentType already exists"+employmentTypeDTO.getName());
+                throw new DuplicateDataException("EmploymentType already exists: "+employmentTypeDTO.getName().trim());
             }
         }
         employmentTypeToUpdate.setName(employmentTypeDTO.getName());
