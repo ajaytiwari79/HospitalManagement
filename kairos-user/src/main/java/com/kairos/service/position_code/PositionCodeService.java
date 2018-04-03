@@ -197,7 +197,7 @@ public class PositionCodeService extends UserBaseService {
             logger.info(data.toString());
         }
 
-        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByOrganization(organization.getId(), ReasonCodeType.EMPLOYMENT);
+        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
 
         PositionCodeUnionWrapper positionCodeUnionWrapper = new PositionCodeUnionWrapper(positionCodes, unions, organizationHierarchy, reasonCodeType);
         return positionCodeUnionWrapper;
