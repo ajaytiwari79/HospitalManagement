@@ -493,7 +493,10 @@ public class UnitPositionService extends UserBaseService {
         timebankWrapper.setCountryId(countryId);
         timebankWrapper.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
         timebankWrapper.setWorkingDaysPerWeek(unitPosition.getWorkingDaysInWeek());
-        timebankWrapper.setUnitPositionDate(DateUtil.asLocalDate(new Date(unitPosition.getStartDateMillis())));
+        timebankWrapper.setUnitPositionStartDate(DateUtil.asLocalDate(new Date(unitPosition.getStartDateMillis())));
+        if(unitPosition.getEndDateMillis()!=null){
+            timebankWrapper.setUnitPositionEndDate(DateUtil.asLocalDate(new Date(unitPosition.getEndDateMillis())));
+        }
         timebankWrapper.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
         return timebankWrapper;
     }
