@@ -107,9 +107,7 @@ public class EmploymentTypeService extends UserBaseService {
         employmentTypeToUpdate.setAllowedForContactPerson(employmentTypeDTO.isAllowedForContactPerson());
         employmentTypeToUpdate.setAllowedForShiftPlan(employmentTypeDTO.isAllowedForShiftPlan());
         employmentTypeToUpdate.setAllowedForFlexPool(employmentTypeDTO.isAllowedForFlexPool());
-        employmentTypeToUpdate.setPermanent(employmentTypeDTO.isPermanent());
-        employmentTypeToUpdate.setTemporary(employmentTypeDTO.isTemporary());
-        employmentTypeToUpdate.setGuest(employmentTypeDTO.isGuest());
+        employmentTypeToUpdate.setEmploymentTypes(employmentTypeDTO.getEmploymentTypes());
         return save(employmentTypeToUpdate);
     }
 

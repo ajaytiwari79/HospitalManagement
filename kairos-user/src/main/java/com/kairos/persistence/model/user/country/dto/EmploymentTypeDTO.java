@@ -2,12 +2,14 @@ package com.kairos.persistence.model.user.country.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.EmploymentTypeEnum;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 /**
  * Created by prerna on 7/11/17.
@@ -22,9 +24,8 @@ public class EmploymentTypeDTO {
     private boolean allowedForContactPerson;
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
-    private boolean permanent;
-    private boolean temporary;
-    private boolean guest;
+    private Set<EmploymentTypeEnum> employmentTypes;
+
 
     public Long getId() {
         return id;
@@ -74,28 +75,12 @@ public class EmploymentTypeDTO {
         this.allowedForFlexPool = allowedForFlexPool;
     }
 
-    public boolean isPermanent() {
-        return permanent;
+    public Set<EmploymentTypeEnum> getEmploymentTypes() {
+        return employmentTypes;
     }
 
-    public void setPermanent(boolean permanent) {
-        this.permanent = permanent;
-    }
-
-    public boolean isTemporary() {
-        return temporary;
-    }
-
-    public void setTemporary(boolean temporary) {
-        this.temporary = temporary;
-    }
-
-    public boolean isGuest() {
-        return guest;
-    }
-
-    public void setGuest(boolean guest) {
-        this.guest = guest;
+    public void setEmploymentTypes(Set<EmploymentTypeEnum> employmentTypes) {
+        this.employmentTypes = employmentTypes;
     }
 
     public EmploymentType generateEmploymentTypeFromEmploymentTypeDTO() {
@@ -105,15 +90,14 @@ public class EmploymentTypeDTO {
         employmentType.setAllowedForContactPerson(this.isAllowedForContactPerson());
         employmentType.setAllowedForShiftPlan(this.isAllowedForShiftPlan());
         employmentType.setAllowedForFlexPool(this.isAllowedForFlexPool());
-        employmentType.setPermanent(this.isPermanent());
-        employmentType.setTemporary(this.isTemporary());
-        employmentType.setGuest(this.isGuest());
+        employmentType.setEmploymentTypes(this.getEmploymentTypes());
+
 
         return employmentType;
     }
     @AssertTrue(message = "At least one role should be selected")
     public boolean isValid() {
-        return (permanent || temporary ||guest)?true:false;
+        return (employmentTypes.isEmpty())?false:true;
     }
 
 }

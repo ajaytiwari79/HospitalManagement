@@ -3,10 +3,12 @@ package com.kairos.persistence.model.user.country;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.EmploymentTypeEnum;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 /**
  * Created by prerna on 2/11/17.
@@ -23,9 +25,7 @@ public class EmploymentType extends UserBaseEntity {
     private boolean allowedForContactPerson;
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
-    private boolean permanent;
-    private boolean temporary;
-    private boolean guest;
+    private Set<EmploymentTypeEnum> employmentTypes;
 
 
     public String getName() {
@@ -68,28 +68,11 @@ public class EmploymentType extends UserBaseEntity {
         this.allowedForFlexPool = allowedForFlexPool;
     }
 
-    public boolean isPermanent() {
-        return permanent;
+    public Set<EmploymentTypeEnum> getEmploymentTypes() {
+        return employmentTypes;
     }
 
-    public void setPermanent(boolean permanent) {
-        this.permanent = permanent;
+    public void setEmploymentTypes(Set<EmploymentTypeEnum> employmentTypes) {
+        this.employmentTypes = employmentTypes;
     }
-
-    public boolean isTemporary() {
-        return temporary;
-    }
-
-    public void setTemporary(boolean temporary) {
-        this.temporary = temporary;
-    }
-
-    public boolean isGuest() {
-        return guest;
-    }
-
-    public void setGuest(boolean guest) {
-        this.guest = guest;
-    }
-
 }
