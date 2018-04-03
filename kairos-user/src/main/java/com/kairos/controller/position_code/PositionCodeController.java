@@ -66,7 +66,7 @@ public class PositionCodeController {
     }
 
     @RequestMapping(value =  "/unions_with_position_code", method = RequestMethod.GET)
-    @ApiOperation("Get All Unions and position_code code for unit employment  by organization ")
+    @ApiOperation("Get All Unions and position code for unit employment  by organization ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnionsAndPositionCodes(@PathVariable Long unitId,@RequestParam("type") String type) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,

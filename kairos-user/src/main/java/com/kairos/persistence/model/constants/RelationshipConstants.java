@@ -231,7 +231,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_FUNCTION = "HAS_FUNCTION";
     public final static String HAS_DRAFT_EXPERTISE = "HAS_DRAFT_EXPERTISE";
     public final static String HAS_PAY_TABLE = "HAS_PAY_TABLE";
-
+    public final static String HAS_BASE_PAY_GRADE = "HAS_BASE_PAY_GRADE";
 
 
     /**
