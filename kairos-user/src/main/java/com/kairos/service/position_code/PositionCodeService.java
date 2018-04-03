@@ -8,9 +8,11 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.OrganizationHierarchyData;
 import com.kairos.persistence.model.organization.union.UnionResponseDTO;
+import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepository;
 import com.kairos.response.dto.web.PositionCodeUnionWrapper;
@@ -57,6 +59,8 @@ public class PositionCodeService extends UserBaseService {
     private OrganizationService organizationService;
     @Inject
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
+    @Inject
+    private FunctionGraphRepository functionGraphRepository;
 
 
     public PositionCode createPositionCode(Long id, PositionCodeDTO positionCodeDTO, String type) {
@@ -198,8 +202,8 @@ public class PositionCodeService extends UserBaseService {
         }
 
         List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
-
-        PositionCodeUnionWrapper positionCodeUnionWrapper = new PositionCodeUnionWrapper(positionCodes, unions, organizationHierarchy, reasonCodeType);
+        List<FunctionDTO> functions = functionGraphRepository.findFunctionsByOrganization(organization.getId());
+        PositionCodeUnionWrapper positionCodeUnionWrapper = new PositionCodeUnionWrapper(positionCodes, unions, organizationHierarchy, reasonCodeType, functions);
         return positionCodeUnionWrapper;
     }
 

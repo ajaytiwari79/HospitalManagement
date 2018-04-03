@@ -1,0 +1,3 @@
+//This for set default value for calculate Scheduled hour
+//Jira task KP-2836
+Match(ctaRuleTemplate:CTARuleTemplate) set ctaRuleTemplate.calculateScheduledHours = false;

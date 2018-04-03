@@ -182,6 +182,14 @@ public class CTARuleTemplateQueryResult {
         this.calculateValueIfPlanned = calculateValueIfPlanned;
     }
 
+    public boolean isCalculateScheduledHours() {
+        return calculateScheduledHours;
+    }
+
+    public void setCalculateScheduledHours(boolean calculateScheduledHours) {
+        this.calculateScheduledHours = calculateScheduledHours;
+    }
+
     public List<Long> getEmploymentTypes() {
         return employmentTypes;
     }
