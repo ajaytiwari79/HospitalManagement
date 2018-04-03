@@ -20,7 +20,7 @@ public class StaffAdditionalInfoQueryResult {
     private List<Long> skills;
     private String profilePic;
     private Long unitId;
-    private StaffUnitPositionDetails unitEmploymentPosition;
+    private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
 
@@ -77,12 +77,12 @@ public class StaffAdditionalInfoQueryResult {
         this.unitId = unitId;
     }
 
-    public StaffUnitPositionDetails getUnitEmploymentPosition() {
-        return unitEmploymentPosition;
+    public StaffUnitPositionDetails getUnitPosition() {
+        return unitPosition;
     }
 
-    public void setUnitEmploymentPosition(StaffUnitPositionDetails unitEmploymentPosition) {
-        this.unitEmploymentPosition = unitEmploymentPosition;
+    public void setUnitPosition(StaffUnitPositionDetails unitPosition) {
+        this.unitPosition = unitPosition;
     }
 
     public Date getOrganizationNightStartTimeFrom() {

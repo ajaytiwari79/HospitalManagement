@@ -72,8 +72,8 @@ public class UnitPositionController {
 /*
     @ApiOperation(value = "Get Position")
     @GetMapping(value = "/unit_employment_position/{unitPositionId}")
-    public ResponseEntity<Map<String, Object>> getUnitEmploymentPosition(@PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getUnitEmploymentPosition(unitPositionId));
+    public ResponseEntity<Map<String, Object>> getUnitPosition(@PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getUnitPosition(unitPositionId));
     }
 
 */
