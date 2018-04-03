@@ -50,4 +50,7 @@ public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGrou
 
     @Query("MATCH (payGroupArea:PayGroupArea{deleted:false}) where id(payGroupArea) IN {0} return payGroupArea")
     List<PayGroupArea> findAllById(List<Long> payGroupArea);
+
+    @Query("MATCH (payGroupArea:PayGroupArea{deleted:false}) where id(payGroupArea) IN {0} return payGroupArea")
+    List<PayGroupArea> findAllById(Set<Long> payGroupArea);
 }

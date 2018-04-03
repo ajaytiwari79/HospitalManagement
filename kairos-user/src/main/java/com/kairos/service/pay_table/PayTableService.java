@@ -1,16 +1,20 @@
 package com.kairos.service.pay_table;
 
+
+
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.Country;
+import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.model.user.pay_table.*;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
@@ -56,18 +60,42 @@ public class PayTableService extends UserBaseService {
     @Inject
     private PayTableRelationShipGraphRepository payTableRelationShipGraphRepository;
 
+    @Inject
+    private FunctionGraphRepository functionGraphRepository;
+
     private Logger logger = LoggerFactory.getLogger(PayTableService.class);
 
 
-    public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId) {
+    public PayTableResponseWrapper getPayTablesByOrganizationLevel(Long countryId, Long organizationLevelId, Long startDate) {
         Level level = countryGraphRepository.getLevel(countryId, organizationLevelId);
         if (!Optional.ofNullable(level).isPresent()) {
             throw new DataNotFoundByIdException("Invalid level in country");
         }
-        List<PayGroupAreaQueryResult> payGroupAreas = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
-        List<PayTableResponse> payTables = payTableGraphRepository.findPayTableByOrganizationLevel(organizationLevelId, -1L);
-        PayTableResponseWrapper responseWrapper = new PayTableResponseWrapper(payGroupAreas, payTables);
-        return responseWrapper;
+
+        List<PayGroupAreaQueryResult> payGroupAreaQueryResults = payGroupAreaGraphRepository.getPayGroupAreaByOrganizationLevelId(organizationLevelId);
+        List<FunctionDTO> functions = functionGraphRepository.getFunctionsByOrganizationLevel(organizationLevelId);
+        List<PayTableResponse> payTableQueryResults = payTableGraphRepository.findActivePayTableByOrganizationLevel(organizationLevelId, startDate);
+        PayTableResponse result = null;
+        if (payTableQueryResults.size() > 1) {
+            // multiple payTables are found NOW need to filter by date
+            for (PayTableResponse currentPayTable : payTableQueryResults) {
+                if (Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
+                        (new DateTime(currentPayTable.getEndDateMillis()).isAfter(new DateTime(startDate)) || new DateTime(currentPayTable.getEndDateMillis()).isEqual(new DateTime(startDate)))
+                        && (new DateTime(currentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(currentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
+                    result = currentPayTable;
+                    break;
+                }
+                if (!Optional.ofNullable(currentPayTable.getEndDateMillis()).isPresent() &&
+                        (new DateTime(currentPayTable.getStartDateMillis()).isBefore(new DateTime(startDate)) || new DateTime(currentPayTable.getStartDateMillis()).isEqual(new DateTime(startDate)))) {
+                    result = currentPayTable;
+                    break;
+                }
+            }
+        } else if (payTableQueryResults.size() == 1)
+            result = payTableQueryResults.get(0);
+
+        PayTableResponseWrapper payTableResponseWrapper = new PayTableResponseWrapper(payGroupAreaQueryResults, result,functions);
+        return payTableResponseWrapper;
 
     }
 
@@ -489,8 +517,6 @@ public class PayTableService extends UserBaseService {
             response.add(parentPayTable);
 
         }
-
         return response;
-
     }
 }

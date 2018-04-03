@@ -46,6 +46,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.constants.AppConstants.COPY_OF;
+
 
 /**
  * Created by pawanmandhan on 2/8/17.
@@ -452,7 +454,7 @@ public class WTAService extends UserBaseService {
     }
 
     public WorkingTimeAgreement copyWta(WorkingTimeAgreement oldWta, WorkingTimeAgreement newWta) {
-        newWta.setName(oldWta.getName());
+        newWta.setName(COPY_OF + oldWta.getName());
         newWta.setDescription(oldWta.getDescription());
         newWta.setStartDateMillis(oldWta.getStartDateMillis());
         newWta.setEndDateMillis(oldWta.getEndDateMillis());

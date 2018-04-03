@@ -95,6 +95,7 @@ public class AppConstants {
     public static final String ORGANIZATION_LABEL = "Organization";
     public static final String GROUP_LABEL = "Group";
     public static final String TEAM_LABEL = "Team";
+    public static final String COPY_OF = "copy of";
 
     //Kettle commands
     public static final String KETTLE_TRANS_STATUS = "/kettle/transStatus/?name=GetAllWorkShiftsByWorkPlaceId&xml=y";
