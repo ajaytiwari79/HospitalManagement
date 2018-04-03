@@ -111,8 +111,8 @@ public class ExpertiseService extends UserBaseService {
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid expertise Id");
             }
-            Long basePayGradeCount = expertise.getSeniorityLevel().stream().filter(basePayGrade -> basePayGrade.getPayGrade().equals(expertiseDTO.getSeniorityLevel().getPayGradeId())).count();
-            if (basePayGradeCount > 0) {
+            Boolean basePayGradeCount = seniorityLevelGraphRepository.checkPayGradeInSeniorityLevel(expertise.getId(), -1L, expertiseDTO.getSeniorityLevel().getPayGradeId());
+            if (basePayGradeCount) {
                 throw new DuplicateDataException("base Pay grade already exist in expertise");
             }
             if (expertise.isPublished()) {
@@ -657,6 +657,15 @@ public class ExpertiseService extends UserBaseService {
             parentExpertise.setPublished(true);
         }
         return parentExpertise;
+    }
+
+
+    public ExpertiseQueryResult getExpertiseById(Long expertiseId) {
+        ExpertiseQueryResult expertise = expertiseGraphRepository.getExpertiseById(expertiseId);
+        if (!Optional.ofNullable(expertise).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid Expertise Id " + expertiseId);
+        }
+        return expertise;
     }
 
 
