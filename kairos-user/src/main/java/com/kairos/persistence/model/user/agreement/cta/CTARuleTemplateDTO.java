@@ -39,6 +39,7 @@ public class CTARuleTemplateDTO {
     private PlanningCategory planningCategory;
     private List<Long> staffFunctions=new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
+    private boolean scheduledHoursTemplate;
 //    private List<Long> timeTypes =new ArrayList<>();
 
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
@@ -49,6 +50,15 @@ public class CTARuleTemplateDTO {
     private List<Long> dayTypeIds;
 
     public CTARuleTemplateDTO() {
+    }
+
+
+    public boolean isScheduledHoursTemplate() {
+        return scheduledHoursTemplate;
+    }
+
+    public void setScheduledHoursTemplate(boolean scheduledHoursTemplate) {
+        this.scheduledHoursTemplate = scheduledHoursTemplate;
     }
 
     public Long getId() {
