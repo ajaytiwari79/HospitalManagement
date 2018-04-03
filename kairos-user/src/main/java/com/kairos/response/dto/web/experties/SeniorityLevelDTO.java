@@ -16,7 +16,7 @@ public class SeniorityLevelDTO {
     private Integer to;
     private Integer moreThan;
     private List<FunctionsDTO> functions;
-    private Integer basePayGrade;  // this is payGrade Id which is coming from payTable
+    private Long payGradeId;  // this is payGrade Id which is coming from payTable
     private Set<Long> payGroupAreasIds;// applicable payGroup areas
     // TODO We are unclear about this just adding and make sure this will utilize in future.
     private BigDecimal pensionPercentage;
@@ -76,12 +76,12 @@ public class SeniorityLevelDTO {
         this.functions = functions;
     }
 
-    public Integer getBasePayGrade() {
-        return basePayGrade;
+    public Long getPayGradeId() {
+        return payGradeId;
     }
 
-    public void setBasePayGrade(Integer basePayGrade) {
-        this.basePayGrade = basePayGrade;
+    public void setPayGradeId(Long payGradeId) {
+        this.payGradeId = payGradeId;
     }
 
     public BigDecimal getPensionPercentage() {
@@ -108,21 +108,21 @@ public class SeniorityLevelDTO {
         this.freeChoiceToPension = freeChoiceToPension;
     }
 
-    public SeniorityLevelDTO(Integer from, Integer to,  Integer basePayGrade, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension) {
+    public SeniorityLevelDTO(Integer from, Integer to, Long payGradeId, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension) {
         this.from = from;
         this.to = to;
 
 
-        this.basePayGrade = basePayGrade;
+        this.payGradeId = payGradeId;
 
         this.pensionPercentage = pensionPercentage;
         this.freeChoicePercentage = freeChoicePercentage;
         this.freeChoiceToPension = freeChoiceToPension;
     }
 
-    public SeniorityLevelDTO(Integer moreThan, Integer basePayGrade, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension) {
+    public SeniorityLevelDTO(Integer moreThan, Long payGradeId, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension) {
         this.moreThan = moreThan;
-        this.basePayGrade = basePayGrade;
+        this.payGradeId = payGradeId;
         this.pensionPercentage = pensionPercentage;
         this.freeChoicePercentage = freeChoicePercentage;
         this.freeChoiceToPension = freeChoiceToPension;

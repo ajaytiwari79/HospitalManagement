@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
+import com.kairos.persistence.model.user.pay_table.PayGrade;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Map;
 public class FunctionAndSeniorityLevelQueryResult {
     private List<Map<String, Object>> functions;
     private List<PayGroupArea> payGroupAreas;
-
+    private PayGrade payGrade;
     public FunctionAndSeniorityLevelQueryResult() {
         //default
     }
@@ -32,5 +33,13 @@ public class FunctionAndSeniorityLevelQueryResult {
 
     public void setPayGroupAreas(List<PayGroupArea> payGroupAreas) {
         this.payGroupAreas = payGroupAreas;
+    }
+
+    public PayGrade getPayGrade() {
+        return payGrade;
+    }
+
+    public void setPayGrade(PayGrade payGrade) {
+        this.payGrade = payGrade;
     }
 }

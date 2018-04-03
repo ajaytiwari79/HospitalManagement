@@ -52,23 +52,31 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = UserServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = UserServiceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class CostTimeAgreementServiceTest {
     private Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
-    @Inject private RuleTemplateCategoryService ruleTemplateCategoryService;
-    @Inject private CostTimeAgreementService costTimeAgreementService;
-    @Inject private CurrencyService currencyService;
-    @Inject DayTypeService dayTypeService;
-    @Inject ExpertiseService expertiseService;
-    @Inject OrganizationService organizationService;
-    @Inject CountryService countryService;
-    @Inject UnitPositionService unitPositionService;
+    @Inject
+    private RuleTemplateCategoryService ruleTemplateCategoryService;
+    @Inject
+    private CostTimeAgreementService costTimeAgreementService;
+    @Inject
+    private CurrencyService currencyService;
+    @Inject
+    DayTypeService dayTypeService;
+    @Inject
+    ExpertiseService expertiseService;
+    @Inject
+    OrganizationService organizationService;
+    @Inject
+    CountryService countryService;
+    @Inject
+    UnitPositionService unitPositionService;
     @Value("${server.host.http.url}")
     private String url;
     @Inject
     TestRestTemplate restTemplate;
     static Long createdCtaId = null;
-//    static Long countryId = 53L;
+    //    static Long countryId = 53L;
     static Long countryId = null;
     static Long organizationId = null;
     static Long unitPositionId = null;
@@ -95,17 +103,16 @@ public class CostTimeAgreementServiceTest {
 
 
     @Test
-    public void addCTARuleTemplateCategory(){
-        RuleTemplateCategory category=new RuleTemplateCategory();
+    public void addCTARuleTemplateCategory() {
+        RuleTemplateCategory category = new RuleTemplateCategory();
         category.setName("NONE");
         category.setRuleTemplateCategoryType(RuleTemplateCategoryType.CTA);
-        ruleTemplateCategoryService.createRuleTemplateCategory(countryId,category);
+        ruleTemplateCategoryService.createRuleTemplateCategory(countryId, category);
     }
 
     @Test
-    public void addCTARuleTemplate()
-    {
-        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Overtime CTA",
+    public void addCTARuleTemplate() {
+        CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO("Overtime CTA",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
                         " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
@@ -121,8 +128,12 @@ public class CostTimeAgreementServiceTest {
         ctaRuleTemplateDTO.setBudgetType(BudgetType.ACTIVITY_COST);
         ctaRuleTemplateDTO.setActivityTypeForCostCalculation(ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE);
         ctaRuleTemplateDTO.setPlanningCategory(PlanningCategory.DEVIATION_FROM_PLANNED);
+
+        // ctaRuleTemplateDTO.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
+
         //ctaRuleTemplateDTO.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
-        ctaRuleTemplateDTO.setPlannedTimeWithFactor(PlannedTimeWithFactor.buildPlannedTimeWithFactor(10,true,AccountType.DUTYTIME_ACCOUNT));
+
+        ctaRuleTemplateDTO.setPlannedTimeWithFactor(PlannedTimeWithFactor.buildPlannedTimeWithFactor(10, true, AccountType.DUTYTIME_ACCOUNT));
 
         RuleTemplateCategory category = ruleTemplateCategoryService.getCTARuleTemplateCategoryOfCountryByName(countryId, "NONE");
         ctaRuleTemplateDTO.setRuleTemplateCategory(category.getId());
@@ -134,35 +145,36 @@ public class CostTimeAgreementServiceTest {
         ResponseEntity<RestTemplateResponseEnvelope<CTARuleTemplateDTO>> response = restTemplate.exchange(
                 baseUrl + "/cta_rule_template",
                 HttpMethod.POST, requestBodyData, typeReference);
-        logger.info("Status Code : "+response.getStatusCode());
-        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||  HttpStatus.UNPROCESSABLE_ENTITY.equals(response.getStatusCode()) ||
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) || HttpStatus.UNPROCESSABLE_ENTITY.equals(response.getStatusCode()) ||
                 HttpStatus.CONFLICT.equals(response.getStatusCode()));
 
     }
 
 
     @Test
-    public void getAllRuleTemplate(){
-        CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS= costTimeAgreementService.loadAllCTARuleTemplateByCountry(countryId);
+    public void getAllRuleTemplate() {
+        CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS = costTimeAgreementService.loadAllCTARuleTemplateByCountry(countryId);
         System.out.println(ctaRuleTemplateDTOS);
     }
-    @Test
-    public void getCurrency(){
 
-        Currency currency=currencyService.getCurrencyByCountryId(countryId);
+    @Test
+    public void getCurrency() {
+
+        Currency currency = currencyService.getCurrencyByCountryId(countryId);
         System.out.println(currency);
 
     }
 
 
     @Test
-    public void saveCom(){
+    public void saveCom() {
         costTimeAgreementService.saveInterval();
     }
 
     @Test
-    public void createCostTimeAgreement(){
-        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("working overtime",
+    public void createCostTimeAgreement() {
+        CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO("working overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
                         " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
@@ -182,28 +194,28 @@ public class CostTimeAgreementServiceTest {
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
                 baseUrl + "/cta",
                 HttpMethod.POST, requestBodyData, typeReference);
-        logger.info("Status Code : "+response.getStatusCode());
-        Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) ||  HttpStatus.UNPROCESSABLE_ENTITY.equals(response.getStatusCode()) ||
+        logger.info("Status Code : " + response.getStatusCode());
+        Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.UNPROCESSABLE_ENTITY.equals(response.getStatusCode()) ||
                 HttpStatus.CONFLICT.equals(response.getStatusCode()));
-        if(HttpStatus.CREATED.equals(response.getStatusCode())) {
+        if (HttpStatus.CREATED.equals(response.getStatusCode())) {
             createdCtaId = response.getBody().getData().getId();
         }
     }
 
 
     @Test
-    public void updateCostTimeAgreement(){
+    public void updateCostTimeAgreement() {
         // Check for CTA by Id
-        if(createdCtaId == null){
+        if (createdCtaId == null) {
             logger.info("CTA Id is null");
             createdCtaId = costTimeAgreementService.getCTAIdByNameAndCountry(nameOfCTA, countryId);
         }
         // If CTA not found by Id check for cta by name
-        if(createdCtaId == null){
-            logger.info("CTA not found with name : {}",nameOfCTA);
+        if (createdCtaId == null) {
+            logger.info("CTA not found with name : {}", nameOfCTA);
             return;
         }
-        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Working Overtime",
+        CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO("Working Overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
                         " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
@@ -225,25 +237,25 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta/"+createdCtaId,
+                baseUrl + "/cta/" + createdCtaId,
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
-        createdCtaId=  response.getBody().getData().getId();
+        createdCtaId = response.getBody().getData().getId();
     }
 
     @Test
     @Ignore
-    public  void changeCTARuleTemplateCategory() throws Exception{
-        CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS= costTimeAgreementService.loadAllCTARuleTemplateByCountry(53L);
+    public void changeCTARuleTemplateCategory() throws Exception {
+        CTARuleTemplateCategoryWrapper ctaRuleTemplateDTOS = costTimeAgreementService.loadAllCTARuleTemplateByCountry(53L);
         ArrayList arrayList = new ArrayList();
-         List<Long> ctaRuleTemplateList=null;
+        List<Long> ctaRuleTemplateList = null;
         ctaRuleTemplateList.add(ctaRuleTemplateDTOS.getRuleTemplates().get(0).getId());
-        String ruleTemplateCategory="test";
+        String ruleTemplateCategory = "test";
     }
 
     @Test
-    public  void updateCTARuleTemplateCategory() throws Exception{
-        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Working Overtime",
+    public void updateCTARuleTemplateCategory() throws Exception {
+        CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO("Working Overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
                         " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
@@ -256,11 +268,11 @@ public class CostTimeAgreementServiceTest {
                 ("CTA TEST", "Test description", expertise.getId(), organizationType.getId(),
                         organizationSubType.getId(), new Date().getTime(), ctaRuleTemplates);
 
-        if(createdCtaId == null){
+        if (createdCtaId == null) {
             // GET CTA with name  "New Test CTA"
-            try{
+            try {
                 collectiveTimeAgreementDTO = costTimeAgreementService.createCostTimeAgreement(countryId, collectiveTimeAgreementDTO);
-            } catch (Exception e){
+            } catch (Exception e) {
                 logger.info("Exception occured");
             }
             createdCtaId = collectiveTimeAgreementDTO.getId();
@@ -273,19 +285,19 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<CollectiveTimeAgreementDTO>> response = restTemplate.exchange(
-                baseUrl + "/cta/"+createdCtaId,
+                baseUrl + "/cta/" + createdCtaId,
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
-        createdCtaId=  response.getBody().getData().getId();
+        createdCtaId = response.getBody().getData().getId();
 
     }
 
-    public CTARuleTemplateDTO prepareCTARuleTemplate(CTARuleTemplateDTO ctaRuleTemplateDTO){
+    public CTARuleTemplateDTO prepareCTARuleTemplate(CTARuleTemplateDTO ctaRuleTemplateDTO) {
 //        ctaRuleTemplateDTO
 
         // Prepare Compensation Table
         CompensationTableInterval compensationTableInterval = new CompensationTableInterval(LocalTime.MIN, LocalTime.MAX,
-                10,CompensationMeasurementType.MINUTES);
+                10, CompensationMeasurementType.MINUTES);
         List<CompensationTableInterval> compensationTableIntervals = new ArrayList<>();
         compensationTableIntervals.add(compensationTableInterval);
         CompensationTable compensationTable = new CompensationTable(10, compensationTableIntervals);
@@ -297,17 +309,15 @@ public class CostTimeAgreementServiceTest {
     }
 
 
-
-
     @Test
-    public void createCostTimeAgreementForUnitPosition(){
+    public void createCostTimeAgreementForUnitPosition() {
         // Check for CTA by Id
-        if(ctaLinkedWithUnitPosition == null){
+        if (ctaLinkedWithUnitPosition == null) {
             logger.info("CTA With Unit position not found");
             return;
         }
 
-        CTARuleTemplateDTO ctaRuleTemplateDTO  = new CTARuleTemplateDTO("Working Overtime",
+        CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO("Working Overtime",
                 "CTA rule for overtime shift, from 00-24 o. clock.  For this organization/unit this is payroll type “230: " +
                         " 50% overtime compensation”.",
                 "230:50% overtime compensation", "xyz");
@@ -331,7 +341,7 @@ public class CostTimeAgreementServiceTest {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionQueryResult>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<UnitPositionQueryResult>> response = restTemplate.exchange(
-                baseUrl + "/unit/"+organizationId+"/unit_position/"+unitPositionId+"/cta/"+ctaLinkedWithUnitPosition.getId(),
+                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta/" + ctaLinkedWithUnitPosition.getId(),
                 HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
@@ -339,18 +349,18 @@ public class CostTimeAgreementServiceTest {
     @Test
     public void getCTALinkedWithUnitPosition() throws Exception {
 
-        String baseUrl=getBaseUrl(organizationId,null);
+        String baseUrl = getBaseUrl(organizationId, null);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAListQueryResult>> resTypeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAListQueryResult>>() {
                 };
 
         ResponseEntity<RestTemplateResponseEnvelope<CTAListQueryResult>> response = restTemplate.exchange(
-                baseUrl+"/unit/"+organizationId+"/unit_position/"+unitPositionId+"/cta",
+                baseUrl + "/unit/" + organizationId + "/unit_position/" + unitPositionId + "/cta",
                 HttpMethod.GET, null, resTypeReference);
 
-        logger.info("STATUS CODE ---------------------> {}",response.getStatusCode());
+        logger.info("STATUS CODE ---------------------> {}", response.getStatusCode());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()) ||
-                HttpStatus.NOT_FOUND.equals(response.getStatusCode()) );
+                HttpStatus.NOT_FOUND.equals(response.getStatusCode()));
 
     }
 

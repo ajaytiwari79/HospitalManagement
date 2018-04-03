@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
+import com.kairos.persistence.model.user.pay_table.PayGrade;
 import com.kairos.response.dto.web.experties.FunctionsDTO;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -9,6 +10,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_BASE_PAY_GRADE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PAY_GROUP_AREA;
 
 /**
@@ -19,8 +21,9 @@ public class SeniorityLevel extends UserBaseEntity {
     private Integer from;
     private Integer to;
     private Integer moreThan;
-    private List<FunctionsDTO> functions;
-    private Integer basePayGrade;  // this is payGrade Id which is coming from payTable
+
+    @Relationship(type = HAS_BASE_PAY_GRADE)
+    private PayGrade payGrade;  // this is payGrade Id which is coming from payTable
     @Relationship(type = HAS_PAY_GROUP_AREA)
     private List<PayGroupArea> payGroupAreas;// applicable payGroup areas
     // TODO We are unclear about this just adding and make sure this will utilize in future.
@@ -65,20 +68,12 @@ public class SeniorityLevel extends UserBaseEntity {
         this.moreThan = moreThan;
     }
 
-    public List<FunctionsDTO> getFunctions() {
-        return functions;
+    public PayGrade getPayGrade() {
+        return payGrade;
     }
 
-    public void setFunctions(List<FunctionsDTO> functions) {
-        this.functions = functions;
-    }
-
-    public Integer getBasePayGrade() {
-        return basePayGrade;
-    }
-
-    public void setBasePayGrade(Integer basePayGrade) {
-        this.basePayGrade = basePayGrade;
+    public void setPayGrade(PayGrade payGrade) {
+        this.payGrade = payGrade;
     }
 
     public List<PayGroupArea> getPayGroupAreas() {

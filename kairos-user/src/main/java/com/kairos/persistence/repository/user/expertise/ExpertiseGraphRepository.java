@@ -83,13 +83,14 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) \n" +
             "optional match(seniorityLevel)-[rel:" + HAS_FUNCTION + "]->(functions:Function) \n" +
             "with expertise,payTable,union,level,orgService,seniorityLevel,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData  \n" +
+            "optional match(seniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGradeData:PayGrade) \n" +
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
-            "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
+            "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
             "return expertise.name as name ,id(expertise) as id,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis ," +
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
-            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,basePayGrade:seniorityLevel.basePayGrade,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas})  END  as seniorityLevel")
+            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,basePayGrade:seniorityLevel.basePayGrade,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevel")
             List<ExpertiseQueryResult> getAllExpertiseByCountryId(long countryId);
 
 
@@ -107,13 +108,14 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) \n" +
             "optional match(seniorityLevel)-[rel:" + HAS_FUNCTION + "]->(functions:Function) \n" +
             "with expertise,payTable,union,level,orgService,seniorityLevel,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData  \n" +
+            "optional match(seniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGradeData:PayGrade) \n" +
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
-            "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
+            "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
             "return expertise.name as name ,id(expertise) as id,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis ," +
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
-            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,basePayGrade:seniorityLevel.basePayGrade,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas})  END  as seniorityLevel")
+            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,basePayGrade:seniorityLevel.basePayGrade,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevel")
     ExpertiseQueryResult getParentExpertiseByExpertiseId(Long expertiseId);
 
 

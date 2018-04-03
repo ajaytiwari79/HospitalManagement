@@ -13,6 +13,7 @@ import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
+import com.kairos.persistence.model.user.pay_table.PayGrade;
 import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -25,6 +26,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelFunctionRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
+import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
@@ -83,6 +85,8 @@ public class ExpertiseService extends UserBaseService {
     ObjectMapper objectMapper;
     @Inject
     private SeniorityLevelGraphRepository seniorityLevelGraphRepository;
+    @Inject
+    private PayGradeGraphRepository payGradeGraphRepository;
 
     public ExpertiseResponseDTO saveExpertise(long countryId, CountryExpertiseDTO expertiseDTO) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -107,7 +111,7 @@ public class ExpertiseService extends UserBaseService {
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid expertise Id");
             }
-            Long basePayGradeCount = expertise.getSeniorityLevel().stream().filter(basePayGrade -> basePayGrade.getBasePayGrade().equals(expertiseDTO.getSeniorityLevel().getBasePayGrade())).count();
+            Long basePayGradeCount = expertise.getSeniorityLevel().stream().filter(basePayGrade -> basePayGrade.getPayGrade().equals(expertiseDTO.getSeniorityLevel().getPayGradeId())).count();
             if (basePayGradeCount > 0) {
                 throw new DuplicateDataException("base Pay grade already exist in expertise");
             }
@@ -197,7 +201,7 @@ public class ExpertiseService extends UserBaseService {
                     seniorityLevel.setFrom(seniorityLevelFromDB.getFrom());
                     seniorityLevel.setTo(seniorityLevelFromDB.getTo());
                 }
-                seniorityLevel.setBasePayGrade(seniorityLevelFromDB.getBasePayGrade());
+                seniorityLevel.setPayGrade(seniorityLevelFromDB.getPayGrade());
                 seniorityLevel.setPensionPercentage(seniorityLevelFromDB.getPensionPercentage());
                 seniorityLevel.setFreeChoicePercentage(seniorityLevelFromDB.getFreeChoicePercentage());
                 seniorityLevel.setFreeChoiceToPension(seniorityLevelFromDB.getFreeChoiceToPension());
@@ -317,7 +321,12 @@ public class ExpertiseService extends UserBaseService {
             seniorityLevel.setFrom(seniorityLevelDTO.getFrom());
             seniorityLevel.setTo(seniorityLevelDTO.getTo());
         }
-        seniorityLevel.setBasePayGrade(seniorityLevelDTO.getBasePayGrade());
+        PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId());
+        if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
+            throw new DataNotFoundByIdException("Invalid pay grade id " + seniorityLevelDTO.getPayGradeId());
+        }
+        seniorityLevel.setPayGrade(payGrade);
+
         seniorityLevel.setPensionPercentage(seniorityLevelDTO.getPensionPercentage());
         seniorityLevel.setFreeChoicePercentage(seniorityLevelDTO.getFreeChoicePercentage());
         seniorityLevel.setFreeChoiceToPension(seniorityLevelDTO.getFreeChoiceToPension());
@@ -345,17 +354,18 @@ public class ExpertiseService extends UserBaseService {
         }
 
         Optional<SeniorityLevel> seniorityLevelToUpdate =
-        currentExpertise.getSeniorityLevel().stream().filter(seniorityLevel -> seniorityLevel.getId().equals(expertiseDTO.getSeniorityLevel().getId())).findFirst();
+                currentExpertise.getSeniorityLevel().stream().filter(seniorityLevel -> seniorityLevel.getId().equals(expertiseDTO.getSeniorityLevel().getId())).findFirst();
 
         if (!Optional.ofNullable(seniorityLevelToUpdate).isPresent()) {
             throw new DataNotFoundByIdException("Seniority Level not found in expertise" + expertiseDTO.getSeniorityLevel().getId());
         }
+        Boolean basePayGrade = seniorityLevelGraphRepository.checkPayGradeInSeniorityLevel(expertiseDTO.getId(), seniorityLevelToUpdate.get().getId(), expertiseDTO.getSeniorityLevel().getPayGradeId());
 
-        Long basePayGradeCount = currentExpertise.getSeniorityLevel().stream().filter(seniorityLevelPredicate ->
-                seniorityLevelPredicate.getBasePayGrade().equals(expertiseDTO.getSeniorityLevel().getBasePayGrade())
-                        && !seniorityLevelPredicate.getId().equals(expertiseDTO.getSeniorityLevel().getId())
-        ).count();
-        if (basePayGradeCount > 0) {
+//        Long basePayGradeCount = currentExpertise.getSeniorityLevel().stream().filter(seniorityLevelPredicate ->
+//                seniorityLevelPredicate.getPayGrade().getId().equals(expertiseDTO.getSeniorityLevel().getPayGradeId())
+//                        && !seniorityLevelPredicate.getId().equals(expertiseDTO.getSeniorityLevel().getId())).count();
+//
+        if (basePayGrade) {
             throw new DuplicateDataException("base Pay grade already exist in expertise");
         }
 
@@ -446,7 +456,16 @@ public class ExpertiseService extends UserBaseService {
             seniorityLevel.setTo(seniorityLevelDTO.getTo());
             seniorityLevel.setMoreThan(null);
         }
-        seniorityLevel.setBasePayGrade(seniorityLevelDTO.getBasePayGrade());
+
+        if (!seniorityLevelDTO.getPayGradeId().equals(functionAndSeniorityLevel.getPayGrade().getId())) {
+            seniorityLevelGraphRepository.removePreviousPayGradeFromSeniorityLevel(seniorityLevelDTO.getId());
+            PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId());
+            if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
+                throw new DataNotFoundByIdException("Invalid pay grade id " + seniorityLevelDTO.getPayGradeId());
+            }
+            seniorityLevel.setPayGrade(payGrade);
+        }
+
         seniorityLevel.setPensionPercentage(seniorityLevelDTO.getPensionPercentage());
         seniorityLevel.setFreeChoicePercentage(seniorityLevelDTO.getFreeChoicePercentage());
         seniorityLevel.setFreeChoiceToPension(seniorityLevelDTO.getFreeChoiceToPension());
