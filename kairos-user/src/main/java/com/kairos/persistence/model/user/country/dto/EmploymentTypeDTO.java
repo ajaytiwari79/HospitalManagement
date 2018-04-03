@@ -14,8 +14,9 @@ import javax.validation.constraints.NotNull;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
-public class EmploymentTypeDTO extends UserBaseEntity {
-    @NotEmpty(message = "error.EmploymentType.name.notEmptyOrNotNull")    @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull")
+public class EmploymentTypeDTO {
+    private Long id;
+    @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull")
     private String name;
     private String description;
     private boolean allowedForContactPerson;
@@ -24,6 +25,14 @@ public class EmploymentTypeDTO extends UserBaseEntity {
     private boolean permanent;
     private boolean temporary;
     private boolean guest;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -102,7 +111,7 @@ public class EmploymentTypeDTO extends UserBaseEntity {
 
         return employmentType;
     }
-    @AssertTrue(message = "At least one field should be selected")
+    @AssertTrue(message = "At least one role should be selected")
     public boolean isValid() {
         return (permanent || temporary ||guest)?true:false;
     }

@@ -92,13 +92,15 @@ public class EmploymentTypeService extends UserBaseService {
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
-        boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,"(?i)"+employmentTypeDTO.getName().trim(),employmentTypeId);
-        if(isAlreadyExists){
-            throw new DuplicateDataException("EmploymentType already exists"+employmentTypeDTO.getName());
-        }
         EmploymentType employmentTypeToUpdate = countryGraphRepository.getEmploymentTypeByCountryAndEmploymentType(countryId, employmentTypeId);
         if (employmentTypeToUpdate == null) {
             throw new DataNotFoundByIdException("Incorrect Employment Type id " + employmentTypeId);
+        }
+        if(!employmentTypeDTO.getName().trim().equalsIgnoreCase(employmentTypeToUpdate.getName())){
+            boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,"(?i)"+employmentTypeDTO.getName().trim(),employmentTypeId);
+            if(isAlreadyExists){
+                throw new DuplicateDataException("EmploymentType already exists"+employmentTypeDTO.getName());
+            }
         }
         employmentTypeToUpdate.setName(employmentTypeDTO.getName());
         employmentTypeToUpdate.setDescription(employmentTypeDTO.getDescription());
