@@ -156,7 +156,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "optional match (unitPosition)-[:HAS_WTA ]->(wta:WorkingTimeAgreement) \n" +
             "optional match (unitPosition)-[:HAS_CTA]->(cta:CostTimeAgreement) \n" +
-            "optional match (unitPosition)-[:SUPPORTED_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
+            "optional match (unitPosition)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union, \n" +
             "positionCode as positionCode, \n" +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, \n" +

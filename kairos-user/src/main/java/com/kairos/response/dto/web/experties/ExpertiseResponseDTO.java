@@ -1,11 +1,8 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.user.pay_table.FutureDate;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +13,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExpertiseResponseDTO {
     private Long id;
+    private Long parentId;
     private String name;
     private String description;
     @DateLong
@@ -32,6 +30,7 @@ public class ExpertiseResponseDTO {
     private List<SeniorityLevelDTO> seniorityLevels = new ArrayList<>();
     private List<Long> tags;
     private Boolean published;
+    private Boolean hasVersion;
 
     public ExpertiseResponseDTO() {
     }
@@ -42,6 +41,14 @@ public class ExpertiseResponseDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
     public String getName() {
@@ -154,5 +161,13 @@ public class ExpertiseResponseDTO {
 
     public void setPublished(Boolean published) {
         this.published = published;
+    }
+
+    public Boolean getHasVersion() {
+        return hasVersion;
+    }
+
+    public void setHasVersion(Boolean hasVersion) {
+        this.hasVersion = hasVersion;
     }
 }

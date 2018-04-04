@@ -71,4 +71,16 @@ public class StaffExperienceInExpertiseDTO {
         this.relevantExperienceInMonths = relevantExperienceInMonths;
         this.expertiseStartDate = expertiseStartDate;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("StaffExperienceInExpertiseDTO{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", expertiseId=").append(expertiseId);
+        sb.append(", relevantExperienceInMonths=").append(relevantExperienceInMonths);
+        sb.append(", expertiseStartDate=").append(expertiseStartDate);
+        sb.append('}');
+        return sb.toString();
+    }
 }

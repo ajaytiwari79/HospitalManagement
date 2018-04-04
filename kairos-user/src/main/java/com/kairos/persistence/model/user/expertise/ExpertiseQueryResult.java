@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
-import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -26,6 +25,7 @@ public class ExpertiseQueryResult {
     private Integer numberOfWorkingDaysInWeek;
     private Long id;
     private Boolean published;
+    private Boolean hasVersion;
     private PaidOutFrequencyEnum paidOutFrequency;
 
 
@@ -34,7 +34,7 @@ public class ExpertiseQueryResult {
     //TODO in current unwinded property cant be set to any nested domain to QueryResult DTO , We will change if in feature this will handle
     private Organization union;
     private PayTable payTable;
-    private List<Map<String, Object>> seniorityLevel;
+    private List<Map<String, Object>> seniorityLevels;
 
     public String getName() {
         return name;
@@ -140,12 +140,20 @@ public class ExpertiseQueryResult {
         this.payTable = payTable;
     }
 
-    public List<Map<String, Object>> getSeniorityLevel() {
-        return seniorityLevel;
+    public List<Map<String, Object>> getSeniorityLevels() {
+        return seniorityLevels;
     }
 
-    public void setSeniorityLevel(List<Map<String, Object>> seniorityLevel) {
-        this.seniorityLevel = seniorityLevel;
+    public void setSeniorityLevels(List<Map<String, Object>> seniorityLevels) {
+        this.seniorityLevels = seniorityLevels;
+    }
+
+    public Boolean getHasVersion() {
+        return hasVersion;
+    }
+
+    public void setHasVersion(Boolean hasVersion) {
+        this.hasVersion = hasVersion;
     }
 
     public ExpertiseQueryResult() {

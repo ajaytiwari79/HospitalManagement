@@ -22,8 +22,10 @@ import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
+import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.persistence.model.user.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.user.unit_position.PositionCtaWtaQueryResult;
 
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
@@ -46,6 +48,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionEmploymentTypeRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 
@@ -62,6 +65,7 @@ import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.joda.time.Months;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -128,7 +132,8 @@ public class UnitPositionService extends UserBaseService {
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
     private FunctionGraphRepository functionGraphRepository;
-
+    @Inject
+    private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
 
     public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
         unitPositionDTO.setUnitId(id);//Todo vipul as you say it should be removed for future
@@ -168,7 +173,7 @@ public class UnitPositionService extends UserBaseService {
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
 
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
-        timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(), id));
+        timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(), organization.getId()));
 
         return unitPositionQueryResult;
     }
@@ -433,7 +438,7 @@ public class UnitPositionService extends UserBaseService {
     }
 
     /*
-     * @auth vipul
+     * @author vipul
      * used to get all positions of organization n by organization and staff Id
      * */
     public List<UnitPositionQueryResult> getUnitPositionsOfStaff(long id, long staffId, String type) {
@@ -461,14 +466,47 @@ public class UnitPositionService extends UserBaseService {
         //TODO  return unitPositionGraphRepository.getAllUnitPositionsByStaff(organization.getId(), staffId);
     }
 
-    public PositionCtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId) {
+    public PositionCtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId) {
         PositionCtaWtaQueryResult positionCtaWtaQueryResult = new PositionCtaWtaQueryResult();
         positionCtaWtaQueryResult.setCta(unitPositionGraphRepository.getCtaByExpertise(unitId, expertiseId));
         positionCtaWtaQueryResult.setWta(unitPositionGraphRepository.getWtaByExpertise(unitId, expertiseId));
-        positionCtaWtaQueryResult.setExpertise(expertiseGraphRepository.getExpertiseById(expertiseId));
+
+        Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
+
+        positionCtaWtaQueryResult.setExpertise(null);
+
+        StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, expertiseId);
+        if (!Optional.ofNullable(staffSelectedExpertise).isPresent() || !currentExpertise.isPresent()) {
+            throw new DataNotFoundByIdException("Expertise is not assigned to staff or unavailable");
+
+        }
+        DateTime expertiseStartDate = new DateTime(staffSelectedExpertise.getExpertiseStartDate());
+        DateTime currentDate = new DateTime(DateUtil.getCurrentDateMillis());
+
+        Integer experienceInMonth = Months.monthsBetween(expertiseStartDate, currentDate).getMonths() + staffSelectedExpertise.getRelevantExperienceInMonths();
+        logger.info("user has current experience in months :{}", experienceInMonth);
+        SeniorityLevel appliedSeniorityLevel = null;
+        for (SeniorityLevel seniorityLevel : currentExpertise.get().getSeniorityLevel()) {
+            if (seniorityLevel.getMoreThan() != null) {
+                // more than  is set if
+                if (experienceInMonth >= seniorityLevel.getMoreThan()) {
+                    appliedSeniorityLevel = seniorityLevel;
+                    break;
+                }
+            } else {
+                // to and from is present
+                if (seniorityLevel.getFrom() >= experienceInMonth && seniorityLevel.getTo() <= experienceInMonth) {
+                    appliedSeniorityLevel = seniorityLevel;
+                    break;
+                }
+            }
+        }
+        positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
+        positionCtaWtaQueryResult.setApplicableSeniorityLevel(appliedSeniorityLevel);
 
         return positionCtaWtaQueryResult;
     }
+
 
     public UnitPositionQueryResult updateUnitPositionWTA(Long unitId, Long unitPositionId, Long wtaId, WTADTO updateDTO) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);

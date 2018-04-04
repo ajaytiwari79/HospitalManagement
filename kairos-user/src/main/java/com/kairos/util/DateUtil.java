@@ -227,7 +227,13 @@ public class DateUtil {
     }
 
 
-    public static Date getCurrentDate(){
+    public static Date getCurrentDate() {
         return new Date();
     }
+
+    public static Long getCurrentDateMillis() {
+        DateTime date = new DateTime().withTime(0, 0, 0, 0);
+        return date.getMillis();
+    }
+
 }

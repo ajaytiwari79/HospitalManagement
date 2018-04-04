@@ -2,7 +2,9 @@ package com.kairos.persistence.model.user.unit_position;
 
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
+import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -15,7 +17,8 @@ public class PositionCtaWtaQueryResult {
 
     private List<CostTimeAgreement> cta;
     private List<WorkingTimeAgreement> wta;
-    private ExpertiseQueryResult expertise;
+    private Expertise expertise;
+    private SeniorityLevel applicableSeniorityLevel;
 
     public PositionCtaWtaQueryResult() {
     }
@@ -36,11 +39,19 @@ public class PositionCtaWtaQueryResult {
         this.wta = wta;
     }
 
-    public ExpertiseQueryResult getExpertise() {
+    public Expertise getExpertise() {
         return expertise;
     }
 
-    public void setExpertise(ExpertiseQueryResult expertise) {
+    public void setExpertise(Expertise expertise) {
         this.expertise = expertise;
+    }
+
+    public SeniorityLevel getApplicableSeniorityLevel() {
+        return applicableSeniorityLevel;
+    }
+
+    public void setApplicableSeniorityLevel(SeniorityLevel applicableSeniorityLevel) {
+        this.applicableSeniorityLevel = applicableSeniorityLevel;
     }
 }

@@ -102,6 +102,7 @@ public class ExpertiseService extends UserBaseService {
             prepareExpertiseWhileCreate(expertise, expertiseDTO, countryId);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
+            expertiseResponseDTO.setHasVersion(expertise.isHasVersion());
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
 
         } else {
@@ -113,7 +114,7 @@ public class ExpertiseService extends UserBaseService {
             }
             Boolean basePayGradeCount = seniorityLevelGraphRepository.checkPayGradeInSeniorityLevel(expertise.getId(), -1L, expertiseDTO.getSeniorityLevel().getPayGradeId());
             if (basePayGradeCount) {
-                throw new DuplicateDataException("base Pay grade already exist in expertise");
+                throw new DuplicateDataException("base Pay grade already exist.");
             }
             if (expertise.isPublished()) {
                 expertiseResponseDTO = createCopyOfExpertise(expertise, expertiseDTO, countryId);
@@ -140,6 +141,7 @@ public class ExpertiseService extends UserBaseService {
         BeanUtils.copyProperties(expertise, copiedExpertise);
         copiedExpertise.setId(null);
         expertise.setHasDraftCopy(true);
+        expertise.setHasVersion(true);
         copiedExpertise.setPublished(false);
         copiedExpertise.setExpertise(expertise);
         copiedExpertise.setSeniorityLevel(null);
@@ -149,6 +151,7 @@ public class ExpertiseService extends UserBaseService {
         SeniorityLevel seniorityLevel = new SeniorityLevel();
         addNewSeniorityLevelInExpertise(copiedExpertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
         expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
+        expertiseDTO.getSeniorityLevel().setParentId(expertiseDTO.getSeniorityLevel().getId());
         seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
 
 
@@ -157,6 +160,9 @@ public class ExpertiseService extends UserBaseService {
         expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
         expertiseResponseDTO.setId(copiedExpertise.getId());
         expertiseResponseDTO.setPublished(false);
+        expertiseResponseDTO.setHasVersion(true);
+        // setting previous Id as parent id
+        expertiseResponseDTO.setParentId(expertise.getId());
         expertiseResponseDTO.setSeniorityLevels(seniorityLevelDTOList);
         return expertiseResponseDTO;
     }
@@ -168,13 +174,12 @@ public class ExpertiseService extends UserBaseService {
     */
     private List<SeniorityLevelDTO> copyExistingSeniorityLevelInExpertise(Expertise expertise, List<SeniorityLevel> seniorityLevels, Long seniorityLevelToSkip) {
         List<SeniorityLevelDTO> seniorityLevelResponse = new ArrayList<>();
-        SeniorityLevel seniorityLevel = new SeniorityLevel();
         // Iterating on all object from DB and now copying to new Object
         for (SeniorityLevel seniorityLevelFromDB : seniorityLevels) {
             if (!seniorityLevelFromDB.getId().equals(seniorityLevelToSkip)) {
                 List<SeniorityLevelFunctionsRelationship> seniorityLevelFunctionsRelationships = new ArrayList<>();
 
-                seniorityLevel = new SeniorityLevel();
+                SeniorityLevel seniorityLevel = new SeniorityLevel();
                 BeanUtils.copyProperties(seniorityLevelFromDB, seniorityLevel);
                 seniorityLevel.setId(null);
                 FunctionAndSeniorityLevelQueryResult functionAndSeniorityLevel = seniorityLevelGraphRepository.getFunctionAndPayGroupAreaBySeniorityLevelId(seniorityLevelFromDB.getId());
@@ -205,10 +210,10 @@ public class ExpertiseService extends UserBaseService {
                 seniorityLevel.setPensionPercentage(seniorityLevelFromDB.getPensionPercentage());
                 seniorityLevel.setFreeChoicePercentage(seniorityLevelFromDB.getFreeChoicePercentage());
                 seniorityLevel.setFreeChoiceToPension(seniorityLevelFromDB.getFreeChoiceToPension());
-
+                save(seniorityLevel);
                 expertise.getSeniorityLevel().add(seniorityLevel);
                 seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
-                seniorityLevelResponse.add(getSeniorityLevelResponse(seniorityLevel, functionAndSeniorityLevel));
+                seniorityLevelResponse.add(getSeniorityLevelResponse(seniorityLevelFromDB, seniorityLevel, functionAndSeniorityLevel));
 
             }
         }
@@ -229,10 +234,11 @@ public class ExpertiseService extends UserBaseService {
     }
 
     /*This method is responsible for generating Seniority Level response */
-    private SeniorityLevelDTO getSeniorityLevelResponse(SeniorityLevel seniorityLevel, FunctionAndSeniorityLevelQueryResult functionAndSeniorityLevel) {
+    private SeniorityLevelDTO getSeniorityLevelResponse(SeniorityLevel seniorityLevelFromDB, SeniorityLevel seniorityLevel, FunctionAndSeniorityLevelQueryResult functionAndSeniorityLevel) {
         SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO();
         ObjectMapper objectMapper = new ObjectMapper();
         seniorityLevelDTO = objectMapper.convertValue(seniorityLevel, SeniorityLevelDTO.class);
+        seniorityLevelDTO.setParentId(seniorityLevelFromDB.getId());
         if (Optional.ofNullable(functionAndSeniorityLevel.getPayGroupAreas()).isPresent() && !functionAndSeniorityLevel.getPayGroupAreas().isEmpty()) {
             Set<Long> payGroupAreasId = functionAndSeniorityLevel.getPayGroupAreas().stream().map(PayGroupArea::getId).collect(Collectors.toSet());
             seniorityLevelDTO.setPayGroupAreasIds(payGroupAreasId);
@@ -361,10 +367,6 @@ public class ExpertiseService extends UserBaseService {
         }
         Boolean basePayGrade = seniorityLevelGraphRepository.checkPayGradeInSeniorityLevel(expertiseDTO.getId(), seniorityLevelToUpdate.get().getId(), expertiseDTO.getSeniorityLevel().getPayGradeId());
 
-//        Long basePayGradeCount = currentExpertise.getSeniorityLevel().stream().filter(seniorityLevelPredicate ->
-//                seniorityLevelPredicate.getPayGrade().getId().equals(expertiseDTO.getSeniorityLevel().getPayGradeId())
-//                        && !seniorityLevelPredicate.getId().equals(expertiseDTO.getSeniorityLevel().getId())).count();
-//
         if (basePayGrade) {
             throw new DuplicateDataException("base Pay grade already exist in expertise");
         }
@@ -378,8 +380,10 @@ public class ExpertiseService extends UserBaseService {
             BeanUtils.copyProperties(currentExpertise, copiedExpertise);
             copiedExpertise.setId(null);
             currentExpertise.setHasDraftCopy(true);
+            currentExpertise.setHasVersion(true);
+            copiedExpertise.setPublished(false);
             copiedExpertise.setExpertise(currentExpertise);
-            // copiedExpertise.getSeniorityLevel().clear();
+            // copiedExpertise.getSeniorityLevels().clear();
             // Calling this function to get any updates or updated value from DTO.
             updateCurrentExpertise(countryId, copiedExpertise, expertiseDTO);
 
@@ -387,8 +391,11 @@ public class ExpertiseService extends UserBaseService {
             //  Adding the currently edited  Sr level in expertise.
             SeniorityLevel seniorityLevel = new SeniorityLevel();
             copiedExpertise.setSeniorityLevel(null);
+
             addNewSeniorityLevelInExpertise(copiedExpertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+
             expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
+            expertiseDTO.getSeniorityLevel().setParentId(expertiseDTO.getSeniorityLevel().getId());
             seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
 
 
@@ -396,6 +403,10 @@ public class ExpertiseService extends UserBaseService {
             // since we have already
             seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, currentExpertise.getSeniorityLevel(), seniorityLevelToUpdate.get().getId()));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
+            expertiseResponseDTO.setPublished(false);
+            expertiseResponseDTO.setHasVersion(true);
+            expertiseResponseDTO.setId(copiedExpertise.getId());
+            expertiseResponseDTO.setParentId(currentExpertise.getId());
             expertiseResponseDTO.setSeniorityLevels(seniorityLevelDTOList);
 
 
@@ -406,6 +417,7 @@ public class ExpertiseService extends UserBaseService {
             save(currentExpertise);
             expertiseDTO.setId(currentExpertise.getId());
             expertiseDTO.setPublished(currentExpertise.isPublished());
+
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
 

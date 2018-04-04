@@ -2,20 +2,27 @@ package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
  * Created by vipul on 27/3/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Valid
 public class SeniorityLevelDTO {
-    private  Long id;
+    private Long id;
+    private Long parentId;
     private Integer from;
     private Integer to;
     private Integer moreThan;
     private List<FunctionsDTO> functions;
+    @NotNull(message = "PayGradeId  can not be null")
     private Long payGradeId;  // this is payGrade Id which is coming from payTable
     private Set<Long> payGroupAreasIds;// applicable payGroup areas
     // TODO We are unclear about this just adding and make sure this will utilize in future.
@@ -34,6 +41,14 @@ public class SeniorityLevelDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
     public Set<Long> getPayGroupAreasIds() {
@@ -127,16 +142,19 @@ public class SeniorityLevelDTO {
         this.freeChoicePercentage = freeChoicePercentage;
         this.freeChoiceToPension = freeChoiceToPension;
     }
-    // from 2-4(to)
-//    @AssertTrue(message = "Incorrect interval")
-//    public boolean isValid() {
-//        if (!Optional.ofNullable(this.from).isPresent()) {
-//            return false;
-//        }
-//        if (Optional.ofNullable(this.to).isPresent()) {
-//            if (this.to < this.from)
-//                return false;
-//        }
-//        return true;
-//    }
+
+
+    @AssertTrue(message = "Incorrect Data")
+    public boolean isValid() {
+        if (!Optional.ofNullable(this.moreThan).isPresent()) {
+            if (!Optional.ofNullable(this.from).isPresent()) {
+                return false;
+            }
+            if (Optional.ofNullable(this.to).isPresent()) {
+                if (this.to < this.from)
+                    return false;
+            }
+        }
+        return true;
+    }
 }
