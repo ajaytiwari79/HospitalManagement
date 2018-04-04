@@ -37,7 +37,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.hourlyWages as hourlyWages," +
             "id(unitPosition)   as id," +
             "unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
-            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis")
+            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.totalWeeklyMinutes as totalWeeklyMinutes")
     StaffUnitPositionDetails getUnitPositionById(long unitEmploymentId);
 
     /* Error while binding to WTA
