@@ -486,7 +486,7 @@ public class UnitPositionService extends UserBaseService {
 
     public TimebankWrapper getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
-        CTAListQueryResult ctaRuleTemplateQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
+        CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
         TimebankWrapper timebankWrapper = new TimebankWrapper(unitPositionId);
         timebankWrapper.setStaffId(unitPosition.getStaff().getId());
@@ -497,7 +497,7 @@ public class UnitPositionService extends UserBaseService {
         if(unitPosition.getEndDateMillis()!=null){
             timebankWrapper.setUnitPositionEndDate(DateUtil.asLocalDate(new Date(unitPosition.getEndDateMillis())));
         }
-        timebankWrapper.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaRuleTemplateQueryResults));
+        timebankWrapper.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaQueryResults));
         return timebankWrapper;
     }
 
@@ -514,6 +514,10 @@ public class UnitPositionService extends UserBaseService {
             ctaRuleTemplateDTO.setTimeTypeId(rt.getTimeTypeId()!=null?new BigInteger(rt.getTimeTypeId().toString()):null);
             //ctaRuleTemplateDTO.setPublicHolidays();
             ctaRuleTemplateDTO.setCtaIntervalDTOS(getCtaIntervalDto((List<CompensationTableInterval>) rt.getCompensationTable().get("compensationTableInterval")));
+            ctaRuleTemplateDTO.setPlannedTimeId(rt.getPlannedTimeId());
+            ctaRuleTemplateDTO.setCalculateScheduledHours(rt.isCalculateScheduledHours());
+            ctaRuleTemplateDTO.setEmploymentTypes(rt.getEmploymentTypes());
+            ctaRuleTemplateDTO.setAccountType(rt.getPlannedTimeWithFactor().getAccountType().name());
             ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
         });
         return ctaRuleTemplateDTOS;
