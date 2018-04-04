@@ -26,7 +26,6 @@ public class EmploymentTypeDTO {
     private boolean allowedForFlexPool;
     private Set<EmploymentTypeEnum> employmentTypes;
 
-
     public Long getId() {
         return id;
     }
@@ -91,7 +90,6 @@ public class EmploymentTypeDTO {
         employmentType.setAllowedForShiftPlan(this.isAllowedForShiftPlan());
         employmentType.setAllowedForFlexPool(this.isAllowedForFlexPool());
         employmentType.setEmploymentTypes(this.getEmploymentTypes());
-
 
         return employmentType;
     }
