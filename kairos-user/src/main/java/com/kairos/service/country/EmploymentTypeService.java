@@ -2,6 +2,8 @@ package com.kairos.service.country;
 
 import com.kairos.client.dto.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DataNotMatchedException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.EmploymentType;
@@ -63,9 +65,17 @@ public class EmploymentTypeService extends UserBaseService {
     private OrganizationService organizationService;
 
     public EmploymentType addEmploymentType(Long countryId, EmploymentTypeDTO employmentTypeDTO) {
+        if(employmentTypeDTO.getName().trim().isEmpty()){
+            throw new DataNotMatchedException("Name can't be blank");
+        }
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
+        }
+
+        boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,"(?i)"+employmentTypeDTO.getName().trim(),-1L);
+        if(isAlreadyExists){
+            throw new DuplicateDataException("EmploymentType already exists: "+employmentTypeDTO.getName().trim());
         }
         EmploymentType employmentTypeToCreate = employmentTypeDTO.generateEmploymentTypeFromEmploymentTypeDTO();
         country.addEmploymentType(employmentTypeToCreate);
@@ -75,20 +85,29 @@ public class EmploymentTypeService extends UserBaseService {
     }
 
     public EmploymentType updateEmploymentType(long countryId, long employmentTypeId, EmploymentTypeDTO employmentTypeDTO) {
+        if(employmentTypeDTO.getName().trim().isEmpty()){
+            throw new DataNotMatchedException("Name can't be blank");
+        }
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             throw new DataNotFoundByIdException("Incorrect country id " + countryId);
         }
         EmploymentType employmentTypeToUpdate = countryGraphRepository.getEmploymentTypeByCountryAndEmploymentType(countryId, employmentTypeId);
         if (employmentTypeToUpdate == null) {
-//            logger.debug("Finding Employment Type by id::" + levelId);
             throw new DataNotFoundByIdException("Incorrect Employment Type id " + employmentTypeId);
+        }
+        if(!employmentTypeDTO.getName().trim().equalsIgnoreCase(employmentTypeToUpdate.getName())){
+            boolean isAlreadyExists=employmentTypeGraphRepository.findByNameExcludingCurrent(countryId,"(?i)"+employmentTypeDTO.getName().trim(),employmentTypeId);
+            if(isAlreadyExists){
+                throw new DuplicateDataException("EmploymentType already exists: "+employmentTypeDTO.getName().trim());
+            }
         }
         employmentTypeToUpdate.setName(employmentTypeDTO.getName());
         employmentTypeToUpdate.setDescription(employmentTypeDTO.getDescription());
         employmentTypeToUpdate.setAllowedForContactPerson(employmentTypeDTO.isAllowedForContactPerson());
         employmentTypeToUpdate.setAllowedForShiftPlan(employmentTypeDTO.isAllowedForShiftPlan());
         employmentTypeToUpdate.setAllowedForFlexPool(employmentTypeDTO.isAllowedForFlexPool());
+        employmentTypeToUpdate.setEmploymentCategories(employmentTypeDTO.getEmploymentCategories());
         return save(employmentTypeToUpdate);
     }
 

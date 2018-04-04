@@ -3,10 +3,12 @@ package com.kairos.persistence.model.user.country;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.EmploymentCategory;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 /**
  * Created by prerna on 2/11/17.
@@ -23,7 +25,7 @@ public class EmploymentType extends UserBaseEntity {
     private boolean allowedForContactPerson;
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
-    private boolean deleted = false;
+    private Set<EmploymentCategory> employmentCategories;
 
     public String getName() {
         return name;
@@ -65,11 +67,11 @@ public class EmploymentType extends UserBaseEntity {
         this.allowedForFlexPool = allowedForFlexPool;
     }
 
-    public boolean isDeleted() {
-        return deleted;
+    public Set<EmploymentCategory> getEmploymentCategories() {
+        return employmentCategories;
     }
 
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public void setEmploymentCategories(Set<EmploymentCategory> employmentCategories) {
+        this.employmentCategories = employmentCategories;
     }
 }

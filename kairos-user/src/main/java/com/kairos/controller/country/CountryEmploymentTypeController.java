@@ -37,7 +37,7 @@ public class CountryEmploymentTypeController {
     @RequestMapping(value = COUNTRY_URL + "/employment_type/{employmentTypeId}", method = RequestMethod.PUT)
     @ApiOperation("Update employment type in country")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateEmploymentType(@PathVariable long countryId, @PathVariable long employmentTypeId, @RequestBody EmploymentTypeDTO employmentTypeDTO) {
+    public ResponseEntity<Map<String, Object>> updateEmploymentType(@PathVariable long countryId, @PathVariable long employmentTypeId, @Valid @RequestBody EmploymentTypeDTO employmentTypeDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.updateEmploymentType(countryId, employmentTypeId, employmentTypeDTO));
     }
 
