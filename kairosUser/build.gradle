@@ -71,7 +71,7 @@ dependencies {
 	compile group: 'javax.mail', name: 'mail', version: '1.4'
 	compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'
 	compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.10-FINAL'
-	compile group: 'joda-time', name: 'joda-time', version: '2.9.4'
+	//compile group: 'joda-time', name: 'joda-time', version: '2.9.4'
 	compile "io.springfox:springfox-swagger2:${swaggerVersion}"
 	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion
 	compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion
@@ -88,11 +88,11 @@ dependencyManagement {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
-configurations { c ->
+/*configurations { c ->
     println 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC $c'+configurations.compile.collect { it.getName() }.join(' ')
-}
+}*/
 //Just for windows
-task pathingJar(type: Jar) {
+/*task pathingJar(type: Jar) {
     dependsOn configurations.runtime
     appendix = 'pathing'
 
@@ -103,8 +103,9 @@ task pathingJar(type: Jar) {
             }.join(' ')
         }
     }
-}
+}*/
 
+/*
 bootRun {
     dependsOn pathingJar
     doFirst {
@@ -112,4 +113,4 @@ bootRun {
 
         classpath = files("$buildDir/classes/java/main", "$buildDir/resources/main", pathingJar.archivePath)
     }
-}
+}*/

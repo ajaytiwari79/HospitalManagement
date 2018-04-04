@@ -31,6 +31,21 @@ dependencies {
 */
 apply plugin: 'java'
 
-dependencies {
-    compile(project(":dto"))
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
 }
+subprojects{
+    apply plugin: 'java'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        //compile(project(":dto"))
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+        compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+    }
+}
+
