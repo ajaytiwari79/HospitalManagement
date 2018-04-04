@@ -44,6 +44,7 @@ public class CTARuleTemplateQueryResult {
     private Long timeTypeId;
     private Long plannedTimeId;
     private List<Long> dayTypeIds;
+    private boolean calculateScheduledHours;
 
     public CTARuleTemplateQueryResult() {
     }
@@ -171,6 +172,14 @@ public class CTARuleTemplateQueryResult {
 
     public void setCalculateValueIfPlanned(List<CalculateValueIfPlanned> calculateValueIfPlanned) {
         this.calculateValueIfPlanned = calculateValueIfPlanned;
+    }
+
+    public boolean isCalculateScheduledHours() {
+        return calculateScheduledHours;
+    }
+
+    public void setCalculateScheduledHours(boolean calculateScheduledHours) {
+        this.calculateScheduledHours = calculateScheduledHours;
     }
 
     public List<Long> getEmploymentTypes() {

@@ -57,6 +57,8 @@ public class CTARuleTemplate extends RuleTemplate{
     private Long timeTypeId;
     private Long plannedTimeId;
     private List<Long> dayTypeIds;
+    //it describe that this template is scheduledHoursTemplate or not
+    private boolean calculateScheduledHours;
 
     public CTARuleTemplate() {
 
@@ -111,6 +113,14 @@ public class CTARuleTemplate extends RuleTemplate{
             this.getPlannedTimeWithFactor().setId(null);
         }
 
+    }
+
+    public boolean isCalculateScheduledHours() {
+        return calculateScheduledHours;
+    }
+
+    public void setCalculateScheduledHours(boolean calculateScheduledHours) {
+        this.calculateScheduledHours = calculateScheduledHours;
     }
 
     public CTARuleTemplate buildCTARuleTemplateFromDTO(CTARuleTemplateDTO ctaRuleTemplateDTO){
