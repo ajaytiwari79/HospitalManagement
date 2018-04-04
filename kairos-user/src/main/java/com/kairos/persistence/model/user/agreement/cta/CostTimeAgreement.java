@@ -50,6 +50,12 @@ public class CostTimeAgreement extends UserBaseEntity {
     public CostTimeAgreement() {
     }
 
+    public CostTimeAgreement(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+
     public String getName() {
         return name;
     }

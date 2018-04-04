@@ -5,7 +5,7 @@ import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
 import com.kairos.config.OrderTestRunner;
 import com.kairos.persistence.model.user.pay_table.OrganizationLevelPayTableDTO;
-import com.kairos.persistence.model.user.pay_table.PayTableQueryResult;
+import com.kairos.persistence.model.user.pay_table.PayTableResponse;
 import com.kairos.response.dto.web.pay_table.PayTableUpdateDTO;
 import com.kairos.response.dto.web.pay_table.PayTableDTO;
 import com.kairos.response.dto.web.pay_table.PayTableResponseWrapper;
@@ -71,7 +71,7 @@ public class PayTableServiceIntegrationTest {
                 HttpMethod.GET, null, typeReference);
         RestTemplateResponseEnvelope<PayTableResponseWrapper> responseBody = response.getBody();
         Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assert.assertEquals(false, responseBody.getData().getPayTables().isEmpty());
+        Assert.assertEquals(false, responseBody.getData().getPayTables());
     }
 
     @Test
@@ -94,13 +94,13 @@ public class PayTableServiceIntegrationTest {
         PayTableDTO payTableDTO = new PayTableDTO("Test pay level", "SF", "", DateUtil.getCurrentDate(), null, organizationLevel);
         HttpEntity<PayTableDTO> entity = new HttpEntity<>(payTableDTO);
 
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableQueryResult>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableQueryResult>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableResponse>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableResponse>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<PayTableQueryResult>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<PayTableResponse>> response = restTemplate.exchange(
                 baseUrlWithCountry + "/pay_table",
                 HttpMethod.POST, entity, typeReference);
-        RestTemplateResponseEnvelope<PayTableQueryResult> responseBody = response.getBody();
+        RestTemplateResponseEnvelope<PayTableResponse> responseBody = response.getBody();
 
         payTableId = responseBody.getData().getId();
         Assert.assertEquals(201, response.getStatusCodeValue());
@@ -114,13 +114,13 @@ public class PayTableServiceIntegrationTest {
         PayTableUpdateDTO payTableUpdateDTO = new PayTableUpdateDTO("Test pay level", "SF", "By test", currentDate.toDate(), null, organizationLevel);
         HttpEntity<PayTableUpdateDTO> entity = new HttpEntity<>(payTableUpdateDTO);
 
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableQueryResult>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableQueryResult>>() {
+        ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableResponse>> typeReference =
+                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PayTableResponse>>() {
                 };
-        ResponseEntity<RestTemplateResponseEnvelope<PayTableQueryResult>> response = restTemplate.exchange(
+        ResponseEntity<RestTemplateResponseEnvelope<PayTableResponse>> response = restTemplate.exchange(
                 baseUrlWithCountry + "/pay_table/" + 2958,
                 HttpMethod.PUT, entity, typeReference);
-        RestTemplateResponseEnvelope<PayTableQueryResult> responseBody = response.getBody();
+        RestTemplateResponseEnvelope<PayTableResponse> responseBody = response.getBody();
         payTableId = responseBody.getData().getId();
         Assert.assertEquals(200, response.getStatusCodeValue());
         Assert.assertNotNull(payTableId);

@@ -37,13 +37,14 @@ public class CTARuleTemplateQueryResult {
     private List<Long> employmentTypes =new ArrayList<>();
 //    private ActivityType activityType;
     private PlanningCategory planningCategory;
-    private List<StaffFunction> staffFunctions=new ArrayList<>();
+    private List<Long> staffFunctions=new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
     private List<Long> activityIds;
     private Long timeTypeId;
     private Long plannedTimeId;
     private List<Long> dayTypeIds;
+    private boolean calculateScheduledHours;
 
     public CTARuleTemplateQueryResult() {
     }
@@ -173,6 +174,14 @@ public class CTARuleTemplateQueryResult {
         this.calculateValueIfPlanned = calculateValueIfPlanned;
     }
 
+    public boolean isCalculateScheduledHours() {
+        return calculateScheduledHours;
+    }
+
+    public void setCalculateScheduledHours(boolean calculateScheduledHours) {
+        this.calculateScheduledHours = calculateScheduledHours;
+    }
+
     public List<Long> getEmploymentTypes() {
         return employmentTypes;
     }
@@ -197,11 +206,11 @@ public class CTARuleTemplateQueryResult {
         this.planningCategory = planningCategory;
     }
 
-    public List<StaffFunction> getStaffFunctions() {
+    public List<Long> getStaffFunctions() {
         return staffFunctions;
     }
 
-    public void setStaffFunctions(List<StaffFunction> staffFunctions) {
+    public void setStaffFunctions(List<Long> staffFunctions) {
         this.staffFunctions = staffFunctions;
     }
 

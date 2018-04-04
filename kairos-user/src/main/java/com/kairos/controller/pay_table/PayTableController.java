@@ -33,9 +33,9 @@ public class PayTableController {
     //TODO
     // NOT used currently need to change the filter criteria by date
     @RequestMapping(value = "/pay_table_data", method = GET)
-    public ResponseEntity<Map<String, Object>> getPayTablesByOrganizationLevel(@PathVariable Long countryId,
+    public ResponseEntity<Map<String, Object>> getPayTablesByOrganizationLevel(@PathVariable Long countryId,@RequestParam Long startDate,
                                                                                @RequestParam Long organizationLevel) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayTablesByOrganizationLevel(countryId, organizationLevel));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayTablesByOrganizationLevel(countryId, organizationLevel,startDate));
     }
 
     @RequestMapping(value = "/organization_level_pay_table", method = GET)
@@ -75,7 +75,7 @@ public class PayTableController {
 
     @RequestMapping(value = "/pay_table/{payTableId}/pay_grade", method = GET)
     public ResponseEntity<Map<String, Object>> getPayGridsByPayTableId(@PathVariable Long payTableId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayGridsByPayTableId(payTableId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.getPayGradesByPayTableId(payTableId));
     }
 
     // THIS API is used to delete a particular  payGrade from a payTable
@@ -86,11 +86,11 @@ public class PayTableController {
 
     // THIS API is used to update a row of payGrade matrix of a payTable.
     @RequestMapping(value = "/pay_table/{payTableId}/pay_grade/{payGradeId}", method = PUT)
-    public ResponseEntity<Map<String, Object>> updatePayGradeInPayTable(@PathVariable Long payGradeId, @Validated @RequestBody PayGradeDTO payGradeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.updatePayGradeInPayTable(payGradeId, payGradeDTO));
+    public ResponseEntity<Map<String, Object>> updatePayGradeInPayTable(@PathVariable Long payTableId,@PathVariable Long payGradeId, @Validated @RequestBody PayGradeDTO payGradeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.updatePayGradeInPayTable(payTableId,payGradeId, payGradeDTO));
     }
 
-    @RequestMapping(value = "/pay_table/{payTableId}/publish", method = GET)
+    @RequestMapping(value = "/pay_table/{payTableId}/publish", method = POST)
     public ResponseEntity<Map<String, Object>> publishPayTable(@PathVariable Long payTableId,@RequestParam Long publishedDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, payTableService.publishPayTable(payTableId,publishedDate));
     }

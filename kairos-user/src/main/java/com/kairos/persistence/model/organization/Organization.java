@@ -43,8 +43,10 @@ import static com.kairos.persistence.model.enums.time_slot.TimeSlotMode.STANDARD
  * Organization Domain & it's properties
  */
 //@JsonSerialize(using = OrganizationSerializer.class)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @NodeEntity
 public class Organization extends UserBaseEntity {
     private boolean isEnable = true;
@@ -66,7 +68,7 @@ public class Organization extends UserBaseEntity {
     private String costCenterName;
     private String shortName;
     private String webSiteUrl;
-    private long clientSince;
+    private Long clientSince;
     private String cvrNumber;
     private String pNumber;
 
@@ -519,7 +521,7 @@ public class Organization extends UserBaseEntity {
         this.webSiteUrl = webSiteUrl;
     }
 
-    public void setClientSince(long clientSince) {
+    public void setClientSince(Long clientSince) {
         this.clientSince = clientSince;
     }
 
@@ -531,7 +533,7 @@ public class Organization extends UserBaseEntity {
         return webSiteUrl;
     }
 
-    public long getClientSince() {
+    public Long getClientSince() {
         return clientSince;
     }
 

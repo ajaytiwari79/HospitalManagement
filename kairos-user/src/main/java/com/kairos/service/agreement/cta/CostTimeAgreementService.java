@@ -14,6 +14,7 @@ import com.kairos.persistence.model.user.country.Currency;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
+import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -205,7 +206,7 @@ public class CostTimeAgreementService extends UserBaseService {
         ctaRuleTemplate.setBudgetType(BudgetType.ACTIVITY_COST);
         ctaRuleTemplate.setActivityTypeForCostCalculation(ActivityTypeForCostCalculation.SELECTED_ACTIVITY_TYPE);
         ctaRuleTemplate.setPlanningCategory(PlanningCategory.DEVIATION_FROM_PLANNED);
-        ctaRuleTemplate.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
+        //ctaRuleTemplate.setStaffFunctions(Stream.of(StaffFunction.TRAINING_COORDINATOR).collect(Collectors.toList()));
         ctaRuleTemplate.setPlannedTimeWithFactor(PlannedTimeWithFactor.buildPlannedTimeWithFactor(10,true,AccountType.DUTYTIME_ACCOUNT));
         return ctaRuleTemplate;
 
@@ -772,7 +773,7 @@ public class CostTimeAgreementService extends UserBaseService {
         return cta;
     }
 
-    public CollectiveTimeAgreementDTO createCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+    public UnitPositionQueryResult createCostTimeAgreementForUnitPosition(Long unitId, Long unitPositionId, Long ctaId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {
             throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitPositionId);
@@ -796,8 +797,11 @@ public class CostTimeAgreementService extends UserBaseService {
         unitPosition.setCta(costTimeAgreement);
         unitPositionService.save(unitPosition);
 
-        collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
-        return collectiveTimeAgreementDTO;
+        UnitPositionQueryResult unitPositionQueryResult = unitPositionService.getBasicDetails(unitPosition);
+        CostTimeAgreement responseCTA = new CostTimeAgreement(costTimeAgreement.getId(), costTimeAgreement.getName());
+
+        unitPositionQueryResult.setCostTimeAgreement(responseCTA);
+        return unitPositionQueryResult;
     }
 
     public CostTimeAgreement getCTALinkedWithUnitPosition(Long unitPositionId){

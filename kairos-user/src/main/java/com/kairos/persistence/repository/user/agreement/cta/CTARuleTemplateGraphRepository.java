@@ -62,7 +62,7 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
            "p.dayTypeIds as dayTypeIds, "+
            "p.activityIds as activityIds, "+
            "p.planningCategory as planningCategory ,"+
-           "p.staffFunctions as staffFunctions ,"+
+           "p.staffFunctions as staffFunctions ,p.calculateScheduledHours as calculateScheduledHours,"+
            "plannedTimeWithFactor as plannedTimeWithFactor ,"+
 //           "collect(distinct ID(timeType)) as timeTypes,"+
            "ID(p) as id")

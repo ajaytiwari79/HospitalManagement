@@ -17,6 +17,7 @@ import com.kairos.response.dto.web.FunctionDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.CountryExpertiseDTO;
+import com.kairos.response.dto.web.experties.ExpertiseUpdateDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.*;
@@ -323,36 +324,6 @@ public class CountryController {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
-    }
-
-
-    // Expertise
-    @ApiOperation(value = "Create Expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.POST)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId, @Validated @RequestBody CountryExpertiseDTO expertise) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, expertiseService.saveExpertise(countryId, expertise));
-    }
-
-    @ApiOperation(value = "Get Available expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.GET)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllExpertise(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getAllExpertise(countryId));
-    }
-
-    @ApiOperation(value = "Update expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.PUT)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateExpertise(@RequestBody @Validated CountryExpertiseDTO expertise) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(expertise));
-    }
-
-    @ApiOperation(value = "Delete expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.DELETE)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteExpertise(@PathVariable long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.deleteExpertise(expertiseId));
     }
 
 
@@ -931,6 +902,62 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, citizenStatusService.deleteCitizenStatus(citizenStatusId));
     }
 
+    @ApiOperation(value = "Create Expertise")
+    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> saveExpertise(@PathVariable long countryId, @Validated @RequestBody CountryExpertiseDTO expertise) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, expertiseService.saveExpertise(countryId, expertise));
+    }
+
+
+    @ApiOperation(value = "Get Available expertise")
+    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllExpertise(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getAllExpertise(countryId));
+    }
+
+    @ApiOperation(value = "Get all union with Service")
+    @RequestMapping(value = COUNTRY_URL + "/union_with_service", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnionsAndService(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getUnionsAndService(countryId));
+    }
+
+    @ApiOperation(value = "Update expertise")
+    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable long countryId,@RequestBody @Validated ExpertiseUpdateDTO expertise) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(countryId,expertise));
+    }
+
+    @ApiOperation(value = "Delete expertise")
+    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.DELETE)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteExpertise(@PathVariable long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.deleteExpertise(expertiseId));
+    }
+    @ApiOperation(value = "get a single expertise based on Id")
+    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getExpertiseById(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseById(expertiseId));
+    }
+    @ApiOperation(value = "Publish expertise")
+    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/publish", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> publishExpertise(@PathVariable long expertiseId, @RequestParam Long publishedDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.publishExpertise(expertiseId, publishedDate));
+    }
+
+    @ApiOperation(value = "Delete expertise")
+    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/seniority_level/{seniorityLevelId}", method = RequestMethod.DELETE)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> removeSeniorityLevelFromExpertise(@PathVariable Long expertiseId, @PathVariable Long seniorityLevelId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.removeSeniorityLevelFromExpertise(expertiseId, seniorityLevelId));
+    }
+
+
     @ApiOperation(value = "Add/remove expertise skill")
     @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/skill", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -1137,14 +1164,16 @@ public class CountryController {
     public ResponseEntity<Map<String, Object>> getDayTypesById(@RequestBody List<Long> dayTypeIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, dayTypeService.getDayTypes(dayTypeIds));
     }
+
     @RequestMapping(value = COUNTRY_URL + "/cta/default-data", method = RequestMethod.GET)
     @ApiOperation("get default data for cta rule template")
     public ResponseEntity<Map<String, Object>> getDefaultDataForCTARuleTemplate(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultDataForCTATemplate(countryId, null));
     }
+
     @ApiOperation(value = "Get day types by id")
     @RequestMapping(value = COUNTRY_URL + "/time_slots", method = RequestMethod.GET)
-     public ResponseEntity<Map<String, Object>> getTimeSlotOfCountry(@PathVariable Long countryId){
+    public ResponseEntity<Map<String, Object>> getTimeSlotOfCountry(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getTimeSlotsOfCountry(countryId));
     }
 
@@ -1153,7 +1182,7 @@ public class CountryController {
     @ApiOperation(value = "Add function by countryId")
     @RequestMapping(value = COUNTRY_URL + "/function", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addFunction(@PathVariable long countryId,@Validated @RequestBody FunctionDTO functionDTO) {
+    public ResponseEntity<Map<String, Object>> addFunction(@PathVariable long countryId, @Validated @RequestBody FunctionDTO functionDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.createFunction(countryId, functionDTO));
     }
 
@@ -1161,15 +1190,15 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/functions", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getFunctions(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctions(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getFunctionsByCountry(countryId));
 
     }
 
     @ApiOperation(value = "Update functions")
     @RequestMapping(value = COUNTRY_URL + "/function/{functionId}", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateFunction(@PathVariable long countryId,@Validated @RequestBody FunctionDTO functionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateFunction(countryId,functionDTO));
+    public ResponseEntity<Map<String, Object>> updateFunction(@PathVariable long countryId, @Validated @RequestBody FunctionDTO functionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateFunction(countryId, functionDTO));
     }
 
     @ApiOperation(value = "Delete function by functionId")

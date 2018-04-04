@@ -732,7 +732,9 @@ public class OrganizationService extends UserBaseService {
         OrganizationQueryResult organizationQueryResult = organizationGraphRepository.getParentOrganizationOfRegion(countryId);
         OrganizationCreationData organizationCreationData = organizationGraphRepository.getOrganizationCreationData(countryId);
         List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
-        organizationCreationData.setZipCodes(zipCodes);
+        if(Optional.ofNullable(organizationCreationData).isPresent()){
+            organizationCreationData.setZipCodes(zipCodes);
+        }
         List<Map<String, Object>> orgData = new ArrayList<>();
         for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
             HashMap<String, Object> orgBasicData = new HashMap<>();
