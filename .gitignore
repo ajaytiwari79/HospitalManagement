@@ -1,10 +1,14 @@
 .idea/
+.idea
 
 .gradle/
+.gradle
 
 build/
+build
 
 gradle/
+gradle
 
 logs/
 
