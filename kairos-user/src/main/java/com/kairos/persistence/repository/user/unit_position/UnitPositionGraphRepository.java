@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.unit_position;
 
+import com.kairos.persistence.model.constants.RelationshipConstants;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
@@ -49,7 +50,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(unitPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false})" +
             "optional match (unitPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement)\n" +
             "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
-            "optional match (unitPosition)-[:" + BACKING_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true})\n" +
+            "optional match (unitPosition)-[:" + RelationshipConstants.SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true})\n" +
             "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union," +
             "positionCode as positionCode," +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
@@ -155,7 +156,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "optional match (unitPosition)-[:HAS_WTA ]->(wta:WorkingTimeAgreement) \n" +
             "optional match (unitPosition)-[:HAS_CTA]->(cta:CostTimeAgreement) \n" +
-            "optional match (unitPosition)-[:BACKING_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
+            "optional match (unitPosition)-[:SUPPORTED_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union, \n" +
             "positionCode as positionCode, \n" +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, \n" +
@@ -181,7 +182,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
             "optional match (unitPosition)-[:HAS_WTA ]->(wta:WorkingTimeAgreement) \n" +
             "optional match (unitPosition)-[:HAS_CTA]->(cta:CostTimeAgreement) \n" +
-            "optional match (unitPosition)-[:BACKING_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
+            "optional match (unitPosition)-[:SUPPORTED_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union, \n" +
             "positionCode as positionCode, \n" +
             "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, \n" +

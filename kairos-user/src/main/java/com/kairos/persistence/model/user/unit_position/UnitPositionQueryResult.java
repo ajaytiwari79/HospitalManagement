@@ -31,7 +31,7 @@ public class UnitPositionQueryResult {
     private float hourlyWages;
     private long id;
     private EmploymentType employmentType;
-    private float salary;
+    private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
     private WorkingTimeAgreement workingTimeAgreement;
@@ -106,11 +106,11 @@ public class UnitPositionQueryResult {
         this.employmentType = employmentType;
     }
 
-    public float getSalary() {
+    public Double getSalary() {
         return salary;
     }
 
-    public void setSalary(float salary) {
+    public void setSalary(Double salary) {
         this.salary = salary;
     }
 
@@ -212,7 +212,7 @@ public class UnitPositionQueryResult {
     }
 
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WorkingTimeAgreement wta) {
+    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WorkingTimeAgreement wta) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;

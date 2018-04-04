@@ -1,0 +1,57 @@
+package com.kairos.persistence.model.user.unit_position;
+
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.user.country.EmploymentType;
+import org.neo4j.ogm.annotation.EndNode;
+import org.neo4j.ogm.annotation.Property;
+import org.neo4j.ogm.annotation.RelationshipEntity;
+import org.neo4j.ogm.annotation.StartNode;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENT_TYPE;
+
+/**
+ * Created by vipul on 3/4/18.
+ */
+@RelationshipEntity(type = HAS_EMPLOYMENT_TYPE)
+public class UnitPositionEmploymentTypeRelationShip extends UserBaseEntity {
+    @StartNode
+    private UnitPosition unitPosition;
+    @EndNode
+    private EmploymentType employmentType;
+    @Property
+    private String employmentTypeEnum;
+
+    public UnitPosition getUnitPosition() {
+        return unitPosition;
+    }
+
+    public void setUnitPosition(UnitPosition unitPosition) {
+        this.unitPosition = unitPosition;
+    }
+
+    public EmploymentType getEmploymentType() {
+        return employmentType;
+    }
+
+    public void setEmploymentType(EmploymentType employmentType) {
+        this.employmentType = employmentType;
+    }
+
+    public String getEmploymentTypeEnum() {
+        return employmentTypeEnum;
+    }
+
+    public void setEmploymentTypeEnum(String employmentTypeEnum) {
+        this.employmentTypeEnum = employmentTypeEnum;
+    }
+
+    public UnitPositionEmploymentTypeRelationShip() {
+
+    }
+
+    public UnitPositionEmploymentTypeRelationShip(UnitPosition unitPosition, EmploymentType employmentType, String employmentTypeEnum) {
+        this.unitPosition = unitPosition;
+        this.employmentType = employmentType;
+        this.employmentTypeEnum = employmentTypeEnum;
+    }
+}
