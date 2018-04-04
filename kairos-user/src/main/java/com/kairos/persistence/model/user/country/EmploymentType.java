@@ -3,7 +3,7 @@ package com.kairos.persistence.model.user.country;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.EmploymentTypeEnum;
+import com.kairos.persistence.model.enums.EmploymentCategory;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 
@@ -25,7 +25,7 @@ public class EmploymentType extends UserBaseEntity {
     private boolean allowedForContactPerson;
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
-    private Set<EmploymentTypeEnum> employmentTypes;
+    private Set<EmploymentCategory> employmentCategories;
 
     public String getName() {
         return name;
@@ -67,11 +67,11 @@ public class EmploymentType extends UserBaseEntity {
         this.allowedForFlexPool = allowedForFlexPool;
     }
 
-    public Set<EmploymentTypeEnum> getEmploymentTypes() {
-        return employmentTypes;
+    public Set<EmploymentCategory> getEmploymentCategories() {
+        return employmentCategories;
     }
 
-    public void setEmploymentTypes(Set<EmploymentTypeEnum> employmentTypes) {
-        this.employmentTypes = employmentTypes;
+    public void setEmploymentCategories(Set<EmploymentCategory> employmentCategories) {
+        this.employmentCategories = employmentCategories;
     }
 }

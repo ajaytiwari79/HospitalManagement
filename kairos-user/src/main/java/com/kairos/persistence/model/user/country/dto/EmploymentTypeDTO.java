@@ -1,10 +1,8 @@
 package com.kairos.persistence.model.user.country.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.EmploymentTypeEnum;
+import com.kairos.persistence.model.enums.EmploymentCategory;
 import com.kairos.persistence.model.user.country.EmploymentType;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
@@ -24,7 +22,7 @@ public class EmploymentTypeDTO {
     private boolean allowedForContactPerson;
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
-    private Set<EmploymentTypeEnum> employmentTypes;
+    private Set<EmploymentCategory> employmentCategories;
 
     public Long getId() {
         return id;
@@ -74,12 +72,12 @@ public class EmploymentTypeDTO {
         this.allowedForFlexPool = allowedForFlexPool;
     }
 
-    public Set<EmploymentTypeEnum> getEmploymentTypes() {
-        return employmentTypes;
+    public Set<EmploymentCategory> getEmploymentCategories() {
+        return employmentCategories;
     }
 
-    public void setEmploymentTypes(Set<EmploymentTypeEnum> employmentTypes) {
-        this.employmentTypes = employmentTypes;
+    public void setEmploymentCategories(Set<EmploymentCategory> employmentCategories) {
+        this.employmentCategories = employmentCategories;
     }
 
     public EmploymentType generateEmploymentTypeFromEmploymentTypeDTO() {
@@ -89,13 +87,13 @@ public class EmploymentTypeDTO {
         employmentType.setAllowedForContactPerson(this.isAllowedForContactPerson());
         employmentType.setAllowedForShiftPlan(this.isAllowedForShiftPlan());
         employmentType.setAllowedForFlexPool(this.isAllowedForFlexPool());
-        employmentType.setEmploymentTypes(this.getEmploymentTypes());
+        employmentType.setEmploymentCategories(this.getEmploymentCategories());
 
         return employmentType;
     }
     @AssertTrue(message = "At least one role should be selected")
     public boolean isValid() {
-        return (employmentTypes.isEmpty())?false:true;
+        return (employmentCategories.isEmpty())?false:true;
     }
 
 }
