@@ -1,25 +1,36 @@
 package com.kairos.persistence.model.user.country.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.EmploymentCategory;
 import com.kairos.persistence.model.user.country.EmploymentType;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 /**
  * Created by prerna on 7/11/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
-public class EmploymentTypeDTO extends UserBaseEntity {
-    @NotEmpty(message = "error.EmploymentType.name.notEmptyOrNotNull")    @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull")
+public class EmploymentTypeDTO {
+    private Long id;
+    @NotNull(message = "error.EmploymentType.name.notEmptyOrNotNull")
     private String name;
     private String description;
     private boolean allowedForContactPerson;
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
+    private Set<EmploymentCategory> employmentCategories;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -61,13 +72,28 @@ public class EmploymentTypeDTO extends UserBaseEntity {
         this.allowedForFlexPool = allowedForFlexPool;
     }
 
+    public Set<EmploymentCategory> getEmploymentCategories() {
+        return employmentCategories;
+    }
+
+    public void setEmploymentCategories(Set<EmploymentCategory> employmentCategories) {
+        this.employmentCategories = employmentCategories;
+    }
+
     public EmploymentType generateEmploymentTypeFromEmploymentTypeDTO() {
         EmploymentType employmentType = new EmploymentType();
-        employmentType.setName(this.getName());
+        employmentType.setName(this.getName().trim());
         employmentType.setDescription(this.getDescription());
         employmentType.setAllowedForContactPerson(this.isAllowedForContactPerson());
         employmentType.setAllowedForShiftPlan(this.isAllowedForShiftPlan());
         employmentType.setAllowedForFlexPool(this.isAllowedForFlexPool());
+        employmentType.setEmploymentCategories(this.getEmploymentCategories());
+
         return employmentType;
     }
+    @AssertTrue(message = "At least one role should be selected")
+    public boolean isValid() {
+        return (employmentCategories.isEmpty())?false:true;
+    }
+
 }
