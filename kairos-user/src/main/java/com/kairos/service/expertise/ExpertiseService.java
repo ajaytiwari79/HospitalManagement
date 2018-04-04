@@ -150,12 +150,12 @@ public class ExpertiseService extends UserBaseService {
         //  Adding the currently added Sr level in expertise.
         SeniorityLevel seniorityLevel = new SeniorityLevel();
         addNewSeniorityLevelInExpertise(copiedExpertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
-        expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
         expertiseDTO.getSeniorityLevel().setParentId(expertiseDTO.getSeniorityLevel().getId());
+        expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
         seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
 
 
-        seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, expertise.getSeniorityLevel(), -1L));
+        seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, expertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getParentId()));
 
         expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
         expertiseResponseDTO.setId(copiedExpertise.getId());
@@ -362,7 +362,7 @@ public class ExpertiseService extends UserBaseService {
         Optional<SeniorityLevel> seniorityLevelToUpdate =
                 currentExpertise.getSeniorityLevel().stream().filter(seniorityLevel -> seniorityLevel.getId().equals(expertiseDTO.getSeniorityLevel().getId())).findFirst();
 
-        if (!Optional.ofNullable(seniorityLevelToUpdate).isPresent()) {
+        if (!seniorityLevelToUpdate.isPresent()) {
             throw new DataNotFoundByIdException("Seniority Level not found in expertise" + expertiseDTO.getSeniorityLevel().getId());
         }
         Boolean basePayGrade = seniorityLevelGraphRepository.checkPayGradeInSeniorityLevel(expertiseDTO.getId(), seniorityLevelToUpdate.get().getId(), expertiseDTO.getSeniorityLevel().getPayGradeId());
@@ -393,9 +393,9 @@ public class ExpertiseService extends UserBaseService {
             copiedExpertise.setSeniorityLevel(null);
 
             addNewSeniorityLevelInExpertise(copiedExpertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
+            expertiseDTO.getSeniorityLevel().setParentId(expertiseDTO.getSeniorityLevel().getId());
 
             expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
-            expertiseDTO.getSeniorityLevel().setParentId(expertiseDTO.getSeniorityLevel().getId());
             seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
 
 

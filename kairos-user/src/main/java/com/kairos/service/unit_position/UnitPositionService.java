@@ -495,7 +495,9 @@ public class UnitPositionService extends UserBaseService {
                 }
             } else {
                 // to and from is present
-                if (seniorityLevel.getFrom() >= experienceInMonth && seniorityLevel.getTo() <= experienceInMonth) {
+                logger.info("user has current experience in months :{} ,{}", seniorityLevel.getFrom() <= experienceInMonth , seniorityLevel.getTo() >= experienceInMonth);
+
+                if (seniorityLevel.getFrom() <= experienceInMonth && seniorityLevel.getTo() >= experienceInMonth) {
                     appliedSeniorityLevel = seniorityLevel;
                     break;
                 }
