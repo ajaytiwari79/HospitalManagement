@@ -1425,12 +1425,12 @@ public class StaffService extends UserBaseService {
 
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = new StaffAdditionalInfoQueryResult();
         staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
-        StaffUnitPositionDetails unitEmploymentPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
+        StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         staffAdditionalInfoQueryResult.setUnitId(organization.getId());
         staffAdditionalInfoQueryResult.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
-        if (Optional.ofNullable(unitEmploymentPosition).isPresent()) {
-            staffAdditionalInfoQueryResult.setUnitPosition(unitEmploymentPosition);
+        if (Optional.ofNullable(unitPosition).isPresent()) {
+            staffAdditionalInfoQueryResult.setUnitPosition(unitPosition);
 
             WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
