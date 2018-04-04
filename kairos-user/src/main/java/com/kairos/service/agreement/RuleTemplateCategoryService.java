@@ -118,17 +118,18 @@ public class RuleTemplateCategoryService extends UserBaseService {
         if (countryService.getCountryById(countryId) == null) {
             throw new DataNotFoundByIdException("Country does not exist");
         }
-        if (ruleTemplateCategory.getName().equals("NONE")) {
-            throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
-        }
-
-        boolean isAlreadyExists=ruleTemplateCategoryGraphRepository.findByNameExcludingCurrent(countryId,CTA,"(?i)" + ruleTemplateCategory.getName().trim(),templateCategoryId);
-        if(isAlreadyExists){
-            throw new DuplicateDataException("ruleTemplateCategory name already  exists "+ruleTemplateCategory.getName());
-        }
         RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
-        if (ruleTemplateCategoryObj.getName().equals("NONE")) {
+        if(!Optional.ofNullable(ruleTemplateCategoryObj).isPresent()){
+            throw new DataNotFoundByIdException("Invalid category "+templateCategoryId);
+        }
+        if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategory.getName().equals("NONE")) {
             throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
+        }
+        if(!ruleTemplateCategory.getName().trim().equalsIgnoreCase(ruleTemplateCategoryObj.getName())){
+            boolean isAlreadyExists=ruleTemplateCategoryGraphRepository.findByNameExcludingCurrent(countryId,CTA,"(?i)" + ruleTemplateCategory.getName().trim(),templateCategoryId);
+            if(isAlreadyExists){
+                throw new DuplicateDataException("ruleTemplateCategory name already  exists "+ruleTemplateCategory.getName());
+            }
         }
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategory.getDescription());
