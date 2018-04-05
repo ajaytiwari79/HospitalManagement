@@ -22,12 +22,12 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
     List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffId(Long staffId);
 
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} AND id(expertise)={1}" +
-            " return id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.relevantExperienceInMonths as relevantExperienceInMonths, rel.expertiseStartDate as expertiseStartDate")
-    StaffExperienceInExpertiseDTO getExpertiseWithExperienceByStaffIdAndExpertiseId(Long staffId,Long expertiseId);
+            " return id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths")
+    StaffExperienceInExpertiseDTO getExpertiseWithExperienceByStaffIdAndExpertiseId(Long staffId, Long expertiseId);
 
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} return expertise")
     List<Expertise> getAllExpertiseByStaffId(Long staffId);
 
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} AND NOT id(expertise) IN{1} detach delete rel")
-    void unlinkExpertiseFromStaffExcludingCurrent(Long staffId,List<Long> ids);
+    void unlinkExpertiseFromStaffExcludingCurrent(Long staffId, List<Long> ids);
 }

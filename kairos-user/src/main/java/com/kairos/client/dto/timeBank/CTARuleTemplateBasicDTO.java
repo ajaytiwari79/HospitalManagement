@@ -2,6 +2,7 @@ package com.kairos.client.dto.timeBank;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CTARuleTemplateBasicDTO {
@@ -16,6 +17,42 @@ public class CTARuleTemplateBasicDTO {
     private List<BigInteger> activityIds;
     private BigInteger timeTypeId;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
+    private boolean calculateScheduledHours;
+    private Long plannedTimeId;
+    private List<Long> employmentTypes =new ArrayList<>();
+    private String accountType;
+
+    public boolean isCalculateScheduledHours() {
+        return calculateScheduledHours;
+    }
+
+    public void setCalculateScheduledHours(boolean calculateScheduledHours) {
+        this.calculateScheduledHours = calculateScheduledHours;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
+
+    public List<Long> getEmploymentTypes() {
+        return employmentTypes;
+    }
+
+    public void setEmploymentTypes(List<Long> employmentTypes) {
+        this.employmentTypes = employmentTypes;
+    }
+
+    public Long getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(Long plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
+    }
 
     public CTARuleTemplateBasicDTO() {
     }

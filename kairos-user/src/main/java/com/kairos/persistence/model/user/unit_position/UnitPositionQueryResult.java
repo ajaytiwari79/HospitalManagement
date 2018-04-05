@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -30,7 +29,7 @@ public class UnitPositionQueryResult {
     private float avgDailyWorkingHours;
     private float hourlyWages;
     private long id;
-    private EmploymentType employmentType;
+    private EmploymentTypeQueryResult employmentType;
     private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
@@ -40,6 +39,10 @@ public class UnitPositionQueryResult {
     private Long lastWorkingDateMillis;
     private Long parentUnitId;
     private Long unitId;
+    private Long regionCodeId;
+
+    private UnitPositionSeniorityLevelResponse seniorityLevel;
+
 
     public int getWorkingDaysInWeek() {
         return workingDaysInWeek;
@@ -98,11 +101,11 @@ public class UnitPositionQueryResult {
         this.hourlyWages = hourlyWages;
     }
 
-    public EmploymentType getEmploymentType() {
+    public EmploymentTypeQueryResult getEmploymentType() {
         return employmentType;
     }
 
-    public void setEmploymentType(EmploymentType employmentType) {
+    public void setEmploymentType(EmploymentTypeQueryResult employmentType) {
         this.employmentType = employmentType;
     }
 
@@ -207,12 +210,28 @@ public class UnitPositionQueryResult {
         this.unitId = unitId;
     }
 
+    public Long getRegionCodeId() {
+        return regionCodeId;
+    }
+
+    public void setRegionCodeId(Long regionCodeId) {
+        this.regionCodeId = regionCodeId;
+    }
+
+    public UnitPositionSeniorityLevelResponse getSeniorityLevel() {
+        return seniorityLevel;
+    }
+
+    public void setSeniorityLevel(UnitPositionSeniorityLevelResponse seniorityLevel) {
+        this.seniorityLevel = seniorityLevel;
+    }
+
     public UnitPositionQueryResult() {
         //default cons
     }
 
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WorkingTimeAgreement wta) {
+    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentTypeQueryResult employmentType, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WorkingTimeAgreement wta) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;

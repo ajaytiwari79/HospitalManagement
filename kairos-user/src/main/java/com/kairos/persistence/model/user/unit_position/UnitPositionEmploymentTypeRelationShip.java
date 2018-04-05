@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.unit_position;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.EmploymentCategory;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.Property;
@@ -19,7 +20,7 @@ public class UnitPositionEmploymentTypeRelationShip extends UserBaseEntity {
     @EndNode
     private EmploymentType employmentType;
     @Property
-    private String employmentTypeEnum;
+    private EmploymentCategory employmentTypeCategory;
 
     public UnitPosition getUnitPosition() {
         return unitPosition;
@@ -37,21 +38,21 @@ public class UnitPositionEmploymentTypeRelationShip extends UserBaseEntity {
         this.employmentType = employmentType;
     }
 
-    public String getEmploymentTypeEnum() {
-        return employmentTypeEnum;
+    public EmploymentCategory getEmploymentTypeCategory() {
+        return employmentTypeCategory;
     }
 
-    public void setEmploymentTypeEnum(String employmentTypeEnum) {
-        this.employmentTypeEnum = employmentTypeEnum;
+    public void setEmploymentTypeCategory(EmploymentCategory employmentTypeCategory) {
+        this.employmentTypeCategory = employmentTypeCategory;
     }
 
     public UnitPositionEmploymentTypeRelationShip() {
 
     }
 
-    public UnitPositionEmploymentTypeRelationShip(UnitPosition unitPosition, EmploymentType employmentType, String employmentTypeEnum) {
+    public UnitPositionEmploymentTypeRelationShip(UnitPosition unitPosition, EmploymentType employmentType, EmploymentCategory employmentTypeCategory) {
         this.unitPosition = unitPosition;
         this.employmentType = employmentType;
-        this.employmentTypeEnum = employmentTypeEnum;
+        this.employmentTypeCategory = employmentTypeCategory;
     }
 }

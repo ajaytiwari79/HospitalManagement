@@ -1,5 +1,6 @@
 package com.kairos.response.dto.web;
 
+import com.kairos.persistence.model.enums.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
@@ -31,8 +32,10 @@ public class UnitPositionDTO {
     private int workingDaysInWeek;
     private float hourlyWages;
     private Double salary;
+    @NotNull(message = "employmentTypeId can't be null")
     private Long employmentTypeId;
-    private String employmentType;
+    @NotNull(message = "employmentTypeCategory can't be null")
+    private EmploymentCategory employmentTypeCategory;
     @NotNull(message = "wta can't be null")
     private Long wtaId;
     private Long ctaId;
@@ -263,12 +266,12 @@ public class UnitPositionDTO {
         this.parentUnitId = parentUnitId;
     }
 
-    public String getEmploymentType() {
-        return employmentType;
+    public EmploymentCategory getEmploymentTypeCategory() {
+        return employmentTypeCategory;
     }
 
-    public void setEmploymentType(String employmentType) {
-        this.employmentType = employmentType;
+    public void setEmploymentTypeCategory(EmploymentCategory employmentTypeCategory) {
+        this.employmentTypeCategory = employmentTypeCategory;
     }
 
     public Long getReasonCodeId() {

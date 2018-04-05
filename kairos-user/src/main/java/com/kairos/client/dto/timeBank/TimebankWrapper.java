@@ -1,7 +1,6 @@
 package com.kairos.client.dto.timeBank;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 public class TimebankWrapper {
@@ -11,21 +10,30 @@ public class TimebankWrapper {
     private int contractedMinByWeek;
     private int workingDaysPerWeek;
     private Long staffId;
-    private LocalDate unitPositionDate;
+    private LocalDate unitPositionStartDate;
+    private LocalDate unitPositionEndDate;
     private Long countryId;
 
     public TimebankWrapper(Long unitPositionId) {
         this.unitPositionId = unitPositionId;
     }
 
-    public TimebankWrapper(Long unitPositionId, int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionDate) {
+    public TimebankWrapper(Long unitPositionId, int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionStartDate) {
         this.unitPositionId = unitPositionId;
         this.contractedMinByWeek = contractedMinByWeek;
         this.workingDaysPerWeek = workingDaysPerWeek;
-        this.unitPositionDate = unitPositionDate;
+        this.unitPositionStartDate = unitPositionStartDate;
     }
 
     public TimebankWrapper() {
+    }
+
+    public LocalDate getUnitPositionEndDate() {
+        return unitPositionEndDate;
+    }
+
+    public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
+        this.unitPositionEndDate = unitPositionEndDate;
     }
 
     public Long getCountryId() {
@@ -36,12 +44,12 @@ public class TimebankWrapper {
         this.countryId = countryId;
     }
 
-    public LocalDate getUnitPositionDate() {
-        return unitPositionDate;
+    public LocalDate getUnitPositionStartDate() {
+        return unitPositionStartDate;
     }
 
-    public void setUnitPositionDate(LocalDate unitPositionDate) {
-        this.unitPositionDate = unitPositionDate;
+    public void setUnitPositionStartDate(LocalDate unitPositionStartDate) {
+        this.unitPositionStartDate = unitPositionStartDate;
     }
 
     public Long getStaffId() {
