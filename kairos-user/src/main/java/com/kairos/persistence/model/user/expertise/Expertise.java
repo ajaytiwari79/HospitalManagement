@@ -56,6 +56,7 @@ public class Expertise extends UserBaseEntity {
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
+    // TODO REMOVE.
     @Relationship(type = HAS_PAY_TABLE)
     private PayTable payTable;
 

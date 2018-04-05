@@ -23,7 +23,8 @@ public class SeniorityLevel extends UserBaseEntity {
     private Integer moreThan;
 
     @Relationship(type = HAS_BASE_PAY_GRADE)
-    private PayGrade payGrade;  // this is payGrade Id which is coming from payTable
+    private PayGrade payGrade;  // this is payGrade which is coming from payTable
+
     @Relationship(type = HAS_PAY_GROUP_AREA)
     private List<PayGroupArea> payGroupAreas;// applicable payGroup areas
     // TODO We are unclear about this just adding and make sure this will utilize in future.

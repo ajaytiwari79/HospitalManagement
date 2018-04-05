@@ -57,6 +57,7 @@ import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
+import org.apache.commons.collections.map.HashedMap;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.Months;
@@ -286,7 +287,7 @@ public class UnitPositionService extends UserBaseService {
             unitPosition.setCta(cta);
         }
 
-        Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId());
+        Optional<Expertise> expertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId(), 0);
         if (!expertise.isPresent()) {
             throw new DataNotFoundByIdException("Invalid expertise id");
         }
@@ -543,23 +544,30 @@ public class UnitPositionService extends UserBaseService {
     }
 
     private UnitPositionQueryResult getBasicDetails(UnitPositionDTO unitPositionDTO, UnitPosition unitPosition, EmploymentType employmentType, UnitPositionEmploymentTypeRelationShip relationShip, Long parentOrganizationId) {
-        EmploymentTypeQueryResult employmentTypeQueryResult = new EmploymentTypeQueryResult(employmentType.getName(), employmentType.getId(), relationShip.getEmploymentTypeCategory());
+
 
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
-                unitPosition.getId(), employmentTypeQueryResult, unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
+                unitPosition.getId(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
                 unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), unitPosition.getWorkingTimeAgreement());
         result.setUnitId(unitPosition.getUnit().getId());
-        result.setRegionCodeId(unitPosition.getReasonCode().getId());
-
+        result.setReasonCodeId(unitPosition.getReasonCode().getId());
         result.setParentUnitId(parentOrganizationId);
+        // TODO Setting for compatibility
 
-        UnitPositionSeniorityLevelResponse seniorityLevel;
+        Map<String, Object> employmentTypes = new HashMap();
+        employmentTypes.put("name", employmentType.getName());
+        employmentTypes.put("id", employmentType.getId());
+        employmentTypes.put("employmentTypeCategory", relationShip.getEmploymentTypeCategory());
+        result.setEmploymentTypes(employmentTypes);
+
+
+        Map<String, Object> seniorityLevel;
         ObjectMapper objectMapper = new ObjectMapper();
-        seniorityLevel = objectMapper.convertValue(unitPosition.getSeniorityLevel(), UnitPositionSeniorityLevelResponse.class);
-        seniorityLevel.setFunctions(unitPositionDTO.getFunctionIds());
-        seniorityLevel.setPayGradeId(unitPosition.getSeniorityLevel().getPayGrade().getId());
-        result.setSeniorityLevel(seniorityLevel);
+        seniorityLevel = objectMapper.convertValue(unitPosition.getSeniorityLevel(), Map.class);
+        seniorityLevel.put("functions", unitPositionDTO.getFunctionIds());
+        seniorityLevel.put("payGrade", unitPosition.getSeniorityLevel().getPayGrade());
+        result.setSeniorityLevels(seniorityLevel);
         return result;
     }
 
@@ -567,9 +575,9 @@ public class UnitPositionService extends UserBaseService {
         UnitPositionQueryResult unitPositionQueryResult = unitPositionGraphRepository.getUnitIdAndParentUnitIdByUnitPositionId(unitPosition.getId());
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
-                unitPosition.getId(), null, unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
+                unitPosition.getId(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
                 unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), unitPosition.getWorkingTimeAgreement());
-        result.setRegionCodeId(unitPosition.getReasonCode().getId());
+        result.setReasonCodeId(unitPosition.getReasonCode().getId());
         result.setUnitId(unitPositionQueryResult.getUnitId());
         result.setParentUnitId(unitPositionQueryResult.getParentUnitId());
 
