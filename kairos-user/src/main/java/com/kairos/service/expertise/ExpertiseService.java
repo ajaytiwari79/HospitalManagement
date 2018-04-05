@@ -108,7 +108,6 @@ public class ExpertiseService extends UserBaseService {
         } else {
             // Expertise is already created only need to add Sr level
             expertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
-
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid expertise Id");
             }
@@ -119,7 +118,6 @@ public class ExpertiseService extends UserBaseService {
             if (expertise.isPublished()) {
                 expertiseResponseDTO = createCopyOfExpertise(expertise, expertiseDTO, countryId);
                 // Expertise is already published Now we need to maintain a tempCopy of it.
-
             } else {
                 SeniorityLevel seniorityLevel = new SeniorityLevel();
                 addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
@@ -343,6 +341,7 @@ public class ExpertiseService extends UserBaseService {
         } else {
             expertise.getSeniorityLevel().add(seniorityLevel);
         }
+        save(seniorityLevel);
         seniorityLevelFunctionRelationshipGraphRepository.saveAll(seniorityLevelFunctionsRelationships);
         return seniorityLevel;
     }

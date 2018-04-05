@@ -172,10 +172,15 @@ public class UnitPositionService extends UserBaseService {
         UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentType());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
 
-        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
+        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition,employmentType,relationShip);
         timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(), organization.getId()));
 
         return unitPositionQueryResult;
+    }
+
+    private UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition, EmploymentType employmentType, UnitPositionEmploymentTypeRelationShip relationShip) {
+        return  new UnitPositionQueryResult();
+
     }
 
     public boolean validateUnitPositionWithExpertise(List<UnitPosition> unitPositions, UnitPositionDTO unitPositionDTO) {
@@ -555,7 +560,6 @@ public class UnitPositionService extends UserBaseService {
 
         return result;
     }
-
     public WTAResponseDTO getUnitPositionWTA(Long unitId, Long unitEmploymentPositionId) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitEmploymentPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {

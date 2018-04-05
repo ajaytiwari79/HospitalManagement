@@ -23,7 +23,7 @@ public class EmploymentType extends UserBaseEntity {
     private boolean allowedForContactPerson;
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
-    private boolean deleted = false;
+
 
     public String getName() {
         return name;
