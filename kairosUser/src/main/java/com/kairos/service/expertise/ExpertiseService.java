@@ -179,7 +179,7 @@ public class ExpertiseService extends UserBaseService {
                 seniorityLevel.setId(null);
                 FunctionAndSeniorityLevelQueryResult functionAndSeniorityLevel = seniorityLevelGraphRepository.getFunctionAndPayGroupAreaBySeniorityLevelId(seniorityLevelFromDB.getId());
 
-                // TODO java.lang.ClassCastException: java.util.Collections$UnmodifiableMap cannot be cast to com.kairos.response.dto.web.experties.FunctionsDTO
+                // TODO java.lang.ClassCastException: java.util.Collections$UnmodifiableMap cannot be cast to FunctionsDTO
 
                 if (Optional.ofNullable(functionAndSeniorityLevel.getFunctions()).isPresent() && !functionAndSeniorityLevel.getFunctions().isEmpty()) {
                     for (Map<String, Object> currentObject : functionAndSeniorityLevel.getFunctions()) {

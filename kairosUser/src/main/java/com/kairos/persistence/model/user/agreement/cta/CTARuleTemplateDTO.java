@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 import com.kairos.persistence.model.user.country.TimeType;
+import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -36,8 +37,9 @@ public class CTARuleTemplateDTO {
     private List<Long> employmentTypes =new ArrayList<>();
 //    private ActivityType activityType;
     private PlanningCategory planningCategory;
-    private List<StaffFunction> staffFunctions=new ArrayList<>();
+    private List<Long> staffFunctions=new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
+    private boolean calculateScheduledHours;
 //    private List<Long> timeTypes =new ArrayList<>();
 
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
@@ -48,6 +50,15 @@ public class CTARuleTemplateDTO {
     private List<Long> dayTypeIds;
 
     public CTARuleTemplateDTO() {
+    }
+
+
+    public boolean isCalculateScheduledHours() {
+        return calculateScheduledHours;
+    }
+
+    public void setCalculateScheduledHours(boolean calculateScheduledHours) {
+        this.calculateScheduledHours = calculateScheduledHours;
     }
 
     public Long getId() {
@@ -207,11 +218,11 @@ public class CTARuleTemplateDTO {
         this.planningCategory = planningCategory;
     }
 
-    public List<StaffFunction> getStaffFunctions() {
+    public List<Long> getStaffFunctions() {
         return staffFunctions;
     }
 
-    public void setStaffFunctions(List<StaffFunction> staffFunctions) {
+    public void setStaffFunctions(List<Long> staffFunctions) {
         this.staffFunctions = staffFunctions;
     }
 

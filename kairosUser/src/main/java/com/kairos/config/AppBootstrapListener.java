@@ -69,7 +69,7 @@ public class AppBootstrapListener implements ApplicationListener<ApplicationRead
     public void onApplicationEvent(ApplicationReadyEvent event) {
         generateSequence(); // This method create sequence table for mongodb
         //createAccessPages();
-        //bootDataService.createData();
+        bootDataService.createData();
         //flsVisitourChangeService.registerReceiver("visitourChange");
     }
 
