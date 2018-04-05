@@ -257,8 +257,8 @@ public class UnitPositionService extends UserBaseService {
             logger.info(unitPositionEmploymentTypeRelationShip.toString());
         }
         preparePosition(oldUnitPosition, unitPositionDTO);
-        //   save(oldUnitPosition);
-        return new PositionWrapper(getBasicDetails(oldUnitPosition));
+        save(oldUnitPosition);
+        return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, null, unitPositionEmploymentTypeRelationShip, null));
 
     }
 
@@ -575,8 +575,8 @@ public class UnitPositionService extends UserBaseService {
         // TODO Setting for compatibility
 
         Map<String, Object> employmentTypes = new HashMap();
-        employmentTypes.put("name", employmentType.getName());
-        employmentTypes.put("id", employmentType.getId());
+        employmentTypes.put("name", relationShip.getEmploymentType().getName());
+        employmentTypes.put("id", relationShip.getEmploymentType().getId());
         employmentTypes.put("employmentTypeCategory", relationShip.getEmploymentTypeCategory());
         result.setEmploymentTypes(employmentTypes);
 
