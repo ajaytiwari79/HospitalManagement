@@ -10,6 +10,10 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * Created by vipul on 10/8/17.
  */
@@ -30,6 +34,8 @@ public class UnitPositionQueryResult {
     private float hourlyWages;
     private long id;
     private EmploymentTypeQueryResult employmentType;
+    private Map<String, Object> employmentTypes;
+    private List<Map<String, Object>> seniorityLevels;
     private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
@@ -224,6 +230,22 @@ public class UnitPositionQueryResult {
 
     public void setSeniorityLevel(UnitPositionSeniorityLevelResponse seniorityLevel) {
         this.seniorityLevel = seniorityLevel;
+    }
+
+    public Map<String, Object> getEmploymentTypes() {
+        return employmentTypes;
+    }
+
+    public void setEmploymentTypes(Map<String, Object> employmentTypes) {
+        this.employmentTypes = employmentTypes;
+    }
+
+    public List<Map<String, Object>> getSeniorityLevels() {
+        return seniorityLevels;
+    }
+
+    public void setSeniorityLevels(List<Map<String, Object>> seniorityLevels) {
+        this.seniorityLevels = seniorityLevels;
     }
 
     public UnitPositionQueryResult() {
