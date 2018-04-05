@@ -10,6 +10,7 @@ import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.skill.Skill;
 import com.kairos.activity.config.env.EnvConfig;
+import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DataNotFoundException;
@@ -743,17 +744,17 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    public List<Activity> createActivitiesFromTimeCare(GetAllActivitiesResponse getAllActivitiesResponse, Long unitId, Long countryId) {
+    public List<Activity> createActivitiesFromTimeCare(GetAllActivitiesResponse getAllActivitiesResponse, Long unitId, Long countryId,BigInteger presenceTimeTypeId,BigInteger absenceTimeTypeId) {
 
         List<TimeCareActivity> timeCareActivities = getAllActivitiesResponse.getGetAllActivitiesResult();
         List<String> externalIdsOfAllActivities = timeCareActivities.stream().map(timeCareActivity -> timeCareActivity.getId()).collect(Collectors.toList());
-        List<Activity> countryActivities = createActivatesForCountryFromTimeCare(timeCareActivities, unitId, countryId, externalIdsOfAllActivities);
+        List<Activity> countryActivities = createActivatesForCountryFromTimeCare(timeCareActivities, unitId, countryId, externalIdsOfAllActivities,presenceTimeTypeId,absenceTimeTypeId);
         mapActivitiesInOrganization(countryActivities, unitId, externalIdsOfAllActivities);
         return countryActivities;
     }
 
     private List<Activity> createActivatesForCountryFromTimeCare(List<TimeCareActivity> timeCareActivities, Long unitId, Long countryId,
-                                                                 List<String> externalIdsOfAllActivities) {
+                                                                 List<String> externalIdsOfAllActivities,BigInteger presenceTimeTypeId,BigInteger absenceTimeTypeId) {
 
         OrganizationDTO organizationDTO = organizationRestClient.getOrganization(unitId);
         if (organizationDTO == null) {
@@ -796,6 +797,7 @@ public class ActivityService extends MongoBaseService {
             //balance setting tab
             BalanceSettingsActivityTab balanceSettingsActivityTab = Optional.ofNullable(activity.getBalanceSettingsActivityTab()).isPresent() ? activity.getBalanceSettingsActivityTab() :
                     new BalanceSettingsActivityTab();
+            balanceSettingsActivityTab.setTimeTypeId(timeCareActivity.getIsWork() && timeCareActivity.getIsPresence()?presenceTimeTypeId:absenceTimeTypeId);
             balanceSettingsActivityTab.setNegativeDayBalancePresent(timeCareActivity.getNegativeDayBalance());
             balanceSettingsActivityTab.setAddDayTo(timeCareActivity.getBalanceDayType().replace(" ", "_"));
             activity.setBalanceSettingsActivityTab(balanceSettingsActivityTab);
@@ -805,7 +807,7 @@ public class ActivityService extends MongoBaseService {
                     new RulesActivityTab();
 
             rulesActivityTab.setEligibleAgainstTimeRules(timeCareActivity.getUseTimeRules());
-
+            rulesActivityTab.setEligibleForStaffingLevel(timeCareActivity.getIsStaffing());
             List<PhaseTemplateValue> phaseTemplateValues = getPhaseForRulesActivity(phases);
             rulesActivityTab.setEligibleForSchedules(phaseTemplateValues);
             activity.setRulesActivityTab(rulesActivityTab);
@@ -816,6 +818,7 @@ public class ActivityService extends MongoBaseService {
                     activity.getTimeCalculationActivityTab() : new TimeCalculationActivityTab();
             List<String> balanceTypes = new ArrayList<>();
             balanceTypes.add(timeCareActivity.getBalanceType().replace(" ", "_"));
+            timeCalculationActivityTab.setMethodForCalculatingTime(getMethodUsingTimeCareActivity(timeCareActivity.getTimeMethod()));
             timeCalculationActivityTab.setBalanceType(balanceTypes);
 
             if (!StringUtils.isBlank(timeCareActivity.getMultiplyTimeWith())) {
@@ -838,6 +841,25 @@ public class ActivityService extends MongoBaseService {
         }
         save(activities);
         return activities;
+    }
+
+
+    private String getMethodUsingTimeCareActivity(String method){
+        String calculationType = null;
+        switch (method){
+            case "FixedTime":calculationType = "FIXED_TIME";
+                break;
+            case "FullWeeklyHours":calculationType = "FULL_DAY";
+                break;
+            case "WeeklyWorkTime":calculationType = "WEEKLY_HOURS";
+                break;
+            case "CalculatedTime":calculationType = "ENTERED_TIMES";
+                break;
+       /*     case "":
+                break;*/
+
+        }
+        return calculationType;
     }
 
     private List<Activity> mapActivitiesInOrganization(List<Activity> countryActivities, Long unitId, List<String> externalIds) {

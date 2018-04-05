@@ -110,7 +110,9 @@ public class TimeBankService extends MongoBaseService {
                 }
             }
         }
-        save(updatedDailyTimeBanks);
+        if(!updatedDailyTimeBanks.isEmpty()) {
+            save(updatedDailyTimeBanks);
+        }
     }
 
 

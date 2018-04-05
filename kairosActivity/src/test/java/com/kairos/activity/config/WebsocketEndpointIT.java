@@ -61,7 +61,7 @@ public class WebsocketEndpointIT {
             WebSocketClient webSocketClient = new StandardWebSocketClient();
             stompClient = new WebSocketStompClient(webSocketClient);
             stompClient.setMessageConverter(new StringMessageConverter());
-        String st="d:/";
+
 
            stompSession = stompClient.connect(URL, new StompSessionHandlerAdapter() {
             @Override

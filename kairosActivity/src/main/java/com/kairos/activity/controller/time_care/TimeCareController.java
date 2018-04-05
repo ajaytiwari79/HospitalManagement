@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class TimeCareController {
      * @params
      */
 
-    @RequestMapping(value = "/time_care/getShifts/{controlPanelId}", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(value = "/unit/{unitId}/time_care/getShifts/{controlPanelId}", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_XML_VALUE})
     ResponseEntity<Map<String, Object>> getShiftsFromTimeCare(@RequestBody GetWorkShiftsFromWorkPlaceByIdResponse shifts) {
 
         try {
@@ -64,11 +65,12 @@ public class TimeCareController {
         return null;
     }
 
-    @RequestMapping(value = ORGANIZATION_UNIT_URL + COUNTRY_URL + "/time_care/time_care_activites", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(value = ORGANIZATION_UNIT_URL + COUNTRY_URL + "/time_care/time_care_activites/presenceTimeType/{presenceTimeTypeId}/absenceTimeType/{absenceTimeTypeId}", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_XML_VALUE})
     ResponseEntity<Map<String, Object>> getActivitesFromTimeCare(@RequestBody GetAllActivitiesResponse getAllActivitiesResponses,
-                                                                 @PathVariable Long countryId, @PathVariable Long unitId) {
+                                                                 @PathVariable Long countryId, @PathVariable Long unitId,
+                                                                 @PathVariable BigInteger presenceTimeTypeId,@PathVariable BigInteger absenceTimeTypeId) {
         logger.info("Get activities from time care " + getAllActivitiesResponses);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.createActivitiesFromTimeCare(getAllActivitiesResponses, unitId, countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.createActivitiesFromTimeCare(getAllActivitiesResponses, unitId, countryId,presenceTimeTypeId,absenceTimeTypeId));
     }
 
 
