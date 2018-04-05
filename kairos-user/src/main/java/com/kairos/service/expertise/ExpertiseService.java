@@ -246,9 +246,9 @@ public class ExpertiseService extends UserBaseService {
 
         if (Optional.ofNullable(functionAndSeniorityLevel.getFunctions()).isPresent() && !functionAndSeniorityLevel.getFunctions().isEmpty()) {
             List<FunctionsDTO> allFunctions = new ArrayList<>();
-            for (Map<String, Object> currentObje : functionAndSeniorityLevel.getFunctions()) {
-                BigDecimal functionAmount = new BigDecimal(currentObje.get("amount").toString());
-                Long currentFunctionId = (Long) currentObje.get("functionId");
+            for (Map<String, Object> currentFunction : functionAndSeniorityLevel.getFunctions()) {
+                BigDecimal functionAmount = new BigDecimal(currentFunction.get("amount").toString());
+                Long currentFunctionId = (Long) currentFunction.get("functionId");
                 FunctionsDTO function = new FunctionsDTO(functionAmount, currentFunctionId);
                 allFunctions.add(function);
             }
