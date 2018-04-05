@@ -39,6 +39,25 @@ public class ShiftQueryResult {
     private Long unitId;
     private List<ShiftQueryResult> subShifts;
     private Long unitPositionId;
+    private int scheduledMinutes;
+    private int durationMinutes;
+
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
+
+    public int getScheduledMinutes() {
+        return scheduledMinutes;
+    }
+
+    public void setScheduledMinutes(int scheduledMinutes) {
+        this.scheduledMinutes = scheduledMinutes;
+    }
 
     public BigInteger getId() {
         return id;

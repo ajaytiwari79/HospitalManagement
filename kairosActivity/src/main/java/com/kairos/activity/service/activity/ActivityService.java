@@ -10,7 +10,6 @@ import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.skill.Skill;
 import com.kairos.activity.config.env.EnvConfig;
-import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DataNotFoundException;
@@ -52,6 +51,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -101,6 +101,10 @@ public class ActivityService extends MongoBaseService {
             logger.error("ActivityName already exist" + activityDTO.getName());
             throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
         }
+        activity.getTimeCalculationActivityTab().setMultiplyWith(true);
+        activity.getTimeCalculationActivityTab().setMultiplyWithValue(1d);
+        activity.getTimeCalculationActivityTab().setFixedTimeValue(0l);
+        activity.getTimeCalculationActivityTab().setDefaultStartTime(LocalTime.of(7,0));
         activity = activityDTO.buildActivity();
         initializeActivityTabs(activity, countryId);
         save(activity);
@@ -818,9 +822,14 @@ public class ActivityService extends MongoBaseService {
                     activity.getTimeCalculationActivityTab() : new TimeCalculationActivityTab();
             List<String> balanceTypes = new ArrayList<>();
             balanceTypes.add(timeCareActivity.getBalanceType().replace(" ", "_"));
-            timeCalculationActivityTab.setMethodForCalculatingTime(getMethodUsingTimeCareActivity(timeCareActivity.getTimeMethod()));
+            timeCalculationActivityTab.setMethodForCalculatingTime(durationCalculationMethod(timeCareActivity.getTimeMethod()));
             timeCalculationActivityTab.setBalanceType(balanceTypes);
-
+            if(timeCalculationActivityTab.getMethodForCalculatingTime().equals(FIXED_TIME)) {
+                timeCalculationActivityTab.setFixedTimeValue(0l);
+            }
+            timeCalculationActivityTab.setDefaultStartTime(LocalTime.of(7,0));
+            timeCalculationActivityTab.setMultiplyWithValue(1d);
+            timeCalculationActivityTab.setMultiplyWith(true);
             if (!StringUtils.isBlank(timeCareActivity.getMultiplyTimeWith())) {
                 timeCalculationActivityTab.setMultiplyWithValue(Double.parseDouble(timeCareActivity.getMultiplyTimeWith()));
                 timeCalculationActivityTab.setMultiplyWith(true);
@@ -844,16 +853,16 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    private String getMethodUsingTimeCareActivity(String method){
+    private String durationCalculationMethod(String method){
         String calculationType = null;
         switch (method){
-            case "FixedTime":calculationType = "FIXED_TIME";
+            case FixedTime:calculationType = FIXED_TIME;
                 break;
-            case "FullWeeklyHours":calculationType = "FULL_DAY";
+            case FullTimeHour:calculationType = FULL_DAY_CALCULATION;
                 break;
-            case "WeeklyWorkTime":calculationType = "WEEKLY_HOURS";
+            case WeeklyWorkTime:calculationType = WEEKLY_HOURS;
                 break;
-            case "CalculatedTime":calculationType = "ENTERED_TIMES";
+            case CalculatedTime:calculationType = ENTERED_TIMES;
                 break;
        /*     case "":
                 break;*/

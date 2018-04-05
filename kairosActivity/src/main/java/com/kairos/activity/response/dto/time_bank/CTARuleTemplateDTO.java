@@ -2,6 +2,7 @@ package com.kairos.activity.response.dto.time_bank;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CTARuleTemplateDTO {
@@ -18,6 +19,10 @@ public class CTARuleTemplateDTO {
     private List<CTAIntervalDTO> ctaIntervalDTOS;
     private int minutesFromCta;
     private List<BigInteger> timeTypeIdsWithParentTimeType;
+    private boolean calculateScheduledHours;
+    private Long plannedTimeId;
+    private List<Long> employmentTypes;
+    private String accountType;
 
     public CTARuleTemplateDTO() {
     }
@@ -29,12 +34,44 @@ public class CTARuleTemplateDTO {
         this.timeTypeId = timeTypeId;
     }
 
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
+
     public List<BigInteger> getTimeTypeIdsWithParentTimeType() {
         return timeTypeIdsWithParentTimeType;
     }
 
     public void setTimeTypeIdsWithParentTimeType(List<BigInteger> timeTypeIdsWithParentTimeType) {
         this.timeTypeIdsWithParentTimeType = timeTypeIdsWithParentTimeType;
+    }
+
+    public boolean isCalculateScheduledHours() {
+        return calculateScheduledHours;
+    }
+
+    public void setCalculateScheduledHours(boolean calculateScheduledHours) {
+        this.calculateScheduledHours = calculateScheduledHours;
+    }
+
+    public Long getPlannedTimeId() {
+        return plannedTimeId;
+    }
+
+    public void setPlannedTimeId(Long plannedTimeId) {
+        this.plannedTimeId = plannedTimeId;
+    }
+
+    public List<Long> getEmploymentTypes() {
+        return employmentTypes;
+    }
+
+    public void setEmploymentTypes(List<Long> employmentTypes) {
+        this.employmentTypes = employmentTypes;
     }
 
     public int getMinutesFromCta() {

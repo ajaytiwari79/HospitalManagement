@@ -23,6 +23,7 @@ public final class ApiConstants {
     public static final String API_REQUEST_COMPONENT_URL =  API_V1 + PARENT_ORGANIZATION_URL + "/resourceComponent";
     public static final String API_ORGANIZATION_COUNTRY_URL =API_V1+PARENT_ORGANIZATION_URL+COUNTRY_URL;
     public static final String TIMEBANK_URL = API_ORGANIZATION_UNIT_URL+"/timeBank";
+    public static final String COUNTER_URL = API_INTEGRATION_URL + "/counters";
 
     private ApiConstants() {
     }

@@ -2,7 +2,7 @@ package com.kairos.activity.service.time_bank;
 
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivityTab;
-import com.kairos.activity.persistence.model.time_bank.DailyTimeBank;
+import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
@@ -68,12 +68,12 @@ public class TImeBankCalculationServiceTest {
     @Test
     public void calculateTimeBank(){
         when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId())));
-        TimebankWrapper timebankWrapper = timeBankService.getCostTimeAgreement(1225l,95l);
-        DailyTimeBank dailyTimeBank = new DailyTimeBank(timebankWrapper.getUnitPositionId(), timebankWrapper.getStaffId(), timebankWrapper.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
-        timeBankCalculationService.calculateDailyTimebank(interval, timebankWrapper,shifts,dailyTimeBank);
-        Assert.assertEquals(dailyTimeBank.getTotalTimeBankMin(),1130);
-        Assert.assertEquals(dailyTimeBank.getScheduledMin(),1020);
-        Assert.assertEquals(dailyTimeBank.getContractualMin(),300);
+        TimebankWrapper timebankWrapper = timeBankService.getCostTimeAgreement(1225l);
+        DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(timebankWrapper.getUnitPositionId(), timebankWrapper.getStaffId(), timebankWrapper.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
+        timeBankCalculationService.calculateDailyTimebank(interval, timebankWrapper,shifts, dailyTimeBankEntry);
+        Assert.assertEquals(dailyTimeBankEntry.getTotalTimeBankMin(),1130);
+        Assert.assertEquals(dailyTimeBankEntry.getScheduledMin(),1020);
+        Assert.assertEquals(dailyTimeBankEntry.getContractualMin(),300);
     }
 
 

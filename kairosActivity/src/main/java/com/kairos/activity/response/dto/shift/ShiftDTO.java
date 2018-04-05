@@ -38,6 +38,9 @@ public class ShiftDTO {
     @Range(min = 0)
     @NotNull(message = "error.ShiftDTO.unitPositionId.notnull")
     private Long unitPositionId;
+    private int scheduledMinutes;
+    private int durationMinutes;
+    private Date shiftDate;
 
 
     public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
@@ -55,6 +58,30 @@ public class ShiftDTO {
         this.unitId = unitId;
         this.staffId = staffId;
         this.unitPositionId = unitPositionId;
+    }
+
+    public Date getShiftDate() {
+        return shiftDate;
+    }
+
+    public void setShiftDate(Date shiftDate) {
+        this.shiftDate = shiftDate;
+    }
+
+    public int getScheduledMinutes() {
+        return scheduledMinutes;
+    }
+
+    public void setScheduledMinutes(int scheduledMinutes) {
+        this.scheduledMinutes = scheduledMinutes;
+    }
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
     }
 
     private List<ShiftDTO> subShifts = new ArrayList<>();
@@ -225,6 +252,8 @@ public class ShiftDTO {
     public Shift buildShift() {
 
         Shift shift = new Shift(this.id, this.name, this.startDate, this.endDate, this.bid, this.pId, this.bonusTimeBank, this.amount, this.probability, this.accumulatedTimeBankInMinutes, this.remarks, this.activityId, this.staffId, this.unitId, this.unitPositionId);
+        shift.setDurationMinutes(this.durationMinutes);
+        shift.setScheduledMinutes(this.scheduledMinutes);
         return shift;
     }
 

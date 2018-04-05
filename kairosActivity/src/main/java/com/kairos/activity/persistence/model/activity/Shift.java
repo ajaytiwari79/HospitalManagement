@@ -38,6 +38,9 @@ public class Shift extends MongoBaseEntity {
     @Indexed
     private Long unitId;
 
+    private int scheduledMinutes;
+    private int durationMinutes;
+
     private boolean isMainShift = true;
     private Set<BigInteger> subShifts;
     //time care id
@@ -77,7 +80,21 @@ public class Shift extends MongoBaseEntity {
 
     }
 
+    public int getScheduledMinutes() {
+        return scheduledMinutes;
+    }
 
+    public void setScheduledMinutes(int scheduledMinutes) {
+        this.scheduledMinutes = scheduledMinutes;
+    }
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
 
     public String getName() {
         return name;

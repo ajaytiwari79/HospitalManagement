@@ -3,7 +3,6 @@ package com.kairos.activity.response.dto.time_bank;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,7 +13,8 @@ public class TimebankWrapper {
     private int contractedMinByWeek;
     private int workingDaysPerWeek;
     private Long staffId;
-    private LocalDate unitPositionDate;
+    private LocalDate unitPositionStartDate;
+    private LocalDate unitPositionEndDate;
     private Long countryId;
     private int minutesFromCta;
 
@@ -26,6 +26,14 @@ public class TimebankWrapper {
     public TimebankWrapper() {
     }
 
+    public LocalDate getUnitPositionEndDate() {
+        return unitPositionEndDate;
+    }
+
+    public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
+        this.unitPositionEndDate = unitPositionEndDate;
+    }
+
     public int getMinutesFromCta() {
         return minutesFromCta;
     }
@@ -34,8 +42,8 @@ public class TimebankWrapper {
         this.minutesFromCta = minutesFromCta;
     }
 
-    public TimebankWrapper(LocalDate unitPositionDate) {
-        this.unitPositionDate = unitPositionDate;
+    public TimebankWrapper(LocalDate unitPositionStartDate) {
+        this.unitPositionStartDate = unitPositionStartDate;
     }
 
     public Long getCountryId() {
@@ -46,12 +54,12 @@ public class TimebankWrapper {
         this.countryId = countryId;
     }
 
-    public LocalDate getUnitPositionDate() {
-        return unitPositionDate;
+    public LocalDate getUnitPositionStartDate() {
+        return unitPositionStartDate;
     }
 
-    public void setUnitPositionDate(LocalDate unitPositionDate) {
-        this.unitPositionDate = unitPositionDate;
+    public void setUnitPositionStartDate(LocalDate unitPositionStartDate) {
+        this.unitPositionStartDate = unitPositionStartDate;
     }
 
 

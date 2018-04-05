@@ -1,6 +1,6 @@
 package com.kairos.activity.persistence.repository.time_bank;
 
-import com.kairos.activity.persistence.model.time_bank.DailyTimeBank;
+import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,17 +16,17 @@ import java.util.List;
 * */
 
 @Repository
-public interface TimeBankMongoRepository extends MongoBaseRepository<DailyTimeBank,BigInteger> {
+public interface TimeBankMongoRepository extends MongoBaseRepository<DailyTimeBankEntry,BigInteger> {
 
     @Query("{unitPositionId:{$in:?0},date:{$gte:?1 , $lte:?2}}")
-    List<DailyTimeBank> findAllByUnitPositionsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
+    List<DailyTimeBankEntry> findAllByUnitPositionsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$gte:?1 , $lte:?2}}")
-    List<DailyTimeBank> findAllByUnitPositionAndDate(Long unitPositionId, Date startDate, Date endDate);
+    List<DailyTimeBankEntry> findAllByUnitPositionAndDate(Long unitPositionId, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$gte:?1}}")
-    DailyTimeBank findOneByUnitPositionAndDate(Long unitPositionId, Date timeBankDate);
+    DailyTimeBankEntry findOneByUnitPositionAndDate(Long unitPositionId, Date timeBankDate);
 
-    @Query("{unitPositionId:?0,date:{$lte:?1}}")
-    List<DailyTimeBank> findAllByUnitPositionAndBeforeDate(Long unitPositionId, Date timeBankDate);
+    @Query("{unitPositionId:?0,date:{$lt:?1}}")
+    List<DailyTimeBankEntry> findAllByUnitPositionAndBeforeDate(Long unitPositionId, Date timeBankDate);
 }

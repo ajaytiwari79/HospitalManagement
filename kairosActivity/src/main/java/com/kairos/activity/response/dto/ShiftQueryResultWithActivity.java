@@ -39,6 +39,8 @@ public class ShiftQueryResultWithActivity {
     private static boolean overrideWeekCount;
     private Long unitId;
     private Activity activity;
+    private int scheduledMinutes;
+    private int durationMinutes;
     private ShiftQueryResultWithActivity subShift;
 
     public Long getUnitEmploymentPositionId() {
@@ -56,6 +58,22 @@ public class ShiftQueryResultWithActivity {
 
     public void setUnitEmploymentPositionId(Long unitEmploymentPositionId) {
         this.unitEmploymentPositionId = unitEmploymentPositionId;
+    }
+
+    public int getScheduledMinutes() {
+        return scheduledMinutes;
+    }
+
+    public void setScheduledMinutes(int scheduledMinutes) {
+        this.scheduledMinutes = scheduledMinutes;
+    }
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
     }
 
     public ShiftQueryResultWithActivity getSubShift() {

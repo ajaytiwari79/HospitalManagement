@@ -52,7 +52,7 @@ public class TimeBankController {
     @GetMapping(value = "overview/unit_position/{unitEmploymentId}/")
     public ResponseEntity<Map<String, Object>> getTimeBankForOverview(@PathVariable Long unitId,@PathVariable Long unitEmploymentId, @RequestParam Integer year) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getOverviewTimeBank
-                (unitId,unitEmploymentId,year));
+                (unitEmploymentId,year));
     }
 
 
@@ -61,10 +61,10 @@ public class TimeBankController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.saveTimeBank());
     }
 
-    @PostMapping(value = "/createBlankTimebank")
+   /* @PostMapping(value = "/createBlankTimebank")
     public ResponseEntity<Map<String,Object>> createBlankTimeBank(@RequestBody TimebankWrapper timebankWrapper){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,timeBankService.createBlankTimeBank(timebankWrapper));
-    }
+    }*/
 
     @PutMapping(value = "/updateBlankTimebank")
     public ResponseEntity<Map<String,Object>> updateBlankTimebank(@RequestBody TimebankWrapper timebankWrapper){

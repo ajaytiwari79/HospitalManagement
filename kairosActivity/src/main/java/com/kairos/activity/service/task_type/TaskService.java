@@ -38,6 +38,7 @@ import com.kairos.activity.persistence.repository.task_type.TaskDemandMongoRepos
 import com.kairos.activity.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.activity.persistence.repository.task_type.TaskTypeMongoRepository;
 import com.kairos.activity.response.dto.*;
+import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.serializers.MongoDateMapper;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.fls_visitour.schedule.Scheduler;
@@ -53,6 +54,7 @@ import com.kairos.activity.util.JsonUtils;
 import com.kairos.activity.util.TaskUtil;
 import com.kairos.activity.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResponse;
 import com.kairos.activity.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
+import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import com.kairos.activity.util.userContext.UserContext;
 import org.bson.Document;
 import org.joda.time.DateTime;
@@ -158,6 +160,8 @@ public class TaskService extends MongoBaseService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject private TimeBankService timeBankService;
+    @Inject
+    private TimeBankCalculationService timeBankCalculationService;
 
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
         logger.info("Fetching tasks for ClientId: " + clientId);
@@ -656,11 +660,11 @@ public class TaskService extends MongoBaseService {
         int skip = 0;
         if (sizeOfTimeCareShifts > MONOGDB_QUERY_RECORD_LIMIT) {
             do {
-                saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getUnitPosition().getId(), skippedShiftsWhileSave);
+                saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getUnitPosition(), skippedShiftsWhileSave);
                 skip += MONOGDB_QUERY_RECORD_LIMIT;
             } while (skip <= sizeOfTimeCareShifts);
         } else {
-            saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getUnitPosition().getId(), skippedShiftsWhileSave);
+            saveShifts(skip, shiftsFromTimeCare, organizationDTO.getId(), staffDTO.getId(), organizationStaffWrapper.getUnitPosition(), skippedShiftsWhileSave);
         }
         return skippedShiftsWhileSave;
     }
@@ -676,7 +680,7 @@ public class TaskService extends MongoBaseService {
         return shift;
     }
 
-    private void saveShifts(int skip, List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare, Long workPlaceId, Long staffId, Long unitPositionId, List<String> skippedShiftsWhileSave) {
+    private void saveShifts(int skip, List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare, Long workPlaceId, Long staffId,UnitPositionDTO unitPositionDTO , List<String> skippedShiftsWhileSave) {
         List<String> externalIdsOfShifts = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).map(timeCareShift -> timeCareShift.getId()).
                 collect(Collectors.toList());
         List<String> externalIdsOfActivities = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).map(timeCareShift -> timeCareShift.getActivityId()).
@@ -685,6 +689,7 @@ public class TaskService extends MongoBaseService {
         List<Activity> activities = activityMongoRepository.findByUnitIdAndExternalIdIn(workPlaceId, externalIdsOfActivities);
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
+        StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
         for (GetWorkShiftsFromWorkPlaceByIdResult timeCareShift : timeCareShiftsByPagination) {
             Shift shift = shiftsInKairos.stream().filter(shiftInKairos -> shiftInKairos.getExternalId().equals(timeCareShift.getId())).findAny().orElse(mapTimeCareShiftDataToKairos
                     (timeCareShift, workPlaceId));
@@ -695,7 +700,8 @@ public class TaskService extends MongoBaseService {
                 shift.setName(activity.get().getName());
                 shift.setActivityId(activity.get().getId());
                 shift.setStaffId(staffId);
-                shift.setUnitPositionId(unitPositionId);
+                shift.setUnitPositionId(unitPositionDTO.getId());
+                timeBankCalculationService.calculateScheduleAndDurationHour(shift,activity.get(),staffUnitPositionDetails);
                 shiftsToCreate.add(shift);
             }
 
@@ -703,7 +709,8 @@ public class TaskService extends MongoBaseService {
         if (!shiftsToCreate.isEmpty()) {
 
             save(shiftsToCreate);
-            timeBankService.saveTimeBank(unitPositionId, shiftsToCreate,shiftsToCreate.get(0).getUnitId());
+            timeBankService.saveTimeBanks(unitPositionDTO.getId(), shiftsToCreate);
+
 
         }
     }

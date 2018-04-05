@@ -64,7 +64,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 ,project("unitId")
                         .andInclude("deleted")
                         .andInclude("startDate")
-                        .andInclude("endDate")
+                        .andInclude("endDate").andInclude("scheduledMinutes").andInclude("durationMinutes")
                         .andInclude("isMainShift").andInclude("subShift")
                         //.andInclude("subShift.startDate").andInclude("subShift.endDate")
                         .andInclude("subShift.activity")

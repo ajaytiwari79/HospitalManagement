@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivityTab;
 
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -27,6 +28,8 @@ public class TimeCalculationActivityDTO {
     private List<Long> dayTypes;
     private DayOfWeek fullWeekStart;
     private DayOfWeek fullWeekEnd;
+    private int historyDuration;
+    private LocalTime defaultStartTime;
 
     public DayOfWeek getFullWeekStart() {
         return fullWeekStart;
@@ -45,11 +48,26 @@ public class TimeCalculationActivityDTO {
     }
 
 
+    public int getHistoryDuration() {
+        return historyDuration;
+    }
+
+    public void setHistoryDuration(int historyDuration) {
+        this.historyDuration = historyDuration;
+    }
+
+    public LocalTime getDefaultStartTime() {
+        return defaultStartTime;
+    }
+
+    public void setDefaultStartTime(LocalTime defaultStartTime) {
+        this.defaultStartTime = defaultStartTime;
+    }
 
     public TimeCalculationActivityTab buildTimeCalculationActivityTab(){
         TimeCalculationActivityTab timeCalculationActivityTab =new TimeCalculationActivityTab(methodForCalculatingTime,allowBreakReduction,
                 fixedTimeValue,monthsToCalculate,methodForCalculatingTimeInMonths,balanceType,multiplyWith,multiplyWithValue,multiplyByVacationFactor,multiplyByFinalSchedule, breakTemplates,
-                dayTypes,fullWeekStart,fullWeekEnd);
+                dayTypes,fullWeekStart,fullWeekEnd,historyDuration,defaultStartTime);
         return timeCalculationActivityTab;
     }
     public String getMethodForCalculatingTime() {

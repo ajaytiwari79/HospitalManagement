@@ -191,7 +191,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 graphLookup("activities").startWith("$compositeActivities").connectFrom("compositeActivities").connectTo("_id").maxDepth(0).as("compositeActivities"),
-                project("name", "generalActivityTab","compositeActivities","expertises","employmentTypes","rulesActivityTab","skillActivityTab"));
+                project("name", "generalActivityTab","compositeActivities","expertises","employmentTypes","rulesActivityTab","skillActivityTab","timeCalculationActivityTab"));
         AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCompositeDTO.class);
         return result.getMappedResults();
     }

@@ -1,6 +1,6 @@
 package com.kairos.activity.client.dto.staff;
 
-import com.kairos.activity.response.dto.shift.StaffUnitEmploymentDetails;
+import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 
 import java.util.Date;
 import java.util.List;
@@ -16,7 +16,7 @@ public class StaffAdditionalInfoDTO {
     private List<Long> skills;
     private String profilePic;
     private Long unitId;
-    private StaffUnitEmploymentDetails unitEmploymentPosition;
+    private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
 
@@ -71,12 +71,12 @@ public class StaffAdditionalInfoDTO {
         this.unitId = unitId;
     }
 
-    public StaffUnitEmploymentDetails getUnitEmploymentPosition() {
-        return unitEmploymentPosition;
+    public StaffUnitPositionDetails getUnitPosition() {
+        return unitPosition;
     }
 
-    public void setUnitEmploymentPosition(StaffUnitEmploymentDetails unitEmploymentPosition) {
-        this.unitEmploymentPosition = unitEmploymentPosition;
+    public void setUnitPosition(StaffUnitPositionDetails unitPosition) {
+        this.unitPosition = unitPosition;
     }
 
     public Date getOrganizationNightStartTimeFrom() {

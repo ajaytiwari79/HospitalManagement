@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.tabs.GeneralActivityTab;
 import com.kairos.activity.persistence.model.activity.tabs.RulesActivityTab;
 import com.kairos.activity.persistence.model.activity.tabs.SkillActivityTab;
+import com.kairos.activity.response.dto.activity.TimeCalculationActivityDTO;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class ActivityWithCompositeDTO {
     private BigInteger id;
     private String name;
     private GeneralActivityTab generalActivityTab;
+    private TimeCalculationActivityDTO timeCalculationActivityTab;
     private List<CompositeActivityDTO> compositeActivities;
     private List<Long> expertises= new ArrayList<>();
     private List<Long> employmentTypes= new ArrayList<>();
@@ -30,6 +32,14 @@ public class ActivityWithCompositeDTO {
 
     public ActivityWithCompositeDTO() {
         //Default Constructor
+    }
+
+    public TimeCalculationActivityDTO getTimeCalculationActivityTab() {
+        return timeCalculationActivityTab;
+    }
+
+    public void setTimeCalculationActivityTab(TimeCalculationActivityDTO timeCalculationActivityTab) {
+        this.timeCalculationActivityTab = timeCalculationActivityTab;
     }
 
     public BigInteger getId() {

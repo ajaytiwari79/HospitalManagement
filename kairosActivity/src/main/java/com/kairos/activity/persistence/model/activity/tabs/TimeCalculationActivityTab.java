@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.activity.tabs;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +25,19 @@ public class TimeCalculationActivityTab implements Serializable {
     private DayOfWeek fullWeekEnd;
     private String breakTemplates;
     private int historyDuration;
+    private LocalTime defaultStartTime;
     private List<Long> dayTypes = new ArrayList<>();
 
     public TimeCalculationActivityTab() {
     }
 
+    public LocalTime getDefaultStartTime() {
+        return defaultStartTime;
+    }
+
+    public void setDefaultStartTime(LocalTime defaultStartTime) {
+        this.defaultStartTime = defaultStartTime;
+    }
 
     public TimeCalculationActivityTab(String methodForCalculatingTime) {
         this.methodForCalculatingTime = methodForCalculatingTime;
@@ -157,7 +166,7 @@ public class TimeCalculationActivityTab implements Serializable {
     }
 
     public TimeCalculationActivityTab(String methodForCalculatingTime, Boolean allowBreakReduction, Long fixedTimeValue, Long monthsToCalculate, String methodForCalculatingTimeInMonths, List<String> balanceType,
-                                      Boolean multiplyWith, Double multiplyWithValue, Boolean multiplyByVacationFactor, Boolean multiplyByFinalSchedule, String breakTemplates, List<Long> dayTypes, DayOfWeek fullWeekStart, DayOfWeek fullWeekEnd) {
+                                      Boolean multiplyWith, Double multiplyWithValue, Boolean multiplyByVacationFactor, Boolean multiplyByFinalSchedule, String breakTemplates, List<Long> dayTypes, DayOfWeek fullWeekStart, DayOfWeek fullWeekEnd,int historyDuration,LocalTime defaultStartTime) {
         this.methodForCalculatingTime = methodForCalculatingTime;
         this.allowBreakReduction = allowBreakReduction;
         this.fixedTimeValue = fixedTimeValue;
@@ -172,6 +181,8 @@ public class TimeCalculationActivityTab implements Serializable {
         this.dayTypes = dayTypes;
         this.fullWeekStart = fullWeekStart;
         this.fullWeekEnd = fullWeekEnd;
+        this.historyDuration = historyDuration;
+        this.defaultStartTime = defaultStartTime;
     }
 
 }
