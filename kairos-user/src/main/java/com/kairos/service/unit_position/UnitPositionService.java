@@ -233,12 +233,31 @@ public class UnitPositionService extends UserBaseService {
         if (!Optional.ofNullable(oldUnitPosition).isPresent()) {
             throw new DataNotFoundByIdException("Invalid positionId id " + unitPositionId + " while updating the position_code");
         }
+
         List<UnitPosition> oldUnitPositions
                 = unitPositionGraphRepository.getAllUEPByExpertiseExcludingCurrent(unitPositionDTO.getUnitId(), unitPositionDTO.getStaffId(), unitPositionDTO.getExpertiseId(), unitPositionId);
         validateUnitPositionWithExpertise(oldUnitPositions, unitPositionDTO);
 
+        UnitPositionEmploymentTypeRelationShip unitPositionEmploymentTypeRelationShip = unitPositionGraphRepository.findEmploymentTypeByUnitPositionId(unitPositionId);
+        if (unitPositionEmploymentTypeRelationShip != null) {
+            // user has changed need to remove previous and add new
+            if (unitPositionEmploymentTypeRelationShip.getEmploymentType().getId() != unitPositionDTO.getEmploymentTypeId()) {
+                EmploymentType employmentType = employmentTypeGraphRepository.findOne(unitPositionDTO.getEmploymentTypeId());
+                if (!Optional.ofNullable(employmentType).isPresent()) {
+                    throw new DataNotFoundByIdException("employmentType Cannot be null" + unitPositionDTO.getEmploymentTypeId());
+                }
+                unitPositionEmploymentTypeRelationShipGraphRepository.delete(unitPositionEmploymentTypeRelationShip);
+                unitPositionEmploymentTypeRelationShip = new UnitPositionEmploymentTypeRelationShip(oldUnitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
+            }
+            // user has changed the type
+            else if (!unitPositionDTO.getEmploymentTypeCategory().equals(unitPositionEmploymentTypeRelationShip.getEmploymentTypeCategory())) {
+                unitPositionEmploymentTypeRelationShip.setEmploymentTypeCategory(unitPositionDTO.getEmploymentTypeCategory());
+            }
+            unitPositionEmploymentTypeRelationShipGraphRepository.save(unitPositionEmploymentTypeRelationShip);
+            logger.info(unitPositionEmploymentTypeRelationShip.toString());
+        }
         preparePosition(oldUnitPosition, unitPositionDTO);
-        save(oldUnitPosition);
+        //   save(oldUnitPosition);
         return new PositionWrapper(getBasicDetails(oldUnitPosition));
 
     }
@@ -400,19 +419,19 @@ public class UnitPositionService extends UserBaseService {
         if (!oldUnitPosition.getPositionCode().getId().equals(unitPositionDTO.getPositionCodeId())) {
             PositionCode positionCode = positionCodeGraphRepository.findOne(unitPositionDTO.getPositionCodeId());
             if (!Optional.ofNullable(positionCode).isPresent()) {
-                throw new DataNotFoundByIdException("PositionCode Cannot be null" + unitPositionDTO.getPositionCodeId());
+                throw new DataNotFoundByIdException("Position Code Cannot be null" + unitPositionDTO.getPositionCodeId());
             }
             oldUnitPosition.setPositionCode(positionCode);
 
         }
+        if (!oldUnitPosition.getReasonCode().getId().equals(unitPositionDTO.getReasonCodeId())) {
+            Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(unitPositionDTO.getReasonCodeId(), 0);
+            if (!Optional.ofNullable(reasonCode).isPresent()) {
+                throw new DataNotFoundByIdException("Invalid reasonCode Id" + unitPositionDTO.getReasonCodeId());
+            }
+            oldUnitPosition.setReasonCode(reasonCode.get());
+        }
 
-//        if (!oldUnitPosition.getEmploymentTypeCategory().getId().equals(unitPositionDTO.getEmploymentTypeId())) {
-//            EmploymentType employmentType = employmentTypeGraphRepository.findOne(unitPositionDTO.getEmploymentTypeId());
-//            if (!Optional.ofNullable(employmentType).isPresent()) {
-//                throw new DataNotFoundByIdException("employmentType Cannot be null" + unitPositionDTO.getEmploymentTypeId());
-//            }
-//            oldUnitPosition.setEmploymentTypeCategory(employmentType);
-//        }
 
         if (Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) {
             if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
