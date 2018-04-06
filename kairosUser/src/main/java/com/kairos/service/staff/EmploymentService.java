@@ -16,12 +16,14 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -84,6 +86,8 @@ public class EmploymentService extends UserBaseService {
     private PartialLeaveGraphRepository partialLeaveGraphRepository;
     @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    @Inject
+    private UnitPositionGraphRepository unitPositionGraphRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
@@ -703,5 +707,45 @@ public class EmploymentService extends UserBaseService {
         map.put("note", partialLeave.getNote());
         return map;
     }
+    public void updateEmploymentEndDate(UnitPositionDTO unitPositionDTO, Long unitId) {
+
+        Organization unit = organizationGraphRepository.findOne(unitId);
+
+        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+
+        if (!Optional.ofNullable(parentOrganization).isPresent()) {
+            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unit.getId());
+        }
+
+        List<UnitPositionQueryResult> unitPositionsQuery = unitPositionGraphRepository.getAllUnitPositionsByStaffId(parentOrganization.getId(), unitPositionDTO.getStaffId());
+
+        // List<Long> endDates = unitPositionsQuery.stream().map(UnitPositionQueryResult::getEndDateMillis).collect(Collectors.toList());
+
+        Long max = unitPositionsQuery.get(0).getEndDateMillis();
+        boolean isEndDateBlank = false;
+        for(UnitPositionQueryResult unitPosition:unitPositionsQuery) {
+            if(!Optional.ofNullable(unitPosition.getEndDateMillis()).isPresent()) {
+                isEndDateBlank = true;
+                break;
+            }
+            if(max < unitPosition.getEndDateMillis()){
+                max = unitPosition.getEndDateMillis();
+            }
+
+        }
+
+
+        Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) ? null : (max>unitPositionDTO.getEndDateMillis()?max:unitPositionDTO.getEndDateMillis());
+//        (endDates.contains(null))?employmentGraphRepository.set(null):employmentGraphRepository.set(Collections.max(endDates));
+
+        Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),unitPositionDTO.getStaffId());
+
+        employment.setEndDateMillis(employmentEndDate);
+
+        employmentGraphRepository.save(employment);
+        moveToReadOnlyAccessGroup();
+    }
+
+
 
 }

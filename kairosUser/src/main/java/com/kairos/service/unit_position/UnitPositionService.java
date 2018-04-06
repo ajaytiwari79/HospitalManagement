@@ -188,7 +188,7 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
-    public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO) {
+    public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO, Long unitId) {
 
         List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(unitPositionDTO.getStaffId());
         if (clientMinimumDTO.size() > 0) {
@@ -205,6 +205,7 @@ public class UnitPositionService extends UserBaseService {
 
         preparePosition(oldUnitPosition, unitPositionDTO);
         save(oldUnitPosition);
+
         return new PositionWrapper(getBasicDetails(oldUnitPosition));
 
     }

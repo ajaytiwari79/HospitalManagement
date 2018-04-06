@@ -204,4 +204,29 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(employment)<-[:" +HAS_EMPLOYMENTS + "]-(org:Organization) " +
             "RETURN id(subOrg) as unitId,id(org) as parentUnitId")
     UnitPositionQueryResult getUnitIdAndParentUnitIdByUnitPositionId(Long unitPositionId);
+
+
+    @Query("match(staff:Staff)-[r1:BELONGS_TO_STAFF]-(up:UnitPosition{deleted:false}) where id(staff)={1} \n" +
+            "Match(org:Organization)-[r2:HAS_SUB_ORGANIZATION]-(suborg:Organization)-[r3:IN_UNIT]-(up) where id(org)={0}  return \n" +
+            "up.totalWeeklyMinutes as totalWeeklyMinutes, \n" +
+            "up.startDateMillis as startDateMillis, \n" +
+            "up.endDateMillis as endDateMillis, \n" +
+            "up.salary as salary, \n" +
+            "up.workingDaysInWeek as workingDaysInWeek, \n" +
+            "up.hourlyWages as hourlyWages, \n" +
+            "id(up)   as id, \n" +
+            "up.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
+            "up.lastWorkingDateMillis as lastWorkingDateMillis \n" +
+            "UNION \n" +
+            "Match(staff:Staff)-[r11:BELONGS_TO_STAFF]-(up:UnitPosition{deleted:false}) where id(staff) = {1} Match(org:Organization)-[r22:IN_UNIT]-(up) where id(org)= {0} return  \n"+
+            "up.totalWeeklyMinutes as totalWeeklyMinutes, \n" +
+            "up.startDateMillis as startDateMillis, \n" +
+            "up.endDateMillis as endDateMillis, \n" +
+            "up.salary as salary, \n" +
+            "up.workingDaysInWeek as workingDaysInWeek, \n" +
+            "up.hourlyWages as hourlyWages, \n" +
+            "id(up)   as id, \n" +
+            "up.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
+            "up.lastWorkingDateMillis as lastWorkingDateMillis ")
+    List<UnitPositionQueryResult> getAllUnitPositionsByStaffId(Long organizationId, Long staffId);
 }
