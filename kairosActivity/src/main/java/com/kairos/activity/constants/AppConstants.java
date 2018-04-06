@@ -219,4 +219,8 @@ public class AppConstants {
     public static final String FixedTime = "FixedTime";
     public static final String FullTimeHour = "FullTimeHour";
 
+    // Default Settings of period for unit
+    public static final int PRESENCE_LIMIT_IN_YEAR = 1;
+    public static final int ABSENCE_LIMIT_IN_YEAR = 2;
+
 }
