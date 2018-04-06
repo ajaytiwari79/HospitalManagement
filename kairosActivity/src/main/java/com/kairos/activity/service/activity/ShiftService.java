@@ -92,7 +92,7 @@ public class ShiftService extends MongoBaseService {
             throw new DataNotFoundByIdException(shiftDTO.getStaffId() + " Staff Do not belong to unit ->" + shiftDTO.getUnitId());
         }
         Shift shift = shiftDTO.buildShift();
-        shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
+        shift.setUnitId(staffAdditionalInfoDTO.getUnitId());
         shift.setMainShift(true);
         shift.setName(activity.getName());
         validateShiftWithActivity(activity, shift, staffAdditionalInfoDTO);
