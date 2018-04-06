@@ -24,6 +24,8 @@ public class UnitPositionDTO {
     public UnitPositionDTO() {
     }
 
+
+
     public Long getId() {
         return id;
     }

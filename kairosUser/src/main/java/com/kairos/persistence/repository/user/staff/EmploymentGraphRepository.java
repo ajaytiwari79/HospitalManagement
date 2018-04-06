@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.user.staff.Employment;
+import com.kairos.persistence.model.user.staff.EmploymentOrganizationAccessGroupQueryResult;
 import com.kairos.persistence.model.user.staff.UnitPermission;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -33,4 +34,9 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "create (employment)-[r2:BELONGS_TO]->(staff) create (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit) return r")
     void createEmployments(long organizationId, List<Long> staffId, long unitId);
 
+    @Query("Match(emp:Employment)-[r1:BELONGS_TO]-(staff:Staff)-[r2:BELONGS_TO_STAFF]-(up:UnitPosition{deleted:false}) where id(emp) in {0} \n" +
+            "Match(up)-[r3:IN_UNIT]-(org:Organization)-[r4:ORGANIZATION_HAS_ACCESS_GROUPS]-(ag:AccessGroup{isEmploymentExpired:true,deleted:false}) return emp, \n" +
+            "case when org IS NOT NULL then COLLECT( distinct ag) else[] end as accessGroups,case when org IS NOT NULL then COLLECT( distinct org) else[] end as organizations")
+    List<EmploymentOrganizationAccessGroupQueryResult> findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(List<Long> empIds);
 }
+

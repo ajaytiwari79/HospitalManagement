@@ -1,7 +1,6 @@
 package com.kairos.service.pay_table;
 
 
-
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
@@ -94,7 +93,7 @@ public class PayTableService extends UserBaseService {
         } else if (payTableQueryResults.size() == 1)
             result = payTableQueryResults.get(0);
 
-        PayTableResponseWrapper payTableResponseWrapper = new PayTableResponseWrapper(payGroupAreaQueryResults, result,functions);
+        PayTableResponseWrapper payTableResponseWrapper = new PayTableResponseWrapper(payGroupAreaQueryResults, result, functions);
         return payTableResponseWrapper;
 
     }

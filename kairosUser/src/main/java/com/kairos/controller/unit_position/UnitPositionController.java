@@ -1,4 +1,4 @@
-package com.kairos.controller.unit_employment_position;
+package com.kairos.controller.unit_position;
 
 
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
@@ -71,7 +71,7 @@ public class UnitPositionController {
     }
 /*
     @ApiOperation(value = "Get Position")
-    @GetMapping(value = "/unit_employment_position/{unitPositionId}")
+    @GetMapping(value = "/unit_position/{unitPositionId}")
     public ResponseEntity<Map<String, Object>> getUnitPosition(@PathVariable Long unitPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitEmploymentPositionService.getUnitPosition(unitPositionId));
     }

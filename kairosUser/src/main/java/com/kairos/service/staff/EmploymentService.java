@@ -24,6 +24,7 @@ import com.kairos.persistence.repository.user.access_permission.AccessPermission
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
+import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -747,5 +748,53 @@ public class EmploymentService extends UserBaseService {
     }
 
 
+    public void moveToReadOnlyAccessGroup() {
+
+        Long curDateMillis = DateUtil.getCurrentDate().getTime();
+        UnitPermission unitPermission = null;
+        List<Long> employmentIds = Arrays.asList(3122L,3110L,2564L,429L);
+        List<EmploymentOrganizationAccessGroupQueryResult> employmentOrganizationAccessGroupQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);
+
+        List<Organization> organizations = null;
+        int orgNo = 0;
+        Employment employment = null;
+
+
+        for(EmploymentOrganizationAccessGroupQueryResult employmentOrganizationAccessGroup:employmentOrganizationAccessGroupQueryResults) {
+
+            organizations = employmentOrganizationAccessGroup.getOrganizations();
+            employment = employmentOrganizationAccessGroup.getEmployment();
+
+            for(AccessGroup accessGroup:employmentOrganizationAccessGroup.getAccessGroups()){
+
+                //unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaffByEmployment( organizations.get(i).getId(), employmentOrganizationAccessGroup.getEmployment().getId() );
+                unitPermission = unitPermissionGraphRepository.findUnitPermissionOfStaffByEmployment(organizations.get(orgNo).getId(),employment.getId());
+                if(Optional.ofNullable(unitPermission).isPresent() ) {
+                    //throw new DataNotFoundByIdException("Unit permission already exist for Access Group" + staffId);
+                    accessGroupRepository.deleteAccessGroupAndCustomizedPermission(employment.getId(), organizations.get(orgNo).getId());
+                    unitPermission.setAccessGroup(accessGroup);
+                    employment.getUnitPermissions().add(unitPermission);
+                }
+                else {
+                    unitPermission = new UnitPermission();
+                    unitPermission.setOrganization(organizations.get(orgNo));
+                    unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+                    unitPermission.setAccessGroup(accessGroup);
+                    employment.getUnitPermissions().add(unitPermission);
+                }
+
+                //  AccessGroup accessGroup = accessGroupRepository.findReadonlyAccessGroupByOrganization(accessGroupId);
+//            unitPermission = new UnitPermission();
+//            unitPermission.setOrganization(unit);
+//            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+                //employment.getUnitPermissions().add(unitPermission);
+                orgNo++;
+            }
+
+            employmentGraphRepository.save(employment);
+            //employmentGraphRepository.save(employment);
+
+        }
+    }
 
 }

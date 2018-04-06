@@ -75,4 +75,8 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
             "Match (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]-(organization)\n" +
             "return  unitPermission")
     UnitPermission checkUnitPermissionOfStaff(Long parentOrganizationId, Long staffId);
+
+    @Query("Match (emp:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission) where id(emp)=(1) \n" +
+            "Match(unitPermission)-[:APPLICABLE_IN_UNIT]-(co:Organization) where id(co)={0} return  unitPermission")
+    UnitPermission findUnitPermissionOfStaffByEmployment( Long organizationId, Long employmentId);
 }

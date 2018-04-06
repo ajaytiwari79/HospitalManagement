@@ -27,6 +27,7 @@ public class EmploymentType extends UserBaseEntity {
     private boolean allowedForFlexPool;
     private Set<EmploymentCategory> employmentCategories;
 
+
     public String getName() {
         return name;
     }

@@ -45,8 +45,6 @@ public class CountryExpertiseDTO {
     private int fullTimeWeeklyMinutes = 2220; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
-    @NotNull(message = "PayTable can not be null")
-    private Long payTableId;
     @NotNull(message = "Paid Out Frequency can not be null")
     private PaidOutFrequencyEnum paidOutFrequency;
 
@@ -154,13 +152,6 @@ public class CountryExpertiseDTO {
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
     }
 
-    public Long getPayTableId() {
-        return payTableId;
-    }
-
-    public void setPayTableId(Long payTableId) {
-        this.payTableId = payTableId;
-    }
 
     public PaidOutFrequencyEnum getPaidOutFrequency() {
         return paidOutFrequency;
@@ -190,7 +181,8 @@ public class CountryExpertiseDTO {
         return published;
     }
 
-    public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Long serviceId, @NotNull(message = "union can not be null") Long unionId, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @NotNull(message = "PayTable can not be null") Long payTableId, @NotNull(message = "Paid Out Frequency can not be null") PaidOutFrequencyEnum paidOutFrequency, @Valid SeniorityLevelDTO seniorityLevel) {
+    public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Long serviceId, @NotNull(message = "union can not be null") Long unionId,
+                               int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @NotNull(message = "Paid Out Frequency can not be null") PaidOutFrequencyEnum paidOutFrequency, @Valid SeniorityLevelDTO seniorityLevel) {
         this.name = name;
         this.description = description;
         this.startDateMillis = startDateMillis;
@@ -200,7 +192,7 @@ public class CountryExpertiseDTO {
         this.unionId = unionId;
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
-        this.payTableId = payTableId;
+
         this.paidOutFrequency = paidOutFrequency;
         this.seniorityLevel = seniorityLevel;
     }
