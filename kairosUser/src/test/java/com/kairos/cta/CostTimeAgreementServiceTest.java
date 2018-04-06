@@ -3,6 +3,8 @@ package com.kairos.cta;
 import com.kairos.UserServiceApplication;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.config.OrderTest;
+
+import com.kairos.persistence.model.enums.FixedValueType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.cta.*;
@@ -122,7 +124,7 @@ public class CostTimeAgreementServiceTest {
         ctaRuleTemplateDTO.setCompensationTable(compensationTable);
         // Get currency
         Currency currency = currencyService.getCurrencyByCountryId(countryId);
-        FixedValue fixedValue = new FixedValue(10, currency, FixedValue.Type.PER_ACTIVITY);
+        FixedValue fixedValue = new FixedValue(10, currency, FixedValueType.PER_ACTIVITY);
         ctaRuleTemplateDTO.setCalculateValueAgainst(new CalculateValueAgainst(CalculateValueAgainst.CalculateValueType.FIXED_VALUE, 10.5f, fixedValue));
         ctaRuleTemplateDTO.setApprovalWorkFlow(ApprovalWorkFlow.NO_APPROVAL_NEEDED);
         ctaRuleTemplateDTO.setBudgetType(BudgetType.ACTIVITY_COST);
