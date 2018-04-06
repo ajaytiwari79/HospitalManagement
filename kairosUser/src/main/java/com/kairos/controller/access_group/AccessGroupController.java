@@ -129,8 +129,8 @@ public class AccessGroupController {
     }
 
     @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}/auth/access_page", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> assignPermission(@RequestParam(value = "updateChildren") Boolean updateChildren, @PathVariable long accessGroupId, @RequestBody AccessPermissionDTO accessPermissionDTO) {
-        accessGroupService.assignPermission(accessGroupId,accessPermissionDTO, updateChildren);
+    public ResponseEntity<Map<String, Object>> assignPermission(@PathVariable long accessGroupId, @RequestBody AccessPermissionDTO accessPermissionDTO) {
+        accessGroupService.assignPermission(accessGroupId,accessPermissionDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
 
     }
