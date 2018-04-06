@@ -16,20 +16,20 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise, Long> {
 
-    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) return expertise")
+    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false}) return expertise")
     List<Expertise> getAllExpertiseByCountry(long countryId);
 
-    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) return expertise LIMIT 1")
+    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false}) return expertise LIMIT 1")
     Expertise getOneDefaultExpertiseByCountry(long countryId);
 
-    /*@Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) return expertise")*/
-    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true}) with expertise, country \n" +
+    /*@Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false}) return expertise")*/
+    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false}) with expertise, country \n" +
             "OPTIONAL MATCH (expertise)-[:HAS_TAG]-(tag:Tag)<-[:COUNTRY_HAS_TAG]-(country) WHERE tag.deleted=false AND tag.masterDataType='EXPERTISE' with expertise,tag\n" +
             "RETURN id(expertise) as id, expertise.name as name, expertise.description as description,CASE when tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag})  END as tags")
     List<ExpertiseTagDTO> getAllExpertiseWithTagsByCountry(long countryId);
 
     @Override
-    @Query("MATCH (expertise:Expertise{isEnabled:true}) return expertise")
+    @Query("MATCH (expertise:Expertise{deleted:false}) return expertise")
     List<Expertise> findAll();
 
     @Query("Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill:Skill) where id(expertise)={0} AND id(skill)={1} return count(r) as countOfRel")
@@ -52,23 +52,23 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "return collect({id:id(skillCategory),name:skillCategory.name,children:skill}) as skills")
     ExpertiseSkillQueryResult getExpertiseSkills(long expertiseId, long countryId);
 
-    @Query("match (e:Expertise{isEnabled:true}) where id(e) in {0} \n" +
+    @Query("match (e:Expertise{deleted:false}) where id(e) in {0} \n" +
             "return count (e) as totalMatched")
     Long findAllExpertiseCountMatchedByIds(List<Long> ids);
 
-    @Query("match (e:Expertise{isEnabled:true}) where id(e) in {0} \n" +
+    @Query("match (e:Expertise{deleted:false}) where id(e) in {0} \n" +
             "return id(e) as id,e.name as name,e.description as description")
     List<ExpertiseDTO> getAllFreeExpertises(List<Long> ids);
 
-    @Query("match (e:Expertise{isEnabled:true})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} return e LIMIT 1")
+    @Query("match (e:Expertise{deleted:false})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} return e LIMIT 1")
     Expertise getExpertiesByCountry(Long id);
 
 
-    @Query("MATCH (org:Organization) - [:" + BELONGS_TO + "] -> (country)<-[:BELONGS_TO]-(expertise:Expertise{isEnabled:true})  where id(org)={0} return expertise")
+    @Query("MATCH (org:Organization) - [:" + BELONGS_TO + "] -> (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false})  where id(org)={0} return expertise")
     List<Expertise> getAllExpertiseByOrganizationId(long unitId);
 
 
-    @Query("match (e:Expertise{isEnabled:true})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} AND id(e) = {1} return e")
+    @Query("match (e:Expertise{deleted:false})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} AND id(e) = {1} return e")
     Expertise getExpertiesOfCountry(Long countryId, Long expertiseId);
 
 
@@ -112,7 +112,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     ExpertiseQueryResult getParentExpertiseByExpertiseId(Long expertiseId);
 
 
-    @Query("match (expertise:Expertise{isEnabled:true}) where id(expertise) IN {0} \n" +
+    @Query("match (expertise:Expertise{deleted:false}) where id(expertise) IN {0} \n" +
             "return id(expertise) as id,expertise.name as name,expertise.description as description")
     List<Expertise> getExpertiseByIdsIn(List<Long> ids);
 

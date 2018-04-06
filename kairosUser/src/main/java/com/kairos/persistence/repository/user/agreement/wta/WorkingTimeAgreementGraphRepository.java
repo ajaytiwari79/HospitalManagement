@@ -19,7 +19,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository<WorkingTimeAgreement, Long> {
 
     @Query("MATCH (wta:WorkingTimeAgreement {deleted:false}) where id(wta)={0} \n" +
-            "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true})\n" +
+            "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{deleted:false})\n" +
             "return wta")
     WorkingTimeAgreement getWta(Long wtaId);
 
@@ -33,7 +33,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, Long wtaId, Long organizationTypeId, Long subOrganizationTypeId);
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where id(o)={0}\n" +
-            "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertises:Expertise{isEnabled:true})\n" +
+            "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertises:Expertise{deleted:false})\n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTempCatg:RuleTemplateCategory)" +
             "with wta,o,expertises,ruleTemp,ruleTempCatg\n" +
             "with wta,expertises, CASE  WHEN ruleTemp IS NOT NULL THEN collect({disabled:ruleTemp.disabled,daysLimit:ruleTemp.daysLimit,fromDayOfWeek:ruleTemp.fromDayOfWeek," +
@@ -53,7 +53,7 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     List<WTAResponseDTO> getAllWTAByOrganizationTypeId(long organizationId);
 
     @Query("match(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={0} \n" +
-            "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{isEnabled:true}) \n" +
+            "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{deleted:false}) \n" +
             "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]->(orgType:OrganizationType)\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orgSubType:OrganizationType) \n" +
             "optional match(wta)-[:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)-[:" + HAS_RULE_TEMPLATES + "]-(ruleTempCatg:RuleTemplateCategory)\n" +
@@ -127,19 +127,19 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     @Query("match (wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={3}\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where Id(o)={1}\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orSubType:OrganizationType) where Id(orSubType)={0}\n" +
-            "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(exp:Expertise{isEnabled:true}) where Id(exp)={2}\n" +
+            "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(exp:Expertise{deleted:false}) where Id(exp)={2}\n" +
             "return wta")
     WorkingTimeAgreement checkUniquenessOfData(long orgSubTypeId, long orgTypeId, long expertiseId, long countryId);
 
     @Query("match (wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where id(c)={3} AND Id(wta) <> {4}\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_TYPE + "]->(o:OrganizationType) where Id(o)={1}\n" +
             "match(wta)-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(orSubType:OrganizationType) where Id(orSubType)={0}\n" +
-            "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(exp:Expertise{isEnabled:true}) where Id(exp)={2}\n" +
+            "match(wta)-[:" + HAS_EXPERTISE_IN + "]->(exp:Expertise{deleted:false}) where Id(exp)={2}\n" +
             "return wta")
     WorkingTimeAgreement checkUniquenessOfDataExcludingCurrent(long orgSubTypeId, long orgTypeId, long expertiseId, long countryId, long wtaId);
 
     @Query("match (linkedEx:Expertise{deleted:false})<-[:" + HAS_EXPERTISE_IN + "]-(wta:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(o:OrganizationType) where id(o)={1}\n" +
-            "with collect (id(linkedEx)) as linkedExpertiseIds match(allExp:Expertise{isEnabled:true})-[:" + BELONGS_TO + "]->(c:Country) where Id(c)={0} \n" +
+            "with collect (id(linkedEx)) as linkedExpertiseIds match(allExp:Expertise{deleted:false})-[:" + BELONGS_TO + "]->(c:Country) where Id(c)={0} \n" +
             "with linkedExpertiseIds, collect (id(allExp)) as allExpertiseIds\n" +
             "return linkedExpertiseIds,allExpertiseIds")
     ExpertiseIdListDTO getAvailableAndFreeExpertise(long countryId, long organizationSubTypeId);
