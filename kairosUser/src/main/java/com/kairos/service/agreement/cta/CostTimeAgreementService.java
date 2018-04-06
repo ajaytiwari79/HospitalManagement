@@ -689,7 +689,7 @@ public class CostTimeAgreementService extends UserBaseService {
             List<Long> parentActivityIds = ruleTemplateDTO.getActivityIds();
             List<Long> unitActivityIds = new ArrayList<Long>();
             parentActivityIds.forEach(parentActivityId ->{
-                if( Optional.ofNullable( parentUnitActivityMap.get(parentActivityId) ).isPresent() ){
+                if(Optional.ofNullable(parentUnitActivityMap).isPresent() && Optional.ofNullable( parentUnitActivityMap.get(parentActivityId) ).isPresent() ){
                     unitActivityIds.add(parentUnitActivityMap.get(parentActivityId));
                 }
             });
