@@ -44,6 +44,7 @@ ext {
 }
 
 dependencies {
+	compile project (':dto')
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-aop') //c
 	compile('org.springframework.boot:spring-boot-starter-cache') //c
