@@ -118,8 +118,6 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "return unitPosition")
     List<UnitPosition> getAllUEPByExpertise(Long unitId, Long staffId, Long expertiseId);
 
-    @Query("match(u:UnitEmployment)-[:HAS_UNIT_EMPLOYMENT_POSITION]-(uep:UnitPosition{deleted:false}) where id(uep)={0} return Id(u)")
-    Long findEmploymentByUnitPosition(Long unitEmploymentPositionId);
 
     @Query("match(s:Staff)-[:" + BELONGS_TO_STAFF + "]-(unitPosition:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1}  AND Id(unitPosition)<>{3}\n" +
             "match(unitPosition)-[:" + HAS_EXPERTISE_IN + "]-(e:Expertise) where id(e)={2}\n" +
