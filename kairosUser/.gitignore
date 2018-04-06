@@ -1,0 +1,15 @@
+.idea/
+
+.gradle/
+
+build/
+
+gradle/
+
+logs/
+
+out/
+
+.sonar
+classes/
+kairosActivity.iml
