@@ -17,6 +17,7 @@ public class TimebankWrapper {
     private LocalDate unitPositionEndDate;
     private Long countryId;
     private int minutesFromCta;
+    private String unitTimeZone;
 
 
     public TimebankWrapper(Long unitPositionId) {
@@ -24,6 +25,14 @@ public class TimebankWrapper {
     }
 
     public TimebankWrapper() {
+    }
+
+    public String getUnitTimeZone() {
+        return unitTimeZone;
+    }
+
+    public void setUnitTimeZone(String unitTimeZone) {
+        this.unitTimeZone = unitTimeZone;
     }
 
     public LocalDate getUnitPositionEndDate() {

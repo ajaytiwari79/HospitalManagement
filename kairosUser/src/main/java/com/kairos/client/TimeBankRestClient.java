@@ -2,7 +2,7 @@ package com.kairos.client;
 
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.client.dto.timeBank.TimebankWrapper;
+import com.kairos.client.dto.time_bank.TimebankWrapper;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -8,10 +8,12 @@ import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
-import com.kairos.activity.response.dto.time_bank.*;
-import com.kairos.activity.response.dto.time_bank.TimebankWrapper;
 import com.kairos.activity.persistence.repository.time_bank.TimeBankMongoRepository;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
+import com.kairos.activity.response.dto.time_bank.CTARuleTemplateDTO;
+import com.kairos.activity.response.dto.time_bank.CalculatedTimeBankByDateDTO;
+import com.kairos.activity.response.dto.time_bank.TimeBankDTO;
+import com.kairos.activity.response.dto.time_bank.TimebankWrapper;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.TimeTypeService;
 import com.kairos.activity.util.DateUtils;
@@ -203,14 +205,17 @@ public class TimeBankService extends MongoBaseService {
         List<ShiftQueryResultWithActivity> shiftQueryResultWithActivities = shiftMongoRepository.findAllShiftsBetweenDurationByUEP(unitPositionId, startDate, endDate);
         shiftQueryResultWithActivities = filterSubshifts(shiftQueryResultWithActivities);
         TimebankWrapper timebankWrapper = getCostTimeAgreement(unitPositionId);
-        List<DailyTimeBankEntry> dailyTimeBanksBeforeStartDate = timeBankMongoRepository.findAllByUnitPositionAndBeforeDate(unitPositionId, new DateTime(startDate).toDate());
-        Interval interval = new Interval(DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionStartDate()),new DateTime(startDate));
-        //totaltimebank is timebank without daily timebank entries
-        int totalTimeBank = timeBankCalculationService.calculateTimeBankForInterval(interval,timebankWrapper);
+        int totalTimeBankBeforeStartDate = 0;
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeTypeByCountryId(timebankWrapper.getCountryId());
-        int totalTimeBankBeforeStartDate = dailyTimeBanksBeforeStartDate != null && !dailyTimeBanksBeforeStartDate.isEmpty()
-                ? dailyTimeBanksBeforeStartDate.stream().mapToInt(dailyTimeBank -> dailyTimeBank.getTotalTimeBankMin()).sum() : 0;
-        totalTimeBankBeforeStartDate = totalTimeBankBeforeStartDate - totalTimeBank;
+        if(new DateTime(startDate).isAfter(DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionStartDate()))){
+            Interval interval = new Interval(DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionStartDate()),new DateTime(startDate));
+            //totaltimebank is timebank without daily timebank entries
+            int totalTimeBank = timeBankCalculationService.calculateTimeBankForInterval(interval,timebankWrapper);
+            List<DailyTimeBankEntry> dailyTimeBanksBeforeStartDate = timeBankMongoRepository.findAllByUnitPositionAndBeforeDate(unitPositionId, new DateTime(startDate).toDate());
+            totalTimeBankBeforeStartDate = dailyTimeBanksBeforeStartDate != null && !dailyTimeBanksBeforeStartDate.isEmpty()
+                    ? dailyTimeBanksBeforeStartDate.stream().mapToInt(dailyTimeBank -> dailyTimeBank.getTotalTimeBankMin()).sum() : 0;
+            totalTimeBankBeforeStartDate = totalTimeBankBeforeStartDate - totalTimeBank;
+        }
         timeBankDTO = timeBankCalculationService.getAdvanceViewTimeBank(totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, timebankWrapper, timeTypeDTOS);
         //timeBankDTO1.setCostTimeAgreement(getCostTimeAgreement(145l));
         return timeBankDTO;

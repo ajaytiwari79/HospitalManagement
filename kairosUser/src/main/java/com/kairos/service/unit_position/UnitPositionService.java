@@ -4,8 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.client.TimeBankRestClient;
-import com.kairos.client.dto.timeBank.CTAIntervalDTO;
-import com.kairos.client.dto.timeBank.TimebankWrapper;
+import com.kairos.client.dto.time_bank.*;
+import com.kairos.client.dto.time_bank.CTARuleTemplateDTO;
+import com.kairos.client.dto.time_bank.TimebankWrapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
@@ -501,11 +502,11 @@ public class UnitPositionService extends UserBaseService {
         return timebankWrapper;
     }
 
-    public List<com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO> getCtaRuleTemplateDtos(CTAListQueryResult ctaListQueryResult){
-        List<com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO> ctaRuleTemplateDTOS = new ArrayList<>(ctaListQueryResult.getRuleTemplates().size());
+    public List<CTARuleTemplateDTO> getCtaRuleTemplateDtos(CTAListQueryResult ctaListQueryResult){
+        List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ctaListQueryResult.getRuleTemplates().size());
         List<CTARuleTemplateQueryResult> ruleTemplateQueryResults = getObjects(ctaListQueryResult.getRuleTemplates(), new TypeReference<List<CTARuleTemplateQueryResult>>() {});
         ruleTemplateQueryResults.forEach(rt->{
-            com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO ctaRuleTemplateDTO = new com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO();
+            CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO();
             ctaRuleTemplateDTO.setGranularity((int)rt.getCompensationTable().get("granularityLevel"));
             ctaRuleTemplateDTO.setActivityIds(rt.getActivityIds().stream().map(ac->new BigInteger(ac.toString())).collect(Collectors.toList()));
             ctaRuleTemplateDTO.setName(rt.getName());
@@ -517,7 +518,9 @@ public class UnitPositionService extends UserBaseService {
             ctaRuleTemplateDTO.setPlannedTimeId(rt.getPlannedTimeId());
             ctaRuleTemplateDTO.setCalculateScheduledHours(rt.isCalculateScheduledHours());
             ctaRuleTemplateDTO.setEmploymentTypes(rt.getEmploymentTypes());
-            ctaRuleTemplateDTO.setAccountType(rt.getPlannedTimeWithFactor().getAccountType().name());
+            if(rt.getPlannedTimeWithFactor().getAccountType()!=null) {
+                ctaRuleTemplateDTO.setAccountType(rt.getPlannedTimeWithFactor().getAccountType().name());
+            }
             ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
         });
         return ctaRuleTemplateDTOS;
