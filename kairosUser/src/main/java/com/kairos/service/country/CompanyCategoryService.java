@@ -1,5 +1,6 @@
 package com.kairos.service.country;
 
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
@@ -30,17 +31,17 @@ public class CompanyCategoryService extends UserBaseService {
 
     public CompanyCategoryDTO createCompanyCategory(Long countryId, CompanyCategoryDTO companyCategoryDTO) {
         if (companyCategoryDTO.getName().trim().isEmpty()) {
-            throw new DataNotMatchedException("Name can't be blank");
+            throw new ActionNotPermittedException("Company category Name can't be blank");
         }
-        Country country = countryGraphRepository.findOne(countryId);
-        if (!Optional.ofNullable(country).isPresent()) {
+        Optional<Country> country = countryGraphRepository.findById(countryId);
+        if (!Optional.ofNullable(country.get()).isPresent()) {
             throw new DataNotFoundByIdException("Country not found: " + countryId);
         }
-        boolean isAlreadyExists = companyCategoryGraphRepository.findByNameExcludingCurrent(countryId, -1L, "(?i)" + companyCategoryDTO.getName().trim());
+        boolean isAlreadyExists = companyCategoryGraphRepository.findByCountryAndNameExcludingCurrent(countryId, -1L, "(?i)" + companyCategoryDTO.getName().trim());
         if (isAlreadyExists) {
-            throw new DuplicateDataException("CompanyCategory already exists: " + companyCategoryDTO.getName().trim());
+            throw new DuplicateDataException("Company category already exists: " + companyCategoryDTO.getName().trim());
         }
-        CompanyCategory companyCategory = new CompanyCategory(companyCategoryDTO.getName().trim(), companyCategoryDTO.getDescription(), country);
+        CompanyCategory companyCategory = new CompanyCategory(companyCategoryDTO.getName().trim(), companyCategoryDTO.getDescription(), country.get());
         save(companyCategory);
         return new CompanyCategoryDTO(companyCategory.getId(), companyCategory.getName(), companyCategory.getDescription());
     }
@@ -52,16 +53,16 @@ public class CompanyCategoryService extends UserBaseService {
     public CompanyCategoryResponseDTO updateCompanyCategory(Long countryId, CompanyCategoryDTO companyCategoryDTO) {
 
         if (companyCategoryDTO.getName().trim().isEmpty()) {
-            throw new DataNotMatchedException("Name can't be blank");
+            throw new ActionNotPermittedException("Company category Name can't be blank");
         }
         CompanyCategory companyCategory = companyCategoryGraphRepository.findByCountryAndCompanycategory(countryId, companyCategoryDTO.getId());
         if (!Optional.ofNullable(companyCategory).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid CompanyCategory " + companyCategoryDTO.getId());
+            throw new DataNotFoundByIdException("Invalid Company category " + companyCategoryDTO.getId());
         }
         if (!companyCategoryDTO.getName().trim().equalsIgnoreCase(companyCategory.getName())) {
-            boolean isAlreadyExists = companyCategoryGraphRepository.findByNameExcludingCurrent(countryId, companyCategoryDTO.getId(), "(?i)" + companyCategoryDTO.getName().trim());
+            boolean isAlreadyExists = companyCategoryGraphRepository.findByCountryAndNameExcludingCurrent(countryId, companyCategoryDTO.getId(), "(?i)" + companyCategoryDTO.getName().trim());
             if (isAlreadyExists) {
-                throw new DuplicateDataException("CompanyCategory already exists: " + companyCategoryDTO.getName().trim());
+                throw new DuplicateDataException("Company category already exists: " + companyCategoryDTO.getName().trim());
             }
         }
         companyCategory.setName(companyCategoryDTO.getName().trim());

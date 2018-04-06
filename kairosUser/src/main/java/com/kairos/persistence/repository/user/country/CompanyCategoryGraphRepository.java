@@ -25,6 +25,6 @@ public interface CompanyCategoryGraphRepository extends Neo4jBaseRepository<Comp
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(companyCategory:CompanyCategory{deleted:false}) where id(country)={0} AND id(companyCategory) <> {1} AND companyCategory.name=~{2} " +
             "with count(companyCategory) as companyCategoryCount return CASE when companyCategoryCount>0 THEN  true ELSE false END as response ")
-    boolean findByNameExcludingCurrent(Long countryId, Long companyCategoryId, String name);
+    boolean findByCountryAndNameExcludingCurrent(Long countryId, Long companyCategoryId, String name);
 
 }
