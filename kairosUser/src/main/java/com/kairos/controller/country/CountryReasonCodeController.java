@@ -40,7 +40,7 @@ public class CountryReasonCodeController {
     @ApiOperation(value = "Get ReasonCodes by countryId")
     @RequestMapping(value = COUNTRY_URL + "/reason_codes", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getReasonCodes(@RequestParam("reasonCodeType") ReasonCodeType reasonCodeType ,@PathVariable long countryId) {
+    public ResponseEntity<Map<String, Object>> getReasonCodes(@RequestParam("reasonCodeType") ReasonCodeType reasonCodeType , @PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, reasonCodeService.getReasonCodes(countryId,reasonCodeType));
 
     }
