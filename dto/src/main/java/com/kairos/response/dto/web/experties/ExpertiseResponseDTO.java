@@ -25,7 +25,7 @@ public class ExpertiseResponseDTO {
     private Long unionId;
     private int fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
-    private Long payTableId;
+
     private PaidOutFrequencyEnum paidOutFrequency;
     private List<SeniorityLevelDTO> seniorityLevels = new ArrayList<>();
     private List<Long> tags;
@@ -123,13 +123,6 @@ public class ExpertiseResponseDTO {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-    public Long getPayTableId() {
-        return payTableId;
-    }
-
-    public void setPayTableId(Long payTableId) {
-        this.payTableId = payTableId;
-    }
 
     public PaidOutFrequencyEnum getPaidOutFrequency() {
         return paidOutFrequency;

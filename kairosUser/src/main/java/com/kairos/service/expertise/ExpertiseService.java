@@ -278,11 +278,8 @@ public class ExpertiseService extends UserBaseService {
         expertise.setUnion(union);
         expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
         expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
-        PayTable payTable = payTableGraphRepository.findOne(expertiseDTO.getPayTableId());
-        if (!Optional.ofNullable(payTable).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid pay Table id " + expertiseDTO.getPayTableId());
-        }
-        expertise.setPayTable(payTable);
+
+
         expertise.setPaidOutFrequency(expertiseDTO.getPaidOutFrequency());
         SeniorityLevel seniorityLevel = null;
         if (expertiseDTO.getSeniorityLevel() != null) {
@@ -367,7 +364,7 @@ public class ExpertiseService extends UserBaseService {
         Boolean basePayGrade = seniorityLevelGraphRepository.checkPayGradeInSeniorityLevel(expertiseDTO.getId(), seniorityLevelToUpdate.get().getId(), expertiseDTO.getSeniorityLevel().getPayGradeId());
 
         if (basePayGrade) {
-            throw new DuplicateDataException("base Pay grade already exist in expertise");
+            throw new DuplicateDataException("Base Pay grade already exist in expertise");
         }
 
         ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
@@ -510,13 +507,7 @@ public class ExpertiseService extends UserBaseService {
             }
             expertise.setUnion(union);
         }
-        if (!expertise.getPayTable().getId().equals(expertiseDTO.getPayTableId())) {
-            PayTable payTable = payTableGraphRepository.findOne(expertiseDTO.getPayTableId());
-            if (!Optional.ofNullable(payTable).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid pay Table id " + expertiseDTO.getPayTableId());
-            }
-            expertise.setPayTable(payTable);
-        }
+
         expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
         expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
         expertise.setPaidOutFrequency(expertiseDTO.getPaidOutFrequency());

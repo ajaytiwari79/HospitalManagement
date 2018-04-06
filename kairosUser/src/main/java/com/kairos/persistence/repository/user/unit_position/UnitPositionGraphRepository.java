@@ -42,29 +42,6 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.totalWeeklyMinutes as totalWeeklyMinutes")
     StaffUnitPositionDetails getUnitPositionById(long unitEmploymentId);
 
-    /* Error while binding to WTA
-    * java.lang.IllegalArgumentException: Can not set com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO field com.kairos.persistence.model.user.position_code.StaffUnitEmploymentDetails.workingTimeAgreement to java.util.Collections$UnmodifiableMap
-    * */
-    @Query("match(s:Staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false})-[:" + IN_UNIT + "]-(o:Organization) where id(o)={0} AND id(s)={1} \n" +
-            "match(unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
-            "match(unitPosition)-[:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
-            "match(unitPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false})" +
-            "optional match (unitPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement)\n" +
-            "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement)\n" +
-            "optional match (unitPosition)-[:" + RelationshipConstants.SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true})\n" +
-            "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union," +
-            "positionCode as positionCode," +
-            "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes," +
-            "unitPosition.startDateMillis as startDateMillis," +
-            "unitPosition.endDateMillis as endDateMillis," +
-            "unitPosition.salary as salary," +
-            "unitPosition.workingDaysInWeek as workingDaysInWeek," +
-            "employmentType as employmentType," +
-            "unitPosition.hourlyWages as hourlyWages," +
-            "id(unitPosition)   as id," +
-            "unitPosition.avgDailyWorkingHours as avgDailyWorkingHours," +
-            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis")
-    List<UnitPositionQueryResult> getAllUnitPositionsByStaff(Long unitId, Long staffId);
 
     @Query("Match (org:Organization) where id(org)={0} WITH org\n" +
             "Match (e:Expertise) where id(e)={1} WITH e,org\n" +
@@ -145,62 +122,52 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     CostTimeAgreement getCTALinkedWithUnitPosition(Long unitPositionId);
 
     @Query(
-          /*  "MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0} \n" +
-            "with staff \n" +
-            "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
-            "with staff,employment,org \n" +
-            "match(org)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization) with org,subOrg,staff,employment \n" +
-            "optional match(subOrg)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff) with unitPosition,org,subOrg,staff,employment \n" +
-            "match(unitPosition)-[:HAS_EXPERTISE_IN ]->(expertise:Expertise) \n" +
-            "match(unitPosition)-[rel:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
-            "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
-            "optional match (unitPosition)-[:HAS_WTA ]->(wta:WorkingTimeAgreement) \n" +
-            "optional match (unitPosition)-[:HAS_CTA]->(cta:CostTimeAgreement) \n" +
-            "optional match (unitPosition)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
-            "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union, \n" +
-            "positionCode as positionCode, \n" +
-            "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, \n" +
-            "unitPosition.startDateMillis as startDateMillis, \n" +
-            "unitPosition.endDateMillis as endDateMillis, \n" +
-            "unitPosition.salary as salary, \n" +
-            "unitPosition.workingDaysInWeek as workingDaysInWeek, \n" +
-            "{employmentTypeCategory:rel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentTypes, \n" +
-            "unitPosition.hourlyWages as hourlyWages, \n" +
-            "id(unitPosition)   as id, \n" +
-            "unitPosition.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
-            "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis, \n" +
-            "id(org) as parentUnitId, \n" +
-            "id(subOrg) as unitId " +
-            "UNION " + */
-            "MATCH (user:User)-[:BELONGS_TO]-(staff:Staff) where id(user)={0}\n" +
-                    "match(staff)<-[:BELONGS_TO]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
-                    "with staff,employment,org \n" +
-                    "match(org)<-[:IN_UNIT]-(unitPosition:UnitPosition{deleted:false})<-[:BELONGS_TO_STAFF]-(staff)  \n" +
-                    "match(unitPosition)-[:HAS_EXPERTISE_IN ]->(expertise:Expertise) \n" +
-                    "match(unitPosition)-[employmentRel:HAS_EMPLOYMENT_TYPE]->(employmentType:EmploymentType) \n" +
-                    "match(unitPosition)-[:HAS_POSITION_CODE]->(positionCode:PositionCode{deleted:false}) \n" +
-                    "match(unitPosition)-[:HAS_SENIORITY_LEVEL]->(seniorityLevel:SeniorityLevel)-[:HAS_BASE_PAY_GRADE ]->(payGrade:PayGrade)" +
-                    "MATCH (unitPosition)-[:HAS_WTA ]->(wta:WorkingTimeAgreement) \n" +
-                    "MATCH (unitPosition)-[:HAS_REASON_CODE ]->(reasonCode:ReasonCode) \n" +
-                    "optional match (unitPosition)-[:HAS_CTA]->(cta:CostTimeAgreement) \n" +
-                    "optional match (unitPosition)-[:SUPPORTED_BY_UNION]->(unionData:Organization{isEnable:true,union:true}) \n" +
-                    "optional match(unitPosition)-[rel:HAS_FUNCTION]->(functions:Function)" +
+            "MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} \n" +
+                    "match(staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) \n" +
+                    "match(org)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization) with org,subOrg,staff,employment \n" +
+                    "optional match(subOrg)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition{deleted:false})<-[:" + BELONGS_TO_STAFF + "]-(staff) with unitPosition,org,subOrg,staff,employment \n" +
+                    "match(unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
+                    "match(unitPosition)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
+                    "match(unitPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false}) \n" +
+                    "match(unitPosition)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade)" +
+                    "match (unitPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement) \n" +
+                    "MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
+                    "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement) \n" +
+                    "optional match (unitPosition)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
+                    "optional match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function)" +
+                    "with expertise ,org,subOrg,reasonCode,unitPosition,wta,cta,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData " +
+                    "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union, positionCode as positionCode, \n" +
+                    " {id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
+                    " freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGrade:{id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}} as seniorityLevels, \n" +
+                    "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis, \n" +
+                    "unitPosition.salary as salary,id(reasonCode) as reasonCodeId,unitPosition.workingDaysInWeek as workingDaysInWeek, \n" +
+                    "{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentTypes, \n" +
+                    "unitPosition.hourlyWages as hourlyWages, id(unitPosition) as id,unitPosition.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
+                    "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis, id(org) as parentUnitId, id(subOrg) as unitId " +
+                    "UNION " +
+                    "MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0}\n" +
+                    "match(staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:HAS_EMPLOYMENTS]-(org:Organization) \n" +
+                    "match(org)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition{deleted:false})<-[:" + BELONGS_TO_STAFF + "]-(staff)  \n" +
+                    "match(unitPosition)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) \n" +
+                    "match(unitPosition)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
+                    "match(unitPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false}) \n" +
+                    "match(unitPosition)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade)" +
+                    "MATCH (unitPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement) \n" +
+                    "MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
+                    "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement) \n" +
+                    "optional match (unitPosition)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
+                    "optional match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function)" +
                     "with expertise ,org,reasonCode,unitPosition,wta,cta,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData " +
                     "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union, positionCode as positionCode,\n" +
                     " {id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
                     " freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGrade:{id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}} as seniorityLevels, \n" +
-                    "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, \n" +
-                    "unitPosition.startDateMillis as startDateMillis, \n" +
-                    "unitPosition.endDateMillis as endDateMillis, \n" +
-                    "unitPosition.salary as salary, id(reasonCode) as reasonCodeId,\n" +
+                    "unitPosition.totalWeeklyMinutes as totalWeeklyMinutes, unitPosition.startDateMillis as startDateMillis, unitPosition.endDateMillis as endDateMillis, unitPosition.salary as salary, id(reasonCode) as reasonCodeId,\n" +
                     "unitPosition.workingDaysInWeek as workingDaysInWeek, \n" +
                     "{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentTypes, \n" +
-                    "unitPosition.hourlyWages as hourlyWages, \n" +
-                    "id(unitPosition) as id, \n" +
+                    "unitPosition.hourlyWages as hourlyWages, id(unitPosition) as id, \n" +
                     "unitPosition.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
                     "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis, \n" +
-                    "id(org) as parentUnitId, \n" +
-                    "id(org) as unitId ")
+                    "id(org) as parentUnitId,id(org) as unitId ")
     List<UnitPositionQueryResult> getAllUnitPositionsByUser(long userId);
 //id:id(seniorityLevel)," +
 
@@ -213,4 +180,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("match(unitPosition)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)  where id(unitPosition)={0} return unitPosition,employmentRel,employmentType")
     UnitPositionEmploymentTypeRelationShip findEmploymentTypeByUnitPositionId(Long unitPositionId);
+
+    @Query("match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function) where id(unitPosition)={0}  detach delete rel")
+    void removeOlderFunctionsFromUnitPosition(Long unitPositionId);
 }

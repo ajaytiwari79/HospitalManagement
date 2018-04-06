@@ -56,9 +56,6 @@ public class Expertise extends UserBaseEntity {
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
-    // TODO REMOVE.
-    @Relationship(type = HAS_PAY_TABLE)
-    private PayTable payTable;
 
     private PaidOutFrequencyEnum paidOutFrequency;
 
@@ -172,13 +169,6 @@ public class Expertise extends UserBaseEntity {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-    public PayTable getPayTable() {
-        return payTable;
-    }
-
-    public void setPayTable(PayTable payTable) {
-        this.payTable = payTable;
-    }
 
     public PaidOutFrequencyEnum getPaidOutFrequency() {
         return paidOutFrequency;

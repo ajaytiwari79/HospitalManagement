@@ -126,10 +126,7 @@ public class SeniorityLevelDTO {
     public SeniorityLevelDTO(Integer from, Integer to, Long payGradeId, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension) {
         this.from = from;
         this.to = to;
-
-
         this.payGradeId = payGradeId;
-
         this.pensionPercentage = pensionPercentage;
         this.freeChoicePercentage = freeChoicePercentage;
         this.freeChoiceToPension = freeChoiceToPension;
