@@ -59,7 +59,7 @@ public class PeriodSettingsService extends MongoBaseService {
         PeriodSettings periodSettings = periodSettingsMongoRepository.findOne(periodSettingsId);
         if (!Optional.ofNullable(periodSettings).isPresent()) {
             logger.info("Periodsetting not found {}" , periodSettingsId);
-            throw new DataNotFoundByIdException("Period setting not found " + periodSettingsId);
+            throw new DataNotFoundByIdException("PlanningPeriod setting not found " + periodSettingsId);
         }
         periodSettings.setPresenceLimitInYear(periodSettingsDTO.getPresenceLimitInYear());
         periodSettings.setAbsenceLimitInYear(periodSettingsDTO.getAbsenceLimitInYear());

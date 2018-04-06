@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(OrderTestRunner.class)
 @SpringBootTest(classes = KairosActivityApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class PeriodSettingsServiceTest {
+public class PlanningPeriodSettingsServiceTest {
 
     @Value("${server.host.http.url}")
     private String url;
@@ -37,7 +37,7 @@ public class PeriodSettingsServiceTest {
         String baseUrl = getBaseUrl(71L, null,53L);
     }
 
-    public void createPhaseInCountry() throws Exception {
+    /*public void createPhaseInCountry() throws Exception {
         PhaseDTO testPhase = new PhaseDTO("TEST", "TEST Phase", 1, DurationType.WEEKS, 19, 53L);
         String baseUrl = getBaseUrl(71L, null,53L);
         HttpEntity<PhaseDTO> entity = new HttpEntity<>(testPhase);
@@ -51,7 +51,7 @@ public class PeriodSettingsServiceTest {
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.CONFLICT.equals(response.getStatusCode()));
         Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()));
         createdIdForDelete = createdId = response.getBody().getData().getId();
-    }
+    }*/
 
     @Test
     public void getPeriodSettings() throws Exception {
