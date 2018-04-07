@@ -101,12 +101,12 @@ public class ActivityService extends MongoBaseService {
             logger.error("ActivityName already exist" + activityDTO.getName());
             throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
         }
+        activity = activityDTO.buildActivity();
+        initializeActivityTabs(activity, countryId);
         activity.getTimeCalculationActivityTab().setMultiplyWith(true);
         activity.getTimeCalculationActivityTab().setMultiplyWithValue(1d);
         activity.getTimeCalculationActivityTab().setFixedTimeValue(0l);
         activity.getTimeCalculationActivityTab().setDefaultStartTime(LocalTime.of(7,0));
-        activity = activityDTO.buildActivity();
-        initializeActivityTabs(activity, countryId);
         save(activity);
         // Fetch tags detail
         List<TagDTO> tags = tagMongoRepository.getTagsById(activityDTO.getTags());
