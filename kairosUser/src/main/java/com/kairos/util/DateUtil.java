@@ -227,8 +227,15 @@ public class DateUtil {
     }
 
 
+
     public static Date getCurrentDate(){
         //TODO this cant be system's date. this gotta be unit;s date. sachin
         return new Date();
     }
+
+    public static Long getCurrentDateMillis() {
+        DateTime date = new DateTime().withTime(0, 0, 0, 0);
+        return date.getMillis();
+    }
+
 }

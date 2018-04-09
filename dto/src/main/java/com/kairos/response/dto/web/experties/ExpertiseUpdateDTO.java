@@ -37,8 +37,6 @@ public class ExpertiseUpdateDTO {
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
-    @NotNull(message = "PayTable can not be null")
-    private Long payTableId;
     @NotNull(message = "Paid Out Frequency can not be null")
     private PaidOutFrequencyEnum paidOutFrequency;
 
@@ -133,13 +131,7 @@ public class ExpertiseUpdateDTO {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-    public Long getPayTableId() {
-        return payTableId;
-    }
 
-    public void setPayTableId(Long payTableId) {
-        this.payTableId = payTableId;
-    }
 
     public PaidOutFrequencyEnum getPaidOutFrequency() {
         return paidOutFrequency;
