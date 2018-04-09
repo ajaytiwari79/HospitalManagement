@@ -1,31 +1,45 @@
-package com.kairos.client.dto.timeBank;
+package com.kairos.activity.response.dto.time_bank;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.joda.time.DateTimeZone;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
-public class TimebankWrapper {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UnitPositionWithCtaDetailsDTO {
 
     private Long unitPositionId;
-    private List<CTARuleTemplateBasicDTO> ctaRuleTemplates;
+    private List<CTARuleTemplateCalulatedTimeBankDTO> ctaRuleTemplates;
     private int contractedMinByWeek;
     private int workingDaysPerWeek;
     private Long staffId;
     private LocalDate unitPositionStartDate;
     private LocalDate unitPositionEndDate;
     private Long countryId;
+    private int minutesFromCta;
+    private ZoneId unitTimeZone;
 
-    public TimebankWrapper(Long unitPositionId) {
+
+    public UnitPositionWithCtaDetailsDTO(Long unitPositionId) {
         this.unitPositionId = unitPositionId;
     }
 
-    public TimebankWrapper(Long unitPositionId, int contractedMinByWeek, int workingDaysPerWeek, LocalDate unitPositionStartDate) {
-        this.unitPositionId = unitPositionId;
-        this.contractedMinByWeek = contractedMinByWeek;
-        this.workingDaysPerWeek = workingDaysPerWeek;
-        this.unitPositionStartDate = unitPositionStartDate;
+    public UnitPositionWithCtaDetailsDTO() {
     }
 
-    public TimebankWrapper() {
+    public DateTimeZone getUnitDateTimeZone() {
+        return DateTimeZone.forID(unitPositionId.toString());
+    }
+
+
+    public ZoneId getUnitTimeZone() {
+        return unitTimeZone;
+    }
+
+    public void setUnitTimeZone(ZoneId unitTimeZone) {
+        this.unitTimeZone = unitTimeZone;
     }
 
     public LocalDate getUnitPositionEndDate() {
@@ -34,6 +48,18 @@ public class TimebankWrapper {
 
     public void setUnitPositionEndDate(LocalDate unitPositionEndDate) {
         this.unitPositionEndDate = unitPositionEndDate;
+    }
+
+    public int getMinutesFromCta() {
+        return minutesFromCta;
+    }
+
+    public void setMinutesFromCta(int minutesFromCta) {
+        this.minutesFromCta = minutesFromCta;
+    }
+
+    public UnitPositionWithCtaDetailsDTO(LocalDate unitPositionStartDate) {
+        this.unitPositionStartDate = unitPositionStartDate;
     }
 
     public Long getCountryId() {
@@ -51,6 +77,7 @@ public class TimebankWrapper {
     public void setUnitPositionStartDate(LocalDate unitPositionStartDate) {
         this.unitPositionStartDate = unitPositionStartDate;
     }
+
 
     public Long getStaffId() {
         return staffId;
@@ -84,11 +111,11 @@ public class TimebankWrapper {
         this.unitPositionId = unitPositionId;
     }
 
-    public List<CTARuleTemplateBasicDTO> getCtaRuleTemplates() {
+    public List<CTARuleTemplateCalulatedTimeBankDTO> getCtaRuleTemplates() {
         return ctaRuleTemplates;
     }
 
-    public void setCtaRuleTemplates(List<CTARuleTemplateBasicDTO> ctaRuleTemplates) {
+    public void setCtaRuleTemplates(List<CTARuleTemplateCalulatedTimeBankDTO> ctaRuleTemplates) {
         this.ctaRuleTemplates = ctaRuleTemplates;
     }
 

@@ -4,8 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.client.TimeBankRestClient;
-import com.kairos.client.dto.timeBank.CTAIntervalDTO;
-import com.kairos.client.dto.timeBank.TimebankWrapper;
+import com.kairos.client.dto.time_bank.*;
+import com.kairos.client.dto.time_bank.CTARuleTemplateDTO;
+import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
@@ -22,7 +23,6 @@ import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
-import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.FunctionAndSeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
@@ -633,47 +633,50 @@ public class UnitPositionService extends UserBaseService {
         return workingTimeAgreement;
     }
 
-    public TimebankWrapper getUnitPositionCTA(Long unitPositionId, Long unitId) {
+    public UnitPositionWithCtaDetailsDTO getUnitPositionCTA(Long unitPositionId, Long unitId) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-        TimebankWrapper timebankWrapper = new TimebankWrapper(unitPositionId);
-        timebankWrapper.setStaffId(unitPosition.getStaff().getId());
-        timebankWrapper.setCountryId(countryId);
-        timebankWrapper.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
-        timebankWrapper.setWorkingDaysPerWeek(unitPosition.getWorkingDaysInWeek());
-        timebankWrapper.setUnitPositionStartDate(DateUtil.asLocalDate(new Date(unitPosition.getStartDateMillis())));
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = new UnitPositionWithCtaDetailsDTO(unitPositionId);
+        unitPositionWithCtaDetailsDTO.setStaffId(unitPosition.getStaff().getId());
+        unitPositionWithCtaDetailsDTO.setCountryId(countryId);
+        unitPositionWithCtaDetailsDTO.setContractedMinByWeek(unitPosition.getTotalWeeklyMinutes());
+        unitPositionWithCtaDetailsDTO.setWorkingDaysPerWeek(unitPosition.getWorkingDaysInWeek());
+        unitPositionWithCtaDetailsDTO.setUnitPositionStartDate(DateUtil.asLocalDate(new Date(unitPosition.getStartDateMillis())));
         if (unitPosition.getEndDateMillis() != null) {
-            timebankWrapper.setUnitPositionEndDate(DateUtil.asLocalDate(new Date(unitPosition.getEndDateMillis())));
+            unitPositionWithCtaDetailsDTO.setUnitPositionEndDate(DateUtil.asLocalDate(new Date(unitPosition.getEndDateMillis())));
         }
-        timebankWrapper.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaQueryResults));
-        return timebankWrapper;
+        Optional<Organization> organization = organizationGraphRepository.findById(unitId,0);
+        unitPositionWithCtaDetailsDTO.setUnitTimeZone(organization.get().getTimeZone());
+        unitPositionWithCtaDetailsDTO.setCtaRuleTemplates(getCtaRuleTemplates(ctaQueryResults));
+        return unitPositionWithCtaDetailsDTO;
     }
 
-    public List<com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO> getCtaRuleTemplateDtos(CTAListQueryResult ctaListQueryResult) {
-        List<com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO> ctaRuleTemplateDTOS = new ArrayList<>(ctaListQueryResult.getRuleTemplates().size());
-        List<CTARuleTemplateQueryResult> ruleTemplateQueryResults = getObjects(ctaListQueryResult.getRuleTemplates(), new TypeReference<List<CTARuleTemplateQueryResult>>() {
-        });
-        ruleTemplateQueryResults.forEach(rt -> {
-            com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO ctaRuleTemplateDTO = new com.kairos.client.dto.timeBank.CTARuleTemplateBasicDTO();
-            ctaRuleTemplateDTO.setGranularity((int) rt.getCompensationTable().get("granularityLevel"));
-            ctaRuleTemplateDTO.setActivityIds(rt.getActivityIds().stream().map(ac -> new BigInteger(ac.toString())).collect(Collectors.toList()));
+    public List<CTARuleTemplateDTO> getCtaRuleTemplates(CTAListQueryResult ctaListQueryResult){
+        List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ctaListQueryResult.getRuleTemplates().size());
+        List<CTARuleTemplateQueryResult> ruleTemplateQueryResults = getObjects(ctaListQueryResult.getRuleTemplates(), new TypeReference<List<CTARuleTemplateQueryResult>>() {});
+        ruleTemplateQueryResults.forEach(rt->{
+            CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO();
+            ctaRuleTemplateDTO.setGranularity((int)rt.getCompensationTable().get("granularityLevel"));
+            ctaRuleTemplateDTO.setActivityIds(rt.getActivityIds().stream().map(ac->new BigInteger(ac.toString())).collect(Collectors.toList()));
             ctaRuleTemplateDTO.setName(rt.getName());
             ctaRuleTemplateDTO.setId(rt.getId());
             //ctaRuleTemplateDTO.setDays(rt.getCalculateOnDayTypes());
             ctaRuleTemplateDTO.setTimeTypeId(rt.getTimeTypeId() != null ? new BigInteger(rt.getTimeTypeId().toString()) : null);
             //ctaRuleTemplateDTO.setPublicHolidays();
-            ctaRuleTemplateDTO.setCtaIntervalDTOS(getCtaIntervalDto((List<CompensationTableInterval>) rt.getCompensationTable().get("compensationTableInterval")));
+            ctaRuleTemplateDTO.setCtaIntervalDTOS(getCtaInterval((List<CompensationTableInterval>) rt.getCompensationTable().get("compensationTableInterval")));
             ctaRuleTemplateDTO.setPlannedTimeId(rt.getPlannedTimeId());
             ctaRuleTemplateDTO.setCalculateScheduledHours(rt.isCalculateScheduledHours());
             ctaRuleTemplateDTO.setEmploymentTypes(rt.getEmploymentTypes());
-            ctaRuleTemplateDTO.setAccountType(rt.getPlannedTimeWithFactor().getAccountType().name());
+            if(rt.getPlannedTimeWithFactor().getAccountType()!=null) {
+                ctaRuleTemplateDTO.setAccountType(rt.getPlannedTimeWithFactor().getAccountType().name());
+            }
             ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
         });
         return ctaRuleTemplateDTOS;
     }
 
-    private List<CTAIntervalDTO> getCtaIntervalDto(List<CompensationTableInterval> compensationTableIntervals) {
+    private List<CTAIntervalDTO> getCtaInterval(List<CompensationTableInterval> compensationTableIntervals) {
         List<CTAIntervalDTO> ctaIntervalDTOS = new ArrayList<>(compensationTableIntervals.size());
         compensationTableIntervals = getObjects(compensationTableIntervals, new TypeReference<List<CompensationTableInterval>>() {
         });
