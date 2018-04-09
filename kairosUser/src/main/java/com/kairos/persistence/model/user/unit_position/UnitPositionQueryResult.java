@@ -32,8 +32,8 @@ public class UnitPositionQueryResult {
     private float hourlyWages;
     private long id;
 
-    private Map<String, Object> employmentTypes;
-    private Map<String, Object> seniorityLevels;
+    private Map<String, Object> employmentType;
+    private Map<String, Object> seniorityLevel;
     private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
@@ -215,20 +215,20 @@ public class UnitPositionQueryResult {
     }
 
 
-    public Map<String, Object> getEmploymentTypes() {
-        return employmentTypes;
+    public Map<String, Object> getEmploymentType() {
+        return employmentType;
     }
 
-    public void setEmploymentTypes(Map<String, Object> employmentTypes) {
-        this.employmentTypes = employmentTypes;
+    public void setEmploymentType(Map<String, Object> employmentType) {
+        this.employmentType = employmentType;
     }
 
-    public Map<String, Object> getSeniorityLevels() {
-        return seniorityLevels;
+    public Map<String, Object> getSeniorityLevel() {
+        return seniorityLevel;
     }
 
-    public void setSeniorityLevels(Map<String, Object> seniorityLevels) {
-        this.seniorityLevels = seniorityLevels;
+    public void setSeniorityLevel(Map<String, Object> seniorityLevel) {
+        this.seniorityLevel = seniorityLevel;
     }
 
     public UnitPositionQueryResult() {

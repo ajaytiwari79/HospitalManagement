@@ -7,14 +7,10 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.enums.EmploymentStatus;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
-import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -228,7 +224,7 @@ public class EmploymentService extends UserBaseService {
                 AccessPermission accessPermission;
                 if (parentOrganization == null) {
                     accessPermission = unitPermissionGraphRepository.getAccessPermission(unit.getId(), unitId, staffId, accessGroupId);
-                } else {
+                } else {createUni
                     accessPermission = unitPermissionGraphRepository.getAccessPermission(parentOrganization.getId(), unitId, staffId, accessGroupId);
                 }
                 AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
@@ -744,57 +740,66 @@ public class EmploymentService extends UserBaseService {
         employment.setEndDateMillis(employmentEndDate);
 
         employmentGraphRepository.save(employment);
-        moveToReadOnlyAccessGroup();
     }
 
 
     public void moveToReadOnlyAccessGroup() {
 
         Long curDateMillis = DateUtil.getCurrentDate().getTime();
+        List<UnitPermission> unitPermissions = null;
         UnitPermission unitPermission = null;
         List<Long> employmentIds = Arrays.asList(3122L,3110L,2564L,429L);
-        List<EmploymentOrganizationAccessGroupQueryResult> employmentOrganizationAccessGroupQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);
+        List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);
+        accessGroupRepository.deleteAccessGroupAndCustomizedPermission(employmentIds);
 
         List<Organization> organizations = null;
-        int orgNo = 0;
+        List<Employment> employments = null;
+        int curEle = 0;
         Employment employment = null;
+        if(expiredEmploymentsQueryResults.size()>0)
+            employments = new ArrayList<Employment>();
 
 
-        for(EmploymentOrganizationAccessGroupQueryResult employmentOrganizationAccessGroup:employmentOrganizationAccessGroupQueryResults) {
+        for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult: expiredEmploymentsQueryResults) {
 
-            organizations = employmentOrganizationAccessGroup.getOrganizations();
-            employment = employmentOrganizationAccessGroup.getEmployment();
+            organizations = expiredEmploymentsQueryResult.getOrganizations();
+            employment = expiredEmploymentsQueryResult.getEmployment();
+            unitPermissions = expiredEmploymentsQueryResult.getUnitPermissions();
+            curEle = 0;
 
-            for(AccessGroup accessGroup:employmentOrganizationAccessGroup.getAccessGroups()){
+            for(AccessGroup accessGroup:expiredEmploymentsQueryResult.getAccessGroups()){
 
                 //unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaffByEmployment( organizations.get(i).getId(), employmentOrganizationAccessGroup.getEmployment().getId() );
-                unitPermission = unitPermissionGraphRepository.findUnitPermissionOfStaffByEmployment(organizations.get(orgNo).getId(),employment.getId());
-                if(Optional.ofNullable(unitPermission).isPresent() ) {
-                    //throw new DataNotFoundByIdException("Unit permission already exist for Access Group" + staffId);
-                    accessGroupRepository.deleteAccessGroupAndCustomizedPermission(employment.getId(), organizations.get(orgNo).getId());
-                    unitPermission.setAccessGroup(accessGroup);
-                    employment.getUnitPermissions().add(unitPermission);
-                }
-                else {
+                unitPermission = unitPermissions.get(curEle);
+                if(!Optional.ofNullable(unitPermission).isPresent() ) {
                     unitPermission = new UnitPermission();
-                    unitPermission.setOrganization(organizations.get(orgNo));
+                    unitPermission.setOrganization(organizations.get(curEle));
                     unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
-                    unitPermission.setAccessGroup(accessGroup);
-                    employment.getUnitPermissions().add(unitPermission);
+
                 }
+
+                unitPermission.setAccessGroup(accessGroup);
+                employment.getUnitPermissions().add(unitPermission);
+
 
                 //  AccessGroup accessGroup = accessGroupRepository.findReadonlyAccessGroupByOrganization(accessGroupId);
 //            unitPermission = new UnitPermission();
 //            unitPermission.setOrganization(unit);
 //            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
                 //employment.getUnitPermissions().add(unitPermission);
-                orgNo++;
+                curEle++;
+
+                //unitPermissionGraphRepository.save(unitPermission);
+
             }
 
-            employmentGraphRepository.save(employment);
+            employments.add(employment);
             //employmentGraphRepository.save(employment);
 
         }
+
+        employmentGraphRepository.saveAll(employments);
+
     }
 
 }

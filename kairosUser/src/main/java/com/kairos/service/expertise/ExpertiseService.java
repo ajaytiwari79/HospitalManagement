@@ -379,7 +379,7 @@ public class ExpertiseService extends UserBaseService {
             currentExpertise.setHasVersion(true);
             copiedExpertise.setPublished(false);
             copiedExpertise.setExpertise(currentExpertise);
-            // copiedExpertise.getSeniorityLevels().clear();
+            // copiedExpertise.getSeniorityLevel().clear();
             // Calling this function to get any updates or updated value from DTO.
             updateCurrentExpertise(countryId, copiedExpertise, expertiseDTO);
 

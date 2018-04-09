@@ -98,10 +98,11 @@ public class DailyTimeBankServiceTest {
         TimebankWrapper timebankWrapper = new TimebankWrapper(DateUtils.asLocalDate(new DateTime().withYear(2018).minusDays(5).toDate()));
         DateTime startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
         DateTime endDate = new DateTime().withYear(year).dayOfYear().withMaximumValue().withTimeAtStartOfDay();
-        if(startDate.getYear()==new DateTime(timebankWrapper.getUnitPositionDate()).getYear() && startDate.isBefore(DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionDate()).withTimeAtStartOfDay())){
-            startDate = DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionDate()).withTimeAtStartOfDay();
+        if(startDate.getYear()==new DateTime(timebankWrapper.getUnitPositionStartDate()).getYear() && startDate.isBefore(DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionEndDate()).withTimeAtStartOfDay())){
+            startDate = DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionStartDate()).withTimeAtStartOfDay();
+
         }
-        if(startDate.getYear()!=DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionDate()).getYear() && startDate.isAfter(DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionDate()))){
+        if(startDate.getYear()!=DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionStartDate()).getYear() && startDate.isAfter(DateUtils.toJodaDateTime(timebankWrapper.getUnitPositionEndDate()))){
             startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
         }
         if(endDate.isAfter(new DateTime().plusDays(1).withTimeAtStartOfDay()) && endDate.getYear()==new DateTime().getYear()){

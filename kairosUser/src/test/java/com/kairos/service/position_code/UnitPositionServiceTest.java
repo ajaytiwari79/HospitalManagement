@@ -1,6 +1,6 @@
 package com.kairos.service.position_code;
 
-import com.kairos.activity.client.dto.staff.UnitPositionDTO;
+import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 
@@ -52,7 +52,7 @@ public class UnitPositionServiceTest {
 
     @Test
     public void validateUnitEmploymentPositionWithExpertiseWithEndDates() throws Exception {
-        unitPositionDTO = new UnitPositionDTO(14L, 733L, new DateTime("2018-02-10T00:00:00.000Z").getMillis(), new DateTime(new Double(12), 100, 1000, 10.2f, 10.2f, null);
+        unitPositionDTO = new UnitPositionDTO(14L, 733L, new DateTime("2018-02-10T00:00:00.000Z").getMillis(), new DateTime().getMillis(), 100, 1000, 10.2f, 1000D, null);
         unitPositions.get(1).setEndDateMillis(new DateTime("2017-08-11T00:00:00.000Z").getMillis());
         System.out.println(unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO));
     }
@@ -82,7 +82,7 @@ UnitEmploymentPosition uep5 = new UnitEmploymentPosition(new DateTime("2018-02-1
           Timestamp in milliseconds: 1549092502000
           Human time (GMT): Saturday, 2 February 2019 07:28:22
           */
-        UnitPosition uep5 = new UnitPosition(new DateTime("2018-02-10T00:00:00.000Z").getMillis(), 1549092502000L, 733, 14, 15, 16, 18000);
+        UnitPosition uep5 = new UnitPosition(new DateTime("2018-02-10T00:00:00.000Z").getMillis(), 1549092502000L, 733, 14, 15, 16, 1800D);
         unitPositions.add(uep5);
         unitPositionService.validateUnitPositionWithExpertise(unitPositions, unitPositionDTO);
 
@@ -93,7 +93,7 @@ UnitEmploymentPosition uep5 = new UnitEmploymentPosition(new DateTime("2018-02-1
         unitPositions.clear();
         //  new DateTime("2018-02-10T00:00:00.000Z").getMillis()    GMT: Friday, 2 February 2018 07:28:22
         // 1549092502000L   2019-02-02T12:58:22.000+05:30
-        UnitPosition uep5 = new UnitPosition(1486020502000L, 1549092502000L, 733, 14, 15, 16, 18000);
+        UnitPosition uep5 = new UnitPosition(1486020502000L, 1549092502000L, 733, 14, 15, 16, 18000D);
         unitPositions.add(uep5);
         unitPositionDTO.setStartDateMillis(1486020502000L); //GMT: Thursday, 2 February 2017 07:28:22
         unitPositionDTO.setEndDateMillis(new DateTime("2018-02-10T00:00:00.000Z").getMillis());  // GMT: Friday, 2 February 2018 07:28:22

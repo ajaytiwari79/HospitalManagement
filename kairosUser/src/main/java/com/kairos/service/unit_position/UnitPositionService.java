@@ -22,6 +22,8 @@ import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
+import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
+import com.kairos.persistence.model.user.expertise.FunctionAndSeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.staff.StaffExperienceInExpertiseDTO;
@@ -50,6 +52,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 
 import com.kairos.response.dto.web.PositionWrapper;
+import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.organization.OrganizationService;
@@ -58,7 +61,6 @@ import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
-import org.apache.commons.collections.map.HashedMap;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.Months;
@@ -514,18 +516,19 @@ public class UnitPositionService extends UserBaseService {
 
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
 
-        positionCtaWtaQueryResult.setExpertise(null);
-
         StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, expertiseId);
+
         if (!Optional.ofNullable(staffSelectedExpertise).isPresent() || !currentExpertise.isPresent()) {
             throw new DataNotFoundByIdException("Expertise is not assigned to staff or unavailable");
 
         }
+
         DateTime expertiseStartDate = new DateTime(staffSelectedExpertise.getExpertiseStartDate());
         DateTime currentDate = new DateTime(DateUtil.getCurrentDateMillis());
 
         Integer experienceInMonth = Months.monthsBetween(expertiseStartDate, currentDate).getMonths() + staffSelectedExpertise.getRelevantExperienceInMonths();
         logger.info("user has current experience in months :{}", experienceInMonth);
+
         SeniorityLevel appliedSeniorityLevel = null;
         for (SeniorityLevel seniorityLevel : currentExpertise.get().getSeniorityLevel()) {
             if (seniorityLevel.getMoreThan() != null) {
@@ -545,7 +548,8 @@ public class UnitPositionService extends UserBaseService {
             }
         }
         positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
-        positionCtaWtaQueryResult.setApplicableSeniorityLevel(appliedSeniorityLevel);
+        FunctionAndSeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
+        positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
 
         return positionCtaWtaQueryResult;
     }
@@ -599,7 +603,7 @@ public class UnitPositionService extends UserBaseService {
         employmentTypes.put("name", relationShip.getEmploymentType().getName());
         employmentTypes.put("id", relationShip.getEmploymentType().getId());
         employmentTypes.put("employmentTypeCategory", relationShip.getEmploymentTypeCategory());
-        result.setEmploymentTypes(employmentTypes);
+        result.setEmploymentType(employmentTypes);
 
 
         Map<String, Object> seniorityLevel;
@@ -607,7 +611,7 @@ public class UnitPositionService extends UserBaseService {
         seniorityLevel = objectMapper.convertValue(unitPosition.getSeniorityLevel(), Map.class);
         seniorityLevel.put("functions", unitPositionDTO.getFunctionIds());
         seniorityLevel.put("payGrade", unitPosition.getSeniorityLevel().getPayGrade());
-        result.setSeniorityLevels(seniorityLevel);
+        result.setSeniorityLevel(seniorityLevel);
         return result;
     }
 

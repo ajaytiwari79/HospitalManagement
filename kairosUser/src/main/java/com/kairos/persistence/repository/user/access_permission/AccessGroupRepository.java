@@ -260,8 +260,14 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     AccessGroup getAccessGroupOfOrganizationByName(long organizationId, String name);
 
     @Query("Match(emp:Employment)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission)-[:APPLICABLE_IN_UNIT]-(org:Organization) where id(emp) = {0} and id(org) = {1} \n" +
-            "Match(up)-[r1:HAS_ACCESS_GROUP]-(ag:AccessGroup) optional Match(up)-[r2:HAS_CUSTOMIZED_PERMISSION]-(accesspage:AccessPage) return emp,up,org,ag,accesspage")
+            "Match(up)-[r1:HAS_ACCESS_GROUP]-(ag:AccessGroup) optional Match(up)-[r2:HAS_CUSTOMIZED_PERMISSION]-(accesspage:AccessPage) delete r1, r2")
     void deleteAccessGroupAndCustomizedPermission(Long employmentId, Long organizationId);
+
+    @Query("Match(employment:Employment)-[r1:BELONGS_TO]->(staff:Staff)-[r2:BELONGS_TO_STAFF]->(up:UnitPosition{deleted:false}) where id(employment) in {0} \n"+
+            "Match(up)-[r3:IN_UNIT]->(org:Organization) Match(employment)-[:HAS_UNIT_PERMISSIONS]-(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]-(org) \n" +
+            "Match(unitPermission)-[rel_has_access_group:HAS_ACCESS_GROUP]-(ag:AccessGroup) optional Match(unitPermission)-[rel_has_customized_permission:HAS_CUSTOMIZED_PERMISSION]-" +
+            "(accesspage:AccessPage) delete rel_has_access_group, rel_has_customized_permission")
+    void deleteAccessGroupAndCustomizedPermission(List<Long> empIds);
 }
 
 

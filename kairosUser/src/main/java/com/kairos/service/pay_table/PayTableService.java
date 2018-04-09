@@ -357,7 +357,7 @@ public class PayTableService extends UserBaseService {
             }
         }
         if (found)
-            payGradeGraphRepository.removeAllPayGroupAreasFromPayGrade(payGradeId);
+            payGradeGraphRepository.removeAllPayGroupAreasFromPayGradeAndDeletePayGrade(payGradeId);
         return found;
     }
 
@@ -376,37 +376,22 @@ public class PayTableService extends UserBaseService {
 
     private List<PayGradeResponse> updatePayGradeInUnpublishedPayTable(PayTable payTable, PayGradeDTO payGradeDTO, PayGrade payGrade) {
         List<PayGradeResponse> payGradeResponses = new ArrayList<>();
-        List<Long> relationshipIds = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getId).collect(Collectors.toList());
-
+        Set<Long> payGroupAreaIds = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
+        List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(payGroupAreaIds);
+        // removing all previous Ids
+        payGradeGraphRepository.removeAllPayGroupAreasFromPayGrade(payGrade.getId());
         List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
-        Iterable<PayGradePayGroupAreaRelationShip> payGradeData = payTableRelationShipGraphRepository.findAllById(relationshipIds);
-
         for (PayGroupAreaDTO currentPayGroup : payGradeDTO.getPayGroupAreas()) {
-            // Rare case
-            if (currentPayGroup.getId() == null) { // this is a new pay group area which is added after creation and now user is setting value on that
-                PayGroupArea payGroupArea = payGroupAreaGraphRepository.findOne(currentPayGroup.getPayGroupAreaId());
-                PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
-                        = new PayGradePayGroupAreaRelationShip(payGrade, payGroupArea, currentPayGroup.getPayGroupAreaAmount());
-                payTableRelationShipGraphRepository.save(payGradePayGroupAreaRelationShip);
-                payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
-                currentPayGroup.setId(payGradePayGroupAreaRelationShip.getId());
-
-            } else {
-                for (PayGradePayGroupAreaRelationShip currentPayGradeData : payGradeData) {
-                    if (currentPayGradeData.getId().equals(currentPayGroup.getId()) && !currentPayGradeData.getPayGroupAreaAmount().equals(currentPayGroup.getPayGroupAreaAmount())) {
-                        logger.info("user has changed Amount {} from {}", currentPayGroup.getPayGroupAreaAmount(), currentPayGradeData.getPayGroupAreaAmount());
-                        // The state was published and the amount is changed so we are now adding/checking weather any already relation exist or not
-                        currentPayGradeData.setPayGroupAreaAmount(currentPayGroup.getPayGroupAreaAmount());
-                        payGradePayGroupAreaRelationShips.add(currentPayGradeData);
-                    }
-                }
-            }
+            PayGroupArea currentPayGroupArea = payGroupAreas.stream().filter(payGroupArea -> payGroupArea.getId().equals(currentPayGroup.getPayGroupAreaId())).findFirst().get();
+            PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
+                    = new PayGradePayGroupAreaRelationShip(payGrade, currentPayGroupArea, currentPayGroup.getPayGroupAreaAmount());
+            payTableRelationShipGraphRepository.save(payGradePayGroupAreaRelationShip);
+            payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
+            currentPayGroup.setId(payGradePayGroupAreaRelationShip.getId());
         }
         PayGradeResponse payGradeResponse =
                 new PayGradeResponse(payTable.getId(), payGrade.getPayGradeLevel(), payGrade.getId(), getPayGradeResponse(payGradePayGroupAreaRelationShips), payGrade.isPublished());
         payGradeResponses.add(payGradeResponse);
-
-        payTableRelationShipGraphRepository.saveAll(payGradeData);
         return payGradeResponses;
     }
 
@@ -461,11 +446,16 @@ public class PayTableService extends UserBaseService {
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
             PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
             List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
+
             if (payGradeDTO.getPayGradeId().equals(currentPayGrade.getId())) {
                 // user has changed the value in  this pay Grade area of payTable
+                List<Long> payGroupAreasId = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toList());
+                List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllById(payGroupAreasId);
+
                 for (PayGroupAreaDTO currentPayGroupArea : payGradeDTO.getPayGroupAreas()) {
+                    PayGroupArea payGroupArea = payGroupAreas.stream().filter(payGroupArea1 -> payGroupArea1.getId().equals(currentPayGroupArea.getPayGroupAreaId())).findFirst().get();
                     PayGradePayGroupAreaRelationShip payGradePayGroupAreaRelationShip
-                            = new PayGradePayGroupAreaRelationShip(newPayGrade, new PayGroupArea(currentPayGroupArea.getPayGroupAreaId()), currentPayGroupArea.getPayGroupAreaAmount());
+                            = new PayGradePayGroupAreaRelationShip(newPayGrade, payGroupArea, currentPayGroupArea.getPayGroupAreaAmount());
                     payGradePayGroupAreaRelationShips.add(payGradePayGroupAreaRelationShip);
 
                 }
