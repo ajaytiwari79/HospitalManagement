@@ -22,7 +22,6 @@ import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
 
-import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.FunctionAndSeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
@@ -75,6 +74,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -661,10 +661,10 @@ public class UnitPositionService extends UserBaseService {
             ctaRuleTemplateDTO.setName(rt.getName());
             ctaRuleTemplateDTO.setId(rt.getId());
             //ctaRuleTemplateDTO.setDays(rt.getCalculateOnDayTypes());
-            ctaRuleTemplateDTO.setTimeTypeId(rt.getTimeTypeId() != null ? new BigInteger(rt.getTimeTypeId().toString()) : null);
+            ctaRuleTemplateDTO.setTimeTypeIds(rt.getTimeTypeIds() != null ? rt.getTimeTypeIds().stream().map(t -> new BigInteger(t.toString())).collect(Collectors.toList()) : null);
             //ctaRuleTemplateDTO.setPublicHolidays();
             ctaRuleTemplateDTO.setCtaIntervalDTOS(getCtaIntervalDto((List<CompensationTableInterval>) rt.getCompensationTable().get("compensationTableInterval")));
-            ctaRuleTemplateDTO.setPlannedTimeId(rt.getPlannedTimeId());
+            ctaRuleTemplateDTO.setPlannedTimeIds(rt.getPlannedTimeIds());
             ctaRuleTemplateDTO.setCalculateScheduledHours(rt.isCalculateScheduledHours());
             ctaRuleTemplateDTO.setEmploymentTypes(rt.getEmploymentTypes());
             ctaRuleTemplateDTO.setAccountType(rt.getPlannedTimeWithFactor().getAccountType().name());

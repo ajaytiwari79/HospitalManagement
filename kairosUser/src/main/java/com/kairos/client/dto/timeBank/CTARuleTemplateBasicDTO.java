@@ -15,10 +15,10 @@ public class CTARuleTemplateBasicDTO {
     private List<LocalDate> publicHolidays;
     private int granularity;
     private List<BigInteger> activityIds;
-    private BigInteger timeTypeId;
+    private List<BigInteger> timeTypeIds;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
     private boolean calculateScheduledHours;
-    private Long plannedTimeId;
+    private List<Long> plannedTimeIds;
     private List<Long> employmentTypes =new ArrayList<>();
     private String accountType;
 
@@ -46,12 +46,20 @@ public class CTARuleTemplateBasicDTO {
         this.employmentTypes = employmentTypes;
     }
 
-    public Long getPlannedTimeId() {
-        return plannedTimeId;
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
     }
 
-    public void setPlannedTimeId(Long plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
     }
 
     public CTARuleTemplateBasicDTO() {
@@ -59,7 +67,7 @@ public class CTARuleTemplateBasicDTO {
 
     public CTARuleTemplateBasicDTO(int granularity, List<BigInteger> timeTypes) {
         this.granularity = granularity;
-        this.timeTypeId = timeTypeId;
+        this.timeTypeIds = timeTypeIds;
     }
 
 
@@ -111,13 +119,6 @@ public class CTARuleTemplateBasicDTO {
         this.activityIds = activityIds;
     }
 
-    public BigInteger getTimeTypeId() {
-        return timeTypeId;
-    }
-
-    public void setTimeTypeId(BigInteger timeTypeId) {
-        this.timeTypeId = timeTypeId;
-    }
 
     public List<CTAIntervalDTO> getCtaIntervalDTOS() {
         return ctaIntervalDTOS;
