@@ -18,6 +18,11 @@ public class PeriodPhaseFlippingDate {
         // default constructor
     }
 
+    public PeriodPhaseFlippingDate(BigInteger phaseId, Date flippingDate){
+        this.phaseId = phaseId;
+        this.flippingDate = flippingDate;
+    }
+
     public BigInteger getPhaseId() {
         return phaseId;
     }

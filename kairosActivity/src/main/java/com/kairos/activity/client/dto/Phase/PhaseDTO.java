@@ -33,6 +33,7 @@ public class PhaseDTO {
     private boolean allowFlipping;
     private LocalTime flippingTime;
     private DayOfWeek flippingDay;
+    private int durationInDays;
 
 
     public long getOrganizationId() {
@@ -164,4 +165,11 @@ public class PhaseDTO {
         return phase;
     }
 
+    public int getDurationInDays() {
+        return durationInDays;
+    }
+
+    public void setDurationInDays(int durationInDays) {
+        this.durationInDays = durationInDays;
+    }
 }

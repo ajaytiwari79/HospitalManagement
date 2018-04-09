@@ -3,6 +3,7 @@ package com.kairos.response.dto.web.period;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.joda.time.DurationFieldType;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -10,6 +11,7 @@ import java.util.Date;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanningPeriodDTO {
+    private BigInteger id;
     private Long startDate;
     private Long endDate;
     private Long unitId = -1L;
@@ -113,5 +115,13 @@ public class PlanningPeriodDTO {
 
     public void setConstructionToDraftDate(Long constructionToDraftDate) {
         this.constructionToDraftDate = constructionToDraftDate;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 }

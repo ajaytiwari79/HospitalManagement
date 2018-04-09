@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.repository.phase;
 
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.organization.OrganizationPhaseDTO;
+import com.kairos.activity.persistence.model.period.PlanningPeriod;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.query_result.PhaseWrapper;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
@@ -52,5 +54,10 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
         AggregationResults<OrganizationPhaseDTO> result = mongoTemplate.aggregate(aggregation,Phase.class ,OrganizationPhaseDTO.class);
         return result.getMappedResults();
 
+    }
+
+    public  Boolean checkPhaseByName(BigInteger phaseId, String name){
+        Query query = Query.query(Criteria.where("name").is(name).and("id").is(phaseId));
+        return mongoTemplate.exists(query, Phase.class);
     }
 }
