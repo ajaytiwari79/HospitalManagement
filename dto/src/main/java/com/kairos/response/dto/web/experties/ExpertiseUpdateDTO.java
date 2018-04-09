@@ -19,11 +19,11 @@ public class ExpertiseUpdateDTO {
     private String description;
 
     @NotNull(message = "Start date can't be null")
-    @DateLong
+    //@DateLong
     private Date startDateMillis;
 
 
-    @DateLong
+    //@DateLong
     private Date endDateMillis;
 
     @NotNull(message = "Level can not be null")

@@ -16,9 +16,9 @@ public class ExpertiseResponseDTO {
     private Long parentId;
     private String name;
     private String description;
-    @DateLong
+    //@DateLong
     private Date startDateMillis;
-    @DateLong
+    //@DateLong
     private Date endDateMillis;
     private Long organizationLevelId;
     private Long serviceId;

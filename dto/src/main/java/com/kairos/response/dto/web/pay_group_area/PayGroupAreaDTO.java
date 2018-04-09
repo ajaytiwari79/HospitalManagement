@@ -28,12 +28,12 @@ public class PayGroupAreaDTO {
     private Long municipalityId;
 
     @NotNull(message = "Start date can't be null")
-    @DateLong
+    //@DateLong
     @FutureDate
     private Date startDateMillis;
 
     @FutureDate
-    @DateLong
+    //@DateLong
     private Date endDateMillis;
 
     @NotNull(message = "Level can not be null")
