@@ -46,7 +46,6 @@ public class UnitPositionQueryResult {
     private Long reasonCodeId;
 
 
-
     public int getWorkingDaysInWeek() {
         return workingDaysInWeek;
     }
@@ -244,6 +243,7 @@ public class UnitPositionQueryResult {
         this.totalWeeklyMinutes = totalWeeklyMinutes;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.hourlyWages = hourlyWages;
+        this.lastWorkingDateMillis = lastWorkingDateMillis;
         this.id = id;
         this.salary = salary;
         this.positionCode = positionCode;
