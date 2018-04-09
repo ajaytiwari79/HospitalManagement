@@ -143,4 +143,21 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels")
     ExpertiseQueryResult getExpertiseAndSeniorityLevelById(Long expertiseId);
 
+
+    @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0}" +
+            "match(expertise)-[:" + SUPPORTS_SERVICE + "]-(orgService:OrganizationService)\n" +
+            "match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
+            "match(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
+            "match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable)" +
+            "optional match(seniorityLevel)-[functionRelation:" + HAS_FUNCTION + "]->(functions:Function) \n" +
+            "with expertise,payTable,union,level,orgService,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
+            "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
+            "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
+            "return expertise.name as name ,id(expertise) as id,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis , expertise.hasVersion as hasVersion," +
+            "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
+            "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
+            + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
+            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels")
+    List<ExpertiseQueryResult> getAllPublishedExpertise(Long countryId);
+
 }

@@ -349,6 +349,7 @@ public class ExpertiseService extends UserBaseService {
     }
 
 
+
     public ExpertiseResponseDTO updateExpertise(Long countryId, ExpertiseUpdateDTO expertiseDTO) {
         Expertise currentExpertise = expertiseGraphRepository.findOne(expertiseDTO.getId());
         if (!Optional.ofNullable(currentExpertise).isPresent() || currentExpertise.isDeleted()) {
@@ -678,5 +679,11 @@ public class ExpertiseService extends UserBaseService {
         map.put("expertiseList", staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staff.getId()));
         return map;
     }
+
+    public List<ExpertiseQueryResult> getAllPublishedExpertise(Long countryId) {
+        return expertiseGraphRepository.getAllPublishedExpertise(countryId);
+    }
+
+
 
 }
