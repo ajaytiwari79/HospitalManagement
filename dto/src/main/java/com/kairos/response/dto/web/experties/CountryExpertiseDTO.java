@@ -192,7 +192,6 @@ public class CountryExpertiseDTO {
         this.unionId = unionId;
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
-
         this.paidOutFrequency = paidOutFrequency;
         this.seniorityLevel = seniorityLevel;
     }

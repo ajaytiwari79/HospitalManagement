@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.Shift;
 import org.hibernate.validator.constraints.Range;
+import org.joda.time.Duration;
+import org.joda.time.Interval;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -149,6 +151,10 @@ public class ShiftDTO {
 
     public void setAccumulatedTimeBankInMinutes(long accumulatedTimeBankInMinutes) {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
+    }
+
+    public Duration getDuration(){
+        return new Interval(this.getStartDate().getTime(),this.getEndDate().getTime()).toDuration();
     }
 
     public String getRemarks() {

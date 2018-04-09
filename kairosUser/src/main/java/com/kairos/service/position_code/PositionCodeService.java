@@ -109,8 +109,8 @@ public class PositionCodeService extends UserBaseService {
             throw new DataNotFoundByIdException("PositionCode doesn't exist");
         }
 
-        if (!(oldPositionCode.getName().equalsIgnoreCase(positionCode.getName())) &&
-                (positionCodeGraphRepository.checkDuplicatePositionCode(organization.getId(), positionCode.getName()) != null)) {
+        if (!(oldPositionCode.getName().equalsIgnoreCase(positionCode.getName().trim())) &&
+                (positionCodeGraphRepository.checkDuplicatePositionCode(organization.getId() ,"(?i)"+positionCode.getName().trim()) != null)) {
             throw new DuplicateDataException("PositionCode can't be updated");
         }
 
