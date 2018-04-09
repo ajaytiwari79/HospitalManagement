@@ -39,4 +39,12 @@ public interface SeniorityLevelGraphRepository extends Neo4jBaseRepository<Senio
             "RETURN case when payGradeDataCount>0 THEN  true ELSE false END as response")
     Boolean checkPayGradeInSeniorityLevel(Long expertiseId, Long currentSeniorityLevelId, Long payGradeId);
 
+    @Query("match(seniorityLevel:SeniorityLevel) where id(seniorityLevel)={0}\n" +
+            "match(seniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade)" +
+            "optional match(seniorityLevel)-[relation:" + HAS_FUNCTION + "]-(function:Function)\n" +
+            "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
+            "return id(seniorityLevel) as id,seniorityLevel.from as from,seniorityLevel.pensionPercentage as pensionPercentage,seniorityLevel.freeChoicePercentage as freeChoicePercentage," +
+            "seniorityLevel.freeChoiceToPension as freeChoiceToPension,seniorityLevel.to as to,seniorityLevel.moreThan as moreThan,case when function IS NOT NULL then collect(distinct{id:id(function),amount:relation.amount,name:function.name ,description:function.description," +
+            "startDate:function.startDate ,endDate:function.endDate,amount:rel.amount})else [] end as functions,payGrade as payGrade,collect(DISTINCT pga) as payGroupAreas")
+    FunctionAndSeniorityLevelQueryResult getSeniorityLevelById(Long seniorityLevelId);
 }
