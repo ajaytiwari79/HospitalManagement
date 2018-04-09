@@ -6,7 +6,7 @@ import com.kairos.activity.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
-import com.kairos.activity.response.dto.time_bank.TimebankWrapper;
+import com.kairos.activity.response.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import org.joda.time.DateTime;
@@ -68,9 +68,9 @@ public class TImeBankCalculationServiceTest {
     @Test
     public void calculateTimeBank(){
         when(activityMongoRepository.findAllActivityByUnitId(Mockito.anyLong())).thenReturn(Arrays.asList(new ActivityDTO(activity.getId())));
-        TimebankWrapper timebankWrapper = timeBankService.getCostTimeAgreement(1225l);
-        DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(timebankWrapper.getUnitPositionId(), timebankWrapper.getStaffId(), timebankWrapper.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
-        timeBankCalculationService.calculateDailyTimebank(interval, timebankWrapper,shifts, dailyTimeBankEntry);
+        UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(1225l);
+        DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(unitPositionWithCtaDetailsDTO.getUnitPositionId(), unitPositionWithCtaDetailsDTO.getStaffId(), unitPositionWithCtaDetailsDTO.getWorkingDaysPerWeek(), DateUtils.asLocalDate(interval.getStart().toDate()));
+        timeBankCalculationService.calculateDailyTimebank(interval, unitPositionWithCtaDetailsDTO,shifts, dailyTimeBankEntry);
         Assert.assertEquals(dailyTimeBankEntry.getTotalTimeBankMin(),1130);
         Assert.assertEquals(dailyTimeBankEntry.getScheduledMin(),1020);
         Assert.assertEquals(dailyTimeBankEntry.getContractualMin(),300);

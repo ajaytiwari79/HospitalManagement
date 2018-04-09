@@ -1,8 +1,7 @@
-package com.kairos.activity.response.dto.time_bank;
+package com.kairos.client.dto.time_bank;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CTARuleTemplateDTO {
@@ -15,23 +14,23 @@ public class CTARuleTemplateDTO {
     private List<LocalDate> publicHolidays;
     private int granularity;
     private List<BigInteger> activityIds;
-    private BigInteger timeTypeId;
+    private List<BigInteger> timeTypeIds;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
     private int minutesFromCta;
     private List<BigInteger> timeTypeIdsWithParentTimeType;
     private boolean calculateScheduledHours;
-    private Long plannedTimeId;
+    private List<Long> plannedTimeIds;
     private List<Long> employmentTypes;
     private String accountType;
 
     public CTARuleTemplateDTO() {
     }
 
-    public CTARuleTemplateDTO(Long id, String name, int granularity, BigInteger timeTypeId) {
+    public CTARuleTemplateDTO(Long id, String name, int granularity, List<BigInteger> timeTypeIds) {
         this.id = id;
         this.name = name;
         this.granularity = granularity;
-        this.timeTypeId = timeTypeId;
+        this.timeTypeIds = timeTypeIds;
     }
 
     public String getAccountType() {
@@ -58,12 +57,20 @@ public class CTARuleTemplateDTO {
         this.calculateScheduledHours = calculateScheduledHours;
     }
 
-    public Long getPlannedTimeId() {
-        return plannedTimeId;
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
     }
 
-    public void setPlannedTimeId(Long plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
     }
 
     public List<Long> getEmploymentTypes() {
@@ -130,13 +137,6 @@ public class CTARuleTemplateDTO {
         this.activityIds = activityIds;
     }
 
-    public BigInteger getTimeTypeId() {
-        return timeTypeId;
-    }
-
-    public void setTimeTypeId(BigInteger timeTypeId) {
-        this.timeTypeId = timeTypeId;
-    }
 
     public List<CTAIntervalDTO> getCtaIntervalDTOS() {
         return ctaIntervalDTOS;
