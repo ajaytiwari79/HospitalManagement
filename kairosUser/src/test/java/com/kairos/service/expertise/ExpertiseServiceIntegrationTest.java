@@ -50,7 +50,6 @@ public class ExpertiseServiceIntegrationTest {
         organizationLevelId = 2942L;
         serviceId = 177L;
         unionId = 2597L;
-        payTableId = 3041L;
 
     }
 
@@ -59,7 +58,7 @@ public class ExpertiseServiceIntegrationTest {
     public void saveExpertise() throws Exception {
         SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO(1, 4, 1L, new BigDecimal(1.5), new BigDecimal(2.5), new BigDecimal(5.6));
         CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, serviceId
-                , unionId, 12, 12, payTableId, PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
+                , unionId, 12, 12,  PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
         HttpEntity<CountryExpertiseDTO> entity = new HttpEntity<>(expertiseDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>>() {
@@ -80,7 +79,7 @@ public class ExpertiseServiceIntegrationTest {
         expertiseId = 2955L;
         SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO(6, 1L, new BigDecimal(1.5), new BigDecimal(2.5), new BigDecimal(5.6));
         CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, serviceId
-                , unionId, 12, 12, payTableId, PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
+                , unionId, 12, 12,  PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
         expertiseDTO.setId(expertiseId);
         HttpEntity<CountryExpertiseDTO> entity = new HttpEntity<>(expertiseDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>> typeReference =
