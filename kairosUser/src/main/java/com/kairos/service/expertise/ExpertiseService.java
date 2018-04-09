@@ -102,6 +102,9 @@ public class ExpertiseService extends UserBaseService {
             prepareExpertiseWhileCreate(expertise, expertiseDTO, countryId);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
+            expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
+            expertiseResponseDTO.setNumberOfWorkingDaysInWeek(expertise.getNumberOfWorkingDaysInWeek());
+
             expertiseResponseDTO.setHasVersion(expertise.isHasVersion());
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
 
@@ -276,8 +279,8 @@ public class ExpertiseService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid union id " + expertiseDTO.getUnionId());
         }
         expertise.setUnion(union);
-        expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
-        expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
+        expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes()!=null?expertiseDTO.getFullTimeWeeklyMinutes():2220);
+        expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek()!=null?expertiseDTO.getNumberOfWorkingDaysInWeek():5);
 
 
         expertise.setPaidOutFrequency(expertiseDTO.getPaidOutFrequency());
