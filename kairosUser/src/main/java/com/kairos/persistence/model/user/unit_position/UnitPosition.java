@@ -6,11 +6,16 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.persistence.model.user.country.Function;
+import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.persistence.model.user.staff.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+
+import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -38,15 +43,20 @@ public class UnitPosition extends UserBaseEntity {
     private Staff staff;
 
 
-    @Relationship(type = HAS_EMPLOYMENT_TYPE)
-    private EmploymentType employmentType;
-
-    @Relationship(type = BACKING_BY_UNION)
+    @Relationship(type = SUPPORTED_BY_UNION)
     private Organization union;
 
     @Relationship(type = IN_UNIT)
     private Organization unit;
 
+    @Relationship(type = HAS_REASON_CODE)
+    private ReasonCode reasonCode;
+
+    @Relationship(type =HAS_SENIORITY_LEVEL )
+    private SeniorityLevel seniorityLevel;
+
+    @Relationship(type = HAS_FUNCTION)
+    private List<Function> functions;
 
     private Long startDateMillis;
     private Long endDateMillis;
@@ -57,7 +67,7 @@ public class UnitPosition extends UserBaseEntity {
     private int workingDaysInWeek;
     private float hourlyWages;
 
-    private float salary;
+    private Double salary;
     private Long timeCareExternalId;
 
     public UnitPosition() {
@@ -96,11 +106,11 @@ public class UnitPosition extends UserBaseEntity {
         this.hourlyWages = hourlyWages;
     }
 
-    public float getSalary() {
+    public Double getSalary() {
         return salary;
     }
 
-    public void setSalary(float salary) {
+    public void setSalary(Double salary) {
         this.salary = salary;
     }
 
@@ -160,13 +170,6 @@ public class UnitPosition extends UserBaseEntity {
         this.endDateMillis = endDateMillis;
     }
 
-    public EmploymentType getEmploymentType() {
-        return employmentType;
-    }
-
-    public void setEmploymentType(EmploymentType employmentType) {
-        this.employmentType = employmentType;
-    }
 
     public Staff getStaff() {
         return staff;
@@ -210,8 +213,31 @@ public class UnitPosition extends UserBaseEntity {
         this.timeCareExternalId = timeCareExternalId;
     }
 
+    public ReasonCode getReasonCode() {
+        return reasonCode;
+    }
 
-    public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, float salary) {
+    public void setReasonCode(ReasonCode reasonCode) {
+        this.reasonCode = reasonCode;
+    }
+
+    public SeniorityLevel getSeniorityLevel() {
+        return seniorityLevel;
+    }
+
+    public void setSeniorityLevel(SeniorityLevel seniorityLevel) {
+        this.seniorityLevel = seniorityLevel;
+    }
+
+    public List<Function> getFunctions() {
+        return functions;
+    }
+
+    public void setFunctions(List<Function> functions) {
+        this.functions = functions;
+    }
+
+    public UnitPosition(Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary) {
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.totalWeeklyMinutes = totalWeeklyMinutes;

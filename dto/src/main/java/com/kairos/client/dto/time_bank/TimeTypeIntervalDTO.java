@@ -1,4 +1,4 @@
-package com.kairos.activity.response.dto.time_bank;
+package com.kairos.client.dto.time_bank;
 
 import java.util.Date;
 

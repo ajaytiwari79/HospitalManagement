@@ -6,10 +6,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.util.Map;
 
 /**
  * Created by vipul on 10/8/17.
@@ -30,8 +31,10 @@ public class UnitPositionQueryResult {
     private float avgDailyWorkingHours;
     private float hourlyWages;
     private long id;
-    private EmploymentType employmentType;
-    private float salary;
+
+    private Map<String, Object> employmentType;
+    private Map<String, Object> seniorityLevel;
+    private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
     private WorkingTimeAgreement workingTimeAgreement;
@@ -40,6 +43,8 @@ public class UnitPositionQueryResult {
     private Long lastWorkingDateMillis;
     private Long parentUnitId;
     private Long unitId;
+    private Long reasonCodeId;
+
 
     public int getWorkingDaysInWeek() {
         return workingDaysInWeek;
@@ -98,19 +103,12 @@ public class UnitPositionQueryResult {
         this.hourlyWages = hourlyWages;
     }
 
-    public EmploymentType getEmploymentType() {
-        return employmentType;
-    }
 
-    public void setEmploymentType(EmploymentType employmentType) {
-        this.employmentType = employmentType;
-    }
-
-    public float getSalary() {
+    public Double getSalary() {
         return salary;
     }
 
-    public void setSalary(float salary) {
+    public void setSalary(Double salary) {
         this.salary = salary;
     }
 
@@ -207,12 +205,37 @@ public class UnitPositionQueryResult {
         this.unitId = unitId;
     }
 
+    public Long getReasonCodeId() {
+        return reasonCodeId;
+    }
+
+    public void setReasonCodeId(Long reasonCodeId) {
+        this.reasonCodeId = reasonCodeId;
+    }
+
+
+    public Map<String, Object> getEmploymentType() {
+        return employmentType;
+    }
+
+    public void setEmploymentType(Map<String, Object> employmentType) {
+        this.employmentType = employmentType;
+    }
+
+    public Map<String, Object> getSeniorityLevel() {
+        return seniorityLevel;
+    }
+
+    public void setSeniorityLevel(Map<String, Object> seniorityLevel) {
+        this.seniorityLevel = seniorityLevel;
+    }
+
     public UnitPositionQueryResult() {
         //default cons
     }
 
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, EmploymentType employmentType, float salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WorkingTimeAgreement wta) {
+    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WorkingTimeAgreement wta) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;
@@ -220,8 +243,8 @@ public class UnitPositionQueryResult {
         this.totalWeeklyMinutes = totalWeeklyMinutes;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.hourlyWages = hourlyWages;
+        this.lastWorkingDateMillis = lastWorkingDateMillis;
         this.id = id;
-        this.employmentType = employmentType;
         this.salary = salary;
         this.positionCode = positionCode;
         this.union = union;

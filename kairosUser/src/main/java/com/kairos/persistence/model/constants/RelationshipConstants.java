@@ -212,8 +212,8 @@ public abstract class RelationshipConstants {
     public final static String RESOURCE_HAS_FEATURE = "RESOURCE_HAS_FEATURE";
     public final static String RESOURCE_HAS_EQUIPMENT = "RESOURCE_HAS_EQUIPMENT";
     public final static String LOCATED_IN = "LOCATED_IN";
-    public final static String ORAGANIZATION_HAS_UNIONS = "ORAGANIZATION_HAS_UNIONS";
-    public final static String BACKING_BY_UNION = "BACKING_BY_UNION";
+    public final static String ORGANIZATION_HAS_UNIONS = "ORGANIZATION_HAS_UNIONS";
+
 
     public final static String IN_UNIT = "IN_UNIT";
     public final static String HAS_ACCESS_FOR_ORG_CATEGORY = "HAS_ACCESS_FOR_ORG_CATEGORY";
@@ -232,6 +232,8 @@ public abstract class RelationshipConstants {
     public final static String HAS_DRAFT_EXPERTISE = "HAS_DRAFT_EXPERTISE";
     public final static String HAS_PAY_TABLE = "HAS_PAY_TABLE";
     public final static String HAS_BASE_PAY_GRADE = "HAS_BASE_PAY_GRADE";
+    public final static String HAS_SENIORITY_LEVEL = "HAS_SENIORITY_LEVEL";
+    public final static String HAS_REASON_CODE = "HAS_REASON_CODE";
 
 
     /**

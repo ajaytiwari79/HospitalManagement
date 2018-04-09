@@ -3,7 +3,7 @@ package com.kairos.activity.controller.timeBank;
 
 import com.kairos.activity.constants.ApiConstants;
 import com.kairos.activity.controller.task.TaskController;
-import com.kairos.activity.response.dto.time_bank.TimebankWrapper;
+import com.kairos.activity.response.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.service.time_bank.TimeBankService;
 import com.kairos.activity.util.response.ResponseHandler;
 import org.slf4j.Logger;
@@ -62,13 +62,13 @@ public class TimeBankController {
     }
 
    /* @PostMapping(value = "/createBlankTimebank")
-    public ResponseEntity<Map<String,Object>> createBlankTimeBank(@RequestBody TimebankWrapper timebankWrapper){
+    public ResponseEntity<Map<String,Object>> createBlankTimeBank(@RequestBody UnitPositionWithCtaDetailsDTO timebankWrapper){
         return ResponseHandler.generateResponse(HttpStatus.OK, true,timeBankService.createBlankTimeBank(timebankWrapper));
     }*/
 
     @PutMapping(value = "/updateBlankTimebank")
-    public ResponseEntity<Map<String,Object>> updateBlankTimebank(@RequestBody TimebankWrapper timebankWrapper){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,timeBankService.updateBlankTimebank(timebankWrapper));
+    public ResponseEntity<Map<String,Object>> updateBlankTimebank(@RequestBody UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,timeBankService.updateBlankTimebank(unitPositionWithCtaDetailsDTO));
     }
 
 

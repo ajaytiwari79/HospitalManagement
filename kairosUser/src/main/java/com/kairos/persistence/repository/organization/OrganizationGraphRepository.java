@@ -691,18 +691,18 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "return  id(org) as id,org.name as name")
     List<UnionResponseDTO> getAllUnionsByOrganizationSubType(List<Long> organizationSubTypesId);
 
-    @Query("Match (o:Organization)-[rel:" + ORAGANIZATION_HAS_UNIONS + "]->(union:Organization{isEnable:true,union:true}) " +
+    @Query("Match (o:Organization)-[rel:" + ORGANIZATION_HAS_UNIONS + "]->(union:Organization{isEnable:true,union:true}) " +
             "return  id(union) as id,union.name as name")
     List<UnionResponseDTO> getAllJoinedUnionsByOrganizationId(Long organizationId);
 
-    @Query("Match (o:Organization)-[rel:" + ORAGANIZATION_HAS_UNIONS + "]->(union:Organization) where id(o)={0}  AND  id(union)={1} \n" +
+    @Query("Match (o:Organization)-[rel:" + ORGANIZATION_HAS_UNIONS + "]->(union:Organization) where id(o)={0}  AND  id(union)={1} \n" +
             "SET rel.disabled=true, rel.dateOfSeparation={2} return rel")
     void removeUnionFromOrganization(long unitId, long unionId, long dateOfSeparation);
 
-    @Query("Match (unit:Organization),(union:Organization) where id (unit)={0} AND id(union) = {1} merge (unit)-[r:" + ORAGANIZATION_HAS_UNIONS + "{dateOfJoining:{2},disabled:false}]->(union) return r")
+    @Query("Match (unit:Organization),(union:Organization) where id (unit)={0} AND id(union) = {1} merge (unit)-[r:" + ORGANIZATION_HAS_UNIONS + "{dateOfJoining:{2},disabled:false}]->(union) return r")
     void addUnionInOrganization(long unitId, Long unionId, long dateOfJoining);
 
-    @Query("Match (o:Organization)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false})-[rel:" + ORAGANIZATION_HAS_UNIONS + "]->(union:Organization{isEnable:true,union:true}) " +
+    @Query("Match (o:Organization)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false})-[rel:" + ORGANIZATION_HAS_UNIONS + "]->(union:Organization{isEnable:true,union:true}) " +
             "return  id(union) as id,union.name as name")
     List<UnionResponseDTO> getAllUnionsFromParentOrganization(Long organizationId);
 

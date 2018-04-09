@@ -19,10 +19,14 @@ public interface PayGradeGraphRepository extends Neo4jBaseRepository<PayGrade, L
             "OPTIONAL match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
             "detach delete rel\n" +
             "set payGrade.deleted=true")
-    void removeAllPayGroupAreasFromPayGrade(Long payGradeId);
+    void removeAllPayGroupAreasFromPayGradeAndDeletePayGrade(Long payGradeId);
 
     @Query("Match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea{deleted:false}) where id(payGrade)={0} \n" +
             "return id(pga) as payGroupAreaId,pga.name as payGroupAreaName,rel.payGroupAreaAmount as payGroupAreaAmount  ORDER BY  rel.state")
     HashSet<PayTableMatrixQueryResult> getPayGradeMatrixByPayGradeId(Long PayGradeId);
 
+    @Query("MATCH (payGrade:PayGrade) where id(payGrade)={0}\n" +
+            "OPTIONAL match(payGrade)-[rel:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)\n" +
+            "detach delete rel")
+    void removeAllPayGroupAreasFromPayGrade(Long payGradeId);
 }
