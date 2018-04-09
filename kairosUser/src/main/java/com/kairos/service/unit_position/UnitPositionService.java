@@ -53,6 +53,7 @@ import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -498,6 +499,8 @@ public class UnitPositionService extends UserBaseService {
         if(unitPosition.getEndDateMillis()!=null){
             timebankWrapper.setUnitPositionEndDate(DateUtil.asLocalDate(new Date(unitPosition.getEndDateMillis())));
         }
+        Optional<Organization> organization = organizationGraphRepository.findById(unitId,0);
+        timebankWrapper.setUnitTimeZone(organization.get().getTimeZone());
         timebankWrapper.setCtaRuleTemplates(getCtaRuleTemplateDtos(ctaQueryResults));
         return timebankWrapper;
     }

@@ -19,6 +19,7 @@ import com.kairos.activity.service.activity.TimeTypeService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -58,15 +59,15 @@ public class TimeBankService extends MongoBaseService {
     private TimeTypeService timeTypeService;
 
     public void saveTimeBank(Long unitPositionId, Shift shift) {
-       /* TimebankWrapper timebankWrapper = getCostTimeAgreement(unitPositionId);
+        TimebankWrapper timebankWrapper = getCostTimeAgreement(unitPositionId);
         List<DailyTimeBankEntry> dailyTimeBanks = calculateDailyTimeBank(timebankWrapper,shift,unitPositionId);
         if (!dailyTimeBanks.isEmpty()) {
             save(dailyTimeBanks);
-        }*/
+        }
     }
 
     public void saveTimeBanks(Long unitPositionId, List<Shift> shifts) {
-        /*TimebankWrapper timebankWrapper = getCostTimeAgreement(unitPositionId);
+        TimebankWrapper timebankWrapper = getCostTimeAgreement(unitPositionId);
         List<DailyTimeBankEntry> updatedDailyTimeBankEntries = new ArrayList<>();
         for (Shift shift : shifts) {
             List<DailyTimeBankEntry> dailyTimeBankEntries = calculateDailyTimeBank(timebankWrapper,shift,unitPositionId);
@@ -74,7 +75,7 @@ public class TimeBankService extends MongoBaseService {
         }
         if(!updatedDailyTimeBankEntries.isEmpty()) {
             save(updatedDailyTimeBankEntries);
-        }*/
+        }
     }
 
     private List<DailyTimeBankEntry> calculateDailyTimeBank(TimebankWrapper timebankWrapper,Shift shift,Long unitPositionId){
@@ -188,6 +189,7 @@ public class TimeBankService extends MongoBaseService {
 
     public TimebankWrapper getCostTimeAgreement(Long unitPositionId) {
         TimebankWrapper timebankWrapper = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
+        timebankWrapper.setUnitDateTimeZone(DateTimeZone.forID(timebankWrapper.getUnitTimeZone().getId()));
         for (CTARuleTemplateDTO ctaRuleTemplateDTO : timebankWrapper.getCtaRuleTemplates()) {
             if (ctaRuleTemplateDTO.getTimeTypeId() != null) {
                 List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllParentTimeTypeByTimeTypeId(ctaRuleTemplateDTO.getTimeTypeId(), timebankWrapper.getCountryId());

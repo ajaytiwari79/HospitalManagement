@@ -128,12 +128,13 @@ public class TimeBankCalculationService {
         int contractualMin = interval.getStart().getDayOfWeek() <= ctaDto.getWorkingDaysPerWeek() ? ctaDto.getContractedMinByWeek() / ctaDto.getWorkingDaysPerWeek() : 0;
         Map<Long, Integer> ctaTimeBankMinMap = new HashMap<>();
         for (ShiftQueryResultWithActivity shift : shifts) {
-            Interval shiftInterval = new Interval(shift.getStartDate().getTime(), shift.getEndDate().getTime());
+            Interval shiftInterval = new Interval(new DateTime(shift.getStartDate().getTime()).withZone(ctaDto.getUnitDateTimeZone()), new DateTime(shift.getEndDate().getTime()).withZone(ctaDto.getUnitDateTimeZone()));
             shiftInterval = interval.overlap(shiftInterval);
 
             timeBankMinWithoutCta += shift.getActivity() != null ? (int) shiftInterval.toDuration().getStandardMinutes() : 0;
             totalDailyTimebank += dailyScheduledMin;
             for (CTARuleTemplateDTO ruleTemplate : ctaDto.getCtaRuleTemplates()) {
+                if(ruleTemplate.getAccountType()==null) continue;
                 if(ruleTemplate.getAccountType().equals(TIMEBANK_ACCOUNT)){
                     int ctaTimeBankMin = 0;
                     if ((ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeId() != null && ruleTemplate.getTimeTypeId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))) && ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
@@ -143,7 +144,7 @@ public class TimeBankCalculationService {
                             for (CTAIntervalDTO ctaIntervalDTO : ruleTemplate.getCtaIntervalDTOS()) {
                                 int ctaStart = ctaIntervalDTO.getEndTime() < ctaIntervalDTO.getStartTime() ? 0 : ctaIntervalDTO.getStartTime();
                                 int ctaEnd = ctaIntervalDTO.getEndTime() == 0 ? 1440 : ctaIntervalDTO.getEndTime();
-                                Interval ctaInterval = new Interval(interval.getStart().withTimeAtStartOfDay().plusMinutes(ctaStart), interval.getStart().plusMinutes(ctaEnd));
+                                Interval ctaInterval = new Interval(interval.getStart().withTimeAtStartOfDay().plusMinutes(ctaStart).withZone(ctaDto.getUnitDateTimeZone()), interval.getStart().plusMinutes(ctaEnd).withZone(ctaDto.getUnitDateTimeZone()));
                                 if (ctaInterval.overlaps(shiftInterval)) {
                                     int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).toDuration().getStandardMinutes();
                                     if (ctaIntervalDTO.getCompensationType().equals(AppConstants.MINUTES)) {

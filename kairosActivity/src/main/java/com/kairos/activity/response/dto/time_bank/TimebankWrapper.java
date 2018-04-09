@@ -1,8 +1,10 @@
 package com.kairos.activity.response.dto.time_bank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.joda.time.DateTimeZone;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -17,7 +19,8 @@ public class TimebankWrapper {
     private LocalDate unitPositionEndDate;
     private Long countryId;
     private int minutesFromCta;
-    private String unitTimeZone;
+    private ZoneId unitTimeZone;
+    private DateTimeZone unitDateTimeZone;
 
 
     public TimebankWrapper(Long unitPositionId) {
@@ -27,11 +30,19 @@ public class TimebankWrapper {
     public TimebankWrapper() {
     }
 
-    public String getUnitTimeZone() {
+    public DateTimeZone getUnitDateTimeZone() {
+        return unitDateTimeZone;
+    }
+
+    public void setUnitDateTimeZone(DateTimeZone unitDateTimeZone) {
+        this.unitDateTimeZone = unitDateTimeZone;
+    }
+
+    public ZoneId getUnitTimeZone() {
         return unitTimeZone;
     }
 
-    public void setUnitTimeZone(String unitTimeZone) {
+    public void setUnitTimeZone(ZoneId unitTimeZone) {
         this.unitTimeZone = unitTimeZone;
     }
 

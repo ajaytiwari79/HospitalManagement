@@ -71,7 +71,7 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
 
-    public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type) {
+    public ShiftQueryResult createShift(Long organizationId, ShiftDTO shiftDTO, String type) {
         /*boolean valid=staffingLevelMongoRepository.existsByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(),shiftStartDate);
         if(!valid){
             throw new DataNotFoundByIdException("Staffing level not found for this Day");
@@ -87,8 +87,8 @@ public class ShiftService extends MongoBaseService {
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             throw new DataNotFoundByIdException(shiftDTO.getStaffId() + " Staff Do not belong to unit ->" + shiftDTO.getUnitId());
         }
-        List<ShiftQueryResult> shiftQueryResults = null;
-        if(!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().isEmpty()){
+        /*List<ShiftQueryResult> shiftQueryResults = null;
+        if(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)){
             if(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
                 Date endDate = new DateTime().plusDays(1).withTimeAtStartOfDay().toDate();
                 Date startDate = new DateTime(shiftDTO.getShiftDate()).minusWeeks(activity.getTimeCalculationActivityTab().getHistoryDuration()).withTimeAtStartOfDay().toDate();
@@ -101,17 +101,17 @@ public class ShiftService extends MongoBaseService {
                 Date shiftFromDate = new DateTime(shiftDTO.getShiftDate()).withTimeAtStartOfDay().toDate();
                 shiftQueryResults = getAverageOfShiftByActivity(staffAdditionalInfoDTO,activity,shiftFromDate);
             }
-        }else {
+        }else {*/
             ShiftQueryResult shiftQueryResult = saveShift(activity, staffAdditionalInfoDTO, shiftDTO);
-            shiftQueryResults = Arrays.asList(shiftQueryResult);
-        }
-        return shiftQueryResults;
+            /*shiftQueryResults = Arrays.asList(shiftQueryResult);
+        }*/
+        return shiftQueryResult;
     }
 
     private ShiftQueryResult saveShift(Activity activity,StaffAdditionalInfoDTO staffAdditionalInfoDTO,ShiftDTO shiftDTO){
         Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getStartDate());
-        Shift shift = shiftDTO.buildShift();
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
+        Shift shift = shiftDTO.buildShift();
         shift.setMainShift(true);
         shift.setName(activity.getName());
         validateShiftWithActivity(activity, shift, staffAdditionalInfoDTO);
@@ -130,8 +130,8 @@ public class ShiftService extends MongoBaseService {
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>(shiftDTOS.size());
         shiftDTOS.forEach(shiftDTO->{
             Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getStartDate());
-            Shift shift = shiftDTO.buildShift();
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
+            Shift shift = shiftDTO.buildShift();
             shift.setMainShift(true);
             shift.setName(activity.getName());
             validateShiftWithActivity(activity, shift, staffAdditionalInfoDTO);
@@ -143,9 +143,7 @@ public class ShiftService extends MongoBaseService {
             applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null));
         });
         save(shifts);
-        shifts.forEach(s->{
-            shiftQueryResults.add(s.getShiftQueryResult());
-        });
+        shifts.stream().forEach(s->shiftQueryResults.add(s.getShiftQueryResult()));
         return shiftQueryResults;
     }
 
@@ -370,7 +368,7 @@ public class ShiftService extends MongoBaseService {
 
     public Boolean addSubShifts(Long unitId, List<ShiftDTO> shiftDTOS, String type) {
         for (ShiftDTO shiftDTO : shiftDTOS) {
-            ShiftQueryResult shiftQueryResult = createShift(unitId, shiftDTO, "Organization").get(0);
+            ShiftQueryResult shiftQueryResult = createShift(unitId, shiftDTO, "Organization");
             shiftDTO.setId(shiftQueryResult.getId());
         }
 
