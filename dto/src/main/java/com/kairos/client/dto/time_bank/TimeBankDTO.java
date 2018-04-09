@@ -41,7 +41,7 @@ public class TimeBankDTO {
     private List<TimeBankCTADistributionDTO> timeBankDistributions = new ArrayList<>();
     private ScheduleTimeByTimeTypeDTO workingTimeType;
     private ScheduleTimeByTimeTypeDTO nonWorkingTimeType;
-    private TimebankWrapper costTimeAgreement;
+    private UnitPositionWithCtaDetailsDTO costTimeAgreement;
 
     private List<TimeBankIntervalDTO> weeklyIntervalsTimeBank;
     private List<TimeBankIntervalDTO> monthlyIntervalsTimeBank;
@@ -110,11 +110,11 @@ public class TimeBankDTO {
         this.query = query;
     }
 
-    public TimebankWrapper getCostTimeAgreement() {
+    public UnitPositionWithCtaDetailsDTO getCostTimeAgreement() {
         return costTimeAgreement;
     }
 
-    public void setCostTimeAgreement(TimebankWrapper costTimeAgreement) {
+    public void setCostTimeAgreement(UnitPositionWithCtaDetailsDTO costTimeAgreement) {
         this.costTimeAgreement = costTimeAgreement;
     }
 
