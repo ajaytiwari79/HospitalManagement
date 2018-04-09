@@ -40,8 +40,8 @@ public class CountryExpertiseDTO {
 
     @NotNull(message = "union can not be null")
     private Long unionId;
-    private Integer fullTimeWeeklyMinutes = 2220; // This is equals to 37 hours
-    private Integer numberOfWorkingDaysInWeek = 5; // 5 or 7
+    private Integer fullTimeWeeklyMinutes ; // This is equals to 37 hours
+    private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
     @NotNull(message = "Paid Out Frequency can not be null")
     private PaidOutFrequencyEnum paidOutFrequency;
