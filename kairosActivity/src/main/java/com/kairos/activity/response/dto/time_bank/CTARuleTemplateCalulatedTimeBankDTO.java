@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CTARuleTemplateDTO {
+public class CTARuleTemplateCalulatedTimeBankDTO {
 
 
     private Long id;
@@ -24,10 +24,10 @@ public class CTARuleTemplateDTO {
     private List<Long> employmentTypes;
     private String accountType;
 
-    public CTARuleTemplateDTO() {
+    public CTARuleTemplateCalulatedTimeBankDTO() {
     }
 
-    public CTARuleTemplateDTO(Long id, String name, int granularity, BigInteger timeTypeId) {
+    public CTARuleTemplateCalulatedTimeBankDTO(Long id, String name, int granularity, BigInteger timeTypeId) {
         this.id = id;
         this.name = name;
         this.granularity = granularity;

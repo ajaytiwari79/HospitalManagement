@@ -2,7 +2,7 @@ package com.kairos.client;
 
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.client.dto.timeBank.TimebankWrapper;
+import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +27,10 @@ public class TimeBankRestClient {
 
 
     @Async
-    public Boolean createBlankTimeBank(TimebankWrapper timebankWrapper){
+    public Boolean createBlankTimeBank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<TimebankWrapper> request = new HttpEntity<>(timebankWrapper);
+            HttpEntity<UnitPositionWithCtaDetailsDTO> request = new HttpEntity<>(unitPositionWithCtaDetailsDTO);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
@@ -52,10 +52,10 @@ public class TimeBankRestClient {
 
     }
 
-    public Boolean updateBlankTimeBank(TimebankWrapper timebankWrapper){
+    public Boolean updateBlankTimeBank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<TimebankWrapper> request = new HttpEntity<>(timebankWrapper);
+            HttpEntity<UnitPositionWithCtaDetailsDTO> request = new HttpEntity<>(unitPositionWithCtaDetailsDTO);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(

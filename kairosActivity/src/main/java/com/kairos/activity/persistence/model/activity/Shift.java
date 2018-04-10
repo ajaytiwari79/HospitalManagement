@@ -264,6 +264,7 @@ public class Shift extends MongoBaseEntity {
     }
 
 
+
     public ShiftQueryResult getShiftQueryResult() {
         ShiftQueryResult shiftQueryResult = new ShiftQueryResult(this.id, this.name,
                 this.startDate,
@@ -275,7 +276,9 @@ public class Shift extends MongoBaseEntity {
                 this.probability,
                 this.accumulatedTimeBankInMinutes,
                 this.remarks,
-                this.activityId);
+                this.activityId,this.staffId, this.unitId, this.unitPositionId);
+        shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
+        shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
         return shiftQueryResult;
     }
 
