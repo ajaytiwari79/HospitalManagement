@@ -1,7 +1,6 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,22 +12,24 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExpertiseResponseDTO {
     private Long id;
+    private Long parentId;
     private String name;
     private String description;
-    @DateLong
+    //@DateLong
     private Date startDateMillis;
-    @DateLong
+    //@DateLong
     private Date endDateMillis;
     private Long organizationLevelId;
     private Long serviceId;
     private Long unionId;
     private int fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
-    private Long payTableId;
+
     private PaidOutFrequencyEnum paidOutFrequency;
     private List<SeniorityLevelDTO> seniorityLevels = new ArrayList<>();
     private List<Long> tags;
     private Boolean published;
+    private Boolean hasVersion;
 
     public ExpertiseResponseDTO() {
     }
@@ -39,6 +40,14 @@ public class ExpertiseResponseDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
     public String getName() {
@@ -113,13 +122,6 @@ public class ExpertiseResponseDTO {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-    public Long getPayTableId() {
-        return payTableId;
-    }
-
-    public void setPayTableId(Long payTableId) {
-        this.payTableId = payTableId;
-    }
 
     public PaidOutFrequencyEnum getPaidOutFrequency() {
         return paidOutFrequency;
@@ -151,5 +153,13 @@ public class ExpertiseResponseDTO {
 
     public void setPublished(Boolean published) {
         this.published = published;
+    }
+
+    public Boolean getHasVersion() {
+        return hasVersion;
+    }
+
+    public void setHasVersion(Boolean hasVersion) {
+        this.hasVersion = hasVersion;
     }
 }

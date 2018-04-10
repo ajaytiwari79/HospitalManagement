@@ -5,12 +5,12 @@ import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORAGANIZATION_HAS_UNIONS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_HAS_UNIONS;
 
 /**
  * Created by vipul on 14/2/18.
  */
-@RelationshipEntity(type = ORAGANIZATION_HAS_UNIONS)
+@RelationshipEntity(type = ORGANIZATION_HAS_UNIONS)
 public class OrganizationUnionRelationship {
     @StartNode
     private Organization organization;
