@@ -3,7 +3,6 @@ package com.kairos.response.dto.web.pay_group_area;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.user.pay_table.DateRange;
 import com.kairos.persistence.model.user.pay_table.FutureDate;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -28,12 +27,12 @@ public class PayGroupAreaDTO {
     private Long municipalityId;
 
     @NotNull(message = "Start date can't be null")
-    @DateLong
+    //@DateLong
     @FutureDate
     private Date startDateMillis;
 
     @FutureDate
-    @DateLong
+    //@DateLong
     private Date endDateMillis;
 
     @NotNull(message = "Level can not be null")
