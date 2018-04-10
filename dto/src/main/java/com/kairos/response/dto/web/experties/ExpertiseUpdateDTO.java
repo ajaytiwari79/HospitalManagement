@@ -1,8 +1,8 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import org.joda.time.DateTime;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
@@ -22,9 +22,7 @@ public class ExpertiseUpdateDTO {
     private String description;
 
     @NotNull(message = "Start date can't be null")
-
     private Date startDateMillis;
-
 
     private Date endDateMillis;
 
@@ -132,7 +130,6 @@ public class ExpertiseUpdateDTO {
     public void setNumberOfWorkingDaysInWeek(Integer numberOfWorkingDaysInWeek) {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
-
 
 
     public PaidOutFrequencyEnum getPaidOutFrequency() {

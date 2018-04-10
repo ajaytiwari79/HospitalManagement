@@ -3,7 +3,6 @@ package com.kairos.response.dto.web.experties;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.user.pay_table.FutureDate;
 import org.joda.time.DateTime;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;

@@ -1,6 +1,5 @@
 package com.kairos.response.dto.web.experties;
 
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
 
