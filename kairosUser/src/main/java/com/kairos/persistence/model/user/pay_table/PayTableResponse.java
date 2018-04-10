@@ -25,6 +25,8 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
     private List<PayGrade> payGrades;
     private String description;
     private Boolean published;
+    private Boolean editable;
+
 
     public PayTableResponse() {
     }
@@ -101,13 +103,23 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
         this.published = published;
     }
 
-    public PayTableResponse(String name, String shortName, String description, Long startDateMillis, Date endDateMillis, Boolean published) {
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
+    public PayTableResponse(String name, String shortName, String description, Long startDateMillis, Date endDateMillis, Boolean published, Boolean editable) {
         this.name = name;
         this.published = published;
         this.description = description;
         this.shortName = shortName;
         this.startDateMillis = startDateMillis;
+        this.editable = editable;
         this.endDateMillis = endDateMillis;
+
     }
 
     @Override
