@@ -1,7 +1,6 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -19,11 +18,11 @@ public class ExpertiseUpdateDTO {
     private String description;
 
     @NotNull(message = "Start date can't be null")
-    @DateLong
+    //@DateLong
     private Date startDateMillis;
 
 
-    @DateLong
+    //@DateLong
     private Date endDateMillis;
 
     @NotNull(message = "Level can not be null")
