@@ -589,13 +589,4 @@ public class StaffController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/move_to_readonly_accessgroup")
-    @ApiOperation("move staff to read only access group")
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    private ResponseEntity<Map<String, Object>> moveToReadOnlyAccessGroup() {
-        employmentService.moveToReadOnlyAccessGroup();
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
-    }
-
-
 }

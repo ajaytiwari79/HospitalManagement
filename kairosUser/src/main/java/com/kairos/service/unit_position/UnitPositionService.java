@@ -171,6 +171,7 @@ public class UnitPositionService extends UserBaseService {
 
         unitPosition.setUnit(organization);
         save(unitPosition);
+        employmentService.updateEmploymentEndDate(unitPositionDTO,id);
 
         UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);

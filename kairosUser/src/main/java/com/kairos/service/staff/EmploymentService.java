@@ -716,9 +716,6 @@ public class EmploymentService extends UserBaseService {
         }
 
         List<UnitPositionQueryResult> unitPositionsQuery = unitPositionGraphRepository.getAllUnitPositionsByStaffId(parentOrganization.getId(), unitPositionDTO.getStaffId());
-
-        // List<Long> endDates = unitPositionsQuery.stream().map(UnitPositionQueryResult::getEndDateMillis).collect(Collectors.toList());
-
         Long max = unitPositionsQuery.get(0).getEndDateMillis();
         boolean isEndDateBlank = false;
         for(UnitPositionQueryResult unitPosition:unitPositionsQuery) {
@@ -732,21 +729,19 @@ public class EmploymentService extends UserBaseService {
 
         }
 
-
         Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) ? null : (max>unitPositionDTO.getEndDateMillis()?max:unitPositionDTO.getEndDateMillis());
-//        (endDates.contains(null))?employmentGraphRepository.set(null):employmentGraphRepository.set(Collections.max(endDates));
-
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),unitPositionDTO.getStaffId());
-
         employment.setEndDateMillis(employmentEndDate);
-
         employmentGraphRepository.save(employment);
     }
 
 
+
+
+
+
     public void moveToReadOnlyAccessGroup() {
 
-        String timezone;
         Long curDateMillisStart = DateUtil.getTimezonedStartOfDay("Indian Standard Time",DateUtil.getCurrentDate()).getTime();
         Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions = null;
@@ -762,8 +757,6 @@ public class EmploymentService extends UserBaseService {
         if(expiredEmploymentsQueryResults.size()>0) {
             employments = new ArrayList<Employment>();
         }
-
-
 
         for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult: expiredEmploymentsQueryResults) {
 
