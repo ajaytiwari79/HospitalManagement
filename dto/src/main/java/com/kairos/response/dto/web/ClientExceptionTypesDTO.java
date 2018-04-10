@@ -1,8 +1,6 @@
 package com.kairos.response.dto.web;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.exc.IgnoredPropertyException;
 
 import java.math.BigInteger;
 

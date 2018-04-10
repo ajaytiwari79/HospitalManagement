@@ -7,7 +7,6 @@ import com.kairos.persistence.model.user.pay_table.FutureDate;
 import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.joda.time.DateTime;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.AssertTrue;
@@ -29,12 +28,12 @@ public class PayTableDTO {
     private String description;
 
     @NotNull(message = "Start date can't be null")
-    @DateLong
+    //@DateLong
     @FutureDate
     private Date startDateMillis;
 
     @FutureDate
-    @DateLong
+    //@DateLong
     private Date endDateMillis;
     @NotNull(message = "Level can not be null")
     private Long levelId;

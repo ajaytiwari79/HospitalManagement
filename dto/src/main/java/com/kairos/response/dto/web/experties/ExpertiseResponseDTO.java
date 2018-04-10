@@ -1,7 +1,6 @@
 package com.kairos.response.dto.web.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,9 +15,9 @@ public class ExpertiseResponseDTO {
     private Long parentId;
     private String name;
     private String description;
-    @DateLong
+    //@DateLong
     private Date startDateMillis;
-    @DateLong
+    //@DateLong
     private Date endDateMillis;
     private Long organizationLevelId;
     private Long serviceId;
