@@ -22,7 +22,7 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = "activities")
-public class Activity extends MongoBaseEntity implements Serializable{
+public class Activity extends MongoBaseEntity implements Serializable {
 
     private String name;
     private String description;
@@ -34,9 +34,9 @@ public class Activity extends MongoBaseEntity implements Serializable{
     private List<Long> levels;
     private List<Long> employmentTypes;
     private List<BigInteger> tags = new ArrayList<>();
-
+    private boolean published;
     @Indexed
-    private Long unitId = -1L;
+    private Long unitId;
     private BigInteger parentId;
     @JsonIgnore
     private boolean isParentActivity = true;
@@ -295,6 +295,14 @@ public class Activity extends MongoBaseEntity implements Serializable{
         this.compositeActivities = compositeActivities;
     }
 
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
     public static Activity copyProperties(Activity source, Activity target, String _id, String organizationType, String organizationSubType) {
         BeanUtils.copyProperties(source, target, _id, organizationSubType, organizationType);
         return target;
@@ -320,7 +328,7 @@ public class Activity extends MongoBaseEntity implements Serializable{
     public String toString() {
         return "Activity{" +
                 "name='" + name + '\'' +
-                "id='" + super.id + '\''+
+                "id='" + super.id + '\'' +
                 '}';
     }
 }

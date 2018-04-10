@@ -27,7 +27,7 @@ public class GeneralActivityTabDTO {
     private  String shortName;
     private boolean eligibleForUse=true;
     private String ultraShortName;
-    private String bonusHoursType;
+
     private boolean overRuleCtaWta;
 
     public String getUltraShortName() {
@@ -67,13 +67,8 @@ public class GeneralActivityTabDTO {
     public GeneralActivityTab buildGeneralActivityTab() {
         GeneralActivityTab generalActivityTab =
                 new GeneralActivityTab(name, code, printoutSymbol,categoryId, colorPresent, backgroundColor, textColor, description,this.isActive,
-                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName,bonusHoursType,overRuleCtaWta);
+                        this.shortName,this.eligibleForUse,this.originalIconName,this.modifiedIconName,ultraShortName,overRuleCtaWta);
         return generalActivityTab;
-    }
-    public GeneralActivityTab buildGeneralTabWithNameAndDesc() {
-        GeneralActivityTab general = new GeneralActivityTab(name, description,ultraShortName);
-
-        return general;
     }
 
     public List<BigInteger> getTags() {
@@ -208,13 +203,6 @@ public class GeneralActivityTabDTO {
         this.modifiedIconName = modifiedIconName;
     }
 
-    public String getBonusHoursType() {
-        return bonusHoursType;
-    }
-
-    public void setBonusHoursType(String bonusHoursType) {
-        this.bonusHoursType = bonusHoursType;
-    }
 
     public boolean isOverRuleCtaWta() {
         return overRuleCtaWta;

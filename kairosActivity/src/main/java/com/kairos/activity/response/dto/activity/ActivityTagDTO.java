@@ -27,11 +27,12 @@ public class ActivityTagDTO {
     private BigInteger categoryId;
     private String categoryName;
     private List<TagDTO> tags = new ArrayList<>();
-    private Long unitId = -1L;
+    private Long unitId;
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
     private List<ActivityTagDTO> compositeActivities = new ArrayList<ActivityTagDTO>();
     private Long parentId;
+    private boolean published;
 
     public ActivityTagDTO() {
         //default constructor
@@ -131,6 +132,14 @@ public class ActivityTagDTO {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {

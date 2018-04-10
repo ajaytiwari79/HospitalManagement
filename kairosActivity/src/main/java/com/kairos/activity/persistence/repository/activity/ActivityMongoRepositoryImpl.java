@@ -42,28 +42,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-   /*public  List<ActivityDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds){
 
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("isParentActivity").is(true).and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))),
-                graphLookup("activities").startWith("$compositeActivities").connectFrom("compositeActivities").connectTo("_id").as("compositeActivities"),
-                project("name", "generalActivityTab", "compositeActivities"));
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
-        return result.getMappedResults();
-
-   }*/
 
     public List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds) {
 
-        /*Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("isParentActivity").is(true).and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))),
-                project("name","generalActivityTab"));
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
-        return result.getMappedResults();*/
-
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("isParentActivity").is(true).and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))),
+                match(Criteria.where("deleted").is(false).and("published").is(true).and("isParentActivity").is(true).and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))),
                 unwind("tags", true),
                 lookup("tag", "tags", "_id", "tags_data"),
                 unwind("tags_data", true),
@@ -176,7 +160,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("published").is(true)),
                 graphLookup("activities").startWith("$compositeActivities").connectFrom("compositeActivities").connectTo("_id").maxDepth(0).as("compositeActivities"),
                 project("name", "generalActivityTab", "compositeActivities"));
 
