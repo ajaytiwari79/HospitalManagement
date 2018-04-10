@@ -87,7 +87,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels")
-    List<ExpertiseQueryResult> getAllExpertiseByCountryId(long countryId);
+    List<ExpertiseQueryResult> getUnpublishedExpertise(long countryId);
 
 
     @Query("MATCH (expertise:Expertise)-[rel:" + HAS_DRAFT_EXPERTISE + "]-(parentExpertise:Expertise) where id(expertise)={0} \n" +
@@ -158,6 +158,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels")
-    List<ExpertiseQueryResult> getAllPublishedExpertise(Long countryId);
+    List<ExpertiseQueryResult> getAllExpertiseByCountryId(Long countryId);
 
 }
