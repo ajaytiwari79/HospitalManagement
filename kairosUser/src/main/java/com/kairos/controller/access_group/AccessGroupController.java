@@ -198,4 +198,15 @@ public class AccessGroupController {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.updatePermissionsForAccessTabsOfAccessGroup(accessGroupId, accessPageId, accessPermissionDTO, updateChildren));
     }
+
+    @RequestMapping(value = UNIT_URL+"/copy_access_group", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> copyUnitAccessGroup(@PathVariable long unitId, @RequestBody AccessGroup objectToSave) {
+        AccessGroup savedObject = accessGroupService.createAccessGroup(unitId, objectToSave);
+        if (savedObject == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, savedObject);
+    }
+
 }
