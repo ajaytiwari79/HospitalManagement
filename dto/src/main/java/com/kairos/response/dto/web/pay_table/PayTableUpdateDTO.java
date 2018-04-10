@@ -1,7 +1,6 @@
 package com.kairos.response.dto.web.pay_table;
 
 import com.kairos.persistence.model.user.pay_table.FutureDate;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;

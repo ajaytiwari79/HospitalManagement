@@ -94,7 +94,7 @@ public class DailyTimeBankServiceTest {
 
     @Test
     public void getIntervalByDateOverviewTimebank(){
-        int year  = 2018;
+        /*int year  = 2018;
         TimebankWrapper timebankWrapper = new TimebankWrapper(DateUtils.asLocalDate(new DateTime().withYear(2018).minusDays(5).toDate()));
         DateTime startDate = new DateTime().withYear(year).dayOfYear().withMinimumValue().withTimeAtStartOfDay();
         DateTime endDate = new DateTime().withYear(year).dayOfYear().withMaximumValue().withTimeAtStartOfDay();
@@ -107,7 +107,7 @@ public class DailyTimeBankServiceTest {
         if(endDate.isAfter(new DateTime().plusDays(1).withTimeAtStartOfDay()) && endDate.getYear()==new DateTime().getYear()){
             endDate = new DateTime().withTimeAtStartOfDay();
         }
-        Interval interval = new Interval(startDate,endDate);
+        Interval interval = new Interval(startDate,endDate);*/
     }
     @Test
     public void getWeeksBYMonth(){

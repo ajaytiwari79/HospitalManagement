@@ -3,7 +3,6 @@ package com.kairos.response.dto.web.pay_group_area;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.user.pay_table.DateRange;
 import com.kairos.persistence.model.user.pay_table.FutureDate;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
