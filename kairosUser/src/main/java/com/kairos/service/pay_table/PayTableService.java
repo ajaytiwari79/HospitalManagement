@@ -128,7 +128,7 @@ public class PayTableService extends UserBaseService {
         validatePayLevel(payTables, payTableDTO.getStartDateMillis(), payTableDTO.getEndDateMillis());
         save(payTable);
 
-        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis(), payTable.isPublished(), payTable.isEditable());
+        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), (payTable.getEndDateMillis() != null) ? payTable.getEndDateMillis().getTime() : null, payTable.isPublished(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         payTableResponse.setLevel(level);
         return payTableResponse;
@@ -143,13 +143,13 @@ public class PayTableService extends UserBaseService {
                     throw new ActionNotPermittedException("overlap date range" + new DateTime(startDateMillis) + " ON " + (new DateTime(payTableToValidate.getEndDateMillis())));
                 }
                 if (endDateMillis != null) {
-                    Interval previousInterval = new Interval(payTableToValidate.getStartDateMillis(), payTableToValidate.getEndDateMillis().getTime());
+                    Interval previousInterval = new Interval(payTableToValidate.getStartDateMillis(), payTableToValidate.getEndDateMillis());
                     Interval interval = new Interval(startDateMillis.getTime(), endDateMillis.getTime());
                     if (previousInterval.overlaps(interval))
                         throw new ActionNotPermittedException("overlap date range");
                 } else {
-                    logger.info("new  EndDate {}", new DateTime(startDateMillis) + "  End date " + (new DateTime(payTableToValidate.getEndDateMillis())));
-                    if (new DateTime(startDateMillis).isBefore(new DateTime(payTableToValidate.getEndDateMillis()))) {
+                    logger.info("new  startDate{}", new DateTime(startDateMillis) + "  End date " + (new DateTime(payTableToValidate.getEndDateMillis())));
+                    if (new DateTime(startDateMillis).isBefore(new DateTime(payTableToValidate.getEndDateMillis())) || new DateTime(startDateMillis).isEqual(new DateTime(payTableToValidate.getEndDateMillis()))) {
                         throw new ActionNotPermittedException("overlap date range" + new DateTime(startDateMillis).toDate() + " --> " + new DateTime(payTableToValidate.getEndDateMillis()).toDate());
                     }
                 }
@@ -226,7 +226,7 @@ public class PayTableService extends UserBaseService {
         payTable.setDescription(payTableDTO.getDescription());
         prepareDates(payTable, payTableDTO);
         save(payTable);
-        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis(), payTable.isPublished(), payTable.isEditable());
+        PayTableResponse payTableResponse = new PayTableResponse(payTable.getName(), payTable.getShortName(), payTable.getDescription(), payTable.getStartDateMillis().getTime(), payTable.getEndDateMillis()!=null?payTable.getEndDateMillis().getTime():null, payTable.isPublished(), payTable.isEditable());
         payTableResponse.setId(payTable.getId());
         return payTableResponse;
     }
