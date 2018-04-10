@@ -201,12 +201,8 @@ public class AccessGroupController {
 
     @RequestMapping(value = UNIT_URL+"/copy_access_group", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> copyUnitAccessGroup(@PathVariable long unitId, @RequestBody AccessGroup objectToSave) {
-        AccessGroup savedObject = accessGroupService.createAccessGroup(unitId, objectToSave);
-        if (savedObject == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
-        }
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, savedObject);
+    public ResponseEntity<Map<String, Object>> copyUnitAccessGroup(@PathVariable long unitId, @RequestBody AccessGroupDTO accessGroupDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.copyUnitAccessGroup(unitId, accessGroupDTO));
     }
 
 }

@@ -567,4 +567,41 @@ public class AccessGroupService extends UserBaseService {
     Long getAccessPageIdByAccessGroup(Long accessGroupId){
         return accessGroupRepository.getAccessPageIdByAccessGroup(accessGroupId);
     }
+
+    public AccessGroup copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroupDTO.getName());
+        if ( isAccessGroupExistWithSameName ) {
+            throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
+        }
+        Optional<AccessGroup> oldAccessGroup=accessGroupRepository.findById(accessGroupDTO.getId());
+        AccessGroup accessGroup=new AccessGroup(accessGroupDTO.getName(),accessGroupDTO.getDescription(),accessGroupDTO.getRole());
+        save(accessGroup);
+        Organization organization = organizationGraphRepository.findOne(organizationId);
+        if (organization == null) {
+            return null;
+        }
+        Organization parent;
+        if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
+
+        } else {
+            parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
+        }
+
+        if (parent == null) {
+            organization.getAccessGroups().add(accessGroup);
+            save(organization);
+
+            //List<AccessPageQueryResult> accessPages=getAccessPageHierarchy(accessGroupDTO.getId(),null);
+            //set default permission of access page while creating access group
+           // List<AccessGroupPageRelationShip> accessGroupPageRelationShips=
+                    accessPageRepository.setAccessGroupPageRelationShips(accessGroupDTO.getId(),accessGroup.getId());
+//            accessGroupPageRelationShips.forEach(accessGroupPageRelationShip -> {
+//                accessGroupPageRelationShip.setAccessGroup(accessGroup);
+//            });
+           // save(accessGroupPageRelationShips);
+            return accessGroup;
+        }
+        return null;
+    }
 }
