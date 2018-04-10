@@ -11,10 +11,14 @@ import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.positionCode.PositionCodeGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.PositionCodeUnionWrapper;
 import com.kairos.response.dto.web.organization.position_code.PositionCodeDTO;
 import com.kairos.service.UserBaseService;
@@ -61,7 +65,10 @@ public class PositionCodeService extends UserBaseService {
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject
     private FunctionGraphRepository functionGraphRepository;
-
+    @Inject
+    private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
+    @Inject
+    private StaffGraphRepository staffGraphRepository;
 
     public PositionCode createPositionCode(Long id, PositionCodeDTO positionCodeDTO, String type) {
         Long unitId = organizationService.getOrganization(id, type);
@@ -103,7 +110,7 @@ public class PositionCodeService extends UserBaseService {
         }
 
         if (!(oldPositionCode.getName().equalsIgnoreCase(positionCode.getName().trim())) &&
-                (positionCodeGraphRepository.checkDuplicatePositionCode(organization.getId(), "(?i)"+positionCode.getName().trim()) != null)) {
+                (positionCodeGraphRepository.checkDuplicatePositionCode(organization.getId() ,"(?i)"+positionCode.getName().trim()) != null)) {
             throw new DuplicateDataException("PositionCode can't be updated");
         }
 
@@ -171,7 +178,13 @@ public class PositionCodeService extends UserBaseService {
 
     }
 
-    public PositionCodeUnionWrapper getUnionsAndPositionCodes(Long id, String type) {
+    public PositionCodeUnionWrapper getUnionsAndPositionCodes(Long id, String type, Long staffId) {
+        Optional<Staff> staff = staffGraphRepository.findById(staffId);
+        if (!staff.isPresent()) {
+            throw new DataNotFoundByIdException("Can't find staff with provided Id");
+        }
+
+        List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffId(staffId);
 
         Organization organization = organizationService.getOrganizationDetail(id, type);
         if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
@@ -202,8 +215,7 @@ public class PositionCodeService extends UserBaseService {
         }
 
         List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
-        List<FunctionDTO> functions = functionGraphRepository.findFunctionsByOrganization(organization.getId());
-        PositionCodeUnionWrapper positionCodeUnionWrapper = new PositionCodeUnionWrapper(positionCodes, unions, organizationHierarchy, reasonCodeType, functions);
+        PositionCodeUnionWrapper positionCodeUnionWrapper = new PositionCodeUnionWrapper(positionCodes, unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
         return positionCodeUnionWrapper;
     }
 

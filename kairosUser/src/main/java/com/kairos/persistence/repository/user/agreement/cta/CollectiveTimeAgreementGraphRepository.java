@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseRepository<CostTimeAgreement,Long> {
 
     @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0}  WITH cta\n" +
-            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{isEnabled:true}) WITH cta,expertise\n" +
+            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise\n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType\n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType\n" +
             "OPTIONAL MATCH (cta)-[:HAS_RULE_TEMPLATE]-(ruleTemp:`CTARuleTemplate`)  WHERE NOT(ruleTemp.`deleted` = true ) AND NOT(ruleTemp.`disabled` = true ) WITH cta,expertise,orgType,orgSubType,ruleTemp\n" +
@@ -54,7 +54,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
 
 
     @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:`HAS_CTA`]-(unit:Organization) WHERE id(unit)={0}  WITH cta\n" +
-            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{isEnabled:true}) WITH cta,expertise\n" +
+            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise\n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType\n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType\n" +
             "OPTIONAL MATCH (cta)-[:HAS_RULE_TEMPLATE]-(ruleTemp:`CTARuleTemplate`)  WHERE NOT(ruleTemp.`deleted` = true ) AND NOT(ruleTemp.`disabled` = true ) WITH cta,expertise,orgType,orgSubType,ruleTemp\n" +
@@ -136,7 +136,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
 
 
     /*@Query("MATCH (uep:UnitPosition)-[:HAS_CTA]-(cta:CostTimeAgreement{deleted:false}) WHERE id(uep)={0}  WITH cta \n" +
-            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{isEnabled:true}) WITH cta,expertise \n" +
+            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise \n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType \n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType \n" +
             "OPTIONAL MATCH (cta)-[:HAS_RULE_TEMPLATE]-(ruleTemp:`CTARuleTemplate`)  WHERE NOT(ruleTemp.`deleted` = true ) AND NOT(ruleTemp.`disabled` = true ) WITH cta,expertise,orgType,orgSubType,ruleTemp \n" +
@@ -174,7 +174,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
 
 
     @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:HAS_CTA]-(up:UnitPosition) WHERE id(up)={0} WITH cta\n" +
-            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{isEnabled:true}) WITH cta,expertise\n" +
+            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise\n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType\n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType\n" +
             "OPTIONAL MATCH (cta)-[:HAS_RULE_TEMPLATE]-(ruleTemp:`CTARuleTemplate`)  WHERE NOT(ruleTemp.`deleted` = true ) AND NOT(ruleTemp.`disabled` = true ) WITH cta,expertise,orgType,orgSubType,ruleTemp\n" +

@@ -336,8 +336,8 @@ public class CostTimeAgreementService extends UserBaseService {
     public CTARuleTemplate saveEmbeddedEntitiesOfCTARuleTemplate(CTARuleTemplate ctaRuleTemplate, RuleTemplate oldCTA){
 
         // Fetch Employment Type
-        /*List<Long> employmentTypeIds = oldCTA.getEmploymentTypes();
-        ctaRuleTemplate.setEmploymentTypes(employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds, false));
+        /*List<Long> employmentTypeIds = oldCTA.getEmploymentType();
+        ctaRuleTemplate.setEmploymentType(employmentTypeGraphRepository.getEmploymentTypeByIds(employmentTypeIds, false));
 
         // Fetch Time Type
         List<Long> timeTypeIds = ctaRuleTemplateDTO.getTimeTypes();
@@ -836,7 +836,7 @@ public class CostTimeAgreementService extends UserBaseService {
         CompletableFuture.allOf(hasUpdated).join();
         this.save(costTimeAgreement);
         collectiveTimeAgreementGraphRepository.linkUnitCTAToOrganization(costTimeAgreement.getId(),unitId);
-        BeanUtils.copyProperties(costTimeAgreement,collectiveTimeAgreementDTO);
+        collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         return collectiveTimeAgreementDTO;
     }
 }

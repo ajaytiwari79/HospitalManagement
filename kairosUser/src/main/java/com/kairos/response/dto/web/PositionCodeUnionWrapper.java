@@ -5,18 +5,20 @@ import com.kairos.persistence.model.organization.union.UnionResponseDTO;
 import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.country.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.persistence.model.user.staff.StaffExperienceInExpertiseDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by vipul on 15/2/18.
  */
 public class PositionCodeUnionWrapper {
-    private List<PositionCode> positionCodes;
-    private List<UnionResponseDTO> unions;
-    private List<OrganizationBasicResponse> organizationHierarchy;
-    private List<ReasonCodeResponseDTO> reasonCodes;
-    private List<FunctionDTO> functions;
+    private List<PositionCode> positionCodes = new ArrayList<>();
+    private List<UnionResponseDTO> unions = new ArrayList<>();
+    private List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
+    private List<ReasonCodeResponseDTO> reasonCodes = new ArrayList<>();
+    private List<StaffExperienceInExpertiseDTO> staffSelectedExpertise;
 
 
     public PositionCodeUnionWrapper() {
@@ -54,19 +56,21 @@ public class PositionCodeUnionWrapper {
         this.reasonCodes = reasonCodes;
     }
 
-    public List<FunctionDTO> getFunctions() {
-        return functions;
+
+    public List<StaffExperienceInExpertiseDTO> getStaffSelectedExpertise() {
+        return staffSelectedExpertise;
     }
 
-    public void setFunctions(List<FunctionDTO> functions) {
-        this.functions = functions;
+    public void setStaffSelectedExpertise(List<StaffExperienceInExpertiseDTO> staffSelectedExpertise) {
+        this.staffSelectedExpertise = staffSelectedExpertise;
     }
 
-    public PositionCodeUnionWrapper(List<PositionCode> positionCodes, List<UnionResponseDTO> unions, List<OrganizationBasicResponse> organizationHierarchy, List<ReasonCodeResponseDTO> reasonCodes,List<FunctionDTO> functions) {
+    public PositionCodeUnionWrapper(List<PositionCode> positionCodes, List<UnionResponseDTO> unions, List<OrganizationBasicResponse> organizationHierarchy,
+                                    List<ReasonCodeResponseDTO> reasonCodes, List<StaffExperienceInExpertiseDTO> staffSelectedExpertise) {
         this.positionCodes = positionCodes;
         this.unions = unions;
         this.organizationHierarchy = organizationHierarchy;
         this.reasonCodes = reasonCodes;
-        this.functions=functions;
+        this.staffSelectedExpertise = staffSelectedExpertise;
     }
 }

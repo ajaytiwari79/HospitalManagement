@@ -1,4 +1,5 @@
 package com.kairos.controller.position_code;
+
 import com.kairos.persistence.model.user.position_code.PositionCode;
 import com.kairos.response.dto.web.organization.position_code.PositionCodeDTO;
 import com.kairos.service.position_code.PositionCodeService;
@@ -28,28 +29,28 @@ public class PositionCodeController {
 
     @ApiOperation("Create PositionCode")
     @PostMapping(value = "/position_code")
-    ResponseEntity<Map<String, Object>> createPositionCode( @RequestParam("type") String type,@PathVariable Long unitId, @RequestBody PositionCodeDTO positionCodeDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.createPositionCode( unitId, positionCodeDTO,type));
+    ResponseEntity<Map<String, Object>> createPositionCode(@RequestParam("type") String type, @PathVariable Long unitId, @RequestBody PositionCodeDTO positionCodeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.createPositionCode(unitId, positionCodeDTO, type));
     }
 
     @ApiOperation("Update PositionCode")
     @PutMapping(value = "/position_code/{positionCodeId}")
     ResponseEntity<Map<String, Object>> updatePositionCode(@RequestParam("type") String type, @PathVariable Long unitId, @PathVariable long positionCodeId, @RequestBody PositionCode positionCode) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.updatePositionCode(unitId, positionCodeId, positionCode,type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.updatePositionCode(unitId, positionCodeId, positionCode, type));
 
     }
 
     @ApiOperation("Delete PositionCode")
     @DeleteMapping(value = "/position_code/{positionCodeId}")
-    ResponseEntity<Map<String, Object>> deletePositionCode(@RequestParam("type") String type,@PathVariable Long unitId,  @PathVariable Long positionCodeId) {
+    ResponseEntity<Map<String, Object>> deletePositionCode(@RequestParam("type") String type, @PathVariable Long unitId, @PathVariable Long positionCodeId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.deletePositionCode(unitId,positionCodeId,type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.deletePositionCode(unitId, positionCodeId, type));
 
     }
 
     @ApiOperation("Get PositionCode")
     @GetMapping(value = "/position_code/{positionCodeId}")
-    ResponseEntity<Map<String, Object>> getPositionCode(@RequestParam("type") String type,@PathVariable Long positionCodeId) {
+    ResponseEntity<Map<String, Object>> getPositionCode(@RequestParam("type") String type, @PathVariable Long positionCodeId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.getPositionCode(positionCodeId));
 
@@ -59,21 +60,19 @@ public class PositionCodeController {
 
     @ApiOperation("Get All PositionCode")
     @GetMapping(value = "/position_code")
-    ResponseEntity<Map<String, Object>> getAllPositionCode(@RequestParam("type") String type,@PathVariable Long unitId) {
+    ResponseEntity<Map<String, Object>> getAllPositionCode(@RequestParam("type") String type, @PathVariable Long unitId) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.getAllPositionCodes(unitId,type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, positionCodeService.getAllPositionCodes(unitId, type));
 
     }
 
-    @RequestMapping(value =  "/unions_with_position_code", method = RequestMethod.GET)
+    @RequestMapping(value = "/unions_with_position_code", method = RequestMethod.GET)
     @ApiOperation("Get All Unions and position code for unit employment  by organization ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getUnionsAndPositionCodes(@PathVariable Long unitId,@RequestParam("type") String type) {
+    public ResponseEntity<Map<String, Object>> getUnionsAndPositionCodes(@PathVariable Long unitId, @RequestParam("type") String type, @RequestParam("staffId") Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                positionCodeService.getUnionsAndPositionCodes(unitId,type));
+                positionCodeService.getUnionsAndPositionCodes(unitId, type, staffId));
     }
-
-
 
 
 }
