@@ -1,20 +1,17 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
-import com.kairos.persistence.model.user.country.CountryHolidayCalender;
-import com.kairos.persistence.model.user.country.TimeType;
-import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CTARuleTemplateDTO {
-//    @NotNull
+    //    @NotNull
     public Long id;
     @NotEmpty(message = "error.cta.ruleTemplate.name.notEmpty")
     @NotNull(message = "error.cta.ruleTemplate.name.notNull")
@@ -30,22 +27,26 @@ public class CTARuleTemplateDTO {
     private CompensationTable compensationTable;
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-//    private List<CTARuleTemplateDayTypeDTO>calculateOnDayTypes=new ArrayList<>();
-    private List<CTARuleTemplatePhaseInfo> phaseInfo=new ArrayList<>();
+    //    private List<CTARuleTemplateDayTypeDTO>calculateOnDayTypes=new ArrayList<>();
+    private List<CTARuleTemplatePhaseInfo> phaseInfo = new ArrayList<>();
     private BudgetType budgetType;
-    private List<CalculateValueIfPlanned> calculateValueIfPlanned =new ArrayList<>();
-    private List<Long> employmentTypes =new ArrayList<>();
-//    private ActivityType activityType;
+    private List<CalculateValueIfPlanned> calculateValueIfPlanned = new ArrayList<>();
+    private List<Long> employmentTypes = new ArrayList<>();
+    //    private ActivityType activityType;
     private PlanningCategory planningCategory;
-    private List<Long> staffFunctions=new ArrayList<>();
+    private List<Long> staffFunctions = new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private boolean calculateScheduledHours;
 //    private List<Long> timeTypes =new ArrayList<>();
 
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
     private List<Long> activityIds;
-    private Long timeTypeId;
-    private Long plannedTimeId;
+
+    /* @Modified by VIPUL
+    * for KP-2927
+    * */
+    private Set<Long> timeTypeIds;
+    private Set<Long> plannedTimeIds;
 
     private List<Long> dayTypeIds;
 
@@ -68,6 +69,7 @@ public class CTARuleTemplateDTO {
     public void setId(Long id) {
         this.id = id;
     }
+
     public String getName() {
         return name;
     }
@@ -167,9 +169,11 @@ public class CTARuleTemplateDTO {
     public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
         return phaseInfo;
     }
+
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
         this.phaseInfo = phaseInfo;
     }
+
     public BudgetType getBudgetType() {
         return budgetType;
     }
@@ -258,23 +262,23 @@ public class CTARuleTemplateDTO {
         this.activityIds = activityIds;
     }
 
-    public Long getTimeTypeId() {
-        return timeTypeId;
+    public Set<Long> getTimeTypeIds() {
+        return timeTypeIds;
     }
 
-    public void setTimeTypeId(Long timeTypeId) {
-        this.timeTypeId = timeTypeId;
+    public void setTimeTypeIds(Set<Long> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
     }
 
-    public Long getPlannedTimeId() {
-        return plannedTimeId;
+    public Set<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
     }
 
-    public void setPlannedTimeId(Long plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
+    public void setPlannedTimeIds(Set<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
     }
 
-    public CTARuleTemplateDTO cloneNew(){
+    public CTARuleTemplateDTO cloneNew() {
         this.setId(null);
         for (CompensationTableInterval compensationTableInterval : this.getCompensationTable().getCompensationTableInterval()) {
             compensationTableInterval.setId(null);
@@ -294,11 +298,11 @@ public class CTARuleTemplateDTO {
     }
 
     public CTARuleTemplateDTO(String name, String description, String payrollType, String payrollSystem) {
-        this.name=name;
-        this.description=description;
-        this.ruleTemplateCategory=ruleTemplateCategory;
-        this.payrollType=payrollType;
-        this.payrollSystem=payrollSystem;
+        this.name = name;
+        this.description = description;
+        this.ruleTemplateCategory = ruleTemplateCategory;
+        this.payrollType = payrollType;
+        this.payrollSystem = payrollSystem;
 
     }
 
