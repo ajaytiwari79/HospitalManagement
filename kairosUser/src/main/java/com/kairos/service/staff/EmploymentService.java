@@ -29,6 +29,7 @@ import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -745,10 +746,12 @@ public class EmploymentService extends UserBaseService {
 
     public void moveToReadOnlyAccessGroup() {
 
-        Long curDateMillis = DateUtil.getCurrentDate().getTime();
+        String timezone;
+        Long curDateMillisStart = DateUtil.getTimezonedStartOfDay("Indian Standard Time",DateUtil.getCurrentDate()).getTime();
+        Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions = null;
         UnitPermission unitPermission = null;
-        List<Long> employmentIds = Arrays.asList(3122L,3110L,2564L,429L);
+        List<Long> employmentIds = Arrays.asList(3024L,2201L,2194L,2996L);
         List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);
         accessGroupRepository.deleteAccessGroupAndCustomizedPermission(employmentIds);
 
@@ -756,8 +759,10 @@ public class EmploymentService extends UserBaseService {
         List<Employment> employments = null;
         int curEle = 0;
         Employment employment = null;
-        if(expiredEmploymentsQueryResults.size()>0)
+        if(expiredEmploymentsQueryResults.size()>0) {
             employments = new ArrayList<Employment>();
+        }
+
 
 
         for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult: expiredEmploymentsQueryResults) {
@@ -769,7 +774,6 @@ public class EmploymentService extends UserBaseService {
 
             for(AccessGroup accessGroup:expiredEmploymentsQueryResult.getAccessGroups()){
 
-                //unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaffByEmployment( organizations.get(i).getId(), employmentOrganizationAccessGroup.getEmployment().getId() );
                 unitPermission = unitPermissions.get(curEle);
                 if(!Optional.ofNullable(unitPermission).isPresent() ) {
                     unitPermission = new UnitPermission();
@@ -780,22 +784,9 @@ public class EmploymentService extends UserBaseService {
 
                 unitPermission.setAccessGroup(accessGroup);
                 employment.getUnitPermissions().add(unitPermission);
-
-
-                //  AccessGroup accessGroup = accessGroupRepository.findReadonlyAccessGroupByOrganization(accessGroupId);
-//            unitPermission = new UnitPermission();
-//            unitPermission.setOrganization(unit);
-//            unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
-                //employment.getUnitPermissions().add(unitPermission);
                 curEle++;
-
-                //unitPermissionGraphRepository.save(unitPermission);
-
             }
-
             employments.add(employment);
-            //employmentGraphRepository.save(employment);
-
         }
 
         employmentGraphRepository.saveAll(employments);
