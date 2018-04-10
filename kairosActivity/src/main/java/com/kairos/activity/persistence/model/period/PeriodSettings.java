@@ -2,7 +2,6 @@ package com.kairos.activity.persistence.model.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-import com.kairos.activity.service.phase.DurationType;
 
 /**
  * Created by prerna on 30/3/18.

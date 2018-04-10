@@ -30,22 +30,14 @@ public class PlanningPeriod extends MongoBaseEntity {
         // default constructor
     }
 
-    public PlanningPeriod(String name, Date startDate, Date endDate, Long unitId, List<PeriodPhaseFlippingDate> phaseFlippingDate, List<PhaseDTO> applicablePhases) {
+    public PlanningPeriod(String name, Date startDate, Date endDate, Long unitId, List<PeriodPhaseFlippingDate> phaseFlippingDate, BigInteger currentPhaseId, BigInteger nextPhaseId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.unitId = unitId;
         this.phaseFlippingDate = phaseFlippingDate;
-        if(Optional.ofNullable(applicablePhases).isPresent()){
-            List<PeriodPhaseFlippingDate> tempPhaseFlippingDate = new ArrayList<>();
-            Date tempEndDate = endDate;
-            applicablePhases.forEach(phase->{
-                // TODO Check if duration of period is enough to assign next flipping
-                // TODO Calculate flipping date by duration
-                PeriodPhaseFlippingDate periodPhaseFlippingDate = new PeriodPhaseFlippingDate(phase.getId(), endDate);
-
-            });
-        }
+        this.currentPhaseId = currentPhaseId;
+        this.nextPhaseId = nextPhaseId;
     }
 
     public Date getStartDate() {

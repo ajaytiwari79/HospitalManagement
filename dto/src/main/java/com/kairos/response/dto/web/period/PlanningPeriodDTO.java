@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.enums.DurationType;
 import org.joda.time.DurationFieldType;
 
 import java.math.BigInteger;
@@ -12,11 +13,13 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanningPeriodDTO {
     private BigInteger id;
-    private Long startDate;
-    private Long endDate;
+    private Long startDateInMillis;
+    private Long endDateInMillis;
+    private Date startDate;
+    private Date endDate;
     private Long unitId = -1L;
     private int duration;
-    private DurationFieldType durationType;
+    private DurationType durationType;
     private int recurringNumber;
     private String currentPhase;
     private String nextPhase;
@@ -27,14 +30,6 @@ public class PlanningPeriodDTO {
 
     public PlanningPeriodDTO(){
         // default constructor
-    }
-
-    public Date getStartDate() {
-        return new Date(startDate);
-    }
-
-    public void setStartDate(Long startDate) {
-        this.startDate = startDate;
     }
 
     public Long getUnitId() {
@@ -53,11 +48,11 @@ public class PlanningPeriodDTO {
         this.duration = duration;
     }
 
-    public DurationFieldType getDurationType() {
+    public DurationType getDurationType() {
         return durationType;
     }
 
-    public void setDurationType(DurationFieldType durationType) {
+    public void setDurationType(DurationType durationType) {
         this.durationType = durationType;
     }
 
@@ -69,13 +64,13 @@ public class PlanningPeriodDTO {
         this.recurringNumber = recurringNumber;
     }
 
-    public Date getEndDate() {
+    /*public Date getEndDate() {
         return new Date(endDate);
     }
 
     public void setEndDate(Long endDate) {
         this.endDate = endDate;
-    }
+    }*/
 
     public String getCurrentPhase() {
         return currentPhase;
@@ -124,5 +119,40 @@ public class PlanningPeriodDTO {
     public void setId(BigInteger id) {
         this.id = id;
     }
+
+    public Long getStartDateInMillis() {
+        return startDateInMillis;
+    }
+
+    public void setStartDateInMillis(Long startDateInMillis) {
+        this.startDateInMillis = startDateInMillis;
+    }
+
+    public Long getEndDateInMillis() {
+        return endDateInMillis;
+    }
+
+    public void setEndDateInMillis(Long endDateInMillis) {
+        this.endDateInMillis = endDateInMillis;
+    }
+
+    public Date getStartDate() {
+        return new Date(startDateInMillis);
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+
+
 }
 

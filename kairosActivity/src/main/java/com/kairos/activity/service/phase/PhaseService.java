@@ -12,6 +12,7 @@ import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.util.DateUtils;
+import com.kairos.persistence.model.enums.DurationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -224,6 +225,7 @@ public class PhaseService extends MongoBaseService {
     private void preparePhase(Phase phase, PhaseDTO phaseDTO) {
 
         phase.setDuration(phaseDTO.getDuration());
+        phase.setDurationType(phaseDTO.getDurationType());
         phase.setName(phase.getName());
         phase.setSequence(phase.getSequence());
         phase.setDescription(phaseDTO.getDescription());
