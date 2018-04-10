@@ -1,17 +1,12 @@
 package com.kairos.activity.service.period;
 
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
-import com.kairos.activity.client.dto.organization.OrganizationDTO;
-import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.persistence.model.period.PeriodSettings;
 import com.kairos.activity.persistence.model.period.PlanningPeriod;
-import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.activity.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
-import com.kairos.activity.service.phase.DurationType;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.response.dto.web.period.PlanningPeriodDTO;
 import org.slf4j.Logger;
