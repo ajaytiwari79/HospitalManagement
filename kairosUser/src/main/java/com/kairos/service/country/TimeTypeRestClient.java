@@ -2,14 +2,7 @@ package com.kairos.service.country;
 
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.timetype.TimeTypeDTO;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.TimeTypeGraphRepository;
-import com.kairos.service.UserBaseService;
-import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -21,7 +14,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Optional;
+
+import static com.kairos.client.RestClientURLUtil.getBaseUrl;
 
 /**
  * Created by vipul on 17/10/17.
@@ -61,16 +55,6 @@ public class TimeTypeRestClient {
 
     }
 
-    private final String getBaseUrl(boolean hasUnitInUrl) {
-        if (hasUnitInUrl) {
-            String baseUrl = new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        } else {
-            String baseUrl = new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
-        }
-
-    }
 
 
 }

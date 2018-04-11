@@ -13,7 +13,6 @@ import com.kairos.activity.service.planner.TasksMergingService;
 import com.kairos.activity.service.task_type.TaskService;
 import com.kairos.activity.service.visitator.VisitatorService;
 import com.kairos.activity.util.response.ResponseHandler;
-import com.netflix.discovery.converters.Auto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

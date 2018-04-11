@@ -59,7 +59,6 @@ import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1008,7 +1007,7 @@ public class OrganizationService extends UserBaseService {
         if (organization == null) {
             throw new DataNotFoundByIdException("Incorrect id of an organization");
         }
-        Map<String, Object> requiredDataForTimeCareTask = new HashedMap();
+        Map<String, Object> requiredDataForTimeCareTask = new HashMap<>();
         OrganizationContactAddress organizationContactData = organizationGraphRepository.getContactAddressOfOrg(organization.getId());
         Staff staff = staffGraphRepository.findByExternalId(workShift.getPerson().getId());
         AbsenceTypes absenceTypes = absenceTypesRepository.findByName(workShift.getActivity().getName());
@@ -1215,7 +1214,7 @@ public class OrganizationService extends UserBaseService {
         List<String> zoneList = new ArrayList<>(allZones);
         Collections.sort(zoneList);
 
-        Map<String, Object> timeZonesData = new HashedMap();
+        Map<String, Object> timeZonesData = new HashMap<>();
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);

@@ -4,7 +4,6 @@ import com.kairos.client.dto.PhaseAndActivityTypeWrapper;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.response.dto.web.cta.PhaseDTO;
 import com.kairos.service.organization.OrganizationService;
-import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.util.List;
+
+import static com.kairos.client.RestClientURLUtil.getBaseUrl;
 
 /**
  * Created by vipul on 25/9/17.
@@ -121,17 +122,6 @@ public class PhaseRestClient {
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
-        }
-
-    }
-
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
         }
 
     }

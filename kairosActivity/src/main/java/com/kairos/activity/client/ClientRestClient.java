@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
+
 @Component
 public class ClientRestClient {
 
@@ -402,17 +404,6 @@ public class ClientRestClient {
 
     }
 
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
-        }
-
-    }
-
     private ResponseEnvelope convertRestClientExceptionJsonToDto(HttpClientErrorException e){
         ObjectMapper objectMapper = new ObjectMapper();
         ResponseEnvelope responseEnvelope = null;
@@ -439,7 +430,7 @@ public class ClientRestClient {
             HttpEntity<List<Long>> request = new HttpEntity<>(unitIds);
             ResponseEntity<RestTemplateResponseEnvelope<List<ClientOrganizationIds>>> restExchange =
                     schedulerRestTemplate.exchange(
-                           "http://zuulservice/kairos/user/api/v1/organization/{organizationId}/unit/{unitId}/client/client_ids_by_unitIds",
+                            baseUrl+"{organizationId}/unit/{unitId}/client/client_ids_by_unitIds",
                             HttpMethod.POST,
                             request, typeReference, organizationId, unitId);
             RestTemplateResponseEnvelope<List<ClientOrganizationIds>> response = restExchange.getBody();

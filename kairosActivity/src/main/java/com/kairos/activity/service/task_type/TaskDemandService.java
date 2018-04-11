@@ -24,7 +24,6 @@ import com.kairos.activity.util.JsonUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
-import com.netflix.discovery.converters.Auto;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
@@ -56,8 +55,6 @@ public class TaskDemandService extends MongoBaseService {
 
     @Inject
     TaskTypeMongoRepository taskTypeMongoRepository;
-    @Auto
-
     @Inject
     TaskDemandMongoRepository taskDemandMongoRepository;
 

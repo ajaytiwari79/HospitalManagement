@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
+
 /*
 * Created By Pradeep singh rajawat
 *  Date-27/01/2018
@@ -27,7 +29,7 @@ public class TimeBankRestClient {
     private RestTemplate restTemplate;
 
     public TimebankWrapper getCTAbyUnitEmployementPosition(Long unitPositionId) {
-        String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
+        String baseUrl=new StringBuilder(getBaseUrl(false)).append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<TimebankWrapper>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<TimebankWrapper>>(){};
             ResponseEntity<RestTemplateResponseEnvelope<TimebankWrapper>> restExchange =

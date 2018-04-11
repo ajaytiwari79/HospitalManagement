@@ -3,7 +3,6 @@ package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.timeBank.TimebankWrapper;
-import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,6 +15,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
+
+import static com.kairos.client.RestClientURLUtil.getBaseUrl;
 
 @Service
 public class TimeBankRestClient {
@@ -73,18 +74,6 @@ public class TimeBankRestClient {
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
-        }
-
-    }
-
-
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
         }
 
     }
