@@ -1,5 +1,6 @@
 package com.kairos.service.mail;
 
+import com.kairos.constants.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,6 +20,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
 
+import static com.kairos.constants.AppConstants.MAIL_FROM;
 
 
 /**
@@ -71,7 +73,7 @@ public class MailService {
             StringBuilder sb = getRecipientsFromArray(recipients);
             String recipientsString = sb.toString();
             logger.info("List: "+recipientsString);
-            mail.setFrom(new InternetAddress("info@nordicplanning.dk"));
+            mail.setFrom(new InternetAddress(MAIL_FROM));
             mail.setRecipients(Message.RecipientType.TO,InternetAddress.parse(recipientsString));
             mail.setSubject(subject);
             mail.setText(message);

@@ -29,7 +29,6 @@ import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -765,9 +764,7 @@ public class EmploymentService extends UserBaseService {
                     unitPermission = new UnitPermission();
                     unitPermission.setOrganization(organizations.get(currentElement));
                     unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
-
                 }
-
                 unitPermission.setAccessGroup(accessGroup);
                 employment.getUnitPermissions().add(unitPermission);
                 currentElement++;
