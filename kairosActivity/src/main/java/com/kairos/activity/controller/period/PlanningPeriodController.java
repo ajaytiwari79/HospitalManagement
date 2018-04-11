@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -30,8 +31,20 @@ public class PlanningPeriodController {
     @PostMapping(value="/period")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createPlanningPeriod(@PathVariable Long unitId,  @RequestBody @Valid PlanningPeriodDTO planningPeriodDTO) {
-        planningPeriodService.createPeriod(unitId, planningPeriodDTO);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.createPeriod(unitId, planningPeriodDTO));
+    }
+
+    @ApiOperation(value = "Get Planning Period")
+    @GetMapping(value="/period")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getPlanningPeriod(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPeriods(unitId, null, null));
+    }
+
+    @ApiOperation(value = "Remove Period")
+    @DeleteMapping(value = "/period/{periodId}")
+    public ResponseEntity<Map<String, Object>> deletePhase(@PathVariable Long unitId, @PathVariable BigInteger periodId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.deletePeriod(unitId, periodId));
     }
 
 

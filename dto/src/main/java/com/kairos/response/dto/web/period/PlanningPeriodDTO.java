@@ -2,10 +2,10 @@ package com.kairos.response.dto.web.period;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.enums.DurationType;
-import org.joda.time.DurationFieldType;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by prerna on 10/4/18.
@@ -13,8 +13,9 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlanningPeriodDTO {
     private BigInteger id;
-    private Long startDateInMillis;
-    private Long endDateInMillis;
+    private String name;
+    private Long startDateMillis;
+    private Long endDateMillis;
     private Date startDate;
     private Date endDate;
     private Long unitId = -1L;
@@ -26,10 +27,19 @@ public class PlanningPeriodDTO {
     private Long requestToPuzzleDate;
     private Long puzzleToConstructionDate;
     private Long constructionToDraftDate;
+    private List<PeriodPhaseFlippingDateDTO> phaseFlippingDate;
+    private String periodDuration;
 
 
     public PlanningPeriodDTO(){
         // default constructor
+    }
+
+    public PlanningPeriodDTO(Long startDateMillis, int duration, DurationType durationType, int recurringNumber){
+        this.startDateMillis = startDateMillis;
+        this.duration = duration;
+        this.durationType = durationType;
+        this.recurringNumber = recurringNumber;
     }
 
     public Long getUnitId() {
@@ -120,24 +130,24 @@ public class PlanningPeriodDTO {
         this.id = id;
     }
 
-    public Long getStartDateInMillis() {
-        return startDateInMillis;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDateInMillis(Long startDateInMillis) {
-        this.startDateInMillis = startDateInMillis;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Long getEndDateInMillis() {
-        return endDateInMillis;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDateInMillis(Long endDateInMillis) {
-        this.endDateInMillis = endDateInMillis;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
     public Date getStartDate() {
-        return new Date(startDateInMillis);
+        return startDate;
     }
 
     public void setStartDate(Date startDate) {
@@ -152,7 +162,28 @@ public class PlanningPeriodDTO {
         this.endDate = endDate;
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    public List<PeriodPhaseFlippingDateDTO> getPhaseFlippingDate() {
+        return phaseFlippingDate;
+    }
+
+    public void setPhaseFlippingDate(List<PeriodPhaseFlippingDateDTO> phaseFlippingDate) {
+        this.phaseFlippingDate = phaseFlippingDate;
+    }
+
+    public String getPeriodDuration() {
+        return periodDuration;
+    }
+
+    public void setPeriodDuration(String periodDuration) {
+        this.periodDuration = periodDuration;
+    }
 }
 
