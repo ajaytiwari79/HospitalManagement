@@ -8,7 +8,10 @@ import com.kairos.persistence.model.enums.FixedValueType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.cta.*;
+import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
+import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
+import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.Currency;
@@ -51,6 +54,8 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import static com.kairos.constants.AppConstants.COPY_OF;
 
 @Transactional
 @Service
@@ -838,5 +843,50 @@ public class CostTimeAgreementService extends UserBaseService {
         collectiveTimeAgreementGraphRepository.linkUnitCTAToOrganization(costTimeAgreement.getId(),unitId);
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         return collectiveTimeAgreementDTO;
+    }
+
+    public List<CTAListQueryResult> getAllCTAByOrganizationSubType(Long organizationSubTypeId){
+        return collectiveTimeAgreementGraphRepository.getAllCTAByOrganiationSubType(organizationSubTypeId);
+    }
+
+    public Map<String, Object> setCTAWithOrganizationType(Long countryId, long ctaId, long organizationSubTypeId, boolean checked) {
+        Map<String, Object> map = new HashMap<>();
+
+
+        OrganizationType organizationSubType = organizationTypeRepository.findOne(organizationSubTypeId);
+        if (!Optional.ofNullable(organizationSubType).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid organisation Sub type Id " + organizationSubTypeId);
+        }
+        CostTimeAgreement cta = collectiveTimeAgreementGraphRepository.findOne(ctaId, 2);
+
+        if (!Optional.ofNullable(cta).isPresent()) {
+            throw new DataNotFoundByIdException("cta not found " + ctaId);
+        }
+        if (checked) {
+            CostTimeAgreement newCtaObject = new CostTimeAgreement();
+            cta.setId(null);
+
+            BeanUtils.copyProperties(cta,newCtaObject);
+            newCtaObject.getRuleTemplates().forEach(ruleTemplate -> {
+                ruleTemplate.setId(null);
+            });
+
+            newCtaObject.setName(COPY_OF+" "+ cta.getName());
+            newCtaObject.setCountry(cta.getCountry());
+            newCtaObject.setOrganizationType(cta.getOrganizationType());
+            newCtaObject.setOrganizationSubType(organizationSubType);
+            save(newCtaObject);
+            newCtaObject.setOrganizationType(newCtaObject.getOrganizationType().basicDetails());
+            newCtaObject.setOrganizationSubType(newCtaObject.getOrganizationSubType().basicDetails());
+            newCtaObject.setExpertise(newCtaObject.getExpertise().retrieveBasicDetails());
+            newCtaObject.setCountry(null);
+            map.put("cta", newCtaObject);
+            map.put("ruleTemplate", newCtaObject.getRuleTemplates());
+        } else {
+            cta.setDeleted(true);
+            save(cta);
+        }
+        return map;
+
     }
 }
