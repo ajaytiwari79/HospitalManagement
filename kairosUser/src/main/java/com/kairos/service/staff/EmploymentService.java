@@ -704,9 +704,8 @@ public class EmploymentService extends UserBaseService {
         map.put("note", partialLeave.getNote());
         return map;
     }
-    public void updateEmploymentEndDate(UnitPositionDTO unitPositionDTO, Long unitId) {
+    public void updateEmploymentEndDate(Organization unit, UnitPositionDTO unitPositionDTO, Long unitId) {
 
-        Organization unit = organizationGraphRepository.findOne(unitId);
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
 
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
