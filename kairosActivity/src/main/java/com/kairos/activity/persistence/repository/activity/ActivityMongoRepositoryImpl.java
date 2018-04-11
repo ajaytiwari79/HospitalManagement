@@ -7,6 +7,7 @@ import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
 import com.kairos.activity.response.dto.activity.ActivityWithCTAWTASettingsDTO;
 import com.kairos.activity.response.dto.activity.OrganizationActivityDTO;
+import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -47,7 +48,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("published").is(true).and("isParentActivity").is(true).and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))),
+                match(Criteria.where("deleted").is(false).and("isParentActivity").is(true)
+                        .and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))
+                        .and("state").nin("DRAFT")),
                 unwind("tags", true),
                 lookup("tag", "tags", "_id", "tags_data"),
                 unwind("tags_data", true),
@@ -104,7 +107,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 unwind("tags_data", true),
                 group("$id")
                         .first("$name").as("name")
-                        .first("$published").as("published")
+                        .first("$state").as("state")
                         .first("$description").as("description")
                         .first("$countryId").as("countryId")
                         .first("$isParentActivity").as("isParentActivity")

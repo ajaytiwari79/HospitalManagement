@@ -6,6 +6,7 @@ import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.GeneralActivityTab;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
+import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigInteger;
@@ -30,7 +31,7 @@ public class ActivityTagDTO {
     private GeneralActivityTab generalActivityTab;
     private List<ActivityTagDTO> compositeActivities = new ArrayList<ActivityTagDTO>();
     private Long parentId;
-    private Boolean published;
+    private ActivityStateEnum state;
 
     public ActivityTagDTO() {
         //default constructor
@@ -132,12 +133,12 @@ public class ActivityTagDTO {
         this.parentId = parentId;
     }
 
-    public Boolean getPublished() {
-        return published;
+    public ActivityStateEnum getState() {
+        return state;
     }
 
-    public void setPublished(Boolean published) {
-        this.published = published;
+    public void setState(ActivityStateEnum state) {
+        this.state = state;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
@@ -147,6 +148,7 @@ public class ActivityTagDTO {
         this.isParentActivity = activity.isParentActivity();
         this.unitId = activity.getUnitId();
         this.tags = tags;
+        this.state=activity.getState();
         return this;
     }
 }

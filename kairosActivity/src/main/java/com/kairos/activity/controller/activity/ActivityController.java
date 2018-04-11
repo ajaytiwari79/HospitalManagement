@@ -325,4 +325,12 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.publishActivity(activityId));
     }
 
+
+
+    @ApiOperation("copy Activity")
+    @PostMapping(value = "/activity/{activityId}/copy_activity")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> copyActivityDetails(@PathVariable Long countryId, @PathVariable BigInteger activityId, @RequestBody  ActivityDTO activity) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.copyActivityDetails(countryId, activityId, activity));
+    }
 }

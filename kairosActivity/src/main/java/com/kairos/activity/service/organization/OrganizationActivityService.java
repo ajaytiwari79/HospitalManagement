@@ -21,6 +21,7 @@ import com.kairos.activity.response.dto.activity.GeneralActivityTabDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.service.activity.TimeTypeService;
+import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -63,6 +64,11 @@ public class OrganizationActivityService extends MongoBaseService {
         if (checked) {
             Activity activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             save(activityCopied);
+
+            if (!activity.getState().equals(ActivityStateEnum.LIVE)) {
+                activity.setState(ActivityStateEnum.LIVE);
+                save(activity);
+            }
             return activityCopied.retrieveBasicDetails();
 
         } else {
@@ -124,7 +130,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setParentActivity(false);
         activityCopied.setOrganizationTypes(null);
         activityCopied.setOrganizationSubTypes(null);
-        activityCopied.setPublished(null);
+        activityCopied.setState(null);
         activityCopied.setLevels(null);
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
@@ -202,22 +208,20 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
         Activity activity = activityMongoRepository.
-                findByNameIgnoreCaseAndDeletedFalse(activityDTO.getName().trim());
+                findByNameIgnoreCaseAndDeletedFalseAndUnitId(activityDTO.getName().trim(), unitId);
         if (Optional.ofNullable(activity).isPresent()) {
             logger.error("ActivityName already exist" + activityDTO.getName());
             throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
         }
-
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
-        if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !activityFromDatabase.get().getUnitId().equals(unitId)) {
+        if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
             throw new DataNotFoundByIdException("Invalid ActivityId:" + activityId);
         }
-        Activity activityCopied = copyAllActivitySettings(activityFromDatabase.get(), unitId);
+        Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
         activityCopied.setName(activityDTO.getName().trim());
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
         return activityDTO;
-
     }
 
 }

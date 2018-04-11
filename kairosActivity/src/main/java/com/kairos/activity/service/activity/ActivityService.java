@@ -30,6 +30,7 @@ import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
+import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -96,11 +97,8 @@ public class ActivityService extends MongoBaseService {
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         logger.info(activityDTO.getName());
         Activity activity = activityMongoRepository.
-<<<<<<< HEAD
-                findByNameIgnoreCaseAndDeletedFalse(activityDTO.getName().trim());
-=======
-                findByNameIgnoreCaseAndDeletedFalse(activityDTO.getName().trim(), countryId);
->>>>>>> KP-2694
+                findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
+
         if (Optional.ofNullable(activity).isPresent()) {
             logger.error("ActivityName already exist" + activityDTO.getName());
             throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
@@ -112,6 +110,7 @@ public class ActivityService extends MongoBaseService {
         List<TagDTO> tags = tagMongoRepository.getTagsById(activityDTO.getTags());
         ActivityTagDTO activityTagDTO = new ActivityTagDTO();
         activityTagDTO.buildActivityTagDTO(activity, tags);
+
         return activityTagDTO;
     }
 
@@ -145,8 +144,6 @@ public class ActivityService extends MongoBaseService {
         TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab(ENTERED_TIMES, 0l, true, LocalTime.of(7, 0), 1d);
         activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
 
-        activity.getTimeCalculationActivityTab().setMultiplyWithValue(1d);
-
         IndividualPointsActivityTab individualPointsActivityTab = new IndividualPointsActivityTab("addHourValues", 0.0);
         activity.setIndividualPointsActivityTab(individualPointsActivityTab);
 
@@ -163,7 +160,6 @@ public class ActivityService extends MongoBaseService {
 
         SkillActivityTab skillActivityTab = new SkillActivityTab();
         activity.setSkillActivityTab(skillActivityTab);
-
 
     }
 
@@ -211,8 +207,9 @@ public class ActivityService extends MongoBaseService {
 
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid TimeCareActivity Id : " + activityId);
+            throw new DataNotFoundByIdException("Invalid activity Id : " + activityId);
         }
+
         long activityCount = shiftService.countByActivityId(activityId);
         if (activityCount > 0) {
             throw new ActionNotPermittedException("TimeCareActivity type is being used in activities");
@@ -707,10 +704,15 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Activity Id : " + activityId);
         }
-        Integer activityTypeCount = activityMongoRepository.countByParentIdAndDeletedFalse(activityId);
-        if (activityTypeCount > 0) {
-            throw new ActionNotPermittedException("TimeCareActivity type is being used in organizations");
+        if (activity.getState().equals(ActivityStateEnum.LIVE)) {
+            throw new ActionNotPermittedException("activity type is being used in organizations : " + activityId);
         }
+
+
+//        Integer activityTypeCount = activityMongoRepository.countByParentIdAndDeletedFalse(activityId);
+//        if (activityTypeCount > 0) {
+//            throw new ActionNotPermittedException("activity type is being used in organizations");
+//        }
         activity.setDeleted(true);
         save(activity);
         return true;
@@ -788,6 +790,7 @@ public class ActivityService extends MongoBaseService {
             Activity activity = (result.isPresent()) ? result.get() : new Activity();
             activity.setCountryId(countryId);
             activity.setParentActivity(true);
+            activity.setState(ActivityStateEnum.LIVE);
             activity.setName(timeCareActivity.getName());
             activity.setOrganizationTypes(orgTypes);
             activity.setOrganizationSubTypes(orgSubTypes);
@@ -894,6 +897,7 @@ public class ActivityService extends MongoBaseService {
                 activity.setUnitId(unitId);
                 activity.setParentActivity(false);
                 activity.setOrganizationTypes(null);
+                activity.setState(null);
                 activity.setOrganizationSubTypes(null);
                 activity.setLevels(null);
                 activity.setRegions(null);
@@ -941,12 +945,33 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid ActivityId : " + activityId);
         }
-        if (activity.getPublished()) {
+        if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             throw new ActionNotPermittedException("activity is already published :" + activityId);
         }
-        activity.setPublished(true);
+        activity.setState(ActivityStateEnum.PUBLISHED);
         save(activity);
         return true;
-
     }
+
+    public ActivityDTO copyActivityDetails(Long countryId, BigInteger activityId, ActivityDTO activityDTO) {
+        Activity activity = activityMongoRepository.
+                findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
+        if (Optional.ofNullable(activity).isPresent()) {
+            logger.error("ActivityName already exist " + activityDTO.getName());
+            throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
+        }
+        Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
+        if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
+            throw new DataNotFoundByIdException("Invalid ActivityId:" + activityId);
+        }
+
+        Activity activityCopied = new Activity();
+        Activity.copyProperties(activityFromDatabase.get(), activityCopied, "id", "organizationTypes", "organizationSubTypes");
+        activityCopied.setName(activityDTO.getName().trim());
+        activityCopied.setState(ActivityStateEnum.DRAFT);
+        save(activityCopied);
+        activityDTO.setId(activityCopied.getId());
+        return activityDTO;
+    }
+
 }

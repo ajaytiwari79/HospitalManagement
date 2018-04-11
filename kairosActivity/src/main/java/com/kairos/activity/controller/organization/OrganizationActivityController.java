@@ -281,8 +281,8 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityWithCtaWtaSettingByUnit(unitId));
     }
 
-    @ApiOperation("Create Activity")
-    @PostMapping(value = "/activity/{activityId}/copy-activity")
+    @ApiOperation("copy Activity")
+    @PostMapping(value = "/activity/{activityId}/copy_activity")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> copyActivityDetails(@PathVariable Long unitId, @PathVariable BigInteger activityId, @RequestBody @Valid ActivityDTO activity) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.copyActivityDetails(unitId, activityId, activity));
