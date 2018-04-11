@@ -108,7 +108,6 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getUnitPositionCTA(unitId, unitPositionId));
     }
 
-
     @RequestMapping(value = "unit/{unitId}/copy_unit_cta", method = RequestMethod.POST)
     @ApiOperation("Create copy of CTA at unit")
     public ResponseEntity<Map<String, Object>> createCopyOfUnitCTA(@PathVariable Long unitId

@@ -1,19 +1,17 @@
 package com.kairos.persistence.repository.user.access_permission;
 
-import com.kairos.persistence.model.user.access_permission.AccessGroupPageRelationShip;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.user.auth.StaffPermissionQueryResult;
-import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;
-import static com.kairos.constants.AppConstants.MANAGE_COUNTRY_TAB_MODULE_ID;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
