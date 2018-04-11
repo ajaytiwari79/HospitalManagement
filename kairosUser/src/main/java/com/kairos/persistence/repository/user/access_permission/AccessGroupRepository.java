@@ -263,10 +263,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "Match(up)-[r1:HAS_ACCESS_GROUP]-(ag:AccessGroup) optional Match(up)-[r2:HAS_CUSTOMIZED_PERMISSION]-(accesspage:AccessPage) delete r1, r2")
     void deleteAccessGroupAndCustomizedPermission(Long employmentId, Long organizationId);
 
-    @Query("Match(employment:Employment)-[:HAS_UNIT_PERMISSIONS]-(unitPermission:UnitPermission) where id(employment) in {0} \n"+
+    @Query("Match(employment:Employment)-[:HAS_UNIT_PERMISSIONS]-(unitPermission:UnitPermission) where employment.endDateMillis <= {0} and employment.endDateMillis >= {1} \n"+
             "Match(unitPermission)-[rel_has_access_group:HAS_ACCESS_GROUP]-(ag:AccessGroup) optional Match(unitPermission)-[rel_has_customized_permission:HAS_CUSTOMIZED_PERMISSION]-" +
             "(accesspage:AccessPage) delete rel_has_access_group, rel_has_customized_permission")
-    void deleteAccessGroupAndCustomizedPermission(List<Long> empIds);
+    void deleteAccessGroupRelationAndCustomizedPermissionRelation(Long curDateMillisStart, Long curDateMillisEnd );
 }
 
 

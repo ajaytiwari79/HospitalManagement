@@ -225,7 +225,7 @@ public class EmploymentService extends UserBaseService {
                 AccessPermission accessPermission;
                 if (parentOrganization == null) {
                     accessPermission = unitPermissionGraphRepository.getAccessPermission(unit.getId(), unitId, staffId, accessGroupId);
-                } else {createUni
+                } else {
                     accessPermission = unitPermissionGraphRepository.getAccessPermission(parentOrganization.getId(), unitId, staffId, accessGroupId);
                 }
                 AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
@@ -708,7 +708,6 @@ public class EmploymentService extends UserBaseService {
     public void updateEmploymentEndDate(UnitPositionDTO unitPositionDTO, Long unitId) {
 
         Organization unit = organizationGraphRepository.findOne(unitId);
-
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
 
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
@@ -716,43 +715,37 @@ public class EmploymentService extends UserBaseService {
         }
 
         List<UnitPositionQueryResult> unitPositionsQuery = unitPositionGraphRepository.getAllUnitPositionsByStaffId(parentOrganization.getId(), unitPositionDTO.getStaffId());
-        Long max = unitPositionsQuery.get(0).getEndDateMillis();
+        Long maxEndDate = unitPositionsQuery.get(0).getEndDateMillis();
         boolean isEndDateBlank = false;
         for(UnitPositionQueryResult unitPosition:unitPositionsQuery) {
             if(!Optional.ofNullable(unitPosition.getEndDateMillis()).isPresent()) {
                 isEndDateBlank = true;
                 break;
             }
-            if(max < unitPosition.getEndDateMillis()){
-                max = unitPosition.getEndDateMillis();
+            if(maxEndDate < unitPosition.getEndDateMillis()){
+                maxEndDate = unitPosition.getEndDateMillis();
             }
-
         }
 
-        Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) ? null : (max>unitPositionDTO.getEndDateMillis()?max:unitPositionDTO.getEndDateMillis());
+        Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDateMillis()?maxEndDate:unitPositionDTO.getEndDateMillis());
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),unitPositionDTO.getStaffId());
         employment.setEndDateMillis(employmentEndDate);
         employmentGraphRepository.save(employment);
     }
 
-
-
-
-
-
+    
     public void moveToReadOnlyAccessGroup() {
 
-        Long curDateMillisStart = DateUtil.getTimezonedStartOfDay("Indian Standard Time",DateUtil.getCurrentDate()).getTime();
+        Long curDateMillisStart = DateUtil.getStartOfDay(DateUtil.getCurrentDate()).getTime();
         Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions = null;
         UnitPermission unitPermission = null;
-        List<Long> employmentIds = Arrays.asList(3024L,2201L,2194L,2996L);
-        List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);
-        accessGroupRepository.deleteAccessGroupAndCustomizedPermission(employmentIds);
+        List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(curDateMillisStart,curDateMillisEnd);
+        accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(curDateMillisStart, curDateMillisEnd);
 
         List<Organization> organizations = null;
         List<Employment> employments = null;
-        int curEle = 0;
+        int currentElement = 0;
         Employment employment = null;
         if(expiredEmploymentsQueryResults.size()>0) {
             employments = new ArrayList<Employment>();
@@ -763,27 +756,27 @@ public class EmploymentService extends UserBaseService {
             organizations = expiredEmploymentsQueryResult.getOrganizations();
             employment = expiredEmploymentsQueryResult.getEmployment();
             unitPermissions = expiredEmploymentsQueryResult.getUnitPermissions();
-            curEle = 0;
+            currentElement = 0;
 
             for(AccessGroup accessGroup:expiredEmploymentsQueryResult.getAccessGroups()){
 
-                unitPermission = unitPermissions.get(curEle);
+                unitPermission = unitPermissions.get(currentElement);
                 if(!Optional.ofNullable(unitPermission).isPresent() ) {
                     unitPermission = new UnitPermission();
-                    unitPermission.setOrganization(organizations.get(curEle));
+                    unitPermission.setOrganization(organizations.get(currentElement));
                     unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
 
                 }
 
                 unitPermission.setAccessGroup(accessGroup);
                 employment.getUnitPermissions().add(unitPermission);
-                curEle++;
+                currentElement++;
             }
             employments.add(employment);
         }
-
-        employmentGraphRepository.saveAll(employments);
-
+        if(expiredEmploymentsQueryResults.size()>0) {
+            employmentGraphRepository.saveAll(employments);
+        }
     }
 
 }
