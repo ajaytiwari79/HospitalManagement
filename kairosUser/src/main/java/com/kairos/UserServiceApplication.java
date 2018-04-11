@@ -18,6 +18,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -113,7 +114,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 		converters.add(mappingJackson2XmlHttpMessageConverter());
 
 	}
-
+    @Profile("!development")
     @LoadBalanced
 	@Primary
 	@Bean
@@ -124,6 +125,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
+    @Profile("!development")
 	@LoadBalanced
 	@Bean(name ="schedulerRestTemplate")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
@@ -132,6 +134,24 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
+    @Profile("development")
+    @Primary
+    @Bean
+    public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
+                .interceptors(new UserContextInterceptor())
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
+    @Profile("development")
+    @Bean(name ="schedulerRestTemplate")
+    public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
 
 }
 
