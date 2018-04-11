@@ -16,20 +16,20 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise, Long> {
 
-    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false}) return expertise")
+    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) return expertise")
     List<Expertise> getAllExpertiseByCountry(long countryId);
 
-    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false}) return expertise LIMIT 1")
+    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) return expertise LIMIT 1")
     Expertise getOneDefaultExpertiseByCountry(long countryId);
 
     /*@Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false}) return expertise")*/
-    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false}) with expertise, country \n" +
+    @Query("MATCH (country:Country) where id(country)={0} MATCH (country)<-[:BELONGS_TO]-(expertise:Expertise{deleted:false,published:true}) with expertise, country \n" +
             "OPTIONAL MATCH (expertise)-[:HAS_TAG]-(tag:Tag)<-[:COUNTRY_HAS_TAG]-(country) WHERE tag.deleted=false AND tag.masterDataType='EXPERTISE' with expertise,tag\n" +
             "RETURN id(expertise) as id, expertise.name as name, expertise.description as description,CASE when tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag})  END as tags")
     List<ExpertiseTagDTO> getAllExpertiseWithTagsByCountry(long countryId);
 
     @Override
-    @Query("MATCH (expertise:Expertise{deleted:false}) return expertise")
+    @Query("MATCH (expertise:Expertise{deleted:false,published:true}) return expertise")
     List<Expertise> findAll();
 
     @Query("Match (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill:Skill) where id(expertise)={0} AND id(skill)={1} return count(r) as countOfRel")
@@ -60,7 +60,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "return id(e) as id,e.name as name,e.description as description")
     List<ExpertiseDTO> getAllFreeExpertises(List<Long> ids);
 
-    @Query("match (e:Expertise{deleted:false})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} return e LIMIT 1")
+    @Query("match (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} return e LIMIT 1")
     Expertise getExpertiesByCountry(Long id);
 
 
@@ -68,7 +68,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<Expertise> getAllExpertiseByOrganizationId(long unitId);
 
 
-    @Query("match (e:Expertise{deleted:false})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} AND id(e) = {1} return e")
+    @Query("match (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) where id(country) = {0} AND id(e) = {1} return e")
     Expertise getExpertiesOfCountry(Long countryId, Long expertiseId);
 
 
@@ -86,8 +86,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
-            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels order by expertise.creationDate")
-    List<ExpertiseQueryResult> getAllExpertiseByCountryId(long countryId);
+            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels")
+    List<ExpertiseQueryResult> getUnpublishedExpertise(long countryId);
 
 
     @Query("MATCH (expertise:Expertise)-[rel:" + HAS_DRAFT_EXPERTISE + "]-(parentExpertise:Expertise) where id(expertise)={0} \n" +
@@ -158,6 +158,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,moreThan:seniorityLevel.moreThan,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels order by expertise.creationDate")
-    List<ExpertiseQueryResult> getAllPublishedExpertise(Long countryId);
+    List<ExpertiseQueryResult> getAllExpertiseByCountryId(Long countryId);
+
 
 }
