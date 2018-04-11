@@ -34,7 +34,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private List<Long> levels;
     private List<Long> employmentTypes;
     private List<BigInteger> tags = new ArrayList<>();
-    private boolean published;
+    private Boolean published;
     @Indexed
     private Long unitId;
     private BigInteger parentId;
@@ -295,11 +295,11 @@ public class Activity extends MongoBaseEntity implements Serializable {
         this.compositeActivities = compositeActivities;
     }
 
-    public boolean isPublished() {
+    public Boolean getPublished() {
         return published;
     }
 
-    public void setPublished(boolean published) {
+    public void setPublished(Boolean published) {
         this.published = published;
     }
 

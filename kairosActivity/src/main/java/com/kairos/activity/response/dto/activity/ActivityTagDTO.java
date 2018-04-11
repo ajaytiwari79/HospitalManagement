@@ -19,9 +19,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityTagDTO {
     private BigInteger id;
-
     private String name;
-
     private String description;
     private Long countryId;
     private BigInteger categoryId;
@@ -32,7 +30,7 @@ public class ActivityTagDTO {
     private GeneralActivityTab generalActivityTab;
     private List<ActivityTagDTO> compositeActivities = new ArrayList<ActivityTagDTO>();
     private Long parentId;
-    private boolean published;
+    private Boolean published;
 
     public ActivityTagDTO() {
         //default constructor
@@ -134,11 +132,11 @@ public class ActivityTagDTO {
         this.parentId = parentId;
     }
 
-    public boolean isPublished() {
+    public Boolean getPublished() {
         return published;
     }
 
-    public void setPublished(boolean published) {
+    public void setPublished(Boolean published) {
         this.published = published;
     }
 

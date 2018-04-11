@@ -76,20 +76,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     }
 
-    // List<ActivityDTO> ;
-    /*public  List<ActivityDTO> findAllActivityByCountry(long countryId){
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("countryId").in(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
-                lookup("tag","tags","_id",
-                        "tags")
-        );
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class,ActivityDTO.class);
-        return result.getMappedResults();
-
-    }*/
-
-
     public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
 
         Aggregation aggregation = Aggregation.newAggregation(
@@ -118,9 +104,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 unwind("tags_data", true),
                 group("$id")
                         .first("$name").as("name")
+                        .first("$published").as("published")
                         .first("$description").as("description")
                         .first("$countryId").as("countryId")
-                        .first("$unitId").as("unitId")
                         .first("$isParentActivity").as("isParentActivity")
                         .first("generalActivityTab").as("generalActivityTab")
                         .push("tags_data").as("tags")
@@ -160,7 +146,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityTagDTO> findAllActivityByParentOrganization(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("published").is(true)),
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 graphLookup("activities").startWith("$compositeActivities").connectFrom("compositeActivities").connectTo("_id").maxDepth(0).as("compositeActivities"),
                 project("name", "generalActivityTab", "compositeActivities"));
 

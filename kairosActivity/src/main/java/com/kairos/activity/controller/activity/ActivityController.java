@@ -319,7 +319,7 @@ public class ActivityController {
     }*/
 
      @ApiOperation("publish activity")
-    @GetMapping(value = "/publish/{activityId}")
+    @PutMapping(value = "/activity/{activityId}/publish")
     public ResponseEntity<Map<String, Object>> publishActivity(@PathVariable BigInteger activityId) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.publishActivity(activityId));

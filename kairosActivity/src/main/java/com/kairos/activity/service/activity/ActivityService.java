@@ -937,7 +937,7 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid ActivityId : " + activityId);
         }
-        if (activity.isPublished()) {
+        if (activity.getPublished()) {
             throw new ActionNotPermittedException("activity is already published :" + activityId);
         }
         activity.setPublished(true);

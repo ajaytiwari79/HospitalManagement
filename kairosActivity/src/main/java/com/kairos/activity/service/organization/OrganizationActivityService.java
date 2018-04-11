@@ -122,6 +122,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setParentActivity(false);
         activityCopied.setOrganizationTypes(null);
         activityCopied.setOrganizationSubTypes(null);
+        activityCopied.setPublished(null);
         activityCopied.setLevels(null);
         activityCopied.setRegions(null);
         activityCopied.setCountryId(null);
