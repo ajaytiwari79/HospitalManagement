@@ -96,7 +96,7 @@ public class ActivityService extends MongoBaseService {
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         logger.info(activityDTO.getName());
         Activity activity = activityMongoRepository.
-                findByNameIgnoreCaseAndDeletedFalse(activityDTO.getName());
+                findByNameIgnoreCaseAndDeletedFalse(activityDTO.getName().trim());
         if (Optional.ofNullable(activity).isPresent()) {
             logger.error("ActivityName already exist" + activityDTO.getName());
             throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
