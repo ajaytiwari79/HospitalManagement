@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
+import com.kairos.response.dto.web.cta.DayTypeDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -44,6 +45,7 @@ public class CTARuleTemplateQueryResult {
     private Long timeTypeId;
     private Long plannedTimeId;
     private List<Long> dayTypeIds;
+    private List<DayTypeDTO> dayTypes;
     private boolean calculateScheduledHours;
 
     public CTARuleTemplateQueryResult() {
@@ -55,6 +57,14 @@ public class CTARuleTemplateQueryResult {
 
     public void setCalculateScheduledHours(boolean calculateScheduledHours) {
         this.calculateScheduledHours = calculateScheduledHours;
+    }
+
+    public List<DayTypeDTO> getDayTypes() {
+        return dayTypes;
+    }
+
+    public void setDayTypes(List<DayTypeDTO> dayTypes) {
+        this.dayTypes = dayTypes;
     }
 
     public Long getId() {

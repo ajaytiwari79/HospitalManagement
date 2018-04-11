@@ -1,6 +1,6 @@
 package com.kairos.activity.client.dto;
 
-import com.kairos.activity.response.dto.time_bank.TimebankWrapper;
+import com.kairos.activity.response.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,16 +28,17 @@ public class TimeBankRestClient {
     @Autowired
     private RestTemplate restTemplate;
 
-    public TimebankWrapper getCTAbyUnitEmployementPosition(Long unitPositionId) {
+    public UnitPositionWithCtaDetailsDTO getCTAbyUnitEmployementPosition(Long unitPositionId) {
         String baseUrl=new StringBuilder(getBaseUrl(false)).append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
+
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<TimebankWrapper>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<TimebankWrapper>>(){};
-            ResponseEntity<RestTemplateResponseEnvelope<TimebankWrapper>> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO>>(){};
+            ResponseEntity<RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/getCTAbyUnitPosition/{unitPositionId}",
                             HttpMethod.GET,
                             null, typeReference,unitPositionId);
-            RestTemplateResponseEnvelope<TimebankWrapper> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<UnitPositionWithCtaDetailsDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
@@ -50,15 +51,15 @@ public class TimeBankRestClient {
         }
     }
 
-    /*public List<TimebankWrapper> getCTAbyUnitEmployementPosition() {
+    /*public List<UnitPositionWithCtaDetailsDTO> getCTAbyUnitEmployementPosition() {
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimebankWrapper>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimebankWrapper>>>(){};
-            ResponseEntity<RestTemplateResponseEnvelope<List<TimebankWrapper>>> restExchange =
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<UnitPositionWithCtaDetailsDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<UnitPositionWithCtaDetailsDTO>>>(){};
+            ResponseEntity<RestTemplateResponseEnvelope<List<UnitPositionWithCtaDetailsDTO>>> restExchange =
                     restTemplate.exchange(
                             "" + "/getAllCTASWithUnitEmployementPositionIds",
                             HttpMethod.GET,
                             null, typeReference);
-            RestTemplateResponseEnvelope<List<TimebankWrapper>> response = restExchange.getBody();
+            RestTemplateResponseEnvelope<List<UnitPositionWithCtaDetailsDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {

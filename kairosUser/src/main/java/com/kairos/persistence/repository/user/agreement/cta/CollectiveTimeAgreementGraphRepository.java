@@ -220,4 +220,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "MATCH(cta)-[:BELONGS_TO]-(country:Country) where id(country)={1} return cta")
     List<CostTimeAgreement> getCTAsByOrganiationSubTypeIdsIn(List<Long> organizationSubTypeIds, long countryId);
 
+    @Query("MATCH(unitCta:CostTimeAgreement),(organization:Organization) WHERE id(unitCta)={0} AND id(organization)={1} CREATE UNIQUE (organization)-[r:" + HAS_CTA + "]->(unitCta)")
+    void linkUnitCTAToOrganization(Long unitCtaId, Long organizationId);
+
 }
