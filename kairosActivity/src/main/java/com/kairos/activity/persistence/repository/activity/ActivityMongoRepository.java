@@ -18,7 +18,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
         CustomActivityMongoRepository {
 
 
-    Activity findByNameIgnoreCaseAndDeletedFalse(String name);
+    Activity findByNameIgnoreCaseAndDeletedFalse(String name, Long countryId);
 
     @Query("{'deleted' : false, 'unitId':?1, 'name':{$regex:?0, $options:'i'}}")
     Activity findByNameAndOrgIDIgnoreCaseAndDeletedFalse(String name, int orgID);

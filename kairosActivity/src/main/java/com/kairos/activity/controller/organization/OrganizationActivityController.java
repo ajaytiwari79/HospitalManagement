@@ -25,7 +25,7 @@ import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_U
 /**
  * Created by vipul on 5/12/17.
  */
-@RestController()
+@RestController
 @Api(API_ORGANIZATION_UNIT_URL)
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 public class OrganizationActivityController {

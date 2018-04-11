@@ -28,5 +28,4 @@ import static org.junit.Assert.*;
         LocalDate expectedDOB=CPRUtil.getDateOfBirthFromCPR("0403812765");
         assertEquals(expectedDOB,LocalDate.of(1981,03,04));
     }
-
 }

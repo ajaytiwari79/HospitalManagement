@@ -3,7 +3,6 @@ package com.kairos.activity.service.organization;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.persistence.model.activity.Activity;
@@ -62,7 +61,7 @@ public class OrganizationActivityService extends MongoBaseService {
             throw new DataNotFoundByIdException("Invalid Activity Id : " + activityId);
         }
         if (checked) {
-            Activity activityCopied = copyAllActivitySettings(activity, unitId);
+            Activity activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             save(activityCopied);
             return activityCopied.retrieveBasicDetails();
 
@@ -70,7 +69,6 @@ public class OrganizationActivityService extends MongoBaseService {
             Activity activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
             activityCopied.setDeleted(true);
             save(activityCopied);
-
 
         }
         return null;
@@ -119,13 +117,14 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityTabsWrapper;
     }
 
-    private Activity copyAllActivitySettings(Activity activity, Long unitId) {
+    private Activity copyAllActivitySettingsInUnit(Activity activity, Long unitId) {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
         activityCopied.setParentId(activity.getId());
         activityCopied.setParentActivity(false);
         activityCopied.setOrganizationTypes(null);
         activityCopied.setOrganizationSubTypes(null);
+        activityCopied.setPublished(null);
         activityCopied.setLevels(null);
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);

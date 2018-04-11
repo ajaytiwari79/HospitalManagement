@@ -318,4 +318,11 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatetimeType_setting(activityId,timeTypeId));
     }*/
 
+     @ApiOperation("publish activity")
+    @PutMapping(value = "/activity/{activityId}/publish")
+    public ResponseEntity<Map<String, Object>> publishActivity(@PathVariable BigInteger activityId) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.publishActivity(activityId));
+    }
+
 }

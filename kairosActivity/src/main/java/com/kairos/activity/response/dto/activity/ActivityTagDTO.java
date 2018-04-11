@@ -19,19 +19,18 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityTagDTO {
     private BigInteger id;
-
     private String name;
-
     private String description;
     private Long countryId;
     private BigInteger categoryId;
     private String categoryName;
     private List<TagDTO> tags = new ArrayList<>();
-    private Long unitId = -1L;
+    private Long unitId;
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
     private List<ActivityTagDTO> compositeActivities = new ArrayList<ActivityTagDTO>();
     private Long parentId;
+    private Boolean published;
 
     public ActivityTagDTO() {
         //default constructor
@@ -131,6 +130,14 @@ public class ActivityTagDTO {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
