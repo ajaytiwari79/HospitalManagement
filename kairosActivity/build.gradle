@@ -50,7 +50,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-cache') //c
 	compile group: 'javax.inject', name: 'javax.inject', version: '1'
 
-	//compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client') //c
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client') //c
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')//c
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 	//compile('org.springframework.boot:spring-boot-starter-data-redis')//c
