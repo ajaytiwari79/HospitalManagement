@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.activity.util.RestClientUrlUtil.getDefaultSchedulerUrl;
 
 
 /**
@@ -29,7 +30,7 @@ public class SchedulerRestClient {
     private RestTemplate restTemplate;
 
     public List<Long> getAllOrganizationIds(){
-        final String baseUrl=getBaseUrl();
+        final String baseUrl=getDefaultSchedulerUrl();
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {};

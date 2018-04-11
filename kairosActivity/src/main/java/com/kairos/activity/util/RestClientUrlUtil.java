@@ -28,20 +28,16 @@ public class RestClientUrlUtil {
         }
 
     }
-    public static final String getCommonUrl() {
-        String baseUrl = new String("http://zuulservice/kairos/user/api/v1/");
-        return baseUrl;
+    public static final String getBaseUrl() {
+        return userServiceUrl;
 
 
     }
 
-    /**
-     * Used by
-     * @return
-     */
-    public static final String getBaseUrl(){
 
-        String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/123").toString();
+    public static final String getDefaultSchedulerUrl(){
+
+        String baseUrl=new StringBuilder(userServiceUrl+"organization/123").toString();
         return baseUrl;
 
 
