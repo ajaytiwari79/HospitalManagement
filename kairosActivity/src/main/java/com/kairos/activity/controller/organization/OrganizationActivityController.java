@@ -1,6 +1,7 @@
 package com.kairos.activity.controller.organization;
 
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.SkillActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.service.activity.ActivityService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Map;
@@ -277,6 +279,13 @@ public class OrganizationActivityController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnitActivityForDefaultData(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityWithCtaWtaSettingByUnit(unitId));
+    }
+
+    @ApiOperation("Create Activity")
+    @PostMapping(value = "/activity/{activityId}/copy-activity")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> copyActivityDetails(@PathVariable Long unitId, @PathVariable BigInteger activityId, @RequestBody @Valid ActivityDTO activity) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.copyActivityDetails(unitId, activityId, activity));
     }
 
 }
