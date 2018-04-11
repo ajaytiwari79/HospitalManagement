@@ -2,6 +2,7 @@ package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.client.dto.organization.OrganizationCategoryDTO;
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.OrganizationCategory;
@@ -569,9 +570,23 @@ public class AccessGroupService extends UserBaseService {
     }
 
     public AccessGroup copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
+        Optional<Organization> organization = organizationGraphRepository.findById(organizationId);
+        if (!organization.isPresent()) {
+            throw new DataNotFoundByIdException("Organization not found " + organizationId);
+        }
+        Organization parent;
+        if (organization.get().getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.get().getId());
+
+        } else {
+            parent = organizationGraphRepository.getParentOfOrganization(organization.get().getId());
+        }
+        if(Optional.ofNullable(parent).isPresent()){
+            throw new  ActionNotPermittedException("Access group can't be copied at child organization");
+        }
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroupDTO.getName().trim());
         if ( isAccessGroupExistWithSameName ) {
-            throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
+            throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName().trim() );
         }
         Optional<AccessGroup> currentAccessGroup=accessGroupRepository.findById(accessGroupDTO.getId());
         if (!currentAccessGroup.isPresent()) {
@@ -579,31 +594,21 @@ public class AccessGroupService extends UserBaseService {
         }
         AccessGroup accessGroup=new AccessGroup(accessGroupDTO.getName().trim(),accessGroupDTO.getDescription(),accessGroupDTO.getRole());
         save(accessGroup);
-        Organization organization = organizationGraphRepository.findOne(organizationId);
-        if (organization == null) {
-            return null;
-        }
-        Organization parent;
-        if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
 
-        } else {
-            parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
-        }
+        organization.get().getAccessGroups().add(accessGroup);
+        save(organization.get());
+        accessPageRepository.setAccessGroupPageRelationShips(accessGroupDTO.getId(),accessGroup.getId());
+        return accessGroup;
 
-        if (parent == null) {
-            organization.getAccessGroups().add(accessGroup);
-            save(organization);
-            accessPageRepository.setAccessGroupPageRelationShips(accessGroupDTO.getId(),accessGroup.getId());
-            return accessGroup;
-        }
-        return null;
     }
     public CountryAccessGroupDTO copyCountryAccessGroup(long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
-        Country country = countryGraphRepository.findOne(countryId);
+        Optional<Country> country = countryGraphRepository.findById(countryId);
+        if(!country.isPresent()){
+            throw new DataNotFoundByIdException("Country not found " + countryId);
+        }
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getOrganizationCategory().toString());
         if (isAccessGroupExistWithSameName) {
-            throw new DuplicateDataException("Access Group already exists with name " + countryAccessGroupDTO.getName());
+            throw new DuplicateDataException("Access Group already exists with name " + countryAccessGroupDTO.getName().trim());
         }
         Optional<AccessGroup> currentAccessGroup = accessGroupRepository.findById(countryAccessGroupDTO.getId());
         if (!currentAccessGroup.isPresent()) {
@@ -613,11 +618,11 @@ public class AccessGroupService extends UserBaseService {
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
-        CountryAccessGroupRelationship accessGroupRelationship = new CountryAccessGroupRelationship(country, accessGroup, countryAccessGroupDTO.getOrganizationCategory());
+        CountryAccessGroupRelationship accessGroupRelationship = new CountryAccessGroupRelationship(country.get(), accessGroup, countryAccessGroupDTO.getOrganizationCategory());
         accessGroupRelationship.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
-        save(country);
+        save(country.get());
 
         accessPageRepository.setAccessGroupPageRelationShips(countryAccessGroupDTO.getId(), accessGroup.getId());
         return countryAccessGroupDTO;
