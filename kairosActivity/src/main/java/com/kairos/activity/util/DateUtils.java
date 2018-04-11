@@ -233,6 +233,10 @@ public class DateUtils {
         long duration = endDate.getTime() - startDate.getTime();
         return TimeUnit.MILLISECONDS.toMinutes(duration);
     }
+    public static Date getCurrentDate(){
+        //TODO this cant be system's date. this gotta be unit;s date. sachin
+        return new Date();
+    }
 
     /**
      * This method receives date to return date of particular DAY on the week number of provided date's month.

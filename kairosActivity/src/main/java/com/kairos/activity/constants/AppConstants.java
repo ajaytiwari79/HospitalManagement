@@ -203,6 +203,7 @@ public class AppConstants {
     public static final String REQUEST_TO_PUZZLE_PHASE = "REQUEST_TO_PUZZLE_PHASE";
     public static final String PUZZLE_TO_CONSTRUCTION_PHASE = "PUZZLE_TO_CONSTRUCTION_PHASE";
     public static final Long DURATION_IN_WEEK=4L;
+    public static final String COPY_OF = "copy of";
 
 
     //Scheduled Hours Calculation constants

@@ -83,6 +83,32 @@ public class CountryRestClient {
 
     }
 
+    public CountryDTO getCountryById(long countryId) {
+        final String baseUrl = getBaseUrl(false);
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<CountryDTO>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/country/{countryId}",
+                            HttpMethod.GET,
+                            null, typeReference, countryId);
+
+            RestTemplateResponseEnvelope<CountryDTO> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
+        }
+
+
+    }
+
 
     public List<Map<String,Object>> getSkillsByCountryForTaskType(long countryId) {
         final String baseUrl = getBaseUrl(false);
