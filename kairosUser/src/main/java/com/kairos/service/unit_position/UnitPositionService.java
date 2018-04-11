@@ -172,7 +172,7 @@ public class UnitPositionService extends UserBaseService {
 
         unitPosition.setUnit(organization);
         save(unitPosition);
-        employmentService.updateEmploymentEndDate(organization,unitPositionDTO,id);
+        employmentService.updateEmploymentEndDate(organization,unitPositionDTO);
 
         UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
@@ -267,7 +267,7 @@ public class UnitPositionService extends UserBaseService {
         }
         preparePosition(oldUnitPosition, unitPositionDTO);
         save(oldUnitPosition);
-        employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(),unitPositionDTO,unitId);
+        employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(),unitPositionDTO);
         return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null));
 
     }

@@ -704,7 +704,7 @@ public class EmploymentService extends UserBaseService {
         map.put("note", partialLeave.getNote());
         return map;
     }
-    public void updateEmploymentEndDate(Organization unit, UnitPositionDTO unitPositionDTO, Long unitId) {
+    public void updateEmploymentEndDate(Organization unit, UnitPositionDTO unitPositionDTO) {
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unit.getId());
@@ -732,15 +732,16 @@ public class EmploymentService extends UserBaseService {
     public void moveToReadOnlyAccessGroup() {
         Long curDateMillisStart = DateUtil.getStartOfDay(DateUtil.getCurrentDate()).getTime();
         Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
-        List<UnitPermission> unitPermissions = null;
-        UnitPermission unitPermission = null;
+        List<UnitPermission> unitPermissions;
+        UnitPermission unitPermission;
         List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(curDateMillisStart,curDateMillisEnd);
         accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(curDateMillisStart, curDateMillisEnd);
-        List<Organization> organizations = null;
-        List<Employment> employments = null;
-        int currentElement = 0;
-        Employment employment = null;
-        employments = expiredEmploymentsQueryResults.isEmpty() ? null : new ArrayList<Employment>();
+
+        List<Organization> organizations;
+        List<Employment>  employments = expiredEmploymentsQueryResults.isEmpty() ? null : new ArrayList<Employment>();
+        int currentElement;
+        Employment employment;
+
         for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult: expiredEmploymentsQueryResults) {
             organizations = expiredEmploymentsQueryResult.getOrganizations();
             employment = expiredEmploymentsQueryResult.getEmployment();
