@@ -109,4 +109,12 @@ public class CostTimeAgreementController {
     }
 
 
+    @RequestMapping(value = "unit/{unitId}/copy_unit_cta", method = RequestMethod.POST)
+    @ApiOperation("Create copy of CTA at unit")
+    public ResponseEntity<Map<String, Object>> createCopyOfUnitCTA(@PathVariable Long unitId
+            , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
+                costTimeAgreementService.createCopyOfUnitCTA(unitId,collectiveTimeAgreementDTO));
+    }
+
 }

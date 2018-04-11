@@ -102,7 +102,7 @@ public class ShiftService extends MongoBaseService {
                 shiftQueryResults = getAverageOfShiftByActivity(staffAdditionalInfoDTO,activity,shiftFromDate);
             }
         }else {*/
-            ShiftQueryResult shiftQueryResult = saveShift(activity, staffAdditionalInfoDTO, shiftDTO);
+        ShiftQueryResult shiftQueryResult = saveShift(activity, staffAdditionalInfoDTO, shiftDTO);
             /*shiftQueryResults = Arrays.asList(shiftQueryResult);
         }*/
         return shiftQueryResult;
