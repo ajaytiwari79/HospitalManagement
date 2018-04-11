@@ -199,10 +199,16 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.updatePermissionsForAccessTabsOfAccessGroup(accessGroupId, accessPageId, accessPermissionDTO, updateChildren));
     }
 
-    @RequestMapping(value = UNIT_URL+"/copy_access_group", method = RequestMethod.POST)
+    @RequestMapping(value = UNIT_URL+"/copy_unit_access_group", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> copyUnitAccessGroup(@PathVariable long unitId, @RequestBody AccessGroupDTO accessGroupDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.copyUnitAccessGroup(unitId, accessGroupDTO));
+    }
+
+    @RequestMapping(value = COUNTRY_URL+"/copy_country_access_group", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> copyCountryAccessGroup(@PathVariable long countryId, @RequestBody CountryAccessGroupDTO countryAccessGroupDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.copyCountryAccessGroup(countryId, countryAccessGroupDTO));
     }
 
 }
