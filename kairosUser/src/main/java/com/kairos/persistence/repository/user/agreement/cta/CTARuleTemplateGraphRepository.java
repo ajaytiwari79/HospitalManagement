@@ -57,8 +57,8 @@ public interface CTARuleTemplateGraphRepository  extends Neo4jBaseRepository<CTA
            "p.calculateValueIfPlanned as calculateValueIfPlanned ,"+
            "collect(distinct ID(employmentType)) as employmentTypes ,"+
            "p.activityTypeForCostCalculation as activityTypeForCostCalculation,"+
-           "p.plannedTimeId as plannedTimeId, "+
-           "p.timeTypeId as timeTypeId, "+
+           "p.plannedTimeIds as plannedTimeIds, "+
+           "p.timeTypeIds as timeTypeIds, "+
            "p.dayTypeIds as dayTypeIds, "+
            "p.activityIds as activityIds, "+
            "p.planningCategory as planningCategory ,"+

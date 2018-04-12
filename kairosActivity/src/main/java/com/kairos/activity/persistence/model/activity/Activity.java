@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.tabs.*;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,7 +23,7 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = "activities")
-public class Activity extends MongoBaseEntity implements Serializable{
+public class Activity extends MongoBaseEntity implements Serializable {
 
     private String name;
     private String description;
@@ -34,9 +35,9 @@ public class Activity extends MongoBaseEntity implements Serializable{
     private List<Long> levels;
     private List<Long> employmentTypes;
     private List<BigInteger> tags = new ArrayList<>();
-
+    private ActivityStateEnum state=ActivityStateEnum.DRAFT;
     @Indexed
-    private Long unitId = -1L;
+    private Long unitId;
     private BigInteger parentId;
     @JsonIgnore
     private boolean isParentActivity = true;
@@ -295,6 +296,14 @@ public class Activity extends MongoBaseEntity implements Serializable{
         this.compositeActivities = compositeActivities;
     }
 
+    public ActivityStateEnum getState() {
+        return state;
+    }
+
+    public void setState(ActivityStateEnum state) {
+        this.state = state;
+    }
+
     public static Activity copyProperties(Activity source, Activity target, String _id, String organizationType, String organizationSubType) {
         BeanUtils.copyProperties(source, target, _id, organizationSubType, organizationType);
         return target;
@@ -320,7 +329,7 @@ public class Activity extends MongoBaseEntity implements Serializable{
     public String toString() {
         return "Activity{" +
                 "name='" + name + '\'' +
-                "id='" + super.id + '\''+
+                "id='" + super.id + '\'' +
                 '}';
     }
 }

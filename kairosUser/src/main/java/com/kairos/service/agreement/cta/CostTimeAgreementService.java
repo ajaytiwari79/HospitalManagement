@@ -49,7 +49,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Transactional
@@ -579,8 +578,8 @@ public class CostTimeAgreementService extends UserBaseService {
                 ctaRuleTemplate.setActivityIds(new ArrayList<>());
                 break;
             default:
-                ctaRuleTemplate.setPlannedTimeId(null);
-                ctaRuleTemplate.setTimeTypeId(null);
+                ctaRuleTemplate.setPlannedTimeIds(null);
+                ctaRuleTemplate.setTimeTypeIds(null);
                 break;
         }
     }
