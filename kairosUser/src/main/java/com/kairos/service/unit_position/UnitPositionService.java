@@ -75,6 +75,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -335,6 +336,15 @@ public class UnitPositionService extends UserBaseService {
             if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
                 throw new ActionNotPermittedException("Start date can't be less than End Date ");
             }
+            if (!Optional.ofNullable(unitPositionDTO.getReasonCodeId()).isPresent()) {
+                throw new ActionNotPermittedException("Please select region with end date");
+            }
+
+            Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(unitPositionDTO.getReasonCodeId(), 0);
+            if (!Optional.ofNullable(reasonCode).isPresent()) {
+                throw new DataNotFoundByIdException("Invalid reasonCode Id" + unitPositionDTO.getReasonCodeId());
+            }
+            unitPosition.setReasonCode(reasonCode.get());
             unitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
         }
 
@@ -344,11 +354,6 @@ public class UnitPositionService extends UserBaseService {
             }
             unitPosition.setLastWorkingDateMillis(unitPositionDTO.getLastWorkingDateMillis());
         }
-        Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(unitPositionDTO.getReasonCodeId(), 0);
-        if (!Optional.ofNullable(reasonCode).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid reasonCode Id" + unitPositionDTO.getReasonCodeId());
-        }
-        unitPosition.setReasonCode(reasonCode.get());
 
         Optional<SeniorityLevel> seniorityLevel = seniorityLevelGraphRepository.findById(unitPositionDTO.getSeniorityLevelId(), 1);
         if (!Optional.ofNullable(seniorityLevel).isPresent()) {
@@ -442,14 +447,6 @@ public class UnitPositionService extends UserBaseService {
             oldUnitPosition.setFunctions(functions);
         }
 
-        if (!oldUnitPosition.getReasonCode().getId().equals(unitPositionDTO.getReasonCodeId())) {
-            Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(unitPositionDTO.getReasonCodeId(), 0);
-            if (!Optional.ofNullable(reasonCode).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid reasonCode Id" + unitPositionDTO.getReasonCodeId());
-            }
-            oldUnitPosition.setReasonCode(reasonCode.get());
-        }
-
 
         if (Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) {
             if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
@@ -464,6 +461,23 @@ public class UnitPositionService extends UserBaseService {
         }
         oldUnitPosition.setStartDateMillis(unitPositionDTO.getStartDateMillis());
         oldUnitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
+
+        if (Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) {
+
+            oldUnitPosition.setEndDateMillis(unitPositionDTO.getEndDateMillis());
+
+            if (!Optional.ofNullable(unitPositionDTO.getReasonCodeId()).isPresent()) {
+                throw new ActionNotPermittedException("Please select region with end date");
+            }
+
+            if (!oldUnitPosition.getReasonCode().getId().equals(unitPositionDTO.getReasonCodeId())) {
+                Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(unitPositionDTO.getReasonCodeId(), 0);
+                if (!Optional.ofNullable(reasonCode).isPresent()) {
+                    throw new DataNotFoundByIdException("Invalid reasonCode Id" + unitPositionDTO.getReasonCodeId());
+                }
+                oldUnitPosition.setReasonCode(reasonCode.get());
+            }
+        }
 
 
         oldUnitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
@@ -590,7 +604,7 @@ public class UnitPositionService extends UserBaseService {
                 unitPosition.getId(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
                 unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), unitPosition.getWorkingTimeAgreement());
         result.setUnitId(unitPosition.getUnit().getId());
-        result.setReasonCodeId(unitPosition.getReasonCode().getId());
+        result.setReasonCodeId(unitPosition.getReasonCode() != null ? unitPosition.getReasonCode().getId() : null);
         result.setParentUnitId(parentOrganizationId);
         // TODO Setting for compatibility
 
@@ -662,10 +676,15 @@ public class UnitPositionService extends UserBaseService {
             ctaRuleTemplateDTO.setName(rt.getName());
             ctaRuleTemplateDTO.setId(rt.getId());
             //ctaRuleTemplateDTO.setDays(rt.getCalculateOnDayTypes());
-            ctaRuleTemplateDTO.setTimeTypeId(rt.getTimeTypeId() != null ? new BigInteger(rt.getTimeTypeId().toString()) : null);
+            ctaRuleTemplateDTO.setTimeTypeIds(rt.getTimeTypeIds() != null ? rt.getTimeTypeIds().stream().map(t -> new BigInteger(t.toString())).collect(Collectors.toList()) : null);
             //ctaRuleTemplateDTO.setPublicHolidays();
+
+//            ctaRuleTemplateDTO.setCtaIntervalDTOS(rt.getCtaIntervalDto((List<CompensationTableInterval>) rt.getCompensationTable().get("compensationTableInterval")));
+            ctaRuleTemplateDTO.setPlannedTimeIds(rt.getPlannedTimeIds());
+
             ctaRuleTemplateDTO.setCtaIntervalDTOS(getCtaInterval((List<CompensationTableInterval>) rt.getCompensationTable().get("compensationTableInterval")));
-            ctaRuleTemplateDTO.setPlannedTimeId(rt.getPlannedTimeId());
+
+
             ctaRuleTemplateDTO.setCalculateScheduledHours(rt.isCalculateScheduledHours());
             ctaRuleTemplateDTO.setEmploymentTypes(rt.getEmploymentTypes());
             if(rt.getPlannedTimeWithFactor().getAccountType()!=null) {
