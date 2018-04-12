@@ -59,10 +59,10 @@ public class ExpertiseController {
     }
 
     @ApiOperation(value = "Get Available expertise")
-    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/publish_expertise", method = RequestMethod.GET)
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/all_expertise", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllPublishedExpertise(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getAllPublishedExpertise(countryId));
+    public ResponseEntity<Map<String, Object>> getUnpublishedExpertise(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getUnpublishedExpertise(countryId));
     }
 
 }
