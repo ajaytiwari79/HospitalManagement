@@ -6,6 +6,7 @@ import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.GeneralActivityTab;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
+import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigInteger;
@@ -19,19 +20,18 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityTagDTO {
     private BigInteger id;
-
     private String name;
-
     private String description;
     private Long countryId;
     private BigInteger categoryId;
     private String categoryName;
     private List<TagDTO> tags = new ArrayList<>();
-    private Long unitId = -1L;
+    private Long unitId;
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
     private List<ActivityTagDTO> compositeActivities = new ArrayList<ActivityTagDTO>();
     private Long parentId;
+    private ActivityStateEnum state;
 
     public ActivityTagDTO() {
         //default constructor
@@ -133,6 +133,14 @@ public class ActivityTagDTO {
         this.parentId = parentId;
     }
 
+    public ActivityStateEnum getState() {
+        return state;
+    }
+
+    public void setState(ActivityStateEnum state) {
+        this.state = state;
+    }
+
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
         this.id = activity.getId();
         this.name = activity.getName();
@@ -140,6 +148,7 @@ public class ActivityTagDTO {
         this.isParentActivity = activity.isParentActivity();
         this.unitId = activity.getUnitId();
         this.tags = tags;
+        this.state=activity.getState();
         return this;
     }
 }
