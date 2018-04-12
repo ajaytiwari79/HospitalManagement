@@ -220,4 +220,5 @@ public class AppConstants {
     public static final String FixedTime = "FixedTime";
     public static final String FullTimeHour = "FullTimeHour";
 
+
 }

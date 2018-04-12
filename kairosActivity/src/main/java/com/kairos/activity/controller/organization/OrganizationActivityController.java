@@ -25,7 +25,7 @@ import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_U
 /**
  * Created by vipul on 5/12/17.
  */
-@RestController()
+@RestController
 @Api(API_ORGANIZATION_UNIT_URL)
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 public class OrganizationActivityController {
@@ -281,8 +281,8 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityWithCtaWtaSettingByUnit(unitId));
     }
 
-    @ApiOperation("Create Activity")
-    @PostMapping(value = "/activity/{activityId}/copy-activity")
+    @ApiOperation("copy Activity")
+    @PostMapping(value = "/activity/{activityId}/copy_activity")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> copyActivityDetails(@PathVariable Long unitId, @PathVariable BigInteger activityId, @RequestBody @Valid ActivityDTO activity) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.copyActivityDetails(unitId, activityId, activity));

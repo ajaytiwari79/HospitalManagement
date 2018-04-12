@@ -3,7 +3,6 @@ package com.kairos.activity.service.organization;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.persistence.model.activity.Activity;
@@ -22,6 +21,7 @@ import com.kairos.activity.response.dto.activity.GeneralActivityTabDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.service.activity.TimeTypeService;
+import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -62,15 +62,19 @@ public class OrganizationActivityService extends MongoBaseService {
             throw new DataNotFoundByIdException("Invalid Activity Id : " + activityId);
         }
         if (checked) {
-            Activity activityCopied = copyAllActivitySettings(activity, unitId);
+            Activity activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
             save(activityCopied);
+
+            if (!activity.getState().equals(ActivityStateEnum.LIVE)) {
+                activity.setState(ActivityStateEnum.LIVE);
+                save(activity);
+            }
             return activityCopied.retrieveBasicDetails();
 
         } else {
             Activity activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
             activityCopied.setDeleted(true);
             save(activityCopied);
-
 
         }
         return null;
@@ -119,13 +123,14 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityTabsWrapper;
     }
 
-    private Activity copyAllActivitySettings(Activity activity, Long unitId) {
+    private Activity copyAllActivitySettingsInUnit(Activity activity, Long unitId) {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
         activityCopied.setParentId(activity.getId());
         activityCopied.setParentActivity(false);
         activityCopied.setOrganizationTypes(null);
         activityCopied.setOrganizationSubTypes(null);
+        activityCopied.setState(null);
         activityCopied.setLevels(null);
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
@@ -203,22 +208,20 @@ public class OrganizationActivityService extends MongoBaseService {
 
     public ActivityDTO copyActivityDetails(Long unitId, BigInteger activityId, ActivityDTO activityDTO) {
         Activity activity = activityMongoRepository.
-                findByNameIgnoreCaseAndDeletedFalse(activityDTO.getName().trim());
+                findByNameIgnoreCaseAndDeletedFalseAndUnitId(activityDTO.getName().trim(), unitId);
         if (Optional.ofNullable(activity).isPresent()) {
             logger.error("ActivityName already exist" + activityDTO.getName());
             throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
         }
-
         Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
-        if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !activityFromDatabase.get().getUnitId().equals(unitId)) {
+        if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !unitId.equals(activityFromDatabase.get().getUnitId())) {
             throw new DataNotFoundByIdException("Invalid ActivityId:" + activityId);
         }
-        Activity activityCopied = copyAllActivitySettings(activityFromDatabase.get(), unitId);
+        Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
         activityCopied.setName(activityDTO.getName().trim());
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
         return activityDTO;
-
     }
 
 }

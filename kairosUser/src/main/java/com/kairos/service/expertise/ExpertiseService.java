@@ -684,8 +684,8 @@ public class ExpertiseService extends UserBaseService {
         return map;
     }
 
-    public List<ExpertiseQueryResult> getAllPublishedExpertise(Long countryId) {
-        return expertiseGraphRepository.getAllPublishedExpertise(countryId);
+    public List<ExpertiseQueryResult> getUnpublishedExpertise(Long countryId) {
+        return expertiseGraphRepository.getUnpublishedExpertise(countryId);
     }
 
 

@@ -165,8 +165,16 @@ public class TimeCalculationActivityTab implements Serializable {
         this.dayTypes = dayTypes;
     }
 
+    public TimeCalculationActivityTab(String methodForCalculatingTime, Long fixedTimeValue, Boolean multiplyWith, LocalTime defaultStartTime,Double multiplyWithValue) {
+        this.methodForCalculatingTime = methodForCalculatingTime;
+        this.fixedTimeValue = fixedTimeValue;
+        this.multiplyWith = multiplyWith;
+        this.defaultStartTime = defaultStartTime;
+        this.multiplyWithValue = multiplyWithValue;
+    }
+
     public TimeCalculationActivityTab(String methodForCalculatingTime, Boolean allowBreakReduction, Long fixedTimeValue, Long monthsToCalculate, String methodForCalculatingTimeInMonths, List<String> balanceType,
-                                      Boolean multiplyWith, Double multiplyWithValue, Boolean multiplyByVacationFactor, Boolean multiplyByFinalSchedule, String breakTemplates, List<Long> dayTypes, DayOfWeek fullWeekStart, DayOfWeek fullWeekEnd,int historyDuration,LocalTime defaultStartTime) {
+                                      Boolean multiplyWith, Double multiplyWithValue, Boolean multiplyByVacationFactor, Boolean multiplyByFinalSchedule, String breakTemplates, List<Long> dayTypes, DayOfWeek fullWeekStart, DayOfWeek fullWeekEnd, int historyDuration, LocalTime defaultStartTime) {
         this.methodForCalculatingTime = methodForCalculatingTime;
         this.allowBreakReduction = allowBreakReduction;
         this.fixedTimeValue = fixedTimeValue;
