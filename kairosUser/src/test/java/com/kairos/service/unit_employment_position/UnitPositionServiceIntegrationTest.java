@@ -11,6 +11,7 @@ import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.service.position_code.PositionCodeServiceIntegrationTest;
+import com.kairos.service.staff.EmploymentService;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -47,6 +48,9 @@ public class UnitPositionServiceIntegrationTest {
     private String url;
     @Autowired
     TestRestTemplate restTemplate;
+    @Autowired
+    EmploymentService employmentService;
+
     static private Long createdId;
     static private String baseUrlWithUnit;
 
@@ -119,4 +123,10 @@ public class UnitPositionServiceIntegrationTest {
         }
     }
 
+
+    @Test
+    public void moveToReadOnlyAccessGroupTest() throws Exception {
+
+        employmentService.moveToReadOnlyAccessGroup();
+    }
 }
