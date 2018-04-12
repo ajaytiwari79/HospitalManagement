@@ -192,10 +192,9 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         }
         if (Optional.ofNullable(organization.get().getPaymentSettings()).isPresent()) {
             logger.info("payment settings already found, for unit{}", unitId);
-            throw new DataNotFoundByIdException("payment settings already found, for unit" + unitId);
+            throw new DataNotFoundByIdException("payment settings already found for unit" + unitId);
         }
-        PaymentSettings paymentSettings;
-        paymentSettings = paymentSettingsDTO.getType().equals(PaidOutFrequencyEnum.MONTHLY)
+        PaymentSettings paymentSettings = paymentSettingsDTO.getType().equals(PaidOutFrequencyEnum.MONTHLY)
                 ? new PaymentSettings(PaidOutFrequencyEnum.MONTHLY, paymentSettingsDTO.getDateOfPayment())
                 : new PaymentSettings(PaidOutFrequencyEnum.YEARLY, paymentSettingsDTO.getDateOfPayment(), paymentSettingsDTO.getMonthOfPayment());
         organization.get().setPaymentSettings(paymentSettings);
@@ -210,10 +209,9 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
             logger.info("Unable to payment while updating payments settings for unit ,{}", unitId);
             throw new DataNotFoundByIdException("Unable to get payment updating payments settings for unit ,{}" + unitId);
         }
-        if(paymentSettingsDTO.getType().equals(PaidOutFrequencyEnum.MONTHLY))
-        {
+        if (paymentSettingsDTO.getType().equals(PaidOutFrequencyEnum.MONTHLY)) {
             paymentSettings.setDateOfPayment(paymentSettingsDTO.getDateOfPayment());
-        }else{
+        } else {
             paymentSettings.setDateOfPayment(paymentSettingsDTO.getDateOfPayment());
             paymentSettings.setMonthOfPayment(paymentSettingsDTO.getMonthOfPayment());
         }

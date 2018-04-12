@@ -15,8 +15,7 @@ public class PaymentSettings extends UserBaseEntity {
     private PaidOutFrequencyEnum type;
     private Long dateOfPayment;
     private Long monthOfPayment;
-    @Version
-    private  Long versionId;
+
 
     public PaymentSettings() {
         // default cons
@@ -45,15 +44,7 @@ public class PaymentSettings extends UserBaseEntity {
     public void setMonthOfPayment(Long monthOfPayment) {
         this.monthOfPayment = monthOfPayment;
     }
-
-    public Long getVersionId() {
-        return versionId;
-    }
-
-    public void setVersionId(Long versionId) {
-        this.versionId = versionId;
-    }
-
+    
     public PaymentSettings(PaidOutFrequencyEnum type, Long dateOfPayment, Long monthOfPayment) {
         this.type = type;
         this.dateOfPayment = dateOfPayment;

@@ -50,7 +50,7 @@ public class PaymentSettingsDTO {
         this.monthOfPayment = monthOfPayment;
     }
 
-    public PaymentSettingsDTO(Long id, PaidOutFrequencyEnum type, Long dateOfPayment, @Range(min = 1l, max = 12L) Long monthOfPayment) {
+    public PaymentSettingsDTO(Long id, PaidOutFrequencyEnum type, Long dateOfPayment, Long monthOfPayment) {
         this.id = id;
         this.type = type;
         this.dateOfPayment = dateOfPayment;
