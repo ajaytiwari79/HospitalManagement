@@ -45,6 +45,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.AppConstants.FULL_TIME_WEEKLY_MINUTES;
+import static com.kairos.constants.AppConstants.NUMBER_OF_WORKING_DAYS_IN_WEEK;
 import static javax.management.timer.Timer.ONE_DAY;
 
 import java.util.ArrayList;
@@ -102,6 +104,9 @@ public class ExpertiseService extends UserBaseService {
             prepareExpertiseWhileCreate(expertise, expertiseDTO, countryId);
             expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
+            expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
+            expertiseResponseDTO.setNumberOfWorkingDaysInWeek(expertise.getNumberOfWorkingDaysInWeek());
+
             expertiseResponseDTO.setHasVersion(expertise.isHasVersion());
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
 
@@ -276,8 +281,8 @@ public class ExpertiseService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid union id " + expertiseDTO.getUnionId());
         }
         expertise.setUnion(union);
-        expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
-        expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
+        expertise.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES);
+        expertise.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK);
 
 
         expertise.setPaidOutFrequency(expertiseDTO.getPaidOutFrequency());
@@ -347,7 +352,6 @@ public class ExpertiseService extends UserBaseService {
     public List<ExpertiseQueryResult> getAllExpertise(long countryId) {
         return expertiseGraphRepository.getAllExpertiseByCountryId(countryId);
     }
-
 
 
     public ExpertiseResponseDTO updateExpertise(Long countryId, ExpertiseUpdateDTO expertiseDTO) {
@@ -683,7 +687,6 @@ public class ExpertiseService extends UserBaseService {
     public List<ExpertiseQueryResult> getUnpublishedExpertise(Long countryId) {
         return expertiseGraphRepository.getUnpublishedExpertise(countryId);
     }
-
 
 
 }

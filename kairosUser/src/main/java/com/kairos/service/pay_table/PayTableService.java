@@ -111,7 +111,7 @@ public class PayTableService extends UserBaseService {
         logger.info(payTableDTO.toString());
         Level level = countryGraphRepository.getLevel(countryId, payTableDTO.getLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid grade id " + payTableDTO.getLevelId());
+            throw new DataNotFoundByIdException("Invalid level id " + payTableDTO.getLevelId());
         }
 
         Boolean isAlreadyExists = payTableGraphRepository.

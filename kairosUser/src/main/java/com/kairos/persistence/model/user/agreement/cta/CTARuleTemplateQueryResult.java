@@ -2,7 +2,6 @@ package com.kairos.persistence.model.user.agreement.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.response.dto.web.cta.CTARuleTemplateDayTypeDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -28,22 +27,22 @@ public class CTARuleTemplateQueryResult {
     private String payrollType;
     private String payrollSystem;
     private CalculationUnit calculationUnit;
-    private Map<String,Object> compensationTable;
-    private Map<String,Object> calculateValueAgainst;
+    private Map<String, Object> compensationTable;
+    private Map<String, Object> calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-    private List<CTARuleTemplateDayTypeDTO> calculateOnDayTypes=new ArrayList<>();
-    private List<CTARuleTemplatePhaseInfo> phaseInfo=new ArrayList<>();
+    private List<CTARuleTemplateDayTypeDTO> calculateOnDayTypes = new ArrayList<>();
+    private List<CTARuleTemplatePhaseInfo> phaseInfo = new ArrayList<>();
     private BudgetType budgetType;
-    private List<CalculateValueIfPlanned> calculateValueIfPlanned =new ArrayList<>();
-    private List<Long> employmentTypes =new ArrayList<>();
-//    private ActivityType activityType;
+    private List<CalculateValueIfPlanned> calculateValueIfPlanned = new ArrayList<>();
+    private List<Long> employmentTypes = new ArrayList<>();
+    //    private ActivityType activityType;
     private PlanningCategory planningCategory;
-    private List<Long> staffFunctions=new ArrayList<>();
+    private List<Long> staffFunctions = new ArrayList<>();
     private PlannedTimeWithFactor plannedTimeWithFactor;
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
     private List<Long> activityIds;
-    private Long timeTypeId;
-    private Long plannedTimeId;
+    private List<Long> timeTypeIds = new ArrayList<>();
+    private List<Long> plannedTimeIds = new ArrayList<>();
     private List<Long> dayTypeIds;
     private List<DayTypeDTO> dayTypes;
     private boolean calculateScheduledHours;
@@ -74,6 +73,7 @@ public class CTARuleTemplateQueryResult {
     public void setId(Long id) {
         this.id = id;
     }
+
     public String getName() {
         return name;
     }
@@ -138,11 +138,11 @@ public class CTARuleTemplateQueryResult {
         this.calculationUnit = calculationUnit;
     }
 
-    public Map<String,Object> getCompensationTable() {
+    public Map<String, Object> getCompensationTable() {
         return compensationTable;
     }
 
-    public void setCompensationTable(Map<String,Object> compensationTable) {
+    public void setCompensationTable(Map<String, Object> compensationTable) {
         this.compensationTable = compensationTable;
     }
 
@@ -173,9 +173,11 @@ public class CTARuleTemplateQueryResult {
     public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
         return phaseInfo;
     }
+
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
         this.phaseInfo = phaseInfo;
     }
+
     public BudgetType getBudgetType() {
         return budgetType;
     }
@@ -257,20 +259,20 @@ public class CTARuleTemplateQueryResult {
         this.activityIds = activityIds;
     }
 
-    public Long getTimeTypeId() {
-        return timeTypeId;
+    public List<Long> getTimeTypeIds() {
+        return timeTypeIds;
     }
 
-    public void setTimeTypeId(Long timeTypeId) {
-        this.timeTypeId = timeTypeId;
+    public void setTimeTypeIds(List<Long> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
     }
 
-    public Long getPlannedTimeId() {
-        return plannedTimeId;
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
     }
 
-    public void setPlannedTimeId(Long plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
     }
 
     public List<Long> getDayTypeIds() {
