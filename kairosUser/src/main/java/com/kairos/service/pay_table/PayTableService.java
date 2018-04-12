@@ -139,9 +139,7 @@ public class PayTableService extends UserBaseService {
         payTables.forEach(payTableToValidate -> {
             logger.info(payTableToValidate.toString());
             if (payTableToValidate.getEndDateMillis() != null) {
-                if (new DateTime(startDateMillis).isBefore(new DateTime(payTableToValidate.getEndDateMillis()))) {
-                    throw new ActionNotPermittedException("overlap date range" + new DateTime(startDateMillis) + " ON " + (new DateTime(payTableToValidate.getEndDateMillis())));
-                }
+
                 if (endDateMillis != null) {
                     Interval previousInterval = new Interval(payTableToValidate.getStartDateMillis(), payTableToValidate.getEndDateMillis());
                     Interval interval = new Interval(startDateMillis.getTime(), endDateMillis.getTime());

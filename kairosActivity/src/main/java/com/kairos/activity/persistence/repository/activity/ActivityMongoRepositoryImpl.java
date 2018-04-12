@@ -32,7 +32,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 .as("categoryName");
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted)),
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(deleted).and("rulesActivityTab.eligibleForStaffingLevel").is(true)),
                 unwind("generalActivityTab"),
                 lookup("activity_category", "generalActivityTab.categoryId", "_id",
                         "activity_type_category"),
