@@ -42,6 +42,7 @@ import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.annotation.Version;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -865,12 +866,13 @@ public class CostTimeAgreementService extends UserBaseService {
             CostTimeAgreement newCtaObject = new CostTimeAgreement();
             costTimeAgreement.setId(null);
 
-            BeanUtils.copyProperties(cta,newCtaObject);
+            BeanUtils.copyProperties(costTimeAgreement,newCtaObject);
             newCtaObject.getRuleTemplates().forEach(ruleTemplate -> {
                 ruleTemplate.setId(null);
             });
             // for setting the unique name
-            newCtaObject.setName(DateUtil.getCurrentDate().toString()+costTimeAgreement.getName());
+
+            newCtaObject.setName(costTimeAgreement.getName()+DateUtil.getCurrentDateMillis());
             newCtaObject.setCountry(costTimeAgreement.getCountry());
             newCtaObject.setOrganizationType(costTimeAgreement.getOrganizationType());
             newCtaObject.setOrganizationSubType(organizationSubType);
