@@ -1,7 +1,11 @@
 package com.kairos.activity.client.dto.staff;
 
+import com.kairos.activity.persistence.model.task_demand.MonthlyFrequency;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
+import org.joda.time.DateTimeZone;
 
+import java.time.DayOfWeek;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +23,29 @@ public class StaffAdditionalInfoDTO {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
+    private List<DayOfWeek> activityDayTypes;
+    private ZoneId unitTimeZone;
+
+
+    public DateTimeZone getUnitTimeZone() {
+        return DateTimeZone.forID(unitTimeZone.getId());
+    }
+
+    public ZoneId getUnitZoneId() {
+        return unitTimeZone;
+    }
+
+    public void setUnitTimeZone(ZoneId unitTimeZone) {
+        this.unitTimeZone = unitTimeZone;
+    }
+
+    public List<DayOfWeek> getActivityDayTypes() {
+        return activityDayTypes;
+    }
+
+    public void setActivityDayTypes(List<DayOfWeek> activityDayTypes) {
+        this.activityDayTypes = activityDayTypes;
+    }
 
     public StaffAdditionalInfoDTO() {
     }

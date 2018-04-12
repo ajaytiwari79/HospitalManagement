@@ -44,7 +44,7 @@ public class StaffingLevelGraphController {
             StaffingLevelTimeSlotDTO timeSlotDTO1=new StaffingLevelTimeSlotDTO(i,5,10,new StaffingLevelDuration(LocalTime.of(0,0),
                     LocalTime.of(0,15)) );
             timeSlotDTO1.setAvailableNoOfStaff(Random);
-            StaffingLevelActivity activity=new StaffingLevelActivity(1L,6);
+            StaffingLevelActivity activity=new StaffingLevelActivity(1L,6,6);
             timeSlotDTO1.getStaffingLevelActivities().add(activity);
             staffingLevelTimeSlots.add(timeSlotDTO1);
         }
