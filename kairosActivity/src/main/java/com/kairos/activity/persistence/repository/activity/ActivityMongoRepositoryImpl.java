@@ -7,6 +7,7 @@ import com.kairos.activity.response.dto.OrganizationTypeAndSubTypeDTO;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
 import com.kairos.activity.response.dto.activity.ActivityWithCTAWTASettingsDTO;
 import com.kairos.activity.response.dto.activity.OrganizationActivityDTO;
+import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -42,28 +43,14 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
     }
 
-   /*public  List<ActivityDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds){
 
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("isParentActivity").is(true).and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))),
-                graphLookup("activities").startWith("$compositeActivities").connectFrom("compositeActivities").connectTo("_id").as("compositeActivities"),
-                project("name", "generalActivityTab", "compositeActivities"));
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
-        return result.getMappedResults();
-
-   }*/
 
     public List<ActivityTagDTO> findAllActivitiesByOrganizationType(List<Long> orgTypeIds, List<Long> orgSubTypeIds) {
 
-        /*Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("isParentActivity").is(true).and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))),
-                project("name","generalActivityTab"));
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
-        return result.getMappedResults();*/
-
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("isParentActivity").is(true).and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))),
+                match(Criteria.where("deleted").is(false).and("isParentActivity").is(true)
+                        .and("organizationTypes").in(orgTypeIds).orOperator(Criteria.where("organizationSubTypes").in(orgSubTypeIds))
+                        .and("state").nin("DRAFT")),
                 unwind("tags", true),
                 lookup("tag", "tags", "_id", "tags_data"),
                 unwind("tags_data", true),
@@ -91,20 +78,6 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return result.getMappedResults();
 
     }
-
-    // List<ActivityDTO> ;
-    /*public  List<ActivityDTO> findAllActivityByCountry(long countryId){
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("countryId").in(countryId).and("deleted").is(false).and("isParentActivity").is(true)),
-                lookup("tag","tags","_id",
-                        "tags")
-        );
-        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class,ActivityDTO.class);
-        return result.getMappedResults();
-
-    }*/
-
 
     public List<ActivityTagDTO> findAllActivityByUnitIdAndDeleted(Long unitId, boolean deleted) {
 
@@ -134,9 +107,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 unwind("tags_data", true),
                 group("$id")
                         .first("$name").as("name")
+                        .first("$state").as("state")
                         .first("$description").as("description")
                         .first("$countryId").as("countryId")
-                        .first("$unitId").as("unitId")
                         .first("$isParentActivity").as("isParentActivity")
                         .first("generalActivityTab").as("generalActivityTab")
                         .push("tags_data").as("tags")

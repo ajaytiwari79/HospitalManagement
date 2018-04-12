@@ -30,6 +30,7 @@ public class PayTable extends UserBaseEntity {
     private String description;
     private boolean published;
     private boolean hasTempCopy;
+    private boolean editable = true;
 
     @Relationship(type = HAS_TEMP_PAY_TABLE, direction = INCOMING)
     private PayTable payTable;
@@ -112,13 +113,14 @@ public class PayTable extends UserBaseEntity {
         this.payTable = payTable;
     }
 
-    public PayTable(String name, String shortName, String description, Level level, Date startDateMillis, Date endDateMillis) {
+    public PayTable(String name, String shortName, String description, Level level, Date startDateMillis, Date endDateMillis,boolean editable) {
         this.name = name;
         this.description = description;
         this.shortName = shortName;
         this.level = level;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
+        this.editable=editable;
     }
 
     public boolean isHasTempCopy() {
@@ -127,5 +129,13 @@ public class PayTable extends UserBaseEntity {
 
     public void setHasTempCopy(boolean hasTempCopy) {
         this.hasTempCopy = hasTempCopy;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 }

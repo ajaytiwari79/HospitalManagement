@@ -121,8 +121,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     @Query("match (cta:CostTimeAgreement{deleted:false})-[:" + HAS_CTA + "]-(unitPosition:UnitPosition) where id(unitPosition)={0} RETURN cta")
     CostTimeAgreement getCTALinkedWithUnitPosition(Long unitPositionId);
 
-    @Query(
-            "MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} \n" +
+    @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) where id(user)={0} \n" +
                     "match(staff)<-[:" + BELONGS_TO + "]-(employment:Employment)<-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) \n" +
                     "match(org)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization) with org,subOrg,staff,employment \n" +
                     "optional match(subOrg)<-[:" + IN_UNIT + "]-(unitPosition:UnitPosition{deleted:false})<-[:" + BELONGS_TO_STAFF + "]-(staff) with unitPosition,org,subOrg,staff,employment \n" +
@@ -178,9 +177,36 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "RETURN id(subOrg) as unitId,id(org) as parentUnitId")
     UnitPositionQueryResult getUnitIdAndParentUnitIdByUnitPositionId(Long unitPositionId);
 
+
+
+    @Query("match(staff:Staff)-[r1:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={1} \n" +
+            "Match(org:Organization)-[r2:" + HAS_SUB_ORGANIZATION + "]->(suborg:Organization)<-[r3:" + IN_UNIT + "]-(up) where id(org)={0}  return \n" +
+            "up.totalWeeklyMinutes as totalWeeklyMinutes, \n" +
+            "up.startDateMillis as startDateMillis, \n" +
+            "up.endDateMillis as endDateMillis, \n" +
+            "up.salary as salary, \n" +
+            "up.workingDaysInWeek as workingDaysInWeek, \n" +
+            "up.hourlyWages as hourlyWages, \n" +
+            "id(up)   as id, \n" +
+            "up.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
+            "up.lastWorkingDateMillis as lastWorkingDateMillis \n" +
+            "UNION \n" +
+            "Match(staff:Staff)-[r11:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff) = {1} Match(org:Organization)<-[r22:" + IN_UNIT + "]-(up) where id(org)= {0} return  \n"+
+            "up.totalWeeklyMinutes as totalWeeklyMinutes, \n" +
+            "up.startDateMillis as startDateMillis, \n" +
+            "up.endDateMillis as endDateMillis, \n" +
+            "up.salary as salary, \n" +
+            "up.workingDaysInWeek as workingDaysInWeek, \n" +
+            "up.hourlyWages as hourlyWages, \n" +
+            "id(up)   as id, \n" +
+            "up.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
+            "up.lastWorkingDateMillis as lastWorkingDateMillis ")
+    List<UnitPositionQueryResult> getAllUnitPositionsByStaffId(Long organizationId, Long staffId);
+
     @Query("match(unitPosition)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)  where id(unitPosition)={0} return unitPosition,employmentRel,employmentType")
     UnitPositionEmploymentTypeRelationShip findEmploymentTypeByUnitPositionId(Long unitPositionId);
 
     @Query("match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function) where id(unitPosition)={0}  detach delete rel")
     void removeOlderFunctionsFromUnitPosition(Long unitPositionId);
+
 }

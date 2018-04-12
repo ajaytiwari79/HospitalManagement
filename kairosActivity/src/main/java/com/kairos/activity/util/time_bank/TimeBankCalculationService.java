@@ -137,7 +137,7 @@ public class TimeBankCalculationService {
                 if(ruleTemplate.getAccountType()==null) continue;
                 if(ruleTemplate.getAccountType().equals(TIMEBANK_ACCOUNT)){
                     int ctaTimeBankMin = 0;
-                    if ((ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeId() != null && ruleTemplate.getTimeTypeId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))) && ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
+                    if ((ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))) && ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
                         if(ruleTemplate.isCalculateScheduledHours()) {
                             dailyScheduledMin += shift.getScheduledMinutes();
                         }else {
