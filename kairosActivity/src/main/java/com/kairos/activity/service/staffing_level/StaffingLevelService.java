@@ -503,7 +503,8 @@ public class StaffingLevelService extends MongoBaseService {
                     if (activityDB != null) {
                         activity = new StaffingLevelActivity();
                         activity.setName(keyTemp);
-                        activity.setNoOfStaff(Integer.parseInt(singleData.get(keyTemp)));
+                        activity.setMinNoOfStaff(Integer.parseInt(singleData.get(keyTemp)));
+                        activity.setMaxNoOfStaff(Integer.parseInt(singleData.get(keyTemp)));
                         activity.setActivityId(activityDB.getId().longValue());
                         activitySet.add(activity);
                     }
@@ -589,7 +590,7 @@ public class StaffingLevelService extends MongoBaseService {
                         Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
                         int runFor = Integer.parseInt(recordIndexes.get(n + 1).get(recordIndexes.get(n + 1).keySet().toArray()[0]));
                         for (int j = startPos; j < runFor; j++) {
-                            staffingLevelActivities.add(new StaffingLevelActivity(columnActivityNameRecord.get(j), new Integer(csvRecord.get(j))));
+                            staffingLevelActivities.add(new StaffingLevelActivity(columnActivityNameRecord.get(j), new Integer(csvRecord.get(j)),new Integer(csvRecord.get(j))));
                             fromToTimeRecord.put(columnActivityNameRecord.get(j), csvRecord.get(j));
                             activitiesNameList.add(columnActivityNameRecord.get(j));
                         }
@@ -706,7 +707,7 @@ public class StaffingLevelService extends MongoBaseService {
         staffingLevelIntervals.forEach(sli -> {
             StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO = new StaffingLevelTimeSlotDTO(sli.getSequence(), sli.getMinNoOfStaff(), sli.getMaxNoOfStaff(), sli.getStaffingLevelDuration());
             staffingLevelTimeSlotDTO.setStaffingLevelActivities(sli.getStaffingLevelActivities());
-            activityIds.addAll(sli.getStaffingLevelActivities().stream().filter(a -> a.getNoOfStaff() != 0).map(a -> new BigInteger(a.getActivityId().toString())).collect(Collectors.toSet()));
+            activityIds.addAll(sli.getStaffingLevelActivities().stream().filter(a -> a.getMinNoOfStaff() != 0).map(a -> new BigInteger(a.getActivityId().toString())).collect(Collectors.toSet()));
             staffingLevelTimeSlotDTO.setStaffingLevelSkills(sli.getStaffingLevelSkills());
             staffingLevelTimeSlotDTOS.add(staffingLevelTimeSlotDTO);
         });
