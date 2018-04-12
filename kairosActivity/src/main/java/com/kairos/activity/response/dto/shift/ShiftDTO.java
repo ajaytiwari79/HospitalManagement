@@ -1,14 +1,17 @@
 package com.kairos.activity.response.dto.shift;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.Shift;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,7 +45,8 @@ public class ShiftDTO {
     private Long unitPositionId;
     private int scheduledMinutes;
     private int durationMinutes;
-    private Date shiftDate;
+    @JsonFormat(pattern = "YYYY-MM-DD")
+    private LocalDate shiftDate;
 
 
     public ShiftDTO(@Range(min = 0) @NotNull(message = "error.ShiftDTO.activityId.notnull") BigInteger activityId, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.unitPositionId.notnull") Long unitPositionId) {
@@ -62,11 +66,11 @@ public class ShiftDTO {
         this.unitPositionId = unitPositionId;
     }
 
-    public Date getShiftDate() {
+    public LocalDate getShiftDate() {
         return shiftDate;
     }
 
-    public void setShiftDate(Date shiftDate) {
+    public void setShiftDate(LocalDate shiftDate) {
         this.shiftDate = shiftDate;
     }
 

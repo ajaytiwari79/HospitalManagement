@@ -374,4 +374,24 @@ public class DateUtils {
         return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),0,0);
     }
 
+    public static Date convertUTCTOTimeZone(Date date,  TimeZone toTimeZone)
+    {
+        TimeZone fromTimeZone = TimeZone.getTimeZone("UTC");
+        long fromTimeZoneOffset = getTimeZoneUTCAndDSTOffset(date, fromTimeZone);
+        long toTimeZoneOffset = getTimeZoneUTCAndDSTOffset(date, toTimeZone);
+
+        return new Date(date.getTime() - (toTimeZoneOffset - fromTimeZoneOffset));
+    }
+
+    private static long getTimeZoneUTCAndDSTOffset(Date date, TimeZone timeZone)
+    {
+        long timeZoneDSTOffset = 0;
+        if(timeZone.inDaylightTime(date))
+        {
+            timeZoneDSTOffset = timeZone.getDSTSavings();
+        }
+
+        return timeZone.getRawOffset() + timeZoneDSTOffset;
+    }
+
 }
