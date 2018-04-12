@@ -37,6 +37,7 @@ import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
+import com.kairos.util.DateUtil;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -851,29 +852,27 @@ public class CostTimeAgreementService extends UserBaseService {
 
     public Map<String, Object> setCTAWithOrganizationType(Long countryId, long ctaId, long organizationSubTypeId, boolean checked) {
         Map<String, Object> map = new HashMap<>();
-
-
         OrganizationType organizationSubType = organizationTypeRepository.findOne(organizationSubTypeId);
         if (!Optional.ofNullable(organizationSubType).isPresent()) {
             throw new DataNotFoundByIdException("Invalid organisation Sub type Id " + organizationSubTypeId);
         }
-        CostTimeAgreement cta = collectiveTimeAgreementGraphRepository.findOne(ctaId, 2);
-
-        if (!Optional.ofNullable(cta).isPresent()) {
+        Optional<CostTimeAgreement> cta = collectiveTimeAgreementGraphRepository.findById(ctaId, 2);
+        if (!cta.isPresent()) {
             throw new DataNotFoundByIdException("cta not found " + ctaId);
         }
+        CostTimeAgreement costTimeAgreement=cta.get();
         if (checked) {
             CostTimeAgreement newCtaObject = new CostTimeAgreement();
-            cta.setId(null);
+            costTimeAgreement.setId(null);
 
             BeanUtils.copyProperties(cta,newCtaObject);
             newCtaObject.getRuleTemplates().forEach(ruleTemplate -> {
                 ruleTemplate.setId(null);
             });
-
-            newCtaObject.setName(COPY_OF+" "+ cta.getName());
-            newCtaObject.setCountry(cta.getCountry());
-            newCtaObject.setOrganizationType(cta.getOrganizationType());
+            // for setting the unique name
+            newCtaObject.setName(DateUtil.getCurrentDate().toString()+costTimeAgreement.getName());
+            newCtaObject.setCountry(costTimeAgreement.getCountry());
+            newCtaObject.setOrganizationType(costTimeAgreement.getOrganizationType());
             newCtaObject.setOrganizationSubType(organizationSubType);
             save(newCtaObject);
             newCtaObject.setOrganizationType(newCtaObject.getOrganizationType().basicDetails());
@@ -883,8 +882,8 @@ public class CostTimeAgreementService extends UserBaseService {
             map.put("cta", newCtaObject);
             map.put("ruleTemplate", newCtaObject.getRuleTemplates());
         } else {
-            cta.setDeleted(true);
-            save(cta);
+            costTimeAgreement.setDeleted(true);
+            save(costTimeAgreement);
         }
         return map;
 
