@@ -28,14 +28,16 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     @Inject
     private MongoTemplate mongoTemplate;
 
-    public  Boolean checkUnitPeriodExistsBetweenDates(Date startDate, Date endDate, Long unitId){
+    /*public  Boolean checkUnitPeriodExistsBetweenDates(Date startDate, Date endDate, Long unitId){
         Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
-                        orOperator(Criteria.where("startDate").gte(startDate).and("endDate").lte(endDate),
-                        Criteria.where("startDate").gt(startDate).lt(endDate),
-                        Criteria.where("startDate").lt(startDate).and("endDate").gt(endDate),
-                        Criteria.where("endDate").gt(startDate).lt(endDate)) );
+                        andOperator(Criteria.where("startDate").gte(startDate).and("endDate").lte(endDate).
+                                        orOperator(Criteria.where("startDate").gt(startDate).lt(endDate)).
+                                        orOperator(Criteria.where("startDate").lt(startDate).and("endDate").gt(endDate)).
+                                        orOperator(Criteria.where("endDate").gt(startDate).lt(endDate))
+
+                        ) );
         return mongoTemplate.exists(query, PlanningPeriod.class);
-    }
+    }*/
 
     public PlanningPeriod getPlanningPeriodContainsDate(Long unitId, Date dateLiesInPeriod){
         Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
@@ -52,12 +54,19 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return mongoTemplate.updateMulti(query, update, PlanningPeriod.class);
     }
 
-    /*public PlanningPeriod getNextPlanningPeriod(Long unitId, Date startDateOfPeriod, Date endDateOfPeriod){
-        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("endDate").gt(endDateOfPeriod));
-        query.with(Sort.by(Sort.Direction.ASC));
+    public PlanningPeriod getFirstPlanningPeriod(Long unitId){
+        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false));
+        query.with(Sort.by(Sort.Direction.ASC,"startDate"));
         query.limit(1);
         return mongoTemplate.findOne(query, PlanningPeriod.class);
-    }*/
+    }
+
+    public PlanningPeriod getLastPlanningPeriod(Long unitId){
+        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false));
+        query.with(Sort.by(Sort.Direction.DESC,"startDate"));
+        query.limit(1);
+        return mongoTemplate.findOne(query, PlanningPeriod.class);
+    }
 
 
 

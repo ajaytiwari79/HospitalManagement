@@ -12,9 +12,11 @@ import java.util.List;
  */
 public interface CustomPlanningPeriodMongoRepository {
 
-    Boolean checkUnitPeriodExistsBetweenDates(Date startDate, Date endDate, Long unitId);
+//    Boolean checkUnitPeriodExistsBetweenDates(Date startDate, Date endDate, Long unitId);
     List<PlanningPeriodDTO> findAllPeriodsOfUnit(Long unitId);
     List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, Date startDate, Date endDate);
     PlanningPeriod getPlanningPeriodContainsDate(Long unitId, Date dateLiesInPeriod);
     UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, Date startDate, Date endDate);
+    PlanningPeriod getFirstPlanningPeriod(Long unitId);
+    PlanningPeriod getLastPlanningPeriod(Long unitId);
 }

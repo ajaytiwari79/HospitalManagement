@@ -41,6 +41,14 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPeriods(unitId, null, null));
     }
 
+
+    @ApiOperation(value = "update period by unit Id and Period Id")
+    @PutMapping(value = "/{periodId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updatePhase(@PathVariable BigInteger periodId, @PathVariable Long unitId, @RequestBody @Valid PlanningPeriodDTO planningPeriodDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updatePeriod(unitId, periodId, planningPeriodDTO));
+    }
+
     @ApiOperation(value = "Remove Period")
     @DeleteMapping(value = "/period/{periodId}")
     public ResponseEntity<Map<String, Object>> deletePhase(@PathVariable Long unitId, @PathVariable BigInteger periodId) {

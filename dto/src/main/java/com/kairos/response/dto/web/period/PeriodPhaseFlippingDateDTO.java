@@ -13,6 +13,11 @@ public class PeriodPhaseFlippingDateDTO {
     public PeriodPhaseFlippingDateDTO(){
         // default constructor
     }
+    public PeriodPhaseFlippingDateDTO( BigInteger phaseId, Date flippingDate) {
+        this.phaseId = phaseId;
+        this.flippingDate = flippingDate;
+    }
+
 
     public BigInteger getPhaseId() {
         return phaseId;
