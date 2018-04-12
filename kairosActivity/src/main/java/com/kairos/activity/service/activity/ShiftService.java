@@ -98,9 +98,9 @@ public class ShiftService extends MongoBaseService {
                 shiftQueryResults = Arrays.asList(shiftQueryResult);
             }
             if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
-                if (activity.getTimeCalculationActivityTab().getDayTypes() == null || activity.getTimeCalculationActivityTab().getDayTypes().isEmpty()) {
+                /*if (activity.getTimeCalculationActivityTab().getDayTypes() == null || activity.getTimeCalculationActivityTab().getDayTypes().isEmpty()) {
                     throw new InvalidRequestException("Day Type not Selected for this Activity");
-                }
+                }*/
                 Date shiftFromDate = DateUtils.toJodaDateTime(shiftDTO.getShiftDate()).withTimeAtStartOfDay().toDate();
                 shiftQueryResults = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activity, shiftFromDate);
             }
@@ -134,21 +134,24 @@ public class ShiftService extends MongoBaseService {
     private List<ShiftQueryResult> saveShifts(Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ShiftDTO> shiftDTOS) {
         List<Shift> shifts = new ArrayList<>(shiftDTOS.size());
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>(shiftDTOS.size());
-        List<Integer> activityDayTypes = staffAdditionalInfoDTO.getActivityDayTypes().stream().map(ad -> ad.getValue()).collect(Collectors.toList());
-        shiftDTOS.forEach(shiftDTO -> {
+        List<Integer> activityDayTypes = new ArrayList<>();
+        if(staffAdditionalInfoDTO.getActivityDayTypes()!=null && !staffAdditionalInfoDTO.getActivityDayTypes().isEmpty()) {
+            activityDayTypes = staffAdditionalInfoDTO.getActivityDayTypes().stream().map(ad -> ad.getValue()).collect(Collectors.toList());
+        }
+        for (ShiftDTO shiftDTO : shiftDTOS) {
             Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getStartDate());
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             Shift shift = shiftDTO.buildShift();
             shift.setMainShift(true);
             shift.setName(activity.getName());
             validateShiftWithActivity(activity, shift, staffAdditionalInfoDTO);
-            if (activityDayTypes.contains(shiftDTO.getShiftDate().getDayOfWeek().getValue())) {
+            if (activityDayTypes.contains(new DateTime(shiftDTO.getStartDate()).getDayOfWeek())) {
                 timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
             }
             shifts.add(shift);
             timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
             applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null));
-        });
+        }
         save(shifts);
         shifts.stream().forEach(s -> shiftQueryResults.add(s.getShiftQueryResult()));
         return shiftQueryResults;
@@ -395,9 +398,9 @@ public class ShiftService extends MongoBaseService {
         int totalContractualMinOfShift = 0;
         Date shiftDate = fromDate;
         for (int day =0;day<7; day++) {
-            if (staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes() <= totalContractualMinOfShift) {
+            /*if (staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes() <= totalContractualMinOfShift) {
                 break;
-            }
+            }*/
             ShiftDTO shiftDTO = calculateAverageShiftByActivity(shiftQueryResultsInInterval, activity, staffAdditionalInfoDTO, shiftDate);
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             totalContractualMinOfShift += shiftDTO.getDuration().getStandardMinutes();
@@ -441,10 +444,8 @@ public class ShiftService extends MongoBaseService {
         }
         if (startAverageMin != null) {
             DateTime startDateTime = new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes(startAverageMin);
-            Date date = DateUtils.convertUTCTOTimeZone(startDateTime.toDate(), TimeZone.getTimeZone(staffAdditionalInfoDTO.getUnitZoneId()));
-            shiftDTO.setStartDate(date);
-            date = DateUtils.convertUTCTOTimeZone(startDateTime.plusMinutes(contractualMinutesInADay).toDate(), TimeZone.getTimeZone(staffAdditionalInfoDTO.getUnitZoneId()));
-            shiftDTO.setEndDate(date);
+            shiftDTO.setStartDate(startDateTime.toDate());
+            shiftDTO.setEndDate(startDateTime.plusMinutes(contractualMinutesInADay).toDate());
         } else {
             DateTime startDateTime = new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes((activity.getTimeCalculationActivityTab().getDefaultStartTime().getHour() * 60) + activity.getTimeCalculationActivityTab().getDefaultStartTime().getMinute());
             Date date = DateUtils.convertUTCTOTimeZone(startDateTime.toDate(), TimeZone.getTimeZone(staffAdditionalInfoDTO.getUnitZoneId()));

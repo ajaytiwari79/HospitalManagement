@@ -98,6 +98,9 @@ public class TimeBankCalculationService {
             case AppConstants.WEEKLY_HOURS:
                 duration = new Double(unitPosition.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
+            case AppConstants.FULL_WEEK:
+                duration = new Double(unitPosition.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
                 break;
         }
         shift.setDurationMinutes(duration);
