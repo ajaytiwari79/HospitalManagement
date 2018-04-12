@@ -28,17 +28,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     @Inject
     private MongoTemplate mongoTemplate;
 
-    /*public  Boolean checkUnitPeriodExistsBetweenDates(Date startDate, Date endDate, Long unitId){
-        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
-                        andOperator(Criteria.where("startDate").gte(startDate).and("endDate").lte(endDate).
-                                        orOperator(Criteria.where("startDate").gt(startDate).lt(endDate)).
-                                        orOperator(Criteria.where("startDate").lt(startDate).and("endDate").gt(endDate)).
-                                        orOperator(Criteria.where("endDate").gt(startDate).lt(endDate))
-
-                        ) );
-        return mongoTemplate.exists(query, PlanningPeriod.class);
-    }*/
-
     public PlanningPeriod getPlanningPeriodContainsDate(Long unitId, Date dateLiesInPeriod){
         Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
                 and("startDate").lte(dateLiesInPeriod).and("endDate").gte(dateLiesInPeriod));
@@ -48,7 +37,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     public UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, Date startDate, Date endDate){
         Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
                 and("startDate").gte(startDate).and("endDate").lte(endDate));
-//        List<PlanningPeriod> planningPeriods = mongoTemplate.find(query, PlanningPeriod.class);
         Update update = new Update();
         update.set("deleted", true);
         return mongoTemplate.updateMulti(query, update, PlanningPeriod.class);
@@ -69,7 +57,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
     }
 
 
-
     public List<PlanningPeriodDTO> findAllPeriodsOfUnit(Long unitId) {
 
         ProjectionOperation projectionOperation = Aggregation.project().
@@ -85,6 +72,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 match(Criteria.where("deleted").is(false).and("unitId").is(unitId)),
                 lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
                 lookup("phases", "nextPhaseId", "_id", "next_phase_data"),
+                sort(Sort.Direction.ASC,"startDate"),
                 projectionOperation
 
         );
@@ -108,6 +96,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 match(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("startDate").gte(startDate).and("endDate").lte(endDate)),
                 lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
                 lookup("phases", "nextPhaseId", "_id", "next_phase_data"),
+                sort(Sort.Direction.ASC,"startDate"),
                 projectionOperation
 
         );

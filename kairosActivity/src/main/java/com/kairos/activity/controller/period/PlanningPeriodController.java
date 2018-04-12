@@ -43,7 +43,7 @@ public class PlanningPeriodController {
 
 
     @ApiOperation(value = "update period by unit Id and Period Id")
-    @PutMapping(value = "/{periodId}")
+    @PutMapping(value = "/period/{periodId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePhase(@PathVariable BigInteger periodId, @PathVariable Long unitId, @RequestBody @Valid PlanningPeriodDTO planningPeriodDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updatePeriod(unitId, periodId, planningPeriodDTO));

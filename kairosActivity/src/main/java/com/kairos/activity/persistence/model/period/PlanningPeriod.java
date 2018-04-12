@@ -25,6 +25,7 @@ public class PlanningPeriod extends MongoBaseEntity {
     private BigInteger currentPhaseId;
     private BigInteger nextPhaseId;
     private List<PeriodPhaseFlippingDate> phaseFlippingDate = new ArrayList<>();
+    private List<PeriodPhaseFlippingLogs> phaseFlippingLogs = new ArrayList<>();
 
     public PlanningPeriod(){
         // default constructor
@@ -94,5 +95,13 @@ public class PlanningPeriod extends MongoBaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<PeriodPhaseFlippingLogs> getPhaseFlippingLogs() {
+        return phaseFlippingLogs;
+    }
+
+    public void setPhaseFlippingLogs(List<PeriodPhaseFlippingLogs> phaseFlippingLogs) {
+        this.phaseFlippingLogs = phaseFlippingLogs;
     }
 }
