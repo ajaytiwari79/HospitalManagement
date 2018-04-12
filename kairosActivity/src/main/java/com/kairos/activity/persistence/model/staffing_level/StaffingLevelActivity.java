@@ -48,6 +48,14 @@ public class StaffingLevelActivity {
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
+
+    public StaffingLevelActivity(Long activityId, String name, int minNoOfStaff, int maxNoOfStaff) {
+        this.activityId = activityId;
+        this.name = name;
+        this.minNoOfStaff = minNoOfStaff;
+        this.maxNoOfStaff = maxNoOfStaff;
+    }
+
     public Long getActivityId() {
         return activityId;
     }

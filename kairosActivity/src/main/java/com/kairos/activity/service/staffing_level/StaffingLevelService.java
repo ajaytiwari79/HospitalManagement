@@ -408,15 +408,15 @@ public class StaffingLevelService extends MongoBaseService {
     private void createStaffingLevelObject(List<Map<String, String>> processedData, long unitId) {
 
         List<StaffingLevelDto> staffingDtoList = new ArrayList<StaffingLevelDto>();
-        StaffingLevelDto staffingDTO = null;
+        StaffingLevelDto staffingDTO;
         List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlList = new ArrayList<StaffingLevelTimeSlotDTO>();
-        StaffingLevelTimeSlotDTO staffingLevelTimeSlot = null;
-        StaffingLevelDuration duration = null;
-        StaffingLevelSetting staffingLevelSetting = null;
-        LocalTime fromTime = null;
-        LocalTime toTime = null;
-        Set<StaffingLevelActivity> activitySet = null;
-        StaffingLevelActivity activity = null;
+        StaffingLevelTimeSlotDTO staffingLevelTimeSlot;
+        StaffingLevelDuration duration;
+        StaffingLevelSetting staffingLevelSetting;
+        LocalTime fromTime;
+        LocalTime toTime;
+        Set<StaffingLevelActivity> activitySet;
+
 
         Date date = null;
 
@@ -501,12 +501,8 @@ public class StaffingLevelService extends MongoBaseService {
                         && !keyTemp.equals("max") && !keyTemp.equals("forDay")) {
                     Activity activityDB = activityMongoRepository.getActivityByNameAndUnitId( unitId,keyTemp.trim());
                     if (activityDB != null) {
-                        activity = new StaffingLevelActivity();
-                        activity.setName(keyTemp);
-                        activity.setMinNoOfStaff(Integer.parseInt(singleData.get(keyTemp)));
-                        activity.setMaxNoOfStaff(Integer.parseInt(singleData.get(keyTemp)));
-                        activity.setActivityId(activityDB.getId().longValue());
-                        activitySet.add(activity);
+                        StaffingLevelActivity staffingLevelActivity = new StaffingLevelActivity(activityDB.getId().longValue(),keyTemp,Integer.parseInt(singleData.get(keyTemp)),Integer.parseInt(singleData.get(keyTemp)));
+                        activitySet.add(staffingLevelActivity);
                     }
                 }
             }
