@@ -19,12 +19,14 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
     private String name;
     private String shortName;
     private Long startDateMillis;
-    @DateLong
-    private Date endDateMillis;
+
+    private Long endDateMillis;
     private Level level;
     private List<PayGrade> payGrades;
     private String description;
     private Boolean published;
+    private Boolean editable;
+
 
     public PayTableResponse() {
     }
@@ -61,11 +63,11 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
         this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDateMillis() {
+    public Long getEndDateMillis() {
         return endDateMillis;
     }
 
-    public void setEndDateMillis(Date endDateMillis) {
+    public void setEndDateMillis(Long endDateMillis) {
         this.endDateMillis = endDateMillis;
     }
 
@@ -101,13 +103,23 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
         this.published = published;
     }
 
-    public PayTableResponse(String name, String shortName, String description, Long startDateMillis, Date endDateMillis, Boolean published) {
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
+    public PayTableResponse(String name, String shortName, String description, Long startDateMillis, Long endDateMillis, Boolean published, Boolean editable) {
         this.name = name;
         this.published = published;
         this.description = description;
         this.shortName = shortName;
         this.startDateMillis = startDateMillis;
+        this.editable = editable;
         this.endDateMillis = endDateMillis;
+
     }
 
     @Override

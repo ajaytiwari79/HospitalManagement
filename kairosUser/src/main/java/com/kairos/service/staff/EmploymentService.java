@@ -7,21 +7,20 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.enums.EmploymentStatus;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.user.client.ContactAddress;
-import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
-import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.staff.*;
+import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
+import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
+import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -84,6 +83,8 @@ public class EmploymentService extends UserBaseService {
     private PartialLeaveGraphRepository partialLeaveGraphRepository;
     @Inject
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
+    @Inject
+    private UnitPositionGraphRepository unitPositionGraphRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
@@ -702,6 +703,67 @@ public class EmploymentService extends UserBaseService {
         map.put("amount", partialLeave.getAmount());
         map.put("note", partialLeave.getNote());
         return map;
+    }
+    public void updateEmploymentEndDate(Organization unit, UnitPositionDTO unitPositionDTO) {
+        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+        if (!Optional.ofNullable(parentOrganization).isPresent()) {
+            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unit.getId());
+        }
+        List<UnitPositionQueryResult> unitPositionsQuery = unitPositionGraphRepository.getAllUnitPositionsByStaffId(parentOrganization.getId(), unitPositionDTO.getStaffId());
+        Long maxEndDate = unitPositionsQuery.get(0).getEndDateMillis();
+        boolean isEndDateBlank = false;
+        //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
+        for(UnitPositionQueryResult unitPosition:unitPositionsQuery) {
+            if(!Optional.ofNullable(unitPosition.getEndDateMillis()).isPresent()) {
+                isEndDateBlank = true;
+                break;
+            }
+            if(maxEndDate < unitPosition.getEndDateMillis()){
+                maxEndDate = unitPosition.getEndDateMillis();
+            }
+        }
+        Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDateMillis()?maxEndDate:unitPositionDTO.getEndDateMillis());
+        Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),unitPositionDTO.getStaffId());
+        employment.setEndDateMillis(employmentEndDate);
+        employmentGraphRepository.save(employment);
+    }
+
+    
+    public void moveToReadOnlyAccessGroup() {
+        Long curDateMillisStart = DateUtil.getStartOfDay(DateUtil.getCurrentDate()).getTime();
+        Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
+        List<UnitPermission> unitPermissions;
+        UnitPermission unitPermission;
+        List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(curDateMillisStart,curDateMillisEnd);
+        accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(curDateMillisStart, curDateMillisEnd);
+
+        List<Organization> organizations;
+        List<Employment>  employments = expiredEmploymentsQueryResults.isEmpty() ? null : new ArrayList<Employment>();
+        int currentElement;
+        Employment employment;
+
+        for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult: expiredEmploymentsQueryResults) {
+            organizations = expiredEmploymentsQueryResult.getOrganizations();
+            employment = expiredEmploymentsQueryResult.getEmployment();
+            unitPermissions = expiredEmploymentsQueryResult.getUnitPermissions();
+            currentElement = 0;
+
+            for(AccessGroup accessGroup:expiredEmploymentsQueryResult.getAccessGroups()){
+                unitPermission = unitPermissions.get(currentElement);
+                if(!Optional.ofNullable(unitPermission).isPresent() ) {
+                    unitPermission = new UnitPermission();
+                    unitPermission.setOrganization(organizations.get(currentElement));
+                    unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
+                }
+                unitPermission.setAccessGroup(accessGroup);
+                employment.getUnitPermissions().add(unitPermission);
+                currentElement++;
+            }
+            employments.add(employment);
+        }
+        if(expiredEmploymentsQueryResults.size()>0) {
+            employmentGraphRepository.saveAll(employments);
+        }
     }
 
 }
