@@ -442,7 +442,7 @@ public class OrganizationService extends UserBaseService {
 
     public Map<String, Object> createNewUnit(OrganizationDTO organizationDTO, long unitId) {
 
-        Organization parent = organizationGraphRepository.findOne(unitId);
+        Organization parent = organizationGraphRepository.findOne(unitId,2);
 
         Organization unit = new Organization();
         ContactAddress contactAddress = new ContactAddress();
