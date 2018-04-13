@@ -17,10 +17,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -154,5 +151,27 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 		return new PhaseChangeScheduler();
 	}
 
-
-	}
+/*
+	private static final String ALLOWED_HEADERS = "X-Requested-With,access-control-allow-origin,Authorization,authorization,Origin,Content-Type,Version";
+	private static final String ALLOWED_METHODS = "GET,PUT,POST,DELETE,OPTIONS";
+	private static final String ALLOWED_ORIGIN = "*";
+	private static final String MAX_AGE = "3600";
+	@Bean
+	public WebFilter corsFilter() {
+		return (ServerWebExchange ctx, WebFilterChain chain) -> {
+			ServerHttpRequest request = ctx.getRequest();
+			ServerHttpResponse response = ctx.getResponse();
+			HttpHeaders headers = response.getHeaders();
+			headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+			headers.set("Access-Control-Allow-Credentials", "true");
+			headers.set("Access-Control-Allow-Methods", ALLOWED_METHODS);
+			headers.set("Access-Control-Max-Age", MAX_AGE);
+			headers.set("Access-Control-Allow-Headers",ALLOWED_HEADERS);
+			if (request.getMethod() == HttpMethod.OPTIONS) {
+				response.setStatusCode(HttpStatus.OK);
+				return  Mono.empty();
+			}
+			return chain.filter(ctx);
+		};
+	}*/
+}
