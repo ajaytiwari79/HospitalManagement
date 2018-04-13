@@ -31,6 +31,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
+import com.kairos.response.dto.web.cta.CostTimeAgreementDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
@@ -851,7 +852,7 @@ public class CostTimeAgreementService extends UserBaseService {
         return collectiveTimeAgreementGraphRepository.getAllCTAByOrganiationSubType(organizationSubTypeId);
     }
 
-    public Map<String, Object> setCTAWithOrganizationType(Long countryId, long ctaId, long organizationSubTypeId, boolean checked) {
+    public CostTimeAgreementDTO setCTAWithOrganizationType(Long countryId, long ctaId, long organizationSubTypeId, boolean checked) {
         Map<String, Object> map = new HashMap<>();
         OrganizationType organizationSubType = organizationTypeRepository.findOne(organizationSubTypeId);
         if (!Optional.ofNullable(organizationSubType).isPresent()) {
@@ -881,13 +882,12 @@ public class CostTimeAgreementService extends UserBaseService {
             newCtaObject.setOrganizationSubType(newCtaObject.getOrganizationSubType().basicDetails());
             newCtaObject.setExpertise(newCtaObject.getExpertise().retrieveBasicDetails());
             newCtaObject.setCountry(null);
-            map.put("cta", newCtaObject);
-            map.put("ruleTemplate", newCtaObject.getRuleTemplates());
+            return new CostTimeAgreementDTO(newCtaObject,newCtaObject.getRuleTemplates());
         } else {
             costTimeAgreement.setDeleted(true);
             save(costTimeAgreement);
         }
-        return map;
+        return null;
 
     }
 }
