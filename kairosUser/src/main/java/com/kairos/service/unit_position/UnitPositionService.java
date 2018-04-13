@@ -341,7 +341,7 @@ public class UnitPositionService extends UserBaseService {
             throw new ActionNotPermittedException("Start date can't be less than current Date ");
         }
         unitPosition.setStartDateMillis(unitPositionDTO.getStartDateMillis());
-
+        unitPosition.setWorkingDaysInWeek(expertise.get().getNumberOfWorkingDaysInWeek());
 
         if (Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) {
             if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
