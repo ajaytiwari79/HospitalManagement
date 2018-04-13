@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
-public class  AccessGroup extends UserBaseEntity {
+public class AccessGroup extends UserBaseEntity {
 
     @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;

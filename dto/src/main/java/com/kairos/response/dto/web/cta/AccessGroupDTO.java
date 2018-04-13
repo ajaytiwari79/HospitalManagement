@@ -17,7 +17,7 @@ public class AccessGroupDTO {
         //default constructor
     }
 
-    public AccessGroupDTO(Long id, @NotNull(message = "error.name.notnull") String name, String description, AccessGroupRole role) {
+    public AccessGroupDTO(Long id, String name, String description, AccessGroupRole role) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -56,11 +56,8 @@ public class AccessGroupDTO {
         this.role = role;
     }
 
-
     @AssertTrue(message = "Access group can't be blank")
     public boolean isValid() {
         return (this.name.trim().isEmpty())?false:true;
     }
-
-
 }
