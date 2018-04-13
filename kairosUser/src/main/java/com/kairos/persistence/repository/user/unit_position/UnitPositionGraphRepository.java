@@ -209,4 +209,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     @Query("match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function) where id(unitPosition)={0}  detach delete rel")
     void removeOlderFunctionsFromUnitPosition(Long unitPositionId);
 
+    @Query("Match(staff:Staff)-[:BELONGS_TO_STAFF]-(up:UnitPosition{deleted:false}) where id(staff)={0} and ( up.endDateMillis > {1} or up.endDateMillis is null)  set up.endDateMillis = {1}")
+    void updateUnitPositionEndDateFromEmployment(Long staffId, Long endDateMillis);
+
 }

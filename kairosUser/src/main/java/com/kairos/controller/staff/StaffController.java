@@ -14,6 +14,7 @@ import com.kairos.service.staff.ApiExternalStaffService;
 import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffAddressService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -60,6 +61,9 @@ public class StaffController {
     private OrganizationServiceService organizationServiceService;
     @Inject
     private EmploymentTypeService employmentTypeService;
+    @Inject
+    private UnitPositionService unitPositionService;
+
 
 
     @RequestMapping(value = "/{staffId}/employment_details", method = RequestMethod.PUT)
@@ -586,6 +590,19 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getStaffByExperties(@PathVariable Long unitId, @RequestBody List<Long> expertiesIds) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByExperties(unitId, expertiesIds));
+    }
+
+    @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.PUT)
+    @ApiOperation("update employment of staff")
+    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable long staffId, @RequestBody Map<String, Object> employmentDetail) {
+
+        Long endDateMillis = Long.parseLong((String)employmentDetail.get("endDate"));
+        Map<String, Object> response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,endDateMillis);
+        if (response == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+
     }
 
 

@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.user.staff.Employment;
+import com.kairos.persistence.model.user.staff.EmploymentQueryResult;
 import com.kairos.persistence.model.user.staff.ExpiredEmploymentsQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -33,11 +34,17 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "create (employment)-[r2:BELONGS_TO]->(staff) create (employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit) return r")
     void createEmployments(long organizationId, List<Long> staffId, long unitId);
 
-    @Query("Match(employment:Employment)-[r1:" + BELONGS_TO + "]->(staff:Staff)-[r2:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where employment.endDateMillis >= {0} and <= {1} \n" +
+    @Query("Match(employment:Employment)-[r1:" + BELONGS_TO + "]->(staff:Staff)-[r2:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(employment) in {0} \n" +
             "Match(up)-[r3:" +IN_UNIT + "]->(org:Organization)-[r4:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(ag:AccessGroup{isEmploymentExpired:true,deleted:false}) \n" +
             "Match(employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) return employment, \n" +
             "case when org IS NOT NULL then COLLECT( distinct ag) else[] end as accessGroups,case when org IS NOT NULL then COLLECT( distinct org) else[] end as organizations, \n" +
             "case when unitPermission is NOT null then COLLECT(distinct unitPermission) else[] end as unitPermissions")
-    List<ExpiredEmploymentsQueryResult> findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(Long curDateMillisStart, Long curDateMillisEnd);
+    List<ExpiredEmploymentsQueryResult> findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(List<Long> empIds);
+
+    @Query("Match(staff:Staff)-[:BELONGS_TO]-(emp:Employment) where id(staff) = {0} set emp.endDateMillis = {1}")
+    void updateEmploymentEndDate(Long staffId, Long endDateMillis);
+
+    @Query("Match(staff:Staff)-[:BELONGS_TO]-(emp:Employment) where id(staff) = {0} return id(emp) as id, emp.startDateMillis as startDateMillis, emp.endDateMillis as endDateMillis")
+    EmploymentQueryResult findEmploymentByStaff(Long staffId);
 }
 

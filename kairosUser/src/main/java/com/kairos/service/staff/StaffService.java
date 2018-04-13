@@ -1619,7 +1619,8 @@ public class StaffService extends UserBaseService {
         List<com.kairos.response.dto.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
         staffs.forEach(s -> {
             com.kairos.response.dto.web.StaffDTO staffDTO = new com.kairos.response.dto.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
-            List<UnitPositionQueryResult> ueps = unitPositionService.getUnitPositionsOfStaff(unitId, s.getId(), "Organization");
+            EmploymentUnitPositionDTO employmentUnitPositionDTO = unitPositionService.getUnitPositionsOfStaff(unitId, s.getId(), "Organization");
+            List<UnitPositionQueryResult> ueps = employmentUnitPositionDTO.getUnitPositions();
             expertiesIds.forEach(e -> {
                 ueps.forEach(uep -> {
                     if (uep.getExpertise().getId().equals(e)) {

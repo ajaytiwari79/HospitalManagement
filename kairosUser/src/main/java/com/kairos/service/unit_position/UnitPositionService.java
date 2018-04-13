@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
+import com.kairos.persistence.model.user.staff.*;
+import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.client.TimeBankRestClient;
 
@@ -29,11 +32,8 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.FunctionAndSeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.persistence.model.user.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.user.unit_position.*;
 
-import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
@@ -75,6 +75,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -137,6 +138,8 @@ public class UnitPositionService extends UserBaseService {
     private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
     @Inject
     private EmploymentService employmentService;
+    @Inject
+    private EmploymentGraphRepository employmentGraphRepository;
 
     public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
 
@@ -502,14 +505,16 @@ public class UnitPositionService extends UserBaseService {
      * @author vipul
      * used to get all positions of organization n by organization and staff Id
      * */
-    public List<UnitPositionQueryResult> getUnitPositionsOfStaff(long id, long staffId, String type) {
+    public EmploymentUnitPositionDTO getUnitPositionsOfStaff(long id, long staffId, String type) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Staff Id" + staffId);
         }
 
         User user = userGraphRepository.getUserByStaffId(staffId);
-        return unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId());
+        EmploymentQueryResult employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employment,unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) );
+        return employmentUnitPositionDTO;
 
         // TODO  Organization organization = organizationService.getOrganizationDetail(id, type);
 //        Organization parentOrganization;
@@ -524,7 +529,7 @@ public class UnitPositionService extends UserBaseService {
 //            logger.info("Unable to get Unit employment of this staff ,{} in organization,{}", staffId, organization.getId());
 //            throw new DataNotFoundByIdException("unable to get unit employment  of staff");
 //        }
-        //TODO  return unitPositionGraphRepository.getAllUnitPositionsByStaff(organization.getId(), staffId);
+        //  return unitPositionGraphRepository.getAllUnitPositionsByStaff(organization.getId(), staffId);
     }
 
     public PositionCtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId) {
@@ -801,10 +806,28 @@ public class UnitPositionService extends UserBaseService {
         return true;
     }
 
-
     // For Test Cases
     public UnitPosition getDefaultUnitPositionByOrg(Long orgId) {
         return unitPositionGraphRepository.getDefaultUnitPositionByOrg(orgId);
+    }
+
+    public Map<String,Object> updateUnitPositionEndDateFromEmployment( Long staffId, Long endDateMillis) {
+
+//        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+//        if (!Optional.ofNullable(parentOrganization).isPresent()) {
+//            throw new DataNotFoundByIdException("Parent organization not found  Unit ID: " + unit.getId());
+//        }
+        unitPositionGraphRepository.updateUnitPositionEndDateFromEmployment(staffId,endDateMillis);
+        employmentGraphRepository.updateEmploymentEndDate(staffId,endDateMillis);
+        if(DateUtil.getDateFromEpoch(endDateMillis).compareTo(LocalDate.now())==0) {
+            EmploymentQueryResult employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+            List<Long> empIds = Stream.of(employment.getId()).collect(Collectors.toList());
+            employmentService.moveToReadOnlyAccessGroup(empIds);
+        }
+
+
+        return null;
+
     }
 
 

@@ -258,5 +258,9 @@ public class DateUtil {
 
         return calendar.getTime();
     }
+    public static LocalDate getDateFromEpoch(Long dateLong) {
+
+        return Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
+    }
 
 }
