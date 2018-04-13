@@ -5,6 +5,7 @@ import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.activity.persistence.model.period.PlanningPeriod;
+import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.activity.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
@@ -261,11 +262,29 @@ public class PlanningPeriodService extends MongoBaseService {
         save(planningPeriod);
     }*/
 
+    public String setDefaultNameOfPeriod(){
+
+        return null;
+    }
+
     public void addPeriodOnUpdate(Long unitId,Date endDate, Date startDate, List<PhaseDTO> phases){
         int duration = getDifferenceInDates(endDate, startDate);
         PlanningPeriodDTO tempPlanningPeriodDTO = new PlanningPeriodDTO(startDate.getTime(),duration,
                  DurationType.DAYS, 1, endDate);
         addPeriod(unitId,startDate, phases,tempPlanningPeriodDTO );
+    }
+
+    public PlanningPeriod updatePhaseFlippingDateOfPeriod(PlanningPeriod planningPeriod, PlanningPeriodDTO planningPeriodDTO){
+        List<PeriodPhaseFlippingDate>  phaseFlippingDate = planningPeriod.getPhaseFlippingDate();
+        /*int index = 0;
+        for(PeriodPhaseFlippingDate flippingDate : phaseFlippingDate) {
+            System.out.println("Current index is: " + (index++));
+        }
+        phaseFlippingDate.forEach();*/
+        phaseFlippingDate.get(0).setFlippingDate(new Date(planningPeriodDTO.getConstructionToDraftDate()));
+        phaseFlippingDate.get(1).setFlippingDate(new Date(planningPeriodDTO.getPuzzleToConstructionDate()));
+        phaseFlippingDate.get(2).setFlippingDate(new Date(planningPeriodDTO.getRequestToPuzzleDate()));
+        return planningPeriod;
     }
 
     public List<PlanningPeriodDTO> updatePeriod(Long unitId, BigInteger periodId, PlanningPeriodDTO planningPeriodDTO){
@@ -286,6 +305,9 @@ public class PlanningPeriodService extends MongoBaseService {
         if(planningPeriodDTO.getStartDate().compareTo(planningPeriod.getStartDate()) == 0 &&
                 planningPeriodDTO.getEndDate().compareTo(planningPeriod.getEndDate()) == 0){
             //No change in date
+            planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO);
+            planningPeriod.setName(planningPeriodDTO.getName());
+            save(planningPeriod);
             return getPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate());
         }
 
@@ -362,10 +384,13 @@ public class PlanningPeriodService extends MongoBaseService {
             throw new DataNotFoundByIdException("No Period found in the Unit by Id " + periodId);
         }
 
-        List<PhaseDTO> phases = phaseService.getApplicablePhasesByOrganizationId(unitId);
+        Phase initialNextPhase = phaseMongoRepository.findOne(planningPeriod.getNextPhaseId());
+        Phase newNextPhase = phaseMongoRepository.getNextApplicablePhasesOfUnitBySequence(unitId, initialNextPhase.getSequence());
+        planningPeriod.setCurrentPhaseId(initialNextPhase.getId());
+        planningPeriod.setNextPhaseId(newNextPhase.getId());
+        save(planningPeriod);
 
-
-        return null;
+        return getPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
 }

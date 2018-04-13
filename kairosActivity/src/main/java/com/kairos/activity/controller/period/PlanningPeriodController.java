@@ -56,4 +56,11 @@ public class PlanningPeriodController {
     }
 
 
+    @ApiOperation(value = "update period's phase to next phase")
+    @PutMapping(value = "/period/{periodId}/next_phase")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updatePlanningPeriodPhaseToNext(@PathVariable BigInteger periodId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setPlanningPeriodPhaseToNext(unitId, periodId));
+    }
+
 }

@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  * Created by vipul on 26/9/17.
@@ -49,11 +49,33 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
         return mongoTemplate.find(query,PhaseDTO.class,"phases");
     }
 
-    /*public  List<PhaseDTO> getNextApplicablePhasesOfUnit(Long unitId, BigInteger phaseId)
+    public Phase getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence)
     {
-        Query query = Query.query(Criteria.where("organizationId").is(unitId).and("duration").gt(0));
-        query.with(new Sort(Sort.Direction.DESC,"sequence"));
-        return mongoTemplate.find(query,PhaseDTO.class,"phases");
+        Query query = Query.query(Criteria.where("organizationId").is(unitId).and("sequence").gt(sequence));
+        query.with(new Sort(Sort.Direction.ASC,"sequence"));
+        query.limit(1);
+        return mongoTemplate.findOne(query, Phase.class,"phases");
+
+    }
+
+    /*public List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId,Date startDate, Date endDate) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("deleted").is(false).and("isMainShift").is(true).and("unitPositionId").is(unitEmploymentPositionId)
+                        .and("startDate").lte(endDate).and("endDate").gte(startDate)),
+                graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShift"),unwind("subShifts",true),
+                lookup("activities","subShift.activityId","_id","subShift.activity"),
+                lookup("activities","activityId","_id","activity")
+                ,project("unitId")
+                        .andInclude("deleted")
+                        .andInclude("startDate")
+                        .andInclude("endDate").andInclude("scheduledMinutes").andInclude("durationMinutes")
+                        .andInclude("isMainShift").andInclude("subShift")
+                        //.andInclude("subShift.startDate").andInclude("subShift.endDate")
+                        .andInclude("subShift.activity")
+                        .and("activity").arrayElementAt(0).as("activity")
+        );
+        AggregationResults<ShiftQueryResultWithActivity> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResultWithActivity.class);
+        return result.getMappedResults();
     }*/
 
     public List<OrganizationPhaseDTO> getPhasesGroupByOrganization(){
