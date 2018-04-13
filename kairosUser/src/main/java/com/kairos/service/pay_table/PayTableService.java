@@ -495,12 +495,11 @@ public class PayTableService extends UserBaseService {
         List<PayTable> response = new ArrayList<>();
 
         PayTable parentPayTable = payTableGraphRepository.getPermanentPayTableByPayTableId(payTableId);
-        logger.info(new DateTime(payTable.getStartDateMillis()).toLocalDate() +"----"+(new DateTime(publishedDateMillis).toLocalDate()));
+        logger.debug(new DateTime(payTable.getStartDateMillis()).toLocalDate() + "----" + (new DateTime(publishedDateMillis).toLocalDate()));
         if (Optional.ofNullable(parentPayTable).isPresent()) {
-           payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDateMillis - ONE_DAY);
+            payTableGraphRepository.changeStateOfRelationShip(parentPayTable.getId(), publishedDateMillis - ONE_DAY);
             parentPayTable.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
             parentPayTable.setHasTempCopy(false);
-            payTable.setPublished(true);
             parentPayTable.setPayTable(null);
             response.add(parentPayTable);
 
@@ -510,10 +509,8 @@ public class PayTableService extends UserBaseService {
         payTable.setPayTable(null);
         payTable.setPublished(true);
         payTable.setStartDateMillis(new Date(publishedDateMillis));
-        for (PayGrade currentPayGrade : payTable.getPayGrades()) {
-            currentPayGrade.setPublished(true);
-        }
-       save(payTable);
+        payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
+        save(payTable);
         response.add(payTable);
 
         return response;
