@@ -25,7 +25,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     private long continuousDayRestHours;
     private long averageRest;//(hours number)
     private String shiftAffiliation;//(List checkbox)
-    private WTATemplateType wtaTemplateType = WTATemplateType.ShortestAndAverageDailyRest;;
+    private WTATemplateType wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;;
 
 
     public WTATemplateType getWtaTemplateType() {

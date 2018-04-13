@@ -98,7 +98,7 @@ public class ShiftService extends MongoBaseService {
                 shiftQueryResults = Arrays.asList(shiftQueryResult);
             }
             if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
-                /*if (activity.getTimeCalculationActivityTab().getDayTypes() == null || activity.getTimeCalculationActivityTab().getDayTypes().isEmpty()) {
+                /*if (activity.getTimeCalculationActivityTab().getPartOfDays() == null || activity.getTimeCalculationActivityTab().getPartOfDays().isEmpty()) {
                     throw new InvalidRequestException("Day Type not Selected for this Activity");
                 }*/
                 Date shiftFromDate = DateUtils.toJodaDateTime(shiftDTO.getShiftDate()).withTimeAtStartOfDay().toDate();

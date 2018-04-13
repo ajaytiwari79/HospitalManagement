@@ -7,6 +7,7 @@ import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -22,8 +23,35 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     private long validationStartDateMillis;
     private long shiftsLimit;
     private boolean onlyCompositeShifts;//(checkbox)
-    private WTATemplateType wtaTemplateType = WTATemplateType.ShiftsInInterval;;
+    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_SHIFT_IN_INTERVAL;
 
+    private List<BigInteger> timeTypeIds;
+    private List<BigInteger> activityIds;
+    private List<Long> plannedTimeIds;
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
+    public List<BigInteger> getActivityIds() {
+        return activityIds;
+    }
+
+    public void setActivityIds(List<BigInteger> activityIds) {
+        this.activityIds = activityIds;
+    }
+
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;

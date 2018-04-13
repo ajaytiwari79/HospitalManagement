@@ -3,7 +3,6 @@ package com.kairos.activity.service.wta;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.WTADetailRestClient;
-import com.kairos.activity.client.dto.country.CountryDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
@@ -19,6 +18,7 @@ import com.kairos.activity.service.tag.TagService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 
+import com.kairos.response.dto.web.CountryDTO;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.response.dto.web.wta.WTADTO;

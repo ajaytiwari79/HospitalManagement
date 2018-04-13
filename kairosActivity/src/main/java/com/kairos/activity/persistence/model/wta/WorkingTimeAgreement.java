@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -42,22 +43,22 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private WTAOrganization organization;
 
-    private List<BigInteger> averageScheduledTimes;
-    private List<BigInteger> careDayCheck;
-    private List<BigInteger> consecutiveNights;
-    private List<BigInteger> dailyRestingTime;
-    private List<BigInteger> daysOffInPeriod;
-    private List<BigInteger> durationBetweenShift;
-    private List<BigInteger> numberOfNightsAndDays;
-    private List<BigInteger> numberOfWeekEndShift;
-    private List<BigInteger> restInConsecutive;
-    private List<BigInteger> seniorDaysInYear;
-    private List<BigInteger> shiftLength;
-    private List<BigInteger> shiftsInInterval;
-    private List<BigInteger> shortestAndAverageDailyRest;
-    private List<BigInteger> timebank;
-    private List<BigInteger> vetoPerPeriod;
-    private List<BigInteger> weeklyRestPeriod;
+    private List<ShiftLengthWTATemplate> shiftLengths = new ArrayList<>();
+    private List<AverageScheduledTimeWTATemplate> averageScheduledTimes = new ArrayList<>();
+    private List<CareDayCheckWTATemplate> careDayChecks = new ArrayList<>();
+    private List<ConsecutiveRestPartOfDayWTATemplate> consecutiveRestPartOfDays = new ArrayList<>();
+    private List<ConsecutiveWorkWTATemplate> consecutiveWorks = new ArrayList<>();
+    private List<DailyRestingTimeWTATemplate> dailyRestingTimes = new ArrayList<>();
+    private List<DaysOffInPeriodWTATemplate> daysOffInPeriods = new ArrayList<>();
+    private List<DurationBetweenShiftWTATemplate> durationBetweenShifts = new ArrayList<>();
+    private List<NumberOfPartOfDayShiftsWTATemplate> numberOfPartOfDayShifts = new ArrayList<>();
+    private List<NumberOfWeekendShiftInPeriodWTATemplate> numberOfWeekendShiftInPeriods = new ArrayList<>();
+    private List<SeniorDaysInYearWTATemplate> seniorDaysInYears = new ArrayList<>();
+    private List<ShiftsInIntervalWTATemplate> shiftsInIntervals = new ArrayList<>();
+    private List<ShortestAndAverageDailyRestWTATemplate> shortestAndAverageDailyRests = new ArrayList<>();
+    private List<TimeBankWTATemplate> timeBanks = new ArrayList<>();
+    private List<VetoPerPeriodWTATemplate> vetoPerPeriods = new ArrayList<>();
+    private List<WeeklyRestPeriodWTATemplate> weeklyRestPeriods = new ArrayList<>();
 
 
 

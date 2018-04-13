@@ -23,7 +23,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     private boolean balanceAdjustment;
     private boolean useShiftTimes;
     private long maximumAvgTime;
-    private WTATemplateType wtaTemplateType = WTATemplateType.AverageScheduledTime;
+    private WTATemplateType wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
 
 
     public WTATemplateType getWtaTemplateType() {

@@ -7,6 +7,7 @@ import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -16,15 +17,43 @@ import java.util.List;
 @Document
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NumberOfNightsAndDaysWTATemplate extends WTABaseRuleTemplate {
+public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
     private List<String> balanceType;//multiple check boxes
     private long nightsWorked;
     private long intervalLength;
     private String intervalUnit;
     private long validationStartDateMillis;
-    private WTATemplateType wtaTemplateType = WTATemplateType.NumberOfNightsAndDays;
+    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;
 
+    private List<BigInteger> timeTypeIds;
+    private List<BigInteger> activityIds;
+    private List<Long> plannedTimeIds;
+
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
+    public List<BigInteger> getActivityIds() {
+        return activityIds;
+    }
+
+    public void setActivityIds(List<BigInteger> activityIds) {
+        this.activityIds = activityIds;
+    }
+
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -74,7 +103,7 @@ public class NumberOfNightsAndDaysWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public NumberOfNightsAndDaysWTATemplate(String name, String templateType, boolean disabled, String description, List<String> balanceType, long nightsWorked, long intervalLength, long validationStartDateMillis, String intervalUnit) {
+    public NumberOfPartOfDayShiftsWTATemplate(String name, String templateType, boolean disabled, String description, List<String> balanceType, long nightsWorked, long intervalLength, long validationStartDateMillis, String intervalUnit) {
         this.nightsWorked = nightsWorked;
         this.balanceType = balanceType;
         this.intervalLength =intervalLength;
@@ -85,7 +114,7 @@ public class NumberOfNightsAndDaysWTATemplate extends WTABaseRuleTemplate {
         this.description = description;
         this.intervalUnit = intervalUnit;
     }
-    public NumberOfNightsAndDaysWTATemplate() {
+    public NumberOfPartOfDayShiftsWTATemplate() {
 
     }
 

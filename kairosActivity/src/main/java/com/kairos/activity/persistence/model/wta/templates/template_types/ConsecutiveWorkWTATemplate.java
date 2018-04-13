@@ -7,8 +7,6 @@ import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
 /**
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE3
@@ -16,12 +14,13 @@ import java.util.List;
 @Document
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ConsecutiveWorkingWTATemplate extends WTABaseRuleTemplate {
+public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
-    private List<String> balanceType;//multiple check boxes
     private boolean checkAgainstTimeRules;
     private long limit;//no of days
-    private WTATemplateType wtaTemplateType = WTATemplateType.ConsecutiveWorking;
+    private WTATemplateType wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
+
+
 
 
     public WTATemplateType getWtaTemplateType() {
@@ -32,13 +31,6 @@ public class ConsecutiveWorkingWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
 
     public boolean isCheckAgainstTimeRules() {
         return checkAgainstTimeRules;
@@ -56,18 +48,7 @@ public class ConsecutiveWorkingWTATemplate extends WTABaseRuleTemplate {
         this.limit = limit;
     }
 
-    public ConsecutiveWorkingWTATemplate(String name, String templateType, boolean disabled, String description,
-                                         List<String> balanceType, boolean checkAgainstTimeRules, long limit) {
-        this.limit = limit;
-        this.balanceType = balanceType;
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-        this.name = name;
-        this.templateType = templateType;
-        this.disabled = disabled;
-        this.description = description;
-
-    }
-    public ConsecutiveWorkingWTATemplate() {
+    public ConsecutiveWorkWTATemplate() {
 
     }
 

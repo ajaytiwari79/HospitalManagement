@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class DailyRestingTimeWTATemplate extends WTABaseRuleTemplate {
 
     private long continuousDayRestHours;
-    private WTATemplateType wtaTemplateType = WTATemplateType.DailyRestingTime;
+    private WTATemplateType wtaTemplateType = WTATemplateType.DAILY_RESTING_TIME;
 
 
     public WTATemplateType getWtaTemplateType() {

@@ -16,12 +16,12 @@ import java.util.List;
 @Document
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RestInConsecutiveWTATemplate extends WTABaseRuleTemplate {
+public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
 
     private List<String> balanceType;
     private long minimumRest;//hh:mm
     private long daysWorked;
-    private WTATemplateType wtaTemplateType = WTATemplateType.RestInConsecutiveDays;
+    private WTATemplateType wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
 
 
     public WTATemplateType getWtaTemplateType() {
@@ -56,7 +56,7 @@ public class RestInConsecutiveWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public RestInConsecutiveWTATemplate(String name, String templateType, boolean disabled, String description, long minimumRest, long daysWorked) {
+    public ConsecutiveRestPartOfDayWTATemplate(String name, String templateType, boolean disabled, String description, long minimumRest, long daysWorked) {
         this.name=name;
         this.templateType=templateType;
         this.disabled=disabled;
@@ -66,7 +66,7 @@ public class RestInConsecutiveWTATemplate extends WTABaseRuleTemplate {
         this.daysWorked = daysWorked;
 
     }
-    public RestInConsecutiveWTATemplate() {
+    public ConsecutiveRestPartOfDayWTATemplate() {
     }
 
 }

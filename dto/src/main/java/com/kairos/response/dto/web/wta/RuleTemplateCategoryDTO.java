@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 
 
+import java.math.BigInteger;
 import java.util.List;
 
 
@@ -18,7 +19,7 @@ public class RuleTemplateCategoryDTO {
 
     private RuleTemplateCategoryDTO ruleTemplateCategory;
 
-    private Long id;
+    private BigInteger id;
     private String name;
     private String templateType;
     private String category;
@@ -136,11 +137,11 @@ public class RuleTemplateCategoryDTO {
         this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
-    public Long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 

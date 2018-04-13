@@ -1,5 +1,7 @@
 package com.kairos.activity.controller.wta;
 
+import com.kairos.activity.service.wta.RuleTemplateCategoryService;
+import com.kairos.activity.service.wta.RuleTemplateService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.wta.RuleTemplateDTO;

@@ -23,7 +23,7 @@ public class NumberOfWeekendShiftInPeriodWTATemplate extends WTABaseRuleTemplate
     private boolean proportional;
     private long toTime;
     private String toDayOfWeek;
-    private WTATemplateType wtaTemplateType = WTATemplateType.NumberOfWeekendShiftInPeriod;
+    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
 
 
     public WTATemplateType getWtaTemplateType() {

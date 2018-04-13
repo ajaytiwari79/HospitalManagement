@@ -16,12 +16,12 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WTABaseRuleTemplate extends MongoBaseEntity{
 
-    protected String templateType;
     protected String name;
     protected String description;
     protected boolean disabled;
     protected BigInteger WTARuleTemplateCategory;
-    protected PartOfDay dayType;
+    protected List<PartOfDay> partOfDays;
+    protected Long countryId;
 
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected int recommendedValue;
@@ -29,8 +29,12 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     protected boolean minimum;
 
 
-    public PartOfDay getDayType() {
-        return dayType;
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 
     public boolean isMinimum() {
@@ -41,8 +45,12 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         this.minimum = minimum;
     }
 
-    public void setDayType(PartOfDay dayType) {
-        this.dayType = dayType;
+    public List<PartOfDay> getPartOfDays() {
+        return partOfDays;
+    }
+
+    public void setPartOfDays(List<PartOfDay> partOfDays) {
+        this.partOfDays = partOfDays;
     }
 
     public boolean isDisabled() {
@@ -63,9 +71,9 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
 
     public WTABaseRuleTemplate(){}
 
-    public WTABaseRuleTemplate(String name, String templateType, String description) {
+    public WTABaseRuleTemplate(String name, boolean minimum, String description) {
         this.name = name;
-        this.templateType = templateType;
+        this.minimum = minimum;
         this.description = description;
     }
 

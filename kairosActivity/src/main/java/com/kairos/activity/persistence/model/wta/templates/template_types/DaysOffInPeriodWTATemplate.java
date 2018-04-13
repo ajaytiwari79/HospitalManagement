@@ -23,7 +23,7 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     private String intervalUnit;
     private long validationStartDateMillis;
     private long daysLimit;
-    private WTATemplateType wtaTemplateType = WTATemplateType.DaysOffInPeriod;
+    private WTATemplateType wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
 
 
     public WTATemplateType getWtaTemplateType() {

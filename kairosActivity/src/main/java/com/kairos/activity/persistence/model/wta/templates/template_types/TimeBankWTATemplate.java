@@ -19,7 +19,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     private Integer yellowZone;
     private boolean forbid;
     private boolean allowExtraActivity;
-    private WTATemplateType wtaTemplateType = WTATemplateType.TimeBank;;
+    private WTATemplateType wtaTemplateType = WTATemplateType.TIME_BANK;;
 
 
     public WTATemplateType getWtaTemplateType() {

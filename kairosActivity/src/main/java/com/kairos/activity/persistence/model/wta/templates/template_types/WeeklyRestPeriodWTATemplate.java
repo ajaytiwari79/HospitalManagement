@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
 
     private long continuousWeekRest;
-    private WTATemplateType wtaTemplateType = WTATemplateType.WeeklyRestPeriod;;
+    private WTATemplateType wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;;
 
 
     public WTATemplateType getWtaTemplateType() {

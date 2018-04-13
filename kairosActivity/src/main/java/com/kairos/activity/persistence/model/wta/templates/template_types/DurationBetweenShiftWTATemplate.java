@@ -20,7 +20,7 @@ public class DurationBetweenShiftWTATemplate extends WTABaseRuleTemplate {
 
     private List<String> balanceType;
     private long minimumDurationBetweenShifts;
-    private WTATemplateType wtaTemplateType = WTATemplateType.DurationBetweenShift;
+    private WTATemplateType wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
 
 
     public WTATemplateType getWtaTemplateType() {

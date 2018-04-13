@@ -7,6 +7,7 @@ import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -19,10 +20,19 @@ import java.util.List;
 public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
-    private List<String> balanceType;//multiple check boxes
     private boolean checkAgainstTimeRules;
-    private WTATemplateType wtaTemplateType = WTATemplateType.ShiftLength;;
+    private WTATemplateType wtaTemplateType = WTATemplateType.SHIFT_LENGTH;;
+    private List<BigInteger> dayTypes;
 
+
+
+    public List<BigInteger> getDayTypes() {
+        return dayTypes;
+    }
+
+    public void setDayTypes(List<BigInteger> dayTypes) {
+        this.dayTypes = dayTypes;
+    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -39,14 +49,6 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         this.timeLimit = timeLimit;
     }
 
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
-
     public boolean isCheckAgainstTimeRules() {
         return checkAgainstTimeRules;
     }
@@ -55,18 +57,14 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
     }
 
-    public ShiftLengthWTATemplate(String name, String templateType, boolean disabled, String description, long timeLimit, List<String> balanceType, boolean checkAgainstTimeRules) {
-        this.timeLimit = timeLimit;
-        this.balanceType = balanceType;
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-        this.name=name;
-        this.templateType=templateType;
-        this.disabled=disabled;
-        this.description=description;
-
-    }
     public ShiftLengthWTATemplate() {
 
     }
 
+    public ShiftLengthWTATemplate(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules, List<BigInteger> dayTypes) {
+        super(name, minimum, description);
+        this.timeLimit = timeLimit;
+        this.checkAgainstTimeRules = checkAgainstTimeRules;
+        this.dayTypes = dayTypes;
+    }
 }
