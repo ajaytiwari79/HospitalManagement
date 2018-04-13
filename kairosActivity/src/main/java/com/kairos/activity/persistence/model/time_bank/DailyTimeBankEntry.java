@@ -11,7 +11,7 @@ import java.util.List;
 *  Date-27/01/2018
 *
 * */
-@Document(collection = "daily_time_bank_entries")
+@Document(collection = "dailyTimeBankEntries")
 public class DailyTimeBankEntry extends MongoBaseEntity{
 
     private Long unitPositionId;

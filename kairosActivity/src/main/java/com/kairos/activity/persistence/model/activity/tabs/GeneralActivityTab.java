@@ -30,7 +30,7 @@ public class GeneralActivityTab implements Serializable {
     private String originalIconName;
     private String modifiedIconName;
     private String ultraShortName;
-    private String bonusHoursType;
+
     private boolean overRuleCtaWta;
 
     private List<TagDTO> tags = new ArrayList<>();
@@ -72,7 +72,7 @@ public class GeneralActivityTab implements Serializable {
 
 
     public GeneralActivityTab(String name, String code, String printoutSymbol, BigInteger categoryId, Boolean colorPresent, String backgroundColor, String textColor, String description,
-                              boolean isActive, String shortName, boolean eligibleForUse, String originalIconName, String modifiedIconName,String ultraShortName,String bonusHoursType,boolean overRuleCtaWta) {
+                              boolean isActive, String shortName, boolean eligibleForUse, String originalIconName, String modifiedIconName,String ultraShortName,boolean overRuleCtaWta) {
         this.name = name;
         this.code = code;
         this.printoutSymbol = printoutSymbol;
@@ -87,7 +87,7 @@ public class GeneralActivityTab implements Serializable {
         this.originalIconName = originalIconName;
         this.modifiedIconName = modifiedIconName;
         this.ultraShortName=ultraShortName;
-        this.bonusHoursType=bonusHoursType;
+
         this.overRuleCtaWta=overRuleCtaWta;
     }
 
@@ -208,14 +208,6 @@ public class GeneralActivityTab implements Serializable {
 
     public void setUltraShortName(String ultraShortName) {
         this.ultraShortName = ultraShortName;
-    }
-
-    public String getBonusHoursType() {
-        return bonusHoursType;
-    }
-
-    public void setBonusHoursType(String bonusHoursType) {
-        this.bonusHoursType = bonusHoursType;
     }
 
     public boolean isOverRuleCtaWta() {

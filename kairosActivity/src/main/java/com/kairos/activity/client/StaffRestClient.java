@@ -221,16 +221,22 @@ public class StaffRestClient {
         }
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(Long staffId, String type, Long unitEmploymentId) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(Long staffId, String type, Long unitEmploymentId,List<Long> activityDayTypes) {
 
         final String baseUrl = getBaseUrl(true);
 
+        String dayType = "";
+        if(activityDayTypes!=null && !activityDayTypes.isEmpty()) {
+            String a = activityDayTypes.toString().replace("[","");
+            a.replace("]","");
+            dayType = a.replace("]","");
+        }
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type,
+                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type+"&activityDayTypes="+dayType,
                             HttpMethod.GET, null, typeReference, staffId, unitEmploymentId);
             RestTemplateResponseEnvelope<StaffAdditionalInfoDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {

@@ -1,29 +1,23 @@
 package com.kairos.persistence.model.user.agreement.cta;
 
-import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 import com.kairos.persistence.model.user.country.EmploymentType;
-import com.kairos.persistence.model.user.country.TimeType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @NodeEntity
-public class CTARuleTemplate extends RuleTemplate{
+public class CTARuleTemplate extends RuleTemplate {
 
-//    private CTARuleTemplateType ruleTemplateType;
+    //    private CTARuleTemplateType ruleTemplateType;
     private String ruleTemplateType;
     private String payrollType;
     private String payrollSystem;
@@ -33,18 +27,18 @@ public class CTARuleTemplate extends RuleTemplate{
     @Relationship(type = BELONGS_TO)
     private CalculateValueAgainst calculateValueAgainst;
     private ApprovalWorkFlow approvalWorkFlow;
-//    @Relationship(type = BELONGS_TO)
+    //    @Relationship(type = BELONGS_TO)
 //    List<CTARuleTemplateDayType>calculateOnDayTypes=new ArrayList<>(); // Need to confirm, Can have different values for dayType and countryHoliday
     @Relationship(type = BELONGS_TO)
-    private List<CTARuleTemplatePhaseInfo>phaseInfo=new ArrayList<>(); //Query beforeStart
+    private List<CTARuleTemplatePhaseInfo> phaseInfo = new ArrayList<>(); //Query beforeStart
     private BudgetType budgetType;
 
-    private List<CalculateValueIfPlanned> calculateValueIfPlanned=new ArrayList<>();
+    private List<CalculateValueIfPlanned> calculateValueIfPlanned = new ArrayList<>();
     @Relationship(type = HAS_EMPLOYMENT_TYPE)
 
-    private List<EmploymentType> employmentTypes=new ArrayList<>();
+    private List<EmploymentType> employmentTypes = new ArrayList<>();
     private PlanningCategory planningCategory;
-    private List<Long> staffFunctions=new ArrayList<>();
+    private List<Long> staffFunctions = new ArrayList<>();
     @Relationship(type = BELONGS_TO)
     private PlannedTimeWithFactor plannedTimeWithFactor;
     @Relationship(type = BELONGS_TO)
@@ -54,8 +48,8 @@ public class CTARuleTemplate extends RuleTemplate{
 
     private ActivityTypeForCostCalculation activityTypeForCostCalculation;
     private List<Long> activityIds;
-    private Long timeTypeId;
-    private Long plannedTimeId;
+    private Set<Long> timeTypeIds;
+    private Set<Long> plannedTimeIds;
     private List<Long> dayTypeIds;
     //it describe that this template is scheduledHoursTemplate or not
     private boolean calculateScheduledHours;
@@ -65,29 +59,29 @@ public class CTARuleTemplate extends RuleTemplate{
     }
 
     public CTARuleTemplate(String name, String description, String payrollType, String payrollSystem) {
-        this.name=name;
-        this.description=description;
-        this.ruleTemplateCategory=ruleTemplateCategory;
-        this.payrollType=payrollType;
-        this.payrollSystem=payrollSystem;
+        this.name = name;
+        this.description = description;
+        this.ruleTemplateCategory = ruleTemplateCategory;
+        this.payrollType = payrollType;
+        this.payrollSystem = payrollSystem;
 
     }
 
-    public  void cloneCTARuleTemplate(){
+    public void cloneCTARuleTemplate() {
         this.setId(null);
        /* if(doUpdate){
 
         } else {
 
         }*/
-        if(this.getCompensationTable() != null &&  this.getCompensationTable().getCompensationTableInterval() != null){
+        if (this.getCompensationTable() != null && this.getCompensationTable().getCompensationTableInterval() != null) {
             for (CompensationTableInterval compensationTableInterval : this.getCompensationTable().getCompensationTableInterval()) {
-               compensationTableInterval.setId(null);
+                compensationTableInterval.setId(null);
             }
             this.getCompensationTable().setId(null);
         }
 
-        if(this.getCalculateValueAgainst() != null ){
+        if (this.getCalculateValueAgainst() != null) {
             this.getCalculateValueAgainst().getFixedValue().setId(null);
             this.getCalculateValueAgainst().setId(null);
         }
@@ -101,7 +95,7 @@ public class CTARuleTemplate extends RuleTemplate{
                 }
             }
         }*/
-        if(this.getPhaseInfo() != null){
+        if (this.getPhaseInfo() != null) {
             for (CTARuleTemplatePhaseInfo ctaRuleTemplatePhaseInfo : this.getPhaseInfo()) {
                 ctaRuleTemplatePhaseInfo.setId(null);
             }
@@ -109,7 +103,7 @@ public class CTARuleTemplate extends RuleTemplate{
         /*if(this.getActivityType() != null){
             this.getActivityType().setId(null);
         }*/
-        if(this.getPlannedTimeWithFactor() != null){
+        if (this.getPlannedTimeWithFactor() != null) {
             this.getPlannedTimeWithFactor().setId(null);
         }
 
@@ -123,7 +117,7 @@ public class CTARuleTemplate extends RuleTemplate{
         this.calculateScheduledHours = calculateScheduledHours;
     }
 
-    public CTARuleTemplate buildCTARuleTemplateFromDTO(CTARuleTemplateDTO ctaRuleTemplateDTO){
+    public CTARuleTemplate buildCTARuleTemplateFromDTO(CTARuleTemplateDTO ctaRuleTemplateDTO) {
         return this;
     }
 
@@ -143,20 +137,20 @@ public class CTARuleTemplate extends RuleTemplate{
         this.activityIds = activityIds;
     }
 
-    public Long getTimeTypeId() {
-        return timeTypeId;
+    public Set<Long> getTimeTypeIds() {
+        return timeTypeIds;
     }
 
-    public void setTimeTypeId(Long timeTypeId) {
-        this.timeTypeId = timeTypeId;
+    public void setTimeTypeIds(Set<Long> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
     }
 
-    public Long getPlannedTimeId() {
-        return plannedTimeId;
+    public Set<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
     }
 
-    public void setPlannedTimeId(Long plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
+    public void setPlannedTimeIds(Set<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
     }
 
     public String getPayrollType() {
@@ -210,6 +204,7 @@ public class CTARuleTemplate extends RuleTemplate{
     public List<CTARuleTemplatePhaseInfo> getPhaseInfo() {
         return phaseInfo;
     }
+
     public void setPhaseInfo(List<CTARuleTemplatePhaseInfo> phaseInfo) {
         this.phaseInfo = phaseInfo;
     }
@@ -299,7 +294,7 @@ public class CTARuleTemplate extends RuleTemplate{
     }
 
     public void setCreatedBy(User createdBy) {
-        if(this.getId()!=null)
+        if (this.getId() != null)
             throw new UnsupportedOperationException("can't modified this property");
         this.createdBy = createdBy;
     }
@@ -311,8 +306,6 @@ public class CTARuleTemplate extends RuleTemplate{
     public void setLastModifiedBy(User lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
-
-
 
 
     @Override

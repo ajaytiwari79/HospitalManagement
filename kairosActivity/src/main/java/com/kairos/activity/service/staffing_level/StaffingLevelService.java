@@ -409,15 +409,15 @@ public class StaffingLevelService extends MongoBaseService {
     private void createStaffingLevelObject(List<Map<String, String>> processedData, long unitId) {
 
         List<StaffingLevelDto> staffingDtoList = new ArrayList<StaffingLevelDto>();
-        StaffingLevelDto staffingDTO = null;
+        StaffingLevelDto staffingDTO;
         List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlList = new ArrayList<StaffingLevelTimeSlotDTO>();
-        StaffingLevelTimeSlotDTO staffingLevelTimeSlot = null;
-        StaffingLevelDuration duration = null;
-        StaffingLevelSetting staffingLevelSetting = null;
-        LocalTime fromTime = null;
-        LocalTime toTime = null;
-        Set<StaffingLevelActivity> activitySet = null;
-        StaffingLevelActivity activity = null;
+        StaffingLevelTimeSlotDTO staffingLevelTimeSlot;
+        StaffingLevelDuration duration;
+        StaffingLevelSetting staffingLevelSetting;
+        LocalTime fromTime;
+        LocalTime toTime;
+        Set<StaffingLevelActivity> activitySet;
+
 
         Date date = null;
 
@@ -502,11 +502,8 @@ public class StaffingLevelService extends MongoBaseService {
                         && !keyTemp.equals("max") && !keyTemp.equals("forDay")) {
                     Activity activityDB = activityMongoRepository.getActivityByNameAndUnitId( unitId,keyTemp.trim());
                     if (activityDB != null) {
-                        activity = new StaffingLevelActivity();
-                        activity.setName(keyTemp);
-                        activity.setNoOfStaff(Integer.parseInt(singleData.get(keyTemp)));
-                        activity.setActivityId(activityDB.getId().longValue());
-                        activitySet.add(activity);
+                        StaffingLevelActivity staffingLevelActivity = new StaffingLevelActivity(activityDB.getId().longValue(),keyTemp,Integer.parseInt(singleData.get(keyTemp)),Integer.parseInt(singleData.get(keyTemp)));
+                        activitySet.add(staffingLevelActivity);
                     }
                 }
             }
@@ -590,7 +587,7 @@ public class StaffingLevelService extends MongoBaseService {
                         Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
                         int runFor = Integer.parseInt(recordIndexes.get(n + 1).get(recordIndexes.get(n + 1).keySet().toArray()[0]));
                         for (int j = startPos; j < runFor; j++) {
-                            staffingLevelActivities.add(new StaffingLevelActivity(columnActivityNameRecord.get(j), new Integer(csvRecord.get(j))));
+                            staffingLevelActivities.add(new StaffingLevelActivity(columnActivityNameRecord.get(j), new Integer(csvRecord.get(j)),new Integer(csvRecord.get(j))));
                             fromToTimeRecord.put(columnActivityNameRecord.get(j), csvRecord.get(j));
                             activitiesNameList.add(columnActivityNameRecord.get(j));
                         }
@@ -707,7 +704,7 @@ public class StaffingLevelService extends MongoBaseService {
         staffingLevelIntervals.forEach(sli -> {
             StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO = new StaffingLevelTimeSlotDTO(sli.getSequence(), sli.getMinNoOfStaff(), sli.getMaxNoOfStaff(), sli.getStaffingLevelDuration());
             staffingLevelTimeSlotDTO.setStaffingLevelActivities(sli.getStaffingLevelActivities());
-            activityIds.addAll(sli.getStaffingLevelActivities().stream().filter(a -> a.getNoOfStaff() != 0).map(a -> new BigInteger(a.getActivityId().toString())).collect(Collectors.toSet()));
+            activityIds.addAll(sli.getStaffingLevelActivities().stream().filter(a -> a.getMinNoOfStaff() != 0).map(a -> new BigInteger(a.getActivityId().toString())).collect(Collectors.toSet()));
             staffingLevelTimeSlotDTO.setStaffingLevelSkills(sli.getStaffingLevelSkills());
             staffingLevelTimeSlotDTOS.add(staffingLevelTimeSlotDTO);
         });

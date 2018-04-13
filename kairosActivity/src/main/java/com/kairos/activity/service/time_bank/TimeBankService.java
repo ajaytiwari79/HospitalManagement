@@ -190,8 +190,9 @@ public class TimeBankService extends MongoBaseService {
     public UnitPositionWithCtaDetailsDTO getCostTimeAgreement(Long unitPositionId) {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
         for (CTARuleTemplateCalulatedTimeBankDTO ctaRuleTemplateCalulatedTimeBankDTO : unitPositionWithCtaDetailsDTO.getCtaRuleTemplates()) {
-            if (ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeId() != null) {
-                List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllParentTimeTypeByTimeTypeId(ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeId(), unitPositionWithCtaDetailsDTO.getCountryId());
+            if (ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds() != null) {
+                // TODO PRADEEP please change as required
+                List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllParentTimeTypeByTimeTypeId(ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds().get(0), unitPositionWithCtaDetailsDTO.getCountryId());
                 ctaRuleTemplateCalulatedTimeBankDTO.setTimeTypeIdsWithParentTimeType(timeTypeDTOS.stream().map(tt -> tt.getId()).collect(Collectors.toList()));
             }
             ctaRuleTemplateCalulatedTimeBankDTO.setDays(Arrays.asList(1, 2, 3, 4, 5, 6, 7));//Todo it should be removed when cta daytype implemented

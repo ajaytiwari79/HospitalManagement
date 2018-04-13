@@ -15,23 +15,26 @@ public class CTARuleTemplateCalulatedTimeBankDTO {
     private List<LocalDate> publicHolidays;
     private int granularity;
     private List<BigInteger> activityIds;
-    private BigInteger timeTypeId;
+    private List<BigInteger> timeTypeIds;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
     private int minutesFromCta;
     private List<BigInteger> timeTypeIdsWithParentTimeType;
     private boolean calculateScheduledHours;
-    private Long plannedTimeId;
-    private List<Long> employmentTypes;
+
+    private List<Long> plannedTimeIds;
+    private List<Long> employmentTypes = new ArrayList<>();
+
+
     private String accountType;
 
     public CTARuleTemplateCalulatedTimeBankDTO() {
     }
 
-    public CTARuleTemplateCalulatedTimeBankDTO(Long id, String name, int granularity, BigInteger timeTypeId) {
+    public CTARuleTemplateCalulatedTimeBankDTO(Long id, String name, int granularity) {
         this.id = id;
         this.name = name;
         this.granularity = granularity;
-        this.timeTypeId = timeTypeId;
+
     }
 
     public String getAccountType() {
@@ -58,12 +61,20 @@ public class CTARuleTemplateCalulatedTimeBankDTO {
         this.calculateScheduledHours = calculateScheduledHours;
     }
 
-    public Long getPlannedTimeId() {
-        return plannedTimeId;
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
     }
 
-    public void setPlannedTimeId(Long plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
     }
 
     public List<Long> getEmploymentTypes() {
@@ -73,6 +84,8 @@ public class CTARuleTemplateCalulatedTimeBankDTO {
     public void setEmploymentTypes(List<Long> employmentTypes) {
         this.employmentTypes = employmentTypes;
     }
+
+
 
     public int getMinutesFromCta() {
         return minutesFromCta;
@@ -130,13 +143,6 @@ public class CTARuleTemplateCalulatedTimeBankDTO {
         this.activityIds = activityIds;
     }
 
-    public BigInteger getTimeTypeId() {
-        return timeTypeId;
-    }
-
-    public void setTimeTypeId(BigInteger timeTypeId) {
-        this.timeTypeId = timeTypeId;
-    }
 
     public List<CTAIntervalDTO> getCtaIntervalDTOS() {
         return ctaIntervalDTOS;

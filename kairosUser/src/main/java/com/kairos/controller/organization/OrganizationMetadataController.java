@@ -1,4 +1,5 @@
 package com.kairos.controller.organization;
+import com.kairos.persistence.model.organization.PaymentSettingsDTO;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.service.organizationMetadata.OrganizationMetadataService;
 import com.kairos.util.response.ResponseHandler;
@@ -12,21 +13,22 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
+import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
 
 /**
  * Created by neuron on 12/6/17.
  */
 @RestController
-@RequestMapping(API_ORGANIZATION_URL)
-@Api(API_ORGANIZATION_URL)
+@RequestMapping(API_ORGANIZATION_UNIT_URL)
+@Api(API_ORGANIZATION_UNIT_URL)
 public class OrganizationMetadataController {
 
     @Inject
     private OrganizationMetadataService organizationMetadataService;
 
-    private static final String localAreaTagUrl = "/unit/{unitId}/localAreaTags";
+    private static final String localAreaTagUrl = "/localAreaTags";
+    private static final String organizationPaymentSettingsUrl = "/organization_payment_settings";
 
     @ApiOperation(value = "Get Local Area Tag for a unit")
     @RequestMapping(value = localAreaTagUrl,method = RequestMethod.GET)
@@ -59,6 +61,32 @@ public class OrganizationMetadataController {
     public ResponseEntity<Map<String,Object>> deleteLocalAreaTag(@Validated @PathVariable Long localAreaTagId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.deleteTagData(localAreaTagId));
     }
+
+    @ApiOperation(value = "Get Payments settings for a unit")
+    @RequestMapping(value = organizationPaymentSettingsUrl,method = RequestMethod.GET)
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> getPaymentsSettings(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,
+                organizationMetadataService.getPaymentSettings(unitId));
+    }
+
+
+    @ApiOperation(value = "Create Payments settings for a unit")
+    @RequestMapping(value = organizationPaymentSettingsUrl,method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> createPaymentsSettings(@Validated @RequestBody PaymentSettingsDTO paymentSettingsDTO, @PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.createPaymentsSettings(paymentSettingsDTO,unitId));
+    }
+
+
+    @ApiOperation(value = "Update Payments settings for a unit")
+    @RequestMapping(value = organizationPaymentSettingsUrl,method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String,Object>> updatePaymentsSettings(@Validated  @RequestBody PaymentSettingsDTO paymentSettingsDTO, @PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,organizationMetadataService.updatePaymentsSettings(paymentSettingsDTO, unitId));
+    }
+
+
 
 
 }

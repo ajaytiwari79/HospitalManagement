@@ -39,7 +39,7 @@ public class AppConstants {
 
     public static final String API_KMD_CARE_STAFF_SHIFTS = "/api/v1/kmdNexus/citizen/unit/{unitId}/getShifts/{filterId}";
     public static final String API_KMD_CARE_TIME_SLOTS = "/api/v1/kmdNexus/citizen/unit/{unitId}/getTimeSlots";
-    public static final String API_KMD_CARE_URL= "/api/v1/kmdNexus/citizen/unit/";
+    public static final String API_KMD_CARE_URL = "/api/v1/kmdNexus/citizen/unit/";
     public static final String API_TIME_SLOTS_NAME = "/api/v1/organization/{organizationId}/unit/{unitId}/time_slot_name";
 
     public static final String API_CREDENTIAL_UPDATE_URL = "/api/v1/user/password";
@@ -130,7 +130,7 @@ public class AppConstants {
     public static final int EVENING_END_HOUR = 23;
     public static final int NIGHT_START_HOUR = 23;
     public static final int NIGHT_END_HOUR = 7;
-    public static final String CPR_NUMBER="cprNumber";
+    public static final String CPR_NUMBER = "cprNumber";
 
     //KMD Nexus
     public static final String KMD_NEXUS_CLIENT_ID = "third_party_vendor";
@@ -185,13 +185,13 @@ public class AppConstants {
     // Default data to import employments from time care
     public static final float DEFAULT_AVERAGE_DAILY_WORKING_HOURS = 60;
     public static final float DEFAULT_HOURLY_WAGES = 10;
-    public static final float DEFAULT_SALARY= 500;
+    public static final float DEFAULT_SALARY = 500;
     public static final int DEFAULT_WORKING_DAYS_IN_WEEK = 5;
+    public static final Integer FULL_TIME_WEEKLY_MINUTES = 2220;
+    public static final Integer NUMBER_OF_WORKING_DAYS_IN_WEEK = 5;
 
     public static final String MANAGE_COUNTRY_TAB_MODULE_ID = "module_4";
-
-
-
+    public static final String MAIL_FROM = "info@nordicplanning.dk";
 
 
 }
