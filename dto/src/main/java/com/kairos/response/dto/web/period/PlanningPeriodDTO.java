@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.enums.DurationType;
 
 import java.math.BigInteger;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class PlanningPeriodDTO {
     private Long constructionToDraftDate;
     private List<PeriodPhaseFlippingDateDTO> phaseFlippingDate;
     private String periodDuration;
+    private ZoneId zoneId;
 
 
     public PlanningPeriodDTO(){
@@ -185,6 +187,14 @@ public class PlanningPeriodDTO {
 
     public void setPeriodDuration(String periodDuration) {
         this.periodDuration = periodDuration;
+    }
+
+    public ZoneId getZoneId() {
+        return zoneId;
+    }
+
+    public void setZoneId(ZoneId zoneId) {
+        this.zoneId = zoneId;
     }
 }
 

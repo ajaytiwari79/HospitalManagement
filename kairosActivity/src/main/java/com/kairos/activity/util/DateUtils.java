@@ -1,7 +1,10 @@
 package com.kairos.activity.util;
 
+import com.kairos.activity.custom_exception.InvalidRequestException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -368,6 +371,16 @@ public class DateUtils {
 
     public static DateTime toJodaDateTime(LocalDate localDate) {
         return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),0,0);
+    }
+
+    public static String getDateStringByTimeZone(Date date,ZoneId zoneId, String dateFormatString){
+        try {
+            DateTime dateTime = new DateTime(date).withZone(DateTimeZone.forID(zoneId.getId()));
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy MM dd");
+            return dateTime.toString(formatter);
+        } catch (Exception e){
+            throw new InvalidRequestException(e.getMessage());
+        }
     }
 
 }

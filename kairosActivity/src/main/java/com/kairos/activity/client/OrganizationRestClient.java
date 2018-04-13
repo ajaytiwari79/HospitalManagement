@@ -22,6 +22,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.*;
 
 @Component
@@ -742,6 +743,28 @@ public class OrganizationRestClient {
         }
     }
 
+    public ZoneId getOrganizationTimeZone(long unitId) {
+        final String baseUrl = RestClientUrlUtil.getBaseUrl(true);
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<ZoneId>> typeReference
+                    = new ParameterizedTypeReference<RestTemplateResponseEnvelope<ZoneId>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<ZoneId>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/time_zone",
+                            HttpMethod.GET, null, typeReference, unitId);
+            RestTemplateResponseEnvelope<ZoneId> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in user micro service to get organization Time Zone" + e.getMessage());
+        }
+    }
 
     public PresenceTypeWithTimeTypeDTO getPresenceTypeAndTimeTypeByCountry(Long countryId) {
         final String baseUrl = RestClientUrlUtil.getBaseUrl(false);

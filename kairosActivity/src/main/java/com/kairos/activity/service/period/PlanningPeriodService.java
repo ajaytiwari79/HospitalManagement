@@ -1,5 +1,6 @@
 package com.kairos.activity.service.period;
 
+import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
@@ -10,6 +11,7 @@ import com.kairos.activity.persistence.repository.period.PlanningPeriodMongoRepo
 import com.kairos.activity.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.phase.PhaseService;
+import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.response.dto.web.period.PeriodPhaseAndFlippingDateDTO;
 import com.kairos.response.dto.web.period.PeriodPhaseFlippingDateDTO;
@@ -42,6 +44,9 @@ public class PlanningPeriodService extends MongoBaseService {
     PlanningPeriodMongoRepository planningPeriodMongoRepository;
 
     @Inject PhaseMongoRepository phaseMongoRepository;
+
+    @Inject
+    OrganizationRestClient organizationRestClient;
 
     public Date addDaysInDate(Date date,  int duration, DurationType durationType, int recurringNumber){
         Calendar cal = Calendar.getInstance();
@@ -80,10 +85,12 @@ public class PlanningPeriodService extends MongoBaseService {
             Date tempFlippingDate = endDate;
             boolean scopeToFlipNextPhase =true;
             BigInteger previousPhaseId = null;
+            int index = 0;
             for(PhaseDTO phase : phases){
+
                 // Check if duration of period is enough to assign next flipping
                 tempFlippingDate = addDaysInDate(tempFlippingDate, -phase.getDurationInDays(), DurationType.DAYS, 1);
-                if (scopeToFlipNextPhase && startDate.compareTo(tempFlippingDate) >= 0){
+                if (phases.size()==index+1 || (scopeToFlipNextPhase && startDate.compareTo(tempFlippingDate) >= 0)){
                     currentPhaseId = phase.getId();
                     nextPhaseId = previousPhaseId;
                     scopeToFlipNextPhase = false;
@@ -92,11 +99,14 @@ public class PlanningPeriodService extends MongoBaseService {
                  // Calculate flipping date by duration
                  PeriodPhaseFlippingDate periodPhaseFlippingDate = new PeriodPhaseFlippingDate(phase.getId(), scopeToFlipNextPhase ? tempFlippingDate : null);
                 tempPhaseFlippingDate.add(periodPhaseFlippingDate);
+                index +=1;
             }
         }
 
         // TODO set name of period dynamically
-        PlanningPeriod planningPeriod = new PlanningPeriod("Temp Period", startDate, endDate, unitId, tempPhaseFlippingDate, currentPhaseId, nextPhaseId);
+        String name = DateUtils.getDateStringByTimeZone(startDate,planningPeriodDTO.getZoneId(), "dd/MM/yyyy")+ "_" +
+                DateUtils.getDateStringByTimeZone(endDate,planningPeriodDTO.getZoneId(), "dd/MM/yyyy");
+        PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId, tempPhaseFlippingDate, currentPhaseId, nextPhaseId);
         save(planningPeriod);
         addPeriod(unitId, endDate, phases, planningPeriodDTO);
     }
@@ -145,6 +155,8 @@ public class PlanningPeriodService extends MongoBaseService {
         }
 
         phases = getPhasesWithDurationInDays(phases);
+        ZoneId unitZoneId = organizationRestClient.getOrganizationTimeZone(unitId);
+        planningPeriodDTO.setZoneId(unitZoneId);
         /*phases.forEach(phase->{
             switch (phase.getDurationType()){
                 case DAYS:{

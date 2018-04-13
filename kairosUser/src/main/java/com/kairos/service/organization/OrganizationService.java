@@ -1265,6 +1265,14 @@ public class OrganizationService extends UserBaseService {
     public Organization getOneParentUnitByCountry(Long countryId){
         return organizationGraphRepository.getOneParentUnitByCountry(countryId);
     }
+
+    public ZoneId getTimeZoneStringOfUnit(Long unitId) {
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
+        }
+        return unit.getTimeZone(); //(Optional.ofNullable(unit.getTimeZone()).isPresent() ? unit.getTimeZone().toString() : "") ;
+    }
 }
 
 

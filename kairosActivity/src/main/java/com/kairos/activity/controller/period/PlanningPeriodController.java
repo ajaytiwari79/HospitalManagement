@@ -31,7 +31,10 @@ public class PlanningPeriodController {
     @PostMapping(value="/period")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createPlanningPeriod(@PathVariable Long unitId,  @RequestBody @Valid PlanningPeriodDTO planningPeriodDTO) {
+
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.createPeriod(unitId, planningPeriodDTO));
+
+
     }
 
     @ApiOperation(value = "Get Planning Period")
@@ -46,7 +49,8 @@ public class PlanningPeriodController {
     @PutMapping(value = "/period/{periodId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePhase(@PathVariable BigInteger periodId, @PathVariable Long unitId, @RequestBody @Valid PlanningPeriodDTO planningPeriodDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updatePeriod(unitId, periodId, planningPeriodDTO));
+         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updatePeriod(unitId, periodId, planningPeriodDTO));
+
     }
 
     @ApiOperation(value = "Remove Period")

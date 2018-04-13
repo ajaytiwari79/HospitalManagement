@@ -1290,6 +1290,14 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getEmploymentTypeWithExpertise(unitId));
     }
+
+    @RequestMapping(value = UNIT_URL + "/time_zone", method = RequestMethod.GET)
+    //@ApiOperation("Get Parent Organization")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeZoneOfUnit(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getTimeZoneStringOfUnit(unitId));
+    }
 }
 
 
