@@ -317,6 +317,7 @@ public class UnitPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid expertise id");
         }
         unitPosition.setExpertise(expertise.get());
+        unitPosition.setWorkingDaysInWeek(expertise.get().getNumberOfWorkingDaysInWeek());
 
 
         Staff staff = staffGraphRepository.findOne(unitPositionDTO.getStaffId());
