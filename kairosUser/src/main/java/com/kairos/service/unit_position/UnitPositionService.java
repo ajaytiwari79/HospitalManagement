@@ -326,6 +326,8 @@ public class UnitPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid expertise id");
         }
         unitPosition.setExpertise(expertise.get());
+        unitPosition.setWorkingDaysInWeek(expertise.get().getNumberOfWorkingDaysInWeek());
+
 
 
         Staff staff = staffGraphRepository.findOne(unitPositionDTO.getStaffId());
@@ -487,8 +489,6 @@ public class UnitPositionService extends UserBaseService {
                 oldUnitPosition.setReasonCode(reasonCode.get());
             }
         }
-
-
         oldUnitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
         oldUnitPosition.setTotalWeeklyMinutes(unitPositionDTO.getTotalWeeklyMinutes() + (unitPositionDTO.getTotalWeeklyHours() * 60));
         oldUnitPosition.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
