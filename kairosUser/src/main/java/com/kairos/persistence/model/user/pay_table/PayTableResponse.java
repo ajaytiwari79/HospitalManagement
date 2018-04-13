@@ -19,7 +19,6 @@ public class PayTableResponse implements Comparable<PayTableResponse> {
     private String name;
     private String shortName;
     private Long startDateMillis;
-
     private Long endDateMillis;
     private Level level;
     private List<PayGrade> payGrades;
