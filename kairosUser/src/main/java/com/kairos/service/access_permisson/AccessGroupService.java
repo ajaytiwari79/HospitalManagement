@@ -57,7 +57,7 @@ public class AccessGroupService extends UserBaseService {
     private OrganizationService organizationService;
 
     public AccessGroup createAccessGroup(long organizationId, AccessGroup accessGroup) {
-        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroup.getName());
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroup.getName().trim());
         if ( isAccessGroupExistWithSameName ) {
             throw new DuplicateDataException("Access Group already exists with name " +accessGroup.getName() );
         }
@@ -477,11 +477,11 @@ public class AccessGroupService extends UserBaseService {
 
     public AccessGroup createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString());
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName().trim(), accessGroupDTO.getOrganizationCategory().toString());
         if ( isAccessGroupExistWithSameName ) {
             throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
         }
-        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName(), accessGroupDTO.getDescription(), accessGroupDTO.getRole());
+        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole());
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
@@ -502,7 +502,7 @@ public class AccessGroupService extends UserBaseService {
         if (! Optional.ofNullable(accessGrpToUpdate).isPresent()) {
             throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
         }
-        if( accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId) ){
+        if( accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName().trim(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId) ){
             throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
         }
 
@@ -569,7 +569,7 @@ public class AccessGroupService extends UserBaseService {
         return accessGroupRepository.getAccessPageIdByAccessGroup(accessGroupId);
     }
 
-    public AccessGroup copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
+    public AccessGroupDTO copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         Optional<Organization> organization = organizationGraphRepository.findById(organizationId);
         if (!organization.isPresent()) {
             throw new DataNotFoundByIdException("Organization not found " + organizationId);
@@ -598,7 +598,7 @@ public class AccessGroupService extends UserBaseService {
         organization.get().getAccessGroups().add(accessGroup);
         save(organization.get());
         accessPageRepository.setAccessGroupPageRelationShips(accessGroupDTO.getId(),accessGroup.getId());
-        return accessGroup;
+        return new AccessGroupDTO(accessGroup.getId(),accessGroup.getName(),accessGroup.getDescription(),accessGroup.getRole());
 
     }
     public CountryAccessGroupDTO copyCountryAccessGroup(long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
@@ -623,8 +623,8 @@ public class AccessGroupService extends UserBaseService {
         accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
         save(country.get());
-
         accessPageRepository.setAccessGroupPageRelationShips(countryAccessGroupDTO.getId(), accessGroup.getId());
+        countryAccessGroupDTO.setId(accessGroup.getId());
         return countryAccessGroupDTO;
     }
 }
