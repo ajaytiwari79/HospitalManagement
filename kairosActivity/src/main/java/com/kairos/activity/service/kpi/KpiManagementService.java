@@ -27,7 +27,7 @@ import java.util.Map;
 @Service
 public class KpiManagementService extends MongoBaseService{
     //@Inject private KpiStore KpiStore;
-    @Inject private KpiRepository KpiRepository;
+    @Inject private KpiRepository kpiRepository;
 
     private final static Logger logger = LoggerFactory.getLogger(KpiManagementService.class);
 
@@ -36,9 +36,9 @@ public class KpiManagementService extends MongoBaseService{
     }
 
     //storeKpi -List
-    public void storeKpis(List<KPI> KpiDefs){
-        for(KPI KpiDef: KpiDefs){
-            KPI def = KpiRepository.getKpiByType(KpiDef.getType());
+    public void storeKpis(List<KPI> kpiDefs){
+        for(KPI KpiDef: kpiDefs){
+            KPI def = kpiRepository.getKpiByType(KpiDef.getType());
             if(def != null)
                 overrideOldObject(KpiDef, def);
             save(KpiDef);
@@ -46,67 +46,67 @@ public class KpiManagementService extends MongoBaseService{
     }
 
     //storeKpi - Object
-    public void storeKpi(KPI KpiDef){
-        KPI def = KpiRepository.getKpiByType(KpiDef.getType());
+    public void storeKpi(KPI kpiDef){
+        KPI def = kpiRepository.getKpiByType(kpiDef.getType());
         if(def != null)
-            overrideOldObject(KpiDef, def);
-        save(KpiDef);
+            overrideOldObject(kpiDef, def);
+        save(kpiDef);
     }
 
     //vairous methods for accessing Kpitypes
     //to locate the Kpis in moduleWiseKpiMapping will be supplied to UI for ref.
     public List getAllKpis(){
-        return KpiRepository.getEntityItemList(KPI.class);
+        return kpiRepository.getEntityItemList(KPI.class);
     }
 
-    public Map getKpiTypeAndIdMapping(List<KPI> Kpis){
-        Map<KpiType, BigInteger> KpiTypeIdMap = new HashMap<KpiType, BigInteger>();
-        for(KPI definition : Kpis){
-            KpiTypeIdMap.put(definition.getType(), definition.getId());
+    public Map getKpiTypeAndIdMapping(List<KPI> kpis){
+        Map<KpiType, BigInteger> kpiTypeIdMap = new HashMap<KpiType, BigInteger>();
+        for(KPI definition : kpis){
+            kpiTypeIdMap.put(definition.getType(), definition.getId());
         }
-        return KpiTypeIdMap;
+        return kpiTypeIdMap;
     }
 
-    public Map getKpiIdAndTypeMapping(List<KPI> Kpis){
-        Map<BigInteger, KpiType> KpiIdTypeMap = new HashMap<>();
-        for(KPI definition : Kpis){
-            KpiIdTypeMap.put(definition.getId(), definition.getType());
+    public Map getKpiIdAndTypeMapping(List<KPI> kpis){
+        Map<BigInteger, KpiType> kpiIdTypeMap = new HashMap<>();
+        for(KPI definition : kpis){
+            kpiIdTypeMap.put(definition.getId(), definition.getType());
         }
-        return KpiIdTypeMap;
+        return kpiIdTypeMap;
     }
 
     //to identify Kpi definition for by id.
-    public Map getKpiDefinitionByIdMap(List<KPI> Kpis){
-        Map<BigInteger, KPI> KpiTypeIdMap = new HashMap<BigInteger, KPI>();
-        for(KPI definition : Kpis){
-            KpiTypeIdMap.put(definition.getId(), definition);
+    public Map getKpiDefinitionByIdMap(List<KPI> kpis){
+        Map<BigInteger, KPI> kpiTypeIdMap = new HashMap<BigInteger, KPI>();
+        for(KPI definition : kpis){
+            kpiTypeIdMap.put(definition.getId(), definition);
         }
-        return KpiTypeIdMap;
+        return kpiTypeIdMap;
     }
 
     //configuration for modulewise Kpis cofigurable at country level
 
     public List<ModulewiseKpiGroupingDTO> getModulewiseKpisForCountry(BigInteger countryId){
-        return KpiRepository.getModulewiseKpiDTOsForCountry(countryId);
+        return kpiRepository.getModulewiseKpiDTOsForCountry(countryId);
     }
 
     public List<ModuleWiseKpi> getModuleAndModuleKpiMappingForCountry(BigInteger countryId){
-        return KpiRepository.getModulewiseKpisForCountry(countryId);
+        return kpiRepository.getModulewiseKpisForCountry(countryId);
     }
 
     public void storeModuleWiseKpis(List<ModulewiseKpiGroupingDTO> modulesKpiMapping, BigInteger countryId){
         Map<String, Map<BigInteger, BigInteger>> moduleLevelKpisIdMap = getModuleLevelKpisIdMap(countryId);
         for(ModulewiseKpiGroupingDTO moduleKpisData : modulesKpiMapping){
-            Map<BigInteger, BigInteger> KpiIdMap = moduleLevelKpisIdMap.get(moduleKpisData.getModuleId());
-            ManipulatableKpiIdsDTO KpiIdsToModify = getKpiIdsToAddAndUpdate(KpiIdMap, moduleKpisData.getKpiIds());
-            removeModulewiseKpis(KpiIdsToModify.getKpiIdsToRemove(), moduleKpisData.getModuleId());
-            storeModulewiseKpis(countryId, moduleKpisData.getModuleId(), KpiIdsToModify.getKpiIdsToAdd());
+            Map<BigInteger, BigInteger> kpiIdMap = moduleLevelKpisIdMap.get(moduleKpisData.getModuleId());
+            ManipulatableKpiIdsDTO kpiIdsToModify = getKpiIdsToAddAndUpdate(kpiIdMap, moduleKpisData.getKpiIds());
+            removeModulewiseKpis(kpiIdsToModify.getKpiIdsToRemove(), moduleKpisData.getModuleId());
+            storeModulewiseKpis(countryId, moduleKpisData.getModuleId(), kpiIdsToModify.getKpiIdsToAdd());
         }
     }
 
-    private void storeModulewiseKpis(BigInteger countryId, String moduleId, List<BigInteger> KpiIds){
+    private void storeModulewiseKpis(BigInteger countryId, String moduleId, List<BigInteger> kpiIds){
         List<ModuleWiseKpi> moduleWiseKpiList = new ArrayList<>();
-        for(BigInteger KpiId: KpiIds){
+        for(BigInteger KpiId: kpiIds){
             ModuleWiseKpi moduleWiseKpi = new ModuleWiseKpi(moduleId, KpiId, countryId);
             moduleWiseKpiList.add(moduleWiseKpi);
         }
@@ -115,9 +115,9 @@ public class KpiManagementService extends MongoBaseService{
 
     private  ManipulatableKpiIdsDTO getKpiIdsToAddAndUpdate(Map<BigInteger, BigInteger> idMap, List<BigInteger> currentKpiIds){
         ManipulatableKpiIdsDTO manipulatableIds = new ManipulatableKpiIdsDTO();
-        for(BigInteger KpiId : currentKpiIds){
-            if(idMap.remove(KpiId) == null)
-                manipulatableIds.getKpiIdsToAdd().add(KpiId);
+        for(BigInteger kpiId : currentKpiIds){
+            if(idMap.remove(kpiId) == null)
+                manipulatableIds.getKpiIdsToAdd().add(kpiId);
         }
         for(Map.Entry<BigInteger, BigInteger> entry: idMap.entrySet()){
             manipulatableIds.getKpiIdsToRemove().add(entry.getValue());
@@ -126,12 +126,12 @@ public class KpiManagementService extends MongoBaseService{
     }
 
     private Map<String, Map<BigInteger, BigInteger>> getModuleLevelKpisIdMap(BigInteger countryId){
-        List<ModulewiseKpiGroupingDTO> modulewiseKpiGroupingDTOList = KpiRepository.getModulewiseKpiDTOsForCountry(countryId);
+        List<ModulewiseKpiGroupingDTO> modulewiseKpiGroupingDTOList = kpiRepository.getModulewiseKpiDTOsForCountry(countryId);
         Map<String, Map<BigInteger, BigInteger>> moduleLevelKpisIdMap = new HashMap<>();
         for(ModulewiseKpiGroupingDTO modulewiseKpiGroupingDTO : modulewiseKpiGroupingDTOList){
             Map<BigInteger, BigInteger> idMap = new HashMap<>();
-            for(BigInteger KpiId : modulewiseKpiGroupingDTO.getKpiIds()){
-                idMap.put(KpiId, KpiId);
+            for(BigInteger kpiId : modulewiseKpiGroupingDTO.getKpiIds()){
+                idMap.put(kpiId, kpiId);
             }
             moduleLevelKpisIdMap.put(modulewiseKpiGroupingDTO.getModuleId(), idMap);
         }
@@ -150,7 +150,7 @@ public class KpiManagementService extends MongoBaseService{
 
     //get role wise moduleKpiId mapping
     public List<RolewiseKpiDTO> getRolewiseKpiMapping(BigInteger unitId){
-        return KpiRepository.getRoleAndModuleKpiIdMapping(unitId);
+        return kpiRepository.getRoleAndModuleKpiIdMapping(unitId);
     }
 
     private Map<BigInteger, Map<BigInteger, BigInteger>> getRolewiseKpiIdMapping(BigInteger unitId){
@@ -169,8 +169,8 @@ public class KpiManagementService extends MongoBaseService{
     public void storeRolewiseKpisForUnit(List<RolewiseKpiDTO> rolewiseKpiDTOs, BigInteger unitId){
         Map<BigInteger, Map<BigInteger, BigInteger>> roleLevelKpisIdMap = getRolewiseKpiIdMapping(unitId);
         for(RolewiseKpiDTO rolewiseKpiDTO : rolewiseKpiDTOs){
-            Map<BigInteger, BigInteger> KpisIdMap = roleLevelKpisIdMap.get(rolewiseKpiDTO.getRoleId());
-            ManipulatableKpiIdsDTO KpiRefsToModify = getKpiIdsToAddAndUpdate(KpisIdMap, rolewiseKpiDTO.getModulewiseKpiIds());
+            Map<BigInteger, BigInteger> kpisIdMap = roleLevelKpisIdMap.get(rolewiseKpiDTO.getRoleId());
+            ManipulatableKpiIdsDTO kpiRefsToModify = getKpiIdsToAddAndUpdate(kpisIdMap, rolewiseKpiDTO.getModulewiseKpiIds());
 
         }
     }
@@ -200,11 +200,11 @@ public class KpiManagementService extends MongoBaseService{
 
     //getKpiDefinitionList
     public long getKpiDefinitionCount(){
-        return KpiRepository.getEntityItemList(KPI.class).size();
+        return kpiRepository.getEntityItemList(KPI.class).size();
     }
 
     //getCountOfKpiModuleLinks
     public long getKpiModuleLinksCount(){
-        return KpiRepository.getEntityItemList(ModuleWiseKpi.class).size();
+        return kpiRepository.getEntityItemList(ModuleWiseKpi.class).size();
     }
 }

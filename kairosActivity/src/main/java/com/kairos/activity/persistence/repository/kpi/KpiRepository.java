@@ -68,9 +68,9 @@ public class KpiRepository {
     /// old code
 
     //getKpiModuleLink
-    public ModuleWiseKpi getKpiModuleLink(String moduleId, BigInteger KpiDefinitionId) {
+    public ModuleWiseKpi getKpiModuleLink(String moduleId, BigInteger kpiId) {
         Assert.notNull(moduleId, "Module Id can't be null!");
-        Query query = new Query(Criteria.where("moduleId").is(moduleId).and("KpiDefinitionId").is(KpiDefinitionId));
+        Query query = new Query(Criteria.where("moduleId").is(moduleId).and("kpiId").is(kpiId));
         ModuleWiseKpi moduleWiseKpi = mongoTemplate.findOne(query, ModuleWiseKpi.class);
         return moduleWiseKpi;
     }
