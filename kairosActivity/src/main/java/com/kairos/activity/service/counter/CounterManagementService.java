@@ -99,14 +99,14 @@ public class CounterManagementService extends MongoBaseService{
             Map<BigInteger, BigInteger> counterIdMap = moduleLevelCountersIdMap.get(moduleCountersData.getModuleId());
             ManipulatableCounterIdsDTO counterIdsToModify = getCounterIdsToAddAndUpdate(counterIdMap, moduleCountersData.getCounterIds());
             removeModulewiseCounters(counterIdsToModify.getCounterIdsToRemove(), moduleCountersData.getModuleId());
-            storeModulewiseCounters(moduleCountersData.getModuleId(), counterIdsToModify.getCounterIdsToAdd());
+            storeModulewiseCounters(countryId, moduleCountersData.getModuleId(), counterIdsToModify.getCounterIdsToAdd());
         }
     }
 
-    private void storeModulewiseCounters(String moduleId, List<BigInteger> counterIds){
+    private void storeModulewiseCounters(BigInteger countryId, String moduleId, List<BigInteger> counterIds){
         List<ModuleWiseCounter> moduleWiseCounterList = new ArrayList<>();
         for(BigInteger counterId: counterIds){
-            ModuleWiseCounter moduleWiseCounter = new ModuleWiseCounter(moduleId, counterId);
+            ModuleWiseCounter moduleWiseCounter = new ModuleWiseCounter(countryId, moduleId, counterId);
             moduleWiseCounterList.add(moduleWiseCounter);
         }
         save(moduleWiseCounterList);

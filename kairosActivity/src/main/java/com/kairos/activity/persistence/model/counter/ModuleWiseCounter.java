@@ -7,14 +7,16 @@ import java.math.BigInteger;
 public class ModuleWiseCounter extends MongoBaseEntity {
     private String moduleId;
     private BigInteger counterId;
+    private BigInteger countryId;
 
     public ModuleWiseCounter(){
 
     }
 
-    public ModuleWiseCounter(String moduleId, BigInteger counterId){
+    public ModuleWiseCounter(BigInteger countryId, String moduleId, BigInteger counterId){
         this.counterId = counterId;
         this.moduleId = moduleId;
+        this.countryId = countryId;
     }
 
     public BigInteger getCounterId() {
@@ -31,5 +33,13 @@ public class ModuleWiseCounter extends MongoBaseEntity {
 
     public void setModuleId(String moduleId) {
         this.moduleId = moduleId;
+    }
+
+    public BigInteger getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(BigInteger countryId) {
+        this.countryId = countryId;
     }
 }
