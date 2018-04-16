@@ -1,16 +1,19 @@
 package com.kairos.activity.persistence.model.staffing_level;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.format.annotation.DateTimeFormat;
+//import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 
 public class StaffingLevelDuration {
-    @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+    //@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+
     private LocalTime from;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime to;
 
     public StaffingLevelDuration() {

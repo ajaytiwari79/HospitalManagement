@@ -19,6 +19,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
+
 @Component
 public class StaffRestClient {
     private static final Logger logger = LoggerFactory.getLogger(StaffRestClient.class);
@@ -303,17 +305,6 @@ public class StaffRestClient {
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in user micro service "+e.getMessage());
-        }
-
-    }
-
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        } else {
-            String baseUrl = new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
         }
 
     }
