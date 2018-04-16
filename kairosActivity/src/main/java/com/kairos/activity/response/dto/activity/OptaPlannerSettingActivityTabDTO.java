@@ -14,6 +14,7 @@ public class OptaPlannerSettingActivityTabDTO {
     private boolean eligibleForComputerRecruitment;
     private boolean lockLengthPresent;
     private boolean eligibleToBeForced;
+    private boolean eligibleForMove;
 
     public OptaPlannerSettingActivityTabDTO() {
     }
@@ -66,8 +67,16 @@ public class OptaPlannerSettingActivityTabDTO {
         this.eligibleToBeForced = eligibleToBeForced;
     }
 
+    public boolean isEligibleForMove() {
+        return eligibleForMove;
+    }
+
+    public void setEligibleForMove(boolean eligibleForMove) {
+        this.eligibleForMove = eligibleForMove;
+    }
+
     public OptaPlannerSettingActivityTab buildOptaPlannerSettingTab(){
-        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(this.eligibleForComputerRecruitment,this.lockLengthPresent,this.eligibleToBeForced);
+        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(this.eligibleForComputerRecruitment,this.lockLengthPresent,this.eligibleToBeForced,this.eligibleForMove);
         return optaPlannerSettingActivityTab;
     }
 }

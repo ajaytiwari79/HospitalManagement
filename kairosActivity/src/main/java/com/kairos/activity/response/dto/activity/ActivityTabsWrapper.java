@@ -42,6 +42,7 @@ public class ActivityTabsWrapper {
     private List<DayType> dayTypes;
     private Set<BigInteger> compositeActivities;
     private List<TimeTypeDTO> timeTypes;
+    private  LocationActivityTab locationActivityTab;
 
 
     public List<TimeTypeDTO> getTimeTypes() {
@@ -140,6 +141,10 @@ public class ActivityTabsWrapper {
 
     public ActivityTabsWrapper(CompositeShiftActivityTab compositeShiftActivityTab) {
         this.compositeShiftActivityTab = compositeShiftActivityTab;
+    }
+
+    public ActivityTabsWrapper(LocationActivityTab locationActivityTab) {
+        this.locationActivityTab = locationActivityTab;
     }
 
     public ActivityTabsWrapper(Set<BigInteger> compositeActivities) {
@@ -270,5 +275,13 @@ public class ActivityTabsWrapper {
 
     public void setPresenceTypeWithTimeType(PresenceTypeWithTimeTypeDTO presenceTypeWithTimeType) {
         this.presenceTypeWithTimeType = presenceTypeWithTimeType;
+    }
+
+    public LocationActivityTab getLocationActivityTab() {
+        return locationActivityTab;
+    }
+
+    public void setLocationActivityTab(LocationActivityTab locationActivityTab) {
+        this.locationActivityTab = locationActivityTab;
     }
 }
