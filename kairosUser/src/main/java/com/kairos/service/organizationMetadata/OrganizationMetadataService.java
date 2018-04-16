@@ -190,21 +190,27 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
             logger.info("Unable to get unit while getting payments settings for unit ,{}", unitId);
             throw new DataNotFoundByIdException("Unable to get organization by id" + unitId);
         }
-        if (Optional.ofNullable(organization.get().getPaymentSettings()).isPresent()) {
+        /*if (Optional.ofNullable(organization.get().getPaymentSettings()).isPresent()) {
             logger.info("payment settings already found, for unit{}", unitId);
             throw new DataNotFoundByIdException("payment settings already found for unit" + unitId);
         }
-        PaymentSettings paymentSettings = paymentSettingsDTO.getType().equals(PaidOutFrequencyEnum.MONTHLY)
-                ? new PaymentSettings(PaidOutFrequencyEnum.MONTHLY, paymentSettingsDTO.getDateOfPayment())
-                : new PaymentSettings(PaidOutFrequencyEnum.YEARLY, paymentSettingsDTO.getDateOfPayment(), paymentSettingsDTO.getMonthOfPayment());
-        organization.get().setPaymentSettings(paymentSettings);
+        */
+        if (!organization.get().getPaymentSettings().isEmpty()) {
+
+        } else {
+            PaymentSettings paymentSettings = paymentSettingsDTO.getType().equals(PaidOutFrequencyEnum.MONTHLY)
+                    ? new PaymentSettings(PaidOutFrequencyEnum.MONTHLY, paymentSettingsDTO.getDateOfPayment())
+                    : new PaymentSettings(PaidOutFrequencyEnum.YEARLY, paymentSettingsDTO.getDateOfPayment(), paymentSettingsDTO.getMonthOfPayment());
+            organization.get().setPaymentSettings(Collections.singletonList(paymentSettings));
+            paymentSettingsDTO.setId(paymentSettings.getId());
+        }
         save(organization.get());
-        paymentSettingsDTO.setId(paymentSettings.getId());
+
         return paymentSettingsDTO;
     }
 
     public PaymentSettingsDTO updatePaymentsSettings(PaymentSettingsDTO paymentSettingsDTO, Long unitId) {
-        PaymentSettings paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId);
+        PaymentSettings paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId, paymentSettingsDTO.getId());
         if (!Optional.ofNullable(paymentSettings).isPresent()) {
             logger.info("Unable to payment while updating payments settings for unit ,{}", unitId);
             throw new DataNotFoundByIdException("Unable to get payment updating payments settings for unit ,{}" + unitId);

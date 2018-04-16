@@ -181,7 +181,7 @@ public class Organization extends UserBaseEntity {
     private List<TimeSlotSet> timeSlotSets = new ArrayList<>();
 
     @Relationship(type = HAS_PAYMENT_SETTINGS)
-    private PaymentSettings paymentSettings;
+    private List<PaymentSettings> paymentSettings;
 
     public Level getLevel() {
         return level;
@@ -791,11 +791,11 @@ public class Organization extends UserBaseEntity {
         this.nightEndTimeTo = nightEndTimeTo;
     }
 
-    public PaymentSettings getPaymentSettings() {
+    public List<PaymentSettings> getPaymentSettings() {
         return paymentSettings;
     }
 
-    public void setPaymentSettings(PaymentSettings paymentSettings) {
+    public void setPaymentSettings(List<PaymentSettings> paymentSettings) {
         this.paymentSettings = paymentSettings;
     }
 }

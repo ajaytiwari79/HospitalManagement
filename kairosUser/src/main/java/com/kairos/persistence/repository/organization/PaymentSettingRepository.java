@@ -16,4 +16,8 @@ public interface PaymentSettingRepository extends Neo4jBaseRepository<PaymentSet
             " return paymentSettings")
     PaymentSettings getPaymentSettingByUnitId(Long unitId);
 
+    @Query("match(paymentSettings:PaymentSettings{deleted:false})<-["+HAS_PAYMENT_SETTINGS+"]-(unit:Organization) where id(unit)={0} AND id(paymentSettings)={1}" +
+            " return paymentSettings")
+    PaymentSettings getPaymentSettingByUnitId(Long unitId,Long paymentSettingId);
+
 }
