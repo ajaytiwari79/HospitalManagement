@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -150,7 +151,7 @@ public class ActivityService extends MongoBaseService {
         CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab(false, "hours", 1, false);
         activity.setCommunicationActivityTab(communicationActivityTab);
 
-        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(false, false, false);
+        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(false, false, false,false);
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
 
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(false);
@@ -160,6 +161,8 @@ public class ActivityService extends MongoBaseService {
 
         SkillActivityTab skillActivityTab = new SkillActivityTab();
         activity.setSkillActivityTab(skillActivityTab);
+        LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST,Collections.EMPTY_LIST);
+        activity.setLocationActivityTab(locationActivityTab);
 
     }
 
@@ -821,6 +824,9 @@ public class ActivityService extends MongoBaseService {
             rulesActivityTab.setEligibleForSchedules(phaseTemplateValues);
             activity.setRulesActivityTab(rulesActivityTab);
 
+            // location settings
+            LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST,Collections.EMPTY_LIST);
+            activity.setLocationActivityTab(locationActivityTab);
 
             //Time calculation tab
             TimeCalculationActivityTab timeCalculationActivityTab = Optional.ofNullable(activity.getTimeCalculationActivityTab()).isPresent() ?
@@ -974,4 +980,22 @@ public class ActivityService extends MongoBaseService {
         return activityDTO;
     }
 
+    public ActivityTabsWrapper getLocationsTabOfActivity(BigInteger activityId) {
+        Activity activity = activityMongoRepository.findOne(activityId);
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getLocationActivityTab());
+        return activityTabsWrapper;
+    }
+
+    public ActivityTabsWrapper updateLocationsTabOfActivity(LocationActivityTabDTO locationActivityTabDTO) {
+        Activity activity = activityMongoRepository.findOne(locationActivityTabDTO.getActivityId());
+        if (!Optional.ofNullable(activity).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + locationActivityTabDTO.getActivityId());
+        }
+        LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getCanBeStartAt(), locationActivityTabDTO.getCanBeEndAt());
+        activity.setLocationActivityTab(locationActivityTab);
+        save(activity);
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(locationActivityTab);
+        return activityTabsWrapper;
+
+    }
 }
