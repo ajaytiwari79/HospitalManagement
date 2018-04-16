@@ -1,0 +1,97 @@
+package com.kairos.shiftplanning.domain.wta;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.shiftplanning.domain.Shift;
+import com.kairos.shiftplanning.domain.ShiftRequestPhase;
+import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
+
+
+import java.util.List;
+
+/**
+ * Created by Pradeep singh on 5/8/17.
+ * TEMPLATE2
+ */
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class MinimumShiftLengthWTATemplate implements ConstraintHandler {
+
+    private long timeLimit;
+    private List<String> balanceType;//multiple check boxes
+    private boolean checkAgainstTimeRules;
+    private int weight;
+    private ScoreLevel level;
+    private String templateType;
+
+
+    public MinimumShiftLengthWTATemplate(long timeLimit, int weight, ScoreLevel level) {
+        this.timeLimit = timeLimit;
+        this.weight = weight;
+        this.level = level;
+    }
+
+    public String getTemplateType() {
+        return templateType;
+    }
+
+    public void setTemplateType(String templateType) {
+        this.templateType = templateType;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public ScoreLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(ScoreLevel level) {
+        this.level = level;
+    }
+
+
+    public MinimumShiftLengthWTATemplate(long timeLimit, List<String> balanceType, boolean checkAgainstTimeRules) {
+        this.timeLimit = timeLimit;
+        this.balanceType = balanceType;
+        this.checkAgainstTimeRules = checkAgainstTimeRules;
+    }
+
+    public MinimumShiftLengthWTATemplate() {
+    }
+
+
+    public long getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(long timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
+    public List<String> getBalanceType() {
+        return balanceType;
+    }
+
+    public void setBalanceType(List<String> balanceType) {
+        this.balanceType = balanceType;
+    }
+
+    public boolean isCheckAgainstTimeRules() {
+        return checkAgainstTimeRules;
+    }
+
+    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
+        this.checkAgainstTimeRules = checkAgainstTimeRules;
+    }
+
+    public int checkConstraints(Shift shift){
+        return !((ShiftRequestPhase)shift).isAbsenceActivityApplied() && shift.getMinutes()<timeLimit?((int) timeLimit-shift.getMinutes()):0;
+    }
+}
