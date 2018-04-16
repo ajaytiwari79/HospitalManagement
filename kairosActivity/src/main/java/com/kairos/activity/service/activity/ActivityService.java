@@ -825,7 +825,7 @@ public class ActivityService extends MongoBaseService {
             activity.setRulesActivityTab(rulesActivityTab);
 
             // location settings
-            LocationActivityTab locationActivityTab = new LocationActivityTab();
+            LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST,Collections.EMPTY_LIST);
             activity.setLocationActivityTab(locationActivityTab);
 
             //Time calculation tab
