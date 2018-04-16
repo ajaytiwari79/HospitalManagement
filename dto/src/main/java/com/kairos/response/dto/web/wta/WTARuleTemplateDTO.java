@@ -14,10 +14,10 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RuleTemplateCategoryDTO {
+public class WTARuleTemplateDTO {
     private List<PhaseTemplateValueDTO> phaseTemplateValues;
 
-    private RuleTemplateCategoryDTO ruleTemplateCategory;
+    private WTARuleTemplateDTO ruleTemplateCategory;
 
     private BigInteger id;
     private String name;
@@ -129,11 +129,11 @@ public class RuleTemplateCategoryDTO {
         this.category = category;
     }
 
-    public RuleTemplateCategoryDTO getRuleTemplateCategory() {
+    public WTARuleTemplateDTO getRuleTemplateCategory() {
         return ruleTemplateCategory;
     }
 
-    public void setRuleTemplateCategory(RuleTemplateCategoryDTO ruleTemplateCategory) {
+    public void setRuleTemplateCategory(WTARuleTemplateDTO ruleTemplateCategory) {
         this.ruleTemplateCategory = ruleTemplateCategory;
     }
 
@@ -420,11 +420,11 @@ public class RuleTemplateCategoryDTO {
 
 
 
-    public RuleTemplateCategoryDTO() {
+    public WTARuleTemplateDTO() {
         //default const
     }
 
-    public RuleTemplateCategoryDTO(String name, String templateType, boolean disabled, String description, long timeInMins, List<String> balanceTypes, boolean checkAgainstTimeRules) {
+    public WTARuleTemplateDTO(String name, String templateType, boolean disabled, String description, long timeInMins, List<String> balanceTypes, boolean checkAgainstTimeRules) {
         this.name = name;
         this.templateType = templateType;
         this.disabled = disabled;
@@ -436,9 +436,9 @@ public class RuleTemplateCategoryDTO {
     }
 
     // Template 13 Cons
-    public RuleTemplateCategoryDTO(String name, String templateType, Boolean disabled, String description, Long numberShiftsPerPeriod, Long numberOfWeeks,
-                                   String fromDayOfWeek, Long fromTime, Boolean proportional,
-                                   String toDayOfWeek, Long toTime) {
+    public WTARuleTemplateDTO(String name, String templateType, Boolean disabled, String description, Long numberShiftsPerPeriod, Long numberOfWeeks,
+                              String fromDayOfWeek, Long fromTime, Boolean proportional,
+                              String toDayOfWeek, Long toTime) {
         this.name = name;
         this.templateType = templateType;
         this.disabled = disabled;
@@ -454,8 +454,8 @@ public class RuleTemplateCategoryDTO {
 
     }
 
-    public RuleTemplateCategoryDTO(String name, String templateType, Boolean disabled,
-                                   String description, Long intervalLength, Long validationStartDateMillis, String intervalUnit, Long daysLimit) {
+    public WTARuleTemplateDTO(String name, String templateType, Boolean disabled,
+                              String description, Long intervalLength, Long validationStartDateMillis, String intervalUnit, Long daysLimit) {
         this.name = name;
         this.templateType = templateType;
         this.description = description;
@@ -467,7 +467,7 @@ public class RuleTemplateCategoryDTO {
     }
 
     // MinimumDailyRestingTimeWTATemplate
-    public RuleTemplateCategoryDTO(String name, String templateType, Boolean disabled, String description, Long continuousDayRestHours) {
+    public WTARuleTemplateDTO(String name, String templateType, Boolean disabled, String description, Long continuousDayRestHours) {
         this.name = name;
         this.templateType = templateType;
         this.disabled = disabled;

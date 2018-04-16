@@ -35,7 +35,6 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
 
     public TimeBankWTATemplate(String name, String templateType, boolean disabled, String description, TimeBankTypeEnum frequency, Integer yellowZone, boolean forbid, boolean allowExtraActivity) {
         this.name=name;
-        this.templateType=templateType;
         this.disabled=disabled;
         this.description=description;
         this.frequency = frequency;

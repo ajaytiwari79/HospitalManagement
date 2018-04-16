@@ -77,15 +77,13 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         this.useShiftTimes = useShiftTimes;
     }
 
-    public AverageScheduledTimeWTATemplate(String name, String templateType, boolean disabled,
+    public AverageScheduledTimeWTATemplate(String name, boolean disabled,
                                            String description, List<String> balanceType, long intervalLength, long validationStartDateMillis
             , boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime, String intervalUnit) {
         this.intervalLength = intervalLength;
         this.balanceType = balanceType;
-
         this.validationStartDateMillis = validationStartDateMillis;
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
         this.balanceAdjustment=balanceAdjustment;

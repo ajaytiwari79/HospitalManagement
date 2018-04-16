@@ -104,7 +104,6 @@ public class SeniorDaysInYearWTATemplate extends WTABaseRuleTemplate {
                                        String description, long intervalLength, String intervalUnit, long validationStartDateMillis,
                                        long daysLimit, String activityCode) {
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
         this.intervalLength =intervalLength;

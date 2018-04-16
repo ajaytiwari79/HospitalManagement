@@ -91,6 +91,15 @@ public class RuleTemplateCategory extends MongoBaseEntity {
     }
 
 
+    public Map<String, Object> printRuleTemp() {
+        Map<String, Object> mp = new HashMap();
+        mp.put("id", this.getId());
+        mp.put("name", this.getName());
+        mp.put("description", this.getDescription());
+        mp.put("lastModificationDate", this.getUpdatedAt());
+        mp.put("creationDate", this.getCreatedAt());
+        return mp;
+    }
 
 
 }

@@ -18,7 +18,7 @@ public class RuleTemplateDTO {
     private String categoryName;
     private String ruleTemplateCategoryType;
     private List<Long> tags;
-    private  RuleTemplateCategoryDTO ruleTemplateCategory;
+    private WTARuleTemplateDTO ruleTemplateCategory;
 
     public List<Long> getRuleTemplateIds() {
         return ruleTemplateIds;
@@ -51,11 +51,11 @@ public class RuleTemplateDTO {
         this.tags = tags;
     }
 
-    public RuleTemplateCategoryDTO getRuleTemplateCategory() {
+    public WTARuleTemplateDTO getRuleTemplateCategory() {
         return ruleTemplateCategory;
     }
 
-    public void setRuleTemplateCategory(RuleTemplateCategoryDTO ruleTemplateCategory) {
+    public void setRuleTemplateCategory(WTARuleTemplateDTO ruleTemplateCategory) {
         this.ruleTemplateCategory = ruleTemplateCategory;
     }
 }

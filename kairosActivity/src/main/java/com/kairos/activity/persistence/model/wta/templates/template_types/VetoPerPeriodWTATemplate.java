@@ -68,7 +68,6 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
     public VetoPerPeriodWTATemplate(String name, String templateType, boolean disabled,
                                     String description, double maximumVetoPercentage) {
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
         this.maximumVetoPercentage =maximumVetoPercentage;

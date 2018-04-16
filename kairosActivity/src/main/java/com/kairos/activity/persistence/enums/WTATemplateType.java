@@ -13,7 +13,7 @@ public enum WTATemplateType {
     NUMBER_OF_PARTOFDAY("Number Of Nights And Days"),
     MAXIMUM_SENIOR_DAYS_IN_YEAR("Maximum Senior Days In Year"),
     SHIFT_LENGTH("Shift length"),
-    NUMBER_SHIFT_IN_INTERVAL("Shifts in Interval"),
+    NUMBER_OF_SHIFTS_IN_INTERVAL("Shifts in Interval"),
     TIME_BANK("Time Bank"),
     VETO_PER_PERIOD("Veto per period"),
     CONSECUTIVE_NIGHTS_AND_DAYS("Consecutive Nights and days"),

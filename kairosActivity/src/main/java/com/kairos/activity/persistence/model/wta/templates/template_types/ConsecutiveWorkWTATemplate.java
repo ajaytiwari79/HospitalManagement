@@ -52,4 +52,9 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     }
 
+    public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limit) {
+        super(name, minimum, description);
+        this.checkAgainstTimeRules = checkAgainstTimeRules;
+        this.limit = limit;
+    }
 }

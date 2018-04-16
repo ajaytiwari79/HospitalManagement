@@ -95,7 +95,6 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
                                                   String description, List<String> balanceType, long intervalLength, String intervalUnit, long validationStartDateMillis,
                                                   long continuousDayRestHours, long averageRest, String shiftAffiliation) {
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
         this.balanceType = balanceType;

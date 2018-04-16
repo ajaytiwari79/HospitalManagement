@@ -6,44 +6,43 @@ import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
-import com.kairos.activity.persistence.enums.WTATemplateType;
+import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
-import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.activity.persistence.model.wta.templates.template_types.*;
+import com.kairos.activity.persistence.model.wta.templates.WTABuilderFactory;
+import com.kairos.activity.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
+import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.response.dto.web.wta.PhaseTemplateValueDTO;
-import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
+import com.kairos.response.dto.web.wta.WTARuleTemplateDTO;
 import com.kairos.response.dto.web.wta.WTADTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-
-import static com.kairos.activity.persistence.enums.WTATemplateType.*;
-import static com.kairos.persistence.model.enums.MasterDataTypeEnum.WTA;
 
 
 /**
  * Created by vipul on 19/12/17.
  */
 
-//@Transactional
+@Transactional
 @Service
 public class WTAOrganizationService extends MongoBaseService {
 
     @Inject
-    private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
+    private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject
-    private RuleTemplateCategoryGraphRepository ruleTemplateCategoryGraphRepository;
+    private RuleTemplateCategoryMongoRepository ruleTemplateCategoryMongoRepository;
     @Inject private OrganizationRestClient organizationRestClient;
     @Inject private RuleTemplateService ruleTemplateService;
 
@@ -54,18 +53,18 @@ public class WTAOrganizationService extends MongoBaseService {
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new DataNotFoundByIdException("Invalid unit  " + unitId);
         }
-        List<WTAResponseDTO> workingTimeAgreements = workingTimeAgreementGraphRepository.getWtaByOrganization(unitId);
+        List<WTAResponseDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWtaByOrganization(unitId);
         return workingTimeAgreements;
     }
 
 
-    public WorkingTimeAgreement updateWtaOfOrganization(Long unitId, Long wtaId, WTADTO updateDTO) {
+    public WorkingTimeAgreement updateWtaOfOrganization(Long unitId, BigInteger wtaId, WTADTO updateDTO) {
         OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new DataNotFoundByIdException("Invalid unit  " + unitId);
         }
 
-        WorkingTimeAgreement oldWta = workingTimeAgreementGraphRepository.findOne(wtaId, 2);
+        WorkingTimeAgreement oldWta = workingTimeAgreementMongoRepository.findOne(wtaId);
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating at unit %d", wtaId);
             throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
@@ -74,7 +73,7 @@ public class WTAOrganizationService extends MongoBaseService {
 
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
 
-        boolean isWTAAlreadyExists = workingTimeAgreementGraphRepository.checkUniqueWTANameInOrganization("(?i)" + updateDTO.getName(), unitId, wtaId);
+        boolean isWTAAlreadyExists = workingTimeAgreementMongoRepository.checkUniqueWTANameInOrganization("(?i)" + updateDTO.getName(), unitId, wtaId);
         if (isWTAAlreadyExists) {
             logger.info("Duplicate WTA name in organization :", wtaId);
             throw new DuplicateDataException("Duplicate WTA name in organization " + updateDTO.getName());
@@ -98,10 +97,10 @@ public class WTAOrganizationService extends MongoBaseService {
             }
         });*/
 
-        ruleTemplateCategoryGraphRepository.detachPreviousRuleTemplates(oldWta.getId());
+        ruleTemplateCategoryMongoRepository.detachPreviousRuleTemplates(oldWta.getId());
         save(newWta);
         if (Optional.ofNullable(oldWta.getParentWTA()).isPresent()) {
-            workingTimeAgreementGraphRepository.removeOldParentWTAMapping(oldWta.getParentWTA());
+            workingTimeAgreementMongoRepository.removeOldParentWTAMapping(oldWta.getParentWTA());
         }
 
         oldWta.setName(updateDTO.getName());
@@ -117,8 +116,9 @@ public class WTAOrganizationService extends MongoBaseService {
 
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
-
-            ruleTemplates = copyRuleTemplates(oldWta.getRuleTemplates(), updateDTO.getRuleTemplates());
+            WTAQueryResultDTO wtaQueryResultDTO = new WTAQueryResultDTO();
+            WTABuilderFactory.copyRuleTemplate(wtaQueryResultDTO,updateDTO.getRuleTemplates());
+            WTABuilderFactory.copyWTARuleTemplateToWTA(oldWta,wtaQueryResultDTO);
             /*oldWta.setRuleTemplates(ruleTemplates);*/
         }
         //oldWta.setOrganization(organization);
@@ -127,10 +127,10 @@ public class WTAOrganizationService extends MongoBaseService {
 
         save(oldWta);
         //Preparing Response for frontend
-        //workingTimeAgreementGraphRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
+        //workingTimeAgreementMongoRepository.removeOldWorkingTimeAgreement(oldWta.getId(), organization.getId(), updateDTO.getStartDateMillis());
         oldWta.setParentWTA(newWta.getParentWTA());
 
-        /*oldWta.getExpertise().setCountry(null);*/
+        /*oldWta.getExpertise().setCountryId(null);*/
         return oldWta;
     }
 
@@ -158,7 +158,7 @@ public class WTAOrganizationService extends MongoBaseService {
         return phases;
     }
 
-    public void copyRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates, List<RuleTemplateCategoryDTO> ruleTemplatesNewObjects) {
+    public void copyRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates, List<WTARuleTemplateDTO> ruleTemplatesNewObjects) {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<WTABaseRuleTemplate>(20);
 
     }

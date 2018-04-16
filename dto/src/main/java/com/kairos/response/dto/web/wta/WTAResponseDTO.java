@@ -17,7 +17,7 @@ import java.util.List;
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WTAResponseDTO {
 
-    private List<RuleTemplateCategoryDTO> ruleTemplates;
+    private List<WTARuleTemplateDTO> ruleTemplates;
 
     private WTAResponseDTO parentWTA;
 
@@ -120,11 +120,11 @@ public class WTAResponseDTO {
         this.organizationSubType = organizationSubType;
     }
 
-    public List<RuleTemplateCategoryDTO> getRuleTemplates() {
+    public List<WTARuleTemplateDTO> getRuleTemplates() {
         return ruleTemplates;
     }
 
-    public void setRuleTemplates(List<RuleTemplateCategoryDTO> ruleTemplates) {
+    public void setRuleTemplates(List<WTARuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 

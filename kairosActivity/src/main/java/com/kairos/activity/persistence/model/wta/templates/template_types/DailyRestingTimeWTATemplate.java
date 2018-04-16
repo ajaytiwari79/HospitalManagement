@@ -35,10 +35,9 @@ public class DailyRestingTimeWTATemplate extends WTABaseRuleTemplate {
         this.continuousDayRestHours = continuousDayRestHours;
     }
 
-    public DailyRestingTimeWTATemplate(String name, String templateType, boolean disabled,
+    public DailyRestingTimeWTATemplate(String name, boolean disabled,
                                        String description, long continuousDayRestHours) {
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
         this.continuousDayRestHours=continuousDayRestHours;

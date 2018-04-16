@@ -1,16 +1,11 @@
 package com.kairos.activity.persistence.model.wta.templates;
 
-import com.kairos.persistence.model.common.UserBaseEntity;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
  * Created by pavan on 18/1/18.
  */
 
-@NodeEntity
-@QueryResult
-public class PhaseTemplateValue extends UserBaseEntity {
+public class PhaseTemplateValue {
     private int phaseId;
     private String phaseName;
     private short staffValue=0;

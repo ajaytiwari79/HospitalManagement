@@ -19,7 +19,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
-    private List<String> balanceType;//multiple check boxes
     private long nightsWorked;
     private long intervalLength;
     private String intervalUnit;
@@ -71,13 +70,6 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
     }
 
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
 
     public long getNightsWorked() {
         return nightsWorked;
@@ -103,16 +95,11 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public NumberOfPartOfDayShiftsWTATemplate(String name, String templateType, boolean disabled, String description, List<String> balanceType, long nightsWorked, long intervalLength, long validationStartDateMillis, String intervalUnit) {
+    public NumberOfPartOfDayShiftsWTATemplate(String name,  boolean disabled, String description,long nightsWorked) {
         this.nightsWorked = nightsWorked;
-        this.balanceType = balanceType;
-        this.intervalLength =intervalLength;
-        this.validationStartDateMillis =validationStartDateMillis;;
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
-        this.intervalUnit = intervalUnit;
     }
     public NumberOfPartOfDayShiftsWTATemplate() {
 

@@ -1,8 +1,7 @@
 package com.kairos.activity.persistence.model.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.user.country.tag.Tag;
-import org.springframework.data.neo4j.annotation.QueryResult;
+import com.kairos.activity.response.dto.tag.TagDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +9,13 @@ import java.util.List;
 /**
  * Created by prerna on 29/11/17.
  */
-@QueryResult
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RuleTemplateCategoryTagDTO {
 
     private Long id;
     private String name;
     private String description;
-    private List<Tag> tags = new ArrayList<>();
+    private List<TagDTO> tags = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -43,11 +41,11 @@ public class RuleTemplateCategoryTagDTO {
         this.description = description;
     }
 
-    public List<Tag> getTags() {
+    public List<TagDTO> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(List<TagDTO> tags) {
         this.tags = tags;
     }
 }

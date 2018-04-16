@@ -1,0 +1,78 @@
+package com.kairos.activity.persistence.repository.wta;
+
+
+import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by pawanmandhan on 27/7/17.
+ */
+@Repository
+public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository<WorkingTimeAgreement, BigInteger> {
+
+    @Query("{name:?0,countryId:?1}")
+    WorkingTimeAgreement getWtaByName(String wtaName, Long countryId);
+
+    @Query("{}")
+    WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
+
+    @Query("{organizationType.id:?0}")
+    List<WTAResponseDTO> getAllWTAByOrganizationTypeId(long organizationId);
+
+    @Query("{countryId:?0}")
+    List<WTAResponseDTO> getAllWTAByCountryId(long countryId);
+
+    @Query("{organizationSubType.id:?0}")
+    List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId);
+
+    @Query("{countryId:?0}")
+    List<Map<String, Object>> getAllWTAWithOrganization(long countryId);
+
+    @Query("{countryId:?0,id:?1}")
+    List<Map<String, Object>> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
+
+  /*  @Query("{}")
+    WorkingTimeAgreement checkUniquenessOfData(long orgSubTypeId, long orgTypeId, long expertiseId, long countryId);
+
+    @Query("{}")
+    WorkingTimeAgreement checkUniquenessOfDataExcludingCurrent(long orgSubTypeId, long orgTypeId, long expertiseId, long countryId, BigInteger wtaId);
+*/
+    /*@Query("")
+    ExpertiseIdListDTO getAvailableAndFreeExpertise(long countryId, long organizationSubTypeId);
+*/
+
+
+
+
+    @Query("{organization.id:?0}")
+    List<WTAResponseDTO> getWtaByOrganization(Long organizationId);
+
+    @Query("{name:?0,organization.id:?1,id:?2}")
+    boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
+
+   /* @Query("{}")
+    void removeOldWorkingTimeAgreement(BigInteger wtaId, Long organizationId, Long endDateInMillis);
+*/
+    @Query("{id:?0}")
+    void removeOldParentWTAMapping(BigInteger wtaId);
+
+    @Query("{organization.id:?0,id:?1}")
+    WorkingTimeAgreement getOrganizationCopyOfWTA(Long unitId, BigInteger wtaId);
+
+    @Query("{id:?0}")
+    WTAResponseDTO getVersionOfWTA(BigInteger organizationId);
+
+    /*@Query("")
+    WTAResponseDTO findWtaByUnitEmploymentPosition(Long unitEmploymentPositionId);
+
+    @Query("")
+    WTAResponseDTO findRuleTemplateByWTAId(BigInteger wtaId);*/
+
+}

@@ -27,7 +27,6 @@ public class RuleTemplateCategoryDTO extends MongoBaseEntity {
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
     private Long country;
-    private List<RuleTemplate> ruleTemplates=new ArrayList<>();
     public RuleTemplateCategoryDTO(String name, String description, boolean deleted) {
         this.name = name;
         this.description = description;
@@ -42,13 +41,8 @@ public class RuleTemplateCategoryDTO extends MongoBaseEntity {
         this.name = name;
     }
 
-    public List<RuleTemplate> getRuleTemplates() {
-        return ruleTemplates;
-    }
     private List<Long> tags = new ArrayList<>();
-    public void setRuleTemplates(List<RuleTemplate> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
-    }
+
 
 
     public String getName() {

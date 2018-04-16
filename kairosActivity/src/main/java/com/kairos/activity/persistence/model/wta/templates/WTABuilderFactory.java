@@ -3,17 +3,15 @@ package com.kairos.activity.persistence.model.wta.templates;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
-import com.kairos.response.dto.web.wta.PhaseTemplateValueDTO;
-import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
+import com.kairos.response.dto.web.wta.WTARuleTemplateDTO;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.kairos.activity.persistence.enums.WTATemplateType.*;
-import static com.kairos.persistence.model.enums.MasterDataTypeEnum.WTA;
 
 /**
  * @author pradeep
@@ -23,7 +21,7 @@ import static com.kairos.persistence.model.enums.MasterDataTypeEnum.WTA;
 public class WTABuilderFactory {
 
 
-    public static void copyRuleTemplate(WTAQueryResultDTO wtaQueryResultDTO, List<RuleTemplateCategoryDTO> ruleTemplateCategoryDTOS) {
+    public static void copyRuleTemplate(WTAQueryResultDTO wtaQueryResultDTO, List<WTARuleTemplateDTO> WTARuleTemplateDTOS) {
         List<ShiftLengthWTATemplate> shiftLengths = new ArrayList<>();
         List<AverageScheduledTimeWTATemplate> averageScheduledTimes = new ArrayList<>();
         List<CareDayCheckWTATemplate> careDayChecks = new ArrayList<>();
@@ -40,7 +38,7 @@ public class WTABuilderFactory {
         List<TimeBankWTATemplate> timeBanks = new ArrayList<>();
         List<VetoPerPeriodWTATemplate> vetoPerPeriods = new ArrayList<>();
         List<WeeklyRestPeriodWTATemplate> weeklyRestPeriods = new ArrayList<>();
-        for (RuleTemplateCategoryDTO ruleTemplate : ruleTemplateCategoryDTOS) {
+        for (WTARuleTemplateDTO ruleTemplate : WTARuleTemplateDTOS) {
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>(ruleTemplate.getPhaseTemplateValues().size());
             BeanUtils.copyProperties(ruleTemplate.getPhaseTemplateValues(),phaseTemplateValues);
             WTATemplateType wtaTemplateType = getByTemplateType(ruleTemplate.getTemplateType());
@@ -130,7 +128,7 @@ public class WTABuilderFactory {
                     shortestAndAverageDailyRestWTATemplate.setWTARuleTemplateCategory(ruleTemplate.getRuleTemplateCategory().getId());
                     shortestAndAverageDailyRests.add(shortestAndAverageDailyRestWTATemplate);
                     break;
-                case NUMBER_SHIFT_IN_INTERVAL:
+                case NUMBER_OF_SHIFTS_IN_INTERVAL:
                     ShiftsInIntervalWTATemplate shiftsInIntervalWTATemplate = new ShiftsInIntervalWTATemplate();
                     BeanUtils.copyProperties(shiftsInIntervalWTATemplate,ruleTemplate);
                     shiftsInIntervalWTATemplate.setWTARuleTemplateCategory(ruleTemplate.getRuleTemplateCategory().getId());
@@ -170,10 +168,28 @@ public class WTABuilderFactory {
         wtaQueryResultDTO.setTimeBanks(timeBanks);
         wtaQueryResultDTO.setVetoPerPeriods(vetoPerPeriods);
         wtaQueryResultDTO.setWeeklyRestPeriods(weeklyRestPeriods);
-
-
     }
 
+
+    public static void copyWTARuleTemplateToWTA(WorkingTimeAgreement workingTimeAgreement, WTAQueryResultDTO wtaQueryResultDTO){
+        workingTimeAgreement.setShiftLengths(wtaQueryResultDTO.getShiftLengths());
+        workingTimeAgreement.setAverageScheduledTimes(wtaQueryResultDTO.getAverageScheduledTimes());
+        workingTimeAgreement.setCareDayChecks(wtaQueryResultDTO.getCareDayChecks());
+        workingTimeAgreement.setConsecutiveRestPartOfDays(wtaQueryResultDTO.getConsecutiveRestPartOfDays());
+        workingTimeAgreement.setConsecutiveWorks(wtaQueryResultDTO.getConsecutiveWorks());
+        workingTimeAgreement.setDailyRestingTimes(wtaQueryResultDTO.getDailyRestingTimes());
+        workingTimeAgreement.setDaysOffInPeriods(wtaQueryResultDTO.getDaysOffInPeriods());
+        workingTimeAgreement.setDurationBetweenShifts(wtaQueryResultDTO.getDurationBetweenShifts());
+        workingTimeAgreement.setNumberOfPartOfDayShifts(wtaQueryResultDTO.getNumberOfPartOfDayShifts());
+        workingTimeAgreement.setNumberOfWeekendShiftInPeriods(wtaQueryResultDTO.getNumberOfWeekendShiftInPeriods());
+        workingTimeAgreement.setSeniorDaysInYears(wtaQueryResultDTO.getSeniorDaysInYears());
+        workingTimeAgreement.setShiftsInIntervals(wtaQueryResultDTO.getShiftsInIntervals());
+        workingTimeAgreement.setShortestAndAverageDailyRests(wtaQueryResultDTO.getShortestAndAverageDailyRests());
+        workingTimeAgreement.setTimeBanks(wtaQueryResultDTO.getTimeBanks());
+        workingTimeAgreement.setVetoPerPeriods(wtaQueryResultDTO.getVetoPerPeriods());
+        workingTimeAgreement.setWeeklyRestPeriods(wtaQueryResultDTO.getWeeklyRestPeriods());
+
+    }
 
     /*public static List<T> copyPhaseTemplateValue(List<Object> source,List<Object> phaseTemplateValues) {
         List<T> phases = null;
@@ -187,6 +203,113 @@ public class WTABuilderFactory {
         }
         return phases;
     }*/
+
+
+    public static List<WTARuleTemplateDTO> getRuleTemplateDTO(WorkingTimeAgreement workingTimeAgreement) {
+        List<WTARuleTemplateDTO> WTARuleTemplateDTOS = new ArrayList<>();
+        WTARuleTemplateDTO ruleTemplate = new WTARuleTemplateDTO();
+        for (ShiftLengthWTATemplate shiftLengthWTATemplate : workingTimeAgreement.getShiftLengths()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(shiftLengthWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate : workingTimeAgreement.getNumberOfPartOfDayShifts()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(numberOfPartOfDayShiftsWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (DurationBetweenShiftWTATemplate durationBetweenShiftWTATemplate : workingTimeAgreement.getDurationBetweenShifts()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(durationBetweenShiftWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate : workingTimeAgreement.getDaysOffInPeriods()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(daysOffInPeriodWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (DailyRestingTimeWTATemplate dailyRestingTimeWTATemplate : workingTimeAgreement.getDailyRestingTimes()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(dailyRestingTimeWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (ConsecutiveWorkWTATemplate consecutiveWorkWTATemplate : workingTimeAgreement.getConsecutiveWorks()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(consecutiveWorkWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (ConsecutiveRestPartOfDayWTATemplate consecutiveRestPartOfDayWTATemplate : workingTimeAgreement.getConsecutiveRestPartOfDays()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(consecutiveRestPartOfDayWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (CareDayCheckWTATemplate careDayCheckWTATemplate : workingTimeAgreement.getCareDayChecks()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(careDayCheckWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate : workingTimeAgreement.getAverageScheduledTimes()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(averageScheduledTimeWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+
+        for (WeeklyRestPeriodWTATemplate weeklyRestPeriodWTATemplate : workingTimeAgreement.getWeeklyRestPeriods()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(weeklyRestPeriodWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (VetoPerPeriodWTATemplate vetoPerPeriodWTATemplate : workingTimeAgreement.getVetoPerPeriods()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(vetoPerPeriodWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (TimeBankWTATemplate timeBankWTATemplate : workingTimeAgreement.getTimeBanks()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(timeBankWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate : workingTimeAgreement.getShortestAndAverageDailyRests()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(shortestAndAverageDailyRestWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (ShiftsInIntervalWTATemplate shiftsInIntervalWTATemplate : workingTimeAgreement.getShiftsInIntervals()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(shiftsInIntervalWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (SeniorDaysInYearWTATemplate seniorDaysInYearWTATemplate : workingTimeAgreement.getSeniorDaysInYears()) {
+            ruleTemplate = new WTARuleTemplateDTO();
+            BeanUtils.copyProperties(seniorDaysInYearWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        for (NumberOfWeekendShiftInPeriodWTATemplate numberOfWeekendShiftInPeriodWTATemplate : workingTimeAgreement.getNumberOfWeekendShiftInPeriods()) {
+
+            BeanUtils.copyProperties(numberOfWeekendShiftInPeriodWTATemplate,ruleTemplate);
+            WTARuleTemplateDTOS.add(ruleTemplate);
+        }
+        return WTARuleTemplateDTOS;
+    }
+
+    public static void copyRuleTemplateToNewWTA(WorkingTimeAgreement oldWta,WorkingTimeAgreement newWTA) {
+        newWTA.setShiftLengths(oldWta.getShiftLengths());
+        newWTA.setAverageScheduledTimes(oldWta.getAverageScheduledTimes());
+        newWTA.setCareDayChecks(oldWta.getCareDayChecks());
+        newWTA.setConsecutiveRestPartOfDays(oldWta.getConsecutiveRestPartOfDays());
+        newWTA.setConsecutiveWorks(oldWta.getConsecutiveWorks());
+        newWTA.setDailyRestingTimes(oldWta.getDailyRestingTimes());
+        newWTA.setDaysOffInPeriods(oldWta.getDaysOffInPeriods());
+        newWTA.setDurationBetweenShifts(oldWta.getDurationBetweenShifts());
+        newWTA.setNumberOfPartOfDayShifts(oldWta.getNumberOfPartOfDayShifts());
+        newWTA.setNumberOfWeekendShiftInPeriods(oldWta.getNumberOfWeekendShiftInPeriods());
+        newWTA.setSeniorDaysInYears(oldWta.getSeniorDaysInYears());
+        newWTA.setShiftsInIntervals(oldWta.getShiftsInIntervals());
+        newWTA.setShortestAndAverageDailyRests(oldWta.getShortestAndAverageDailyRests());
+        newWTA.setTimeBanks(oldWta.getTimeBanks());
+        newWTA.setVetoPerPeriods(oldWta.getVetoPerPeriods());
+        newWTA.setWeeklyRestPeriods(oldWta.getWeeklyRestPeriods());
+    }
 
 
 

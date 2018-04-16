@@ -23,7 +23,7 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     private long validationStartDateMillis;
     private long shiftsLimit;
     private boolean onlyCompositeShifts;//(checkbox)
-    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_SHIFT_IN_INTERVAL;
+    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
 
     private List<BigInteger> timeTypeIds;
     private List<BigInteger> activityIds;
@@ -112,7 +112,6 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
                                        String description, List<String> balanceType, long intervalLength, String intervalUnit,
                                        long validationStartDateMillis, long shiftsLimit, boolean onlyCompositeShifts) {
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
         this.balanceType = balanceType;

@@ -1,6 +1,8 @@
 package com.kairos.activity.controller.wta;
 
+import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategoryDTO;
 import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategoryType;
+import com.kairos.activity.service.wta.RuleTemplateCategoryService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
 
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.*;
@@ -26,12 +29,10 @@ import static com.kairos.activity.constants.ApiConstants.*;
 public class RuleTemplateCategoryController {
     @Inject
     private RuleTemplateCategoryService ruleTemplateCategoryService;
-    @Inject
-    private CountryService countryService;
 
 
     @RequestMapping(value = COUNTRY_URL+"/template_category", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> createRuleTemplate(@PathVariable long countryId, @RequestBody @Valid RuleTemplateCategory ruleTemplateCategory) {
+    ResponseEntity<Map<String, Object>> createRuleTemplate(@PathVariable long countryId, @RequestBody @Valid RuleTemplateCategoryDTO ruleTemplateCategory) {
 
         if (ruleTemplateCategory != null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.createRuleTemplateCategory(countryId, ruleTemplateCategory));
@@ -45,12 +46,12 @@ public class RuleTemplateCategoryController {
     }
 
     @RequestMapping(value = COUNTRY_URL+"/template_category/{templateCategoryId}", method = RequestMethod.DELETE)
-    ResponseEntity<Map<String, Object>> deleteRuleTemplate(@PathVariable long countryId, @PathVariable long templateCategoryId) {
+    ResponseEntity<Map<String, Object>> deleteRuleTemplate(@PathVariable long countryId, @PathVariable BigInteger templateCategoryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.deleteRuleTemplateCategory(countryId, templateCategoryId));
     }
 
     @RequestMapping(value = COUNTRY_URL+"/template_category/{templateCategoryId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateRuleTemplateCategory(@PathVariable long countryId, @PathVariable long templateCategoryId, @RequestBody UpdateRuleTemplateCategoryDTO ruleTemplateCategory) {
+    ResponseEntity<Map<String, Object>> updateRuleTemplateCategory(@PathVariable long countryId, @PathVariable BigInteger templateCategoryId, @RequestBody UpdateRuleTemplateCategoryDTO ruleTemplateCategory) {
         Map<String, Object> updatedRuleTemplate = ruleTemplateCategoryService.updateRuleTemplateCategory(countryId, templateCategoryId, ruleTemplateCategory);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, updatedRuleTemplate);
     }

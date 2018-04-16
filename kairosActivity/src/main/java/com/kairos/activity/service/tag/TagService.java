@@ -103,6 +103,10 @@ public class TagService extends MongoBaseService {
     }
 
 
+    public List<Tag> getCountryTagsByIdsAndMasterDataType(List<BigInteger> tags, com.kairos.persistence.model.enums.MasterDataTypeEnum type){
+        return null;
+    }
+
 
 
     public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO, String type) {

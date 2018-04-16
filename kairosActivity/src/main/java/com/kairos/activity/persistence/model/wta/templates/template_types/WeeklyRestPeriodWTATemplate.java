@@ -37,7 +37,6 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
     public WeeklyRestPeriodWTATemplate(String name, String templateType, boolean disabled,
                                        String description, long continuousWeekRest) {
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
 

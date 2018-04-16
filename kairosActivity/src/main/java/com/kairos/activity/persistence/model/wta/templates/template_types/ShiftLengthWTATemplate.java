@@ -61,10 +61,9 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     }
 
-    public ShiftLengthWTATemplate(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules, List<BigInteger> dayTypes) {
+    public ShiftLengthWTATemplate(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules) {
         super(name, minimum, description);
         this.timeLimit = timeLimit;
         this.checkAgainstTimeRules = checkAgainstTimeRules;
-        this.dayTypes = dayTypes;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,6 +21,7 @@ import javax.inject.Inject;
  * @date - 11/4/18
  */
 
+@Service
 public class WTADetailRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(StaffRestClient.class);

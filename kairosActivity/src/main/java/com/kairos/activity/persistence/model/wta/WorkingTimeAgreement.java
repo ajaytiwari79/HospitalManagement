@@ -1,18 +1,14 @@
 package com.kairos.activity.persistence.model.wta;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 //@JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,7 +25,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     private String name;
 
     private String description;
-    // This will be only used when the country will update the WTA a new Copy of WTA will be assigned to organization having state disabled
+    // This will be only used when the countryId will update the WTA a new Copy of WTA will be assigned to organization having state disabled
     private Boolean disabled;
 
     private WTAExpertise expertise;
@@ -39,7 +35,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     private WTAOrganizationType organizationSubType;
 
 
-    private Long country;
+    private Long countryId;
 
     private WTAOrganization organization;
 
@@ -109,12 +105,12 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         this.expertise = expertise;
     }
 
-    public Long getCountry() {
-        return country;
+    public Long getCountryId() {
+        return countryId;
     }
 
-    public void setCountry(Long country) {
-        this.country = country;
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 
 
@@ -199,7 +195,135 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         this.disabled = disabled;
     }
 
-    public WorkingTimeAgreement(BigInteger id,@NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description, Long startDateMillis, Long endDateMillis, Long expiryDate) {
+    public List<ShiftLengthWTATemplate> getShiftLengths() {
+        return shiftLengths;
+    }
+
+    public void setShiftLengths(List<ShiftLengthWTATemplate> shiftLengths) {
+        this.shiftLengths = shiftLengths;
+    }
+
+    public List<AverageScheduledTimeWTATemplate> getAverageScheduledTimes() {
+        return averageScheduledTimes;
+    }
+
+    public void setAverageScheduledTimes(List<AverageScheduledTimeWTATemplate> averageScheduledTimes) {
+        this.averageScheduledTimes = averageScheduledTimes;
+    }
+
+    public List<CareDayCheckWTATemplate> getCareDayChecks() {
+        return careDayChecks;
+    }
+
+    public void setCareDayChecks(List<CareDayCheckWTATemplate> careDayChecks) {
+        this.careDayChecks = careDayChecks;
+    }
+
+    public List<ConsecutiveRestPartOfDayWTATemplate> getConsecutiveRestPartOfDays() {
+        return consecutiveRestPartOfDays;
+    }
+
+    public void setConsecutiveRestPartOfDays(List<ConsecutiveRestPartOfDayWTATemplate> consecutiveRestPartOfDays) {
+        this.consecutiveRestPartOfDays = consecutiveRestPartOfDays;
+    }
+
+    public List<ConsecutiveWorkWTATemplate> getConsecutiveWorks() {
+        return consecutiveWorks;
+    }
+
+    public void setConsecutiveWorks(List<ConsecutiveWorkWTATemplate> consecutiveWorks) {
+        this.consecutiveWorks = consecutiveWorks;
+    }
+
+    public List<DailyRestingTimeWTATemplate> getDailyRestingTimes() {
+        return dailyRestingTimes;
+    }
+
+    public void setDailyRestingTimes(List<DailyRestingTimeWTATemplate> dailyRestingTimes) {
+        this.dailyRestingTimes = dailyRestingTimes;
+    }
+
+    public List<DaysOffInPeriodWTATemplate> getDaysOffInPeriods() {
+        return daysOffInPeriods;
+    }
+
+    public void setDaysOffInPeriods(List<DaysOffInPeriodWTATemplate> daysOffInPeriods) {
+        this.daysOffInPeriods = daysOffInPeriods;
+    }
+
+    public List<DurationBetweenShiftWTATemplate> getDurationBetweenShifts() {
+        return durationBetweenShifts;
+    }
+
+    public void setDurationBetweenShifts(List<DurationBetweenShiftWTATemplate> durationBetweenShifts) {
+        this.durationBetweenShifts = durationBetweenShifts;
+    }
+
+    public List<NumberOfPartOfDayShiftsWTATemplate> getNumberOfPartOfDayShifts() {
+        return numberOfPartOfDayShifts;
+    }
+
+    public void setNumberOfPartOfDayShifts(List<NumberOfPartOfDayShiftsWTATemplate> numberOfPartOfDayShifts) {
+        this.numberOfPartOfDayShifts = numberOfPartOfDayShifts;
+    }
+
+    public List<NumberOfWeekendShiftInPeriodWTATemplate> getNumberOfWeekendShiftInPeriods() {
+        return numberOfWeekendShiftInPeriods;
+    }
+
+    public void setNumberOfWeekendShiftInPeriods(List<NumberOfWeekendShiftInPeriodWTATemplate> numberOfWeekendShiftInPeriods) {
+        this.numberOfWeekendShiftInPeriods = numberOfWeekendShiftInPeriods;
+    }
+
+    public List<SeniorDaysInYearWTATemplate> getSeniorDaysInYears() {
+        return seniorDaysInYears;
+    }
+
+    public void setSeniorDaysInYears(List<SeniorDaysInYearWTATemplate> seniorDaysInYears) {
+        this.seniorDaysInYears = seniorDaysInYears;
+    }
+
+    public List<ShiftsInIntervalWTATemplate> getShiftsInIntervals() {
+        return shiftsInIntervals;
+    }
+
+    public void setShiftsInIntervals(List<ShiftsInIntervalWTATemplate> shiftsInIntervals) {
+        this.shiftsInIntervals = shiftsInIntervals;
+    }
+
+    public List<ShortestAndAverageDailyRestWTATemplate> getShortestAndAverageDailyRests() {
+        return shortestAndAverageDailyRests;
+    }
+
+    public void setShortestAndAverageDailyRests(List<ShortestAndAverageDailyRestWTATemplate> shortestAndAverageDailyRests) {
+        this.shortestAndAverageDailyRests = shortestAndAverageDailyRests;
+    }
+
+    public List<TimeBankWTATemplate> getTimeBanks() {
+        return timeBanks;
+    }
+
+    public void setTimeBanks(List<TimeBankWTATemplate> timeBanks) {
+        this.timeBanks = timeBanks;
+    }
+
+    public List<VetoPerPeriodWTATemplate> getVetoPerPeriods() {
+        return vetoPerPeriods;
+    }
+
+    public void setVetoPerPeriods(List<VetoPerPeriodWTATemplate> vetoPerPeriods) {
+        this.vetoPerPeriods = vetoPerPeriods;
+    }
+
+    public List<WeeklyRestPeriodWTATemplate> getWeeklyRestPeriods() {
+        return weeklyRestPeriods;
+    }
+
+    public void setWeeklyRestPeriods(List<WeeklyRestPeriodWTATemplate> weeklyRestPeriods) {
+        this.weeklyRestPeriods = weeklyRestPeriods;
+    }
+
+    public WorkingTimeAgreement(BigInteger id, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description, Long startDateMillis, Long endDateMillis, Long expiryDate) {
         this.id = id;
         this.name = name;
         this.description = description;

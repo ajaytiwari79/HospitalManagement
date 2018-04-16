@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Document(collection = "WtaRuleTemplate")
 public class WTABaseRuleTemplate extends MongoBaseEntity{
 
     protected String name;
@@ -22,12 +24,21 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     protected BigInteger WTARuleTemplateCategory;
     protected List<PartOfDay> partOfDays;
     protected Long countryId;
+    protected int lastInsertedValue;
 
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected int recommendedValue;
     protected String lastUpdatedBy;
     protected boolean minimum;
 
+
+    public int getLastInsertedValue() {
+        return lastInsertedValue;
+    }
+
+    public void setLastInsertedValue(int lastInsertedValue) {
+        this.lastInsertedValue = lastInsertedValue;
+    }
 
     public Long getCountryId() {
         return countryId;
@@ -77,13 +88,6 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return "WTABaseRuleTemplate{" +
-                "phaseTemplateValues=" + phaseTemplateValues +
-                ", templateType='" + templateType + '\'' +
-                '}';
-    }
 
     public String getName() {
         return name;
@@ -93,13 +97,6 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         this.name = name;
     }
 
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
 
     public String getDescription() {
         return description;

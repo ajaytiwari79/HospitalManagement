@@ -94,7 +94,6 @@ public class NumberOfWeekendShiftInPeriodWTATemplate extends WTABaseRuleTemplate
                                                    String description, long numberShiftsPerPeriod, long numberOfWeeks, String fromDayOfWeek, long fromTime, boolean proportional,
                                                    String toDayOfWeek, long toTime) {
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
 

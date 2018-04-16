@@ -2,9 +2,9 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValueDTO;
 import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
+import com.kairos.response.dto.web.wta.PhaseTemplateValueDTO;
 
 
 import java.util.List;

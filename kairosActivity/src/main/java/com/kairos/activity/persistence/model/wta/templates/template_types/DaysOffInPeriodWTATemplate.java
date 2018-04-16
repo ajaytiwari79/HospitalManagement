@@ -83,7 +83,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDateMillis = validationStartDateMillis;
 
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
         this.intervalUnit = intervalUnit;

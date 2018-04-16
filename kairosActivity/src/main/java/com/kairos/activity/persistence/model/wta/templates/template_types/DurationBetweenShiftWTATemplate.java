@@ -49,7 +49,6 @@ public class DurationBetweenShiftWTATemplate extends WTABaseRuleTemplate {
     public DurationBetweenShiftWTATemplate(String name, String templateType, boolean disabled,
                                            String description, List<String> balanceType, long minimumDurationBetweenShifts) {
         this.name = name;
-        this.templateType = templateType;
         this.disabled = disabled;
         this.description = description;
         this.balanceType= balanceType;
