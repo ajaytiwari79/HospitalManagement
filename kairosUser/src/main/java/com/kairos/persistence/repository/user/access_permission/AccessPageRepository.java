@@ -301,7 +301,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH(accessGroup:AccessGroup)-[rel:" + HAS_ACCESS_OF_TABS + "]->(accessPage:AccessPage) where id(accessGroup)={0} with ac,accessGroup as accessGroup," +
             "accessPage as accessPage, rel.read as read, rel.write as write ,rel.isEnabled as isEnabled  " +
             "create unique (ac)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:isEnabled, read:read, write:write}]->(accessPage)")
-    void setAccessGroupPageRelationShips(Long oldAccessGroupId,Long newAccessGroupId);
+    void copyAccessGroupPageRelationShips(Long oldAccessGroupId,Long newAccessGroupId);
 
 }
 

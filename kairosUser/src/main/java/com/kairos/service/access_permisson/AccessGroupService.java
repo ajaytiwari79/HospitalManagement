@@ -597,7 +597,7 @@ public class AccessGroupService extends UserBaseService {
 
         organization.get().getAccessGroups().add(accessGroup);
         save(organization.get());
-        accessPageRepository.setAccessGroupPageRelationShips(accessGroupDTO.getId(),accessGroup.getId());
+        accessPageRepository.copyAccessGroupPageRelationShips(accessGroupDTO.getId(),accessGroup.getId());
         return new AccessGroupDTO(accessGroup.getId(),accessGroup.getName(),accessGroup.getDescription(),accessGroup.getRole());
 
     }
@@ -623,7 +623,7 @@ public class AccessGroupService extends UserBaseService {
         accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
         save(country.get());
-        accessPageRepository.setAccessGroupPageRelationShips(countryAccessGroupDTO.getId(), accessGroup.getId());
+        accessPageRepository.copyAccessGroupPageRelationShips(countryAccessGroupDTO.getId(), accessGroup.getId());
         countryAccessGroupDTO.setId(accessGroup.getId());
         return countryAccessGroupDTO;
     }
