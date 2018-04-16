@@ -219,6 +219,8 @@ public class OrganizationActivityService extends MongoBaseService {
         }
         Activity activityCopied = copyAllActivitySettingsInUnit(activityFromDatabase.get(), unitId);
         activityCopied.setName(activityDTO.getName().trim());
+        activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
+        activityCopied.setState(ActivityStateEnum.DRAFT);
         save(activityCopied);
         activityDTO.setId(activityCopied.getId());
         return activityDTO;
