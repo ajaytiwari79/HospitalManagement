@@ -363,7 +363,8 @@ public class UnitPositionService extends UserBaseService {
             }
             unitPosition.setLastWorkingDateMillis(unitPositionDTO.getLastWorkingDateMillis());
         }
-        SeniorityLevel seniorityLevel=getSeniorityLevelByStaffAndExpertise(staff.getId(),unitPositionDTO.getExpertiseId());
+        Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId());
+        SeniorityLevel seniorityLevel=getSeniorityLevelByStaffAndExpertise(staff.getId(),currentExpertise.get());
         if (!Optional.ofNullable(seniorityLevel).isPresent()) {
             throw new DataNotFoundByIdException("Invalid seniorityLevel Id" + unitPositionDTO.getReasonCodeId());
         }
@@ -532,38 +533,7 @@ public class UnitPositionService extends UserBaseService {
         positionCtaWtaQueryResult.setWta(unitPositionGraphRepository.getWtaByExpertise(unitId, expertiseId));
 
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
-
-        StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, expertiseId);
-
-        if (!Optional.ofNullable(staffSelectedExpertise).isPresent() || !currentExpertise.isPresent()) {
-            throw new DataNotFoundByIdException("Expertise is not assigned to staff or unavailable");
-
-        }
-
-        DateTime expertiseStartDate = new DateTime(staffSelectedExpertise.getExpertiseStartDate());
-        DateTime currentDate = new DateTime(DateUtil.getCurrentDateMillis());
-
-        Integer experienceInMonth = Months.monthsBetween(expertiseStartDate, currentDate).getMonths() + staffSelectedExpertise.getRelevantExperienceInMonths();
-        logger.info("user has current experience in months :{}", experienceInMonth);
-
-        SeniorityLevel appliedSeniorityLevel = null;
-        for (SeniorityLevel seniorityLevel : currentExpertise.get().getSeniorityLevel()) {
-            if (seniorityLevel.getMoreThan() != null) {
-                // more than  is set if
-                if (experienceInMonth >= seniorityLevel.getMoreThan() * 12) {
-                    appliedSeniorityLevel = seniorityLevel;
-                    break;
-                }
-            } else {
-                // to and from is present
-                logger.info("user has current experience in months :{} ,{},{},{}", seniorityLevel.getFrom(), experienceInMonth, seniorityLevel.getTo(), experienceInMonth);
-
-                if (seniorityLevel.getFrom() * 12 <= experienceInMonth && seniorityLevel.getTo() * 12 >= experienceInMonth) {
-                    appliedSeniorityLevel = seniorityLevel;
-                    break;
-                }
-            }
-        }
+        SeniorityLevel appliedSeniorityLevel=getSeniorityLevelByStaffAndExpertise(staffId,currentExpertise.get());
         positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
         FunctionAndSeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
         positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
@@ -806,11 +776,11 @@ public class UnitPositionService extends UserBaseService {
         return unitPositionGraphRepository.getDefaultUnitPositionByOrg(orgId);
     }
 
-    public SeniorityLevel getSeniorityLevelByStaffAndExpertise(Long staffId,Long expertiseId){
-        Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
-        StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, expertiseId);
+    public SeniorityLevel getSeniorityLevelByStaffAndExpertise(Long staffId,Expertise currentExpertise){
 
-        if (!Optional.ofNullable(staffSelectedExpertise).isPresent() || !currentExpertise.isPresent()) {
+        StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, currentExpertise.getId());
+
+        if (!Optional.ofNullable(staffSelectedExpertise).isPresent() || !Optional.ofNullable(currentExpertise).isPresent()) {
             throw new DataNotFoundByIdException("Expertise is not assigned to staff or unavailable");
 
         }
@@ -822,7 +792,7 @@ public class UnitPositionService extends UserBaseService {
         logger.info("user has current experience in months :{}", experienceInMonth);
 
         SeniorityLevel appliedSeniorityLevel = null;
-        for (SeniorityLevel seniorityLevel : currentExpertise.get().getSeniorityLevel()) {
+        for (SeniorityLevel seniorityLevel : currentExpertise.getSeniorityLevel()) {
             if (seniorityLevel.getMoreThan() != null) {
                 // more than  is set if
                 if (experienceInMonth >= seniorityLevel.getMoreThan() * 12) {
