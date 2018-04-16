@@ -48,10 +48,12 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-aop') //c
 	compile('org.springframework.boot:spring-boot-starter-cache') //c
+	compile group: 'javax.inject', name: 'javax.inject', version: '1'
+
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client') //c
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')//c
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
-	compile('org.springframework.boot:spring-boot-starter-data-redis')//c
+	//compile('org.springframework.boot:spring-boot-starter-data-redis')//c
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')//c
 	compile('org.springframework.boot:spring-boot-starter-web')//c
 	compile('org.springframework.boot:spring-boot-starter-websocket')//c
@@ -61,7 +63,7 @@ dependencies {
 	compile group: 'com.sun.mail', name: 'javax.mail', version:'1.5.6'//c
 	compile group: 'javax.mail', name: 'mail', version: '1.4'//c
 	compile group: 'org.springframework.ws', name: 'spring-ws-core', version: '3.0.0.RELEASE'//c
-	compile group: 'redis.clients', name: 'jedis', version: '2.9.0'//c
+	//compile group: 'redis.clients', name: 'jedis', version: '2.9.0'//c
 	compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'//c
 	compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.10-FINAL'//c
 	compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion//c
@@ -79,6 +81,7 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')//c
 
 	compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
+	//compile('org.springframework.boot:spring-boot-starter-webflux')
 
 
 }

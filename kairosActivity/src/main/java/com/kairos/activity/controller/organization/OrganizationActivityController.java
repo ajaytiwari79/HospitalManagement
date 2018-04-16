@@ -1,6 +1,7 @@
 package com.kairos.activity.controller.organization;
 
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.SkillActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.service.activity.ActivityService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Map;
@@ -23,7 +25,7 @@ import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_U
 /**
  * Created by vipul on 5/12/17.
  */
-@RestController()
+@RestController
 @Api(API_ORGANIZATION_UNIT_URL)
 @RequestMapping(API_ORGANIZATION_UNIT_URL)
 public class OrganizationActivityController {
@@ -277,6 +279,27 @@ public class OrganizationActivityController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getUnitActivityForDefaultData(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityWithCtaWtaSettingByUnit(unitId));
+    }
+
+    @ApiOperation("copy Activity")
+    @PostMapping(value = "/activity/{activityId}/copy_activity")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> copyActivityDetails(@PathVariable Long unitId, @PathVariable BigInteger activityId, @RequestBody @Valid ActivityDTO activity) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.copyActivityDetails(unitId, activityId, activity));
+    }
+
+    @ApiOperation("get location settings data of activity")
+    @GetMapping(value = "/activity/{activityId}/location_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getLocationsTabOfActivity(@PathVariable BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getLocationsTabOfActivity(activityId));
+    }
+
+    @ApiOperation("update location settings of activity ")
+    @PutMapping(value = "/activity/location_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateLocationsTabOfActivity(@RequestBody LocationActivityTabDTO locationActivityTabDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(locationActivityTabDTO));
     }
 
 }

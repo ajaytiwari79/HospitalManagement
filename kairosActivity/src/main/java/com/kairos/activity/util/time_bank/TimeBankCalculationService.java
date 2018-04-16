@@ -77,7 +77,6 @@ public class TimeBankCalculationService {
     public void calculateScheduleAndDurationHour(Shift shift, Activity activity, StaffUnitPositionDetails unitPosition){
         int scheduledMinutes = 0;
         int duration = 0;
-        activity.getTimeCalculationActivityTab().setMultiplyWithValue(1d);//todo this should be removed when multiplication factor implemented
         switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
             case ENTERED_MANUALLY:
                 duration = shift.getDurationMinutes();
@@ -97,6 +96,9 @@ public class TimeBankCalculationService {
                 scheduledMinutes = duration;
                 break;
             case AppConstants.WEEKLY_HOURS:
+                duration = new Double(unitPosition.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+            case AppConstants.FULL_WEEK:
                 duration = new Double(unitPosition.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
@@ -137,7 +139,7 @@ public class TimeBankCalculationService {
                 if(ruleTemplate.getAccountType()==null) continue;
                 if(ruleTemplate.getAccountType().equals(TIMEBANK_ACCOUNT)){
                     int ctaTimeBankMin = 0;
-                    if ((ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeId() != null && ruleTemplate.getTimeTypeId().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))) && ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
+                    if ((ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().equals(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()))) && ((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
                         if(ruleTemplate.isCalculateScheduledHours()) {
                             dailyScheduledMin += shift.getScheduledMinutes();
                         }else {
