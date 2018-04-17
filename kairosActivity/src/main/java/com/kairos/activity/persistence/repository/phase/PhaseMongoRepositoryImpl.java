@@ -49,12 +49,12 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
         return mongoTemplate.find(query,PhaseDTO.class,"phases");
     }
 
-    public Phase getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence)
+    public List<PhaseDTO> getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence)
     {
         Query query = Query.query(Criteria.where("organizationId").is(unitId).and("sequence").gt(sequence));
         query.with(new Sort(Sort.Direction.ASC,"sequence"));
         query.limit(1);
-        return mongoTemplate.findOne(query, Phase.class,"phases");
+        return mongoTemplate.find(query, PhaseDTO.class,"phases");
 
     }
 

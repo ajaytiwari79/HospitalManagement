@@ -376,11 +376,15 @@ public class DateUtils {
     public static String getDateStringByTimeZone(Date date,ZoneId zoneId, String dateFormatString){
         try {
             DateTime dateTime = new DateTime(date).withZone(DateTimeZone.forID(zoneId.getId()));
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy MM dd");
+            DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormatString);
             return dateTime.toString(formatter);
         } catch (Exception e){
             throw new InvalidRequestException(e.getMessage());
         }
     }
 
+    public static boolean checkIfTwoDatesExistsBetweenDates(Date startDatetoCompareWith, Date endDatetoCompareWith, Date startDate, Date endDate){
+
+        return true;
+    }
 }

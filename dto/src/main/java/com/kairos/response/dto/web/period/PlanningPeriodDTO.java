@@ -37,12 +37,13 @@ public class PlanningPeriodDTO {
         // default constructor
     }
 
-    public PlanningPeriodDTO(Long startDateMillis, int duration, DurationType durationType, int recurringNumber, Date endDate){
+    public PlanningPeriodDTO(Long startDateMillis, int duration, DurationType durationType, int recurringNumber, Date endDate, ZoneId zoneId){
         this.startDateMillis = startDateMillis;
         this.duration = duration;
         this.durationType = durationType;
         this.recurringNumber = recurringNumber;
         this.endDate = endDate;
+        this.zoneId = zoneId;
     }
 
     public Long getUnitId() {

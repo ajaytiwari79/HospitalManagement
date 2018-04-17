@@ -15,5 +15,5 @@ public interface CustomPhaseMongoRepository {
      List<PhaseDTO> getApplicablePhasesByUnit(Long unitId);
      List<OrganizationPhaseDTO> getPhasesGroupByOrganization();
      Boolean checkPhaseByName(BigInteger phaseId, String name);
-     Phase getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence);
+     List<PhaseDTO> getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence);
 }
