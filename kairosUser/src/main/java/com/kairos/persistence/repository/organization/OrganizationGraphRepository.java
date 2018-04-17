@@ -285,11 +285,14 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     OrganizationQueryResult getParentOrganizationOfRegion(long countryId);
 
     @Query("Match (country:Country) where id(country)={0} with country\n" +
-            "MATCH (bt:BusinessType{isEnabled:true})-[:BELONGS_TO]->(country) with collect(bt) as bt,country\n" +
-            "MATCH (ot:OrganizationType{isEnable:true})-[:BELONGS_TO]->(country) WITH ot,bt\n" +
-            "Optional Match (ot)-[r:HAS_LEVEL]->(level:Level{deleted:false}) with ot,bt,case when r is null then [] else collect({id:id(level),name:level.name}) end as levels\n" +
-            "OPTIONAL MATCH (ot)-[:HAS_SUB_TYPE]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else  collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot),levels:levels} as orgTypes,bt\n" +
-            "return collect(orgTypes) as organizationTypes,bt as businessTypes")
+    "MATCH (bt:BusinessType{isEnabled:true})-[:BELONGS_TO]->(country) with collect(bt) as bt,country\n" +
+    "OPTIONAL MATCH (cc:CompanyCategory{deleted:false})-[:BELONGS_TO]->(country) with collect(cc) as cc,bt,country\n"+
+    "MATCH (ot:OrganizationType{isEnable:true})-[:BELONGS_TO]->(country) WITH ot,bt,cc\n" +
+    "MATCH (os:OrganizationService{isEnabled:true})<-[:HAS_ORGANIZATION_SERVICES]-(country) WITH ot,bt,os,cc\n" +
+    "Optional Match (ot)-[r:HAS_LEVEL]->(level:Level{deleted:false}) with ot,bt,os,cc, case when r is null then [] else collect({id:id(level),name:level.name}) end as levels\n" +
+    "OPTIONAL MATCH (ot)-[:HAS_SUB_TYPE]->(ost:OrganizationType{isEnable:true}) with {children: case when ost is NULL then [] else  collect({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot),levels:levels} as orgTypes,bt,os,cc\n" +
+    "OPTIONAL MATCH (oss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService{isEnabled:true}) with {children: case when oss is NULL then [] else  collect({name:oss.name,id:id(oss)}) end,name:os.name,id:id(os)} as orgServices,bt,orgTypes,cc\n" +
+    "return collect(orgTypes) as organizationTypes,bt as businessTypes, collect(orgServices) as serviceTypes, cc as companyCategories")
     OrganizationCreationData getOrganizationCreationData(long countryId);
 
 

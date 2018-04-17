@@ -2,12 +2,13 @@ package com.kairos.persistence.model.query_wrapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.client.dto.organization.CompanyType;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.user.country.BusinessType;
+import com.kairos.persistence.model.user.country.CompanyCategory;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by prabjot on 6/9/17.
@@ -21,6 +22,10 @@ public class OrganizationCreationData {
     private java.util.List<BusinessType> businessTypes;
     private List<Map<String,Object>> organizationTypes;
     private List<Level> levels;
+    private List<Map<String,Object>> serviceTypes;
+    private List<CompanyCategory> companyCategories;
+    private List<HashMap<String,String>> companyTypes;
+    private List<HashMap<String,String>> companyUnitTypes;
 
     public List<Level> getLevels() {
         return levels;
@@ -52,5 +57,38 @@ public class OrganizationCreationData {
 
     public void setZipCodes(List<Map<String, Object>> zipCodes) {
         this.zipCodes = zipCodes;
+    }
+
+
+    public List<Map<String, Object>> getServiceTypes() {
+        return serviceTypes;
+    }
+
+    public void setServiceTypes(List<Map<String, Object>> serviceTypes) {
+        this.serviceTypes = serviceTypes;
+    }
+
+    public List<CompanyCategory> getCompanyCategories() {
+        return companyCategories;
+    }
+
+    public void setCompanyCategories(List<CompanyCategory> companyCategories) {
+        this.companyCategories = companyCategories;
+    }
+
+    public List<HashMap<String, String>> getCompanyTypes() {
+        return companyTypes;
+    }
+
+    public void setCompanyTypes(List<HashMap<String, String>> companyTypes) {
+        this.companyTypes = companyTypes;
+    }
+
+    public List<HashMap<String, String>> getCompanyUnitTypes() {
+        return companyUnitTypes;
+    }
+
+    public void setCompanyUnitTypes(List<HashMap<String, String>> companyUnitTypes) {
+        this.companyUnitTypes = companyUnitTypes;
     }
 }

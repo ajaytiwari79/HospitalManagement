@@ -1,5 +1,7 @@
 package com.kairos.service.organization;
 
+import com.kairos.client.dto.organization.CompanyType;
+import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationQueryResult;
@@ -42,6 +44,8 @@ public class UnionService {
         OrganizationCreationData organizationCreationData = organizationGraphRepository.getOrganizationCreationData(countryId);
         List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
         organizationCreationData.setZipCodes(zipCodes);
+        organizationCreationData.setCompanyTypes(CompanyType.getListOfCompanyType());
+        organizationCreationData.setCompanyUnitTypes(CompanyUnitType.getListOfCompanyUnitType());
         List<Map<String, Object>> orgData = new ArrayList<>();
         for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
             HashMap<String, Object> orgBasicData = new HashMap<>();
