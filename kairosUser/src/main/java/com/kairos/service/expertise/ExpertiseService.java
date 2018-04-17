@@ -128,10 +128,11 @@ public class ExpertiseService extends UserBaseService {
                         throw new ActionNotPermittedException("The end must be less than " + expertise.getSeniorityLevel().get(i).getFrom() + " " + expertise.getSeniorityLevel().get(i).getId());
                     }
                 } else {
-                    if (expertiseDTO.getSeniorityLevel().getFrom() < expertise.getSeniorityLevel().get(i).getFrom() && !(expertiseDTO.getSeniorityLevel().getTo() >= expertise.getSeniorityLevel().get(i).getFrom())) {
-                        throw new ActionNotPermittedException("Already a Sr level is present"+expertise.getSeniorityLevel().get(i).getTo()+" from- "+expertise.getSeniorityLevel().get(i).getFrom());
-                    } else if (expertiseDTO.getSeniorityLevel().getTo() < expertise.getSeniorityLevel().get(i).getTo() && !(expertiseDTO.getSeniorityLevel().getFrom() >= expertise.getSeniorityLevel().get(i).getTo())) {
-                        throw new ActionNotPermittedException("Already a Sr level is present"+expertise.getSeniorityLevel().get(i).getTo()+" from- "+expertise.getSeniorityLevel().get(i).getFrom());
+                    System.out.println(expertiseDTO.getSeniorityLevel().getFrom() + " --" + expertise.getSeniorityLevel().get(i).getFrom());
+                    if (expertiseDTO.getSeniorityLevel().getFrom() < expertise.getSeniorityLevel().get(i).getFrom() && !(expertiseDTO.getSeniorityLevel().getTo() <= expertise.getSeniorityLevel().get(i).getFrom())) {
+                        throw new ActionNotPermittedException("Already a Sr level is present" + expertise.getSeniorityLevel().get(i).getTo() + " from- " + expertise.getSeniorityLevel().get(i).getFrom());
+                    } else if (expertiseDTO.getSeniorityLevel().getFrom() > expertise.getSeniorityLevel().get(i).getFrom() && !(expertiseDTO.getSeniorityLevel().getTo() >= expertise.getSeniorityLevel().get(i).getTo())) {
+                        throw new ActionNotPermittedException("Already a Sr level is present" + expertise.getSeniorityLevel().get(i).getTo() + " from- " + expertise.getSeniorityLevel().get(i).getFrom());
                     }
                 }
             }
