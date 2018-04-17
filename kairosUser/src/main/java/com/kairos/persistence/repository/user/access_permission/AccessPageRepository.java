@@ -293,8 +293,10 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WITH childrenAccessPages,unitPermission,r,g\n" +
             "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(childrenAccessPages:AccessPage)\n" +
             "WITH r,customRel,unitPermission,childrenAccessPages,g\n" +
-            "RETURN {name:childrenAccessPages.name, id:id(childrenAccessPages), read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END ,\n" +
-            "write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END} as data ORDER BY data.id DESC")
+//            "RETURN {name:childrenAccessPages.name, id:id(childrenAccessPages), read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END ,\n" +
+//            "write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END} as data ORDER BY data.id DESC"
+            "RETURN childrenAccessPages.name as name,id(childrenAccessPages) as id, CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read ,\n" +
+            "CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END as write ORDER BY id DESC")
     List<AccessPageQueryResult> getChildTabsAccessPermissionsByStaffAndOrg(long orgId, long unitId, Long staffId, Long tabId);
 
     @Query("MATCH(ac:AccessGroup) where id(ac)={1} with ac " +

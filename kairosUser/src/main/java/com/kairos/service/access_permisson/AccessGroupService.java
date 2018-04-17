@@ -343,19 +343,11 @@ public class AccessGroupService extends UserBaseService {
         List<AccessPageQueryResult> accesPageList = accessPageRepository.getChildTabsAccessPermissionsByStaffAndOrg(orgId, unitId, staffId, parentTabId);
         int countOfRead = 0, countOfWrite = 0;
         Long accessPageId = accesPageList.get(0).getId();
-        Boolean tempRead = false;
-        Boolean tempWrite = false;
+//        Boolean tempRead = false;
+//        Boolean tempWrite = false;
         for(AccessPageQueryResult accessPage : accesPageList){
-            if(accessPageId == accessPage.getId()){
-                tempRead = tempRead || accessPage.isRead();
-                tempWrite = tempWrite || accessPage.isWrite();
-            } else  {
-                accessPageId = accessPage.getId();
-                countOfRead += tempRead ? 1 : 0 ;
-                countOfRead += tempWrite ? 1 : 0 ;
-                tempRead = false;
-                tempWrite = false;
-            }
+            countOfRead += accessPage.isRead() ? 1 : 0 ;
+            countOfWrite += accessPage.isWrite() ? 1 : 0 ;
         }
         updateReadWritePermissionOfTab( accessGroupId, countOfRead > 0 , countOfWrite > 0, parentTabId, orgId, unitId, staffId );
     }
