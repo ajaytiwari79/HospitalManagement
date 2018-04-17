@@ -27,7 +27,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
-public class Expertise extends UserBaseEntity {
+public class Expertise extends UserBaseEntity{
 
     @NotEmpty(message = "error.Expertise.name.notEmpty")
     @NotNull(message = "error.Expertise.name.notnull")
@@ -263,5 +263,6 @@ public class Expertise extends UserBaseEntity {
         map.put("creationDate", this.getCreationDate());
         return map;
     }
+
 
 }

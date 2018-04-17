@@ -106,7 +106,6 @@ public class ExpertiseService extends UserBaseService {
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
             expertiseResponseDTO.setNumberOfWorkingDaysInWeek(expertise.getNumberOfWorkingDaysInWeek());
-
             expertiseResponseDTO.setHasVersion(expertise.isHasVersion());
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
 
@@ -116,9 +115,25 @@ public class ExpertiseService extends UserBaseService {
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid expertise Id");
             }
-            Boolean basePayGradeCount = seniorityLevelGraphRepository.checkPayGradeInSeniorityLevel(expertise.getId(), -1L, expertiseDTO.getSeniorityLevel().getPayGradeId());
-            if (basePayGradeCount) {
-                throw new DuplicateDataException("base Pay grade already exist.");
+            Collections.sort(expertise.getSeniorityLevel());
+            for (int i = 0; i < expertise.getSeniorityLevel().size(); i++) {
+                if (expertiseDTO.getSeniorityLevel().getTo() == null && expertise.getSeniorityLevel().get(i).getTo() == null) {
+                    throw new ActionNotPermittedException("Already a more than is present in seniority level " + expertise.getSeniorityLevel().get(i).getId());
+                } else if (expertiseDTO.getSeniorityLevel().getTo() == null && expertise.getSeniorityLevel().get(i).getTo() != null) {
+                    if (expertiseDTO.getSeniorityLevel().getFrom() > expertise.getSeniorityLevel().get(i).getTo()) {
+                        throw new ActionNotPermittedException("The start must be greater than " + expertise.getSeniorityLevel().get(i).getTo() + " " + expertise.getSeniorityLevel().get(i).getId());
+                    }
+                } else if (expertiseDTO.getSeniorityLevel().getTo() != null && expertise.getSeniorityLevel().get(i).getTo() == null) {
+                    if (expertiseDTO.getSeniorityLevel().getTo() > expertise.getSeniorityLevel().get(i).getFrom()) {
+                        throw new ActionNotPermittedException("The end must be less than " + expertise.getSeniorityLevel().get(i).getFrom() + " " + expertise.getSeniorityLevel().get(i).getId());
+                    }
+                } else {
+                    if (expertiseDTO.getSeniorityLevel().getFrom() < expertise.getSeniorityLevel().get(i).getFrom() && !(expertiseDTO.getSeniorityLevel().getTo() >= expertise.getSeniorityLevel().get(i).getFrom())) {
+                        throw new ActionNotPermittedException("Already a Sr level is present"+expertise.getSeniorityLevel().get(i).getTo()+" from- "+expertise.getSeniorityLevel().get(i).getFrom());
+                    } else if (expertiseDTO.getSeniorityLevel().getTo() < expertise.getSeniorityLevel().get(i).getTo() && !(expertiseDTO.getSeniorityLevel().getFrom() >= expertise.getSeniorityLevel().get(i).getTo())) {
+                        throw new ActionNotPermittedException("Already a Sr level is present"+expertise.getSeniorityLevel().get(i).getTo()+" from- "+expertise.getSeniorityLevel().get(i).getFrom());
+                    }
+                }
             }
             if (expertise.isPublished()) {
                 expertiseResponseDTO = createCopyOfExpertise(expertise, expertiseDTO, countryId);
@@ -321,12 +336,8 @@ public class ExpertiseService extends UserBaseService {
                 throw new ActionNotPermittedException("Unable to get all payGroup Areas");
             seniorityLevel.setPayGroupAreas(payGroupAreas);
         }
-        if (seniorityLevelDTO.getMoreThan() != null)
-            seniorityLevel.setMoreThan(seniorityLevelDTO.getMoreThan());
-        else {
-            seniorityLevel.setFrom(seniorityLevelDTO.getFrom());
-            seniorityLevel.setTo(seniorityLevelDTO.getTo());
-        }
+        seniorityLevel.setFrom(seniorityLevelDTO.getFrom());
+        seniorityLevel.setTo(seniorityLevelDTO.getTo());
         PayGrade payGrade = payGradeGraphRepository.findOne(seniorityLevelDTO.getPayGradeId());
         if (!Optional.ofNullable(payGrade).isPresent() || payGrade.isDeleted()) {
             throw new DataNotFoundByIdException("Invalid pay grade id " + seniorityLevelDTO.getPayGradeId());
@@ -460,15 +471,9 @@ public class ExpertiseService extends UserBaseService {
 
             }
         }
-        if (seniorityLevelDTO.getMoreThan() != null) {
-            seniorityLevel.setMoreThan(seniorityLevelDTO.getMoreThan());
-            seniorityLevel.setFrom(null);
-            seniorityLevel.setTo(null);
-        } else {
-            seniorityLevel.setFrom(seniorityLevelDTO.getFrom());
-            seniorityLevel.setTo(seniorityLevelDTO.getTo());
-            seniorityLevel.setMoreThan(null);
-        }
+        seniorityLevel.setFrom(seniorityLevelDTO.getFrom());
+        seniorityLevel.setTo(seniorityLevelDTO.getTo());
+
 
         if (!seniorityLevelDTO.getPayGradeId().equals(functionAndSeniorityLevel.getPayGrade().getId())) {
             seniorityLevelGraphRepository.removePreviousPayGradeFromSeniorityLevel(seniorityLevelDTO.getId());
