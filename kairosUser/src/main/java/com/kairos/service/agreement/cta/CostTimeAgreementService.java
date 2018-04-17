@@ -49,7 +49,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Transactional
@@ -579,8 +578,8 @@ public class CostTimeAgreementService extends UserBaseService {
                 ctaRuleTemplate.setActivityIds(new ArrayList<>());
                 break;
             default:
-                ctaRuleTemplate.setPlannedTimeId(null);
-                ctaRuleTemplate.setTimeTypeId(null);
+                ctaRuleTemplate.setPlannedTimeIds(null);
+                ctaRuleTemplate.setTimeTypeIds(null);
                 break;
         }
     }
@@ -819,5 +818,24 @@ public class CostTimeAgreementService extends UserBaseService {
 
     public Long getOrgSubTypeOfCTA(Long ctaId){
         return collectiveTimeAgreementGraphRepository.getOrgSubTypeOfCTA(ctaId);
+    }
+    public CollectiveTimeAgreementDTO createCopyOfUnitCTA(Long unitId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) throws ExecutionException, InterruptedException {
+        logger.info("saving CostTimeAgreement unit {}",unitId);
+        if( collectiveTimeAgreementGraphRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName().trim(),-1L)){
+            throw new DuplicateDataException("CTA already exists with same name " +collectiveTimeAgreementDTO.getName() );
+        }
+        CostTimeAgreement costTimeAgreement=new CostTimeAgreement();
+        collectiveTimeAgreementDTO.setId(null);
+        BeanUtils.copyProperties(collectiveTimeAgreementDTO, costTimeAgreement);
+
+        CompletableFuture<Boolean> hasUpdated= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(CostTimeAgreementService.class)
+                .buildCTA(costTimeAgreement,collectiveTimeAgreementDTO, false, null);
+
+        // Wait until they are all done
+        CompletableFuture.allOf(hasUpdated).join();
+        this.save(costTimeAgreement);
+        collectiveTimeAgreementGraphRepository.linkUnitCTAToOrganization(costTimeAgreement.getId(),unitId);
+        collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
+        return collectiveTimeAgreementDTO;
     }
 }

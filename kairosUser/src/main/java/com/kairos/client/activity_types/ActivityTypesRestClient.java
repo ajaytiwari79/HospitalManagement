@@ -3,7 +3,6 @@ package com.kairos.client.activity_types;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.response.dto.web.cta.ActivityCategoryDTO;
 import com.kairos.response.dto.web.cta.ActivityTypeDTO;
-import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.kairos.client.RestClientURLUtil.getBaseUrl;
 
 @Component
 public class ActivityTypesRestClient {
@@ -142,14 +143,4 @@ public class ActivityTypesRestClient {
 
     }
 
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
-        }
-
-    }
 }

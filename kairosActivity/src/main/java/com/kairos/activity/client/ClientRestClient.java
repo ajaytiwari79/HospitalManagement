@@ -7,12 +7,10 @@ import com.kairos.activity.client.dto.client.Client;
 import com.kairos.activity.client.dto.client.ClientOrganizationIds;
 import com.kairos.activity.client.dto.client.ClientTemporaryAddress;
 import com.kairos.activity.persistence.model.client_exception.ClientExceptionDTO;
-import com.kairos.activity.response.dto.ClientTemporaryAddressDTO;
 import com.kairos.activity.response.dto.OrganizationClientWrapper;
 import com.kairos.activity.response.dto.ResponseEnvelope;
 import com.kairos.activity.util.TaskDemandRequestWrapper;
 import com.kairos.activity.util.TaskDemandVisitWrapper;
-import com.kairos.activity.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,9 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
 
 @Component
 public class ClientRestClient {
@@ -402,17 +403,6 @@ public class ClientRestClient {
 
     }
 
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
-        }
-
-    }
-
     private ResponseEnvelope convertRestClientExceptionJsonToDto(HttpClientErrorException e){
         ObjectMapper objectMapper = new ObjectMapper();
         ResponseEnvelope responseEnvelope = null;
@@ -431,7 +421,7 @@ public class ClientRestClient {
      */
     public List<ClientOrganizationIds> getCitizenIdsByUnitIds(List<Long> unitIds){
 
-        final String baseUrl=getBaseUrl(false);
+        final String baseUrl=getBaseUrl();
         Long unitId = unitIds.get(0);
         Long organizationId = unitIds.get(0);
         try {
@@ -439,7 +429,7 @@ public class ClientRestClient {
             HttpEntity<List<Long>> request = new HttpEntity<>(unitIds);
             ResponseEntity<RestTemplateResponseEnvelope<List<ClientOrganizationIds>>> restExchange =
                     schedulerRestTemplate.exchange(
-                           "http://zuulservice/kairos/user/api/v1/organization/{organizationId}/unit/{unitId}/client/client_ids_by_unitIds",
+                            baseUrl+"organization/{organizationId}/unit/{unitId}/client/client_ids_by_unitIds",
                             HttpMethod.POST,
                             request, typeReference, organizationId, unitId);
             RestTemplateResponseEnvelope<List<ClientOrganizationIds>> response = restExchange.getBody();

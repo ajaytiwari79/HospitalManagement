@@ -473,7 +473,7 @@ public class OrganizationRestClient {
 
 
     public List<Long> getAllOrganizationIds() {
-        final String baseUrl = RestClientUrlUtil.getCommonUrl();
+        final String baseUrl = RestClientUrlUtil.getBaseUrl();
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {
             };
@@ -496,7 +496,7 @@ public class OrganizationRestClient {
     }
 
     public void updateOrganizationWithoutPhases(List<Long> organizationIds) {
-        final String baseUrl = RestClientUrlUtil.getCommonUrl();
+        final String baseUrl = RestClientUrlUtil.getBaseUrl();
         try {
             HttpEntity<List<Long>> request = new HttpEntity<>(organizationIds);
             ParameterizedTypeReference<RestTemplateResponseEnvelope> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope>() {

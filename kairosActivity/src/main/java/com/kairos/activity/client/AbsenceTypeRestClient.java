@@ -1,6 +1,7 @@
 package com.kairos.activity.client;
 
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.activity.util.RestClientUrlUtil;
 import com.kairos.activity.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class AbsenceTypeRestClient {
      */
     public Map<String,Object> getAbsenceTypeByName(String title){
 
-        final String baseUrl=getBaseUrl(false);
+        final String baseUrl=RestClientUrlUtil.getBaseUrl(false);
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String,Object>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Map<String,Object>>> restExchange =
@@ -50,17 +51,6 @@ public class AbsenceTypeRestClient {
             throw new RuntimeException("exception occurred in user micro service "+e.getMessage());
         }
 
-
-    }
-
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
-        }
 
     }
 }

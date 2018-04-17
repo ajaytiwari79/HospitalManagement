@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
+
 @Component
 public class ControlPanelRestClient {
     private static final Logger logger = LoggerFactory.getLogger(CountryRestClient.class);
@@ -44,14 +46,4 @@ public class ControlPanelRestClient {
         }
     }
 
-    private final String getBaseUrl(boolean hasUnitInUrl) {
-        if (hasUnitInUrl) {
-            String baseUrl = new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        } else {
-            String baseUrl = new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
-        }
-
-    }
 }

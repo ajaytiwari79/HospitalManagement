@@ -10,21 +10,50 @@ public class StaffingLevelActivity {
 
     private String name;
     private Long activityId;
-    private int noOfStaff;
+   // private int noOfStaff;
     private boolean includeInMin;
+    private int minNoOfStaff;
+    private int maxNoOfStaff;
+
+    public int getMinNoOfStaff() {
+        return minNoOfStaff;
+    }
+
+    public void setMinNoOfStaff(int minNoOfStaff) {
+        this.minNoOfStaff = minNoOfStaff;
+    }
+
+    public int getMaxNoOfStaff() {
+        return maxNoOfStaff;
+    }
+
+    public void setMaxNoOfStaff(int maxNoOfStaff) {
+        this.maxNoOfStaff = maxNoOfStaff;
+    }
+
 
     public StaffingLevelActivity() {
         //default constructor
     }
 
-    public StaffingLevelActivity(String name, int noOfStaff) {
+    public StaffingLevelActivity(String name, int minNoOfStaff, int maxNoOfStaff) {
         this.name = name;
-        this.noOfStaff = noOfStaff;
+        this.minNoOfStaff = minNoOfStaff;
+        this.maxNoOfStaff = maxNoOfStaff;
     }
 
-    public StaffingLevelActivity(Long activityId, Integer noOfStaff) {
+    public StaffingLevelActivity(Long activityId, int minNoOfStaff, int maxNoOfStaff) {
         this.activityId = activityId;
-        this.noOfStaff = noOfStaff;
+        this.minNoOfStaff = minNoOfStaff;
+        this.maxNoOfStaff = maxNoOfStaff;
+    }
+
+
+    public StaffingLevelActivity(Long activityId, String name, int minNoOfStaff, int maxNoOfStaff) {
+        this.activityId = activityId;
+        this.name = name;
+        this.minNoOfStaff = minNoOfStaff;
+        this.maxNoOfStaff = maxNoOfStaff;
     }
 
     public Long getActivityId() {
@@ -35,13 +64,13 @@ public class StaffingLevelActivity {
         this.activityId = activityId;
     }
 
-    public int getNoOfStaff() {
-        return noOfStaff;
-    }
-
-    public void setNoOfStaff(int noOfStaff) {
-        this.noOfStaff = noOfStaff;
-    }
+//    public int getNoOfStaff() {
+//        return noOfStaff;
+//    }
+//
+//    public void setNoOfStaff(int noOfStaff) {
+//        this.noOfStaff = noOfStaff;
+//    }
 
     public boolean isIncludeInMin() {
         return includeInMin;
@@ -69,7 +98,8 @@ public class StaffingLevelActivity {
 
         return new EqualsBuilder()
                 .append(activityId, that.activityId)
-                .append(noOfStaff, that.noOfStaff)
+                .append(minNoOfStaff, that.minNoOfStaff)
+                .append(maxNoOfStaff, that.maxNoOfStaff)
                 .isEquals();
     }
 
@@ -83,14 +113,15 @@ public class StaffingLevelActivity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, noOfStaff);
+        return Objects.hash(name, minNoOfStaff,maxNoOfStaff);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("activityId", activityId)
-                .append("noOfStaff", noOfStaff)
+                .append("minNoOfStaff", minNoOfStaff)
+                .append("maxNoOfStaff",maxNoOfStaff)
                 .toString();
     }
 }

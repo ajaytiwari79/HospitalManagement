@@ -27,6 +27,7 @@ import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
+import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
@@ -59,7 +60,6 @@ import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -183,6 +183,8 @@ public class OrganizationService extends UserBaseService {
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
     CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
+    @Inject
+    WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -562,7 +564,8 @@ public class OrganizationService extends UserBaseService {
          *  Added all wta of from parent organization
          */
         List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
-        List<WorkingTimeAgreement> allWta = parent.getWorkingTimeAgreements();
+        List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults=workingTimeAgreementGraphRepository.getAllWTAByOrganization(unitId);
+        List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
         linkWTAToOrganization(allWtaCopy, allWta);
         unit.setWorkingTimeAgreements(allWtaCopy);
 
@@ -1008,7 +1011,7 @@ public class OrganizationService extends UserBaseService {
         if (organization == null) {
             throw new DataNotFoundByIdException("Incorrect id of an organization");
         }
-        Map<String, Object> requiredDataForTimeCareTask = new HashedMap();
+        Map<String, Object> requiredDataForTimeCareTask = new HashMap<>();
         OrganizationContactAddress organizationContactData = organizationGraphRepository.getContactAddressOfOrg(organization.getId());
         Staff staff = staffGraphRepository.findByExternalId(workShift.getPerson().getId());
         AbsenceTypes absenceTypes = absenceTypesRepository.findByName(workShift.getActivity().getName());
@@ -1215,7 +1218,7 @@ public class OrganizationService extends UserBaseService {
         List<String> zoneList = new ArrayList<>(allZones);
         Collections.sort(zoneList);
 
-        Map<String, Object> timeZonesData = new HashedMap();
+        Map<String, Object> timeZonesData = new HashMap<>();
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);

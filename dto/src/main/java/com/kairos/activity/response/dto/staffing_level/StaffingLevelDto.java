@@ -1,12 +1,9 @@
 package com.kairos.activity.response.dto.staffing_level;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSetting;
-import com.kairos.activity.util.validator.ExistingStaffingLevel;
-import org.springframework.beans.BeanUtils;
-import org.springframework.format.annotation.DateTimeFormat;
+//import com.kairos.activity.util.validator.ExistingStaffingLevel;
+//import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.*;
@@ -16,8 +13,9 @@ public class StaffingLevelDto {
     private BigInteger id;
     @NotNull
     private Long phaseId;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @ExistingStaffingLevel
+    //@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    //@ExistingStaffingLevel
+    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private Date currentDate;
     private Long weekCount;
     private StaffingLevelSetting staffingLevelSetting;
@@ -83,35 +81,7 @@ public class StaffingLevelDto {
         this.staffingLevelInterval = staffingLevelInterval;
     }
 
-    public static StaffingLevel buildStaffingLevels(StaffingLevelDto staffingLevelDTO, Long orgId){
 
-        StaffingLevel staffingLevel=new StaffingLevel(staffingLevelDTO.currentDate,staffingLevelDTO.weekCount
-        ,orgId,staffingLevelDTO.getPhaseId(),staffingLevelDTO.staffingLevelSetting);
-
-        Set<StaffingLevelInterval>  staffingLevelTimeSlotsList=new LinkedHashSet<>();
-        for(StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO :staffingLevelDTO.getStaffingLevelInterval()){
-            StaffingLevelInterval staffingLevelTimeSlot=new StaffingLevelInterval(staffingLevelTimeSlotDTO.getSequence(),staffingLevelTimeSlotDTO.getMinNoOfStaff(),
-                    staffingLevelTimeSlotDTO.getMaxNoOfStaff(),staffingLevelTimeSlotDTO.getStaffingLevelDuration()
-            );
-            staffingLevelTimeSlot.addStaffLevelActivity(staffingLevelTimeSlotDTO.getStaffingLevelActivities());
-            staffingLevelTimeSlot.addStaffLevelSkill(staffingLevelTimeSlotDTO.getStaffingLevelSkills());
-            staffingLevelTimeSlotsList.add(staffingLevelTimeSlot);
-        }
-
-        staffingLevel.addStaffingLevelTimeSlot(staffingLevelTimeSlotsList);
-      return staffingLevel;
-
-  }
-
-    public static StaffingLevel updateStaffingLevels(BigInteger staffingLevelId,StaffingLevelDto staffingLevelDTO,
-       Long unitId,StaffingLevel staffingLevel){
-
-          BeanUtils.copyProperties(staffingLevelDTO,staffingLevel);
-          staffingLevel.setUnitID(unitId);
-          staffingLevel.setId(staffingLevelId);
-        return staffingLevel;
-
-    }
 
 
 }

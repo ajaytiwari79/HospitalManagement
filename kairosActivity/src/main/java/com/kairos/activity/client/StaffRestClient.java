@@ -19,6 +19,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
+
 @Component
 public class StaffRestClient {
     private static final Logger logger = LoggerFactory.getLogger(StaffRestClient.class);
@@ -219,16 +221,22 @@ public class StaffRestClient {
         }
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(Long staffId, String type, Long unitEmploymentId) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(Long staffId, String type, Long unitEmploymentId,List<Long> activityDayTypes) {
 
         final String baseUrl = getBaseUrl(true);
 
+        String dayType = "";
+        if(activityDayTypes!=null && !activityDayTypes.isEmpty()) {
+            String a = activityDayTypes.toString().replace("[","");
+            a.replace("]","");
+            dayType = a.replace("]","");
+        }
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type,
+                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type+"&activityDayTypes="+dayType,
                             HttpMethod.GET, null, typeReference, staffId, unitEmploymentId);
             RestTemplateResponseEnvelope<StaffAdditionalInfoDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
@@ -297,17 +305,6 @@ public class StaffRestClient {
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in user micro service "+e.getMessage());
-        }
-
-    }
-
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        } else {
-            String baseUrl = new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
         }
 
     }
