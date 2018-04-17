@@ -107,7 +107,7 @@ public class PlanningPeriodService extends MongoBaseService {
             }
         }
 
-        // TODO set name of period dynamically
+        // Set name of period dynamically
         String name = DateUtils.getDateStringByTimeZone(startDate,planningPeriodDTO.getZoneId(), "dd.MMM.yyyy")+ "_" +
                 DateUtils.getDateStringByTimeZone(endDate,planningPeriodDTO.getZoneId(), "dd.MMM.yyyy");
         PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId, tempPhaseFlippingDate, currentPhaseId, nextPhaseId);
@@ -192,25 +192,20 @@ public class PlanningPeriodService extends MongoBaseService {
 
         phases = getPhasesWithDurationInDays(phases);
         planningPeriodDTO.setZoneId(getTimeZoneOfOrganization(unitId));
-        /*phases.forEach(phase->{
-            switch (phase.getDurationType()){
-                case DAYS:{
-                    phase.setDurationInDays(phase.getDuration());
-                    break;
-                }
-                case WEEKS:{
-                    phase.setDurationInDays(phase.getDuration() * 7);
-                    break;
-                }
-            }
-        });*/
         addPeriod(unitId, planningPeriodDTO.getStartDate(), phases, planningPeriodDTO);
         return getPeriods(unitId, planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate());
     }
 
     public int getDifferenceInDates(Date endDate, Date startDate){
+
         int diffInDays = (int) ( (endDate.getTime() - startDate.getTime())
                 / (1000 * 60 * 60 * 24) )   ;
+        int leftMillis = (int) ( (endDate.getTime() - startDate.getTime())
+                % (1000 * 60 * 60 * 24) )   ;
+
+        if(leftMillis > 0){
+            diffInDays+= 1;
+        }
         return diffInDays;
     }
 
