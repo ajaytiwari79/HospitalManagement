@@ -30,7 +30,7 @@ public class PeriodSettingsService extends MongoBaseService {
     @Inject
     PeriodSettingsMongoRepository periodSettingsMongoRepository;
 
-    public void createDefaultPeriodSettings(Long unitId, Long parentOrgId) {
+    public PeriodSettings createDefaultPeriodSettings(Long unitId, Long parentOrgId) {
 
         PeriodSettings periodSettingsOfParentOrg = null;
         // Set default values
@@ -39,7 +39,7 @@ public class PeriodSettingsService extends MongoBaseService {
 
         // If parent exists, set settings as of parent
         if(Optional.ofNullable(parentOrgId).isPresent()){
-            periodSettingsOfParentOrg = periodSettingsMongoRepository.findByUnit(parentOrgId,false);
+            periodSettingsOfParentOrg = periodSettingsMongoRepository.findByUnit(parentOrgId);
         }
 
         if(Optional.ofNullable(periodSettingsOfParentOrg).isPresent()){
@@ -49,17 +49,21 @@ public class PeriodSettingsService extends MongoBaseService {
 
         PeriodSettings periodSettings = new PeriodSettings(presenceLimitInYear,absenceLimitInYear, unitId);
         save(periodSettings);
+        return periodSettings;
     }
 
     public PeriodSettings getPeriodSettings(Long unitId){
-        return periodSettingsMongoRepository.findByUnit(unitId,false);
+        PeriodSettings periodSettings = periodSettingsMongoRepository.findByUnit(unitId);
+        if(!Optional.ofNullable(periodSettings).isPresent()){
+            periodSettings =  createDefaultPeriodSettings(unitId, null);
+        }
+        return periodSettings;
     }
 
-    public PeriodSettings updatePeriodSettings(BigInteger periodSettingsId, PeriodSettingsDTO periodSettingsDTO) {
-        PeriodSettings periodSettings = periodSettingsMongoRepository.findOne(periodSettingsId);
+    public PeriodSettings updatePeriodSettings(Long unitId, PeriodSettingsDTO periodSettingsDTO) {
+        PeriodSettings periodSettings = periodSettingsMongoRepository.findByUnit(unitId);
         if (!Optional.ofNullable(periodSettings).isPresent()) {
-            logger.info("Periodsetting not found {}" , periodSettingsId);
-            throw new DataNotFoundByIdException("PlanningPeriod setting not found " + periodSettingsId);
+            throw new DataNotFoundByIdException("PlanningPeriod setting not found for unit : "+unitId);
         }
         periodSettings.setPresenceLimitInYear(periodSettingsDTO.getPresenceLimitInYear());
         periodSettings.setAbsenceLimitInYear(periodSettingsDTO.getAbsenceLimitInYear());

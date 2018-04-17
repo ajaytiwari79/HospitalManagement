@@ -11,6 +11,6 @@ import java.math.BigInteger;
  */
 public interface PeriodSettingsMongoRepository extends MongoBaseRepository<PeriodSettings, BigInteger>, CustomPeriodSettingsMongoRepository {
 
-    @Query(value = "{ unitId:?0 ,name:?1 ,deleted:false}")
-    PeriodSettings findByUnit(Long unitId, boolean deleted);
+    @Query(value = "{ unitId:?0 ,deleted:false}")
+    PeriodSettings findByUnit(Long unitId);
 }

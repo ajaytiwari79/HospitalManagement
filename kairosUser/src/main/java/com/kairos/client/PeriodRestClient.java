@@ -11,6 +11,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import static com.kairos.client.RestClientURLUtil.getBaseUrl;
 
 /**
  * Created by prerna on 6/4/18.
@@ -22,7 +23,7 @@ public class PeriodRestClient {
     @Autowired
     RestTemplate restTemplate;
 
-    public void createDefaultPeriodSettings (Long unitId, Long parentOrgId){
+    public void createDefaultPeriodSettings (Long unitId){
 
         final String baseUrl=getBaseUrl(false);
 
@@ -31,7 +32,7 @@ public class PeriodRestClient {
                     new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/unit/{unitId}/period_setting?parentOrgId="+parentOrgId,
+                            baseUrl + "/unit/{unitId}/period_setting",
                             HttpMethod.POST,
                             null, typeReference, unitId);
 
@@ -50,14 +51,4 @@ public class PeriodRestClient {
 
     }
 
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
-        }
-
-    }
 }

@@ -31,8 +31,8 @@ public class PeriodSettingsController {
     @ApiOperation(value = "Set default period settings of Organization")
     @PostMapping(value="/period_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createDefaultPeriodSettings(@PathVariable Long unitId, @PathVariable Long parentOrgId) {
-        periodSettingsService.createDefaultPeriodSettings(unitId, parentOrgId);
+    public ResponseEntity<Map<String, Object>> createDefaultPeriodSettings(@PathVariable Long unitId) {
+        periodSettingsService.createDefaultPeriodSettings(unitId, null);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
@@ -46,8 +46,8 @@ public class PeriodSettingsController {
     @ApiOperation(value = "update period settings of Organization")
     @PutMapping(value="/period_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updatePeriodSettings(@PathVariable BigInteger periodSettingId, @RequestBody @Valid PeriodSettingsDTO periodSettingsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, periodSettingsService.updatePeriodSettings(periodSettingId, periodSettingsDTO));
+    public ResponseEntity<Map<String, Object>> updatePeriodSettings(@PathVariable Long unitId, @RequestBody @Valid PeriodSettingsDTO periodSettingsDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, periodSettingsService.updatePeriodSettings(unitId, periodSettingsDTO));
     }
 
 
