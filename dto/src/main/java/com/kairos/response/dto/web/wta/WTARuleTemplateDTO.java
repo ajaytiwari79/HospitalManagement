@@ -3,6 +3,7 @@ package com.kairos.response.dto.web.wta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
+import com.kairos.response.dto.web.enums.WTATemplateType;
 
 
 import java.math.BigInteger;
@@ -17,8 +18,8 @@ import java.util.List;
 public class WTARuleTemplateDTO {
     private List<PhaseTemplateValueDTO> phaseTemplateValues;
 
-    private WTARuleTemplateDTO ruleTemplateCategory;
-
+    private RuleTemplateCategoryDTO ruleTemplateCategory;
+    private WTATemplateType wtaTemplateType;
     private BigInteger id;
     private String name;
     private String templateType;
@@ -62,6 +63,21 @@ public class WTARuleTemplateDTO {
     private Boolean forbid;
     private Boolean allowExtraActivity;
 
+    public WTATemplateType getWtaTemplateType() {
+        return wtaTemplateType;
+    }
+
+    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
+        this.wtaTemplateType = wtaTemplateType;
+    }
+
+    public Boolean getForbid() {
+        return forbid;
+    }
+
+    public Boolean getAllowExtraActivity() {
+        return allowExtraActivity;
+    }
 
     public int getRecommendedValue() {
         return recommendedValue;
@@ -129,11 +145,11 @@ public class WTARuleTemplateDTO {
         this.category = category;
     }
 
-    public WTARuleTemplateDTO getRuleTemplateCategory() {
+    public RuleTemplateCategoryDTO getRuleTemplateCategory() {
         return ruleTemplateCategory;
     }
 
-    public void setRuleTemplateCategory(WTARuleTemplateDTO ruleTemplateCategory) {
+    public void setRuleTemplateCategory(RuleTemplateCategoryDTO ruleTemplateCategory) {
         this.ruleTemplateCategory = ruleTemplateCategory;
     }
 

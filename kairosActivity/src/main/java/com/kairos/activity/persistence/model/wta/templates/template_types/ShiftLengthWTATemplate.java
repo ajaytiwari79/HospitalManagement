@@ -14,7 +14,6 @@ import java.util.List;
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE5
  */
-@Document
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
@@ -22,15 +21,15 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     private long timeLimit;
     private boolean checkAgainstTimeRules;
     private WTATemplateType wtaTemplateType = WTATemplateType.SHIFT_LENGTH;;
-    private List<BigInteger> dayTypes;
+    private List<Long> dayTypes;
 
 
 
-    public List<BigInteger> getDayTypes() {
+    public List<Long> getDayTypes() {
         return dayTypes;
     }
 
-    public void setDayTypes(List<BigInteger> dayTypes) {
+    public void setDayTypes(List<Long> dayTypes) {
         this.dayTypes = dayTypes;
     }
 

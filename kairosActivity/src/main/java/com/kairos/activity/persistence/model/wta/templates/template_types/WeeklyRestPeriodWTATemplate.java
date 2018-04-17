@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 /**
  * Created by pawanmandhan on 5/8/17.
  */
-@Document
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
@@ -34,7 +34,7 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
         this.continuousWeekRest = continuousWeekRest;
     }
 
-    public WeeklyRestPeriodWTATemplate(String name, String templateType, boolean disabled,
+    public WeeklyRestPeriodWTATemplate(String name, boolean disabled,
                                        String description, long continuousWeekRest) {
         this.name = name;
         this.disabled = disabled;

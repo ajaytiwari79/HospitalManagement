@@ -15,7 +15,7 @@ import java.util.List;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Document(collection = "WtaRuleTemplate")
+@Document(collection = "wtaRuleTemplate")
 public class WTABaseRuleTemplate extends MongoBaseEntity{
 
     protected String name;

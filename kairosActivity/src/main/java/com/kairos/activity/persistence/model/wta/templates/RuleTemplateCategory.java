@@ -1,10 +1,9 @@
 package com.kairos.activity.persistence.model.wta.templates;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -26,16 +25,25 @@ public class RuleTemplateCategory extends MongoBaseEntity {
     private String name;
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
-    private Long country;
+    private Long countryId;
+    private List<BigInteger> ruleTemplateIds;
     public RuleTemplateCategory(String name, String description, RuleTemplateCategoryType ruleTemplateCategoryType) {
         this.name = name;
         this.description = description;
         this.deleted = false;
-        ruleTemplateCategoryType = ruleTemplateCategoryType;
+        this.ruleTemplateCategoryType = ruleTemplateCategoryType;
     }
 
     public RuleTemplateCategory() {
         //default
+    }
+
+    public List<BigInteger> getRuleTemplateIds() {
+        return ruleTemplateIds;
+    }
+
+    public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {
+        this.ruleTemplateIds = ruleTemplateIds;
     }
 
     public RuleTemplateCategory(String name) {
@@ -75,12 +83,12 @@ public class RuleTemplateCategory extends MongoBaseEntity {
         this.ruleTemplateCategoryType = ruleTemplateCategoryType;
     }
 
-    public Long getCountry() {
-        return country;
+    public Long getCountryId() {
+        return countryId;
     }
 
-    public void setCountry(Long country) {
-        this.country = country;
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
     public List<BigInteger> getTags() {
         return tags;

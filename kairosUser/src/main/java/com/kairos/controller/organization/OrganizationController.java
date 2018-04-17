@@ -1290,6 +1290,14 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getEmploymentTypeWithExpertise(unitId));
     }
+
+    @RequestMapping(value ="/WTARelatedInfo", method = RequestMethod.GET)
+    @ApiOperation("get  Wta related info")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWTARelatedInfo(@RequestParam Long countryId,@RequestParam Long organizationId,@RequestParam Long organizationSubTypeId,@RequestParam Long organizationTypeId,@RequestParam Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getWTARelatedInfo(countryId,organizationId,organizationSubTypeId,organizationTypeId,expertiseId));
+    }
 }
 
 

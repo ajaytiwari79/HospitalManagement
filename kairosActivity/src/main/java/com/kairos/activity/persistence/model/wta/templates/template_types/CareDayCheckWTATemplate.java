@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE14
  */
-@Document
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CareDayCheckWTATemplate extends WTABaseRuleTemplate {
@@ -61,7 +61,7 @@ public class CareDayCheckWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
     }
 
-    public CareDayCheckWTATemplate(String name, String templateType, boolean isActive,
+    public CareDayCheckWTATemplate(String name, boolean isActive,
                                    String description, long intervalLength, long validationStartDateMillis, String intervalUnit, long daysLimit) {
         this.name = name;
         this.description = description;

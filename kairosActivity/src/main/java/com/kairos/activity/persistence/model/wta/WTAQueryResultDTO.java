@@ -1,6 +1,7 @@
 package com.kairos.activity.persistence.model.wta;
 
 import com.kairos.activity.persistence.model.tag.Tag;
+import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
@@ -33,25 +34,17 @@ public class WTAQueryResultDTO {
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
 
-    private List<ShiftLengthWTATemplate> shiftLengths = new ArrayList<>();
-    private List<AverageScheduledTimeWTATemplate> averageScheduledTimes = new ArrayList<>();
-    private List<CareDayCheckWTATemplate> careDayChecks = new ArrayList<>();
-    private List<ConsecutiveRestPartOfDayWTATemplate> consecutiveRestPartOfDays = new ArrayList<>();
-    private List<ConsecutiveWorkWTATemplate> consecutiveWorks = new ArrayList<>();
-    private List<DailyRestingTimeWTATemplate> dailyRestingTimes = new ArrayList<>();
-    private List<DaysOffInPeriodWTATemplate> daysOffInPeriods = new ArrayList<>();
-    private List<DurationBetweenShiftWTATemplate> durationBetweenShifts = new ArrayList<>();
-    private List<NumberOfPartOfDayShiftsWTATemplate> numberOfPartOfDayShifts = new ArrayList<>();
-    private List<NumberOfWeekendShiftInPeriodWTATemplate> numberOfWeekendShiftInPeriods = new ArrayList<>();
-    private List<SeniorDaysInYearWTATemplate> seniorDaysInYears = new ArrayList<>();
-    private List<ShiftsInIntervalWTATemplate> shiftsInIntervals = new ArrayList<>();
-    private List<ShortestAndAverageDailyRestWTATemplate> shortestAndAverageDailyRests = new ArrayList<>();
-    private List<TimeBankWTATemplate> timeBanks = new ArrayList<>();
-    private List<VetoPerPeriodWTATemplate> vetoPerPeriods = new ArrayList<>();
-    private List<WeeklyRestPeriodWTATemplate> weeklyRestPeriods = new ArrayList<>();
+    private List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
 
     private List<Tag> tags = new ArrayList<>();
 
+    public List<WTABaseRuleTemplate> getWtaBaseRuleTemplates() {
+        return wtaBaseRuleTemplates;
+    }
+
+    public void setWtaBaseRuleTemplates(List<WTABaseRuleTemplate> wtaBaseRuleTemplates) {
+        this.wtaBaseRuleTemplates = wtaBaseRuleTemplates;
+    }
 
     public WTAQueryResultDTO getCountryParentWTA() {
         return countryParentWTA;
@@ -157,131 +150,4 @@ public class WTAQueryResultDTO {
         this.organizationSubType = organizationSubType;
     }
 
-    public List<ShiftLengthWTATemplate> getShiftLengths() {
-        return shiftLengths;
-    }
-
-    public void setShiftLengths(List<ShiftLengthWTATemplate> shiftLengths) {
-        this.shiftLengths = shiftLengths;
-    }
-
-    public List<AverageScheduledTimeWTATemplate> getAverageScheduledTimes() {
-        return averageScheduledTimes;
-    }
-
-    public void setAverageScheduledTimes(List<AverageScheduledTimeWTATemplate> averageScheduledTimes) {
-        this.averageScheduledTimes = averageScheduledTimes;
-    }
-
-    public List<CareDayCheckWTATemplate> getCareDayChecks() {
-        return careDayChecks;
-    }
-
-    public void setCareDayChecks(List<CareDayCheckWTATemplate> careDayChecks) {
-        this.careDayChecks = careDayChecks;
-    }
-
-    public List<ConsecutiveRestPartOfDayWTATemplate> getConsecutiveRestPartOfDays() {
-        return consecutiveRestPartOfDays;
-    }
-
-    public void setConsecutiveRestPartOfDays(List<ConsecutiveRestPartOfDayWTATemplate> consecutiveRestPartOfDays) {
-        this.consecutiveRestPartOfDays = consecutiveRestPartOfDays;
-    }
-
-    public List<ConsecutiveWorkWTATemplate> getConsecutiveWorks() {
-        return consecutiveWorks;
-    }
-
-    public void setConsecutiveWorks(List<ConsecutiveWorkWTATemplate> consecutiveWorks) {
-        this.consecutiveWorks = consecutiveWorks;
-    }
-
-    public List<DailyRestingTimeWTATemplate> getDailyRestingTimes() {
-        return dailyRestingTimes;
-    }
-
-    public void setDailyRestingTimes(List<DailyRestingTimeWTATemplate> dailyRestingTimes) {
-        this.dailyRestingTimes = dailyRestingTimes;
-    }
-
-    public List<DaysOffInPeriodWTATemplate> getDaysOffInPeriods() {
-        return daysOffInPeriods;
-    }
-
-    public void setDaysOffInPeriods(List<DaysOffInPeriodWTATemplate> daysOffInPeriods) {
-        this.daysOffInPeriods = daysOffInPeriods;
-    }
-
-    public List<DurationBetweenShiftWTATemplate> getDurationBetweenShifts() {
-        return durationBetweenShifts;
-    }
-
-    public void setDurationBetweenShifts(List<DurationBetweenShiftWTATemplate> durationBetweenShifts) {
-        this.durationBetweenShifts = durationBetweenShifts;
-    }
-
-    public List<NumberOfPartOfDayShiftsWTATemplate> getNumberOfPartOfDayShifts() {
-        return numberOfPartOfDayShifts;
-    }
-
-    public void setNumberOfPartOfDayShifts(List<NumberOfPartOfDayShiftsWTATemplate> numberOfPartOfDayShifts) {
-        this.numberOfPartOfDayShifts = numberOfPartOfDayShifts;
-    }
-
-    public List<NumberOfWeekendShiftInPeriodWTATemplate> getNumberOfWeekendShiftInPeriods() {
-        return numberOfWeekendShiftInPeriods;
-    }
-
-    public void setNumberOfWeekendShiftInPeriods(List<NumberOfWeekendShiftInPeriodWTATemplate> numberOfWeekendShiftInPeriods) {
-        this.numberOfWeekendShiftInPeriods = numberOfWeekendShiftInPeriods;
-    }
-
-    public List<SeniorDaysInYearWTATemplate> getSeniorDaysInYears() {
-        return seniorDaysInYears;
-    }
-
-    public void setSeniorDaysInYears(List<SeniorDaysInYearWTATemplate> seniorDaysInYears) {
-        this.seniorDaysInYears = seniorDaysInYears;
-    }
-
-    public List<ShiftsInIntervalWTATemplate> getShiftsInIntervals() {
-        return shiftsInIntervals;
-    }
-
-    public void setShiftsInIntervals(List<ShiftsInIntervalWTATemplate> shiftsInIntervals) {
-        this.shiftsInIntervals = shiftsInIntervals;
-    }
-
-    public List<ShortestAndAverageDailyRestWTATemplate> getShortestAndAverageDailyRests() {
-        return shortestAndAverageDailyRests;
-    }
-
-    public void setShortestAndAverageDailyRests(List<ShortestAndAverageDailyRestWTATemplate> shortestAndAverageDailyRests) {
-        this.shortestAndAverageDailyRests = shortestAndAverageDailyRests;
-    }
-
-    public List<TimeBankWTATemplate> getTimeBanks() {
-        return timeBanks;
-    }
-
-    public void setTimeBanks(List<TimeBankWTATemplate> timeBanks) {
-        this.timeBanks = timeBanks;
-    }
-
-    public List<VetoPerPeriodWTATemplate> getVetoPerPeriods() {
-        return vetoPerPeriods;
-    }
-
-    public void setVetoPerPeriods(List<VetoPerPeriodWTATemplate> vetoPerPeriods) {
-        this.vetoPerPeriods = vetoPerPeriods;
-    }
-
-    public List<WeeklyRestPeriodWTATemplate> getWeeklyRestPeriods() {
-        return weeklyRestPeriods;
-    }
-
-    public void setWeeklyRestPeriods(List<WeeklyRestPeriodWTATemplate> weeklyRestPeriods) {
-        this.weeklyRestPeriods = weeklyRestPeriods;
-    }
 }

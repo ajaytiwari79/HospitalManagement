@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 /**
  * Created by pavan on 20/2/18.
  */
-@Document
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class TimeBankWTATemplate extends WTABaseRuleTemplate {
@@ -33,7 +33,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
         //Default Constructor
     }
 
-    public TimeBankWTATemplate(String name, String templateType, boolean disabled, String description, TimeBankTypeEnum frequency, Integer yellowZone, boolean forbid, boolean allowExtraActivity) {
+    public TimeBankWTATemplate(String name, boolean disabled, String description, TimeBankTypeEnum frequency, Integer yellowZone, boolean forbid, boolean allowExtraActivity) {
         this.name=name;
         this.disabled=disabled;
         this.description=description;

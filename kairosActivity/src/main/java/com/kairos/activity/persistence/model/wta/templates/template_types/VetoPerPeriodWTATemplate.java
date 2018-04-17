@@ -14,7 +14,7 @@ import java.util.List;
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE12
  */
-@Document
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
@@ -65,7 +65,7 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.maximumVetoPercentage = maximumVetoPercentage;
     }
 
-    public VetoPerPeriodWTATemplate(String name, String templateType, boolean disabled,
+    public VetoPerPeriodWTATemplate(String name, boolean disabled,
                                     String description, double maximumVetoPercentage) {
         this.name = name;
         this.disabled = disabled;

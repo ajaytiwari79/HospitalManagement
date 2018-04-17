@@ -2,11 +2,13 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategoryDTO;
+import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.response.dto.web.wta.PhaseTemplateValueDTO;
+import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
 
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -17,7 +19,8 @@ import java.util.List;
 public class RuleTemplateResponseDTO {
     private RuleTemplateCategoryDTO ruleTemplateCategory;
     private List<PhaseTemplateValueDTO> phaseTemplateValues;
-    private Long id;
+    private WTATemplateType wtaTemplateType;
+    private BigInteger id;
     private String name;
     private String templateType;
     private String category;
@@ -62,6 +65,21 @@ public class RuleTemplateResponseDTO {
     private Boolean forbid;
     private Boolean allowExtraActivity;
 
+    public WTATemplateType getWtaTemplateType() {
+        return wtaTemplateType;
+    }
+
+    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
+        this.wtaTemplateType = wtaTemplateType;
+    }
+
+    public Boolean getForbid() {
+        return forbid;
+    }
+
+    public Boolean getAllowExtraActivity() {
+        return allowExtraActivity;
+    }
 
     public String getLastUpdatedBy() {
         return lastUpdatedBy;
@@ -88,7 +106,7 @@ public class RuleTemplateResponseDTO {
     }
 
 
-    public Long getId() {
+    public BigInteger getId() {
         return id;
     }
 
@@ -100,7 +118,7 @@ public class RuleTemplateResponseDTO {
         this.phaseTemplateValues = phaseTemplateValues;
     }
 
-    public void setId(Long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 

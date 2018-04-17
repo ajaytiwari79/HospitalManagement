@@ -431,7 +431,7 @@ public class CostTimeAgreementService extends UserBaseService {
         CostTimeAgreement costTimeAgreement=collectiveTimeAgreementGraphRepository.findOne(ctaId,2);
 
         List<Long> ruleTemplateIds = new ArrayList<>();
-        logger.info("costTimeAgreement.getRuleTemplates() : {}",costTimeAgreement.getRuleTemplates().size());
+        logger.info("costTimeAgreement.getRuleTemplateIds() : {}",costTimeAgreement.getRuleTemplates().size());
         for(RuleTemplate ruleTemplate : costTimeAgreement.getRuleTemplates()){
             ruleTemplateIds.add(ruleTemplate.getId());
         }
@@ -607,7 +607,7 @@ public class CostTimeAgreementService extends UserBaseService {
 
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         /*BeanUtils.copyProperties(costTimeAgreement, collectiveTimeAgreementDTO);
-        for(CTARuleTemplateDTO templateDTO : collectiveTimeAgreementDTO.getRuleTemplates()){
+        for(CTARuleTemplateDTO templateDTO : collectiveTimeAgreementDTO.getRuleTemplateIds()){
             templateDTO.setRuleTemplateCategory();
         }*/
         return collectiveTimeAgreementDTO;

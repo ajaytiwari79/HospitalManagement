@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
 
 
 import javax.validation.constraints.NotNull;

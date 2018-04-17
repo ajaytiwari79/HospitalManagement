@@ -13,7 +13,7 @@ import java.util.List;
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE4
  */
-@Document
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {

@@ -1,11 +1,11 @@
 package com.kairos.activity.controller.wta;
 
-import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategoryDTO;
-import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategoryType;
 import com.kairos.activity.service.wta.RuleTemplateCategoryService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
 
+import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
+import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +52,7 @@ public class RuleTemplateCategoryController {
 
     @RequestMapping(value = COUNTRY_URL+"/template_category/{templateCategoryId}", method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> updateRuleTemplateCategory(@PathVariable long countryId, @PathVariable BigInteger templateCategoryId, @RequestBody UpdateRuleTemplateCategoryDTO ruleTemplateCategory) {
-        Map<String, Object> updatedRuleTemplate = ruleTemplateCategoryService.updateRuleTemplateCategory(countryId, templateCategoryId, ruleTemplateCategory);
+        UpdateRuleTemplateCategoryDTO updatedRuleTemplate = ruleTemplateCategoryService.updateRuleTemplateCategory(countryId, templateCategoryId, ruleTemplateCategory);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, updatedRuleTemplate);
     }
 

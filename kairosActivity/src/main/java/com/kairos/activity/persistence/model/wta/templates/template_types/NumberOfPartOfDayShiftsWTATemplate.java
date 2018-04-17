@@ -14,12 +14,12 @@ import java.util.List;
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE9
  */
-@Document
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
-    private long nightsWorked;
+    private long noOfPartOfDayWorked;
     private long intervalLength;
     private String intervalUnit;
     private long validationStartDateMillis;
@@ -71,12 +71,12 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public long getNightsWorked() {
-        return nightsWorked;
+    public long getNoOfPartOfDayWorked() {
+        return noOfPartOfDayWorked;
     }
 
-    public void setNightsWorked(long nightsWorked) {
-        this.nightsWorked = nightsWorked;
+    public void setNoOfPartOfDayWorked(long noOfPartOfDayWorked) {
+        this.noOfPartOfDayWorked = noOfPartOfDayWorked;
     }
 
     public long getIntervalLength() {
@@ -95,8 +95,8 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public NumberOfPartOfDayShiftsWTATemplate(String name,  boolean disabled, String description,long nightsWorked) {
-        this.nightsWorked = nightsWorked;
+    public NumberOfPartOfDayShiftsWTATemplate(String name,  boolean disabled, String description,long noOfPartOfDayWorked) {
+        this.noOfPartOfDayWorked = noOfPartOfDayWorked;
         this.name = name;
         this.disabled = disabled;
         this.description = description;

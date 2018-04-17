@@ -1,10 +1,12 @@
 package com.kairos.response.dto.web;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * @author pradeep
  * @date - 11/4/18
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CountryDTO {
 
     private Long id;

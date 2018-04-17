@@ -10,7 +10,7 @@ import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.activity.persistence.model.wta.templates.WTABuilderFactory;
+import com.kairos.activity.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.activity.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
 import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
@@ -45,6 +45,7 @@ public class WTAOrganizationService extends MongoBaseService {
     private RuleTemplateCategoryMongoRepository ruleTemplateCategoryMongoRepository;
     @Inject private OrganizationRestClient organizationRestClient;
     @Inject private RuleTemplateService ruleTemplateService;
+    @Inject private WTABuilderService wtaBuilderService;
 
     private final Logger logger = LoggerFactory.getLogger(WTAOrganizationService.class);
 
@@ -90,7 +91,7 @@ public class WTAOrganizationService extends MongoBaseService {
         newWta.setStartDateMillis(oldWta.getStartDateMillis());
         newWta.setEndDateMillis(updateDTO.getStartDateMillis());
         newWta.setCountryParentWTA(null);
-        /*newWta.getRuleTemplates().forEach(ruleTemplate -> {
+        /*newWta.getRuleTemplateIds().forEach(ruleTemplate -> {
             if (Optional.ofNullable(ruleTemplate.getPhaseTemplateValues()).isPresent()) {
                 ruleTemplate.getPhaseTemplateValues().forEach(phaseTemplateValue -> {
                 });
@@ -117,9 +118,9 @@ public class WTAOrganizationService extends MongoBaseService {
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (updateDTO.getRuleTemplates().size() > 0) {
             WTAQueryResultDTO wtaQueryResultDTO = new WTAQueryResultDTO();
-            WTABuilderFactory.copyRuleTemplate(wtaQueryResultDTO,updateDTO.getRuleTemplates());
-            WTABuilderFactory.copyWTARuleTemplateToWTA(oldWta,wtaQueryResultDTO);
-            /*oldWta.setRuleTemplates(ruleTemplates);*/
+            wtaBuilderService.copyRuleTemplates(wtaQueryResultDTO,updateDTO.getRuleTemplates());
+            WTABuilderService.copyWTARuleTemplateToWTA(oldWta,wtaQueryResultDTO);
+            /*oldWta.setRuleTemplateIds(ruleTemplates);*/
         }
         //oldWta.setOrganization(organization);
         //organization.addWorkingTimeAgreements(newWta);

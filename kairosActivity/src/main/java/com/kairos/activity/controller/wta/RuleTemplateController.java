@@ -3,6 +3,7 @@ package com.kairos.activity.controller.wta;
 import com.kairos.activity.service.wta.RuleTemplateCategoryService;
 import com.kairos.activity.service.wta.RuleTemplateService;
 import com.kairos.activity.util.response.ResponseHandler;
+import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.wta.WTARuleTemplateDTO;
 import com.kairos.response.dto.web.wta.RuleTemplateDTO;
 import org.springframework.http.HttpStatus;
@@ -46,10 +47,10 @@ public class RuleTemplateController {
     }
 
 
-    /*@RequestMapping(value = COUNTRY_URL+"/rule_templates/category", method = RequestMethod.POST)
-    ResponseEntity<Map<String,Object>> updateRuleTemplateCategory(@Valid @RequestBody RuleTemplateDTO ruleTemplateDTO, @PathVariable long countryId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.updateRuleTemplateCategory(ruleTemplateDTO,countryId));
-    }*/
+    @RequestMapping(value = COUNTRY_URL+"/rule_templates/category", method = RequestMethod.POST)
+    ResponseEntity<Map<String,Object>> updateRuleTemplateCategory(@Valid @RequestBody RuleTemplateCategoryDTO ruleTemplateDTO, @PathVariable long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.createRuleTemplateCategory(countryId,ruleTemplateDTO));
+    }
 
    /* @RequestMapping(value = UNIT_URL+"/rule_templates", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getRulesTemplateCategoryByUnit(@PathVariable Long unitId) {

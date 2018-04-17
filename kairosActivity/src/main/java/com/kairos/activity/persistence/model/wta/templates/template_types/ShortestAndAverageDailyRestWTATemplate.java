@@ -13,12 +13,11 @@ import java.util.List;
 /**
  * Created by pawanmandhan on 5/8/17.
  */
-@Document
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate {
 
-    private List<String> balanceType;//multiple check boxes
     private long intervalLength;//
     private String intervalUnit;
     private long validationStartDateMillis;
@@ -34,13 +33,6 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
 
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
-    }
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
     }
 
     public long getIntervalLength() {
@@ -91,13 +83,12 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         this.shiftAffiliation = shiftAffiliation;
     }
 
-    public ShortestAndAverageDailyRestWTATemplate(String name, String templateType, boolean disabled,
-                                                  String description, List<String> balanceType, long intervalLength, String intervalUnit, long validationStartDateMillis,
+    public ShortestAndAverageDailyRestWTATemplate(String name,  boolean disabled,
+                                                  String description, long intervalLength, String intervalUnit, long validationStartDateMillis,
                                                   long continuousDayRestHours, long averageRest, String shiftAffiliation) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.balanceType = balanceType;
         this.intervalLength =intervalLength;
         this.intervalUnit=intervalUnit;
         this.validationStartDateMillis =validationStartDateMillis;

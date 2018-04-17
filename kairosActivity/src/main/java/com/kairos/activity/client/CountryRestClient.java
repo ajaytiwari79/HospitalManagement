@@ -92,7 +92,7 @@ public class CountryRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<CountryDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/country/{countryId}",
+                            baseUrl + "/countryId/{countryId}",
                             HttpMethod.GET,
                             null, typeReference, countryId);
 

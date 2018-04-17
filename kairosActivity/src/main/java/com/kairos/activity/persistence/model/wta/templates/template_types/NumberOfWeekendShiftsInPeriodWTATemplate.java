@@ -11,10 +11,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE13
  */
-@Document
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NumberOfWeekendShiftInPeriodWTATemplate extends WTABaseRuleTemplate {
+public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplate {
 
     private long numberShiftsPerPeriod;
     private long numberOfWeeks;
@@ -90,9 +90,9 @@ public class NumberOfWeekendShiftInPeriodWTATemplate extends WTABaseRuleTemplate
         this.proportional = proportional;
     }
 
-    public NumberOfWeekendShiftInPeriodWTATemplate(String name, String templateType, boolean disabled,
-                                                   String description, long numberShiftsPerPeriod, long numberOfWeeks, String fromDayOfWeek, long fromTime, boolean proportional,
-                                                   String toDayOfWeek, long toTime) {
+    public NumberOfWeekendShiftsInPeriodWTATemplate(String name, boolean disabled,
+                                                    String description, long numberShiftsPerPeriod, long numberOfWeeks, String fromDayOfWeek, long fromTime, boolean proportional,
+                                                    String toDayOfWeek, long toTime) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
@@ -108,7 +108,7 @@ public class NumberOfWeekendShiftInPeriodWTATemplate extends WTABaseRuleTemplate
 
 
     }
-    public NumberOfWeekendShiftInPeriodWTATemplate() {
+    public NumberOfWeekendShiftsInPeriodWTATemplate() {
     }
 
 

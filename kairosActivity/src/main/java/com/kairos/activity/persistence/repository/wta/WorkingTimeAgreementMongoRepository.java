@@ -17,25 +17,25 @@ import java.util.Map;
 @Repository
 public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository<WorkingTimeAgreement, BigInteger> {
 
-    @Query("{name:?0,countryId:?1}")
+    @Query("{name:?0,countryId:?1,deleted:false}")
     WorkingTimeAgreement getWtaByName(String wtaName, Long countryId);
 
     @Query("{}")
     WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
 
-    @Query("{organizationType.id:?0}")
+    @Query("{organizationType.id:?0,deleted:false}")
     List<WTAResponseDTO> getAllWTAByOrganizationTypeId(long organizationId);
 
-    @Query("{countryId:?0}")
+    @Query("{countryId:?0,deleted:false}")
     List<WTAResponseDTO> getAllWTAByCountryId(long countryId);
 
-    @Query("{organizationSubType.id:?0}")
+    @Query("{organizationSubType.id:?0,deleted:false}")
     List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId);
 
-    @Query("{countryId:?0}")
+    @Query("{countryId:?0,deleted:false}")
     List<Map<String, Object>> getAllWTAWithOrganization(long countryId);
 
-    @Query("{countryId:?0,id:?1}")
+    @Query("{countryId:?0,id:?1,deleted:false}")
     List<Map<String, Object>> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
 
   /*  @Query("{}")
@@ -51,22 +51,22 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
 
 
 
-    @Query("{organization.id:?0}")
+    @Query("{organization.id:?0,deleted:false}")
     List<WTAResponseDTO> getWtaByOrganization(Long organizationId);
 
-    @Query("{name:?0,organization.id:?1,id:?2}")
+    @Query("{name:?0,organization.id:?1,id:?2,deleted:false}")
     boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
 
    /* @Query("{}")
     void removeOldWorkingTimeAgreement(BigInteger wtaId, Long organizationId, Long endDateInMillis);
 */
-    @Query("{id:?0}")
+    @Query("{id:?0,deleted:false}")
     void removeOldParentWTAMapping(BigInteger wtaId);
 
-    @Query("{organization.id:?0,id:?1}")
+    @Query("{organization.id:?0,id:?1,deleted:false}")
     WorkingTimeAgreement getOrganizationCopyOfWTA(Long unitId, BigInteger wtaId);
 
-    @Query("{id:?0}")
+    @Query("{id:?0,deleted:false}")
     WTAResponseDTO getVersionOfWTA(BigInteger organizationId);
 
     /*@Query("")

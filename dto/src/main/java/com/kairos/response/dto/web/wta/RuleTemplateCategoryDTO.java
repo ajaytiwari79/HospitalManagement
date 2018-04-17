@@ -1,15 +1,14 @@
-package com.kairos.activity.persistence.model.wta.templates;
+package com.kairos.response.dto.web.wta;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -20,13 +19,18 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RuleTemplateCategoryDTO extends MongoBaseEntity {
+public class RuleTemplateCategoryDTO{
 
-     @NotNull(message = "error.WTARuleTemplateCategory.name.notnull")
+    @NotNull(message = "error.RuleTemplateCategory.name.notnull")
     private String name;
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
     private Long country;
+    private BigInteger id;
+    private Date createdAt;
+    private Date updatedAt;
+    private boolean deleted ;
+    private List<BigInteger> ruleTemplateIds;
     public RuleTemplateCategoryDTO(String name, String description, boolean deleted) {
         this.name = name;
         this.description = description;
@@ -35,6 +39,39 @@ public class RuleTemplateCategoryDTO extends MongoBaseEntity {
 
     public RuleTemplateCategoryDTO() {
         //default
+    }
+
+    public List<BigInteger> getRuleTemplateIds() {
+        return ruleTemplateIds;
+    }
+
+    public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {
+        this.ruleTemplateIds = ruleTemplateIds;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
+
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public RuleTemplateCategoryDTO(String name) {

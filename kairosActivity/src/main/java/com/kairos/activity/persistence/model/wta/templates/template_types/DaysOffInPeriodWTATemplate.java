@@ -13,12 +13,11 @@ import java.util.List;
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE10
  */
-@Document
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
-    private List<String> balanceType;//multiple check boxes
     private long intervalLength;
     private String intervalUnit;
     private long validationStartDateMillis;
@@ -42,10 +41,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
     }
 
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
     public long getDaysLimit() {
         return daysLimit;
     }
@@ -54,9 +49,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         this.daysLimit = daysLimit;
     }
 
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
 
 
     public long getIntervalLength() {
@@ -75,10 +67,9 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public DaysOffInPeriodWTATemplate(String name, String templateType, boolean disabled,
-                                      String description, List<String> balanceType, long intervalLength, long validationStartDateMillis, long minimumDaysOff, String intervalUnit) {
+    public DaysOffInPeriodWTATemplate(String name, boolean disabled,
+                                      String description,  long intervalLength, long validationStartDateMillis, long minimumDaysOff, String intervalUnit) {
         this.intervalLength = intervalLength;
-        this.balanceType = balanceType;
         this.daysLimit = minimumDaysOff;
         this.validationStartDateMillis = validationStartDateMillis;
 

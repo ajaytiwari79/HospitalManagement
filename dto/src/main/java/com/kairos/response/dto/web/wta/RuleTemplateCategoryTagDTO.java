@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.response.dto.web.tag.TagDTO;
 
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class RuleTemplateCategoryTagDTO {
     private String name;
     private String description;
     private List<TagDTO> tags = new ArrayList<>();
+    private List<BigInteger> ruleTemplates;
 
     public Long getId() {
         return id;
@@ -36,6 +38,14 @@ public class RuleTemplateCategoryTagDTO {
 
     public String getDescription() {
         return description;
+    }
+
+    public List<BigInteger> getRuleTemplates() {
+        return ruleTemplates;
+    }
+
+    public void setRuleTemplates(List<BigInteger> ruleTemplates) {
+        this.ruleTemplates = ruleTemplates;
     }
 
     public void setDescription(String description) {

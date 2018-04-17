@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by pawanmandhan on 5/8/17.
  */
-@Document
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SeniorDaysInYearWTATemplate extends WTABaseRuleTemplate {
@@ -100,7 +100,7 @@ public class SeniorDaysInYearWTATemplate extends WTABaseRuleTemplate {
         this.activityCode = activityCode;
     }
 
-    public SeniorDaysInYearWTATemplate(String name, String templateType, boolean disabled,
+    public SeniorDaysInYearWTATemplate(String name,  boolean disabled,
                                        String description, long intervalLength, String intervalUnit, long validationStartDateMillis,
                                        long daysLimit, String activityCode) {
         this.name = name;

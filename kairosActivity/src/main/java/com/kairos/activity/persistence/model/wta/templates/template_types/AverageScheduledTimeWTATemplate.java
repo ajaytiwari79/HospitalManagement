@@ -11,12 +11,11 @@ import java.util.List;
 /**
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE11
- */@Document
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
-    private List<String> balanceType;//multiple check boxes
     private long intervalLength;
     private String intervalUnit;
     private long validationStartDateMillis;
@@ -34,14 +33,6 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
 
 
     public long getIntervalLength() {
@@ -78,10 +69,9 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     }
 
     public AverageScheduledTimeWTATemplate(String name, boolean disabled,
-                                           String description, List<String> balanceType, long intervalLength, long validationStartDateMillis
+                                           String description, long intervalLength, long validationStartDateMillis
             , boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime, String intervalUnit) {
         this.intervalLength = intervalLength;
-        this.balanceType = balanceType;
         this.validationStartDateMillis = validationStartDateMillis;
         this.name = name;
         this.disabled = disabled;

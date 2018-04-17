@@ -2,8 +2,8 @@ package com.kairos.activity.persistence.repository.wta;
 
 
 import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategory;
-import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategoryType;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
+import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryTagDTO;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -27,16 +27,17 @@ public interface RuleTemplateCategoryMongoRepository extends MongoBaseRepository
             "id(c)=53 with l,t\n" +
             "RETURN id(l) as id, l.name as name, l.description as description, CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})  END as tags")*/
 
-    @Query("{}")
+    @Query("{countryId:?0,ruleTemplateCategoryType:?2,deleted:false}")
     RuleTemplateCategory checkDuplicateRuleTemplateCategory(Long countryId,RuleTemplateCategoryType type,String name);
-    @Query("{}")
+
+    @Query("{countryId:?0,deleted:false}")
     List<RuleTemplateCategoryTagDTO> getAllRulesOfCountry(long countryId);
 
     @Query("{}")
     List<RuleTemplateCategoryTagDTO> getRuleTemplateCategoryByUnitId(Long unitId);
 
 
-    @Query("{}")
+    @Query("{countryId:?0,name:?1,ruleTemplateCategoryType:?2,deleted:false}")
     RuleTemplateCategory findByName(Long countryId, String name, RuleTemplateCategoryType ruleTemplateCategoryType);
 
     @Query("{}")

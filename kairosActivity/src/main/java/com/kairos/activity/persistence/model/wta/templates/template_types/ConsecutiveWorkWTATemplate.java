@@ -11,13 +11,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Created by pawanmandhan on 5/8/17.
  * TEMPLATE3
  */
-@Document
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     private boolean checkAgainstTimeRules;
-    private long limit;//no of days
+    private long limitCount;//no of days
     private WTATemplateType wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
 
 
@@ -40,21 +39,21 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
     }
 
-    public long getLimit() {
-        return limit;
+    public long getLimitCount() {
+        return limitCount;
     }
 
-    public void setLimit(long limit) {
-        this.limit = limit;
+    public void setLimitCount(long limitCount) {
+        this.limitCount = limitCount;
     }
 
     public ConsecutiveWorkWTATemplate() {
 
     }
 
-    public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limit) {
+    public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {
         super(name, minimum, description);
         this.checkAgainstTimeRules = checkAgainstTimeRules;
-        this.limit = limit;
+        this.limitCount = limitCount;
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by pawanmandhan on 5/8/17.
  */
-@Document
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
@@ -108,8 +108,8 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
         this.onlyCompositeShifts = onlyCompositeShifts;
     }
 
-    public ShiftsInIntervalWTATemplate(String name, String templateType, boolean disabled,
-                                       String description, List<String> balanceType, long intervalLength, String intervalUnit,
+    public ShiftsInIntervalWTATemplate(String name,  boolean disabled,
+                                       String description, long intervalLength, String intervalUnit,
                                        long validationStartDateMillis, long shiftsLimit, boolean onlyCompositeShifts) {
         this.name = name;
         this.disabled = disabled;
