@@ -847,7 +847,7 @@ public class CostTimeAgreementService extends UserBaseService {
         return collectiveTimeAgreementDTO;
     }
 
-    public List<CTAListQueryResult> getAllCTAByOrganizationSubType(Long organizationSubTypeId){
+    public List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long organizationSubTypeId){
         return collectiveTimeAgreementGraphRepository.getAllCTAByOrganiationSubType(organizationSubTypeId);
     }
 
@@ -866,13 +866,15 @@ public class CostTimeAgreementService extends UserBaseService {
             CostTimeAgreement newCtaObject = new CostTimeAgreement();
             costTimeAgreement.setId(null);
 
+
             BeanUtils.copyProperties(costTimeAgreement,newCtaObject);
             newCtaObject.getRuleTemplates().forEach(ruleTemplate -> {
                 ruleTemplate.setId(null);
             });
             // for setting the unique name
-
-            newCtaObject.setName(costTimeAgreement.getName()+DateUtil.getCurrentDateMillis());
+            Integer lastCount=collectiveTimeAgreementGraphRepository.getLastIndexofCTA("(?i)"+costTimeAgreement.getName());
+            String name=costTimeAgreement.getName();
+            newCtaObject.setName(name.contains("-")?name.replace(name.substring(name.lastIndexOf("-")+1,name.length()),lastCount.toString()):costTimeAgreement.getName()+"-"+ ++lastCount);
             newCtaObject.setCountry(costTimeAgreement.getCountry());
             newCtaObject.setOrganizationType(costTimeAgreement.getOrganizationType());
             newCtaObject.setOrganizationSubType(organizationSubType);

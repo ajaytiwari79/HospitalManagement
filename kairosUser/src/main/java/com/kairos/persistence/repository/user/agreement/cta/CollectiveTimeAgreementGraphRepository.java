@@ -2,10 +2,7 @@ package com.kairos.persistence.repository.user.agreement.cta;
 
 import com.kairos.persistence.model.constants.RelationshipConstants;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.agreement.cta.CTAListQueryResult;
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateDTO;
-import com.kairos.persistence.model.user.agreement.cta.CTARuleTemplateQueryResult;
-import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
+import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -252,9 +249,14 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "CASE WHEN cTARuleTemplatePhaseInfo IS NULL THEN [] ELSE collect({phaseId:cTARuleTemplatePhaseInfo.phaseId,type:cTARuleTemplatePhaseInfo.type,beforeStart:cTARuleTemplatePhaseInfo.beforeStart}) END  as phaseInfo,ruleTemplCat\n" +
             "optional  MATCH (ruleTemp)-[:" + BELONGS_TO + "]-(plannedTimeWithFactor:`PlannedTimeWithFactor`)  WITH \n" +
             "cta,expertise,orgType,orgSubType,ruleTemp,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,phaseInfo, plannedTimeWithFactor ,ruleTemplCat\n" +
-            "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,\n" +
+            "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, expertise as expertise, orgType as organizationType, orgSubType as organizationSubType, cta.description as description,cta.name as name,\n" +
             "CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),calculateScheduledHours:ruleTemp.calculateScheduledHours,activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation, plannedTimeId:ruleTemp.plannedTimeId, timeTypeId:ruleTemp.timeTypeId, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds    ,\n" +
             "ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo,plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType}}) END as ruleTemplates ORDER BY id DESC")
-    List<CTAListQueryResult> getAllCTAByOrganiationSubType(Long organizationSubTypeId);
+    List<CTAResponseDTO> getAllCTAByOrganiationSubType(Long organizationSubTypeId);
+
+    @Query("MATCH(c:Country)-[:" + BELONGS_TO + "]-(cta:CostTimeAgreement{deleted:false})  where cta.name =~'.*{0}.*' with \n" +
+            "toInt(last(split(cta.name,'-'))) as num " +
+            "RETURN case when num is null  then 0 else MAX(num) end as result limit 1")
+    Integer getLastIndexofCTA(String name);
 
 }

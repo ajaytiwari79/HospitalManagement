@@ -120,8 +120,8 @@ public class CostTimeAgreementController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getAllCTAByOrganizationSubType(organizationSubTypeId));
     }
 
-    @ApiOperation(value = "link unlink cta with org Type")
-    @PutMapping(value = COUNTRY_URL + "/organization_type/{organizationSubTypeId}/cta/{ctaId}")
+    @ApiOperation(value = "link and unlink cta with org sub-type")
+    @PutMapping(value = COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/cta/{ctaId}")
     public ResponseEntity<Map<String, Object>> setCTAWithOrganizationType(@PathVariable long countryId, @PathVariable long ctaId, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.setCTAWithOrganizationType(countryId, ctaId, organizationSubTypeId, checked));
     }
