@@ -2,6 +2,8 @@ package com.kairos.persistence.model.organization;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.Labels;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.springframework.data.annotation.Version;
@@ -54,5 +56,25 @@ public class PaymentSettings extends UserBaseEntity {
     public PaymentSettings(PaidOutFrequencyEnum type, Long dateOfPayment) {
         this.type = type;
         this.dateOfPayment = dateOfPayment;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof PaymentSettings)) return false;
+
+        PaymentSettings that = (PaymentSettings) o;
+
+        return new EqualsBuilder()
+                .append(getType(), that.getType())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getType())
+                .toHashCode();
     }
 }
