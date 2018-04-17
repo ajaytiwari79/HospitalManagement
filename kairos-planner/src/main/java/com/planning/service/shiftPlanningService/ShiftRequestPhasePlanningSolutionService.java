@@ -3,6 +3,7 @@ package com.planning.service.shiftPlanningService;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
 import com.kairos.shiftplanning.domain.*;
 import com.kairos.shiftplanning.domain.activityConstraint.ActivityConstraints;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
@@ -135,7 +136,7 @@ public class ShiftRequestPhasePlanningSolutionService {
 
     }
 
-    public Object[] getStaffingLevel(List<StaffingLevelDto> staffingLevelDtos,Map<BigInteger,Activity> activityMap){
+    public Object[] getStaffingLevel(List<StaffingLevelDto> staffingLevelDtos, Map<BigInteger,Activity> activityMap){
         List<ActivityLineInterval> activityLineIntervals = new ArrayList<>();
         List<SkillLineInterval> skillLineIntervals = new ArrayList<>();
         Set<LocalDate> weekDates = new HashSet<>(staffingLevelDtos.size());
@@ -143,7 +144,7 @@ public class ShiftRequestPhasePlanningSolutionService {
         staffingLevelDtos.forEach(stl->{
             stl.getStaffingLevelInterval().forEach(sli->{
                 sli.getStaffingLevelActivities().forEach(sla->{
-                    IntStream.range(0,sla.getNoOfStaff()).forEachOrdered(i->{
+                    IntStream.range(0,sla.getMinNoOfStaff()).forEachOrdered(i->{
                         Activity activity = activityMap.get(new BigInteger(sla.getActivityId().toString()));
                         //need to clarify require and staffNo.
                         ActivityLineInterval activityLineInterval;
@@ -161,7 +162,7 @@ public class ShiftRequestPhasePlanningSolutionService {
                         skillLineIntervals.add(new SkillLineInterval(asDate(sli.getStaffingLevelDuration().getFrom()),asDate(sli.getStaffingLevelDuration().getTo()),true,new Skill(""+1,"",SkillType.BASIC)));
                     });
                 });
-                weekDates.add(new LocalDate(stl.getCurrentDate().getYear(),stl.getCurrentDate().getMonth().getValue(),stl.getCurrentDate().getDayOfMonth()));
+                weekDates.add(new LocalDate(stl.getCurrentDate()));
             });
         });
 
