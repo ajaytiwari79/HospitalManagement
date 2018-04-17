@@ -519,7 +519,7 @@ public class AbsencePlanningService {
     }
 
     /**
-     * This method is used to get Left hand side common data of given unit required for further filtering Absence planning tasks.
+     * This method is used to get Left hand side common data of given unit required for further filtering Absence planner tasks.
      * @param unitId
      * @return
      */
@@ -537,7 +537,7 @@ public class AbsencePlanningService {
     }
 
     /**
-     * This method is creating reports after every change made by Planner from Absence planning view.
+     * This method is creating reports after every change made by Planner from Absence planner view.
      * @param task
      * @param taskDTO
      */
@@ -688,7 +688,7 @@ public class AbsencePlanningService {
     }
 
     /**
-     * This method is used to sync present or full day absences shift from Absence planning view to FLS
+     * This method is used to sync present or full day absences shift from Absence planner view to FLS
      * update work schedule of Engineer in FLS
      * @param task
      */

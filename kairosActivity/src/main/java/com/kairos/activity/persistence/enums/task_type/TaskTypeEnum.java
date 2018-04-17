@@ -331,7 +331,7 @@ public enum TaskTypeEnum {
     }
 
     public enum TaskOriginator {
-        TIMECARE("TimeCare"),PRE_KAIROS("Pre Kairos"),KAIROS("Kairos"),PRE_PLANNING("Pre Planning"),ACTUAL_PLANNING("Actual planning");
+        TIMECARE("TimeCare"),PRE_KAIROS("Pre Kairos"),KAIROS("Kairos"),PRE_PLANNING("Pre Planning"),ACTUAL_PLANNING("Actual planner");
 
         public String value;
 

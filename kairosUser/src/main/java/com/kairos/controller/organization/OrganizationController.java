@@ -458,7 +458,7 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get Organization Clients with min details")
-    @RequestMapping(value = "/unit/{unitId}/client/planning", method = RequestMethod.GET)
+    @RequestMapping(value = "/unit/{unitId}/client/planner", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationClientsWithPlanning(@PathVariable Long organizationId, @PathVariable Long unitId) {
 

@@ -355,7 +355,7 @@ public class TaskTypeController {
     }
 
     @RequestMapping(value = "/task_types/{taskTypeId}/planning_rules", method = RequestMethod.POST)
-    @ApiOperation("set planning rules for a task type")
+    @ApiOperation("set planner rules for a task type")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> savePlanningRules(@PathVariable String taskTypeId, @RequestBody Map<String, Object> planningRules) {
         boolean isAssignedToClipBoard = (boolean) planningRules.get("isAssignedToClipBoard");
@@ -366,7 +366,7 @@ public class TaskTypeController {
     }
 
     @RequestMapping(value = "/task_types/{taskTypeId}/planning_rules", method = RequestMethod.GET)
-    @ApiOperation("set planning rules for a task type")
+    @ApiOperation("set planner rules for a task type")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPlanningRules(@PathVariable String taskTypeId) {
         Map<String, Object> response = taskTypeService.getPlanningRules(taskTypeId);

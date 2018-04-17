@@ -62,7 +62,7 @@ public class MaximumVetoPerPeriodWTATemplate implements ConstraintHandler {
     }
 
     public int checkConsTraints(List<ShiftConstrutionPhase> shifts, ShiftConstrutionPhase shift){
-        //TODO we can't consider from now it will comes in absence planning @Sachin
+        //TODO we can't consider from now it will comes in absence planner @Sachin
         return 0;
     }
 }
