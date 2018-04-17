@@ -10,6 +10,7 @@ public class OptaPlannerSettingActivityTab implements Serializable{
     private boolean eligibleForComputerRecruitment;
     private boolean lockLengthPresent;
     private boolean eligibleToBeForced;
+    private boolean eligibleForMove;
 
     public OptaPlannerSettingActivityTab() {
     }
@@ -42,8 +43,17 @@ public class OptaPlannerSettingActivityTab implements Serializable{
         this.eligibleToBeForced = eligibleToBeForced;
     }
 
-    public OptaPlannerSettingActivityTab(boolean eligibleForComputerRecruitment, boolean lockLengthPresent, boolean eligibleToBeForced) {
+    public boolean isEligibleForMove() {
+        return eligibleForMove;
+    }
+
+    public void setEligibleForMove(boolean eligibleForMove) {
+        this.eligibleForMove = eligibleForMove;
+    }
+
+    public OptaPlannerSettingActivityTab(boolean eligibleForComputerRecruitment, boolean lockLengthPresent, boolean eligibleToBeForced,boolean eligibleForMove) {
         this.eligibleForComputerRecruitment = eligibleForComputerRecruitment;
+        this.eligibleForMove=eligibleForMove;
         this.lockLengthPresent = lockLengthPresent;
         this.eligibleToBeForced = eligibleToBeForced;
     }
