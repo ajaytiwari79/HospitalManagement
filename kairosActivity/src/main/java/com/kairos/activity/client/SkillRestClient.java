@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
+
 @Component
 public class SkillRestClient {
     private static final Logger logger = LoggerFactory.getLogger(CountryRestClient.class);
@@ -73,21 +75,6 @@ public class SkillRestClient {
             logger.info("response {}", e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
         }
-    }
-
-
-
-
-
-    private final String getBaseUrl(boolean hasUnitInUrl) {
-        if (hasUnitInUrl) {
-            String baseUrl = new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        } else {
-            String baseUrl = new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
-        }
-
     }
 
 

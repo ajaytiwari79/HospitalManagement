@@ -3,6 +3,7 @@ package com.kairos.response.dto.web.cta;
 import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
 public class AccessGroupDTO {
@@ -16,9 +17,11 @@ public class AccessGroupDTO {
         //default constructor
     }
 
-    public AccessGroupDTO(Long id, String name) {
+    public AccessGroupDTO(Long id, String name, String description, AccessGroupRole role) {
         this.id = id;
         this.name = name;
+        this.description = description;
+        this.role = role;
     }
 
     public Long getId() {
@@ -51,5 +54,10 @@ public class AccessGroupDTO {
 
     public void setRole(AccessGroupRole role) {
         this.role = role;
+    }
+
+    @AssertTrue(message = "Access group can't be blank")
+    public boolean isValid() {
+        return (this.name.trim().isEmpty())?false:true;
     }
 }

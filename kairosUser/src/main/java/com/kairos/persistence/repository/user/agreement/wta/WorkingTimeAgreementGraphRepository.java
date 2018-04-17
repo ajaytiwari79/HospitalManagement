@@ -1,10 +1,11 @@
 package com.kairos.persistence.repository.user.agreement.wta;
 
-import com.kairos.persistence.model.user.agreement.wta.*;
-import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
+import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
+import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
+import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.expertise.ExpertiseIdListDTO;
-import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -248,4 +249,9 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
             "wta.description as description, wta.name as name,id(wta) as id")
     WTAResponseDTO findRuleTemplateByWTAId(Long wtaId);
 
+    @Query("MATCH(organization:Organization) where id(organization)={0} " +
+            "OPTIONAL MATCH(organization)-[:" + HAS_WTA + "]-(workingTimeAgreement:WorkingTimeAgreement{deleted:false}) " +
+            "OPTIONAL MATCH(workingTimeAgreement)-[:" + HAS_EXPERTISE_IN + "]-(expertise:Expertise)" +
+            "return workingTimeAgreement,expertise")
+    List<WTAAndExpertiseQueryResult> getAllWTAByOrganization(long organizationId);
 }

@@ -13,22 +13,33 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+//import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import javax.servlet.Filter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -39,12 +50,11 @@ import static java.time.format.DateTimeFormatter.ofPattern;
  * Application Start Point
  */
 @SpringBootApplication
-
+@EnableEurekaClient
 @EnableTransactionManagement(proxyTargetClass=true)
 @EnableResourceServer
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableNeo4jRepositories(basePackages = {"com.kairos.persistence.repository"},repositoryBaseClass = Neo4jBaseRepositoryImpl.class)
-@EnableEurekaClient
 @EnableCircuitBreaker
 public class UserServiceApplication extends WebMvcConfigurerAdapter{
 
@@ -113,7 +123,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 		converters.add(mappingJackson2XmlHttpMessageConverter());
 
 	}
-
+    @Profile("!development")
     @LoadBalanced
 	@Primary
 	@Bean
@@ -124,6 +134,7 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
+    @Profile("!development")
 	@LoadBalanced
 	@Bean(name ="schedulerRestTemplate")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
@@ -132,6 +143,23 @@ public class UserServiceApplication extends WebMvcConfigurerAdapter{
 				.build();
 		return template;
 	}
-
+    @Profile("development")
+    @Primary
+    @Bean
+    public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
+                .interceptors(new UserContextInterceptor())
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
+    @Profile("development")
+    @Bean(name ="schedulerRestTemplate")
+    public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
 }
 
