@@ -195,10 +195,10 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
             if (paymentSettingsFromDB.isPresent()) {
                 throw new DuplicateDataException("payment settings " + paymentSettingsDTO.getType() + " is already present for the organization");
             }
-            paymentSettingsDTO.setId(savePaymentSettings(paymentSettingsDTO, organization.get()));
-        } else {
-            paymentSettingsDTO.setId(savePaymentSettings(paymentSettingsDTO, organization.get()));
         }
+        paymentSettingsDTO.setId(savePaymentSettings(paymentSettingsDTO, organization.get()));
+
+
         return paymentSettingsDTO;
     }
 
