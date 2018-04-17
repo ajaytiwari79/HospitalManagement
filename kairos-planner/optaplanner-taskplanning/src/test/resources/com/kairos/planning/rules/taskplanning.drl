@@ -1,0 +1,118 @@
+package com.kairos.planning.rules;
+    dialect "java"
+//import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
+import org.optaplanner.core.api.score.buildin.bendablelong.BendableLongScoreHolder;
+import com.kairos.planning.domain.*; 
+global BendableLongScoreHolder scoreHolder;
+//****************Hard constraints*************
+rule "Skill requirements"
+salience 20
+    when
+        Task((employee != null)&& (missingSkillCount > 0 && $missingSkillCount : missingSkillCount))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,0,  - $missingSkillCount);
+end
+rule "tasksChain for time"
+salience 15
+    when
+        $task: Task (previousTaskOrVehicle instanceof Task  && $prevTask:previousTaskOrVehicle && !$task.isAfter((Task)$prevTask))
+        //$task: Task( previousTaskOrVehicle==$prevTask && employee!=null)
+    //Boolean(booleanValue == true) from ($task.getEmployee().equals( ((Task)$prevTask).getEmployee())  || !((Task)$task).isAfter(((Task)$prevTask)))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,1,- 10);
+end
+//&& $prevTask:previousTaskOrVehicle && !$task.isAfter((Task)$prevTask)
+// && vehicle!=null && $vehicle: vehicle
+rule "tasksChain for employee"
+salience 14
+    when
+        $task: Task (employee!=null && $employee : employee && previousTaskOrVehicle instanceof Task && $prevTask:previousTaskOrVehicle && $task.getEmployee()!=((Task)$prevTask).getEmployee() )
+        //$task: Task( previousTaskOrVehicle==$prevTask && employee!=null)
+   // Boolean(booleanValue == true) from ($task.getEmployee().equals( ((Task)$prevTask).getEmployee()))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,2,- 1);
+end
+rule "Employee availability"
+salience 10
+    when
+        $task:Task($employee:employee && vehicle!=null &&  $employee != null&& !canAssignedEmployeeWork())
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,3,  - ($task.getDurationIncludingArrivalTime()));
+end
+rule "Employee Reach Back"
+salience 10
+    when
+        $task:Task($employee:employee && vehicle!=null &&  $employee != null&& !canAssignedEmployeeReachBack())
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,4,  - ($task.getTimeToReachBackUnit()));
+end
+
+
+
+rule "Employee Assignment"
+salience 5 //higher number is higher priority
+    when
+        Task(previousTaskOrVehicle!=null &&  employee == null)
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,5, -1);
+end
+
+rule "Employee Unique per route"
+salience 5 //higher number is higher priority
+    when
+        Task(previousTaskOrVehicle instanceof Vehicle && $employee:employee)
+        Task(previousTaskOrVehicle instanceof Vehicle && employee==$employee)
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,5, -1);
+end
+
+
+//****************Soft constraints*************
+
+
+
+rule "employeeWorkingHours"
+salience 4
+    when
+    //Task (employee!=null,$employee : employee,$empId:employeeId)
+    //$availableMinutes:$employee.AvailableMinutes;
+    $employee:Employee ( $availableMinutes:availableMinutes)//id ==$empId,
+    accumulate(
+            $task : Task(employee == $employee);
+            $totalWorkTime : sum($task.getDurationIncludingArrivalTime()+$task.getTimeToReachBackUnit());
+            $totalWorkTime > $availableMinutes
+        )
+    then
+        //System.out.println("============"+$employee.getName()+"---"+$availableMinutes+"---"+$totalWorkTime);
+        scoreHolder.addSoftConstraintMatch(kcontext,0, - ((long)($totalWorkTime - $availableMinutes)));
+end
+
+rule "distanceToPreviousTaskLocation"
+salience 3
+    when
+        $task : Task(previousTaskOrVehicle != null, $distanceFromPreviousTaskOrVehicle : distanceFromPreviousTaskOrVehicle)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,1,- $distanceFromPreviousTaskOrVehicle);
+end
+rule "AllVehicleUsage"
+salience 1
+    when
+    Task ($vehicle : vehicle)
+    accumulate(
+            $task : Task(
+                vehicle == $vehicle);
+            $totalVehicleUsed : count($task);
+            $totalVehicleUsed == 0
+        )
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,2, -1);
+end
+/*
+rule "dummyTask"
+salience  10
+    when
+        $task:Task(nextTask==null)
+    then
+        $task.setNextTask(new Task(1000000+$task.getId(),$task,$task.getVehicle(),$task.getEmployee(),0,$task.getLocation(),"DUMMY",TaskType.getDummyTaskType()));
+end
+*/

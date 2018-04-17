@@ -42,7 +42,7 @@ dependencies {
         }
     }
 }*/
-publishing {
+/*publishing {
     publications {
         mavenJava(MavenPublication) {
 
@@ -62,5 +62,5 @@ publishing {
                 password = "admin2"
             }}
     }
-}
+}*/
 
