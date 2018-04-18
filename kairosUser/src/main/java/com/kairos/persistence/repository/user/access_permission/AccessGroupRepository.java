@@ -131,8 +131,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
 
     @Query("Match (accessGroup:AccessGroup),(accessPage:AccessPage) where id(accessGroup)={0} and id(accessPage) IN {1}\n" +
             "MERGE (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"]->(accessPage)\n" +
-            "ON CREATE SET r.isEnabled={2},r.creationDate={3},r.lastModificationDate={4},r.isRead={5},r.isWrite={6}\n" +
-            "ON MATCH SET r.isEnabled={2},r.lastModificationDate={4},r.isRead={5},r.isWrite={6} return true")
+            "ON CREATE SET r.isEnabled={2},r.creationDate={3},r.lastModificationDate={4},r.read={5},r.write={6}\n" +
+            "ON MATCH SET r.isEnabled={2},r.lastModificationDate={4},r.read={5},r.write={6} return true")
     List<Map<String,Object>> updateAccessPagePermission(long accessGroupId, List<Long> pageIds, boolean isSelected, long creationDate, long lastModificationDate, Boolean read, Boolean write);
 
     @Query("Match (accessPage:AccessPage),(accessGroup:AccessGroup) where id(accessPage)={4} AND id(accessGroup)={3} with accessPage,accessGroup\n" +

@@ -1,0 +1,16 @@
+bin/
+local/
+out/
+target/
+bin/
+build/
+local/
+.gradle/
+.idea/
+gradle/
+*.log
+.classpath
+.project
+
+/example.log
+/example.log.1
