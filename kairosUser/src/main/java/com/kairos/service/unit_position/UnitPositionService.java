@@ -81,6 +81,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -503,14 +504,16 @@ public class UnitPositionService extends UserBaseService {
      * @author vipul
      * used to get all positions of organization n by organization and staff Id
      * */
-    public List<UnitPositionQueryResult> getUnitPositionsOfStaff(long id, long staffId, String type) {
+    public EmploymentUnitPositionDTO getUnitPositionsOfStaff(long id, long staffId, String type) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Staff Id" + staffId);
         }
 
         User user = userGraphRepository.getUserByStaffId(staffId);
-        return unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId());
+        EmploymentQueryResult employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employment,unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) );
+        return employmentUnitPositionDTO;
 
         // TODO  Organization organization = organizationService.getOrganizationDetail(id, type);
 //        Organization parentOrganization;
