@@ -256,5 +256,4 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "toInt(last(split(cta.name,'-'))) as num " +
             "RETURN case when num is null  then 0 else MAX(num) end as result limit 1")
     Integer getLastSuffixNumberOfCTAName(String name);
-
 }

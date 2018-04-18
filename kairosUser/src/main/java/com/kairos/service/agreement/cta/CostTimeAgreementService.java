@@ -845,39 +845,23 @@ public class CostTimeAgreementService extends UserBaseService {
         return collectiveTimeAgreementGraphRepository.getAllCTAByOrganiationSubType(organizationSubTypeId);
     }
 
-    public CostTimeAgreementDTO setCTAWithOrganizationType(Long countryId, long ctaId, long organizationSubTypeId, boolean checked) {
+    public CollectiveTimeAgreementDTO setCTAWithOrganizationType(Long countryId, long ctaId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, long organizationSubTypeId, boolean checked) throws ExecutionException, InterruptedException {
         OrganizationType organizationSubType = organizationTypeRepository.findOne(organizationSubTypeId);
         if (!Optional.ofNullable(organizationSubType).isPresent()) {
             throw new DataNotFoundByIdException("Invalid organisation Sub type Id " + organizationSubTypeId);
         }
-        Optional<CostTimeAgreement> cta = collectiveTimeAgreementGraphRepository.findById(ctaId, 2);
-        if (!cta.isPresent()) {
-            throw new DataNotFoundByIdException("cta not found " + ctaId);
-        }
-        CostTimeAgreement costTimeAgreement=cta.get();
         if (checked) {
-            CostTimeAgreement newCtaObject = new CostTimeAgreement();
-            costTimeAgreement.setId(null);
-
-
-            BeanUtils.copyProperties(costTimeAgreement,newCtaObject);
-            newCtaObject.getRuleTemplates().forEach(ruleTemplate -> {
-                ruleTemplate.setId(null);
-            });
-            // for setting the unique name
-            Integer lastSuffixNumber=collectiveTimeAgreementGraphRepository.getLastSuffixNumberOfCTAName("(?i)"+costTimeAgreement.getName());
-            String name=costTimeAgreement.getName();
-            newCtaObject.setName(name.contains("-")?name.replace(name.substring(name.lastIndexOf("-")+1,name.length()),(++lastSuffixNumber).toString()):costTimeAgreement.getName()+"-"+ ++lastSuffixNumber);
-            newCtaObject.setCountry(costTimeAgreement.getCountry());
-            newCtaObject.setOrganizationType(costTimeAgreement.getOrganizationType());
-            newCtaObject.setOrganizationSubType(organizationSubType);
-            save(newCtaObject);
-            newCtaObject.setOrganizationType(newCtaObject.getOrganizationType().basicDetails());
-            newCtaObject.setOrganizationSubType(newCtaObject.getOrganizationSubType().basicDetails());
-            newCtaObject.setExpertise(newCtaObject.getExpertise().retrieveBasicDetails());
-            newCtaObject.setCountry(null);
-            return new CostTimeAgreementDTO(newCtaObject,newCtaObject.getRuleTemplates());
+            Integer lastSuffixNumber=collectiveTimeAgreementGraphRepository.getLastSuffixNumberOfCTAName("(?i)"+collectiveTimeAgreementDTO.getName());
+            String name=collectiveTimeAgreementDTO.getName();
+            collectiveTimeAgreementDTO.setName(name.contains("-")?name.replace(name.substring(name.lastIndexOf("-")+1,name.length()),(++lastSuffixNumber).toString()):collectiveTimeAgreementDTO.getName()+"-"+ ++lastSuffixNumber);
+            collectiveTimeAgreementDTO.setOrganizationSubType(organizationSubTypeId);
+            return createCostTimeAgreement(countryId,collectiveTimeAgreementDTO);
         } else {
+            Optional<CostTimeAgreement> cta = collectiveTimeAgreementGraphRepository.findById(ctaId);
+            if (!cta.isPresent()) {
+                throw new DataNotFoundByIdException("cta not found " + ctaId);
+            }
+            CostTimeAgreement costTimeAgreement=cta.get();
             costTimeAgreement.setDeleted(true);
             save(costTimeAgreement);
         }

@@ -215,7 +215,7 @@ public class AppConstants {
     public static final String TIMEBANK_ACCOUNT = "TimeBank Account";
 
     //TimeCare date importing constants
-    public static final String CalculatedTime = "ENTERED_TIMES";
+    public static final String CalculatedTime = "CalculatedTime";
     public static final String WeeklyWorkTime = "WeeklyWorkTime";
     public static final String FixedTime = "FixedTime";
     public static final String FullTimeHour = "FullTimeHour";
