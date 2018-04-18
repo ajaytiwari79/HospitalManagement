@@ -13,8 +13,8 @@ public class UnitRoleWiseKpi extends MongoBaseEntity{
 
     }
 
-    public UnitRoleWiseKpi(BigInteger unitId, BigInteger roleId, BigInteger modulewiseCounterId){
-        this.modulewiseKpiId = modulewiseCounterId;
+    public UnitRoleWiseKpi(BigInteger unitId, BigInteger roleId, BigInteger modulewiseKpiId){
+        this.modulewiseKpiId = modulewiseKpiId;
         this.roleId = roleId;
         this.unitId = unitId;
     }
