@@ -4,7 +4,6 @@ package com.kairos.service.expertise;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -14,7 +13,6 @@ import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_table.PayGrade;
-import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.model.user.staff.StaffExpertiseRelationShip;
@@ -106,7 +104,7 @@ public class ExpertiseService extends UserBaseService {
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
             expertiseResponseDTO.setNumberOfWorkingDaysInWeek(expertise.getNumberOfWorkingDaysInWeek());
-            expertiseResponseDTO.setHasVersion(expertise.isHasVersion());
+            expertiseResponseDTO.setEditable(expertise.isEditable());
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
 
         } else {
@@ -115,27 +113,7 @@ public class ExpertiseService extends UserBaseService {
             if (!Optional.ofNullable(expertise).isPresent()) {
                 throw new DataNotFoundByIdException("Invalid expertise Id");
             }
-            Collections.sort(expertise.getSeniorityLevel());
-            for (int i = 0; i < expertise.getSeniorityLevel().size(); i++) {
-                if (expertiseDTO.getSeniorityLevel().getTo() == null && expertise.getSeniorityLevel().get(i).getTo() == null) {
-                    throw new ActionNotPermittedException("Already a more than is present in seniority level " + expertise.getSeniorityLevel().get(i).getId());
-                } else if (expertiseDTO.getSeniorityLevel().getTo() == null && expertise.getSeniorityLevel().get(i).getTo() != null) {
-                    if (expertiseDTO.getSeniorityLevel().getFrom() > expertise.getSeniorityLevel().get(i).getTo()) {
-                        throw new ActionNotPermittedException("The start must be greater than " + expertise.getSeniorityLevel().get(i).getTo() + " " + expertise.getSeniorityLevel().get(i).getId());
-                    }
-                } else if (expertiseDTO.getSeniorityLevel().getTo() != null && expertise.getSeniorityLevel().get(i).getTo() == null) {
-                    if (expertiseDTO.getSeniorityLevel().getTo() > expertise.getSeniorityLevel().get(i).getFrom()) {
-                        throw new ActionNotPermittedException("The end must be less than " + expertise.getSeniorityLevel().get(i).getFrom() + " " + expertise.getSeniorityLevel().get(i).getId());
-                    }
-                } else {
-                    System.out.println(expertiseDTO.getSeniorityLevel().getFrom() + " --" + expertise.getSeniorityLevel().get(i).getFrom());
-                    if (expertiseDTO.getSeniorityLevel().getFrom() < expertise.getSeniorityLevel().get(i).getFrom() && !(expertiseDTO.getSeniorityLevel().getTo() <= expertise.getSeniorityLevel().get(i).getFrom())) {
-                        throw new ActionNotPermittedException("Already a Sr level is present" + expertise.getSeniorityLevel().get(i).getTo() + " from- " + expertise.getSeniorityLevel().get(i).getFrom());
-                    } else if (expertiseDTO.getSeniorityLevel().getFrom() > expertise.getSeniorityLevel().get(i).getFrom() && !(expertiseDTO.getSeniorityLevel().getTo() >= expertise.getSeniorityLevel().get(i).getTo())) {
-                        throw new ActionNotPermittedException("Already a Sr level is present" + expertise.getSeniorityLevel().get(i).getTo() + " from- " + expertise.getSeniorityLevel().get(i).getFrom());
-                    }
-                }
-            }
+            validateSeniorityLevel(expertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), -1L);
             if (expertise.isPublished()) {
                 expertiseResponseDTO = createCopyOfExpertise(expertise, expertiseDTO, countryId);
                 // Expertise is already published Now we need to maintain a tempCopy of it.
@@ -152,6 +130,36 @@ public class ExpertiseService extends UserBaseService {
         return expertiseResponseDTO;
     }
 
+    private void validateSeniorityLevel(List<SeniorityLevel> seniorityLevels, SeniorityLevelDTO seniorityLevelDTO, Long currentSeniorityLevelId) {
+        Collections.sort(seniorityLevels);
+        for (int i = 0; i < seniorityLevels.size(); i++) {
+            if (!seniorityLevels.get(i).getId().equals(currentSeniorityLevelId)) { // we are skipping the current
+                if (seniorityLevelDTO.getTo() == null && seniorityLevels.get(i).getTo() == null) {
+                    throw new ActionNotPermittedException("Already a more than is present in seniority level " + seniorityLevels.get(i).getId());
+                } else if (seniorityLevelDTO.getTo() == null && seniorityLevels.get(i).getTo() != null) {
+                    if (seniorityLevelDTO.getFrom() > seniorityLevels.get(i).getTo()) {
+                        throw new ActionNotPermittedException("The start must be greater than " + seniorityLevels.get(i).getTo() + " " + seniorityLevels.get(i).getId());
+                    }
+                    break;
+                } else if (seniorityLevelDTO.getTo() != null && seniorityLevels.get(i).getTo() == null) {
+                    if (seniorityLevelDTO.getTo() > seniorityLevels.get(i).getFrom()) {
+                        throw new ActionNotPermittedException("The end must be less than " + seniorityLevels.get(i).getFrom() + " " + seniorityLevels.get(i).getId());
+                    }
+
+                } else {
+                    if (seniorityLevelDTO.getFrom() < seniorityLevels.get(i).getFrom() && !(seniorityLevelDTO.getTo() <= seniorityLevels.get(i).getFrom())) {
+                        throw new ActionNotPermittedException("Already a Sr level is present 1:" + seniorityLevels.get(i).getId());
+                    } else if (seniorityLevelDTO.getFrom() > seniorityLevels.get(i).getFrom() && !(seniorityLevelDTO.getFrom() >= seniorityLevels.get(i).getTo())) {
+                        throw new ActionNotPermittedException("Already a Sr level is present 2:" + seniorityLevels.get(i).getId());
+                    } else if (seniorityLevelDTO.getFrom() == seniorityLevels.get(i).getFrom() || (seniorityLevelDTO.getTo() == seniorityLevels.get(i).getTo())) {
+                        throw new ActionNotPermittedException("Same Seniority level already exists");
+                    }
+                }
+            }
+        }
+
+    }
+
     public ExpertiseResponseDTO createCopyOfExpertise(Expertise expertise, CountryExpertiseDTO expertiseDTO, Long countryId) {
 
         ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
@@ -160,9 +168,10 @@ public class ExpertiseService extends UserBaseService {
         BeanUtils.copyProperties(expertise, copiedExpertise);
         copiedExpertise.setId(null);
         expertise.setHasDraftCopy(true);
-        expertise.setHasVersion(true);
+        expertise.setEditable(false);
+        copiedExpertise.setEditable(true);
         copiedExpertise.setPublished(false);
-        copiedExpertise.setExpertise(expertise);
+        copiedExpertise.setParentExpertise(expertise);
         copiedExpertise.setSeniorityLevel(null);
 
         List<SeniorityLevelDTO> seniorityLevelDTOList = new ArrayList<>();
@@ -179,7 +188,7 @@ public class ExpertiseService extends UserBaseService {
         expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
         expertiseResponseDTO.setId(copiedExpertise.getId());
         expertiseResponseDTO.setPublished(false);
-        expertiseResponseDTO.setHasVersion(true);
+        expertiseResponseDTO.setEditable(true);
         // setting previous Id as parent id
         expertiseResponseDTO.setParentId(expertise.getId());
         expertiseResponseDTO.setSeniorityLevels(seniorityLevelDTOList);
@@ -218,14 +227,14 @@ public class ExpertiseService extends UserBaseService {
                 if (Optional.ofNullable(functionAndSeniorityLevel.getPayGroupAreas()).isPresent() && !functionAndSeniorityLevel.getPayGroupAreas().isEmpty()) {
                     seniorityLevel.setPayGroupAreas(functionAndSeniorityLevel.getPayGroupAreas());
                 }
-
-                if (Optional.ofNullable(seniorityLevelFromDB.getMoreThan()).isPresent())
-                    seniorityLevel.setMoreThan(seniorityLevelFromDB.getMoreThan());
-                else {
-                    seniorityLevel.setFrom(seniorityLevelFromDB.getFrom());
-                    seniorityLevel.setTo(seniorityLevelFromDB.getTo());
+                if (Optional.ofNullable(functionAndSeniorityLevel.getPayGrade()).isPresent()) {
+                    seniorityLevel.setPayGrade(functionAndSeniorityLevel.getPayGrade());
                 }
-                seniorityLevel.setPayGrade(seniorityLevelFromDB.getPayGrade());
+
+                seniorityLevel.setFrom(seniorityLevelFromDB.getFrom());
+                seniorityLevel.setTo(seniorityLevelFromDB.getTo());
+
+
                 seniorityLevel.setPensionPercentage(seniorityLevelFromDB.getPensionPercentage());
                 seniorityLevel.setFreeChoicePercentage(seniorityLevelFromDB.getFreeChoicePercentage());
                 seniorityLevel.setFreeChoiceToPension(seniorityLevelFromDB.getFreeChoiceToPension());
@@ -378,11 +387,7 @@ public class ExpertiseService extends UserBaseService {
         if (!seniorityLevelToUpdate.isPresent()) {
             throw new DataNotFoundByIdException("Seniority Level not found in expertise" + expertiseDTO.getSeniorityLevel().getId());
         }
-        Boolean basePayGrade = seniorityLevelGraphRepository.checkPayGradeInSeniorityLevel(expertiseDTO.getId(), seniorityLevelToUpdate.get().getId(), expertiseDTO.getSeniorityLevel().getPayGradeId());
 
-        if (basePayGrade) {
-            throw new DuplicateDataException("Base Pay grade already exist in expertise");
-        }
 
         ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
         if (currentExpertise.isPublished()) {
@@ -392,10 +397,11 @@ public class ExpertiseService extends UserBaseService {
             Expertise copiedExpertise = new Expertise();
             BeanUtils.copyProperties(currentExpertise, copiedExpertise);
             copiedExpertise.setId(null);
+
             currentExpertise.setHasDraftCopy(true);
-            currentExpertise.setHasVersion(true);
+            currentExpertise.setEditable(false);
             copiedExpertise.setPublished(false);
-            copiedExpertise.setExpertise(currentExpertise);
+            copiedExpertise.setParentExpertise(currentExpertise);
             // copiedExpertise.getSeniorityLevel().clear();
             // Calling this function to get any updates or updated value from DTO.
             updateCurrentExpertise(countryId, copiedExpertise, expertiseDTO);
@@ -415,9 +421,10 @@ public class ExpertiseService extends UserBaseService {
             // NOW WE need to add the other seniority level which exists in expertise
             // since we have already
             seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, currentExpertise.getSeniorityLevel(), seniorityLevelToUpdate.get().getId()));
+
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setPublished(false);
-            expertiseResponseDTO.setHasVersion(true);
+            expertiseResponseDTO.setEditable(true);
             expertiseResponseDTO.setId(copiedExpertise.getId());
             expertiseResponseDTO.setParentId(currentExpertise.getId());
             expertiseResponseDTO.setSeniorityLevels(seniorityLevelDTOList);
@@ -425,6 +432,7 @@ public class ExpertiseService extends UserBaseService {
 
         } else {
             // update in current expertise :)
+            validateSeniorityLevel(currentExpertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), expertiseDTO.getSeniorityLevel().getId());
             updateCurrentSeniorityLevel(expertiseDTO.getSeniorityLevel(), seniorityLevelToUpdate.get());
             updateCurrentExpertise(countryId, currentExpertise, expertiseDTO);
             save(currentExpertise);
@@ -526,7 +534,7 @@ public class ExpertiseService extends UserBaseService {
 
     }
 
-    public boolean deleteExpertise(Long expertiseId) {
+    public ExpertiseQueryResult deleteExpertise(Long expertiseId) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
             throw new DataNotFoundByIdException("Invalid expertise Id");
@@ -535,13 +543,20 @@ public class ExpertiseService extends UserBaseService {
             throw new ActionNotPermittedException("Expertise can't be removed, Its already published");
 
         }
+        ExpertiseQueryResult parentExpertise= expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
+        if (Optional.ofNullable(parentExpertise).isPresent()){
+            // remove link and unlink
+            expertiseGraphRepository.unlinkExpertiseAndMakeEditable(parentExpertise.getId(), true,false);
+
+            parentExpertise.setEditable(true);
+        }
         expertise.setDeleted(true);
         if (Optional.ofNullable(expertise.getSeniorityLevel()).isPresent() && !expertise.getSeniorityLevel().isEmpty()) {
             for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel())
                 seniorityLevel.setDeleted(true);
         }
         save(expertise);
-        return true;
+        return parentExpertise;
     }
 
 
@@ -552,7 +567,6 @@ public class ExpertiseService extends UserBaseService {
         }
         if (expertise.isPublished()) {
             throw new ActionNotPermittedException("SeniorityLevelId can't be removed, expertise is already published");
-
         }
 
         if (Optional.ofNullable(expertise.getSeniorityLevel()).isPresent() && !expertise.getSeniorityLevel().isEmpty()) {
@@ -576,7 +590,7 @@ public class ExpertiseService extends UserBaseService {
         }
         staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
         return retrieveExpertiseDetails(currentStaff);
-//        currentStaff.setExpertise(expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds));
+//        currentStaff.setParentExpertise(expertiseGraphRepository.getExpertiseByIdsIn(expertiseIds));
 //        Staff staff = staffGraphRepository.save(currentStaff);
 //        return  staff.retrieveExpertiseDetails();
 

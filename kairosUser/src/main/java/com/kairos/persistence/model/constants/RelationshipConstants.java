@@ -229,7 +229,7 @@ public abstract class RelationshipConstants {
     public final static String SUPPORTED_BY_UNION = "SUPPORTED_BY_UNION";
     public final static String SUPPORTS_SERVICE = "SUPPORTS_SERVICE";
     public final static String HAS_FUNCTION = "HAS_FUNCTION";
-    public final static String HAS_DRAFT_EXPERTISE = "HAS_DRAFT_EXPERTISE";
+    public final static String VERSION_OF = "VERSION_OF";
     public final static String HAS_PAY_TABLE = "HAS_PAY_TABLE";
     public final static String HAS_BASE_PAY_GRADE = "HAS_BASE_PAY_GRADE";
     public final static String HAS_SENIORITY_LEVEL = "HAS_SENIORITY_LEVEL";

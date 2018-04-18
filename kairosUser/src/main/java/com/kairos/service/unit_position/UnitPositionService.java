@@ -426,7 +426,7 @@ public class UnitPositionService extends UserBaseService {
 //            if (!Optional.ofNullable(expertise).isPresent()) {
 //                throw new DataNotFoundByIdException("Invalid expertise id");
 //            }
-//            oldUnitPosition.setExpertise(expertise);
+//            oldUnitPosition.setParentExpertise(expertise);
         }
         if (!oldUnitPosition.getPositionCode().getId().equals(unitPositionDTO.getPositionCodeId())) {
             throw new ActionNotPermittedException("Position Code cant be changed" + unitPositionDTO.getPositionCodeId());
@@ -541,9 +541,9 @@ public class UnitPositionService extends UserBaseService {
 
         SeniorityLevel appliedSeniorityLevel = null;
         for (SeniorityLevel seniorityLevel : currentExpertise.get().getSeniorityLevel()) {
-            if (seniorityLevel.getMoreThan() != null) {
+            if (seniorityLevel.getTo() == null) {
                 // more than  is set if
-                if (experienceInMonth >= seniorityLevel.getMoreThan() * 12) {
+                if (experienceInMonth >= seniorityLevel.getFrom() * 12) {
                     appliedSeniorityLevel = seniorityLevel;
                     break;
                 }
@@ -551,7 +551,7 @@ public class UnitPositionService extends UserBaseService {
                 // to and from is present
                 logger.info("user has current experience in months :{} ,{},{},{}", seniorityLevel.getFrom(), experienceInMonth, seniorityLevel.getTo(), experienceInMonth);
 
-                if (seniorityLevel.getFrom() * 12 <= experienceInMonth && seniorityLevel.getTo() * 12 >= experienceInMonth) {
+                if (seniorityLevel.getFrom() * 12 < experienceInMonth && seniorityLevel.getTo() * 12 >= experienceInMonth) {
                     appliedSeniorityLevel = seniorityLevel;
                     break;
                 }

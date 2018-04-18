@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  * Created by vipul on 27/3/18.
  */
 @NodeEntity
-public class SeniorityLevel extends UserBaseEntity  implements Comparable<SeniorityLevel>{
+public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel> {
     private Integer from;
     private Integer to;
     private Integer moreThan;
@@ -110,6 +110,6 @@ public class SeniorityLevel extends UserBaseEntity  implements Comparable<Senior
 
     @Override
     public int compareTo(SeniorityLevel seniorityLevel) {
-        return this.from-seniorityLevel.from;
+        return seniorityLevel.from - this.from;
     }
 }

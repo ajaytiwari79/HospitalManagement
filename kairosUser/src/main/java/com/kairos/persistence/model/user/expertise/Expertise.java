@@ -8,7 +8,6 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationService;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.tag.Tag;
-import com.kairos.persistence.model.user.pay_table.PayTable;
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -36,7 +35,6 @@ public class Expertise extends UserBaseEntity{
     //@NotEmpty(message = "error.Expertise.description.notEmpty") @NotNull(message = "error.Expertise.description.notnull")
     private String description;
 
-    private boolean isEnabled = true;
 
     @Relationship(type = BELONGS_TO)
     Country country;
@@ -59,12 +57,12 @@ public class Expertise extends UserBaseEntity{
 
     private PaidOutFrequencyEnum paidOutFrequency;
 
-    @Relationship(type = HAS_DRAFT_EXPERTISE)
-    private Expertise expertise;
+    @Relationship(type = VERSION_OF)
+    private Expertise parentExpertise;
 
     private boolean published;
     private boolean hasDraftCopy;
-    private boolean hasVersion;
+    private boolean editable;
 
 
     @Relationship(type = FOR_SENIORITY_LEVEL)
@@ -79,9 +77,7 @@ public class Expertise extends UserBaseEntity{
         this.description = description;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
-    }
+
 
     public Country getCountry() {
         return country;
@@ -100,9 +96,6 @@ public class Expertise extends UserBaseEntity{
         this.name = name;
     }
 
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
 
     public List<Tag> getTags() {
         return tags;
@@ -202,20 +195,20 @@ public class Expertise extends UserBaseEntity{
         this.hasDraftCopy = hasDraftCopy;
     }
 
-    public Expertise getExpertise() {
-        return expertise;
+    public Expertise getParentExpertise() {
+        return parentExpertise;
     }
 
-    public void setExpertise(Expertise expertise) {
-        this.expertise = expertise;
+    public void setParentExpertise(Expertise parentExpertise) {
+        this.parentExpertise = parentExpertise;
     }
 
-    public boolean isHasVersion() {
-        return hasVersion;
+    public boolean isEditable() {
+        return editable;
     }
 
-    public void setHasVersion(boolean hasVersion) {
-        this.hasVersion = hasVersion;
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
     public Expertise() {
