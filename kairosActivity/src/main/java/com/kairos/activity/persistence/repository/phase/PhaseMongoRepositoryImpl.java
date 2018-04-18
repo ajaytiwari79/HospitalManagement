@@ -58,26 +58,6 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
 
     }
 
-    /*public List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId,Date startDate, Date endDate) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("isMainShift").is(true).and("unitPositionId").is(unitEmploymentPositionId)
-                        .and("startDate").lte(endDate).and("endDate").gte(startDate)),
-                graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShift"),unwind("subShifts",true),
-                lookup("activities","subShift.activityId","_id","subShift.activity"),
-                lookup("activities","activityId","_id","activity")
-                ,project("unitId")
-                        .andInclude("deleted")
-                        .andInclude("startDate")
-                        .andInclude("endDate").andInclude("scheduledMinutes").andInclude("durationMinutes")
-                        .andInclude("isMainShift").andInclude("subShift")
-                        //.andInclude("subShift.startDate").andInclude("subShift.endDate")
-                        .andInclude("subShift.activity")
-                        .and("activity").arrayElementAt(0).as("activity")
-        );
-        AggregationResults<ShiftQueryResultWithActivity> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResultWithActivity.class);
-        return result.getMappedResults();
-    }*/
-
     public List<OrganizationPhaseDTO> getPhasesGroupByOrganization(){
         Aggregation aggregation = Aggregation.newAggregation(group("$organizationId").push("$$ROOT").as("phases"));
         AggregationResults<OrganizationPhaseDTO> result = mongoTemplate.aggregate(aggregation,Phase.class ,OrganizationPhaseDTO.class);
