@@ -1,9 +1,12 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.PaymentSettings;
+import com.kairos.persistence.model.organization.PaymentSettingsQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PAYMENT_SETTINGS;
 
@@ -12,8 +15,12 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  */
 @Repository
 public interface PaymentSettingRepository extends Neo4jBaseRepository<PaymentSettings, Long> {
-    @Query("match(paymentSettings:PaymentSettings{deleted:false})<-["+HAS_PAYMENT_SETTINGS+"]-(unit:Organization) where id(unit)={0}" +
+    @Query("match(paymentSettings:PaymentSettings{deleted:false})<-[" + HAS_PAYMENT_SETTINGS + "]-(unit:Organization) where id(unit)={0}" +
+            " return id(paymentSettings) as id,paymentSettings.dateOfPayment as dateOfPayment,paymentSettings.monthOfPayment as monthOfPayment,paymentSettings.type as type")
+    List<PaymentSettingsQueryResult> getPaymentSettingByUnitId(Long unitId);
+
+    @Query("match(paymentSettings:PaymentSettings{deleted:false})<-[" + HAS_PAYMENT_SETTINGS + "]-(unit:Organization) where id(unit)={0} AND id(paymentSettings)={1}" +
             " return paymentSettings")
-    PaymentSettings getPaymentSettingByUnitId(Long unitId);
+    PaymentSettings getPaymentSettingByUnitId(Long unitId, Long paymentSettingId);
 
 }

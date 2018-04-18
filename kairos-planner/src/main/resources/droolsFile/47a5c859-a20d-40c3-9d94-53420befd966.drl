@@ -1,0 +1,112 @@
+package com.kairos.shiftplanning.rules; 
+
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+import com.kairos.shiftplanning.domain.*;
+import java.util.ArrayList;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+dialect "java"
+
+rule "Max consecutiveDays"
+    salience 20
+when
+    $shifts:ArrayList() from collect (Shift()) Shift(getConsecutiveDays($shifts)>5)  
+then
+scoreHolder.addMediumConstraintMatch(kcontext,-1);
+
+end
+
+rule "Maximum shift per Day if Created by staff"
+    salience 20
+when
+    $shifts:ArrayList() from collect (Shift()) Shift(isCreatedByStaff() && getSameDayShiftCount($shifts)>3)  
+then
+scoreHolder.addMediumConstraintMatch(kcontext,-1);
+
+end
+
+rule "Minimum shift hours if Created By Staff"
+    salience 20
+when
+    Shift(isCreatedByStaff() && getMinutes()<60)  
+then
+scoreHolder.addHardConstraintMatch(kcontext,-1);
+
+end
+
+rule "Minimum shift hours"
+    salience 20
+when
+    Shift(!isCreatedByStaff() && getMinutes()<240)  
+then
+scoreHolder.addHardConstraintMatch(kcontext,-1);
+
+end
+
+rule "Max working hours of this week"
+    salience 20
+when
+    $shifts:ArrayList() from collect (Shift()) $shift:Shift(getWorkingHoursOfWeek($shifts)>2880)  
+then
+scoreHolder.addMediumConstraintMatch(kcontext,-1);
+
+end
+
+rule "Min resting time between 2 working days"
+    salience 20
+when
+    $shifts:ArrayList() from collect (Shift()) 
+ Shift( getRestingTimeBetweenTwoWorkingDays($shifts)<660)  
+then
+scoreHolder.addHardConstraintMatch(kcontext,-1);
+
+end
+
+rule "Max time between 2 shifts same day"
+    salience 20
+when
+    $shifts:ArrayList() from collect (Shift()) Shift(getTimeBetweenTwoShiftsInSameDay($shifts)>240)  
+then
+scoreHolder.addMediumConstraintMatch(kcontext,-1);
+
+end
+
+rule "Assigned Start time"
+    salience 20
+when
+    Shift(minutes ==0)  
+then
+scoreHolder.addHardConstraintMatch(kcontext,-1);
+
+end
+
+rule "Maximum shifts per Day"
+    salience 20
+when
+    $shifts:ArrayList() from collect (Shift()) Shift(!isCreatedByStaff() && getSameDayShiftCount($shifts)>2)  
+then
+scoreHolder.addMediumConstraintMatch(kcontext,-1);
+
+end
+
+rule "Maximum length of Shift"
+    salience 20
+when
+    Shift($minutes:minutes, $minutes>480)  
+then
+scoreHolder.addMediumConstraintMatch(kcontext,-1);
+
+end
+
+rule "Staffing Level Limits"
+    salience 20
+when
+    $shift:Shift() $staffingLevel:StaffingLevel(getStaffingLevelSatisfaction($shift)>0)  
+then
+scoreHolder.addMediumConstraintMatch(kcontext,-1);
+
+end
+
+
