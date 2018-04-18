@@ -30,6 +30,7 @@ import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
+import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -96,22 +98,20 @@ public class ActivityService extends MongoBaseService {
     public ActivityTagDTO createActivity(Long countryId, ActivityDTO activityDTO) {
         logger.info(activityDTO.getName());
         Activity activity = activityMongoRepository.
-                findByNameIgnoreCaseAndDeletedFalse(activityDTO.getName());
+                findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
+
         if (Optional.ofNullable(activity).isPresent()) {
             logger.error("ActivityName already exist" + activityDTO.getName());
             throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
         }
         activity = activityDTO.buildActivity();
         initializeActivityTabs(activity, countryId);
-        activity.getTimeCalculationActivityTab().setMultiplyWith(true);
-        activity.getTimeCalculationActivityTab().setMultiplyWithValue(1d);
-        activity.getTimeCalculationActivityTab().setFixedTimeValue(0l);
-        activity.getTimeCalculationActivityTab().setDefaultStartTime(LocalTime.of(7,0));
         save(activity);
         // Fetch tags detail
         List<TagDTO> tags = tagMongoRepository.getTagsById(activityDTO.getTags());
         ActivityTagDTO activityTagDTO = new ActivityTagDTO();
         activityTagDTO.buildActivityTagDTO(activity, tags);
+
         return activityTagDTO;
     }
 
@@ -121,7 +121,7 @@ public class ActivityService extends MongoBaseService {
         generalActivityTab.setColorPresent(false);
         activity.setCountryId(countryId);
 
-        ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId,false);
+        ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId, false);
         if (activityCategory != null) {
             generalActivityTab.setCategoryId(activityCategory.getId());
         } else {
@@ -142,7 +142,7 @@ public class ActivityService extends MongoBaseService {
                 false, false, false, false, false, false, null, phaseTemplateValues);
         activity.setRulesActivityTab(rulesActivityTab);
 
-        TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab("ENTERED_TIMES");
+        TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab(ENTERED_TIMES, 0l, true, LocalTime.of(7, 0), 1d);
         activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
 
         IndividualPointsActivityTab individualPointsActivityTab = new IndividualPointsActivityTab("addHourValues", 0.0);
@@ -151,7 +151,7 @@ public class ActivityService extends MongoBaseService {
         CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab(false, "hours", 1, false);
         activity.setCommunicationActivityTab(communicationActivityTab);
 
-        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(false, false, false);
+        OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(false, false, false,false);
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
 
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(false);
@@ -161,7 +161,8 @@ public class ActivityService extends MongoBaseService {
 
         SkillActivityTab skillActivityTab = new SkillActivityTab();
         activity.setSkillActivityTab(skillActivityTab);
-
+        LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST,Collections.EMPTY_LIST);
+        activity.setLocationActivityTab(locationActivityTab);
 
     }
 
@@ -169,14 +170,14 @@ public class ActivityService extends MongoBaseService {
         return activityMongoRepository.findAllActivityByCountry(countryId);
     }*/
 
-    public Map<String,Object>  findAllActivityByCountry(long countryId) {
-        Map<String,Object> response=new HashMap<>();
+    public Map<String, Object> findAllActivityByCountry(long countryId) {
+        Map<String, Object> response = new HashMap<>();
 
-        List<ActivityTagDTO> activities= activityMongoRepository.findAllActivityByCountry(countryId);
-        List<ActivityCategory> acivitityCategories=activityCategoryRepository.findByCountryId(countryId);
-        response.put("activities",activities);
-        response.put("activityCategories",acivitityCategories);
-        return  response;
+        List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByCountry(countryId);
+        List<ActivityCategory> acivitityCategories = activityCategoryRepository.findByCountryId(countryId);
+        response.put("activities", activities);
+        response.put("activityCategories", acivitityCategories);
+        return response;
     }
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {
@@ -191,16 +192,16 @@ public class ActivityService extends MongoBaseService {
         return activityMongoRepository.findAllActivityWithCtaWtaSettingByUnit(unitId);
     }
 
-    public HashMap<Long,HashMap<Long,Long>> getListOfActivityIdsOfUnitByParentIds(List<BigInteger> parentActivityIds, List<Long> unitIds) {
+    public HashMap<Long, HashMap<Long, Long>> getListOfActivityIdsOfUnitByParentIds(List<BigInteger> parentActivityIds, List<Long> unitIds) {
         List<OrganizationActivityDTO> unitActivities = activityMongoRepository.findAllActivityOfUnitsByParentActivity(parentActivityIds, unitIds);
-        HashMap<Long,HashMap<Long,Long>> mappedParentUnitActivities = new HashMap<Long,HashMap<Long,Long>>();
+        HashMap<Long, HashMap<Long, Long>> mappedParentUnitActivities = new HashMap<Long, HashMap<Long, Long>>();
         unitActivities.forEach(activityDTO -> {
-            HashMap<Long,Long> unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
-            if( ! Optional.ofNullable(  unitParentActivities ).isPresent()){
-                mappedParentUnitActivities.put(activityDTO.getUnitId().longValue(), new HashMap<Long,Long>());
+            HashMap<Long, Long> unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
+            if (!Optional.ofNullable(unitParentActivities).isPresent()) {
+                mappedParentUnitActivities.put(activityDTO.getUnitId().longValue(), new HashMap<Long, Long>());
                 unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
             }
-            unitParentActivities.put(activityDTO.getParentId().longValue() ,  activityDTO.getId().longValue());
+            unitParentActivities.put(activityDTO.getParentId().longValue(), activityDTO.getId().longValue());
         });
         return mappedParentUnitActivities;
     }
@@ -209,8 +210,9 @@ public class ActivityService extends MongoBaseService {
 
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid TimeCareActivity Id : " + activityId);
+            throw new DataNotFoundByIdException("Invalid activity Id : " + activityId);
         }
+
         long activityCount = shiftService.countByActivityId(activityId);
         if (activityCount > 0) {
             throw new ActionNotPermittedException("TimeCareActivity type is being used in activities");
@@ -224,7 +226,7 @@ public class ActivityService extends MongoBaseService {
     public ActivityTabsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
         //check category is available in country
         logger.info(generalDTO.toString());
-        ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted(generalDTO.getCategoryName(), countryId,false);
+        ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted(generalDTO.getCategoryName(), countryId, false);
 
         if (activityCategory != null) {
 
@@ -705,10 +707,15 @@ public class ActivityService extends MongoBaseService {
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Activity Id : " + activityId);
         }
-        Integer activityTypeCount = activityMongoRepository.countByParentIdAndDeletedFalse(activityId);
-        if (activityTypeCount > 0) {
-            throw new ActionNotPermittedException("TimeCareActivity type is being used in organizations");
+        if (activity.getState().equals(ActivityStateEnum.LIVE)) {
+            throw new ActionNotPermittedException("activity type is being used in organizations : " + activityId);
         }
+
+
+//        Integer activityTypeCount = activityMongoRepository.countByParentIdAndDeletedFalse(activityId);
+//        if (activityTypeCount > 0) {
+//            throw new ActionNotPermittedException("activity type is being used in organizations");
+//        }
         activity.setDeleted(true);
         save(activity);
         return true;
@@ -748,25 +755,25 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    public List<Activity> createActivitiesFromTimeCare(GetAllActivitiesResponse getAllActivitiesResponse, Long unitId, Long countryId,BigInteger presenceTimeTypeId,BigInteger absenceTimeTypeId) {
+    public List<Activity> createActivitiesFromTimeCare(GetAllActivitiesResponse getAllActivitiesResponse, Long unitId, Long countryId, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
 
         List<TimeCareActivity> timeCareActivities = getAllActivitiesResponse.getGetAllActivitiesResult();
         List<String> externalIdsOfAllActivities = timeCareActivities.stream().map(timeCareActivity -> timeCareActivity.getId()).collect(Collectors.toList());
-        List<Activity> countryActivities = createActivatesForCountryFromTimeCare(timeCareActivities, unitId, countryId, externalIdsOfAllActivities,presenceTimeTypeId,absenceTimeTypeId);
+        List<Activity> countryActivities = createActivatesForCountryFromTimeCare(timeCareActivities, unitId, countryId, externalIdsOfAllActivities, presenceTimeTypeId, absenceTimeTypeId);
         mapActivitiesInOrganization(countryActivities, unitId, externalIdsOfAllActivities);
         return countryActivities;
     }
 
     private List<Activity> createActivatesForCountryFromTimeCare(List<TimeCareActivity> timeCareActivities, Long unitId, Long countryId,
-                                                                 List<String> externalIdsOfAllActivities,BigInteger presenceTimeTypeId,BigInteger absenceTimeTypeId) {
+                                                                 List<String> externalIdsOfAllActivities, BigInteger presenceTimeTypeId, BigInteger absenceTimeTypeId) {
 
         OrganizationDTO organizationDTO = organizationRestClient.getOrganization(unitId);
         if (organizationDTO == null) {
             throw new DataNotFoundByIdException("Incorrect Organization id");
         }
-        ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId,false);
+        ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId, false);
         if (activityCategory == null) {
-             activityCategory = new ActivityCategory("NONE", "", countryId);
+            activityCategory = new ActivityCategory("NONE", "", countryId);
             save(activityCategory);
         }
         List<Long> orgTypes = organizationDTO.getOrganizationTypes().stream().map(organizationTypeDTO -> organizationTypeDTO.getId()).collect(Collectors.toList());
@@ -786,6 +793,7 @@ public class ActivityService extends MongoBaseService {
             Activity activity = (result.isPresent()) ? result.get() : new Activity();
             activity.setCountryId(countryId);
             activity.setParentActivity(true);
+            activity.setState(ActivityStateEnum.LIVE);
             activity.setName(timeCareActivity.getName());
             activity.setOrganizationTypes(orgTypes);
             activity.setOrganizationSubTypes(orgSubTypes);
@@ -801,7 +809,7 @@ public class ActivityService extends MongoBaseService {
             //balance setting tab
             BalanceSettingsActivityTab balanceSettingsActivityTab = Optional.ofNullable(activity.getBalanceSettingsActivityTab()).isPresent() ? activity.getBalanceSettingsActivityTab() :
                     new BalanceSettingsActivityTab();
-            balanceSettingsActivityTab.setTimeTypeId(timeCareActivity.getIsWork() && timeCareActivity.getIsPresence()?presenceTimeTypeId:absenceTimeTypeId);
+            balanceSettingsActivityTab.setTimeTypeId(timeCareActivity.getIsWork() && timeCareActivity.getIsPresence() ? presenceTimeTypeId : absenceTimeTypeId);
             balanceSettingsActivityTab.setNegativeDayBalancePresent(timeCareActivity.getNegativeDayBalance());
             balanceSettingsActivityTab.setAddDayTo(timeCareActivity.getBalanceDayType().replace(" ", "_"));
             activity.setBalanceSettingsActivityTab(balanceSettingsActivityTab);
@@ -816,6 +824,9 @@ public class ActivityService extends MongoBaseService {
             rulesActivityTab.setEligibleForSchedules(phaseTemplateValues);
             activity.setRulesActivityTab(rulesActivityTab);
 
+            // location settings
+            LocationActivityTab locationActivityTab = new LocationActivityTab(Collections.EMPTY_LIST,Collections.EMPTY_LIST);
+            activity.setLocationActivityTab(locationActivityTab);
 
             //Time calculation tab
             TimeCalculationActivityTab timeCalculationActivityTab = Optional.ofNullable(activity.getTimeCalculationActivityTab()).isPresent() ?
@@ -824,10 +835,10 @@ public class ActivityService extends MongoBaseService {
             balanceTypes.add(timeCareActivity.getBalanceType().replace(" ", "_"));
             timeCalculationActivityTab.setMethodForCalculatingTime(durationCalculationMethod(timeCareActivity.getTimeMethod()));
             timeCalculationActivityTab.setBalanceType(balanceTypes);
-            if(timeCalculationActivityTab.getMethodForCalculatingTime().equals(FIXED_TIME)) {
+            if (timeCalculationActivityTab.getMethodForCalculatingTime().equals(FIXED_TIME)) {
                 timeCalculationActivityTab.setFixedTimeValue(0l);
             }
-            timeCalculationActivityTab.setDefaultStartTime(LocalTime.of(7,0));
+            timeCalculationActivityTab.setDefaultStartTime(LocalTime.of(7, 0));
             timeCalculationActivityTab.setMultiplyWithValue(1d);
             timeCalculationActivityTab.setMultiplyWith(true);
             if (!StringUtils.isBlank(timeCareActivity.getMultiplyTimeWith())) {
@@ -853,16 +864,20 @@ public class ActivityService extends MongoBaseService {
     }
 
 
-    private String durationCalculationMethod(String method){
+    private String durationCalculationMethod(String method) {
         String calculationType = null;
-        switch (method){
-            case FixedTime:calculationType = FIXED_TIME;
+        switch (method) {
+            case FixedTime:
+                calculationType = FIXED_TIME;
                 break;
-            case FullTimeHour:calculationType = FULL_DAY_CALCULATION;
+            case FullTimeHour:
+                calculationType = FULL_DAY_CALCULATION;
                 break;
-            case WeeklyWorkTime:calculationType = WEEKLY_HOURS;
+            case WeeklyWorkTime:
+                calculationType = WEEKLY_HOURS;
                 break;
-            case CalculatedTime:calculationType = ENTERED_TIMES;
+            case CalculatedTime:
+                calculationType = ENTERED_TIMES;
                 break;
        /*     case "":
                 break;*/
@@ -888,6 +903,7 @@ public class ActivityService extends MongoBaseService {
                 activity.setUnitId(unitId);
                 activity.setParentActivity(false);
                 activity.setOrganizationTypes(null);
+                activity.setState(null);
                 activity.setOrganizationSubTypes(null);
                 activity.setLevels(null);
                 activity.setRegions(null);
@@ -928,5 +944,59 @@ public class ActivityService extends MongoBaseService {
         activity.getNotesActivityTab().setModifiedDocumentName(modifiedFileName);
         save(activity);
         return activity.getNotesActivityTab();
+    }
+
+    public Boolean publishActivity(BigInteger activityId) {
+        Activity activity = activityMongoRepository.findOne(activityId);
+        if (!Optional.ofNullable(activity).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + activityId);
+        }
+        if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
+            throw new ActionNotPermittedException("activity is already published :" + activityId);
+        }
+        activity.setState(ActivityStateEnum.PUBLISHED);
+        save(activity);
+        return true;
+    }
+
+    public ActivityDTO copyActivityDetails(Long countryId, BigInteger activityId, ActivityDTO activityDTO) {
+        Activity activity = activityMongoRepository.
+                findByNameIgnoreCaseAndDeletedFalseAndCountryId(activityDTO.getName().trim(), countryId);
+        if (Optional.ofNullable(activity).isPresent()) {
+            logger.error("ActivityName already exist " + activityDTO.getName());
+            throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
+        }
+        Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
+        if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
+            throw new DataNotFoundByIdException("Invalid ActivityId:" + activityId);
+        }
+
+        Activity activityCopied = new Activity();
+        Activity.copyProperties(activityFromDatabase.get(), activityCopied, "id", "organizationTypes", "organizationSubTypes");
+        activityCopied.setName(activityDTO.getName().trim());
+        activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
+        activityCopied.setState(ActivityStateEnum.DRAFT);
+        save(activityCopied);
+        activityDTO.setId(activityCopied.getId());
+        return activityDTO;
+    }
+
+    public ActivityTabsWrapper getLocationsTabOfActivity(BigInteger activityId) {
+        Activity activity = activityMongoRepository.findOne(activityId);
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(activity.getLocationActivityTab());
+        return activityTabsWrapper;
+    }
+
+    public ActivityTabsWrapper updateLocationsTabOfActivity(LocationActivityTabDTO locationActivityTabDTO) {
+        Activity activity = activityMongoRepository.findOne(locationActivityTabDTO.getActivityId());
+        if (!Optional.ofNullable(activity).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid ActivityId : " + locationActivityTabDTO.getActivityId());
+        }
+        LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getCanBeStartAt(), locationActivityTabDTO.getCanBeEndAt());
+        activity.setLocationActivityTab(locationActivityTab);
+        save(activity);
+        ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(locationActivityTab);
+        return activityTabsWrapper;
+
     }
 }

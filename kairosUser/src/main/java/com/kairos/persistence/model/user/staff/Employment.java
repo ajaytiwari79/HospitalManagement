@@ -26,6 +26,15 @@ public class Employment extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Staff staff;
 
+    public Long getEndDateMillis() {
+        return endDateMillis;
+    }
+
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
+    }
+
+    private Long endDateMillis;
     private EmploymentStatus employmentStatus = EmploymentStatus.PENDING;
 
     public Employment(){}

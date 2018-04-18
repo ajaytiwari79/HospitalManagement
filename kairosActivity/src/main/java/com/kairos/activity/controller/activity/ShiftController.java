@@ -1,12 +1,11 @@
 package com.kairos.activity.controller.activity;
 
 import com.kairos.activity.response.dto.shift.ShiftDTO;
-import com.kairos.activity.service.activity.ShiftService;
 import com.kairos.activity.service.activity.ActivityService;
+import com.kairos.activity.service.activity.ShiftService;
 import com.kairos.activity.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +14,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +38,7 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createShift(@RequestParam("type") String type, @PathVariable Long organizationId, @PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type,false));
     }
 
     @ApiOperation("Get Shift of a staff")
@@ -102,11 +99,11 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.addSubShifts( unitId,shiftDTOS,type));
     }
 
-    @ApiOperation("get Average Of Shifts By Activity")
+   /* @ApiOperation("get Average Of Shifts By Activity")
     @GetMapping(value = "/{staffId}/getAverageOfShiftsByActivity")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAverageOfShiftByActivity(@RequestParam("type") String type, @PathVariable long unitId, @PathVariable Long staffId , @RequestParam String activityId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date fromDate,@RequestParam Long unitPositionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAverageOfShiftByActivity( unitId,staffId,activityId,fromDate,type,unitPositionId));
-    }
+    }*/
 
 }

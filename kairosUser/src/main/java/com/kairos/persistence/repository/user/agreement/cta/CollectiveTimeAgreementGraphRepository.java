@@ -18,7 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseRepository<CostTimeAgreement,Long> {
 
     @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:`BELONGS_TO`]-(country:Country) WHERE id(country)= {0}  WITH cta\n" +
-            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{isEnabled:true}) WITH cta,expertise\n" +
+            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise\n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType\n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType\n" +
             "OPTIONAL MATCH (cta)-[:HAS_RULE_TEMPLATE]-(ruleTemp:`CTARuleTemplate`)  WHERE NOT(ruleTemp.`deleted` = true ) AND NOT(ruleTemp.`disabled` = true ) WITH cta,expertise,orgType,orgSubType,ruleTemp\n" +
@@ -48,13 +48,13 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`)  WITH \n" +
             "cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,phaseInfo, plannedTimeWithFactor ,ruleTemplCat\n" +
             "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,\n" +
-    "CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation, plannedTimeId:ruleTemp.plannedTimeId, timeTypeId:ruleTemp.timeTypeId,calculateScheduledHours:ruleTemp.calculateScheduledHours, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds    ,\n" +
+    "CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation, plannedTimeIds:ruleTemp.plannedTimeIds, timeTypeIds:ruleTemp.timeTypeIds,calculateScheduledHours:ruleTemp.calculateScheduledHours, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds    ,\n" +
             "ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo,plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType},calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates ORDER BY id DESC")
     List<CTAListQueryResult> findCTAByCountryId(Long countryId);
 
 
     @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:`HAS_CTA`]-(unit:Organization) WHERE id(unit)={0}  WITH cta\n" +
-            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{isEnabled:true}) WITH cta,expertise\n" +
+            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise\n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType\n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType\n" +
             "OPTIONAL MATCH (cta)-[:HAS_RULE_TEMPLATE]-(ruleTemp:`CTARuleTemplate`)  WHERE NOT(ruleTemp.`deleted` = true ) AND NOT(ruleTemp.`disabled` = true ) WITH cta,expertise,orgType,orgSubType,ruleTemp\n" +
@@ -84,7 +84,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`)  WITH \n" +
             "cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,phaseInfo, plannedTimeWithFactor ,ruleTemplCat\n" +
             "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),\n"+
-            "activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation, calculateScheduledHours:ruleTemp.calculateScheduledHours,plannedTimeId:ruleTemp.plannedTimeId, timeTypeId:ruleTemp.timeTypeId, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds,    "+
+            "activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation, calculateScheduledHours:ruleTemp.calculateScheduledHours,plannedTimeIds:ruleTemp.plannedTimeIds, timeTypeIds:ruleTemp.timeTypeIds, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds,    "+
             "ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo,plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType},calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates ORDER BY id DESC")
     List<CTAListQueryResult> findCTAByUnitId(Long unitId);
 
@@ -136,7 +136,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
 
 
     /*@Query("MATCH (uep:UnitPosition)-[:HAS_CTA]-(cta:CostTimeAgreement{deleted:false}) WHERE id(uep)={0}  WITH cta \n" +
-            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{isEnabled:true}) WITH cta,expertise \n" +
+            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise \n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType \n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType \n" +
             "OPTIONAL MATCH (cta)-[:HAS_RULE_TEMPLATE]-(ruleTemp:`CTARuleTemplate`)  WHERE NOT(ruleTemp.`deleted` = true ) AND NOT(ruleTemp.`disabled` = true ) WITH cta,expertise,orgType,orgSubType,ruleTemp \n" +
@@ -168,13 +168,13 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "\n" +
             "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`)  WITH  \n" +
             "cta,expertise,orgType,orgSubType,ruleTemp,cTARuleTemplateDayTypes,calculateOnDayTypes,employmentTypes,compensationTable,calculateValueAgainst,phaseInfo, plannedTimeWithFactor ,ruleTemplCat \n" +
-            "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,CASE WHEN ruleTemp IS NULL THEN [] ELSE collect( {id:id(ruleTemp),ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType:ruleTemp.budgetType, planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo, activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation,plannedTimeId:ruleTemp.plannedTimeId,timeTypeId:ruleTemp.timeTypeId, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds\n" +
+            "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,CASE WHEN ruleTemp IS NULL THEN [] ELSE collect( {id:id(ruleTemp),ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType:ruleTemp.budgetType, planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo, activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation,plannedTimeIds:ruleTemp.plannedTimeIds,timeTypeIds:ruleTemp.timeTypeIds, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds\n" +
             ",plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType},calculateOnDayTypes:calculateOnDayTypes}) END as ruleTemplates ORDER BY id DESC")
     CTAListQueryResult getCtaByUnitPositionId(Long unitEmploymentPositionId);*/
 
 
     @Query("MATCH (cta:CostTimeAgreement{deleted:false})-[:HAS_CTA]-(up:UnitPosition) WHERE id(up)={0} WITH cta\n" +
-            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{isEnabled:true}) WITH cta,expertise\n" +
+            "optional match(cta)-[:HAS_EXPERTISE_IN]->(expertise:Expertise{deleted:false}) WITH cta,expertise\n" +
             "optional match (cta)-[:BELONGS_TO_ORG_TYPE]->(orgType:OrganizationType) WITH cta,expertise,orgType\n" +
             "optional match(cta)-[:BELONGS_TO_ORG_SUB_TYPE]->(orgSubType:OrganizationType) WITH cta,expertise,orgType,orgSubType\n" +
             "OPTIONAL MATCH (cta)-[:HAS_RULE_TEMPLATE]-(ruleTemp:`CTARuleTemplate`)  WHERE NOT(ruleTemp.`deleted` = true ) AND NOT(ruleTemp.`disabled` = true ) WITH cta,expertise,orgType,orgSubType,ruleTemp\n" +
@@ -197,7 +197,7 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
             "optional  MATCH (ruleTemp)-[:`BELONGS_TO`]-(plannedTimeWithFactor:`PlannedTimeWithFactor`)  WITH \n" +
             "cta,expertise,orgType,orgSubType,ruleTemp,employmentTypes, timeTypes,compensationTable,calculateValueAgainst,phaseInfo, plannedTimeWithFactor ,ruleTemplCat\n" +
             "RETURN id(cta) as id,cta.startDateMillis as startDateMillis, cta.endDateMillis as endDateMillis, id(expertise) as expertise, id(orgType) as organizationType, id(orgSubType) as organizationSubType, cta.description as description,cta.name as name,\n" +
-            "CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),calculateScheduledHours:ruleTemp.calculateScheduledHours,activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation, plannedTimeId:ruleTemp.plannedTimeId, timeTypeId:ruleTemp.timeTypeId, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds    ,\n" +
+            "CASE WHEN ruleTemp IS NULL THEN [] ELSE collect({id:id(ruleTemp),calculateScheduledHours:ruleTemp.calculateScheduledHours,activityTypeForCostCalculation:ruleTemp.activityTypeForCostCalculation, plannedTimeIds:ruleTemp.plannedTimeIds, timeTypeIds:ruleTemp.timeTypeIds, dayTypeIds:ruleTemp.dayTypeIds, activityIds:ruleTemp.activityIds    ,\n" +
             "ruleTemplateCategory:ruleTemplCat,name:ruleTemp.name,approvalWorkFlow:ruleTemp.approvalWorkFlow ,description:ruleTemp.description,disabled:ruleTemp.disabled ,budgetType : ruleTemp.budgetType,planningCategory:ruleTemp.planningCategory,staffFunctions:ruleTemp.staffFunctions,ruleTemplateType:ruleTemp.ruleTemplateType,payrollType:ruleTemp.payrollType ,payrollSystem:ruleTemp.payrollSystem,calculationUnit:ruleTemp.calculationUnit,compensationTable:compensationTable, calculateValueAgainst:calculateValueAgainst, calculateValueIfPlanned:ruleTemp.calculateValueIfPlanned,employmentTypes:employmentTypes,phaseInfo:phaseInfo,plannedTimeWithFactor:{id:id(plannedTimeWithFactor), scale:plannedTimeWithFactor.scale, add:plannedTimeWithFactor.add, accountType:plannedTimeWithFactor.accountType}}) END as ruleTemplates ORDER BY id DESC")
     CTAListQueryResult getCTAByUnitPositionId(Long unitPositionId);
 
@@ -219,5 +219,8 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     @Query("match(cta:CostTimeAgreement{deleted:false})-[:"+ BELONGS_TO_ORG_SUB_TYPE+"]->(ost) WHERE id(ost) IN {0} \n" +
             "MATCH(cta)-[:BELONGS_TO]-(country:Country) where id(country)={1} return cta")
     List<CostTimeAgreement> getCTAsByOrganiationSubTypeIdsIn(List<Long> organizationSubTypeIds, long countryId);
+
+    @Query("MATCH(unitCta:CostTimeAgreement),(organization:Organization) WHERE id(unitCta)={0} AND id(organization)={1} CREATE UNIQUE (organization)-[r:" + HAS_CTA + "]->(unitCta)")
+    void linkUnitCTAToOrganization(Long unitCtaId, Long organizationId);
 
 }

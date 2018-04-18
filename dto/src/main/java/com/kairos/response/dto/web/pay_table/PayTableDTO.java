@@ -1,15 +1,9 @@
 package com.kairos.response.dto.web.pay_table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.persistence.model.user.pay_table.DateRange;
 import com.kairos.persistence.model.user.pay_table.FutureDate;
-import com.kairos.response.dto.web.pay_group_area.PayGroupAreaDTO;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.joda.time.DateTime;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
-import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -29,12 +23,10 @@ public class PayTableDTO {
     private String description;
 
     @NotNull(message = "Start date can't be null")
-    @DateLong
     @FutureDate
     private Date startDateMillis;
 
     @FutureDate
-    @DateLong
     private Date endDateMillis;
     @NotNull(message = "Level can not be null")
     private Long levelId;

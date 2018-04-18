@@ -1,8 +1,11 @@
 package com.kairos.response.dto.web;
 
+import com.kairos.persistence.model.enums.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by pawanmandhan on 27/7/17.
@@ -28,8 +31,11 @@ public class UnitPositionDTO {
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
-    private float salary;
+    private Double salary;
+    @NotNull(message = "employmentTypeId can't be null")
     private Long employmentTypeId;
+    @NotNull(message = "employmentTypeCategory can't be null")
+    private EmploymentCategory employmentTypeCategory;
     @NotNull(message = "wta can't be null")
     private Long wtaId;
     private Long ctaId;
@@ -41,9 +47,18 @@ public class UnitPositionDTO {
     private Long unionId;
     private Long parentUnitId;
 
-    //@NotNull(message = "unitId  is required for position")
-    //@Range(min = 0, message = "unit Id  is required for position")
+    @NotNull(message = "unitId  is required for position")
+    @Range(min = 0, message = "unit Id  is required for position")
     private Long unitId;
+
+    private Long reasonCodeId;
+
+    @NotNull(message = "seniorityLevel  is required for position")
+    @Range(min = 0, message = "seniorityLevel  is required for position")
+    private Long seniorityLevelId;
+
+    private Set<Long> functionIds = new HashSet<>();
+
 
     private Long timeCareExternalId;
 
@@ -53,7 +68,7 @@ public class UnitPositionDTO {
 
 
     public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes,
-                           float avgDailyWorkingHours, float hourlyWages, float salary, Long employmentTypeId) {
+                           float avgDailyWorkingHours, float hourlyWages, Double salary, Long employmentTypeId) {
         this.salary = salary;
         this.avgDailyWorkingHours = avgDailyWorkingHours;
         this.totalWeeklyMinutes = totalWeeklyMinutes;
@@ -184,11 +199,11 @@ public class UnitPositionDTO {
         this.ctaId = ctaId;
     }
 
-    public float getSalary() {
+    public Double getSalary() {
         return salary;
     }
 
-    public void setSalary(float salary) {
+    public void setSalary(Double salary) {
         this.salary = salary;
     }
 
@@ -247,5 +262,38 @@ public class UnitPositionDTO {
 
     public void setParentUnitId(Long parentUnitId) {
         this.parentUnitId = parentUnitId;
+    }
+
+    public EmploymentCategory getEmploymentTypeCategory() {
+        return employmentTypeCategory;
+    }
+
+    public void setEmploymentTypeCategory(EmploymentCategory employmentTypeCategory) {
+        this.employmentTypeCategory = employmentTypeCategory;
+    }
+
+    public Long getReasonCodeId() {
+        return reasonCodeId;
+    }
+
+    public void setReasonCodeId(Long reasonCodeId) {
+        this.reasonCodeId = reasonCodeId;
+    }
+
+    public Long getSeniorityLevelId() {
+        return seniorityLevelId;
+    }
+
+    public void setSeniorityLevelId(Long seniorityLevelId) {
+        this.seniorityLevelId = seniorityLevelId;
+    }
+
+
+    public Set<Long> getFunctionIds() {
+        return functionIds;
+    }
+
+    public void setFunctionIds(Set<Long> functionIds) {
+        this.functionIds = functionIds;
     }
 }

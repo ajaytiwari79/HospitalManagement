@@ -14,6 +14,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+import static com.kairos.activity.util.RestClientUrlUtil.getBaseUrl;
+import static com.kairos.activity.util.RestClientUrlUtil.getDefaultSchedulerUrl;
+
+
 /**
  * Created by oodles on 5/9/17.
  */
@@ -26,7 +30,7 @@ public class SchedulerRestClient {
     private RestTemplate restTemplate;
 
     public List<Long> getAllOrganizationIds(){
-        final String baseUrl=getBaseUrl();
+        final String baseUrl=getDefaultSchedulerUrl();
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {};
@@ -52,13 +56,7 @@ public class SchedulerRestClient {
     }
 
 
-    private final String getBaseUrl(){
 
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/user/api/v1/organization/123").toString();
-            return baseUrl;
-
-
-    }
 
 
 

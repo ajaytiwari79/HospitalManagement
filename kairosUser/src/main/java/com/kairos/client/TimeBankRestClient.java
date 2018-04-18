@@ -2,7 +2,7 @@ package com.kairos.client;
 
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
-import com.kairos.client.dto.timeBank.TimebankWrapper;
+import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 
+import static com.kairos.client.RestClientURLUtil.getBaseUrl;
+
 @Service
 public class TimeBankRestClient {
 
@@ -27,10 +29,10 @@ public class TimeBankRestClient {
 
 
     @Async
-    public Boolean createBlankTimeBank(TimebankWrapper timebankWrapper){
+    public Boolean createBlankTimeBank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<TimebankWrapper> request = new HttpEntity<>(timebankWrapper);
+            HttpEntity<UnitPositionWithCtaDetailsDTO> request = new HttpEntity<>(unitPositionWithCtaDetailsDTO);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
@@ -52,10 +54,10 @@ public class TimeBankRestClient {
 
     }
 
-    public Boolean updateBlankTimeBank(TimebankWrapper timebankWrapper){
+    public Boolean updateBlankTimeBank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<TimebankWrapper> request = new HttpEntity<>(timebankWrapper);
+            HttpEntity<UnitPositionWithCtaDetailsDTO> request = new HttpEntity<>(unitPositionWithCtaDetailsDTO);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
                     restTemplate.exchange(
@@ -73,18 +75,6 @@ public class TimeBankRestClient {
             logger.info("status {}",e.getStatusCode());
             logger.info("response {}",e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
-        }
-
-    }
-
-
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
         }
 
     }

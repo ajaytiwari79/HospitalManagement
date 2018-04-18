@@ -16,7 +16,9 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.5.Final'
     compile group: 'com.google.guava', name: 'guava', version: '24.1-jre'
-    compile group: 'org.springframework.data', name: 'spring-data-neo4j', version: '5.0.2.RELEASE'//As there are DTOs with neo4j annotations which needs to be fixed TODO
+    compile 'org.apache.commons:commons-lang3:3.7'
+   // compile group: 'org.springframework.data', name: 'spring-data-neo4j', version: '5.0.2.RELEASE'//As there are DTOs with neo4j annotations which needs to be fixed TODO
+    //compile 'org.neo4j:neo4j:3.3.4'
 
 }
 /*dependencies {
@@ -40,7 +42,7 @@ dependencies {
         }
     }
 }*/
-publishing {
+/*publishing {
     publications {
         mavenJava(MavenPublication) {
 
@@ -60,5 +62,5 @@ publishing {
                 password = "admin2"
             }}
     }
-}
+}*/
 

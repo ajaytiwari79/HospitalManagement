@@ -131,8 +131,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
 
     @Query("Match (accessGroup:AccessGroup),(accessPage:AccessPage) where id(accessGroup)={0} and id(accessPage) IN {1}\n" +
             "MERGE (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"]->(accessPage)\n" +
-            "ON CREATE SET r.isEnabled={2},r.creationDate={3},r.lastModificationDate={4},r.isRead={5},r.isWrite={6}\n" +
-            "ON MATCH SET r.isEnabled={2},r.lastModificationDate={4},r.isRead={5},r.isWrite={6} return true")
+            "ON CREATE SET r.isEnabled={2},r.creationDate={3},r.lastModificationDate={4},r.read={5},r.write={6}\n" +
+            "ON MATCH SET r.isEnabled={2},r.lastModificationDate={4},r.read={5},r.write={6} return true")
     List<Map<String,Object>> updateAccessPagePermission(long accessGroupId, List<Long> pageIds, boolean isSelected, long creationDate, long lastModificationDate, Boolean read, Boolean write);
 
     @Query("Match (accessPage:AccessPage),(accessGroup:AccessGroup) where id(accessPage)={4} AND id(accessGroup)={3} with accessPage,accessGroup\n" +
@@ -258,6 +258,15 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
 
     @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup {name:{1}}) WHERE id(o)={0} return ag")
     AccessGroup getAccessGroupOfOrganizationByName(long organizationId, String name);
+
+    @Query("Match(emp:Employment)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission)-[:APPLICABLE_IN_UNIT]-(org:Organization) where id(emp) = {0} and id(org) = {1} \n" +
+            "Match(up)-[r1:HAS_ACCESS_GROUP]-(ag:AccessGroup) optional Match(up)-[r2:HAS_CUSTOMIZED_PERMISSION]-(accesspage:AccessPage) delete r1, r2")
+    void deleteAccessGroupAndCustomizedPermission(Long employmentId, Long organizationId);
+
+    @Query("Match(employment:Employment)-[:" + HAS_UNIT_PERMISSIONS + "]-(unitPermission:UnitPermission) where employment.endDateMillis <= {0} and employment.endDateMillis >= {1} \n"+
+            "Match(unitPermission)-[rel_has_access_group:" + HAS_ACCESS_GROUP + " ]-(ag:AccessGroup) optional Match(unitPermission)-[rel_has_customized_permission:" + HAS_CUSTOMIZED_PERMISSION + "]-" +
+            "(accesspage:AccessPage) delete rel_has_access_group, rel_has_customized_permission")
+    void deleteAccessGroupRelationAndCustomizedPermissionRelation(Long curDateMillisStart, Long curDateMillisEnd );
 }
 
 

@@ -224,11 +224,39 @@ public class DateUtil {
 
     public static Date asDate(LocalDate localDate) {
         return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+
     }
+
 
 
     public static Date getCurrentDate(){
         //TODO this cant be system's date. this gotta be unit;s date. sachin
         return new Date();
     }
+
+    public static Long getCurrentDateMillis() {
+        DateTime date = new DateTime().withTime(0, 0, 0, 0);
+        return date.getMillis();
+    }
+
+    public static Date getTimezonedStartOfDay(String timezone, Date date) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone(timezone));
+        DateTime dateTime = new DateTime(date).withTime(0,0,0,0);
+        calendar.setTime(dateTime.toDate());
+
+        return calendar.getTime();
+    }
+
+    public static Date getTimezonedEndOfDay(String timezone, Date date) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone(timezone));
+        DateTime dateTime = new DateTime(date).withTime(23,59,59,59);
+        calendar.setTime(dateTime.toDate());
+
+        return calendar.getTime();
+    }
+
 }

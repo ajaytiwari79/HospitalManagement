@@ -53,10 +53,16 @@ public class ExpertiseController {
     }
 
     @ApiOperation(value = "Get cta and wta by expertise")
-    @RequestMapping(value = PARENT_ORGANIZATION_URL+UNIT_URL + "/expertise/{expertiseId}/cta_wta")
-    ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getCtaAndWtaByExpertiseId(unitId, expertiseId));
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + UNIT_URL + "/expertise/{expertiseId}/cta_wta")
+    ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId));
     }
 
+    @ApiOperation(value = "Get Available expertise")
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/all_expertise", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getUnpublishedExpertise(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getUnpublishedExpertise(countryId));
+    }
 
 }

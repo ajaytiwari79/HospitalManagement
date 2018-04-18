@@ -56,8 +56,6 @@ public class Expertise extends UserBaseEntity {
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
-    @Relationship(type = HAS_PAY_TABLE)
-    private PayTable payTable;
 
     private PaidOutFrequencyEnum paidOutFrequency;
 
@@ -66,10 +64,12 @@ public class Expertise extends UserBaseEntity {
 
     private boolean published;
     private boolean hasDraftCopy;
+    private boolean hasVersion;
 
 
     @Relationship(type = FOR_SENIORITY_LEVEL)
     private List<SeniorityLevel> seniorityLevel;
+
 
     public String getDescription() {
         return description;
@@ -169,13 +169,6 @@ public class Expertise extends UserBaseEntity {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-    public PayTable getPayTable() {
-        return payTable;
-    }
-
-    public void setPayTable(PayTable payTable) {
-        this.payTable = payTable;
-    }
 
     public PaidOutFrequencyEnum getPaidOutFrequency() {
         return paidOutFrequency;
@@ -217,6 +210,14 @@ public class Expertise extends UserBaseEntity {
         this.expertise = expertise;
     }
 
+    public boolean isHasVersion() {
+        return hasVersion;
+    }
+
+    public void setHasVersion(boolean hasVersion) {
+        this.hasVersion = hasVersion;
+    }
+
     public Expertise() {
     }
 
@@ -226,18 +227,31 @@ public class Expertise extends UserBaseEntity {
     }
 
 
+    public Expertise(Long id, @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, PaidOutFrequencyEnum paidOutFrequency, boolean published) {
+        this.name = name;
+        this.id = id;
+        this.description = description;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+        this.paidOutFrequency = paidOutFrequency;
+        this.published = published;
+    }
 
-    public Expertise(Long id,@NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description) {
+    public Expertise(Long id, @NotEmpty(message = "error.Expertise.name.notEmpty") @NotNull(message = "error.Expertise.name.notnull") String name, String description) {
 
         this.name = name;
         this.id = id;
         this.description = description;
     }
 
+
     public Expertise retrieveBasicDetails() {
-        Expertise expertise = new Expertise(this.id, this.name, this.description);
-        return expertise;
+        return new Expertise(this.id, this.name, this.description, this.startDateMillis, this.endDateMillis, this.fullTimeWeeklyMinutes, this.numberOfWorkingDaysInWeek, this.paidOutFrequency, this.published);
+
     }
+
 
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap();
