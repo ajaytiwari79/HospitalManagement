@@ -43,9 +43,6 @@ public class PeriodRestClient {
                 throw new RuntimeException(response.getMessage());
             }
         }catch (HttpClientErrorException e) {
-
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
         }
 
