@@ -41,10 +41,4 @@ public class ArrayUtilTest {
         assertEquals(originalRes, utilRes);
     }
 
-
-    @Test
-    public void getTimezonedCurrentDate(String timezone) {
-
-    }
-
 }
