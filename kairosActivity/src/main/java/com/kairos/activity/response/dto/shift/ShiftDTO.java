@@ -235,7 +235,7 @@ public class ShiftDTO {
     }
 
     public Date getStartDate() {
-        return startDate;
+        return DateUtils.getDateByLocalDateAndLocalTime(startLocalDate,startTime);
     }
 
     public void setStartDate(Date startDate) {
@@ -243,7 +243,7 @@ public class ShiftDTO {
     }
 
     public Date getEndDate() {
-        return endDate;
+        return DateUtils.getDateByLocalDateAndLocalTime(endLocalDate,endTime);
     }
 
     public void setEndDate(Date endDate) {

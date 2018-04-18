@@ -397,7 +397,6 @@ public class ShiftService extends MongoBaseService {
         Date startDate = new DateTime(fromDate).minusWeeks(activity.getTimeCalculationActivityTab().getHistoryDuration()).toDate();
         List<ShiftQueryResult> shiftQueryResultsInInterval = shiftMongoRepository.findAllShiftBetweenDuration(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate, endDate);
         List<ShiftDTO> shiftDTOS = new ArrayList<>(7);
-        int totalContractualMinOfShift=0;
         Date shiftDate = fromDate;
         for (int day =0;day<7; day++) {
             /*if (staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes() <= totalContractualMinOfShift) {
@@ -405,7 +404,6 @@ public class ShiftService extends MongoBaseService {
             }*/
             ShiftDTO shiftDTO = calculateAverageShiftByActivity(shiftQueryResultsInInterval, activity, staffAdditionalInfoDTO, shiftDate);
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-            totalContractualMinOfShift += shiftDTO.getDuration().getStandardMinutes();
             shiftDTOS.add(shiftDTO);
             shiftDate = new DateTime(shiftDate).plusDays(1).toDate();
         }
