@@ -263,4 +263,8 @@ public class DateUtil {
         return Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
+    public static LocalDate getTimezonedCurrentDate(String timezone) {
+        return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDate();
+    }
+
 }

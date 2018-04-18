@@ -75,6 +75,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -811,22 +812,28 @@ public class UnitPositionService extends UserBaseService {
         return unitPositionGraphRepository.getDefaultUnitPositionByOrg(orgId);
     }
 
-    public Map<String,Object> updateUnitPositionEndDateFromEmployment( Long staffId, Long endDateMillis) {
+    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment( Long staffId, String endDate, Long unitId) throws ParseException {
 
-//        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
-//        if (!Optional.ofNullable(parentOrganization).isPresent()) {
-//            throw new DataNotFoundByIdException("Parent organization not found  Unit ID: " + unit.getId());
-//        }
-        unitPositionGraphRepository.updateUnitPositionEndDateFromEmployment(staffId,endDateMillis);
-        employmentGraphRepository.updateEmploymentEndDate(staffId,endDateMillis);
-        if(DateUtil.getDateFromEpoch(endDateMillis).compareTo(LocalDate.now())==0) {
-            EmploymentQueryResult employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        Long endDateMillis = DateUtil.getIsoDateInLong(endDate);
+       List<UnitPosition> unitPositions =  unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId,endDateMillis);
+       for(UnitPosition unitPosition:unitPositions) {
+           unitPosition.setEndDateMillis(endDateMillis);
+       }
+        unitPositionGraphRepository.saveAll(unitPositions);
+       Employment employment = employmentGraphRepository.findEmploymentDomainByStaff(staffId);
+       employment.setEndDateMillis(endDateMillis);
+        employmentGraphRepository.save(employment);
+        LocalDate curDate = DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString());
+        if(DateUtil.getDateFromEpoch(endDateMillis).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0) {
+            //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
             List<Long> empIds = Stream.of(employment.getId()).collect(Collectors.toList());
             employmentService.moveToReadOnlyAccessGroup(empIds);
         }
-
-
-        return null;
+        User user = userGraphRepository.getUserByStaffId(staffId);
+        EmploymentQueryResult employmentUpdated = employmentGraphRepository.findEmploymentByStaff(staffId);
+        EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employmentUpdated,unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) );
+        return employmentUnitPositionDTO;
 
     }
 

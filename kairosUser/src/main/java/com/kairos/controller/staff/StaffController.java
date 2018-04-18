@@ -16,6 +16,7 @@ import com.kairos.service.staff.StaffAddressService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -594,10 +595,10 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.PUT)
     @ApiOperation("update employment of staff")
-    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable long staffId, @RequestBody Map<String, Object> employmentDetail) {
+    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody Map<String, Object> employmentDetail) throws ParseException {
 
-        Long endDateMillis = Long.parseLong((String)employmentDetail.get("endDate"));
-        Map<String, Object> response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,endDateMillis);
+        String endDate = (String)employmentDetail.get("endDate");
+        EmploymentUnitPositionDTO response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,endDate,unitId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

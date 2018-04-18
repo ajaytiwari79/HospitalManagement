@@ -6,6 +6,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -39,5 +42,9 @@ public class ArrayUtilTest {
     }
 
 
+    @Test
+    public void getTimezonedCurrentDate(String timezone) {
+
+    }
 
 }
