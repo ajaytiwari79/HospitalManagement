@@ -29,6 +29,7 @@ public class UnitPositionQueryResult {
     private Long lastModificationDate;
     private int totalWeeklyHours;
     private float avgDailyWorkingHours;
+    private int fullTimeWeeklyMinutes;
     private float hourlyWages;
     private long id;
 
@@ -45,6 +46,14 @@ public class UnitPositionQueryResult {
     private Long unitId;
     private Long reasonCodeId;
 
+
+    public int getFullTimeWeeklyMinutes() {
+        return fullTimeWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+    }
 
     public int getWorkingDaysInWeek() {
         return workingDaysInWeek;

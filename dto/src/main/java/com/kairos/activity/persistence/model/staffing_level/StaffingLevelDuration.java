@@ -10,10 +10,10 @@ import java.time.LocalTime;
 
 public class StaffingLevelDuration {
     //@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
 
     private LocalTime from;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime to;
 
     public StaffingLevelDuration() {

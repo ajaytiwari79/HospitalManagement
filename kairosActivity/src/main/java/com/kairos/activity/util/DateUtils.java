@@ -213,6 +213,10 @@ public class DateUtils {
         return dayOfWeek;
     }
 
+    public static LocalTime toLocalTime(DateTime dateTime){
+        return LocalTime.of(dateTime.getHourOfDay(),dateTime.getMinuteOfHour());
+    }
+
     public static Long getIsoDateInLong(String dateReceived) throws ParseException {
         DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -401,5 +405,9 @@ public class DateUtils {
         }
 
         return timeZone.getRawOffset() + timeZoneDSTOffset;
+    }
+
+    public static Date getDateByLocalDateAndLocalTime(LocalDate localDate,LocalTime localTime){
+        return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),localTime.getHour(),localTime.getMinute()).toDate();
     }
 }
