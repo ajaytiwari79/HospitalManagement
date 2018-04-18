@@ -6,7 +6,6 @@ import com.kairos.response.dto.web.EscalatedTasksWrapper;
 import com.kairos.response.dto.web.KMDShift;
 import com.kairos.response.dto.web.ResponseEnvelope;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
-import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +18,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.kairos.client.RestClientURLUtil.getBaseUrl;
 
 @Component
 public class TaskServiceRestClient {
@@ -111,7 +111,7 @@ public class TaskServiceRestClient {
 
         ResponseEntity<List> restExchange =
                 restTemplate.exchange(
-                        "http://zuulservice/kairos/activity/api/v1/task/{clientId}/{serviceId}/{unitId}",
+                        getBaseUrl()+"task/{clientId}/{serviceId}/{unitId}",
                         HttpMethod.GET,
                         null,List.class);
 
@@ -263,15 +263,5 @@ public class TaskServiceRestClient {
 
     }
 
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
-        }
-
-    }
 
 }

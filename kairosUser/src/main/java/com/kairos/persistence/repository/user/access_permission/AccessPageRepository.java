@@ -4,15 +4,14 @@ import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.user.auth.StaffPermissionQueryResult;
-import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;
-import static com.kairos.constants.AppConstants.MANAGE_COUNTRY_TAB_MODULE_ID;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -294,9 +293,17 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "WITH childrenAccessPages,unitPermission,r,g\n" +
             "optional match (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(childrenAccessPages:AccessPage)\n" +
             "WITH r,customRel,unitPermission,childrenAccessPages,g\n" +
-            "RETURN {name:childrenAccessPages.name, id:id(childrenAccessPages), read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END ,\n" +
-            "write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END} as data ORDER BY data.id DESC")
+//            "RETURN {name:childrenAccessPages.name, id:id(childrenAccessPages), read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END ,\n" +
+//            "write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END} as data ORDER BY data.id DESC"
+            "RETURN childrenAccessPages.name as name,id(childrenAccessPages) as id, CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END as read ,\n" +
+            "CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END as write ORDER BY id DESC")
     List<AccessPageQueryResult> getChildTabsAccessPermissionsByStaffAndOrg(long orgId, long unitId, Long staffId, Long tabId);
+
+    @Query("MATCH(ac:AccessGroup) where id(ac)={1} with ac " +
+            "MATCH(accessGroup:AccessGroup)-[rel:" + HAS_ACCESS_OF_TABS + "]->(accessPage:AccessPage) where id(accessGroup)={0} with ac,accessGroup as accessGroup," +
+            "accessPage as accessPage, rel.read as read, rel.write as write ,rel.isEnabled as isEnabled  " +
+            "create unique (ac)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:isEnabled, read:read, write:write}]->(accessPage)")
+    void copyAccessGroupPageRelationShips(Long oldAccessGroupId,Long newAccessGroupId);
 
 }
 

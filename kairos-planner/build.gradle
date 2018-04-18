@@ -1,0 +1,55 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.7.RELEASE'
+
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("net.saliman:gradle-cobertura-plugin:2.5.1")
+	}
+}
+ext {
+	versionoptaplannerbom='7.0.0.Final'
+	versionslf4j='1.7.23'
+	neo4jversion='3.1.3'
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: "net.saliman.cobertura"
+
+jar {
+	baseName = 'boot-gradle'
+	version = '0.0.1-SNAPSHOT'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+   // compile project(':responseWrapper')
+	compile project('optaplanner-shiftplanning')
+	compile project('optaplanner-taskplanning')
+	compile project('responseWrapper')
+	compile project (':dto')
+	compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+	compile group: 'org.springframework.data', name: 'spring-data-cassandra', version: '1.5.7.RELEASE'
+	compile group: 'com.google.guava', name: 'guava', version: '19.0'
+	compile group: 'com.codahale.metrics', name: 'metrics-core', version: '3.0.2'
+	compile group: 'io.netty', name: 'netty-all', version: '4.1.15.Final'
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
+	compile("org.springframework.boot:spring-boot-starter-web"){
+		exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+	}
+	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+

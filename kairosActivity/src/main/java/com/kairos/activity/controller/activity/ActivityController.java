@@ -333,4 +333,20 @@ public class ActivityController {
     public ResponseEntity<Map<String, Object>> copyActivityDetails(@PathVariable Long countryId, @PathVariable BigInteger activityId, @RequestBody  ActivityDTO activity) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.copyActivityDetails(countryId, activityId, activity));
     }
+
+
+
+    @ApiOperation("get location settings data of activity")
+    @GetMapping(value = "/activity/{activityId}/location_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getLocationsTabOfActivity(@PathVariable BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getLocationsTabOfActivity(activityId));
+    }
+
+    @ApiOperation("update location settings of activity ")
+    @PutMapping(value = "/activity/location_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateLocationsTabOfActivity(@RequestBody LocationActivityTabDTO locationActivityTabDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(locationActivityTabDTO));
+    }
 }

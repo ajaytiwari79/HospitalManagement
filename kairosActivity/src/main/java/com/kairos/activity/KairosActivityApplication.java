@@ -10,16 +10,16 @@ import com.kairos.activity.interceptor.ExtractOrganizationAndUnitInfoInterceptor
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
 import com.kairos.activity.schedular.PhaseChangeScheduler;
 import com.kairos.activity.util.userContext.UserContextInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -41,6 +41,8 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableMongoRepositories(basePackages ={"com.kairos.activity.persistence.repository"},
 repositoryBaseClass = MongoBaseRepositoryImpl.class)
 public class KairosActivityApplication implements WebMvcConfigurer {
+	@Autowired
+	private Environment environment;
 	public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");
 
 	static{
@@ -101,7 +103,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(new ExtractOrganizationAndUnitInfoInterceptor());
 	}
-
+	@Profile("!development")
 	@LoadBalanced
 	@Primary
 	@Bean
@@ -112,7 +114,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 				.build();
 		return template;
 	}
-
+	@Profile("!development")
 	@LoadBalanced
 	@Bean(name ="schedulerRestTemplate")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
@@ -122,10 +124,54 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 		return template;
 	}
 
+
+    @Profile("development")
+    @Primary
+    @Bean
+    public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
+                .interceptors(new UserContextInterceptor())
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
+    @Profile("development")
+    @Bean(name ="schedulerRestTemplate")
+    public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
+        RestTemplate template =restTemplateBuilder
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+        return template;
+    }
+
+
+
 	@Bean
 	public PhaseChangeScheduler getPhaseChangeScheduler() {
 		return new PhaseChangeScheduler();
 	}
 
-
-	}
+/*
+	private static final String ALLOWED_HEADERS = "X-Requested-With,access-control-allow-origin,Authorization,authorization,Origin,Content-Type,Version";
+	private static final String ALLOWED_METHODS = "GET,PUT,POST,DELETE,OPTIONS";
+	private static final String ALLOWED_ORIGIN = "*";
+	private static final String MAX_AGE = "3600";
+	@Bean
+	public WebFilter corsFilter() {
+		return (ServerWebExchange ctx, WebFilterChain chain) -> {
+			ServerHttpRequest request = ctx.getRequest();
+			ServerHttpResponse response = ctx.getResponse();
+			HttpHeaders headers = response.getHeaders();
+			headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+			headers.set("Access-Control-Allow-Credentials", "true");
+			headers.set("Access-Control-Allow-Methods", ALLOWED_METHODS);
+			headers.set("Access-Control-Max-Age", MAX_AGE);
+			headers.set("Access-Control-Allow-Headers",ALLOWED_HEADERS);
+			if (request.getMethod() == HttpMethod.OPTIONS) {
+				response.setStatusCode(HttpStatus.OK);
+				return  Mono.empty();
+			}
+			return chain.filter(ctx);
+		};
+	}*/
+}

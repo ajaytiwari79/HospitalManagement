@@ -15,7 +15,6 @@ import com.kairos.response.dto.web.organization.time_slot.TimeSlotDTO;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

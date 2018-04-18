@@ -1,0 +1,117 @@
+package com.kairos.shiftplanning.rules;
+    dialect "java"
+import com.kairos.shiftplanning.domain.*;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import java.util.ArrayList;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
+global HardMediumSoftLongScoreHolder scoreHolder;
+rule "Empty activity line"
+salience 20
+    when
+        $shifts:ArrayList() from collect (ShiftRequestPhase(getInterval()!=null));
+        $matrix:StaffingLevelMatrix();
+    then
+        //ShiftPlanningUtility.breakConstraints(kcontext,scoreHolder,$shifts);
+        int[] arr=$matrix.getMissingMinAndMax($shifts);
+        scoreHolder.addSoftConstraintMatch(kcontext,  arr[0]*-2 + arr[1]*-1);
+end
+/*
+rule "Unassigned activity interval required"
+salience 20
+    when
+        ActivityLineInterval(activity.isTypePresence() && shift==null && required)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,  - 2);
+end
+rule "Unassigned activity interval"
+salience 20
+    when
+        ActivityLineInterval(activity.isTypePresence() && shift==null && !required)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,  - 1);
+end
+
+rule "Unassigned absence activity interval"
+salience 20
+    when
+        ActivityLineInterval(activity.isTypeAbsence() && shift==null && required)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,  - 96);
+end
+*/
+rule "Unassigned skill interval"
+salience 20
+    when
+        SkillLineInterval(shift==null)
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,  - 1);
+end
+rule "Misassigned skill interval"
+salience 20
+    when
+        SkillLineInterval(shift!=null && !start.toLocalDate().equals(shift.date))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  - 1);
+end
+
+/* with our own move we unassign previous shift to ali so not required anymore
+rule "Multiple activities at same interval"
+salience 20
+    when
+        $ali:ActivityLineInterval(shift!=null)
+        ActivityLineInterval(overlapsActivity($ali));
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  - 2);
+         //modify( $ali ){ setShift( null); }
+        // $ali.setShift(null);
+        // update($ali);
+end
+*/
+
+/*
+rule "Multiple Skill lines at same interval"
+salience 20
+    when
+        $sli:SkillLineInterval(shift!=null && $shift:shift && $interval:interval)
+        SkillLineInterval(!equals($sli) && shift!=null && interval.equals($interval)  && shift.equals($shift));
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  - 2);
+end
+
+rule "Skill line and Activity Line at same interval"
+salience 20
+    when
+        $ali:ActivityLineInterval(shift!=null && $shift:shift && $interval:interval)
+        $sli:SkillLineInterval(shift!=null && interval.equals($interval)  && shift.equals($shift) && !isPossibleAlongActivity($ali));
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  - 2);
+end
+*/
+
+//This should not be a constraint if ali null is already a hard constraint
+/**/rule "Missing Shift intervals"
+salience 20
+    when
+        $shift:ShiftRequestPhase(!locked)
+        $total: Integer(intValue>0) from ($shift.missingIntervals())
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  -$total);
+end
+
+/*
+rule "Activity planned on Shift Break"
+salience 20
+    when
+        $ali:ActivityLineInterval(shift!=null && overlapOnBreak())
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  - 2);
+end
+
+rule "Shift must have empty slots as Break"
+salience 20
+    when
+        ShiftRequestPhase(!isAbsenceActivityApplied() && getInterval()!=null && $missingBreakTime:getMissingBreakTimes() && $missingBreakTime>0)
+    then
+        scoreHolder.addMediumConstraintMatch(kcontext,  -$missingBreakTime);
+end
+*/
