@@ -322,25 +322,22 @@ public class AccessGroupService extends UserBaseService {
         return accessGroupRepository.getAccessPermissions(staffId);
     }
 
-    public void updateReadWritePermissionOfTab(Long accessGroupId, Boolean read, Boolean write, Long tabId, Long orgId, Long unitId, Long staffId){
+    public void updateReadWritePermissionOfParentTab(Long accessGroupId, Boolean read, Boolean write, Long tabId, Long orgId, Long unitId, Long staffId){
 
         AccessPageQueryResult readAndWritePermissionForAccessGroup = accessPageRepository.getAccessPermissionForAccessPage(accessGroupId, tabId);
 
         // Check if new permissions are different then of Access Group
-        if(Optional.ofNullable(readAndWritePermissionForAccessGroup).isPresent() && readAndWritePermissionForAccessGroup.isRead() == read  && readAndWritePermissionForAccessGroup.isWrite() == write){
+        /*if(Optional.ofNullable(readAndWritePermissionForAccessGroup).isPresent() && readAndWritePermissionForAccessGroup.isRead() == read  && readAndWritePermissionForAccessGroup.isWrite() == write){
             // CHECK if custom permission exist and then delete
             accessGroupRepository.deleteCustomPermissionForTab(orgId, staffId, unitId, accessGroupId, tabId);
         } else {
             accessGroupRepository.setCustomPermissionForTab(orgId, staffId, unitId, accessGroupId, tabId, read, write);
-        }
+        }*/
 
 
 
-        Long parentTabId = accessPageRepository.getParentTab(tabId);
-        if( !Optional.ofNullable(parentTabId).isPresent() ){
-            return;
-        }
-        List<AccessPageQueryResult> accesPageList = accessPageRepository.getChildTabsAccessPermissionsByStaffAndOrg(orgId, unitId, staffId, parentTabId);
+
+        List<AccessPageQueryResult> accesPageList = accessPageRepository.getChildTabsAccessPermissionsByStaffAndOrg(orgId, unitId, staffId, tabId);
         int countOfRead = 0, countOfWrite = 0;
         Long accessPageId = accesPageList.get(0).getId();
 //        Boolean tempRead = false;
@@ -349,7 +346,20 @@ public class AccessGroupService extends UserBaseService {
             countOfRead += accessPage.isRead() ? 1 : 0 ;
             countOfWrite += accessPage.isWrite() ? 1 : 0 ;
         }
-        updateReadWritePermissionOfTab( accessGroupId, countOfRead > 0 , countOfWrite > 0, parentTabId, orgId, unitId, staffId );
+
+        // Check if new permissions are different then of Access Group
+        if(Optional.ofNullable(readAndWritePermissionForAccessGroup).isPresent() && readAndWritePermissionForAccessGroup.isRead() == countOfRead > 0  && readAndWritePermissionForAccessGroup.isWrite() == countOfWrite > 0){
+            // CHECK if custom permission exist and then delete
+            accessGroupRepository.deleteCustomPermissionForTab(orgId, staffId, unitId, accessGroupId, tabId);
+        } else {
+            accessGroupRepository.setCustomPermissionForTab(orgId, staffId, unitId, accessGroupId, tabId, read, write);
+        }
+
+        Long parentTabId = accessPageRepository.getParentTab(tabId);
+        if( !Optional.ofNullable(parentTabId).isPresent() ){
+            return;
+        }
+        updateReadWritePermissionOfParentTab( accessGroupId, countOfRead > 0 , countOfWrite > 0, parentTabId, orgId, unitId, staffId );
     }
 
     public void assignPermission(long accessGroupId,AccessPermissionDTO accessPermissionDTO){
@@ -364,7 +374,7 @@ public class AccessGroupService extends UserBaseService {
         } else {
             parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-//        updateReadWritePermissionOfTab(accessGroupId, accessPermissionDTO.isRead(), accessPermissionDTO.isWrite(),
+//        updateReadWritePermissionOfParentTab(accessGroupId, accessPermissionDTO.isRead(), accessPermissionDTO.isWrite(),
 //                accessPermissionDTO.getPageId(), (!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getUnitId(), accessPermissionDTO.getStaffId());
 
 
@@ -394,10 +404,10 @@ public class AccessGroupService extends UserBaseService {
         if(Optional.ofNullable(readAndWritePermissionForAccessGroup).isPresent() && readAndWritePermissionForAccessGroup.isRead() == read  && readAndWritePermissionForAccessGroup.isWrite() == write){
             // CHECK if custom permission exist and then delete
 //            accessGroupRepository.deleteCustomPermissionForTab((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()) ,accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId,accessPermissionDTO.getPageId());
-            accessGroupRepository.deleteCustomPermissionForTabAndChild((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()) ,accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId,accessPermissionDTO.getPageId());
+            accessGroupRepository.deleteCustomPermissionForChildren((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()) ,accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId,accessPermissionDTO.getPageId());
 
         } else {
-            accessGroupRepository.setCustomPermissionForTabAndChildren((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
+            accessGroupRepository.setCustomPermissionForChildren((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
 
             /*if(updateChildren) {
                 accessGroupRepository.setCustomPermissionForTabAndChildren((!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getStaffId(), unit.getId(), accessGroupId, accessPermissionDTO.getPageId(), read, write);
@@ -410,7 +420,7 @@ public class AccessGroupService extends UserBaseService {
         if( !Optional.ofNullable(parentTabId).isPresent() ){
             return;
         } else {
-            updateReadWritePermissionOfTab( accessGroupId, read , write, accessPermissionDTO.getPageId(),
+            updateReadWritePermissionOfParentTab( accessGroupId, read , write, accessPermissionDTO.getPageId(),
                     (!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), unit.getId() , accessPermissionDTO.getStaffId() );
         }
     }
