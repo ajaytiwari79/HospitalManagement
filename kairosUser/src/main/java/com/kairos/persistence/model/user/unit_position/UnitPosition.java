@@ -5,7 +5,6 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.country.Function;
 import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -62,6 +61,7 @@ public class UnitPosition extends UserBaseEntity {
     private Long endDateMillis;
     private Long lastWorkingDateMillis;
     private int totalWeeklyMinutes;
+    private int fullTimeWeeklyMinutes;
 
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
@@ -73,6 +73,13 @@ public class UnitPosition extends UserBaseEntity {
     public UnitPosition() {
     }
 
+    public int getFullTimeWeeklyMinutes() {
+        return fullTimeWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+    }
 
     public int getTotalWeeklyMinutes() {
         return totalWeeklyMinutes;

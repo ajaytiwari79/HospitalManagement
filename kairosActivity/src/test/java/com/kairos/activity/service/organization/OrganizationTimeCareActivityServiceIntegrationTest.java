@@ -53,7 +53,7 @@ public class OrganizationTimeCareActivityServiceIntegrationTest {
     @Before
     public void setUp() throws Exception {
         String baseUrl = getBaseUrl(71L, 145L);
-        ShiftDTO shiftDTO = new ShiftDTO("MyShift", s, s, 1, 1, 2, 23, 1, 12, "Done", new BigInteger("2"), 95L, 1005L, subShift);
+        /*ShiftDTO shiftDTO = new ShiftDTO("MyShift", s, s, 1, 1, 2, 23, 1, 12, "Done", new BigInteger("2"), 95L, 1005L, subShift);*/
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/activity/7/copy-settings").queryParam("type", "organization").queryParam("checked", true);
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset

@@ -31,11 +31,21 @@ public class StaffUnitPositionDetails {
     private EmploymentType employmentType;
     private float salary;
     private int totalWeeklyMinutes;
+    private int fullTimeWeeklyMinutes;
     private PositionCode positionCode;
     private WTAResponseDTO workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
 
     public StaffUnitPositionDetails() {
+    }
+
+
+    public int getFullTimeWeeklyMinutes() {
+        return fullTimeWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
     }
 
     public Expertise getExpertise() {
