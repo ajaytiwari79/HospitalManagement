@@ -78,7 +78,6 @@ public class ShiftService extends MongoBaseService {
         if(!valid){
             throw new DataNotFoundByIdException("Staffing level not found for this Day");
 */
-
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid activity Id ." + shiftDTO.getActivityId());
@@ -98,9 +97,6 @@ public class ShiftService extends MongoBaseService {
                 shiftQueryResults = Arrays.asList(shiftQueryResult);
             }
             if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
-                /*if (activity.getTimeCalculationActivityTab().getDayTypes() == null || activity.getTimeCalculationActivityTab().getDayTypes().isEmpty()) {
-                    throw new InvalidRequestException("Day Type not Selected for this Activity");
-                }*/
                 Date shiftFromDate = DateUtils.toJodaDateTime(shiftDTO.getShiftDate()).withTimeAtStartOfDay().toDate();
                 shiftQueryResults = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activity, shiftFromDate);
             }
@@ -121,7 +117,13 @@ public class ShiftService extends MongoBaseService {
         shift.setMainShift(true);
         shift.setName(activity.getName());
         validateShiftWithActivity(activity, shift, staffAdditionalInfoDTO);
-        timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
+        List<Integer> activityDayTypes = new ArrayList<>();
+        if(staffAdditionalInfoDTO.getActivityDayTypes()!=null && !staffAdditionalInfoDTO.getActivityDayTypes().isEmpty()) {
+            activityDayTypes = staffAdditionalInfoDTO.getActivityDayTypes().stream().map(ad -> ad.getValue()).collect(Collectors.toList());
+        }
+        if (activityDayTypes.contains(new DateTime(shiftDTO.getStartDate()).getDayOfWeek())) {
+            timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
+        }
         save(shift);
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
 
@@ -197,7 +199,7 @@ public class ShiftService extends MongoBaseService {
         //anil m2 notify event for updating staffing level
         applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
                 true, oldStateOfShift));
-        ShiftQueryResult shiftQueryResult = shiftDTO.buildResponse();
+        ShiftQueryResult shiftQueryResult = shift.getShiftQueryResult();
         shiftQueryResult.setName(activity.getName());
         shiftQueryResult.setDurationMinutes(shift.getDurationMinutes());
         shiftQueryResult.setScheduledMinutes(shift.getScheduledMinutes());
@@ -293,7 +295,7 @@ public class ShiftService extends MongoBaseService {
             shift = shiftDTO.buildShift();
             shift.setMainShift(true);
             save(shift);
-            shiftQueryResult = shiftDTO.buildResponse();
+            shiftQueryResult = shift.getShiftQueryResult();
         } else {
             List<Shift> shifts;
             shifts = verifyCompositeShifts(shiftDTO, shiftDTO.getId());
@@ -395,7 +397,7 @@ public class ShiftService extends MongoBaseService {
         Date startDate = new DateTime(fromDate).minusWeeks(activity.getTimeCalculationActivityTab().getHistoryDuration()).toDate();
         List<ShiftQueryResult> shiftQueryResultsInInterval = shiftMongoRepository.findAllShiftBetweenDuration(staffAdditionalInfoDTO.getUnitPosition().getId(), startDate, endDate);
         List<ShiftDTO> shiftDTOS = new ArrayList<>(7);
-        int totalContractualMinOfShift = 0;
+        int totalContractualMinOfShift=0;
         Date shiftDate = fromDate;
         for (int day =0;day<7; day++) {
             /*if (staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes() <= totalContractualMinOfShift) {
@@ -430,13 +432,7 @@ public class ShiftService extends MongoBaseService {
         int contractualMinutesInADay = staffAdditionalInfoDTO.getUnitPosition().getTotalWeeklyMinutes() / staffAdditionalInfoDTO.getUnitPosition().getWorkingDaysInWeek();
 
         ShiftDTO shiftDTO = new ShiftDTO(activity.getId(), staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getId(), staffAdditionalInfoDTO.getUnitPosition().getId());
-        if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
-            Interval shiftInterval = new Interval(new DateTime(fromDate).withTimeAtStartOfDay(), new DateTime(fromDate).plusDays(1).withTimeAtStartOfDay());
-            Optional<ShiftQueryResult> shift = shifts.stream().filter(s -> shiftInterval.contains(s.getStartDate()) || shiftInterval.contains(s.getEndDate())).findFirst();
-            if (shift.isPresent()) {
-                throw new ActionNotPermittedException("Shifts Already Exists in this interval");
-            }
-        }
+
         Integer startAverageMin = null;
         if (shifts != null && !shifts.isEmpty() && activity.getTimeCalculationActivityTab().getHistoryDuration() != 0) {
             startAverageMin = getStartAverage(new DateTime(fromDate).getDayOfWeek(), shifts);
@@ -444,16 +440,26 @@ public class ShiftService extends MongoBaseService {
         }
         if (startAverageMin != null) {
             DateTime startDateTime = new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes(startAverageMin);
-            shiftDTO.setStartDate(startDateTime.toDate());
-            shiftDTO.setEndDate(startDateTime.plusMinutes(contractualMinutesInADay).toDate());
+            shiftDTO.setStartLocalDate(DateUtils.toLocalDate(startDateTime));
+            shiftDTO.setStartTime(DateUtils.toLocalTime(startDateTime));
+            shiftDTO.setEndLocalDate(DateUtils.toLocalDate(startDateTime.plusMinutes(contractualMinutesInADay)));
+            shiftDTO.setEndTime(DateUtils.toLocalTime(startDateTime.plusMinutes(contractualMinutesInADay)));
         } else {
             DateTime startDateTime = new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes((activity.getTimeCalculationActivityTab().getDefaultStartTime().getHour() * 60) + activity.getTimeCalculationActivityTab().getDefaultStartTime().getMinute());
-            Date date = DateUtils.convertUTCTOTimeZone(startDateTime.toDate(), TimeZone.getTimeZone(staffAdditionalInfoDTO.getUnitZoneId()));
-            shiftDTO.setStartDate(date);
-            date = DateUtils.convertUTCTOTimeZone(startDateTime.plusMinutes(contractualMinutesInADay).toDate(), TimeZone.getTimeZone(staffAdditionalInfoDTO.getUnitZoneId()));
-            shiftDTO.setEndDate(date);
+            shiftDTO.setStartLocalDate(DateUtils.toLocalDate(startDateTime));
+            shiftDTO.setStartTime(DateUtils.toLocalTime(startDateTime));
+            shiftDTO.setEndLocalDate(DateUtils.toLocalDate(startDateTime.plusMinutes(contractualMinutesInADay)));
+            shiftDTO.setEndTime(DateUtils.toLocalTime(startDateTime.plusMinutes(contractualMinutesInADay)));
 
         }
+        if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
+            Interval shiftInterval = new Interval(new DateTime(fromDate).withTimeAtStartOfDay(), new DateTime(fromDate).plusDays(1).withTimeAtStartOfDay());
+            Optional<ShiftQueryResult> shift = shifts.stream().filter(s -> shiftInterval.contains(s.getStartDate()) || shiftInterval.contains(s.getEndDate())).findFirst();
+            if (shift.isPresent()) {
+                throw new ActionNotPermittedException("Shifts Already Exists in this interval");
+            }
+        }
+
         return shiftDTO;
     }
 
