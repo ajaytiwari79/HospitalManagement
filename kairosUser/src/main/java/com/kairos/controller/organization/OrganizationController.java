@@ -1292,7 +1292,7 @@ public class OrganizationController {
     }
 
     @RequestMapping(value = UNIT_URL + "/time_zone", method = RequestMethod.GET)
-    //@ApiOperation("Get Parent Organization")
+    //@ApiOperation("Get Time Zone Organization")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTimeZoneOfUnit(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,

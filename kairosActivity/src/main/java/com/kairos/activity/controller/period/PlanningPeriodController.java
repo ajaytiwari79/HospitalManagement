@@ -32,7 +32,7 @@ public class PlanningPeriodController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createPlanningPeriod(@PathVariable Long unitId,  @RequestBody @Valid PlanningPeriodDTO planningPeriodDTO) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.createPeriod(unitId, planningPeriodDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.addPlanningPeriods(unitId, planningPeriodDTO));
 
 
     }
@@ -41,7 +41,7 @@ public class PlanningPeriodController {
     @GetMapping(value="/period")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPlanningPeriod(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPeriods(unitId, null, null));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPlanningPeriods(unitId, null, null));
     }
 
 
@@ -49,14 +49,14 @@ public class PlanningPeriodController {
     @PutMapping(value = "/period/{periodId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updatePhase(@PathVariable BigInteger periodId, @PathVariable Long unitId, @RequestBody @Valid PlanningPeriodDTO planningPeriodDTO) {
-         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updatePeriod(unitId, periodId, planningPeriodDTO));
+         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updatePlanningPeriod(unitId, periodId, planningPeriodDTO));
 
     }
 
     @ApiOperation(value = "Remove Period")
     @DeleteMapping(value = "/period/{periodId}")
     public ResponseEntity<Map<String, Object>> deletePhase(@PathVariable Long unitId, @PathVariable BigInteger periodId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.deletePeriod(unitId, periodId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.deletePlanningPeriod(unitId, periodId));
     }
 
 
