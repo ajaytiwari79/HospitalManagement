@@ -66,7 +66,7 @@ public class PlanningPeriodService extends MongoBaseService {
         return cal.getTime();
     }
 
-    public void createPlanningPeriod(Long unitId, Date startDate, List<PhaseDTO> phases, PlanningPeriodDTO planningPeriodDTO){
+    public void createPlanningPeriod(Long unitId, Date startDate, List<PhaseDTO> applicablePhases, PlanningPeriodDTO planningPeriodDTO){
         //  Calculate END Date
         Date endDate = addDaysInDate(startDate, planningPeriodDTO.getDuration(),
                 planningPeriodDTO.getDurationType(),1,-1);
@@ -79,17 +79,17 @@ public class PlanningPeriodService extends MongoBaseService {
         BigInteger nextPhaseId = null;
 
         List<PeriodPhaseFlippingDate> tempPhaseFlippingDate = new ArrayList<>();
-        if(Optional.ofNullable(phases).isPresent()){
+        if(Optional.ofNullable(applicablePhases).isPresent()){
 
             Date tempFlippingDate = endDate;
             boolean scopeToFlipNextPhase =true;
             BigInteger previousPhaseId = null;
             int index = 0;
-            for(PhaseDTO phase : phases){
+            for(PhaseDTO phase : applicablePhases){
 
                 // Check if duration of period is enough to assign next flipping
                 tempFlippingDate = addDaysInDate(tempFlippingDate, -phase.getDurationInDays(), DurationType.DAYS, 1,1);
-                if (phases.size()==index+1 || (scopeToFlipNextPhase && DateUtils.getDate().compareTo(tempFlippingDate) >= 0)){
+                if (applicablePhases.size()==index+1 || (scopeToFlipNextPhase && DateUtils.getDate().compareTo(tempFlippingDate) >= 0)){
                     if(scopeToFlipNextPhase){
                         currentPhaseId = phase.getId();
                         nextPhaseId = previousPhaseId;
@@ -110,7 +110,7 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId, tempPhaseFlippingDate, currentPhaseId, nextPhaseId);
         save(planningPeriod);
         createPlanningPeriod(unitId, addDaysInDate(endDate, 0,
-                planningPeriodDTO.getDurationType(),1,1), phases, planningPeriodDTO);
+                planningPeriodDTO.getDurationType(),1,1), applicablePhases, planningPeriodDTO);
     }
 
     public List<PhaseDTO> getPhasesWithDurationInDays(Long unitId){
@@ -167,7 +167,7 @@ public class PlanningPeriodService extends MongoBaseService {
             throw new ActionNotPermittedException("Invalid duration for period to be created");
         }
 
-        if(Optional.ofNullable(firstPlanningPeriod).isPresent() && !planningPeriodDTO.getStartDate().after(lastPlanningPeriod.getEndDate()) && planningPeriodDTO.getStartDate().getTime() - lastPlanningPeriod.getEndDate().getTime() > 1){
+        if(Optional.ofNullable(firstPlanningPeriod).isPresent() && planningPeriodDTO.getStartDate().after(lastPlanningPeriod.getEndDate()) && planningPeriodDTO.getStartDate().getTime() - lastPlanningPeriod.getEndDate().getTime() > 1){
             throw new ActionNotPermittedException("Invalid start date for period to be created");
         }
 
@@ -201,14 +201,20 @@ public class PlanningPeriodService extends MongoBaseService {
                 (period.getDays()%7 >0 ? period.getDays() %7+ " DAYS " : "") ;
     }
 
+    // Prepare map for phases with id as key and sequence as value
+    public Map<BigInteger,Integer> getMapOfPhasesIdAndSequence(List<PhaseDTO> phases){
+        Map<BigInteger,Integer> phaseIdAndSequenceMap = new HashMap<>();
+        for(PhaseDTO phase : phases){
+            phaseIdAndSequenceMap.put(phase.getId(), phase.getSequence());
+        }
+        return phaseIdAndSequenceMap;
+    }
+
     public List<PlanningPeriodDTO> getPlanningPeriods(Long unitId, Date startDate, Date endDate){
         List<PhaseDTO> phases = phaseService.getApplicablePhasesByOrganizationId(unitId);
 
-        // Prepare map for phases with id as key and name as value
-        Map<BigInteger,String> phaseIdAndNameMap = new HashMap<>();
-        for(PhaseDTO phase : phases){
-            phaseIdAndNameMap.put(phase.getId(), phase.getName());
-        }
+        // Prepare map for phases with id as key and sequence as value
+        Map<BigInteger,Integer> phaseIdAndSequenceMap = getMapOfPhasesIdAndSequence(phases);
 
         // Fetch planning periods
         List<PlanningPeriodDTO> planningPeriods = null;
@@ -229,17 +235,17 @@ public class PlanningPeriodService extends MongoBaseService {
 
             // Set flippind dates
             for(PeriodPhaseFlippingDateDTO flippingDate : planningPeriod.getPhaseFlippingDate()){
-                String phaseName = phaseIdAndNameMap.get(flippingDate.getPhaseId());
-                switch (phaseName){
-                    case "DRAFT":{
+                int phaseSequence = phaseIdAndSequenceMap.get(flippingDate.getPhaseId());
+                switch (phaseSequence){
+                    case 4:{
                         planningPeriod.setConstructionToDraftDate(Optional.ofNullable(flippingDate.getFlippingDate()).isPresent() ? flippingDate.getFlippingDate().getTime(): null);
                         break;
                     }
-                    case "CONSTRUCTION":{
+                    case 3:{
                         planningPeriod.setPuzzleToConstructionDate(Optional.ofNullable(flippingDate.getFlippingDate()).isPresent() ? flippingDate.getFlippingDate().getTime(): null);
                         break;
                     }
-                    case "PUZZLE":{
+                    case 2:{
                         planningPeriod.setRequestToPuzzleDate(Optional.ofNullable(flippingDate.getFlippingDate()).isPresent() ? flippingDate.getFlippingDate().getTime(): null);
                         break;
                     }
@@ -264,12 +270,30 @@ public class PlanningPeriodService extends MongoBaseService {
         return false;
     }
 
-    public PlanningPeriod updatePhaseFlippingDateOfPeriod(PlanningPeriod planningPeriod, PlanningPeriodDTO planningPeriodDTO){
-        List<PeriodPhaseFlippingDate>  phaseFlippingDate = planningPeriod.getPhaseFlippingDate();
+    public PlanningPeriod updatePhaseFlippingDateOfPeriod(PlanningPeriod planningPeriod, PlanningPeriodDTO planningPeriodDTO, Long unitId){
+        List<PeriodPhaseFlippingDate>  phaseFlippingDateList = planningPeriod.getPhaseFlippingDate();
+        List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
+        Map<BigInteger,Integer> phasesMap = getMapOfPhasesIdAndSequence(phases);
 
-        phaseFlippingDate.get(0).setFlippingDate(DateUtils.getDate(planningPeriodDTO.getConstructionToDraftDate()));
-        phaseFlippingDate.get(1).setFlippingDate(DateUtils.getDate(planningPeriodDTO.getPuzzleToConstructionDate()));
-        phaseFlippingDate.get(2).setFlippingDate(DateUtils.getDate(planningPeriodDTO.getRequestToPuzzleDate()));
+        for(PeriodPhaseFlippingDate phaseFlippingDate : phaseFlippingDateList){
+            switch (phasesMap.get(phaseFlippingDate.getPhaseId())){
+                case 4:{
+                    phaseFlippingDate.setFlippingDate(DateUtils.getDate(planningPeriodDTO.getConstructionToDraftDate()));
+                    break;
+                }
+                case 3:{
+                    phaseFlippingDate.setFlippingDate(DateUtils.getDate(planningPeriodDTO.getPuzzleToConstructionDate()));
+                    break;
+                }
+                case 2:{
+                    phaseFlippingDate.setFlippingDate(DateUtils.getDate(planningPeriodDTO.getRequestToPuzzleDate()));
+                    break;
+                }
+            }
+        }
+//        phaseFlippingDateList.get(0).setFlippingDate(DateUtils.getDate(planningPeriodDTO.getConstructionToDraftDate()));
+//        phaseFlippingDateList.get(1).setFlippingDate(DateUtils.getDate(planningPeriodDTO.getPuzzleToConstructionDate()));
+//        phaseFlippingDateList.get(2).setFlippingDate(DateUtils.getDate(planningPeriodDTO.getRequestToPuzzleDate()));
         // Validation on flipping date, it is being done on front end, can be used in future
         /*if(validateFlippingDateByStartAndEndDate(DateUtils.getDate(planningPeriodDTO.getConstructionToDraftDate()),
                 phaseFlippingDate.get(1).getFlippingDate(), planningPeriod.getEndDate())){
@@ -311,7 +335,8 @@ public class PlanningPeriodService extends MongoBaseService {
         }
 
         planningPeriodDTO.setStartDate(DateUtils.getDate(planningPeriodDTO.getStartDateMillis()));
-        planningPeriodDTO.setEndDate(DateUtils.getDate(planningPeriodDTO.getEndDateMillis()));
+        planningPeriodDTO.setEndDate(DateUtils.getDate(planningPeriodDTO.getEndDateMillis() ));
+
         // If start date is equal to end date or end date is less than start date
         if(planningPeriodDTO.getStartDate().compareTo(planningPeriodDTO.getEndDate()) >= 0 ){
             throw new ActionNotPermittedException("Not a valid duration for a period ");
@@ -321,6 +346,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
         // Check if period is in request phase (Changes for start date and end date can be done in Request Phase
         // We are checking request phase by its name, can be done by sequence, need to ask
+        // TO DO check phase by sequence
         if(!phaseMongoRepository.checkPhaseByName(planningPeriod.getCurrentPhaseId(), "REQUEST")){
             throw new ActionNotPermittedException("Period with name : " + planningPeriod.getName() + " is not in Request Phase.");
         }
@@ -329,7 +355,8 @@ public class PlanningPeriodService extends MongoBaseService {
         if(planningPeriodDTO.getStartDate().compareTo(planningPeriod.getStartDate()) == 0 &&
                 planningPeriodDTO.getEndDate().compareTo(planningPeriod.getEndDate()) == 0){
             //If No change in date
-            planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO);
+
+            planningPeriod = updatePhaseFlippingDateOfPeriod(planningPeriod, planningPeriodDTO, unitId);
             planningPeriod.setName(planningPeriodDTO.getName());
             save(planningPeriod);
             return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate());
@@ -360,7 +387,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
         if( planningPeriodDTO.getEndDate().compareTo(endDateOfPeriodToBeDeleted) != 0 ){
             // Create period from ( planningPeriodDTO.getEndDate() - endDateOfPeriodToBeDeleted )
-            addPlanningPeriodOnUpdate(unitId, endDateOfPeriodToBeDeleted, planningPeriodDTO.getEndDate(), phases, planningPeriodDTO.getZoneId());
+            addPlanningPeriodOnUpdate(unitId, endDateOfPeriodToBeDeleted, DateUtils.getDate(planningPeriodDTO.getEndDateMillis() +1), phases, planningPeriodDTO.getZoneId());
         }
 
         // Fetch periods from start date and end date and return
@@ -385,6 +412,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
         // Check if period is in request phase
         // We are checking request phase by its name, can be done by sequence, need to ask
+        // TO DO check phase by sequence
         if( !phaseMongoRepository.checkPhaseByName(planningPeriod.getCurrentPhaseId(), "REQUEST")){
             throw new ActionNotPermittedException("Period with name : " + planningPeriod.getName() + " is not in Request Phase.");
         }
