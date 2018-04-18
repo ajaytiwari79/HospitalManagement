@@ -130,7 +130,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
                     "match(unitPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false}) \n" +
                     "match(unitPosition)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade)" +
                     "match (unitPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement) \n" +
-                    "MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
+                    "OPTIONAL MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
                     "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement) \n" +
                     "optional match (unitPosition)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
                     "optional match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function)" +
@@ -152,7 +152,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
                     "match(unitPosition)-[:" + HAS_POSITION_CODE + "]->(positionCode:PositionCode{deleted:false}) \n" +
                     "match(unitPosition)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade)" +
                     "MATCH (unitPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement) \n" +
-                    "MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
+                    "OPTIONAL MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
                     "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement) \n" +
                     "optional match (unitPosition)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
                     "optional match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function)" +

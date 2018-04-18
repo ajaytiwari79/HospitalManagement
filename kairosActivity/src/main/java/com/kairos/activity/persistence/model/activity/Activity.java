@@ -43,7 +43,6 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
-
     private RulesActivityTab rulesActivityTab;
     private IndividualPointsActivityTab individualPointsActivityTab;
     private TimeCalculationActivityTab timeCalculationActivityTab;
@@ -55,6 +54,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private SkillActivityTab skillActivityTab;
     private OptaPlannerSettingActivityTab optaPlannerSettingActivityTab;
     private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
+    private LocationActivityTab locationActivityTab;
     @JsonIgnore
     private boolean disabled;
 
@@ -302,6 +302,14 @@ public class Activity extends MongoBaseEntity implements Serializable {
 
     public void setState(ActivityStateEnum state) {
         this.state = state;
+    }
+
+    public LocationActivityTab getLocationActivityTab() {
+        return locationActivityTab;
+    }
+
+    public void setLocationActivityTab(LocationActivityTab locationActivityTab) {
+        this.locationActivityTab = locationActivityTab;
     }
 
     public static Activity copyProperties(Activity source, Activity target, String _id, String organizationType, String organizationSubType) {

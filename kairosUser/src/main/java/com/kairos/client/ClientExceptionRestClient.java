@@ -2,7 +2,6 @@ package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.response.dto.web.client.ClientExceptionTypesDTO;
-import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ public class ClientExceptionRestClient {
 
     public List<ClientExceptionTypesDTO> getClientExceptionTypes(){
 
-        final String baseUrl=getBaseUrl(true);
+        final String baseUrl=RestClientURLUtil.getBaseUrl(true);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ClientExceptionTypesDTO>>> typeReference =
@@ -54,14 +53,5 @@ public class ClientExceptionRestClient {
         }
     }
 
-    private final String getBaseUrl(boolean hasUnitInUrl){
-        if(hasUnitInUrl){
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
-        }else{
-            String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).toString();
-            return baseUrl;
-        }
 
-    }
 }

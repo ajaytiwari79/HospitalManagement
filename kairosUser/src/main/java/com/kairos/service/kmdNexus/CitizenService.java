@@ -25,7 +25,6 @@ import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.JsonUtils;
-import org.apache.commons.collections.map.HashedMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -314,7 +313,7 @@ public class CitizenService {
         grantTypes.add("Serviceloven §83, stk 2");
         grantTypes.add("Sundhedsloven §138");
         grantTypes.add("Sundhedsloven §140");
-        Map<String, Object> grantObject = new HashedMap();
+        Map<String, Object> grantObject = new HashMap<>();
         logger.info("grant url----------> " + AppConstants.KMD_NEXUS_PATIENT_GRANTS + grantId);
         ResponseEntity<String> grantResponse = loginTemplate.exchange(AppConstants.KMD_NEXUS_PATIENT_GRANTS + grantId, HttpMethod.GET, headersElements, String.class);
         PatientGrant patientGrant = JsonUtils.toObject(grantResponse.getBody(), PatientGrant.class);

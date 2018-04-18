@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html style="height: 100%;">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js"></script>
+    <!--<script src="angular-animate.min.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-touch/1.6.6/angular-touch.min.js"></script>-->
+    <!--<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8y3XyNnZEQfub_Lww9CzLTVzFAqKKMXQ"></script>-->
+    <link type="text/css" rel="stylesheet" href="bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="style.css"/>
+    <body style="height: 100%;">
+
+        <div ng-app="shiftPlanningApp" ng-controller="shiftPlanningCtrl">
+            <div class="container" ng-show="!employees.length"><textarea class="form-control" rows="25" placeholder="XML" ng-model="shift.xml"></textarea>
+                <modal visible="showModal">
+                    Any additional data / buttons
+                </modal>
+                <div class="divbutton">
+                    <!--<input type="text" ng-model="task.id" placeholder="Id">-->
+                    <input class="button" type="button" value="submit" ng-click="submitXml();">
+                    <select class="button" ng-show="problemIds.length>0" ng-model="problemId" ng-options="id.planningId for id in problemIds">
+                    </select>
+                    <input class="button" type="button" ng-show="problemIds.length>0" value="Status" ng-click="getStatus();">
+                    <input class="button" type="button" ng-show="problemIds.length>0" value="Solution" ng-click="getSolution();">
+                    <input class="button" type="button" ng-show="false" value="Location" ng-click="makeLocationData();">
+
+                    <span class="status">{{planningProblem.status}}</span>
+                </div>
+            </div>
+
+            <div ng-show="employees.length>0">
+                <div class="table-details">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Details</th>
+                                <th>Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>3.Total Employees</td>
+                                <td>{{employees.length}}</td>
+                            </tr>
+                            <!--<tr>
+                                <td>8.Optaplanner Score</td>
+                                <td>{{plannerScore}}</td>
+                            </tr>-->
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="staff-info-box clearfix">
+                    <ul class="staff-list clearfix" ng-repeat="emp in employees">
+                        <li>
+                            <a><span class="number">{{emp.id}}</span></a>
+                            <div class="staff-name"> <!--<a><span ng-click="getMap();">pradeep</span></a>-->
+                                <a><span>{{emp.name}}</span></a>
+                                <span>Planned Period: {{emp.avialableMinutes}}</span>
+                            </div>
+
+                        </li>
+                    </ul>
+
+                </div>
+
+
+                <div>
+                    <div class="unassigned-task">
+                        <h4 class="heading">Shift Assignment</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Employee Name</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                    <th>Minutes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="sA in shiftAssignments">
+                                    <td>{{sA.id}}</td>
+                                    <td>{{sA.employee.name}}</td>
+                                    <td>{{sA.breakStart}}</td>
+                                    <td>{{sA.end}}</td>
+                                    <td>{{sA.minutes}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div>
+                    <div class="unassigned-task">
+                        <h4 class="heading">Shift Level - {{staffingLevel.id}} - {{staffingLevel.date}}</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>MinimumStaffRequired</th>
+                                    <th>MaximumStaffRequired</th>
+                                    <th>Skills</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="sLevelinterval in staffingLevel.intervals">
+                                    <td>{{sLevelinterval.minimumStaffRequired}}</td>
+                                    <td>{{sLevelinterval.maximumStaffRequired}}</td>
+                                    <td>{{sLevelinterval.skills.id}}</td>
+                                    <td>{{sLevelinterval.breakStart}}</td>
+                                    <td>{{sLevelinterval.end}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+            <a class="back" ng-show="mapShow" ng-click="mapShow=false"><span>Back</span></a>
+            <div ng-show="mapShow" id="map"></div>
+        </div>
+        <script src="shiftPlanningCtrl.js"></script>
+        <script type="text/ng-template" id="infoplan.html">
+<div class="modal-header whiteBg pad10">
+    <h1 class="fs25 mar0">
+        Crop Your Image
+            </h1>
+            </div>
+<div class="modal-body clearfix paddingIn">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="cropArea">
+                <img-crop image="myImage" result-image="myCroppedImage"></img-crop>
+            </div>
+            </div>
+            </div>
+            </div>
+<div class="modal-footer whiteBg pad10">
+    <button class="btn btn-default" ng-click="cancel();">Cancel</button>
+    <button class="btn btn-primary" ng-click="ok();">OK</button>
+            </div>
+        </script>
+    </body>
+</html>

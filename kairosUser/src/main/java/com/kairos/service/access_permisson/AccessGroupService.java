@@ -2,6 +2,7 @@ package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.client.dto.organization.OrganizationCategoryDTO;
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.OrganizationCategory;
@@ -56,7 +57,7 @@ public class AccessGroupService extends UserBaseService {
     private OrganizationService organizationService;
 
     public AccessGroup createAccessGroup(long organizationId, AccessGroup accessGroup) {
-        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroup.getName());
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroup.getName().trim());
         if ( isAccessGroupExistWithSameName ) {
             throw new DuplicateDataException("Access Group already exists with name " +accessGroup.getName() );
         }
@@ -342,19 +343,11 @@ public class AccessGroupService extends UserBaseService {
         List<AccessPageQueryResult> accesPageList = accessPageRepository.getChildTabsAccessPermissionsByStaffAndOrg(orgId, unitId, staffId, parentTabId);
         int countOfRead = 0, countOfWrite = 0;
         Long accessPageId = accesPageList.get(0).getId();
-        Boolean tempRead = false;
-        Boolean tempWrite = false;
+//        Boolean tempRead = false;
+//        Boolean tempWrite = false;
         for(AccessPageQueryResult accessPage : accesPageList){
-            if(accessPageId == accessPage.getId()){
-                tempRead = tempRead || accessPage.isRead();
-                tempWrite = tempWrite || accessPage.isWrite();
-            } else  {
-                accessPageId = accessPage.getId();
-                countOfRead += tempRead ? 1 : 0 ;
-                countOfRead += tempWrite ? 1 : 0 ;
-                tempRead = false;
-                tempWrite = false;
-            }
+            countOfRead += accessPage.isRead() ? 1 : 0 ;
+            countOfWrite += accessPage.isWrite() ? 1 : 0 ;
         }
         updateReadWritePermissionOfTab( accessGroupId, countOfRead > 0 , countOfWrite > 0, parentTabId, orgId, unitId, staffId );
     }
@@ -476,11 +469,11 @@ public class AccessGroupService extends UserBaseService {
 
     public AccessGroup createCountryAccessGroup(long countryId, CountryAccessGroupDTO accessGroupDTO) {
         Country country = countryGraphRepository.findOne(countryId);
-        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString());
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, accessGroupDTO.getName().trim(), accessGroupDTO.getOrganizationCategory().toString());
         if ( isAccessGroupExistWithSameName ) {
             throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
         }
-        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName(), accessGroupDTO.getDescription(), accessGroupDTO.getRole());
+        AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole());
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
 
@@ -501,7 +494,7 @@ public class AccessGroupService extends UserBaseService {
         if (! Optional.ofNullable(accessGrpToUpdate).isPresent()) {
             throw new DataNotFoundByIdException("Incorrect Access Group id " + accessGroupId);
         }
-        if( accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId) ){
+        if( accessGroupRepository.isCountryAccessGroupExistWithNameExceptId(countryId, accessGroupDTO.getName().trim(), accessGroupDTO.getOrganizationCategory().toString(), accessGroupId) ){
             throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName() );
         }
 
@@ -566,5 +559,64 @@ public class AccessGroupService extends UserBaseService {
 
     Long getAccessPageIdByAccessGroup(Long accessGroupId){
         return accessGroupRepository.getAccessPageIdByAccessGroup(accessGroupId);
+    }
+
+    public AccessGroupDTO copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
+        Optional<Organization> organization = organizationGraphRepository.findById(organizationId);
+        if (!organization.isPresent()) {
+            throw new DataNotFoundByIdException("Organization not found " + organizationId);
+        }
+        Organization parent;
+        if (organization.get().getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.get().getId());
+
+        } else {
+            parent = organizationGraphRepository.getParentOfOrganization(organization.get().getId());
+        }
+        if(Optional.ofNullable(parent).isPresent()){
+            throw new  ActionNotPermittedException("Access group can't be copied at child organization");
+        }
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroupDTO.getName().trim());
+        if ( isAccessGroupExistWithSameName ) {
+            throw new DuplicateDataException("Access Group already exists with name " +accessGroupDTO.getName().trim() );
+        }
+        Optional<AccessGroup> currentAccessGroup=accessGroupRepository.findById(accessGroupDTO.getId());
+        if (!currentAccessGroup.isPresent()) {
+            throw new DataNotFoundByIdException("Access group not found " + accessGroupDTO.getId());
+        }
+        AccessGroup accessGroup=new AccessGroup(accessGroupDTO.getName().trim(),accessGroupDTO.getDescription(),accessGroupDTO.getRole());
+        save(accessGroup);
+
+        organization.get().getAccessGroups().add(accessGroup);
+        save(organization.get());
+        accessPageRepository.copyAccessGroupPageRelationShips(accessGroupDTO.getId(),accessGroup.getId());
+        return new AccessGroupDTO(accessGroup.getId(),accessGroup.getName(),accessGroup.getDescription(),accessGroup.getRole());
+
+    }
+    public CountryAccessGroupDTO copyCountryAccessGroup(long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
+        Optional<Country> country = countryGraphRepository.findById(countryId);
+        if(!country.isPresent()){
+            throw new DataNotFoundByIdException("Country not found " + countryId);
+        }
+        Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getOrganizationCategory().toString());
+        if (isAccessGroupExistWithSameName) {
+            throw new DuplicateDataException("Access Group already exists with name " + countryAccessGroupDTO.getName().trim());
+        }
+        Optional<AccessGroup> currentAccessGroup = accessGroupRepository.findById(countryAccessGroupDTO.getId());
+        if (!currentAccessGroup.isPresent()) {
+            throw new DataNotFoundByIdException("Access group not found " + countryAccessGroupDTO.getId());
+        }
+        AccessGroup accessGroup = new AccessGroup(countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getDescription(), countryAccessGroupDTO.getRole());
+        accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
+        accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+
+        CountryAccessGroupRelationship accessGroupRelationship = new CountryAccessGroupRelationship(country.get(), accessGroup, countryAccessGroupDTO.getOrganizationCategory());
+        accessGroupRelationship.setCreationDate(DateUtil.getCurrentDate().getTime());
+        accessGroupRelationship.setLastModificationDate(DateUtil.getCurrentDate().getTime());
+        countryAccessGroupRelationshipRepository.save(accessGroupRelationship);
+        save(country.get());
+        accessPageRepository.copyAccessGroupPageRelationShips(countryAccessGroupDTO.getId(), accessGroup.getId());
+        countryAccessGroupDTO.setId(accessGroup.getId());
+        return countryAccessGroupDTO;
     }
 }

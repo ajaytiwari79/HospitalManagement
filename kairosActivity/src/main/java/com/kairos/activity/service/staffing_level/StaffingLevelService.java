@@ -25,6 +25,7 @@ import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.event.ShiftNotificationEvent;
 import com.kairos.activity.util.timeCareShift.Transstatus;
+import com.kairos.util.serviceutil.StaffingLevelUtil;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -115,7 +116,7 @@ public class StaffingLevelService extends MongoBaseService {
         StaffingLevel staffingLevelOld = null;
         staffingLevelOld = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalseCustom(unitId, DateUtils.onlyDate(staffingLevelDTO.getCurrentDate()));
         if(!Optional.ofNullable(staffingLevelOld).isPresent()) {
-            StaffingLevel staffingLevel = StaffingLevelDto.buildStaffingLevels(staffingLevelDTO, unitId);
+            StaffingLevel staffingLevel = StaffingLevelUtil.buildStaffingLevels(staffingLevelDTO, unitId);
             this.save(staffingLevel);
             BeanUtils.copyProperties(staffingLevel, staffingLevelDTO, new String[]{"staffingLevelInterval"});
             staffingLevelDTO.setStaffingLevelInterval(staffingLevelDTO.getStaffingLevelInterval().stream()
@@ -177,7 +178,7 @@ public class StaffingLevelService extends MongoBaseService {
             throw new UnsupportedOperationException("we can not modified the current date of staffing level");
         }
 
-        staffingLevel = StaffingLevelDto.updateStaffingLevels(staffingLevelId, staffingLevelDTO, unitId, staffingLevel);
+        staffingLevel = StaffingLevelUtil.updateStaffingLevels(staffingLevelId, staffingLevelDTO, unitId, staffingLevel);
         this.save(staffingLevel);
         BeanUtils.copyProperties(staffingLevel, staffingLevelDTO);
         staffingLevelDTO.setStaffingLevelInterval(staffingLevelDTO.getStaffingLevelInterval().stream()
@@ -711,4 +712,5 @@ public class StaffingLevelService extends MongoBaseService {
         return new Object[]{staffingLevelTimeSlotDTOS, activityIds};
 
     }
+
 }
