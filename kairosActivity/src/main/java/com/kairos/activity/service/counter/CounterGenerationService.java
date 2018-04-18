@@ -15,7 +15,7 @@ public class CounterGenerationService extends MongoBaseService{
 
 //    public void setRestingHoursPerPresenceDay(){
 //        Counter cDef = new Counter();
-//        cDef.setType(CounterType.RESTING_HOURS_PER_PRESENCE_DAY);
+//        cDef.setCounterType(CounterType.RESTING_HOURS_PER_PRESENCE_DAY);
 //        cDef.setChartSize(CounterSize.SIZE_1X1);
 //        cDef.setChartsSupported(new ArrayList<ChartType>());
 //        cDef.setViewSupported(CounterView.CHART);
@@ -41,7 +41,7 @@ public class CounterGenerationService extends MongoBaseService{
 //        for(CounterModuleLinkDTO cmLink : links){
 //            UnitRoleWiseCounter accessiblity = new UnitRoleWiseCounter();
 //            accessiblity.setAccessLevel(CounterLevel.INDIVIDUAL);
-//            accessiblity.setModulewiseCounterId(cmLink.getId());
+//            accessiblity.setRefCounterId(cmLink.getId());
 //            accessiblity.setUnitId(unitId);
 //        }
 //

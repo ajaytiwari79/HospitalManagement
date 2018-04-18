@@ -3,15 +3,15 @@ package com.kairos.activity.service.counter;
 import com.kairos.activity.constants.CounterStore;
 import com.kairos.activity.persistence.enums.counter.CounterType;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-import com.kairos.activity.persistence.model.counter.Counter;
-import com.kairos.activity.persistence.model.counter.UnitRoleWiseCounter;
-import com.kairos.activity.persistence.model.counter.ModuleWiseCounter;
+import com.kairos.activity.persistence.model.counter.*;
 import com.kairos.activity.persistence.repository.counter.CounterRepository;
+import com.kairos.activity.response.dto.UserDetailsDTO;
 import com.kairos.activity.response.dto.counter.*;
 import com.kairos.activity.service.MongoBaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -23,10 +23,8 @@ import java.util.Map;
 
 @Service
 public class CounterManagementService extends MongoBaseService{
-    @Inject
-    CounterStore counterStore;
-    @Inject
-    CounterRepository counterRepository;
+    @Inject private CounterStore counterStore;
+    @Inject private CounterRepository counterRepository;
 
     private final static Logger logger = LoggerFactory.getLogger(CounterManagementService.class);
 
@@ -112,9 +110,9 @@ public class CounterManagementService extends MongoBaseService{
         save(moduleWiseCounterList);
     }
 
-    private  ManipulatableCounterIdsDTO getCounterIdsToAddAndUpdate(Map<BigInteger, BigInteger> idMap, List<BigInteger> currentCounterIds){
+    private  ManipulatableCounterIdsDTO getCounterIdsToAddAndUpdate(Map<BigInteger, BigInteger> idMap, List<BigInteger> currentRefCounterIds){
         ManipulatableCounterIdsDTO manipulatableIds = new ManipulatableCounterIdsDTO();
-        for(BigInteger counterId : currentCounterIds){
+        for(BigInteger counterId : currentRefCounterIds){
             if(idMap.remove(counterId) == null)
                 manipulatableIds.getCounterIdsToAdd().add(counterId);
         }
@@ -167,10 +165,12 @@ public class CounterManagementService extends MongoBaseService{
 
     public void storeRolewiseCountersForUnit(List<RolewiseCounterDTO> rolewiseCounterDTOs, BigInteger unitId){
         Map<BigInteger, Map<BigInteger, BigInteger>> roleLevelCountersIdMap = getRolewiseCounterIdMapping(unitId);
+//        Map<BigInteger, BigInteger> baseCounterIdMapping = *//
         for(RolewiseCounterDTO rolewiseCounterDTO : rolewiseCounterDTOs){
-            Map<BigInteger, BigInteger> countersIdMap = roleLevelCountersIdMap.get(rolewiseCounterDTO.getRoleId());
-            ManipulatableCounterIdsDTO counterRefsToModify = getCounterIdsToAddAndUpdate(countersIdMap, rolewiseCounterDTO.getModulewiseCounterIds());
-
+            Map<BigInteger, BigInteger> refCountersIdMap = roleLevelCountersIdMap.get(rolewiseCounterDTO.getRoleId());
+            ManipulatableCounterIdsDTO counterRefsToModify = getCounterIdsToAddAndUpdate(refCountersIdMap, rolewiseCounterDTO.getModulewiseCounterIds());
+            removeRolewiseCounterForUnit(rolewiseCounterDTO.getRoleId(), counterRefsToModify.getCounterIdsToRemove());
+            addRolewiseCounterRefsForUnit(unitId, rolewiseCounterDTO.getRoleId(), counterRefsToModify.getCounterIdsToAdd());
         }
     }
 
@@ -188,6 +188,69 @@ public class CounterManagementService extends MongoBaseService{
     }
 
     ///////////////////////////////////////////////////////
+    // setting default counteres
+    ///////////////////////////////////////////////////
+
+    public void setupInitialConfigurationForUnit(BigInteger countryId, BigInteger unitId){
+        List<CounterOrderDTO> orders = counterRepository.getOrderedCountersListForCountry(countryId, null);
+        List<UnitWiseCounterOrder> unitCounterOrders = new ArrayList<>();
+        for(CounterOrderDTO counterOrderDTO : orders){
+            UnitWiseCounterOrder unitCounterOrder = new UnitWiseCounterOrder(unitId,
+                    counterOrderDTO.getModuleId(),
+                    counterOrderDTO.getTabId(),
+                    counterOrderDTO.getOrderedCounterIds());
+        }
+        save(unitCounterOrders);
+    }
+
+    public void setupInitialConfigurationForStaff(){
+        //get mapping of rolewisecounterIds to role:modulewiseCounterIds.
+    }
+
+    public InitialCountersDetailsDTO getInitialCounterDataForCountry(String moduleId, BigInteger countryId){
+        InitialCountersDetailsDTO initialCountersDetailsDTO = new InitialCountersDetailsDTO();
+        initialCountersDetailsDTO.setCounterDefs(counterRepository.getModuleWiseCounterDetails(moduleId, countryId));
+        initialCountersDetailsDTO.setOrderedList(counterRepository.getOrderedCountersListForCountry(countryId, moduleId));
+        return initialCountersDetailsDTO;
+    }
+
+    public InitialCountersDetailsDTO getInitialCounterDataForUnit(String moduleId, BigInteger unitId, BigInteger countryId){
+        InitialCountersDetailsDTO initialCountersDetailsDTO = new InitialCountersDetailsDTO();
+        initialCountersDetailsDTO.setCounterDefs(counterRepository.getModuleWiseCounterDetails(moduleId, countryId));
+        initialCountersDetailsDTO.setOrderedList(counterRepository.getOrderedCountersListForUnit(unitId, moduleId));
+        if(initialCountersDetailsDTO.getOrderedList() == null || initialCountersDetailsDTO.getOrderedList().isEmpty())
+            setupInitialConfigurationForUnit(countryId, unitId);
+        initialCountersDetailsDTO.setOrderedList(counterRepository.getOrderedCountersListForUnit(unitId, moduleId));
+        return initialCountersDetailsDTO;
+    }
+
+    public InitialCountersDetailsDTO getInitialCounterDataForUser(String moduleId, BigInteger staffId, BigInteger unitId, BigInteger roleId){
+        InitialCountersDetailsDTO initialCountersDetailsDTO = new InitialCountersDetailsDTO();
+        initialCountersDetailsDTO.setCounterDefs(counterRepository.getRolewiseCounterTypeDetails(roleId, unitId, moduleId));
+        initialCountersDetailsDTO.setOrderedList(counterRepository.getOrderedCountersListForUser(unitId, staffId, moduleId));
+        if(initialCountersDetailsDTO.getOrderedList() == null || initialCountersDetailsDTO.getOrderedList().isEmpty())
+            setupInitialConfigurationForStaff(); //TODO
+        initialCountersDetailsDTO.setOrderedList(counterRepository.getOrderedCountersListForUser(unitId, staffId, moduleId));
+        return initialCountersDetailsDTO;
+    }
+
+    public InitialCountersDetailsDTO getCountersListAndDefinitionMapping() {
+        //list of counterIds, with mapping to definition
+        //countryAdmin is binded with modulewiseDistribution for settings
+        //unitAdmin is binded with modulewiseDistribution for settings
+        List<CounterOrderDTO> tabwiseOrder = new ArrayList<>();
+        return null;
+    }
+
+    public void updateCountersOrderForTab(){
+        // update tabwise counters order
+    }
+
+    public UserDetailsDTO getUserDetails(){
+        //identify if user is 'countryAdmin', 'unitManager', 'order' with country and unit id
+        return null;
+    }
+    //////////////////////////////////////////////////
 
     private CounterService getCounterService(CounterType counterType){
         return counterStore.getService(counterType);

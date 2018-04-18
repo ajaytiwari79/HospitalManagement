@@ -7,17 +7,18 @@ import java.math.BigInteger;
 public class UnitRoleWiseCounter extends MongoBaseEntity{
     private BigInteger unitId;
     private BigInteger roleId;
-    private BigInteger modulewiseCounterId;
+    private BigInteger refCounterId;
 
     public UnitRoleWiseCounter(){
 
     }
 
-    public UnitRoleWiseCounter(BigInteger unitId, BigInteger roleId, BigInteger modulewiseCounterId){
-        this.modulewiseCounterId = modulewiseCounterId;
+    public UnitRoleWiseCounter(BigInteger unitId, BigInteger roleId, BigInteger refCounterId){
+        this.refCounterId = refCounterId;
         this.roleId = roleId;
         this.unitId = unitId;
     }
+
     public BigInteger getUnitId() {
         return unitId;
     }
@@ -26,12 +27,12 @@ public class UnitRoleWiseCounter extends MongoBaseEntity{
         this.unitId = unitId;
     }
 
-    public BigInteger getModulewiseCounterId() {
-        return modulewiseCounterId;
+    public BigInteger getRefCounterId() {
+        return refCounterId;
     }
 
-    public void setModulewiseCounterId(BigInteger modulewiseCounterId) {
-        this.modulewiseCounterId = modulewiseCounterId;
+    public void setRefCounterId(BigInteger refCounterId) {
+        this.refCounterId = refCounterId;
     }
 
     public BigInteger getRoleId() {
@@ -41,4 +42,5 @@ public class UnitRoleWiseCounter extends MongoBaseEntity{
     public void setRoleId(BigInteger roleId) {
         this.roleId = roleId;
     }
+
 }

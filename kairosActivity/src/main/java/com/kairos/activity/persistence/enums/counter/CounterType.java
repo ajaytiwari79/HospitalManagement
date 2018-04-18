@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum CounterType {
-    RESTING_HOURS_PER_PRESENCE_DAY("Resting Hours Per Presence Day");
+    RESTING_HOURS_PER_PRESENCE_DAY("Resting Hours Per Presence Day"), COUNTER_2("Counter 2"), COUNTER_3("Counter 3");
     private String name;
 
     private CounterType(String name){

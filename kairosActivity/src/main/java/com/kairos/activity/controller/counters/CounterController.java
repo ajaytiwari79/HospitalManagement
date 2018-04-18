@@ -65,4 +65,15 @@ public class CounterController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
+    public ResponseEntity<Map<String, Object>> getInitialCounterSettingsForCountry(){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+    public ResponseEntity<Map<String, Object>> getInitialCounterSettingsForUnit(){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
+
+    public ResponseEntity<Map<String, Object>> getInitialCounterSettingsForIndividual(){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
+    }
 }
