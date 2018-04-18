@@ -1,8 +1,8 @@
 package com.kairos.persistence.repository.user.agreement.cta;
 
-import com.kairos.persistence.model.constants.RelationshipConstants;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.agreement.cta.*;
+import com.kairos.persistence.model.user.agreement.cta.CTAListQueryResult;
+import com.kairos.persistence.model.user.agreement.cta.CTAResponseDTO;
+import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -257,6 +257,6 @@ public interface CollectiveTimeAgreementGraphRepository extends Neo4jBaseReposit
     @Query("MATCH(c:Country)-[:" + BELONGS_TO + "]-(cta:CostTimeAgreement{deleted:false})  where cta.name =~'.*{0}.*' with \n" +
             "toInt(last(split(cta.name,'-'))) as num " +
             "RETURN case when num is null  then 0 else MAX(num) end as result limit 1")
-    Integer getLastIndexofCTA(String name);
+    Integer getLastSuffixNumberOfCTAName(String name);
 
 }

@@ -872,9 +872,9 @@ public class CostTimeAgreementService extends UserBaseService {
                 ruleTemplate.setId(null);
             });
             // for setting the unique name
-            Integer lastCount=collectiveTimeAgreementGraphRepository.getLastIndexofCTA("(?i)"+costTimeAgreement.getName());
+            Integer lastSuffixNumber=collectiveTimeAgreementGraphRepository.getLastSuffixNumberOfCTAName("(?i)"+costTimeAgreement.getName());
             String name=costTimeAgreement.getName();
-            newCtaObject.setName(name.contains("-")?name.replace(name.substring(name.lastIndexOf("-")+1,name.length()),lastCount.toString()):costTimeAgreement.getName()+"-"+ ++lastCount);
+            newCtaObject.setName(name.contains("-")?name.replace(name.substring(name.lastIndexOf("-")+1,name.length()),(++lastSuffixNumber).toString()):costTimeAgreement.getName()+"-"+ ++lastSuffixNumber);
             newCtaObject.setCountry(costTimeAgreement.getCountry());
             newCtaObject.setOrganizationType(costTimeAgreement.getOrganizationType());
             newCtaObject.setOrganizationSubType(organizationSubType);
@@ -889,6 +889,5 @@ public class CostTimeAgreementService extends UserBaseService {
             save(costTimeAgreement);
         }
         return null;
-
     }
 }
