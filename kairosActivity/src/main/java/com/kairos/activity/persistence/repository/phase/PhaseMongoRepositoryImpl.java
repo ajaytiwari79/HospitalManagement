@@ -35,10 +35,10 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
         return result.getMappedResults();
 
     }
-    public  List<PhaseDTO> getPhasesByUnit(Long unitId)
+    public  List<PhaseDTO> getPhasesByUnit(Long unitId, Sort.Direction direction)
     {
         Query query = Query.query(Criteria.where("organizationId").is(unitId));
-        query.with(new Sort(Sort.DEFAULT_DIRECTION,"sequence"));
+        query.with(new Sort(direction,"sequence"));
         return mongoTemplate.find(query,PhaseDTO.class,"phases");
     }
 
@@ -51,7 +51,7 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
 
     public List<PhaseDTO> getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence)
     {
-        Query query = Query.query(Criteria.where("organizationId").is(unitId).and("sequence").gt(sequence));
+        Query query = Query.query(Criteria.where("organizationId").is(unitId).and("sequence").gt(sequence).and("duration").gt(0));
         query.with(new Sort(Sort.Direction.ASC,"sequence"));
         query.limit(1);
         return mongoTemplate.find(query, PhaseDTO.class,"phases");

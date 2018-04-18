@@ -17,6 +17,7 @@ import com.kairos.response.dto.web.period.PeriodPhaseFlippingDateDTO;
 import com.kairos.response.dto.web.period.PlanningPeriodDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -211,7 +212,7 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public List<PlanningPeriodDTO> getPlanningPeriods(Long unitId, Date startDate, Date endDate){
-        List<PhaseDTO> phases = phaseService.getApplicablePhasesByOrganizationId(unitId);
+        List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
 
         // Prepare map for phases with id as key and sequence as value
         Map<BigInteger,Integer> phaseIdAndSequenceMap = getMapOfPhasesIdAndSequence(phases);
