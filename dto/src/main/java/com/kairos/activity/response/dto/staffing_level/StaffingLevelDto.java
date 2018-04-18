@@ -15,7 +15,7 @@ public class StaffingLevelDto {
     private Long phaseId;
     //@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     //@ExistingStaffingLevel
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date currentDate;
     private Long weekCount;
     private StaffingLevelSetting staffingLevelSetting;
