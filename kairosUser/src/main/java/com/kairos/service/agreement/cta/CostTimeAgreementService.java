@@ -8,13 +8,11 @@ import com.kairos.persistence.model.enums.FixedValueType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.cta.*;
-import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.Currency;
+import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
@@ -38,12 +36,10 @@ import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.unit_position.UnitPositionService;
-import com.kairos.util.DateUtil;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.annotation.Version;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,8 +52,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import static com.kairos.constants.AppConstants.COPY_OF;
 
 @Transactional
 @Service
@@ -852,7 +846,6 @@ public class CostTimeAgreementService extends UserBaseService {
     }
 
     public CostTimeAgreementDTO setCTAWithOrganizationType(Long countryId, long ctaId, long organizationSubTypeId, boolean checked) {
-        Map<String, Object> map = new HashMap<>();
         OrganizationType organizationSubType = organizationTypeRepository.findOne(organizationSubTypeId);
         if (!Optional.ofNullable(organizationSubType).isPresent()) {
             throw new DataNotFoundByIdException("Invalid organisation Sub type Id " + organizationSubTypeId);
