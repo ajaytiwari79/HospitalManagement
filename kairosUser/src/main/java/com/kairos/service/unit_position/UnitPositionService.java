@@ -81,7 +81,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -331,6 +330,7 @@ public class UnitPositionService extends UserBaseService {
         unitPosition.setExpertise(expertise.get());
 
 
+
         Staff staff = staffGraphRepository.findOne(unitPositionDTO.getStaffId());
         if (!Optional.ofNullable(staff).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Staff Id" + unitPositionDTO.getStaffId());
@@ -377,12 +377,12 @@ public class UnitPositionService extends UserBaseService {
             throw new ActionNotPermittedException("unable to get all functions");
         }
         unitPosition.setFunctions(functions);
-
+        unitPosition.setFullTimeWeeklyMinutes(expertise.get().getFullTimeWeeklyMinutes());
         unitPosition.setTotalWeeklyMinutes(unitPositionDTO.getTotalWeeklyMinutes() + (unitPositionDTO.getTotalWeeklyHours() * 60));
         unitPosition.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
         unitPosition.setHourlyWages(unitPositionDTO.getHourlyWages());
         unitPosition.setSalary(unitPositionDTO.getSalary());
-        unitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
+        //unitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
         if (createFromTimeCare) {
             unitPosition.setTimeCareExternalId(unitPositionDTO.getTimeCareExternalId());
         }
@@ -490,8 +490,6 @@ public class UnitPositionService extends UserBaseService {
                 oldUnitPosition.setReasonCode(reasonCode.get());
             }
         }
-
-
         oldUnitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
         oldUnitPosition.setTotalWeeklyMinutes(unitPositionDTO.getTotalWeeklyMinutes() + (unitPositionDTO.getTotalWeeklyHours() * 60));
         oldUnitPosition.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
