@@ -3,6 +3,7 @@ package com.kairos.response.dto.web.period;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.enums.DurationType;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.List;
 public class PlanningPeriodDTO {
     private BigInteger id;
     private String name;
+    @NotNull(message = "error.startdate.notnull")
     private Long startDateMillis;
     private Long endDateMillis;
     private Date startDate;
