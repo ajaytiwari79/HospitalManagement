@@ -2,9 +2,11 @@ package com.kairos.service.organizationMetadata;
 
 import com.kairos.config.env.EnvConfig;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.PaymentSettings;
 import com.kairos.persistence.model.organization.PaymentSettingsDTO;
+import com.kairos.persistence.model.organization.PaymentSettingsQueryResult;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ClientHomeAddressQueryResult;
 import com.kairos.persistence.model.user.region.LatLng;
@@ -21,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -173,15 +174,14 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
         return coordinateInPolygon;
     }
 
-    public PaymentSettingsDTO getPaymentSettings(Long unitId) {
-        PaymentSettings paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId);
+    public List<PaymentSettingsQueryResult> getPaymentSettings(Long unitId) {
+        List<PaymentSettingsQueryResult> paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId);
         if (!Optional.ofNullable(paymentSettings).isPresent()) {
             logger.info("Unable to payments settings for unit ,{}", unitId);
             throw new DataNotFoundByIdException("Unable to get  payments settings for unit " + unitId);
         }
-        PaymentSettingsDTO paymentSettingsDTO = new PaymentSettingsDTO(paymentSettings.getId(), paymentSettings.getType(), paymentSettings.getDateOfPayment(), paymentSettings.getMonthOfPayment());
 
-        return paymentSettingsDTO;
+        return paymentSettings;
     }
 
     public PaymentSettingsDTO createPaymentsSettings(PaymentSettingsDTO paymentSettingsDTO, Long unitId) {
@@ -190,21 +190,33 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
             logger.info("Unable to get unit while getting payments settings for unit ,{}", unitId);
             throw new DataNotFoundByIdException("Unable to get organization by id" + unitId);
         }
-        if (Optional.ofNullable(organization.get().getPaymentSettings()).isPresent()) {
-            logger.info("payment settings already found, for unit{}", unitId);
-            throw new DataNotFoundByIdException("payment settings already found for unit" + unitId);
+        if (Optional.ofNullable(organization.get().getPaymentSettings()).isPresent() && !organization.get().getPaymentSettings().isEmpty()) {
+            Optional<PaymentSettings> paymentSettingsFromDB = organization.get().getPaymentSettings().stream().filter(paymentSettings -> paymentSettings.getType().equals(paymentSettingsDTO.getType())).findFirst();
+            if (paymentSettingsFromDB.isPresent()) {
+                throw new DuplicateDataException("payment settings " + paymentSettingsDTO.getType() + " is already present for the organization");
+            }
         }
-        PaymentSettings paymentSettings = paymentSettingsDTO.getType().equals(PaidOutFrequencyEnum.MONTHLY)
-                ? new PaymentSettings(PaidOutFrequencyEnum.MONTHLY, paymentSettingsDTO.getDateOfPayment())
-                : new PaymentSettings(PaidOutFrequencyEnum.YEARLY, paymentSettingsDTO.getDateOfPayment(), paymentSettingsDTO.getMonthOfPayment());
-        organization.get().setPaymentSettings(paymentSettings);
-        save(organization.get());
-        paymentSettingsDTO.setId(paymentSettings.getId());
+        paymentSettingsDTO.setId(savePaymentSettings(paymentSettingsDTO, organization.get()));
+
+
         return paymentSettingsDTO;
     }
 
+    private Long savePaymentSettings(PaymentSettingsDTO paymentSettingsDTO, Organization organization) {
+        PaymentSettings paymentSettings = paymentSettingsDTO.getType().equals(PaidOutFrequencyEnum.MONTHLY)
+                ? new PaymentSettings(PaidOutFrequencyEnum.MONTHLY, paymentSettingsDTO.getDateOfPayment())
+                : new PaymentSettings(PaidOutFrequencyEnum.YEARLY, paymentSettingsDTO.getDateOfPayment(), paymentSettingsDTO.getMonthOfPayment());
+        if (Optional.ofNullable(organization.getPaymentSettings()).isPresent())
+            organization.getPaymentSettings().add(paymentSettings);
+        else
+            organization.setPaymentSettings(Collections.singleton(paymentSettings));
+        save(organization);
+        return paymentSettings.getId();
+
+    }
+
     public PaymentSettingsDTO updatePaymentsSettings(PaymentSettingsDTO paymentSettingsDTO, Long unitId) {
-        PaymentSettings paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId);
+        PaymentSettings paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId, paymentSettingsDTO.getId());
         if (!Optional.ofNullable(paymentSettings).isPresent()) {
             logger.info("Unable to payment while updating payments settings for unit ,{}", unitId);
             throw new DataNotFoundByIdException("Unable to get payment updating payments settings for unit ,{}" + unitId);

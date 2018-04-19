@@ -1441,11 +1441,11 @@ public class StaffService extends UserBaseService {
             WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
-        List<DayOfWeek> days = null;
+        List<DayOfWeek> days;
         if(activityDayTypes!=null && !activityDayTypes.isEmpty()) {
             List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(activityDayTypes);
             if(dayTypes!=null && !dayTypes.isEmpty()){
-                days = dayTypes.stream().flatMap(dt->dt.getValidDays().stream().map(d->DayOfWeek.of(d.ordinal()))).collect(Collectors.toList());
+                days = dayTypes.stream().flatMap(dt->dt.getValidDays().stream().map(d->DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
                 staffAdditionalInfoQueryResult.setActivityDayTypes(days);
             }
         }

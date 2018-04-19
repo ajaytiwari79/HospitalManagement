@@ -867,16 +867,16 @@ public class ActivityService extends MongoBaseService {
     private String durationCalculationMethod(String method) {
         String calculationType = null;
         switch (method) {
-            case FixedTime:
+            case FIXED_TIME_FOR_TIMECARE:
                 calculationType = FIXED_TIME;
                 break;
-            case FullTimeHour:
+            case FULL_TIME_HOUR:
                 calculationType = FULL_DAY_CALCULATION;
                 break;
-            case WeeklyWorkTime:
+            case WEEKLY_WORK_TIME:
                 calculationType = WEEKLY_HOURS;
                 break;
-            case CalculatedTime:
+            case CALCULATED_TIME:
                 calculationType = ENTERED_TIMES;
                 break;
        /*     case "":
