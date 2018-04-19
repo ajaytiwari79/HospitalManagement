@@ -36,6 +36,7 @@ public class Function extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
     private Country country;
+    private String icon;
 
     public Function() {
         //Default Constructor
@@ -45,7 +46,7 @@ public class Function extends UserBaseEntity {
         this.id = id;
     }
 
-    public Function(String name, String description, Date startDate, Date endDate, List<Organization> unions, List<Level> organizationLevels, Country country) {
+    public Function(String name, String description, Date startDate, Date endDate, List<Organization> unions, List<Level> organizationLevels, Country country, String icon) {
         this.name = name;
         this.description = description;
         this.startDate = startDate;
@@ -53,6 +54,7 @@ public class Function extends UserBaseEntity {
         this.unions = unions;
         this.organizationLevels = organizationLevels;
         this.country = country;
+        this.icon = icon;
     }
 
     public String getName() {
@@ -109,5 +111,13 @@ public class Function extends UserBaseEntity {
 
     public void setCountry(Country country) {
         this.country = country;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }
