@@ -29,7 +29,6 @@ public class StaffCreationPOJOData {
     private String privateEmail;
     private Gender gender;
     private Long engineerTypeId;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private String employedSince;
     private Date inactiveFrom;
     private String privatePhone;

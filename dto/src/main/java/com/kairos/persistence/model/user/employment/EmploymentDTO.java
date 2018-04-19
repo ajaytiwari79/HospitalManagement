@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
  * Created by yatharth on 19/4/18.
  */
 public class EmploymentDTO {
-    @NotNull @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @NotNull
     private String endDate;
 
     public String getEndDate() {

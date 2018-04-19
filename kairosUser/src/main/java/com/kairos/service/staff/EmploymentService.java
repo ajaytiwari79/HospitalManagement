@@ -93,7 +93,7 @@ public class EmploymentService extends UserBaseService {
         EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
         Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if(Optional.ofNullable(employmentUnitPosition).isPresent()) {
-            if(Optional.ofNullable(employmentUnitPosition.getUnitPositionMinStartDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getUnitPositionMinStartDateMillis())
+            if(Optional.ofNullable(employmentUnitPosition.getEarliestUnitPositionStartDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getEarliestUnitPositionStartDateMillis())
                 throw new ActionNotPermittedException("Employment start date cant exceed Unit Position start date");
             if(Optional.ofNullable(employmentUnitPosition.getEmploymentEndDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getEmploymentEndDateMillis())
                 throw new ActionNotPermittedException("Employment start date cant exceed employment end date");
