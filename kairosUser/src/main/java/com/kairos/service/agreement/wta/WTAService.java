@@ -386,7 +386,7 @@ public class WTAService extends UserBaseService {
         }
         WorkingTimeAgreement wta = wtaRepository.findOne(wtaId, 2);
         //TODO need to again activate check
-        //checkUniquenessOfData(countryId, organizationSubTypeId, wta.getOrganizationType().getId(), wta.getExpertise().getId());
+        //checkUniquenessOfData(countryId, organizationSubTypeId, wta.getOrganizationType().getId(), wta.getParentExpertise().getId());
         if (!Optional.ofNullable(wta).isPresent()) {
             throw new DataNotFoundByIdException("wta not found " + wtaId);
         }

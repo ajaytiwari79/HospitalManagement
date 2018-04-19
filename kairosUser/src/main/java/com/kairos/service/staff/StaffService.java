@@ -473,7 +473,7 @@ public class StaffService extends UserBaseService {
             staffExpertiseRelationShips.add(staffExpertiseRelationShip);
         }
 //        if (expertise != null) {
-//            staff.setExpertise(expertise);
+//            staff.setParentExpertise(expertise);
 //            staffGraphRepository.save(staff);
 //        }
         staffExpertiseRelationShipGraphRepository.saveAll(staffExpertiseRelationShips);
