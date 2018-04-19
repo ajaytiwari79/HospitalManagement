@@ -11,10 +11,13 @@ import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.language.Language;
+import com.kairos.util.CPRUtil;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -96,6 +99,7 @@ public class Staff extends UserBaseEntity {
     @DateLong
     private Date dateOfBirth;
     private String careOfName;
+    private int age;
 
 
     public Staff(String firstName) {
@@ -488,5 +492,10 @@ public class Staff extends UserBaseEntity {
 
     public void setSecondaryContactAddress(ContactAddress secondaryContactAddress) {
         this.secondaryContactAddress = secondaryContactAddress;
+    }
+
+    public int getAge() {
+        this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():0;
+        return age;
     }
 }

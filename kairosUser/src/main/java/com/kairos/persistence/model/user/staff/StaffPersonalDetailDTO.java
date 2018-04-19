@@ -1,11 +1,19 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.util.CPRUtil;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.time.LocalDate;
+import java.time.Period;
 
 /**
  * Created by vipul on 8/9/17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
 public class StaffPersonalDetailDTO {
     private long id;
@@ -31,6 +39,7 @@ public class StaffPersonalDetailDTO {
     private String city;
     private String province;
     private Boolean unitPosition;
+    private int age;
 
     public long getId() {
         return id;
@@ -215,4 +224,11 @@ public class StaffPersonalDetailDTO {
     public void setUnitPosition(Boolean unitPosition) {
         this.unitPosition = unitPosition;
     }
+
+    public int getAge() {
+        this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():0;
+        return age;
+    }
+
+
 }
