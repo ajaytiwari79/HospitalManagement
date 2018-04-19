@@ -1,5 +1,6 @@
 package com.kairos.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,16 +193,14 @@ public class DateUtil {
     }
 
     public static Long getIsoDateInLong(String dateReceived) throws ParseException {
-        DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
-        isoFormat.setLenient(false);
-        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date date = isoFormat.parse(dateReceived);
-        if(Optional.ofNullable(date).isPresent()) {
-            return date.getTime();
+        Long date = null;
+        if(!StringUtils.isEmpty(dateReceived)) {
+            DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
+            isoFormat.setLenient(false);
+            isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            date = isoFormat.parse(dateReceived).getTime();
         }
-        else {
-            return null;
-        }
+        return date;
     }
 
 
