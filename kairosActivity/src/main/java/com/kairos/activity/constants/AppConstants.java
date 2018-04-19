@@ -220,5 +220,8 @@ public class AppConstants {
     public static final String FIXED_TIME_FOR_TIMECARE = "FixedTime";
     public static final String FULL_TIME_HOUR = "FullTimeHour";
 
+    // Default Settings of period for unit
+    public static final int PRESENCE_LIMIT_IN_YEAR = 1;
+    public static final int ABSENCE_LIMIT_IN_YEAR = 2;
 
 }
