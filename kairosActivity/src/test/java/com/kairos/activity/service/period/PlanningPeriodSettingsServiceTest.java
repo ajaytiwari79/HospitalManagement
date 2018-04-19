@@ -2,6 +2,7 @@ package com.kairos.activity.service.period;
 
 import com.kairos.activity.KairosActivityApplication;
 import com.kairos.activity.config.OrderTestRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,25 +23,11 @@ public class PlanningPeriodSettingsServiceTest {
     TestRestTemplate restTemplate;
 
     @Test
+    @Ignore
     public void createDefaultPeriodSettings() throws Exception {
         String baseUrl = getBaseUrl(71L, null,53L);
     }
 
-    /*public void createPhaseInCountry() throws Exception {
-        PhaseDTO testPhase = new PhaseDTO("TEST", "TEST Phase", 1, DurationType.WEEKS, 19, 53L);
-        String baseUrl = getBaseUrl(71L, null,53L);
-        HttpEntity<PhaseDTO> entity = new HttpEntity<>(testPhase);
-        ParameterizedTypeReference<RestTemplateResponseEnvelope<PhaseDTO>> typeReference =
-                new ParameterizedTypeReference<RestTemplateResponseEnvelope<PhaseDTO>>() {
-                };
-        ResponseEntity<RestTemplateResponseEnvelope<PhaseDTO>> response = restTemplate.exchange(
-                baseUrl + "/phase",
-                HttpMethod.POST, entity, typeReference);
-
-        Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()) || HttpStatus.CONFLICT.equals(response.getStatusCode()));
-        Assert.assertTrue(HttpStatus.CREATED.equals(response.getStatusCode()));
-        createdIdForDelete = createdId = response.getBody().getData().getId();
-    }*/
 
     @Test
     public void getPeriodSettings() throws Exception {
@@ -56,12 +43,10 @@ public class PlanningPeriodSettingsServiceTest {
         if (organizationId != null && unitId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
                     .append("/unit/").append(unitId).toString();
-            ;
             return baseUrl;
         } else if (organizationId != null && countryId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId)
                     .append("/country/").append(countryId).toString();
-            ;
             return baseUrl;
         } else if (organizationId != null) {
             String baseUrl = new StringBuilder(url + "/api/v1/organization/").append(organizationId).toString();
