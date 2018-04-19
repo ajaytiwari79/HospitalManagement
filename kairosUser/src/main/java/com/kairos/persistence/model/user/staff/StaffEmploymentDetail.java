@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.neo4j.ogm.annotation.typeconversion.DateString;
@@ -17,7 +18,7 @@ public class StaffEmploymentDetail {
     private String sendNotificationBy;
     private String email;
     private boolean copyKariosMailToLogin;
-    @NotEmpty(message = "error.Staff.employedsince.notnull") @NotNull(message = "error.Staff.employedsince.notnull")
+    @NotEmpty(message = "error.Staff.employedsince.notnull") @NotNull(message = "error.Staff.employedsince.notnull") @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private String employedSince;
     private long visitourId;
     private long engineerTypeId;

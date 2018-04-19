@@ -8,8 +8,8 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 public class StaffEmploymentDTO {
 
-    Staff staff;
-    Long employmentStartDate;
+   private Staff staff;
+   private Long employmentStartDate;
 
     public StaffEmploymentDTO() {
 

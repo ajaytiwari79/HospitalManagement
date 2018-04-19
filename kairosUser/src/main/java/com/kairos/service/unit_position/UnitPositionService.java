@@ -511,8 +511,9 @@ public class UnitPositionService extends UserBaseService {
         }
 
         User user = userGraphRepository.getUserByStaffId(staffId);
-        EmploymentQueryResult employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-        EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employment,unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) );
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
+        EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employmentQueryResult,unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) );
         return employmentUnitPositionDTO;
 
         // TODO  Organization organization = organizationService.getOrganizationDetail(id, type);
@@ -816,16 +817,16 @@ public class UnitPositionService extends UserBaseService {
 
         return appliedSeniorityLevel;
     }
-    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String endDate, Long unitId) throws ParseException {
+    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long unitId) throws ParseException {
 
         Organization unit = organizationGraphRepository.findOne(unitId);
-        Long endDateMillis = DateUtil.getIsoDateInLong(endDate);
+        Long endDateMillis = DateUtil.getIsoDateInLong(employmentEndDate);
         List<UnitPosition> unitPositions =  unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId,endDateMillis);
         for(UnitPosition unitPosition:unitPositions) {
             unitPosition.setEndDateMillis(endDateMillis);
         }
         unitPositionGraphRepository.saveAll(unitPositions);
-        Employment employment = employmentGraphRepository.findEmploymentDomainByStaff(staffId);
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
         employment.setEndDateMillis(endDateMillis);
         employmentGraphRepository.save(employment);
         LocalDate curDate = DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString());
@@ -835,7 +836,7 @@ public class UnitPositionService extends UserBaseService {
             employmentService.moveToReadOnlyAccessGroup(empIds);
         }
         User user = userGraphRepository.getUserByStaffId(staffId);
-        EmploymentQueryResult employmentUpdated = employmentGraphRepository.findEmploymentByStaff(staffId);
+        EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
         EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employmentUpdated,unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) );
         return employmentUnitPositionDTO;
 

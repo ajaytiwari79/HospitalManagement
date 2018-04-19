@@ -9,22 +9,22 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 public class EmploymentUnitPositionQueryResult {
 
-Long unitPositionMinStartDate;
-Long employmentEndDate;
+Long unitPositionMinStartDateMillis;
+Long employmentEndDateMillis;
 
-    public Long getUnitPositionMinStartDate() {
-        return unitPositionMinStartDate;
+    public Long getUnitPositionMinStartDateMillis() {
+        return unitPositionMinStartDateMillis;
     }
 
-    public void setUnitPositionMinStartDate(Long unitPositionMinStartDate) {
-        this.unitPositionMinStartDate = unitPositionMinStartDate;
+    public void setUnitPositionMinStartDateMillis(Long unitPositionMinStartDateMillis) {
+        this.unitPositionMinStartDateMillis = unitPositionMinStartDateMillis;
     }
 
-    public Long getEmploymentEndDate() {
-        return employmentEndDate;
+    public Long getEmploymentEndDateMillis() {
+        return employmentEndDateMillis;
     }
 
-    public void setEmploymentEndDate(Long employmentEndDate) {
-        this.employmentEndDate = employmentEndDate;
+    public void setEmploymentEndDateMillis(Long employmentEndDateMillis) {
+        this.employmentEndDateMillis = employmentEndDateMillis;
     }
 }

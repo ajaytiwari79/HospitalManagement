@@ -2,6 +2,7 @@ package com.kairos.controller.staff;
 
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
 
@@ -595,10 +596,10 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.PUT)
     @ApiOperation("update employment of staff")
-    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody Map<String, Object> employmentDetail) throws ParseException {
+    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO) throws ParseException {
 
-        String endDate = (String)employmentDetail.get("endDate");
-        EmploymentUnitPositionDTO response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,endDate,unitId);
+        String employmentEndDate = employmentDTO.getEndDate();//(String)employmentDetail.get("endDate");
+        EmploymentUnitPositionDTO response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,employmentEndDate,unitId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

@@ -90,12 +90,12 @@ public class EmploymentService extends UserBaseService {
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
-        EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getUnitPositionMinStartDateAndEmploymentByStaffId(objectToUpdate.getId());
+        EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
         Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
         if(Optional.ofNullable(employmentUnitPosition).isPresent()) {
-            if(Optional.ofNullable(employmentUnitPosition.getUnitPositionMinStartDate()).isPresent()&&employmentStartDate>employmentUnitPosition.getUnitPositionMinStartDate())
+            if(Optional.ofNullable(employmentUnitPosition.getUnitPositionMinStartDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getUnitPositionMinStartDateMillis())
                 throw new ActionNotPermittedException("Employment start date cant exceed Unit Position start date");
-            if(Optional.ofNullable(employmentUnitPosition.getEmploymentEndDate()).isPresent()&&employmentStartDate>employmentUnitPosition.getEmploymentEndDate())
+            if(Optional.ofNullable(employmentUnitPosition.getEmploymentEndDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getEmploymentEndDateMillis())
                 throw new ActionNotPermittedException("Employment start date cant exceed employment end date");
         }
 
@@ -123,7 +123,8 @@ public class EmploymentService extends UserBaseService {
     public Map<String, Object> retrieveEmploymentDetails(StaffEmploymentDTO staffEmploymentDTO) {
         Staff staff = staffEmploymentDTO.getStaff();
         Map<String, Object> map = new HashMap<>();
-        Date employedSince = Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateConverter.getDate(staffEmploymentDTO.getEmploymentStartDate()) : null;
+        //Date employedSince = Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateConverter.getDate(staffEmploymentDTO.getEmploymentStartDate()) : null;
+        String employedSince =  Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateUtil.getDateFromEpoch(staffEmploymentDTO.getEmploymentStartDate()).toString() : null;
         map.put("employedSince", employedSince);
         map.put("cardNumber", staff.getCardNumber());
         map.put("sendNotificationBy", staff.getSendNotificationBy());
@@ -740,13 +741,13 @@ public class EmploymentService extends UserBaseService {
     }
 
     
-    public void moveToReadOnlyAccessGroup(List<Long> empIds) {
+    public void moveToReadOnlyAccessGroup(List<Long> employmentIds) {
         Long curDateMillisStart = DateUtil.getStartOfDay(DateUtil.getCurrentDate()).getTime();
         Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions;
         UnitPermission unitPermission;
-        List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(empIds);
-        accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(empIds);
+        List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);
+        accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(employmentIds);
 
         List<Organization> organizations;
         List<Employment>  employments = expiredEmploymentsQueryResults.isEmpty() ? null : new ArrayList<Employment>();

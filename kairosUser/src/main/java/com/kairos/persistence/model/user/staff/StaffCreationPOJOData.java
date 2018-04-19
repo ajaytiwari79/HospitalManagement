@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.staff;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.Gender;
@@ -28,7 +29,8 @@ public class StaffCreationPOJOData {
     private String privateEmail;
     private Gender gender;
     private Long engineerTypeId;
-    private Date employedSince;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private String employedSince;
     private Date inactiveFrom;
     private String privatePhone;
     private String workEmail;
@@ -115,13 +117,12 @@ public class StaffCreationPOJOData {
         this.engineerTypeId = engineerTypeId;
     }
 
-    public Long getEmployedSince() {
-        if(employedSince == null)
-            return null;
-        return employedSince.getTime();
+    public String getEmployedSince() {
+
+        return employedSince;
     }
 
-    public void setEmployedSince(Date employedSince) {
+    public void setEmployedSince(String employedSince) {
         this.employedSince = employedSince;
     }
 

@@ -39,16 +39,16 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "Match(employment)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) return employment, \n" +
             "case when org IS NOT NULL then COLLECT( distinct ag) else[] end as accessGroups,case when org IS NOT NULL then COLLECT( distinct org) else[] end as organizations, \n" +
             "case when unitPermission is NOT null then COLLECT(distinct unitPermission) else[] end as unitPermissions")
-    List<ExpiredEmploymentsQueryResult> findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(List<Long> empIds);
+    List<ExpiredEmploymentsQueryResult> findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(List<Long> employmentIds);
 
     @Query("Match(staff:Staff)<-[:"+ BELONGS_TO +"]-(emp:Employment) where id(staff) = {0} set emp.endDateMillis = {1}")
     void updateEmploymentEndDate(Long staffId, Long endDateMillis);
 
-    @Query("Match(staff:Staff)<-[:"+ BELONGS_TO +"]-(emp:Employment) where id(staff) = {0} return id(emp) as id, emp.startDateMillis as startDateMillis, emp.endDateMillis as endDateMillis")
+   /* @Query("Match(staff:Staff)<-[:"+ BELONGS_TO +"]-(emp:Employment) where id(staff) = {0} return id(emp) as id, emp.startDateMillis as startDateMillis, emp.endDateMillis as endDateMillis")
     EmploymentQueryResult findEmploymentByStaff(Long staffId);
-
+*/
     @Query("Match(staff:Staff)<-[:"+ BELONGS_TO +"]-(emp:Employment) where id(staff) = {0} return emp")
-    Employment findEmploymentDomainByStaff(Long staffId);
+    Employment findEmploymentByStaff(Long staffId);
 
     @Query("Match(staff:Staff)<-[:"+ BELONGS_TO +"]-(emp:Employment) where id(staff) = {0} set emp.startDateMillis = {1}")
     void updateEmploymentStartDate(Long staffId, Long endDateMillis);

@@ -918,7 +918,7 @@ public class StaffService extends UserBaseService {
     }
 
 
-    public Staff createStaffFromWeb(Long unitId, StaffCreationPOJOData payload) {
+    public Staff createStaffFromWeb(Long unitId, StaffCreationPOJOData payload) throws ParseException{
 
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
@@ -944,7 +944,7 @@ public class StaffService extends UserBaseService {
         staff.setUser(user);
         staff.setClient(client);
         staffGraphRepository.save(staff);
-        createEmployment(parent, unit, staff, payload.getAccessGroupId(), payload.getEmployedSince(), isEmploymentExist);
+        createEmployment(parent, unit, staff, payload.getAccessGroupId(),  DateUtil.getIsoDateInLong(payload.getEmployedSince()), isEmploymentExist);
         staff.setUser(null); // removing user to send in FE
 
         return staff;

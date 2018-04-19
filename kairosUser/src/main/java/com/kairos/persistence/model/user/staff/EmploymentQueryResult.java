@@ -14,6 +14,15 @@ public class EmploymentQueryResult {
     private Long startDateMillis;
     private Long endDateMillis;
 
+    public EmploymentQueryResult() {
+
+    }
+    public EmploymentQueryResult(Long id, Long startDateMillis, Long endDateMillis) {
+        this.id = id;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+
+    }
     public Long getId() {
         return id;
     }
