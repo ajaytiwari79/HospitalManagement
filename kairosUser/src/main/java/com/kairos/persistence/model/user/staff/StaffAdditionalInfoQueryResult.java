@@ -3,6 +3,8 @@ package com.kairos.persistence.model.user.staff;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.time.DayOfWeek;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +25,25 @@ public class StaffAdditionalInfoQueryResult {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
+    private List<DayOfWeek> activityDayTypes;
+    private ZoneId unitTimeZone;
+
+
+    public ZoneId getUnitTimeZone() {
+        return unitTimeZone;
+    }
+
+    public void setUnitTimeZone(ZoneId unitTimeZone) {
+        this.unitTimeZone = unitTimeZone;
+    }
+
+    public List<DayOfWeek> getActivityDayTypes() {
+        return activityDayTypes;
+    }
+
+    public void setActivityDayTypes(List<DayOfWeek> activityDayTypes) {
+        this.activityDayTypes = activityDayTypes;
+    }
 
     public StaffAdditionalInfoQueryResult() {
     }

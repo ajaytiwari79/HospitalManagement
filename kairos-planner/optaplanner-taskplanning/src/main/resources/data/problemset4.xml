@@ -1,0 +1,1188 @@
+<TaskPlanningSolution id="1">
+  <id>0</id>
+  <skillList id="2">
+    <Skill id="3">
+      <id>0</id>
+      <name>Problem Solving</name>
+    </Skill>
+    <Skill id="4">
+      <id>1</id>
+      <name>Team Building</name>
+    </Skill>
+    <Skill id="5">
+      <id>2</id>
+      <name>Business Storytelling</name>
+    </Skill>
+    <Skill id="6">
+      <id>3</id>
+      <name>Risk Management</name>
+    </Skill>
+    <Skill id="7">
+      <id>4</id>
+      <name>Creative Thinking</name>
+    </Skill>
+    <Skill id="800">
+      <id>5</id>
+      <name>Car Driver</name>
+    </Skill>
+    <Skill id="801">
+      <id>6</id>
+      <name>Bike Driver</name>
+    </Skill>
+  </skillList>
+  <availabilityList id="114">
+    <Availability id="115">
+      <id>0</id>
+      <startTime>08/02/2017 11:00:00</startTime>
+      <endTimeString>08/02/2017 20:00:00</endTimeString>
+    </Availability>
+    <Availability id="116">
+      <id>1</id>
+      <startTime>08/03/2017 11:00:00</startTime>
+      <endTimeString>08/03/2017 20:00:00</endTimeString>
+    </Availability>
+    <Availability id="117">
+      <id>2</id>
+      <startTime>08/04/2017 11:00:00</startTime>
+      <endTimeString>08/04/2017 18:00:00</endTimeString>
+    </Availability>
+    <Availability id="118">
+      <id>3</id>
+      <startTime>08/05/2017 11:00:00</startTime>
+      <endTimeString>08/05/2017 18:00:00</endTimeString>
+    </Availability>
+    <Availability id="119">
+      <id>4</id>
+      <startTime>08/06/2017 11:00:00</startTime>
+      <endTimeString>08/06/2017 18:00:00</endTimeString>
+    </Availability>
+  </availabilityList>
+  <locationList id="107">
+    <Location id="108">
+      <id>0</id>
+      <name>Gurgaon</name>
+      <latitude>11.21300</latitude>
+      <longitude>21.43344</longitude>
+    </Location>
+    <Location id="109">
+      <id>1</id>
+      <name>Noida</name>
+      <latitude>31.21300</latitude>
+      <longitude>41.43344</longitude>
+    </Location>
+    <Location id="110">
+      <id>2</id>
+      <name>Delhi</name>
+      <latitude>41.21300</latitude>
+      <longitude>51.43344</longitude>
+    </Location>
+  </locationList>
+  <taskTypeList id="8">
+    <TaskType id="9">
+      <id>0</id>
+      <code>IS</code>
+      <title>Improve Sales</title>
+      <baseDuration>83</baseDuration>
+      <requiredSkillList id="10">
+        <Skill reference="3"/>
+      </requiredSkillList>
+    </TaskType>
+    <TaskType id="11">
+      <id>1</id>
+      <code>ET</code>
+      <title>Expand Tax</title>
+      <baseDuration>56</baseDuration>
+      <requiredSkillList id="12">
+        <Skill reference="3"/>
+      </requiredSkillList>
+    </TaskType>
+    <TaskType id="13">
+      <id>2</id>
+      <code>SV</code>
+      <title>Shrink VAT</title>
+      <baseDuration>46</baseDuration>
+      <requiredSkillList id="14">
+        <Skill reference="4"/>
+      </requiredSkillList>
+    </TaskType>
+    <TaskType id="15">
+      <id>3</id>
+      <code>AL</code>
+      <title>Approve Legal</title>
+      <baseDuration>53</baseDuration>
+      <requiredSkillList id="16">
+        <Skill reference="5"/>
+      </requiredSkillList>
+    </TaskType>
+    <TaskType id="17">
+      <id>4</id>
+      <code>LC</code>
+      <title>Localize Cloud</title>
+      <baseDuration>47</baseDuration>
+      <requiredSkillList id="18">
+        <Skill reference="4"/>
+      </requiredSkillList>
+    </TaskType>
+    <TaskType id="19">
+      <id>5</id>
+      <code>RM</code>
+      <title>Review Marketing</title>
+      <baseDuration>48</baseDuration>
+      <requiredSkillList id="20">
+        <Skill reference="5"/>
+      </requiredSkillList>
+    </TaskType>
+    <TaskType id="21">
+      <id>6</id>
+      <code>CI</code>
+      <title>Clean IT</title>
+      <baseDuration>79</baseDuration>
+      <requiredSkillList id="22">
+        <Skill reference="5"/>
+      </requiredSkillList>
+    </TaskType>
+    <TaskType id="23">
+      <id>7</id>
+      <code>MC</code>
+      <title>Merge Contract</title>
+      <baseDuration>33</baseDuration>
+      <requiredSkillList id="24">
+        <Skill reference="5"/>
+        <Skill reference="4"/>
+      </requiredSkillList>
+    </TaskType>
+    <TaskType id="25">
+      <id>8</id>
+      <code>DF</code>
+      <title>Double Financial</title>
+      <baseDuration>71</baseDuration>
+      <requiredSkillList id="26">
+        <Skill reference="4"/>
+      </requiredSkillList>
+    </TaskType>
+    <TaskType id="27">
+      <id>9</id>
+      <code>OA</code>
+      <title>Optimize Advertisement</title>
+      <baseDuration>67</baseDuration>
+      <requiredSkillList id="28">
+        <Skill reference="4"/>
+      </requiredSkillList>
+    </TaskType>
+  </taskTypeList>
+  <citizenList id="29">
+    <Citizen id="30">
+      <id>0</id>
+      <name>Steel Inc</name>
+    </Citizen>
+    <Citizen id="31">
+      <id>1</id>
+      <name>Paper Corp</name>
+    </Citizen>
+    <Citizen id="32">
+      <id>2</id>
+      <name>Stone Limited</name>
+    </Citizen>
+    <Citizen id="33">
+      <id>3</id>
+      <name>Wood Express</name>
+    </Citizen>
+    <Citizen id="34">
+      <id>4</id>
+      <name>Water Telco</name>
+    </Citizen>
+    <Citizen id="35">
+      <id>5</id>
+      <name>Food Mobile</name>
+    </Citizen>
+    <Citizen id="36">
+      <id>6</id>
+      <name>Oil Soft</name>
+    </Citizen>
+    <Citizen id="37">
+      <id>7</id>
+      <name>Car Mart</name>
+    </Citizen>
+    <Citizen id="38">
+      <id>8</id>
+      <name>Power Bank</name>
+    </Citizen>
+    <Citizen id="39">
+      <id>9</id>
+      <name>Computer Labs</name>
+    </Citizen>
+  </citizenList>
+  <employees id="40">
+    <Employee id="41">
+      <id>0</id>
+      <name>Amy</name>
+      <skillSet class="linked-hash-set" id="42">
+        <Skill reference="3"/>
+        <Skill reference="4"/>
+        <Skill reference="5"/>
+      </skillSet>
+      <availabilityList id="300">
+        <Availability reference="116"/>
+        <Availability reference="118"/>
+      </availabilityList>
+      <affinityMap class="linked-hash-map" id="43">
+        <entry>
+          <Citizen reference="30"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="31"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="32"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="33"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="34"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="35"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="36"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="37"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="38"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="39"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+      </affinityMap>
+      <location reference="108"/>
+    </Employee>
+    <Employee id="44">
+      <id>1</id>
+      <name>Beth</name>
+      <skillSet class="linked-hash-set" id="45">
+        <Skill reference="6"/>
+        <Skill reference="7"/>
+        <Skill reference="3"/>
+      </skillSet>
+      <availabilityList id="301">
+        <Availability reference="115"/>
+        <Availability reference="116"/>
+        <Availability reference="118"/>
+      </availabilityList>
+      <affinityMap class="linked-hash-map" id="46">
+        <entry>
+          <Citizen reference="30"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="31"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="32"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="33"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="34"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="35"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="36"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="37"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="38"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="39"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+      </affinityMap>
+      <location reference="108"/>
+    </Employee>
+    <Employee id="47">
+      <id>2</id>
+      <name>Chad</name>
+      <skillSet class="linked-hash-set" id="48">
+        <Skill reference="4"/>
+        <Skill reference="5"/>
+      </skillSet>
+      <availabilityList id="302">
+        <Availability reference="116"/>
+        <Availability reference="117"/>
+        <Availability reference="118"/>
+      </availabilityList>
+      <affinityMap class="linked-hash-map" id="49">
+        <entry>
+          <Citizen reference="30"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="31"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="32"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="33"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="34"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="35"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="36"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="37"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="38"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="39"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+      </affinityMap>
+      <location reference="108"/>
+    </Employee>
+    <Employee id="50">
+      <id>3</id>
+      <name>Dan</name>
+      <skillSet class="linked-hash-set" id="51">
+        <Skill reference="6"/>
+        <Skill reference="7"/>
+      </skillSet>
+      <availabilityList id="303">
+        <Availability reference="116"/>
+        <Availability reference="117"/>
+        <Availability reference="119"/>
+      </availabilityList>
+      <affinityMap class="linked-hash-map" id="52">
+        <entry>
+          <Citizen reference="30"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="31"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="32"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="33"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="34"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="35"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="36"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="37"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="38"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="39"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+      </affinityMap>
+      <location reference="108"/>
+    </Employee>
+    <Employee id="53">
+      <id>4</id>
+      <name>Elsa</name>
+      <skillSet class="linked-hash-set" id="54">
+        <Skill reference="3"/>
+        <Skill reference="4"/>
+      </skillSet>
+      <availabilityList id="304">
+        <Availability reference="117"/>
+        <Availability reference="118"/>
+        <Availability reference="119"/>
+      </availabilityList>
+      <affinityMap class="linked-hash-map" id="55">
+        <entry>
+          <Citizen reference="30"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="31"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="32"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="33"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="34"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="35"/>
+          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="36"/>
+          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="37"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="38"/>
+          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+        </entry>
+        <entry>
+          <Citizen reference="39"/>
+          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+        </entry>
+      </affinityMap>
+      <location reference="108"/>
+    </Employee>
+  </employees>
+  <taskList id="56">
+    <Task id="57">
+      <id>0</id>
+      <taskType reference="23"/>
+      <indexInTaskType>1</indexInTaskType>
+      <citizen reference="36"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="58">
+      <id>1</id>
+      <taskType reference="15"/>
+      <indexInTaskType>1</indexInTaskType>
+      <citizen reference="31"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="59">
+      <id>2</id>
+      <taskType reference="23"/>
+      <indexInTaskType>2</indexInTaskType>
+      <citizen reference="38"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="60">
+      <id>3</id>
+      <taskType reference="27"/>
+      <indexInTaskType>1</indexInTaskType>
+      <citizen reference="30"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="61">
+      <id>4</id>
+      <taskType reference="25"/>
+      <indexInTaskType>1</indexInTaskType>
+      <citizen reference="39"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="62">
+      <id>5</id>
+      <taskType reference="21"/>
+      <indexInTaskType>1</indexInTaskType>
+      <citizen reference="39"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="63">
+      <id>6</id>
+      <taskType reference="11"/>
+      <indexInTaskType>1</indexInTaskType>
+      <citizen reference="35"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="64">
+      <id>7</id>
+      <taskType reference="21"/>
+      <indexInTaskType>2</indexInTaskType>
+      <citizen reference="31"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="65">
+      <id>8</id>
+      <taskType reference="27"/>
+      <indexInTaskType>2</indexInTaskType>
+      <citizen reference="31"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="66">
+      <id>9</id>
+      <taskType reference="11"/>
+      <indexInTaskType>2</indexInTaskType>
+      <citizen reference="38"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="67">
+      <id>10</id>
+      <taskType reference="21"/>
+      <indexInTaskType>3</indexInTaskType>
+      <citizen reference="30"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="68">
+      <id>11</id>
+      <taskType reference="13"/>
+      <indexInTaskType>1</indexInTaskType>
+      <citizen reference="35"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="69">
+      <id>12</id>
+      <taskType reference="13"/>
+      <indexInTaskType>2</indexInTaskType>
+      <citizen reference="39"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="70">
+      <id>13</id>
+      <taskType reference="25"/>
+      <indexInTaskType>2</indexInTaskType>
+      <citizen reference="34"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="71">
+      <id>14</id>
+      <taskType reference="21"/>
+      <indexInTaskType>4</indexInTaskType>
+      <citizen reference="33"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="72">
+      <id>15</id>
+      <taskType reference="25"/>
+      <indexInTaskType>3</indexInTaskType>
+      <citizen reference="36"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="110"/>
+    </Task>
+    <Task id="73">
+      <id>16</id>
+      <taskType reference="25"/>
+      <indexInTaskType>4</indexInTaskType>
+      <citizen reference="33"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="110"/>
+    </Task>
+    <Task id="74">
+      <id>17</id>
+      <taskType reference="11"/>
+      <indexInTaskType>3</indexInTaskType>
+      <citizen reference="37"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="110"/>
+    </Task>
+    <Task id="75">
+      <id>18</id>
+      <taskType reference="21"/>
+      <indexInTaskType>5</indexInTaskType>
+      <citizen reference="33"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="110"/>
+    </Task>
+    <Task id="76">
+      <id>19</id>
+      <taskType reference="23"/>
+      <indexInTaskType>3</indexInTaskType>
+      <citizen reference="34"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="110"/>
+    </Task>
+    <Task id="77">
+      <id>20</id>
+      <taskType reference="23"/>
+      <indexInTaskType>4</indexInTaskType>
+      <citizen reference="34"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="110"/>
+    </Task>
+    <Task id="78">
+      <id>21</id>
+      <taskType reference="13"/>
+      <indexInTaskType>3</indexInTaskType>
+      <citizen reference="35"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="79">
+      <id>22</id>
+      <taskType reference="9"/>
+      <indexInTaskType>1</indexInTaskType>
+      <citizen reference="37"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="80">
+      <id>23</id>
+      <taskType reference="9"/>
+      <indexInTaskType>2</indexInTaskType>
+      <citizen reference="33"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="81">
+      <id>24</id>
+      <taskType reference="13"/>
+      <indexInTaskType>4</indexInTaskType>
+      <citizen reference="33"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="82">
+      <id>25</id>
+      <taskType reference="27"/>
+      <indexInTaskType>3</indexInTaskType>
+      <citizen reference="34"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="83">
+      <id>26</id>
+      <taskType reference="13"/>
+      <indexInTaskType>5</indexInTaskType>
+      <citizen reference="31"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="84">
+      <id>27</id>
+      <taskType reference="19"/>
+      <indexInTaskType>1</indexInTaskType>
+      <citizen reference="35"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="85">
+      <id>28</id>
+      <taskType reference="9"/>
+      <indexInTaskType>3</indexInTaskType>
+      <citizen reference="34"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="86">
+      <id>29</id>
+      <taskType reference="9"/>
+      <indexInTaskType>4</indexInTaskType>
+      <citizen reference="31"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="87">
+      <id>30</id>
+      <taskType reference="9"/>
+      <indexInTaskType>5</indexInTaskType>
+      <citizen reference="30"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="88">
+      <id>31</id>
+      <taskType reference="27"/>
+      <indexInTaskType>4</indexInTaskType>
+      <citizen reference="38"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="89">
+      <id>32</id>
+      <taskType reference="23"/>
+      <indexInTaskType>5</indexInTaskType>
+      <citizen reference="31"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="90">
+      <id>33</id>
+      <taskType reference="25"/>
+      <indexInTaskType>5</indexInTaskType>
+      <citizen reference="32"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="91">
+      <id>34</id>
+      <taskType reference="21"/>
+      <indexInTaskType>6</indexInTaskType>
+      <citizen reference="37"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="92">
+      <id>35</id>
+      <taskType reference="21"/>
+      <indexInTaskType>7</indexInTaskType>
+      <citizen reference="39"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="93">
+      <id>36</id>
+      <taskType reference="9"/>
+      <indexInTaskType>6</indexInTaskType>
+      <citizen reference="39"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="94">
+      <id>37</id>
+      <taskType reference="23"/>
+      <indexInTaskType>6</indexInTaskType>
+      <citizen reference="38"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="95">
+      <id>38</id>
+      <taskType reference="21"/>
+      <indexInTaskType>8</indexInTaskType>
+      <citizen reference="34"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="96">
+      <id>39</id>
+      <taskType reference="19"/>
+      <indexInTaskType>2</indexInTaskType>
+      <citizen reference="38"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="97">
+      <id>40</id>
+      <taskType reference="11"/>
+      <indexInTaskType>4</indexInTaskType>
+      <citizen reference="34"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="108"/>
+    </Task>
+    <Task id="98">
+      <id>41</id>
+      <taskType reference="19"/>
+      <indexInTaskType>3</indexInTaskType>
+      <citizen reference="31"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="99">
+      <id>42</id>
+      <taskType reference="11"/>
+      <indexInTaskType>5</indexInTaskType>
+      <citizen reference="32"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="100">
+      <id>43</id>
+      <taskType reference="21"/>
+      <indexInTaskType>9</indexInTaskType>
+      <citizen reference="30"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="101">
+      <id>44</id>
+      <taskType reference="11"/>
+      <indexInTaskType>6</indexInTaskType>
+      <citizen reference="30"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="102">
+      <id>45</id>
+      <taskType reference="9"/>
+      <indexInTaskType>7</indexInTaskType>
+      <citizen reference="32"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="103">
+      <id>46</id>
+      <taskType reference="15"/>
+      <indexInTaskType>2</indexInTaskType>
+      <citizen reference="31"/>
+      <readyTime>0</readyTime>
+      <priority>CRITICAL</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="109"/>
+    </Task>
+    <Task id="104">
+      <id>47</id>
+      <taskType reference="21"/>
+      <indexInTaskType>10</indexInTaskType>
+      <citizen reference="34"/>
+      <readyTime>0</readyTime>
+      <priority>MAJOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="110"/>
+    </Task>
+    <Task id="105">
+      <id>48</id>
+      <taskType reference="27"/>
+      <indexInTaskType>5</indexInTaskType>
+      <citizen reference="38"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="110"/>
+    </Task>
+    <Task id="106">
+      <id>49</id>
+      <taskType reference="11"/>
+      <indexInTaskType>7</indexInTaskType>
+      <citizen reference="38"/>
+      <readyTime>0</readyTime>
+      <priority>MINOR</priority>
+      <locked>false</locked>
+      <startTime>08/02/2017 10:30:00</startTime>
+      <endTime>08/02/2017 17:30:00</endTime>
+      <earlyStartMinutes>60</earlyStartMinutes>
+      <location reference="110"/>
+    </Task>
+  </taskList>
+  <vehicleList id="111">
+    <Vehicle id="112">
+      <id>0</id>
+      <type>Car</type>
+      <location reference="108"/>
+      <speedKmpm>1.1</speedKmpm>
+      <requiredSkillList id="900">
+        <Skill reference="800"/>
+      </requiredSkillList>
+    </Vehicle>
+    <Vehicle id="113">
+    <id>1</id>
+    <type>Bike</type>
+    <location reference="108"/>
+    <speedKmpm>0.9</speedKmpm>
+    <requiredSkillList id="901">
+      <Skill reference="801"/>
+    </requiredSkillList>
+  </Vehicle>
+    <Vehicle id="114">
+      <id>2</id>
+      <type>Car(Lambo)</type>
+      <location reference="108"/>
+      <speedKmpm>1.8</speedKmpm>
+      <requiredSkillList id="901">
+        <Skill reference="801"/>
+      </requiredSkillList>
+    </Vehicle>
+    <Vehicle id="115">
+      <id>3</id>
+      <type>Bike(Ninja)</type>
+      <location reference="108"/>
+      <speedKmpm>1.5</speedKmpm>
+      <requiredSkillList id="901">
+        <Skill reference="801"/>
+      </requiredSkillList>
+    </Vehicle>
+  </vehicleList>
+</TaskPlanningSolution>

@@ -77,7 +77,6 @@ public class TimeBankCalculationService {
     public void calculateScheduleAndDurationHour(Shift shift, Activity activity, StaffUnitPositionDetails unitPosition){
         int scheduledMinutes = 0;
         int duration = 0;
-        activity.getTimeCalculationActivityTab().setMultiplyWithValue(1d);//todo this should be removed when multiplication factor implemented
         switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
             case ENTERED_MANUALLY:
                 duration = shift.getDurationMinutes();
@@ -93,11 +92,14 @@ public class TimeBankCalculationService {
                 break;
 
             case AppConstants.FULL_DAY_CALCULATION:
-                duration = new Double((unitPosition.getTotalWeeklyMinutes() / unitPosition.getWorkingDaysInWeek()) * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                duration = new Double((unitPosition.getFullTimeWeeklyMinutes() / unitPosition.getWorkingDaysInWeek()) * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
             case AppConstants.WEEKLY_HOURS:
                 duration = new Double(unitPosition.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
+                scheduledMinutes = duration;
+            case AppConstants.FULL_WEEK:
+                duration = new Double((unitPosition.getFullTimeWeeklyMinutes() / unitPosition.getWorkingDaysInWeek()) * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
                 scheduledMinutes = duration;
                 break;
         }

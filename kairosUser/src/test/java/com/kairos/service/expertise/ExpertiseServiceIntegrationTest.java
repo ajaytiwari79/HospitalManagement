@@ -50,6 +50,7 @@ public class ExpertiseServiceIntegrationTest {
         organizationLevelId = 2942L;
         serviceId = 177L;
         unionId = 2597L;
+        payTableId = 3041L;
 
     }
 

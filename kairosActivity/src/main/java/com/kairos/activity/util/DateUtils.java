@@ -210,6 +210,10 @@ public class DateUtils {
         return dayOfWeek;
     }
 
+    public static LocalTime toLocalTime(DateTime dateTime){
+        return LocalTime.of(dateTime.getHourOfDay(),dateTime.getMinuteOfHour());
+    }
+
     public static Long getIsoDateInLong(String dateReceived) throws ParseException {
         DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -368,6 +372,31 @@ public class DateUtils {
 
     public static DateTime toJodaDateTime(LocalDate localDate) {
         return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),0,0);
+    }
+
+    public static Date convertUTCTOTimeZone(Date date,  TimeZone toTimeZone)
+    {
+        TimeZone fromTimeZone = TimeZone.getTimeZone("UTC");
+        long fromTimeZoneOffset = getTimeZoneUTCAndDSTOffset(date, fromTimeZone);
+        long toTimeZoneOffset = getTimeZoneUTCAndDSTOffset(date, toTimeZone);
+
+        return new Date(date.getTime() - (toTimeZoneOffset - fromTimeZoneOffset));
+    }
+
+    private static long getTimeZoneUTCAndDSTOffset(Date date, TimeZone timeZone)
+    {
+        long timeZoneDSTOffset = 0;
+        if(timeZone.inDaylightTime(date))
+        {
+            timeZoneDSTOffset = timeZone.getDSTSavings();
+        }
+
+        return timeZone.getRawOffset() + timeZoneDSTOffset;
+    }
+
+
+    public static Date getDateByLocalDateAndLocalTime(LocalDate localDate,LocalTime localTime){
+        return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),localTime.getHour(),localTime.getMinute()).toDate();
     }
 
 }

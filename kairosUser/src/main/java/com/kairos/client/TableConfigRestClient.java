@@ -2,7 +2,6 @@ package com.kairos.client;
 
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.TableConfiguration;
-import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import static com.kairos.client.RestClientURLUtil.getBaseUrl;
 
 @Component
 public class TableConfigRestClient {
@@ -32,7 +33,7 @@ public class TableConfigRestClient {
      */
     public TableConfiguration getTableConfiguration(long organizationId, long unitId, Long staffId){
 
-        final String baseUrl=getBaseUrl();
+        final String baseUrl=getBaseUrl(true);
 
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<TableConfiguration>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<TableConfiguration>>(){};
@@ -56,8 +57,4 @@ public class TableConfigRestClient {
         }
     }
 
-    private final String getBaseUrl(){
-        String baseUrl=new StringBuilder("http://zuulservice/kairos/activity/api/v1/organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
-        return baseUrl;
-    }
 }

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 
+import javax.validation.constraints.AssertTrue;
+
 /**
  * Created by prerna on 5/3/18.
  */
@@ -67,5 +69,10 @@ public class CountryAccessGroupDTO {
 
     public void setRole(AccessGroupRole role) {
         this.role = role;
+    }
+
+    @AssertTrue(message = "Access group can't be blank")
+    public boolean isValid() {
+        return (this.name.trim().isEmpty())?false:true;
     }
 }

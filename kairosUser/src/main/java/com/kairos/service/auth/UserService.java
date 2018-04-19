@@ -16,7 +16,6 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.util.OtpGenerator;
 import com.kairos.util.userContext.UserContext;
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -527,7 +526,7 @@ public class UserService extends UserBaseService {
         List<GrantedAuthority> permissions = new ArrayList<>();
         while (entryIterator.hasNext()) {
             Map.Entry<Long, List<TabPermission>> unitPermissions = entryIterator.next();
-            Map<String, TabPermission> processedTabs = new HashedMap();
+            Map<String, TabPermission> processedTabs = new HashMap<>();
             unitPermissions.getValue().stream().forEach(tabPermission -> {
                 if (processedTabs.containsKey(tabPermission.getTabId())) {
                     if (tabPermission.isWrite() || !processedTabs.get(tabPermission.getTabId()).isRead() && tabPermission.isRead()) {

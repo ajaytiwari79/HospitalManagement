@@ -19,6 +19,8 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
+import com.kairos.persistence.model.user.country.Day;
+import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.language.Language;
@@ -33,6 +35,7 @@ import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreement
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
@@ -79,6 +82,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.text.ParseException;
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -155,6 +159,8 @@ public class StaffService extends UserBaseService {
     @Inject
     private UnitPositionService unitPositionService;
     @Inject StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
+    @Inject
+    private DayTypeGraphRepository dayTypeGraphRepository;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -1418,7 +1424,7 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitPositionId, long id, String type) {
+    public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitPositionId, long id, String type,List<Long> activityDayTypes) {
         Long unitId = -1L;
         Organization organization = organizationService.getOrganizationDetail(id, type);
         unitId = organization.getId();
@@ -1435,6 +1441,15 @@ public class StaffService extends UserBaseService {
             WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
+        List<DayOfWeek> days;
+        if(activityDayTypes!=null && !activityDayTypes.isEmpty()) {
+            List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(activityDayTypes);
+            if(dayTypes!=null && !dayTypes.isEmpty()){
+                days = dayTypes.stream().flatMap(dt->dt.getValidDays().stream().map(d->DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
+                staffAdditionalInfoQueryResult.setActivityDayTypes(days);
+            }
+        }
+        staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
         return staffAdditionalInfoQueryResult;
     }
 

@@ -191,6 +191,7 @@ public class AppConstants {
     public static final Integer NUMBER_OF_WORKING_DAYS_IN_WEEK = 5;
 
     public static final String MANAGE_COUNTRY_TAB_MODULE_ID = "module_4";
+    public static final String MAIL_FROM = "info@nordicplanning.dk";
 
 
 }

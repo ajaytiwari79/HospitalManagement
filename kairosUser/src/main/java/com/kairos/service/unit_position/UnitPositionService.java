@@ -3,10 +3,13 @@ package com.kairos.service.unit_position;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.kairos.client.TimeBankRestClient;
-import com.kairos.client.dto.time_bank.*;
-import com.kairos.client.dto.time_bank.CTARuleTemplateDTO;
+import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.response.dto.web.UnitPositionDTO;
+import com.kairos.client.TimeBankRestClient;
+
+import com.kairos.client.dto.time_bank.CTARuleTemplateDTO;
+
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
@@ -50,12 +53,14 @@ import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRep
 
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
-import com.kairos.response.dto.web.UnitPositionDTO;
+
 import com.kairos.response.dto.web.PositionWrapper;
+
 import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
+import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
@@ -75,7 +80,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -130,6 +134,8 @@ public class UnitPositionService extends UserBaseService {
     private FunctionGraphRepository functionGraphRepository;
     @Inject
     private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
+    @Inject
+    private EmploymentService employmentService;
 
     public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
 
@@ -165,6 +171,7 @@ public class UnitPositionService extends UserBaseService {
 
         unitPosition.setUnit(organization);
         save(unitPosition);
+        employmentService.updateEmploymentEndDate(organization, unitPositionDTO);
 
         UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
@@ -223,7 +230,7 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
-    public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO) {
+    public PositionWrapper updateUnitPosition(long unitPositionId, UnitPositionDTO unitPositionDTO, Long unitId) {
 
         List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(unitPositionDTO.getStaffId());
         if (clientMinimumDTO.size() > 0) {
@@ -259,6 +266,7 @@ public class UnitPositionService extends UserBaseService {
         }
         preparePosition(oldUnitPosition, unitPositionDTO);
         save(oldUnitPosition);
+        employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO);
         return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null));
 
     }
@@ -331,7 +339,7 @@ public class UnitPositionService extends UserBaseService {
             throw new ActionNotPermittedException("Start date can't be less than current Date ");
         }
         unitPosition.setStartDateMillis(unitPositionDTO.getStartDateMillis());
-
+        unitPosition.setWorkingDaysInWeek(expertise.get().getNumberOfWorkingDaysInWeek());
 
         if (Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) {
             if (unitPositionDTO.getStartDateMillis() > unitPositionDTO.getEndDateMillis()) {
@@ -355,23 +363,23 @@ public class UnitPositionService extends UserBaseService {
             }
             unitPosition.setLastWorkingDateMillis(unitPositionDTO.getLastWorkingDateMillis());
         }
-
-        Optional<SeniorityLevel> seniorityLevel = seniorityLevelGraphRepository.findById(unitPositionDTO.getSeniorityLevelId(), 1);
+        Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(unitPositionDTO.getExpertiseId());
+        SeniorityLevel seniorityLevel = getSeniorityLevelByStaffAndExpertise(staff.getId(), currentExpertise.get());
         if (!Optional.ofNullable(seniorityLevel).isPresent()) {
             throw new DataNotFoundByIdException("Invalid seniorityLevel Id" + unitPositionDTO.getReasonCodeId());
         }
-        unitPosition.setSeniorityLevel(seniorityLevel.get());
+        unitPosition.setSeniorityLevel(seniorityLevel);
         List<Function> functions = functionGraphRepository.findAllFunctionsById(unitPositionDTO.getFunctionIds());
         if (functions.size() != unitPositionDTO.getFunctionIds().size()) {
             throw new ActionNotPermittedException("unable to get all functions");
         }
         unitPosition.setFunctions(functions);
-
+        unitPosition.setFullTimeWeeklyMinutes(expertise.get().getFullTimeWeeklyMinutes());
         unitPosition.setTotalWeeklyMinutes(unitPositionDTO.getTotalWeeklyMinutes() + (unitPositionDTO.getTotalWeeklyHours() * 60));
         unitPosition.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
         unitPosition.setHourlyWages(unitPositionDTO.getHourlyWages());
         unitPosition.setSalary(unitPositionDTO.getSalary());
-        unitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
+        //unitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
         if (createFromTimeCare) {
             unitPosition.setTimeCareExternalId(unitPositionDTO.getTimeCareExternalId());
         }
@@ -479,8 +487,6 @@ public class UnitPositionService extends UserBaseService {
                 oldUnitPosition.setReasonCode(reasonCode.get());
             }
         }
-
-
         oldUnitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
         oldUnitPosition.setTotalWeeklyMinutes(unitPositionDTO.getTotalWeeklyMinutes() + (unitPositionDTO.getTotalWeeklyHours() * 60));
         oldUnitPosition.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
@@ -525,38 +531,7 @@ public class UnitPositionService extends UserBaseService {
         positionCtaWtaQueryResult.setWta(unitPositionGraphRepository.getWtaByExpertise(unitId, expertiseId));
 
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
-
-        StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, expertiseId);
-
-        if (!Optional.ofNullable(staffSelectedExpertise).isPresent() || !currentExpertise.isPresent()) {
-            throw new DataNotFoundByIdException("Expertise is not assigned to staff or unavailable");
-
-        }
-
-        DateTime expertiseStartDate = new DateTime(staffSelectedExpertise.getExpertiseStartDate());
-        DateTime currentDate = new DateTime(DateUtil.getCurrentDateMillis());
-
-        Integer experienceInMonth = Months.monthsBetween(expertiseStartDate, currentDate).getMonths() + staffSelectedExpertise.getRelevantExperienceInMonths();
-        logger.info("user has current experience in months :{}", experienceInMonth);
-
-        SeniorityLevel appliedSeniorityLevel = null;
-        for (SeniorityLevel seniorityLevel : currentExpertise.get().getSeniorityLevel()) {
-            if (seniorityLevel.getTo() == null) {
-                // more than  is set if
-                if (experienceInMonth >= seniorityLevel.getFrom() * 12) {
-                    appliedSeniorityLevel = seniorityLevel;
-                    break;
-                }
-            } else {
-                // to and from is present
-                logger.info("user has current experience in months :{} ,{},{},{}", seniorityLevel.getFrom(), experienceInMonth, seniorityLevel.getTo(), experienceInMonth);
-
-                if (seniorityLevel.getFrom() * 12 < experienceInMonth && seniorityLevel.getTo() * 12 >= experienceInMonth) {
-                    appliedSeniorityLevel = seniorityLevel;
-                    break;
-                }
-            }
-        }
+        SeniorityLevel appliedSeniorityLevel = getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
         positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
         FunctionAndSeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
         positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
@@ -661,19 +636,20 @@ public class UnitPositionService extends UserBaseService {
         if (unitPosition.getEndDateMillis() != null) {
             unitPositionWithCtaDetailsDTO.setUnitPositionEndDate(DateUtil.asLocalDate(new Date(unitPosition.getEndDateMillis())));
         }
-        Optional<Organization> organization = organizationGraphRepository.findById(unitId,0);
+        Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
         unitPositionWithCtaDetailsDTO.setUnitTimeZone(organization.get().getTimeZone());
         unitPositionWithCtaDetailsDTO.setCtaRuleTemplates(getCtaRuleTemplates(ctaQueryResults));
         return unitPositionWithCtaDetailsDTO;
     }
 
-    public List<CTARuleTemplateDTO> getCtaRuleTemplates(CTAListQueryResult ctaListQueryResult){
+    public List<CTARuleTemplateDTO> getCtaRuleTemplates(CTAListQueryResult ctaListQueryResult) {
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ctaListQueryResult.getRuleTemplates().size());
-        List<CTARuleTemplateQueryResult> ruleTemplateQueryResults = getObjects(ctaListQueryResult.getRuleTemplates(), new TypeReference<List<CTARuleTemplateQueryResult>>() {});
-        ruleTemplateQueryResults.forEach(rt->{
+        List<CTARuleTemplateQueryResult> ruleTemplateQueryResults = getObjects(ctaListQueryResult.getRuleTemplates(), new TypeReference<List<CTARuleTemplateQueryResult>>() {
+        });
+        ruleTemplateQueryResults.forEach(rt -> {
             CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO();
-            ctaRuleTemplateDTO.setGranularity((int)rt.getCompensationTable().get("granularityLevel"));
-            ctaRuleTemplateDTO.setActivityIds(rt.getActivityIds().stream().map(ac->new BigInteger(ac.toString())).collect(Collectors.toList()));
+            ctaRuleTemplateDTO.setGranularity((int) rt.getCompensationTable().get("granularityLevel"));
+            ctaRuleTemplateDTO.setActivityIds(rt.getActivityIds().stream().map(ac -> new BigInteger(ac.toString())).collect(Collectors.toList()));
             ctaRuleTemplateDTO.setName(rt.getName());
             ctaRuleTemplateDTO.setId(rt.getId());
             //ctaRuleTemplateDTO.setDays(rt.getCalculateOnDayTypes());
@@ -688,7 +664,7 @@ public class UnitPositionService extends UserBaseService {
 
             ctaRuleTemplateDTO.setCalculateScheduledHours(rt.isCalculateScheduledHours());
             ctaRuleTemplateDTO.setEmploymentTypes(rt.getEmploymentTypes());
-            if(rt.getPlannedTimeWithFactor().getAccountType()!=null) {
+            if (rt.getPlannedTimeWithFactor().getAccountType() != null) {
                 ctaRuleTemplateDTO.setAccountType(rt.getPlannedTimeWithFactor().getAccountType().name());
             }
             ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
@@ -720,13 +696,13 @@ public class UnitPositionService extends UserBaseService {
         return null;
     }
 
-    public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, Long wtaId, Long ctaId) {
+    public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, Long wtaId, Long ctaId, Long unitId) {
         Long startDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getStartDate());
         Long endDateMillis = null;
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
             endDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getEndDate());
         }
-        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(positionCodeId, expertiseId, startDateMillis, endDateMillis, Integer.parseInt(timeCareEmploymentDTO.getWeeklyHours()), employmentTypeId, staffId, wtaId, ctaId, null, new Long(timeCareEmploymentDTO.getId()));
+        UnitPositionDTO unitPositionDTO = new UnitPositionDTO(positionCodeId, expertiseId, startDateMillis, endDateMillis, Integer.parseInt(timeCareEmploymentDTO.getWeeklyHours()), employmentTypeId, staffId, wtaId, ctaId, unitId, new Long(timeCareEmploymentDTO.getId()));
         return unitPositionDTO;
     }
 
@@ -770,7 +746,7 @@ public class UnitPositionService extends UserBaseService {
             if (staff == null) {
                 throw new DataNotFoundByIdException("NO staff exist with External Id : " + timeCareEmploymentDTO.getPersonID());
             }
-            UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId(), wta.getId(), cta.getId());
+            UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId(), wta.getId(), cta.getId(), organization.getId());
             createUnitPosition(organization.getId(), "Organization", unitEmploymentPosition, true);
         }
         return true;
@@ -797,6 +773,43 @@ public class UnitPositionService extends UserBaseService {
     // For Test Cases
     public UnitPosition getDefaultUnitPositionByOrg(Long orgId) {
         return unitPositionGraphRepository.getDefaultUnitPositionByOrg(orgId);
+    }
+
+    public SeniorityLevel getSeniorityLevelByStaffAndExpertise(Long staffId, Expertise currentExpertise) {
+
+        StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, currentExpertise.getId());
+
+        if (!Optional.ofNullable(staffSelectedExpertise).isPresent() || !Optional.ofNullable(currentExpertise).isPresent()) {
+            throw new DataNotFoundByIdException("Expertise is not assigned to staff or unavailable");
+
+        }
+
+        DateTime expertiseStartDate = new DateTime(staffSelectedExpertise.getExpertiseStartDate());
+        DateTime currentDate = new DateTime(DateUtil.getCurrentDateMillis());
+
+        Integer experienceInMonth = Months.monthsBetween(expertiseStartDate, currentDate).getMonths() + staffSelectedExpertise.getRelevantExperienceInMonths();
+        logger.info("user has current experience in months :{}", experienceInMonth);
+
+        SeniorityLevel appliedSeniorityLevel = null;
+        for (SeniorityLevel seniorityLevel : currentExpertise.getSeniorityLevel()) {
+            if (seniorityLevel.getTo() == null) {
+                // more than  is set if
+                if (experienceInMonth >= seniorityLevel.getFrom() * 12) {
+                    appliedSeniorityLevel = seniorityLevel;
+                    break;
+                }
+            } else {
+                // to and from is present
+                logger.info("user has current experience in months :{} ,{},{},{}", seniorityLevel.getFrom(), experienceInMonth, seniorityLevel.getTo(), experienceInMonth);
+
+                if (seniorityLevel.getFrom() * 12 < experienceInMonth && seniorityLevel.getTo() * 12 >= experienceInMonth) {
+                    appliedSeniorityLevel = seniorityLevel;
+                    break;
+                }
+            }
+        }
+
+        return appliedSeniorityLevel;
     }
 
 
