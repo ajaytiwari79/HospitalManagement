@@ -18,7 +18,7 @@ public class StaffEmploymentDetail {
     private String sendNotificationBy;
     private String email;
     private boolean copyKariosMailToLogin;
-    @NotEmpty(message = "error.Staff.employedsince.notnull") @NotNull(message = "error.Staff.employedsince.notnull") @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @NotNull(message = "error.Staff.employedsince.notnull")
     private String employedSince;
     private long visitourId;
     private long engineerTypeId;

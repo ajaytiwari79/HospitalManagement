@@ -5,12 +5,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -40,5 +38,4 @@ public class ArrayUtilTest {
         utilRes = ArrayUtil.getUniqueElementWhichIsNotInFirst(original, previous);
         assertEquals(originalRes, utilRes);
     }
-
 }

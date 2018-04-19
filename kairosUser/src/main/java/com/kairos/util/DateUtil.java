@@ -196,6 +196,7 @@ public class DateUtil {
 
     public static Long getIsoDateInLong(String dateReceived) throws ParseException {
         DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
+        isoFormat.setLenient(false);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = isoFormat.parse(dateReceived);
         return date.getTime();
