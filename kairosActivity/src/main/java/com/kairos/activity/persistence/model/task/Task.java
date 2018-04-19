@@ -64,7 +64,7 @@ public class Task extends TaskDemand {
     private Integer numberOfStaffRequired;
     private String relatedTaskId;
 
-    private String joinEventId; // this field is required in kairos planning gantt, to update tasks of same day repeatation.
+    private String joinEventId; // this field is required in kairos planner gantt, to update tasks of same day repeatation.
 
     private List<BigInteger> subTaskIds;
     private Boolean isSubTask = false;

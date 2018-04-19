@@ -56,7 +56,7 @@ public class PlannerController {
     @Autowired
     TaskService taskService;
 
-    @ApiOperation("Get Citizen planning data")
+    @ApiOperation("Get Citizen planner data")
     @RequestMapping(value = "/citizen/{citizenId}", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCitizenPlanning(@PathVariable long unitId, @PathVariable long citizenId, @RequestParam(value = "isActualPlanningScreen", required = false) boolean isActualPlanningScreen,
@@ -161,7 +161,7 @@ public class PlannerController {
 
     }
 
-    @ApiOperation("Revert  actual planning tasks")
+    @ApiOperation("Revert  actual planner tasks")
     @RequestMapping(value = "/citizen/{citizenId}/revert/actual_planning_task", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> revertActualPlanningTask(@PathVariable long unitId, @RequestBody Map<String, Object> tasksToRevert) {
@@ -210,7 +210,7 @@ public class PlannerController {
     }
 
     @RequestMapping(value = "/citizen/{citizenId}/unhandled/actual_task/info", method = RequestMethod.PUT)
-    @ApiOperation("update unhandled actual planning tasks")
+    @ApiOperation("update unhandled actual planner tasks")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateUnhandledActualPlanningTasks(@PathVariable long citizenId, @PathVariable long unitId, @RequestBody TaskDTO taskDTO){
 
@@ -226,7 +226,7 @@ public class PlannerController {
     }
 
     @RequestMapping(value = "/actual_planning_settings", method = RequestMethod.POST)
-    @ApiOperation("save settings of planner for actual planning")
+    @ApiOperation("save settings of planner for actual planner")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> saveSettingsOfPlanner(@PathVariable long unitId,@RequestBody Map<String,Object> actualPlanningSettings) throws ParseException {
         taskExceptionService.saveSettingsOfPlanner(unitId,actualPlanningSettings);
@@ -234,7 +234,7 @@ public class PlannerController {
     }
 
     @RequestMapping(value = "/actual_planning_tasks", method = RequestMethod.PUT)
-    @ApiOperation("bulk update actual planning task")
+    @ApiOperation("bulk update actual planner task")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateActualPlanningTask(@PathVariable long unitId, @RequestBody BulkUpdateTaskDTO bulkUpdateTaskDTO) throws ParseException {
 
@@ -295,7 +295,7 @@ public class PlannerController {
      * @return
      * @throws CloneNotSupportedException
      */
-    @ApiOperation("Revert  actual planning tasks")
+    @ApiOperation("Revert  actual planner tasks")
     @RequestMapping(value = "/citizen/filter_time_slot", method = RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> getCitizenByTimeSlotId(@PathVariable Long unitId, @RequestBody List<Long> timeSlotIds) throws CloneNotSupportedException {
 

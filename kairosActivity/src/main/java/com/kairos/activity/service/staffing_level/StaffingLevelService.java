@@ -7,6 +7,7 @@ import com.kairos.activity.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.config.env.EnvConfig;
 import com.kairos.activity.custom_exception.DuplicateDataException;
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.messaging.wshandlers.StaffingLevelGraphStompClientWebSocketHandler;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.ActivityCategory;
@@ -21,11 +22,13 @@ import com.kairos.activity.response.dto.staffing_level.ShiftPlanningStaffingLeve
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.event.ShiftNotificationEvent;
 import com.kairos.activity.util.timeCareShift.Transstatus;
 import com.kairos.util.serviceutil.StaffingLevelUtil;
+import com.netflix.discovery.converters.Auto;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -105,6 +108,8 @@ public class StaffingLevelService extends MongoBaseService {
     private ActivityMongoRepositoryImpl activityMongoRepositoryImpl;
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private PlannerSyncService plannerSyncService;
 
 
     /**
@@ -121,6 +126,7 @@ public class StaffingLevelService extends MongoBaseService {
             BeanUtils.copyProperties(staffingLevel, staffingLevelDTO, new String[]{"staffingLevelInterval"});
             staffingLevelDTO.setStaffingLevelInterval(staffingLevelDTO.getStaffingLevelInterval().stream()
                     .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
+            plannerSyncService.publishStaffingLevel(unitId,staffingLevelDTO,IntegrationOperation.CREATE);
         }
         else {
             throw new DuplicateDataException("Staffing level already exixts with current date " + staffingLevelDTO.getCurrentDate());
@@ -172,19 +178,17 @@ public class StaffingLevelService extends MongoBaseService {
             , StaffingLevelDto staffingLevelDTO) {
         logger.info("updating staffing level organizationId and staffingLevelId is {} ,{}", unitId, staffingLevelId);
         StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).get();
-
         if (!staffingLevel.getCurrentDate().equals(staffingLevelDTO.getCurrentDate())) {
             logger.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), staffingLevelDTO.getCurrentDate());
             throw new UnsupportedOperationException("we can not modified the current date of staffing level");
         }
-
         staffingLevel = StaffingLevelUtil.updateStaffingLevels(staffingLevelId, staffingLevelDTO, unitId, staffingLevel);
         this.save(staffingLevel);
         BeanUtils.copyProperties(staffingLevel, staffingLevelDTO);
         staffingLevelDTO.setStaffingLevelInterval(staffingLevelDTO.getStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
+        plannerSyncService.publishStaffingLevel(unitId,staffingLevelDTO,IntegrationOperation.DELETE);
         return staffingLevelDTO;
-
     }
 
     public void updateStaffingLevelAvailableStaffCount(ShiftNotificationEvent shiftNotificationEvent) {
@@ -624,7 +628,7 @@ public class StaffingLevelService extends MongoBaseService {
 
     @Async
     public Map<String, Object> submitShiftPlanningProblemToPlanner(Map<String, Object> shiftPlanningInfo) {
-        final String baseUrl = "http://192.168.6.211:8081/api/taskPlanning/planning/submitRecomendationProblem";
+        final String baseUrl = "http://192.168.6.211:8081/api/taskPlanning/planner/submitRecomendationProblem";
 
         JSONObject postBody = new JSONObject(shiftPlanningInfo);
         HttpClient client = HttpClientBuilder.create().build();
