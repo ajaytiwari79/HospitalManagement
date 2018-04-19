@@ -217,7 +217,7 @@ public class AppConstants {
     //TimeCare date importing constants
     public static final String CALCULATED_TIME = "CalculatedTime";
     public static final String WEEKLY_WORK_TIME = "WeeklyWorkTime";
-    public static final String FIXED_TIME_FOR_TIMECRAE = "FixedTime";
+    public static final String FIXED_TIME_FOR_TIMECARE = "FixedTime";
     public static final String FULL_TIME_HOUR = "FullTimeHour";
 
 
