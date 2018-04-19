@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
@@ -100,6 +101,7 @@ public class Staff extends UserBaseEntity {
     private Date dateOfBirth;
     private String careOfName;
     private int age;
+    private Gender gender;
 
 
     public Staff(String firstName) {
@@ -495,7 +497,15 @@ public class Staff extends UserBaseEntity {
     }
 
     public int getAge() {
-        this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():0;
+        this.age = this.cprNumber != null ? Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears() : 0;
         return age;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 }
