@@ -196,6 +196,7 @@ public class DateUtil {
 
     public static Long getIsoDateInLong(String dateReceived) throws ParseException {
         DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
+        isoFormat.setLenient(false);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = isoFormat.parse(dateReceived);
         return date.getTime();
@@ -257,6 +258,14 @@ public class DateUtil {
         calendar.setTime(dateTime.toDate());
 
         return calendar.getTime();
+    }
+    public static LocalDate getDateFromEpoch(Long dateLong) {
+
+        return Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    public static LocalDate getTimezonedCurrentDate(String timezone) {
+        return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDate();
     }
 
 }

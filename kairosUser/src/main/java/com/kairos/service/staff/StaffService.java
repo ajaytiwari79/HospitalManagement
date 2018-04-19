@@ -272,16 +272,19 @@ public class StaffService extends UserBaseService {
 
     public Map<String, Object> getPersonalInfo(long staffId, long unitId, String type) {
 
+        StaffEmploymentDTO staffEmploymentDTO = null;
         Staff staff = null;
 
         if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getTeamStaff(unitId, staffId);
+            staffEmploymentDTO = new StaffEmploymentDTO(staff,null);
         } else if (ORGANIZATION.equalsIgnoreCase(type)) {
             Organization unit = organizationGraphRepository.findOne(unitId);
             Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
             // unit is parent so fetching all staff from itself
             //staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentOrganization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-            staff = staffGraphRepository.getStaffByUnitId(parentOrganization.getId(), staffId);
+            staffEmploymentDTO = staffGraphRepository.getStaffAndEmploymentByUnitId(parentOrganization.getId(), staffId);
+            staff = Optional.ofNullable(staffEmploymentDTO).isPresent() ? staffEmploymentDTO.getStaff():null;
         }
 
         if (staff == null) {
@@ -303,7 +306,7 @@ public class StaffService extends UserBaseService {
             languages = Collections.emptyList();
             engineerTypes = Collections.emptyList();
         }
-        personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staff));
+        personalInfo.put("employmentInfo", employmentService.retrieveEmploymentDetails(staffEmploymentDTO));
         personalInfo.put("personalInfo", retrievePersonalInfo(staff));
         personalInfo.put("expertise", expertise);
         personalInfo.put("languages", languages);
@@ -675,7 +678,7 @@ public class StaffService extends UserBaseService {
                     staffGraphRepository.save(staff);
                     staffList.add(staff);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
-                        createEmployment(parent, unit, staff, accessGroupId, isEmploymentExist);
+                        createEmployment(parent, unit, staff, accessGroupId, null, isEmploymentExist);
                     }
 
                 }
@@ -862,7 +865,7 @@ public class StaffService extends UserBaseService {
         staff.setLastName(data.getLastName());
         staff.setCprNumber(String.valueOf(data.getCprNumber()));
         staff.setFamilyName(data.getFamilyName());
-        staff.setEmployedSince(data.getEmployedSince().getTime());
+        //staff.setEmployedSince(data.getEmployedSince().getTime());
         staff.setCurrentStatus(data.getCurrentStatus());
         staff = createStaff(staff);
         if (staff != null) {
@@ -915,7 +918,7 @@ public class StaffService extends UserBaseService {
     }
 
 
-    public Staff createStaffFromWeb(Long unitId, StaffCreationPOJOData payload) {
+    public Staff createStaffFromWeb(Long unitId, StaffCreationPOJOData payload) throws ParseException{
 
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
@@ -941,7 +944,7 @@ public class StaffService extends UserBaseService {
         staff.setUser(user);
         staff.setClient(client);
         staffGraphRepository.save(staff);
-        createEmployment(parent, unit, staff, payload.getAccessGroupId(), isEmploymentExist);
+        createEmployment(parent, unit, staff, payload.getAccessGroupId(),  DateUtil.getIsoDateInLong(payload.getEmployedSince()), isEmploymentExist);
         staff.setUser(null); // removing user to send in FE
 
         return staff;
@@ -977,7 +980,7 @@ public class StaffService extends UserBaseService {
         }
         staff.setEmail(payload.getPrivateEmail());
         staff.setInactiveFrom(payload.getInactiveFrom());
-        staff.setEmployedSince(payload.getEmployedSince());
+        //staff.setEmployedSince(payload.getEmployedSince());
         staff.setExternalId(payload.getExternalId());
         staff.setFirstName(payload.getFirstName());
         staff.setLastName(payload.getLastName());
@@ -1020,7 +1023,7 @@ public class StaffService extends UserBaseService {
     }
 
     private void createEmployment(Organization organization,
-                                  Organization unit, Staff staff, Long accessGroupId, boolean employmentAlreadyExist) {
+                                  Organization unit, Staff staff, Long accessGroupId, Long employedSince, boolean employmentAlreadyExist) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             throw new DataNotFoundByIdException("Access group not found " + accessGroupId);
@@ -1035,6 +1038,8 @@ public class StaffService extends UserBaseService {
         }
         employment.setName("Working as staff");
         employment.setStaff(staff);
+        employment.setStartDateMillis(employedSince);
+
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(unit);
         unitPermission.setAccessGroup(accessGroup);
@@ -1577,7 +1582,7 @@ public class StaffService extends UserBaseService {
             boolean isEmploymentExist = (staff.getId()) != null;
             staff.setUser(user);
             staffGraphRepository.save(staff);
-            createEmployment(organization, organization, staff, payload.getAccessGroupId(), isEmploymentExist);
+            createEmployment(organization, organization, staff, payload.getAccessGroupId(),null, isEmploymentExist);
         }
         return true;
     }
@@ -1634,7 +1639,8 @@ public class StaffService extends UserBaseService {
         List<com.kairos.response.dto.web.StaffDTO> staffDTOS = new ArrayList<>(staffs.size());
         staffs.forEach(s -> {
             com.kairos.response.dto.web.StaffDTO staffDTO = new com.kairos.response.dto.web.StaffDTO(s.getId(), s.getFirstName(), getSkillSet(skills));
-            List<UnitPositionQueryResult> ueps = unitPositionService.getUnitPositionsOfStaff(unitId, s.getId(), "Organization");
+            EmploymentUnitPositionDTO employmentUnitPositionDTO = unitPositionService.getUnitPositionsOfStaff(unitId, s.getId(), "Organization");
+            List<UnitPositionQueryResult> ueps = employmentUnitPositionDTO.getUnitPositions();
             expertiesIds.forEach(e -> {
                 ueps.forEach(uep -> {
                     if (uep.getExpertise().getId().equals(e)) {

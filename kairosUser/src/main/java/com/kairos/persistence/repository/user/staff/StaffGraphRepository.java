@@ -266,6 +266,11 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             " return staff")
     Staff getStaffByUnitId(long unitId, long staffId);
 
+
+    @Query("MATCH (organization:Organization)-[:"+ HAS_EMPLOYMENTS +"]->(employment:Employment)-[:"+ BELONGS_TO +"]->(staff:Staff) where id(organization)={0} AND id(staff)={1}\n" +
+            " return staff, employment.startDateMillis as employmentStartDate")
+    StaffEmploymentDTO getStaffAndEmploymentByUnitId(long unitId, long staffId);
+
     @Query("Match (unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(organization:Organization) where id(organization)={0} with unitPermission\n" +
             "Match (unitPermission)-[:HAS_ACCESS_PERMISSION]->(accessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup{name:\"COUNTRY_ADMIN\"}) with unitPermission\n" +
             "Match (employment:Employment)-[:HAS_UNIT_PERMISSIONS]->(unitPermission) with employment,unitPermission\n" +
@@ -322,6 +327,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
 
     @Query("Match (team:Team)-[:TEAM_HAS_MEMBER]->(staff:Staff) where id(staff)= {1} AND id(team)={0}  return staff ")
     Staff getTeamStaff(Long teamId, Long staffId);
+
+    @Query("Match (team:Team)-[:TEAM_HAS_MEMBER]->(staff:Staff) where id(staff)= {1} AND id(team)={0} Match(staff)-[:" + BELONGS_TO + "]-(emp:Employment)  return staff ")
+    StaffEmploymentDTO getTeamStaffAndEmployment(Long teamId, Long staffId);
 
     @Query("Match (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(unit:Organization) where id(unit)={1} with unitPermission\n" +
             "Match (unitPermission)<-[:" + HAS_UNIT_PERMISSIONS + "]-(employment:Employment)-[:" + BELONGS_TO + "]->(staff:Staff{externalId:{0}}) return count(staff)>0")
@@ -386,6 +394,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false}) where staff.externalId={0} AND unitPosition.timeCareExternalId={1} " +
             "return unitPosition,staff ")
     StaffUnitPositionWrapper getStaff(Long externalId, Long timeCareExternalId);
+    @Query("Match(staff:Staff)-[:BELONGS_TO]-(emp:Employment) where id(staff) = {0} return staff, emp.startDateMillis")
+    StaffEmploymentDTO findStaffAndEmploymentByStaffId(Long staffId);
 
 
 }

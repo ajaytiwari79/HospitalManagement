@@ -124,9 +124,5 @@ public class UnitPositionServiceIntegrationTest {
     }
 
 
-    @Test
-    public void moveToReadOnlyAccessGroupTest() throws Exception {
 
-        employmentService.moveToReadOnlyAccessGroup();
-    }
 }

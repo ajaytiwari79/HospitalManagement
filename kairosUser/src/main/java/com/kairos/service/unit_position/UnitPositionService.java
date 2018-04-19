@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.persistence.model.user.staff.*;
+import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
 import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.client.TimeBankRestClient;
 
@@ -29,11 +31,8 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.FunctionAndSeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.position_code.PositionCode;
-import com.kairos.persistence.model.user.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.user.unit_position.*;
 
-import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.agreement.cta.CollectiveTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
@@ -75,11 +74,14 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by pawanmandhan on 26/7/17.
@@ -136,6 +138,8 @@ public class UnitPositionService extends UserBaseService {
     private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
     @Inject
     private EmploymentService employmentService;
+    @Inject
+    private EmploymentGraphRepository employmentGraphRepository;
 
     public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
 
@@ -500,14 +504,17 @@ public class UnitPositionService extends UserBaseService {
      * @author vipul
      * used to get all positions of organization n by organization and staff Id
      * */
-    public List<UnitPositionQueryResult> getUnitPositionsOfStaff(long id, long staffId, String type) {
+    public EmploymentUnitPositionDTO getUnitPositionsOfStaff(long id, long staffId, String type) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Staff Id" + staffId);
         }
 
         User user = userGraphRepository.getUserByStaffId(staffId);
-        return unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId());
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
+        EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employmentQueryResult,unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) );
+        return employmentUnitPositionDTO;
 
         // TODO  Organization organization = organizationService.getOrganizationDetail(id, type);
 //        Organization parentOrganization;
@@ -810,6 +817,30 @@ public class UnitPositionService extends UserBaseService {
         }
 
         return appliedSeniorityLevel;
+    }
+    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long unitId) throws ParseException {
+
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        Long endDateMillis = DateUtil.getIsoDateInLong(employmentEndDate);
+        List<UnitPosition> unitPositions =  unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId,endDateMillis);
+        for(UnitPosition unitPosition:unitPositions) {
+            unitPosition.setEndDateMillis(endDateMillis);
+        }
+        unitPositionGraphRepository.saveAll(unitPositions);
+        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+        employment.setEndDateMillis(endDateMillis);
+        employmentGraphRepository.save(employment);
+        LocalDate curDate = DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString());
+        if(DateUtil.getDateFromEpoch(endDateMillis).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0) {
+            //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+            List<Long> empIds = Stream.of(employment.getId()).collect(Collectors.toList());
+            employmentService.moveToReadOnlyAccessGroup(empIds);
+        }
+        User user = userGraphRepository.getUserByStaffId(staffId);
+        EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
+        EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employmentUpdated,unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) );
+        return employmentUnitPositionDTO;
+
     }
 
 

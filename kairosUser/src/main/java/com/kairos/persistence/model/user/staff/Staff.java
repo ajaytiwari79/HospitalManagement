@@ -30,7 +30,7 @@ public class Staff extends UserBaseEntity {
 
     String generalNote;
     String reqFromPerson;
-    private Long employedSince;
+  //  private Long employedSince;
     private String cardNumber;
     private boolean copyKariosMailToLogin;
     private String sendNotificationBy;
@@ -105,8 +105,8 @@ public class Staff extends UserBaseEntity {
     public Staff() {
     }
 
-    public Staff(Long employedSince, String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
-        this.employedSince = employedSince;
+    public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
+      //  this.employedSince = employedSince;
         this.email = email;
         this.userName = userName;
         this.firstName = firstName;
@@ -147,13 +147,13 @@ public class Staff extends UserBaseEntity {
     }
 
 
-    public Long getEmployedSince() {
+    /*public Long getEmployedSince() {
         return employedSince;
     }
 
     public void setEmployedSince(Long employedSince) {
         this.employedSince = employedSince;
-    }
+    }*/
 
     public String getNationalInsuranceNumber() {
         return nationalInsuranceNumber;
