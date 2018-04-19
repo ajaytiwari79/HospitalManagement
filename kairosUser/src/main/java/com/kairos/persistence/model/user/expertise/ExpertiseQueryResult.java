@@ -25,7 +25,7 @@ public class ExpertiseQueryResult {
     private Integer numberOfWorkingDaysInWeek;
     private Long id;
     private Boolean published;
-    private Boolean editable;
+    private Boolean history;
     private PaidOutFrequencyEnum paidOutFrequency;
 
 
@@ -148,12 +148,12 @@ public class ExpertiseQueryResult {
         this.seniorityLevels = seniorityLevels;
     }
 
-    public Boolean getEditable() {
-        return editable;
+    public Boolean getHistory() {
+        return history;
     }
 
-    public void setEditable(Boolean editable) {
-        this.editable = editable;
+    public void setHistory(Boolean history) {
+        this.history = history;
     }
 
     public ExpertiseQueryResult() {

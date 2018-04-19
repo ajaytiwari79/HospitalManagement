@@ -82,7 +82,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "with expertise,payTable,union,level,orgService,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
             "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
-            "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis , expertise.editable as editable," +
+            "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis , expertise.history as history," +
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
@@ -91,7 +91,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
 
     @Query("MATCH (expertise:Expertise)-[rel:" + VERSION_OF + "]-(parentExpertise:Expertise) where id(expertise)={0} \n" +
-            " set expertise.endDateMillis={1} set expertise.hasDraftCopy=false set expertise.published=true set expertise.editable=false ")
+            " set expertise.endDateMillis={1} set expertise.hasDraftCopy=false set expertise.published=true set expertise.history=false ")
     void setEndDateToExpertise(Long expertiseId, Long endDateMillis);
 
 
@@ -104,7 +104,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "with expertise,payTable,union,level,orgService,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
             "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
-            "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis, expertise.editable as editable, " +
+            "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis, expertise.history as history, " +
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
@@ -126,7 +126,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "with expertise,payTable,union,level,orgService,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
             "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
-            "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis ,expertise.editable as editable," +
+            "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis ,expertise.history as history," +
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
@@ -142,7 +142,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "with expertise,payTable,union,level,orgService,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
             "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
-            "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis , expertise.editable as editable," +
+            "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis , expertise.history as history," +
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
             "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
@@ -150,6 +150,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<ExpertiseQueryResult> getAllExpertiseByCountryId(Long countryId);
 
     @Query("MATCH (expertise:Expertise)-[rel:" + VERSION_OF + "]-(childExpertise:Expertise) where id(expertise)={0} \n" +
-            " set expertise.hasDraftCopy=false set expertise.published=true set expertise.editable=true ")
-    void unlinkExpertiseAndMakeEditable(Long expertiseId, boolean editable, boolean hasDraftCopy);
+            " set expertise.hasDraftCopy=false set expertise.published=true set expertise.history=false ")
+    void unlinkExpertiseAndMakeEditable(Long expertiseId, boolean history, boolean hasDraftCopy);
 }

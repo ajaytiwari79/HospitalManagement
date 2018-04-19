@@ -62,7 +62,7 @@ public class Expertise extends UserBaseEntity{
 
     private boolean published;
     private boolean hasDraftCopy;
-    private boolean editable;
+    private boolean history;
 
 
     @Relationship(type = FOR_SENIORITY_LEVEL)
@@ -203,12 +203,12 @@ public class Expertise extends UserBaseEntity{
         this.parentExpertise = parentExpertise;
     }
 
-    public boolean isEditable() {
-        return editable;
+    public boolean isHistory() {
+        return history;
     }
 
-    public void setEditable(boolean editable) {
-        this.editable = editable;
+    public void setHistory(boolean history) {
+        this.history = history;
     }
 
     public Expertise() {

@@ -104,7 +104,7 @@ public class ExpertiseService extends UserBaseService {
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
             expertiseResponseDTO.setNumberOfWorkingDaysInWeek(expertise.getNumberOfWorkingDaysInWeek());
-            expertiseResponseDTO.setEditable(expertise.isEditable());
+            expertiseResponseDTO.setEditable(expertise.isHistory());
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
 
         } else {
@@ -168,8 +168,8 @@ public class ExpertiseService extends UserBaseService {
         BeanUtils.copyProperties(expertise, copiedExpertise);
         copiedExpertise.setId(null);
         expertise.setHasDraftCopy(true);
-        expertise.setEditable(false);
-        copiedExpertise.setEditable(true);
+        expertise.setHistory(true);
+        copiedExpertise.setHistory(false);
         copiedExpertise.setPublished(false);
         copiedExpertise.setParentExpertise(expertise);
         copiedExpertise.setSeniorityLevel(null);
@@ -399,7 +399,7 @@ public class ExpertiseService extends UserBaseService {
             copiedExpertise.setId(null);
 
             currentExpertise.setHasDraftCopy(true);
-            currentExpertise.setEditable(false);
+            currentExpertise.setHistory(true);
             copiedExpertise.setPublished(false);
             copiedExpertise.setParentExpertise(currentExpertise);
             // copiedExpertise.getSeniorityLevel().clear();
@@ -548,7 +548,7 @@ public class ExpertiseService extends UserBaseService {
             // remove link and unlink
             expertiseGraphRepository.unlinkExpertiseAndMakeEditable(parentExpertise.getId(), true,false);
 
-            parentExpertise.setEditable(true);
+            parentExpertise.setHistory(true);
         }
         expertise.setDeleted(true);
         if (Optional.ofNullable(expertise.getSeniorityLevel()).isPresent() && !expertise.getSeniorityLevel().isEmpty()) {
