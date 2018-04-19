@@ -91,7 +91,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
 
     @Query("MATCH (expertise:Expertise)-[rel:" + VERSION_OF + "]-(parentExpertise:Expertise) where id(expertise)={0} \n" +
-            " set expertise.endDateMillis={1} set expertise.hasDraftCopy=false set expertise.published=true set expertise.history=false ")
+            " set expertise.endDateMillis={1} set expertise.hasDraftCopy=false set expertise.published=true set expertise.history=true ")
     void setEndDateToExpertise(Long expertiseId, Long endDateMillis);
 
 
@@ -149,7 +149,13 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels order by expertise.creationDate")
     List<ExpertiseQueryResult> getAllExpertiseByCountryId(Long countryId);
 
-    @Query("MATCH (expertise:Expertise)-[rel:" + VERSION_OF + "]-(childExpertise:Expertise) where id(expertise)={0} \n" +
+    @Query("MATCH (expertise:Expertise) where id(expertise)={0} \n" +
             " set expertise.hasDraftCopy=false set expertise.published=true set expertise.history=false ")
     void unlinkExpertiseAndMakeEditable(Long expertiseId, boolean history, boolean hasDraftCopy);
+
+    @Query("match(expertise:Expertise{deleted:false,history:false})-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level) where id(level)={0} AND expertise.name={1}  AND id(expertise)<> {2}" +
+            "with count(expertise) as expertiseCount " +
+            "RETURN case when expertiseCount>0 THEN  true ELSE false END as response")
+    Boolean checkExpertiseNameUniqueInOrganizationLevel(Long organizationLevelId, String expertiseName,Long currentExpertise);
+
 }
