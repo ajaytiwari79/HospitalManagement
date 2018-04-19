@@ -10,10 +10,7 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -199,7 +196,12 @@ public class DateUtil {
         isoFormat.setLenient(false);
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = isoFormat.parse(dateReceived);
-        return date.getTime();
+        if(Optional.ofNullable(date).isPresent()) {
+            return date.getTime();
+        }
+        else {
+            return null;
+        }
     }
 
 
