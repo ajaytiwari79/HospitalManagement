@@ -187,7 +187,7 @@ public class StaffingLevelService extends MongoBaseService {
         BeanUtils.copyProperties(staffingLevel, staffingLevelDTO);
         staffingLevelDTO.setStaffingLevelInterval(staffingLevelDTO.getStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
-        plannerSyncService.publishStaffingLevel(unitId,staffingLevelDTO,IntegrationOperation.DELETE);
+        plannerSyncService.publishStaffingLevel(unitId,staffingLevelDTO,IntegrationOperation.UPDATE);
         return staffingLevelDTO;
     }
 
