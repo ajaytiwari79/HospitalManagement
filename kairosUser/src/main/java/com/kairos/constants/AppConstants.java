@@ -105,7 +105,7 @@ public class AppConstants {
     //development and production
     public static final String IMPORT_TIMECARE_SHIFTS_PATH = "/opt/infra/data-integration/GetAllWorkShiftsByWorkPlaceId.ktr";
 
-    //Absence planning
+    //Absence planner
     public static final String TASK_TYPE_MISSING_MESSAGE = "Please update taskType details of task just imported from TimeCare";
     public static final String STAFF_MISSING_MESSAGE = "Please update staff details of task just imported from TimeCare";
     public static final String TASK_TYPE_MISSING_STATUS = "Task Type Missing";

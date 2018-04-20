@@ -458,7 +458,7 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get Organization Clients with min details")
-    @RequestMapping(value = "/unit/{unitId}/client/planning", method = RequestMethod.GET)
+    @RequestMapping(value = "/unit/{unitId}/client/planner", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationClientsWithPlanning(@PathVariable Long organizationId, @PathVariable Long unitId) {
 
@@ -1289,6 +1289,14 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getEmploymentTypeWithExpertise(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getEmploymentTypeWithExpertise(unitId));
+    }
+
+    @RequestMapping(value = UNIT_URL + "/time_zone", method = RequestMethod.GET)
+    //@ApiOperation("Get Time Zone Organization")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getTimeZoneOfUnit(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getTimeZoneStringOfUnit(unitId));
     }
 }
 

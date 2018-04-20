@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,9 +19,9 @@ import java.util.Set;
 public class SeniorityLevelDTO {
     private Long id;
     private Long parentId;
+    @Min(value = 0,message = "can't be less than 0")
     private Integer from;
     private Integer to;
-    private Integer moreThan;
     private List<FunctionsDTO> functions;
     @NotNull(message = "PayGradeId  can not be null")
     private Long payGradeId;  // this is payGrade Id which is coming from payTable
@@ -75,13 +76,6 @@ public class SeniorityLevelDTO {
         this.to = to;
     }
 
-    public Integer getMoreThan() {
-        return moreThan;
-    }
-
-    public void setMoreThan(Integer moreThan) {
-        this.moreThan = moreThan;
-    }
 
     public List<FunctionsDTO> getFunctions() {
         return functions;
@@ -132,18 +126,10 @@ public class SeniorityLevelDTO {
         this.freeChoiceToPension = freeChoiceToPension;
     }
 
-    public SeniorityLevelDTO(Integer moreThan, Long payGradeId, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension) {
-        this.moreThan = moreThan;
-        this.payGradeId = payGradeId;
-        this.pensionPercentage = pensionPercentage;
-        this.freeChoicePercentage = freeChoicePercentage;
-        this.freeChoiceToPension = freeChoiceToPension;
-    }
-
 
     @AssertTrue(message = "Incorrect Data")
     public boolean isValid() {
-        if (!Optional.ofNullable(this.moreThan).isPresent()) {
+
             if (!Optional.ofNullable(this.from).isPresent()) {
                 return false;
             }
@@ -151,7 +137,7 @@ public class SeniorityLevelDTO {
                 if (this.to < this.from)
                     return false;
             }
-        }
+
         return true;
     }
 }

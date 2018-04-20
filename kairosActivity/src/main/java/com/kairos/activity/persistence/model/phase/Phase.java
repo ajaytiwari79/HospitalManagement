@@ -1,9 +1,8 @@
 package com.kairos.activity.persistence.model.phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-import com.kairos.activity.service.phase.DurationType;
+import com.kairos.persistence.model.enums.DurationType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.mongodb.core.index.Indexed;

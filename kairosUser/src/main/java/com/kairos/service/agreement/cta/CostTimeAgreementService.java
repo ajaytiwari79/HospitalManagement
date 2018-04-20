@@ -10,8 +10,9 @@ import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.model.user.country.Currency;
+import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
@@ -28,6 +29,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.response.dto.web.cta.CTARuleTemplateCategoryWrapper;
 import com.kairos.response.dto.web.cta.CollectiveTimeAgreementDTO;
+import com.kairos.response.dto.web.cta.CostTimeAgreementDTO;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.auth.UserService;
@@ -837,5 +839,32 @@ public class CostTimeAgreementService extends UserBaseService {
         collectiveTimeAgreementGraphRepository.linkUnitCTAToOrganization(costTimeAgreement.getId(),unitId);
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         return collectiveTimeAgreementDTO;
+    }
+
+    public List<CTAResponseDTO> getAllCTAByOrganizationSubType(Long organizationSubTypeId){
+        return collectiveTimeAgreementGraphRepository.getAllCTAByOrganiationSubType(organizationSubTypeId);
+    }
+
+    public CollectiveTimeAgreementDTO setCTAWithOrganizationType(Long countryId, long ctaId,CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, long organizationSubTypeId, boolean checked) throws ExecutionException, InterruptedException {
+        OrganizationType organizationSubType = organizationTypeRepository.findOne(organizationSubTypeId);
+        if (!Optional.ofNullable(organizationSubType).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid organisation Sub type Id " + organizationSubTypeId);
+        }
+        if (checked) {
+            Integer lastSuffixNumber=collectiveTimeAgreementGraphRepository.getLastSuffixNumberOfCTAName("(?i)"+collectiveTimeAgreementDTO.getName());
+            String name=collectiveTimeAgreementDTO.getName();
+            collectiveTimeAgreementDTO.setName(name.contains("-")?name.replace(name.substring(name.lastIndexOf("-")+1,name.length()),(++lastSuffixNumber).toString()):collectiveTimeAgreementDTO.getName()+"-"+ ++lastSuffixNumber);
+            collectiveTimeAgreementDTO.setOrganizationSubType(organizationSubTypeId);
+            return createCostTimeAgreement(countryId,collectiveTimeAgreementDTO);
+        } else {
+            Optional<CostTimeAgreement> cta = collectiveTimeAgreementGraphRepository.findById(ctaId);
+            if (!cta.isPresent()) {
+                throw new DataNotFoundByIdException("cta not found " + ctaId);
+            }
+            CostTimeAgreement costTimeAgreement=cta.get();
+            costTimeAgreement.setDeleted(true);
+            save(costTimeAgreement);
+        }
+        return null;
     }
 }

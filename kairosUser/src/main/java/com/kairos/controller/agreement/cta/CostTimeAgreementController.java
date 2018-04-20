@@ -14,9 +14,7 @@ import javax.validation.Valid;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-import static com.kairos.constants.ApiConstants.API_ORGANIZATION_URL;
-import static com.kairos.constants.ApiConstants.UNIT_URL;
+import static com.kairos.constants.ApiConstants.*;
 
 @RequestMapping(API_ORGANIZATION_URL)
 @RestController
@@ -114,6 +112,18 @@ public class CostTimeAgreementController {
             , @RequestBody @Valid CollectiveTimeAgreementDTO collectiveTimeAgreementDTO ) throws ExecutionException, InterruptedException {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 costTimeAgreementService.createCopyOfUnitCTA(unitId,collectiveTimeAgreementDTO));
+    }
+
+    @ApiOperation(value = "Get CTA by Organization sub type  by using sub type Id")
+    @RequestMapping(value = COUNTRY_URL + "/cta/organization_sub_type/{organizationSubTypeId}", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getAllCTAByOrganizationSubType(@PathVariable long organizationSubTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.getAllCTAByOrganizationSubType(organizationSubTypeId));
+    }
+
+    @ApiOperation(value = "link and unlink cta with org sub-type")
+    @PutMapping(value = COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/cta/{ctaId}")
+    public ResponseEntity<Map<String, Object>> setCTAWithOrganizationType(@PathVariable long countryId, @PathVariable long ctaId, @RequestBody CollectiveTimeAgreementDTO collectiveTimeAgreementDTO, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked) throws ExecutionException, InterruptedException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, costTimeAgreementService.setCTAWithOrganizationType(countryId, ctaId,collectiveTimeAgreementDTO, organizationSubTypeId, checked));
     }
 
 }

@@ -1,7 +1,10 @@
 package com.kairos.activity.util;
 
+import com.kairos.activity.custom_exception.InvalidRequestException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -375,6 +378,16 @@ public class DateUtils {
         return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),0,0);
     }
 
+    public static String getDateStringByTimeZone(Date date,ZoneId zoneId, String dateFormatString){
+        try {
+            DateTime dateTime = new DateTime(date).withZone(DateTimeZone.forID(zoneId.getId()));
+            DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormatString);
+            return dateTime.toString(formatter);
+        } catch (Exception e){
+            throw new InvalidRequestException(e.getMessage());
+        }
+    }
+
     public static Date convertUTCTOTimeZone(Date date,  TimeZone toTimeZone)
     {
         TimeZone fromTimeZone = TimeZone.getTimeZone("UTC");
@@ -395,9 +408,7 @@ public class DateUtils {
         return timeZone.getRawOffset() + timeZoneDSTOffset;
     }
 
-
     public static Date getDateByLocalDateAndLocalTime(LocalDate localDate,LocalTime localTime){
         return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),localTime.getHour(),localTime.getMinute()).toDate();
     }
-
 }
