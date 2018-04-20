@@ -366,6 +366,7 @@ public class DateUtils {
         return Instant.ofEpochMilli(date.toDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
+
     public static Long getDifferenceBetweenDatesInMinute(Date startDate, Date endDate) {
         return ((endDate.getTime() - startDate.getTime()) / (1000 * 60));
     }

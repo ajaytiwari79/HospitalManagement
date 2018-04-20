@@ -165,7 +165,7 @@ public class AppConstants {
 
     public static final String WEEK = "Week";
     public static final String MINUTES = "MINUTES";
-    public static final String PERCENTAGE = "PERCENTAGE";
+    public static final String PERCENT = "PERCENT";
     public static final String DAILY = "daily";
     public static final String ANNUALLY = "annually";
     public static final String QUATERLY = "quaterly";
@@ -212,7 +212,7 @@ public class AppConstants {
     public static final String FULL_DAY_CALCULATION = "FULL_DAY";
     public static final String ENTERED_MANUALLY = "ENTERED_MANUALLY";
     public static final String FULL_WEEK = "FULL_WEEK";
-    public static final String TIMEBANK_ACCOUNT = "TimeBank Account";
+    public static final String TIMEBANK_ACCOUNT = "TIMEBANK_ACCOUNT";
 
     //TimeCare date importing constants
     public static final String CalculatedTime = "ENTERED_TIMES";

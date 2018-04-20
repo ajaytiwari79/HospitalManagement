@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TimeTypeService extends MongoBaseService {
@@ -39,6 +41,11 @@ public class TimeTypeService extends MongoBaseService {
                         timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
                     }
                     timeType = save(timeType);
+                    if(timeTypeDTO.getUpperLevelTimeTypeId() != null){
+                        TimeType parentTimeType = timeTypeMongoRepository.findOne(timeTypeDTO.getUpperLevelTimeTypeId());
+                        parentTimeType.getChildTimeTypeIds().add(timeType.getId());
+                        save(parentTimeType);
+                    }
                     timeTypeDTO.setId(timeType.getId());
                 } else {
                     throw new DuplicateDataException("Name already Exists");
@@ -135,24 +142,22 @@ public class TimeTypeService extends MongoBaseService {
     }
 
 
-    public List<TimeTypeDTO> getAllParentTimeTypeByTimeTypeId(BigInteger timeTypeId, Long countryId) {
-        TimeType timeType = timeTypeMongoRepository.findOneById(timeTypeId, countryId);
+    public List<BigInteger> getAllParentTimeTypeByTimeTypeId(List<BigInteger> timeTypeIds, Long countryId) {
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByCountryId(countryId);
-        TimeTypeDTO timeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription());
-        BigInteger upperLevelTimeTypeId = timeType.getUpperLevelTimeTypeId();
-        List<TimeTypeDTO> timeTypeDTOS = new ArrayList<>();
-        while (upperLevelTimeTypeId != null) {
-            for (TimeType type : timeTypes) {
-                if (type.getId().equals(upperLevelTimeTypeId)) {
-                    TimeTypeDTO parentTimeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription());
-                    timeTypeDTOS.add(parentTimeTypeDTO);
-                    upperLevelTimeTypeId = parentTimeTypeDTO.getUpperLevelTimeTypeId();
-                    break;
+        Set<BigInteger> timeTypeIdsWithChildrens = new HashSet<>();
+        timeTypeIds.forEach(tt->{
+            timeTypes.forEach(timeType -> {
+                if(timeTypeIds.contains(timeType.getId())){
+                    timeTypeIdsWithChildrens.addAll(timeType.getChildTimeTypeIds());
+                    if(timeType.getChildTimeTypeIds().contains(timeType.getId())){
+                        timeTypeIdsWithChildrens.addAll(timeType.getChildTimeTypeIds());
+                    }
                 }
-            }
+            });
 
-        }
-        return timeTypeDTOS;
+        });
+        timeTypeIdsWithChildrens.addAll(timeTypeIds);
+        return new ArrayList<>(timeTypeIdsWithChildrens);
     }
 
     public boolean deleteTimeType(BigInteger timeTypeId, Long countryId) {
