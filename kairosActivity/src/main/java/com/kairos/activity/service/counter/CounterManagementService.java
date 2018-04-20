@@ -96,7 +96,7 @@ public class CounterManagementService extends MongoBaseService{
         for(ModulewiseCounterGroupingDTO moduleCountersData : modulesCounterMapping){
             Map<BigInteger, BigInteger> counterIdMap = moduleLevelCountersIdMap.get(moduleCountersData.getModuleId());
             ManipulatableCounterIdsDTO counterIdsToModify = getCounterIdsToAddAndUpdate(counterIdMap, moduleCountersData.getCounterIds());
-            removeModulewiseCounters(counterIdsToModify.getCounterIdsToRemove(), moduleCountersData.getModuleId());
+            removeModulewiseCounters(counterIdsToModify.getCounterIdsToRemove(), moduleCountersData.getModuleId(), countryId);
             storeModulewiseCounters(countryId, moduleCountersData.getModuleId(), counterIdsToModify.getCounterIdsToAdd());
         }
     }
@@ -135,12 +135,11 @@ public class CounterManagementService extends MongoBaseService{
         return moduleLevelCountersIdMap;
     }
 
-    private void removeModulewiseCounters(List<BigInteger> modulewiseCounterIds, String moduleId){
+    private void removeModulewiseCounters(List<BigInteger> refCounterIds, String moduleId, BigInteger countryId){
         //TODO:
-        //identify unitlevel ids
-        //identify individual level ids
-        //identify individual level default views
-
+        List<BigInteger> moduleWiseCountersIds = counterRepository.getModuleWiseCountersIds(refCounterIds, moduleId, countryId);
+        counterRepository.removeAll("refCounterId", moduleWiseCountersIds, UnitRoleWiseCounter.class);
+        counterRepository.removeAll("_id", moduleWiseCountersIds, ModuleWiseCounter.class);
     }
 
     ////////////////////////////////////////////////////////
@@ -176,6 +175,7 @@ public class CounterManagementService extends MongoBaseService{
 
     public void removeRolewiseCounterForUnit(BigInteger roleId, List<BigInteger> counterRefsToRemove){
         //TODO: removal of counters
+        counterRepository.removeRoleWiseCounters(roleId, counterRefsToRemove);
     }
 
     public void addRolewiseCounterRefsForUnit(BigInteger unitId, BigInteger roleId, List<BigInteger> countersRefToAdd){
@@ -224,7 +224,7 @@ public class CounterManagementService extends MongoBaseService{
         return initialCountersDetailsDTO;
     }
 
-    public InitialCountersDetailsDTO getInitialCounterDataForUser(String moduleId, BigInteger staffId, BigInteger unitId, BigInteger roleId){
+    public InitialCountersDetailsDTO getInitialCounterDataForStaff(String moduleId, BigInteger staffId, BigInteger unitId, BigInteger roleId){
         InitialCountersDetailsDTO initialCountersDetailsDTO = new InitialCountersDetailsDTO();
         initialCountersDetailsDTO.setCounterDefs(counterRepository.getRolewiseCounterTypeDetails(roleId, unitId, moduleId));
         initialCountersDetailsDTO.setOrderedList(counterRepository.getOrderedCountersListForUser(unitId, staffId, moduleId));
@@ -232,14 +232,6 @@ public class CounterManagementService extends MongoBaseService{
             setupInitialConfigurationForStaff(); //TODO
         initialCountersDetailsDTO.setOrderedList(counterRepository.getOrderedCountersListForUser(unitId, staffId, moduleId));
         return initialCountersDetailsDTO;
-    }
-
-    public InitialCountersDetailsDTO getCountersListAndDefinitionMapping() {
-        //list of counterIds, with mapping to definition
-        //countryAdmin is binded with modulewiseDistribution for settings
-        //unitAdmin is binded with modulewiseDistribution for settings
-        List<CounterOrderDTO> tabwiseOrder = new ArrayList<>();
-        return null;
     }
 
     public void updateCountersOrderForTab(){
