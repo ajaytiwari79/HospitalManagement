@@ -100,7 +100,7 @@ public class Staff extends UserBaseEntity {
     @DateLong
     private Date dateOfBirth;
     private String careOfName;
-    private int age;
+    private Integer age;
     private Gender gender;
 
 
@@ -496,8 +496,8 @@ public class Staff extends UserBaseEntity {
         this.secondaryContactAddress = secondaryContactAddress;
     }
 
-    public int getAge() {
-        this.age = this.cprNumber != null ? Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears() : 0;
+    public Integer getAge() {
+        this.age = this.cprNumber != null ? Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears() : null;
         return age;
     }
 

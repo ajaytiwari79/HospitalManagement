@@ -35,7 +35,7 @@ public class StaffPersonalDetailDTO {
     private String city;
     private String province;
     private Boolean unitPosition;
-    private int age;
+    private Integer age;
 
     public long getId() {
         return id;
@@ -221,8 +221,8 @@ public class StaffPersonalDetailDTO {
         this.unitPosition = unitPosition;
     }
 
-    public int getAge() {
-        this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():0;
+    public Integer getAge() {
+        this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():null;
         return age;
     }
 }
