@@ -9,20 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.cassandra.config.CassandraClusterFactoryBean;
-import org.springframework.data.cassandra.config.CassandraEntityClassScanner;
-import org.springframework.data.cassandra.config.CassandraSessionFactoryBean;
-import org.springframework.data.cassandra.config.SchemaAction;
-import org.springframework.data.cassandra.config.java.AbstractCassandraConfiguration;
-import org.springframework.data.cassandra.convert.CassandraConverter;
-import org.springframework.data.cassandra.convert.CustomConversions;
-import org.springframework.data.cassandra.convert.MappingCassandraConverter;
+import org.springframework.data.cassandra.config.*;
 import org.springframework.data.cassandra.core.CassandraAdminOperations;
 import org.springframework.data.cassandra.core.CassandraAdminTemplate;
-import org.springframework.data.cassandra.mapping.BasicCassandraMappingContext;
-import org.springframework.data.cassandra.mapping.CassandraMappingContext;
-import org.springframework.data.cassandra.mapping.SimpleUserTypeResolver;
+import org.springframework.data.cassandra.core.convert.CassandraConverter;
+import org.springframework.data.cassandra.core.convert.MappingCassandraConverter;
+import org.springframework.data.cassandra.core.mapping.BasicCassandraMappingContext;
+import org.springframework.data.cassandra.core.mapping.CassandraMappingContext;
+import org.springframework.data.cassandra.core.mapping.SimpleUserTypeResolver;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
+import org.springframework.data.convert.CustomConversions;
 
 
 @PropertySource(value = { "classpath:cassandra.properties" })
@@ -46,14 +42,15 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 
     @Bean
     @Override
-    public CassandraMappingContext cassandraMapping() throws ClassNotFoundException {
+    public CassandraMappingContext cassandraMapping() {
 
-        BasicCassandraMappingContext mappingContext = new BasicCassandraMappingContext();
+        /*BasicCassandraMappingContext mappingContext = new BasicCassandraMappingContext();
 
-        mappingContext.setBeanClassLoader(beanClassLoader);
-        mappingContext.setInitialEntitySet(CassandraEntityClassScanner.scan(getEntityBasePackages()));
+        mappingContext.setBeanClassLoader(getb);
+        mappingContext.setInitialEntitySet(CassandraEntityClassScanner.scan(getEntityBasePackages()));*/
 
         CustomConversions customConversions = customConversions();
+        CassandraMappingContext mappingContext= cassandraMapping();
 
         mappingContext.setCustomConversions(customConversions);
         mappingContext.setSimpleTypeHolder(customConversions.getSimpleTypeHolder());
@@ -64,7 +61,7 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 
     @Bean
     @Override
-    public CassandraConverter cassandraConverter() throws ClassNotFoundException {
+    public CassandraConverter cassandraConverter() {
 
         MappingCassandraConverter mappingCassandraConverter = new MappingCassandraConverter(cassandraMapping());
 
@@ -76,7 +73,7 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 
     @Bean
     @Override
-    public CassandraSessionFactoryBean session() throws ClassNotFoundException {
+    public CassandraSessionFactoryBean session() {
 
         CassandraSessionFactoryBean session = new CassandraSessionFactoryBean();
         session.setCluster(cluster().getObject());

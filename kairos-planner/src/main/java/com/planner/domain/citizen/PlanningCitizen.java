@@ -1,7 +1,7 @@
 package com.planner.domain.citizen;
 
 import com.planner.domain.common.BaseEntity;
-import org.springframework.data.cassandra.mapping.Table;
+import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.List;
 

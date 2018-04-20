@@ -9,8 +9,8 @@ import com.planner.domain.common.BaseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cassandra.core.keyspace.AlterTableSpecification;
 import org.springframework.data.cassandra.core.CassandraTemplate;
+import org.springframework.data.cassandra.core.cql.keyspace.AlterTableSpecification;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -25,11 +25,11 @@ public class BaseRepository {
     CassandraTemplate cassandraTemplate;
 
     public <T> T findById(String id, Class class_Name) {
-        return (T)cassandraTemplate.selectOneById(class_Name, id);
+        return (T)cassandraTemplate.selectOneById(id, class_Name);
     }
 
     public Object findByIds(List<String> ids, Class class_Name) {
-        return cassandraTemplate.selectBySimpleIds(class_Name, ids);
+        return null;//cassandraTemplate.selectBySimpleIds(class_Name, ids);
     }
 
     public <T> List getAll(Class class_Name){
@@ -79,11 +79,11 @@ public class BaseRepository {
         } else {
             entity.setUpdatedDate(new Date());
         }
-        return cassandraTemplate.insert(entity);
+        return null;//cassandraTemplate.insert(entity);
     }
 
     public boolean save(Object object, Class class_Name) {
-        return cassandraTemplate.exists(class_Name, object);
+        return cassandraTemplate.exists(object,class_Name);
     }
 
     public <T extends BaseEntity> List<T> saveList(List<T> entities) {
@@ -99,7 +99,7 @@ public class BaseRepository {
                 }
                 save(entity);
             }
-            return cassandraTemplate.insert(entities);
+            return null;//cassandraTemplate.insert(entities);
         }
         else {
             return saveListByPagination(entities);
@@ -125,14 +125,14 @@ public class BaseRepository {
 
     public void addColumnInTable(DataType type, String columnName) {
         log.info("column " + columnName + " created Successfully");
-        AlterTableSpecification alterTableSpecification = new AlterTableSpecification();
+        /*AlterTableSpecification alterTableSpecification = new AlterTableSpecification();
         alterTableSpecification.add(columnName, type);
-        cassandraTemplate.execute(alterTableSpecification);
+        cassandraTemplate.execute(alterTableSpecification);*/
     }
 
     public void deleteById(Object id, Class class_Name) {
         log.info("Object id" + id + " Successfully " + class_Name);
-        cassandraTemplate.deleteById(class_Name, id);
+        cassandraTemplate.deleteById(id,class_Name);
     }
 
     public void deleteByObject(Object object) {
@@ -147,7 +147,7 @@ public class BaseRepository {
 
     public void delete(Update query) {
         log.info("delete by query " + query);
-        cassandraTemplate.execute(query);
+        //cassandraTemplate.execute(query);
     }
 
     public void update(Object object) {
@@ -162,12 +162,12 @@ public class BaseRepository {
 
     public void update(Update query) {
         log.info("update by query " + query);
-        cassandraTemplate.execute(query);
+        //cassandraTemplate.execute(query);
     }
 
     public List findAll(Class class_Name) {
         log.info("find All Successfully " + class_Name);
-        return cassandraTemplate.selectAll(class_Name);
+        return null;//cassandraTemplate.selectAll(class_Name);
     }
 
     public List findAllByQuery(Select select, Class class_Name) {

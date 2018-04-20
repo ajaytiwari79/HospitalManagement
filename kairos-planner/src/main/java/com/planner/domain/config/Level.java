@@ -2,7 +2,7 @@ package com.planner.domain.config;
 
 
 import com.planner.domain.common.BaseEntity;
-import org.springframework.data.cassandra.mapping.Table;
+import org.springframework.data.cassandra.core.mapping.Table;
 
 @Table
 public class Level extends BaseEntity{

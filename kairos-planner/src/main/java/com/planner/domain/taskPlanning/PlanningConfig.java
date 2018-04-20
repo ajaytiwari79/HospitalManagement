@@ -2,7 +2,7 @@ package com.planner.domain.taskPlanning;
 
 import com.planner.domain.common.BaseEntity;
 import com.planner.enums.ContraintType;
-import org.springframework.data.cassandra.mapping.Table;
+import org.springframework.data.cassandra.core.mapping.Table;
 
 @Table
 public class PlanningConfig extends BaseEntity{

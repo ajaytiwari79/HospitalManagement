@@ -1,6 +1,6 @@
 package com.planner.domain.common;
 
-import org.springframework.data.cassandra.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 
 import java.util.Date;
 

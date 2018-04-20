@@ -1,8 +1,7 @@
 package com.planner.domain.common;
 
 
-import org.springframework.data.cassandra.mapping.PrimaryKey;
-
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 
 public class TableIds {
 
