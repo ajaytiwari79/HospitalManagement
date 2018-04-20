@@ -382,8 +382,9 @@ public class UserService extends UserBaseService {
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
 
 
-        List<AccessPageQueryResult> mainModulePermissions = (organization.isKairosHub() || isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
-                accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
+        List<AccessPageQueryResult> mainModulePermissions = accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
+                //(organization.isKairosHub() || isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
+                //accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
         Set<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
         // USER HAS NO main module permission check his permission in current unit only via parent employment id
         Organization parentOrganization = (organization.isParentOrganization()) ? organization : organizationGraphRepository.getParentOfOrganization(organization.getId());
@@ -398,11 +399,12 @@ public class UserService extends UserBaseService {
         Map<String, Object> unitPermissionMap;
         for (Organization unit : units) {
             List<AccessPageQueryResult> accessPageQueryResults;
-            if (organization.isKairosHub() || isCountryAdmin) {
+            /*if (organization.isKairosHub() || isCountryAdmin) {
                 accessPageQueryResults = accessPageRepository.getTabsPermissionForHubMember();
             } else {
                 accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId,parentOrganization.getId());
-            }
+            }*/
+            accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId,parentOrganization.getId());
             unitPermissionMap = new HashMap<>();
             unitPermissionMap.put("id", unit.getId());
             unitPermissionMap.put("permissions", getUnionOfPermissions(accessPageQueryResults));
