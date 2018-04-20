@@ -156,6 +156,12 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("match(expertise:Expertise{deleted:false,history:false})-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level) where id(level)={0} AND expertise.name={1}  AND id(expertise)<> {2}" +
             "with count(expertise) as expertiseCount " +
             "RETURN case when expertiseCount>0 THEN  true ELSE false END as response")
-    Boolean checkExpertiseNameUniqueInOrganizationLevel(Long organizationLevelId, String expertiseName,Long currentExpertise);
+    Boolean checkExpertiseNameUniqueInOrganizationLevel(Long organizationLevelId, String expertiseName, Long currentExpertise);
+
+    @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0}" +
+            "match(expertise)-[:" + SUPPORTS_SERVICE + "]-(orgService:OrganizationService) where id(orgService) IN {1}\n" +
+            "return expertise order by expertise.creationDate")
+    List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds);
+
 
 }

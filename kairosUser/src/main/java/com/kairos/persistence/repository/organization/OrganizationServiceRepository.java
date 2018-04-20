@@ -67,4 +67,7 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     @Query("MATCH (os:OrganizationService{imported:false})-[r:"+LINK_WITH_EXTERNAL_SERVICE+"]->(es:OrganizationService{hasMapped:true}) where id(es)={0}  delete r ")
     OrganizationExternalServiceRelationship removeOrganizationExternalServiceRelationship(Long organizationId);
 
+    @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}" +
+            "  return id(os)")
+    List<Long> getOrganizationServiceIdsByOrganizationId(Long organizationId);
 }
