@@ -145,7 +145,7 @@ public class TimeTypeService extends MongoBaseService {
     public List<BigInteger> getAllParentTimeTypeByTimeTypeId(List<BigInteger> timeTypeIds, Long countryId) {
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByCountryId(countryId);
         Set<BigInteger> timeTypeIdsWithChildrens = new HashSet<>();
-        timeTypeIds.forEach(tt->{
+      /*  timeTypeIds.forEach(tt->{
             timeTypes.forEach(timeType -> {
                 if(timeTypeIds.contains(timeType.getId())){
                     timeTypeIdsWithChildrens.addAll(timeType.getChildTimeTypeIds());
@@ -155,7 +155,7 @@ public class TimeTypeService extends MongoBaseService {
                 }
             });
 
-        });
+        });*/
         timeTypeIdsWithChildrens.addAll(timeTypeIds);
         return new ArrayList<>(timeTypeIdsWithChildrens);
     }

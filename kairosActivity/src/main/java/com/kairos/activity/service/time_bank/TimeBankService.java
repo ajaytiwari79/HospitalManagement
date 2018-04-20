@@ -191,12 +191,12 @@ public class TimeBankService extends MongoBaseService {
 
     public UnitPositionWithCtaDetailsDTO getCostTimeAgreement(Long unitPositionId) {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
-        for (CTARuleTemplateCalulatedTimeBankDTO ctaRuleTemplateCalulatedTimeBankDTO : unitPositionWithCtaDetailsDTO.getCtaRuleTemplates()) {
+       /* for (CTARuleTemplateCalulatedTimeBankDTO ctaRuleTemplateCalulatedTimeBankDTO : unitPositionWithCtaDetailsDTO.getCtaRuleTemplates()) {
             if (ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds() != null && !ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds().isEmpty()) {
                 List<BigInteger> timeTypeIds = timeTypeService.getAllParentTimeTypeByTimeTypeId(ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds(), unitPositionWithCtaDetailsDTO.getCountryId());
-                ctaRuleTemplateCalulatedTimeBankDTO.setTimeTypeIdsWithParentTimeType(timeTypeIds);
+                ctaRuleTemplateCalulatedTimeBankDTO.setTimeTypeIdsWithParentTimeType(ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds());
             }
-        }
+        }*/
         return unitPositionWithCtaDetailsDTO;
     }
 

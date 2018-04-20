@@ -662,28 +662,28 @@ public class UnitPositionService extends UserBaseService {
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ctaListQueryResult.getRuleTemplates().size());
         List<CTARuleTemplateQueryResult> ruleTemplateQueryResults = getObjects(ctaListQueryResult.getRuleTemplates(), new TypeReference<List<CTARuleTemplateQueryResult>>() {
         });
-        ruleTemplateQueryResults.forEach(rt -> {
+        ruleTemplateQueryResults.forEach(ruleTemplateQueryResult -> {
             CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO();
-            ctaRuleTemplateDTO.setGranularity((int) rt.getCompensationTable().get("granularityLevel"));
-            ctaRuleTemplateDTO.setActivityIds(rt.getActivityIds().stream().map(ac -> new BigInteger(ac.toString())).collect(Collectors.toList()));
-            ctaRuleTemplateDTO.setName(rt.getName());
-            ctaRuleTemplateDTO.setId(rt.getId());
-            if(rt.getDayTypeIds()!=null && !rt.getDayTypeIds().isEmpty()) {
-                List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(rt.getDayTypeIds());
+            ctaRuleTemplateDTO.setGranularity((int) ruleTemplateQueryResult.getCompensationTable().get("granularityLevel"));
+            ctaRuleTemplateDTO.setActivityIds(ruleTemplateQueryResult.getActivityIds().stream().map(ac -> new BigInteger(ac.toString())).collect(Collectors.toList()));
+            ctaRuleTemplateDTO.setName(ruleTemplateQueryResult.getName());
+            ctaRuleTemplateDTO.setId(ruleTemplateQueryResult.getId());
+            if(ruleTemplateQueryResult.getDayTypeIds()!=null && !ruleTemplateQueryResult.getDayTypeIds().isEmpty()) {
+                List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(ruleTemplateQueryResult.getDayTypeIds());
                 ctaRuleTemplateDTO.setDays(dayTypes.stream().flatMap(dt -> dt.getValidDays().stream().map(day -> DayOfWeek.valueOf(day.name()).getValue())).collect(Collectors.toList()));
             }
-            ctaRuleTemplateDTO.setTimeTypeIds(rt.getTimeTypeIds() != null ? rt.getTimeTypeIds().stream().map(t -> new BigInteger(t.toString())).collect(Collectors.toList()) : null);
+            ctaRuleTemplateDTO.setTimeTypeIds(ruleTemplateQueryResult.getTimeTypeIds() != null ? ruleTemplateQueryResult.getTimeTypeIds().stream().map(t -> new BigInteger(t.toString())).collect(Collectors.toList()) : null);
             //ctaRuleTemplateDTO.setPublicHolidays();
 
-            ctaRuleTemplateDTO.setPlannedTimeIds(rt.getPlannedTimeIds());
+            ctaRuleTemplateDTO.setPlannedTimeIds(ruleTemplateQueryResult.getPlannedTimeIds());
 
-            ctaRuleTemplateDTO.setCtaIntervalDTOS(getCtaInterval((List<CompensationTableInterval>) rt.getCompensationTable().get("compensationTableInterval")));
+            ctaRuleTemplateDTO.setCtaIntervalDTOS(getCtaInterval((List<CompensationTableInterval>) ruleTemplateQueryResult.getCompensationTable().get("compensationTableInterval")));
 
 
-            ctaRuleTemplateDTO.setCalculateScheduledHours(rt.isCalculateScheduledHours());
-            ctaRuleTemplateDTO.setEmploymentTypes(rt.getEmploymentTypes());
-            if (rt.getPlannedTimeWithFactor().getAccountType() != null) {
-                ctaRuleTemplateDTO.setAccountType(rt.getPlannedTimeWithFactor().getAccountType().name());
+            ctaRuleTemplateDTO.setCalculateScheduledHours(ruleTemplateQueryResult.isCalculateScheduledHours());
+            ctaRuleTemplateDTO.setEmploymentTypes(ruleTemplateQueryResult.getEmploymentTypes());
+            if (ruleTemplateQueryResult.getPlannedTimeWithFactor().getAccountType() != null) {
+                ctaRuleTemplateDTO.setAccountType(ruleTemplateQueryResult.getPlannedTimeWithFactor().getAccountType().name());
             }
             ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
         });
