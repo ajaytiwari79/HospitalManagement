@@ -870,10 +870,10 @@ public class ActivityService extends MongoBaseService {
             case FIXED_TIME_FOR_TIMECARE:
                 calculationType = FIXED_TIME;
                 break;
-            case FULL_TIME_HOUR:
+            case WEEKLY_WORK_TIME:
                 calculationType = FULL_DAY_CALCULATION;
                 break;
-            case WEEKLY_WORK_TIME:
+            case FULL_TIME_HOUR:
                 calculationType = WEEKLY_HOURS;
                 break;
             case CALCULATED_TIME:
