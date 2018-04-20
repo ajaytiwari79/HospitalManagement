@@ -413,11 +413,8 @@ public class OrganizationService extends UserBaseService {
 
         Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
         if (geographyData == null) {
-            logger.info("Geography  not found with zipcodeId: " + zipCode.getId());
             throw new InternalError("Geography data not found with provided municipality");
         }
-        logger.info("Geography Data: " + geographyData);
-
 
         if (Optional.ofNullable(orgDetails.getTypeId()).isPresent() && orgDetails.getTypeId().size() > 0 && Optional.ofNullable(orgDetails.getLevelId()).isPresent()) {
             Level level = organizationTypeGraphRepository.getLevel(orgDetails.getTypeId().get(0), orgDetails.getLevelId());
@@ -464,7 +461,6 @@ public class OrganizationService extends UserBaseService {
 
         // Verify Address here
         if (addressDTO.isVerifiedByGoogleMap()) {
-            logger.info("Google Map verified address received ");
             ZipCode zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
             if (zipCode == null) {
                 logger.info("ZipCode Not Found returning null");
@@ -478,11 +474,8 @@ public class OrganizationService extends UserBaseService {
 
             Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
             if (geographyData == null) {
-                logger.info("Geography  not found with zipcodeId: " + municipality.getId());
                 throw new InternalError("Geography data not found with provided municipality");
             }
-            logger.info("Geography Data: " + geographyData);
-
 
             // Geography Data
             contactAddress.setMunicipality(municipality);
@@ -502,7 +495,6 @@ public class OrganizationService extends UserBaseService {
             contactAddress.setCity(zipCode.getName());
             unit.setContactAddress(contactAddress);
         } else {
-            logger.info("Sending address to verify from TOM TOM server");
             // Send Address to verify
             Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO, unitId);
             if (tomtomResponse != null) {
@@ -515,7 +507,6 @@ public class OrganizationService extends UserBaseService {
 
                 ZipCode zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
                 if (zipCode == null) {
-                    logger.info("ZipCode Not Found returning null");
                     return null;
                 }
                 Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
@@ -524,11 +515,8 @@ public class OrganizationService extends UserBaseService {
                 }
                 Map<String, Object> geographyData = regionGraphRepository.getGeographicData(municipality.getId());
                 if (geographyData == null) {
-                    logger.info("Geography  not found with zipcodeId: " + municipality.getId());
                     throw new InternalError("Geography data not found with provided municipality");
                 }
-                logger.info("Geography Data: " + geographyData);
-
 
                 // Geography Data
                 contactAddress.setMunicipality(municipality);

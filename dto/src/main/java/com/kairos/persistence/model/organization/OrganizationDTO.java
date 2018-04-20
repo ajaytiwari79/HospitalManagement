@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.client.dto.organization.CompanyType;
+import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -30,6 +32,20 @@ public class OrganizationDTO {
     private boolean isOneTimeSyncPerformed;
     private LocalTime nightStartTime;
     private LocalTime nightEndTime;
+
+    private String desiredUrl;
+    private String shortCompanyName;
+    private Long companyCategoryId;
+    private Integer kairosCompanyId;
+    private CompanyType companyType;
+
+    private String vatId;
+
+    private boolean costCenter;
+    private Integer costCenterId;
+    private CompanyUnitType companyUnitType;
+
+
 
     public Long getId() {
         return id;
