@@ -830,11 +830,10 @@ public class UnitPositionService extends UserBaseService {
         Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
         employment.setEndDateMillis(endDateMillis);
         employmentGraphRepository.save(employment);
-        LocalDate curDate = DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString());
         if(DateUtil.getDateFromEpoch(endDateMillis).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0) {
             //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-            List<Long> empIds = Stream.of(employment.getId()).collect(Collectors.toList());
-            employmentService.moveToReadOnlyAccessGroup(empIds);
+            List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
+            employmentService.moveToReadOnlyAccessGroup(employmentIds);
         }
         User user = userGraphRepository.getUserByStaffId(staffId);
         EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
