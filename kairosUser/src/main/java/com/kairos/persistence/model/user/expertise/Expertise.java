@@ -26,7 +26,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
-public class Expertise extends UserBaseEntity{
+public class Expertise extends UserBaseEntity {
 
     @NotEmpty(message = "error.Expertise.name.notEmpty")
     @NotNull(message = "error.Expertise.name.notnull")
@@ -47,8 +47,10 @@ public class Expertise extends UserBaseEntity{
     private Date endDateMillis;
     @Relationship(type = IN_ORGANIZATION_LEVEL)
     private Level organizationLevel;
-    @Relationship(type = SUPPORTS_SERVICE)
-    private OrganizationService organizationService;
+
+    @Relationship(type = SUPPORTS_SERVICES)
+    private Set<OrganizationService> organizationServices;
+
     @Relationship(type = SUPPORTED_BY_UNION)
     private Organization union;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
@@ -76,7 +78,6 @@ public class Expertise extends UserBaseEntity{
     public void setDescription(String description) {
         this.description = description;
     }
-
 
 
     public Country getCountry() {
@@ -130,12 +131,12 @@ public class Expertise extends UserBaseEntity{
         this.organizationLevel = organizationLevel;
     }
 
-    public OrganizationService getOrganizationService() {
-        return organizationService;
+    public Set<OrganizationService> getOrganizationServices() {
+        return organizationServices;
     }
 
-    public void setOrganizationService(OrganizationService organizationService) {
-        this.organizationService = organizationService;
+    public void setOrganizationServices(Set<OrganizationService> organizationServices) {
+        this.organizationServices = organizationServices;
     }
 
     public Organization getUnion() {

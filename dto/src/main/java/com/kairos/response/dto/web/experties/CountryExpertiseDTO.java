@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by prerna on 14/11/17.
@@ -35,7 +36,7 @@ public class CountryExpertiseDTO {
     private Long organizationLevelId;
 
     @NotNull(message = "services can not be null")
-    private Long serviceId;
+    private Set<Long> organizationServiceIds;
 
     @NotNull(message = "union can not be null")
     private Long unionId;
@@ -125,12 +126,12 @@ public class CountryExpertiseDTO {
         this.organizationLevelId = organizationLevelId;
     }
 
-    public Long getServiceId() {
-        return serviceId;
+    public Set<Long> getOrganizationServiceIds() {
+        return organizationServiceIds;
     }
 
-    public void setServiceId(Long serviceId) {
-        this.serviceId = serviceId;
+    public void setOrganizationServiceIds(Set<Long> organizationServiceIds) {
+        this.organizationServiceIds = organizationServiceIds;
     }
 
     public Long getUnionId() {
@@ -179,13 +180,13 @@ public class CountryExpertiseDTO {
     }
 
 
-    public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Long serviceId, @NotNull(message = "union can not be null") Long unionId, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @NotNull(message = "Paid Out Frequency can not be null") PaidOutFrequencyEnum paidOutFrequency, @Valid SeniorityLevelDTO seniorityLevel) {
+    public CountryExpertiseDTO(@NotNull(message = "error.Expertise.name.notnull") String name, String description, @NotNull(message = "Start date can't be null") Date startDateMillis, Date endDateMillis, @NotNull(message = "Level can not be null") Long organizationLevelId, @NotNull(message = "services can not be null") Set<Long> serviceId, @NotNull(message = "union can not be null") Long unionId, Integer fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, @NotNull(message = "Paid Out Frequency can not be null") PaidOutFrequencyEnum paidOutFrequency, @Valid SeniorityLevelDTO seniorityLevel) {
         this.name = name;
         this.description = description;
         this.startDateMillis = startDateMillis;
         this.endDateMillis = endDateMillis;
         this.organizationLevelId = organizationLevelId;
-        this.serviceId = serviceId;
+        this.organizationServiceIds = serviceId;
         this.unionId = unionId;
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
