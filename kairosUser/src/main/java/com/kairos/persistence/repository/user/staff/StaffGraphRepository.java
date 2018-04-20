@@ -297,7 +297,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "MATCH (staff)-[:BELONGS_TO]->(user:User) with user, staff\n" +
             "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)\n" +
             "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType,contactAddress, staff, user\n" +
-            "return distinct id(staff) as id, contactAddress.city as city,contactAddress.province as province ,staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName,user.age as age, user.gender as gender, {1} + staff.profilePic as profilePic, id(engineerType) as engineerType")
+            "return distinct id(staff) as id, contactAddress.city as city,contactAddress.province as province ,staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName, user.gender as gender, {1} + staff.profilePic as profilePic, id(engineerType) as engineerType")
     List<StaffPersonalDetailDTO> getAllStaffHavingUnitPositionByUnitId(long unitId, String imageUrl);
 
 
@@ -313,7 +313,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
             "optional MATCH(staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization)" +
             "OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) with engineerType, staff, user,unitPos \n" +
             "optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress)  with engineerType, staff,contactAddress, user ,count(unitPos) as unitPosition \n" +
-            "return  distinct id(staff) as id,case  when unitPosition > 0 then TRUE else false end as unitPosition , contactAddress.city as city,contactAddress.province as province ,staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName,user.age as age, user.gender as gender, {1} + staff.profilePic as profilePic, id(engineerType) as engineerType")
+            "return  distinct id(staff) as id,case  when unitPosition > 0 then TRUE else false end as unitPosition , contactAddress.city as city,contactAddress.province as province ,staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName, user.gender as gender, {1} + staff.profilePic as profilePic, id(engineerType) as engineerType")
     List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, String imageUrl);
 
     @Query("MATCH (staff:Staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) where id(staff)={0} return id(engineerType)")
