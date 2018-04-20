@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "time_Type")
 public class TimeType extends MongoBaseEntity{
@@ -17,6 +19,7 @@ public class TimeType extends MongoBaseEntity{
     private BigInteger upperLevelTimeTypeId;
     private String label;
     private String description;
+    private List<BigInteger> childTimeTypeIds = new ArrayList<>();
 
 
     public TimeType(BigInteger upperLevelTimeTypeId, String label, String description) {
@@ -39,6 +42,15 @@ public class TimeType extends MongoBaseEntity{
         this.timeTypes = timeTypes;
         this.label = label;
         this.description = description;
+    }
+
+
+    public List<BigInteger> getChildTimeTypeIds() {
+        return childTimeTypeIds;
+    }
+
+    public void setChildTimeTypeIds(List<BigInteger> childTimeTypeIds) {
+        this.childTimeTypeIds = childTimeTypeIds;
     }
 
     public TimeTypes getTimeTypes() {
