@@ -6,6 +6,7 @@ import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
+import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
@@ -101,6 +102,11 @@ public class ShiftService extends MongoBaseService {
                 shiftQueryResults = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activity, shiftFromDate);
             }
         } else {
+            Shift shiftOld = shiftMongoRepository.findShiftBetweenDurationByStaff(shiftDTO.getStaffId(),shiftDTO.getStartDate(),shiftDTO.getEndDate());
+            if(Optional.ofNullable(shiftOld).isPresent()) {
+                throw new DuplicateDataException(" Shift already exists between duration- startDate: "+shiftOld.getStartDate()+" endDate: "+shiftOld.getEndDate());
+            }
+
             if (shiftDTO.getStartDate().after(shiftDTO.getEndDate())) {
                 throw new InvalidRequestException(" Start date can't be greater than endDate");
             }

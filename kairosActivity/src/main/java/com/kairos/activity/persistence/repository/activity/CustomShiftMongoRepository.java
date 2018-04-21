@@ -1,6 +1,7 @@
 package com.kairos.activity.persistence.repository.activity;
 
 
+import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.response.dto.shift.ShiftQueryResult;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 import java.util.Date;
@@ -16,5 +17,6 @@ public interface CustomShiftMongoRepository {
     List<ShiftQueryResult> findAllActivityBetweenDuration(Long staffId, Date startDate, Date endDate, Long unitId);
     List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId, Date startDate, Date endDate);
     List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEPs(List<Long> unitEmploymentPositionId, Date startDate, Date endDate);
+    Shift findShiftBetweenDurationByStaff(Long staffId, Date startDate, Date endDate);
 
 }

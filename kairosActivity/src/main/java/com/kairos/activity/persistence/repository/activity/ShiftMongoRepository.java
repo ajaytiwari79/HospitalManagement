@@ -23,5 +23,4 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     Long countByActivityId(BigInteger activityId);
 
     List<Shift> findByExternalIdIn(List<String> externalIds);
-
 }
