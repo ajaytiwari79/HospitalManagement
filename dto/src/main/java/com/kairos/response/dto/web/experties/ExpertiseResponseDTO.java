@@ -29,7 +29,7 @@ public class ExpertiseResponseDTO {
     private List<SeniorityLevelDTO> seniorityLevels = new ArrayList<>();
     private List<Long> tags;
     private Boolean published;
-    private Boolean hasVersion;
+    private Boolean editable;
 
     public ExpertiseResponseDTO() {
     }
@@ -155,11 +155,11 @@ public class ExpertiseResponseDTO {
         this.published = published;
     }
 
-    public Boolean getHasVersion() {
-        return hasVersion;
+    public Boolean getEditable() {
+        return editable;
     }
 
-    public void setHasVersion(Boolean hasVersion) {
-        this.hasVersion = hasVersion;
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
     }
 }

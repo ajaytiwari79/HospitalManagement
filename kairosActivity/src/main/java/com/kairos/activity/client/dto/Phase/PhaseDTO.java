@@ -1,9 +1,8 @@
 package com.kairos.activity.client.dto.Phase;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.phase.Phase;
-import com.kairos.activity.service.phase.DurationType;
+import com.kairos.persistence.model.enums.DurationType;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -33,6 +32,7 @@ public class PhaseDTO {
     private boolean allowFlipping;
     private LocalTime flippingTime;
     private DayOfWeek flippingDay;
+    private int durationInDays;
 
 
     public long getOrganizationId() {
@@ -164,4 +164,11 @@ public class PhaseDTO {
         return phase;
     }
 
+    public int getDurationInDays() {
+        return durationInDays;
+    }
+
+    public void setDurationInDays(int durationInDays) {
+        this.durationInDays = durationInDays;
+    }
 }

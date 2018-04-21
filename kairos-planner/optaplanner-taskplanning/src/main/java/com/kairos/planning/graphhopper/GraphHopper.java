@@ -86,7 +86,7 @@ public class GraphHopper {
 	public String getApiKey() {
 		  /*Properties prop = new Properties(); 
 		  try { 
-			  prop.load(new FileInputStream(new File("/media/pradeep/bak/multiOpta/task-planning/src/main/resources/taskplanner.properties")));
+			  prop.load(new FileInputStream(new File("/media/pradeep/bak/multiOpta/task-planner/src/main/resources/taskplanner.properties")));
 		 String key = prop.getProperty("graphhopper.key"); 
 		 
 		  } catch (IOException e) { e.printStackTrace(); }*/

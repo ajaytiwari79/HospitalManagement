@@ -90,6 +90,14 @@ public class EmploymentService extends UserBaseService {
 
     public Map<String, Object> saveEmploymentDetail(long staffId, StaffEmploymentDetail staffEmploymentDetail) throws ParseException {
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
+        EmploymentUnitPositionQueryResult employmentUnitPosition = unitPositionGraphRepository.getEarliestUnitPositionStartDateAndEmploymentByStaffId(objectToUpdate.getId());
+        Long employmentStartDate = DateUtil.getIsoDateInLong(staffEmploymentDetail.getEmployedSince());
+        if(Optional.ofNullable(employmentUnitPosition).isPresent()) {
+            if(Optional.ofNullable(employmentUnitPosition.getEarliestUnitPositionStartDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getEarliestUnitPositionStartDateMillis())
+                throw new ActionNotPermittedException("Employment start date cant exceed Unit Position start date");
+            if(Optional.ofNullable(employmentUnitPosition.getEmploymentEndDateMillis()).isPresent()&&employmentStartDate>employmentUnitPosition.getEmploymentEndDateMillis())
+                throw new ActionNotPermittedException("Employment start date cant exceed employment end date");
+        }
 
         if (objectToUpdate == null) {
             logger.info("Staff does not found by id {}", staffId);
@@ -102,17 +110,21 @@ public class EmploymentService extends UserBaseService {
         objectToUpdate.setCardNumber(staffEmploymentDetail.getCardNumber());
         objectToUpdate.setSendNotificationBy(staffEmploymentDetail.getSendNotificationBy());
         objectToUpdate.setCopyKariosMailToLogin(staffEmploymentDetail.isCopyKariosMailToLogin());
-        objectToUpdate.setEmployedSince(DateConverter.parseDate(staffEmploymentDetail.getEmployedSince()).getTime());
+        //objectToUpdate.setEmployedSince(DateConverter.parseDate(staffEmploymentDetail.getEmployedSince()).getTime());
         objectToUpdate.setVisitourId(staffEmploymentDetail.getVisitourId());
         objectToUpdate.setEngineerType(engineerType);
         objectToUpdate.setExternalId(staffEmploymentDetail.getTimeCareExternalId());
         save(objectToUpdate);
-        return retrieveEmploymentDetails(objectToUpdate);
+        employmentGraphRepository.updateEmploymentStartDate(objectToUpdate.getId(), employmentStartDate);
+        StaffEmploymentDTO staffEmploymentDTO = new StaffEmploymentDTO(objectToUpdate,employmentStartDate);
+        return retrieveEmploymentDetails(staffEmploymentDTO);
     }
 
-    public Map<String, Object> retrieveEmploymentDetails(Staff staff) {
+    public Map<String, Object> retrieveEmploymentDetails(StaffEmploymentDTO staffEmploymentDTO) {
+        Staff staff = staffEmploymentDTO.getStaff();
         Map<String, Object> map = new HashMap<>();
-        Date employedSince = Optional.ofNullable(staff.getEmployedSince()).isPresent() ? DateConverter.getDate(staff.getEmployedSince()) : null;
+        //Date employedSince = Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateConverter.getDate(staffEmploymentDTO.getEmploymentStartDate()) : null;
+        String employedSince =  Optional.ofNullable(staffEmploymentDTO.getEmploymentStartDate()).isPresent() ? DateUtil.getDateFromEpoch(staffEmploymentDTO.getEmploymentStartDate()).toString() : null;
         map.put("employedSince", employedSince);
         map.put("cardNumber", staff.getCardNumber());
         map.put("sendNotificationBy", staff.getSendNotificationBy());
@@ -707,7 +719,7 @@ public class EmploymentService extends UserBaseService {
     public void updateEmploymentEndDate(Organization unit, UnitPositionDTO unitPositionDTO) {
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
-            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unit.getId());
+            throw new DataNotFoundByIdException("Parent organization not found  Unit ID: " + unit.getId());
         }
         List<UnitPositionQueryResult> unitPositionsQuery = unitPositionGraphRepository.getAllUnitPositionsByStaffId(parentOrganization.getId(), unitPositionDTO.getStaffId());
         Long maxEndDate = unitPositionsQuery.get(0).getEndDateMillis();
@@ -729,13 +741,13 @@ public class EmploymentService extends UserBaseService {
     }
 
     
-    public void moveToReadOnlyAccessGroup() {
+    public void moveToReadOnlyAccessGroup(List<Long> employmentIds) {
         Long curDateMillisStart = DateUtil.getStartOfDay(DateUtil.getCurrentDate()).getTime();
         Long curDateMillisEnd = DateUtil.getEndOfDay(DateUtil.getCurrentDate()).getTime();
         List<UnitPermission> unitPermissions;
         UnitPermission unitPermission;
-        List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(curDateMillisStart,curDateMillisEnd);
-        accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(curDateMillisStart, curDateMillisEnd);
+        List<ExpiredEmploymentsQueryResult> expiredEmploymentsQueryResults = employmentGraphRepository.findExpiredEmploymentsAccessGroupsAndOrganizationsByEndDate(employmentIds);
+        accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(employmentIds);
 
         List<Organization> organizations;
         List<Employment>  employments = expiredEmploymentsQueryResults.isEmpty() ? null : new ArrayList<Employment>();

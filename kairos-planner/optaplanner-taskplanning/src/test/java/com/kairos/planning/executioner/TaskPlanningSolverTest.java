@@ -4,7 +4,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 
-//@PropertySource("/media/pradeep/bak/multiOpta/task-planning/src/main/resources/taskplanner.properties")
+//@PropertySource("/media/pradeep/bak/multiOpta/task-planner/src/main/resources/taskplanner.properties")
 public class TaskPlanningSolverTest {
 	@Test
 	public void test() {

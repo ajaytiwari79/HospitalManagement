@@ -25,7 +25,7 @@ public class ExpertiseQueryResult {
     private Integer numberOfWorkingDaysInWeek;
     private Long id;
     private Boolean published;
-    private Boolean hasVersion;
+    private Boolean history;
     private PaidOutFrequencyEnum paidOutFrequency;
 
 
@@ -148,12 +148,12 @@ public class ExpertiseQueryResult {
         this.seniorityLevels = seniorityLevels;
     }
 
-    public Boolean getHasVersion() {
-        return hasVersion;
+    public Boolean getHistory() {
+        return history;
     }
 
-    public void setHasVersion(Boolean hasVersion) {
-        this.hasVersion = hasVersion;
+    public void setHistory(Boolean history) {
+        this.history = history;
     }
 
     public ExpertiseQueryResult() {

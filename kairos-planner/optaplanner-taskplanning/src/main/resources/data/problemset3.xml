@@ -272,43 +272,43 @@
       <affinityMap class="linked-hash-map" id="49">
         <entry>
           <Citizen reference="30"/>
-          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>MEDIUM</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="31"/>
-          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>MEDIUM</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="32"/>
-          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>LOW</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="33"/>
-          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>HIGH</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="34"/>
-          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>HIGH</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="35"/>
-          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>MEDIUM</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="36"/>
-          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>MEDIUM</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="37"/>
-          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>HIGH</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="38"/>
-          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>LOW</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="39"/>
-          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>MEDIUM</com.kairos.planner.domain.Affinity>
         </entry>
       </affinityMap>
       <location reference="108"/>
@@ -328,43 +328,43 @@
       <affinityMap class="linked-hash-map" id="52">
         <entry>
           <Citizen reference="30"/>
-          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>LOW</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="31"/>
-          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>HIGH</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="32"/>
-          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>NONE</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="33"/>
-          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>MEDIUM</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="34"/>
-          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>NONE</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="35"/>
-          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>LOW</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="36"/>
-          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>NONE</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="37"/>
-          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>HIGH</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="38"/>
-          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>LOW</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="39"/>
-          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>HIGH</com.kairos.planner.domain.Affinity>
         </entry>
       </affinityMap>
       <location reference="108"/>
@@ -384,43 +384,43 @@
       <affinityMap class="linked-hash-map" id="55">
         <entry>
           <Citizen reference="30"/>
-          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>NONE</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="31"/>
-          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>HIGH</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="32"/>
-          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>LOW</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="33"/>
-          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>NONE</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="34"/>
-          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>MEDIUM</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="35"/>
-          <com.kairos.planning.domain.Affinity>NONE</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>NONE</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="36"/>
-          <com.kairos.planning.domain.Affinity>LOW</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>LOW</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="37"/>
-          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>HIGH</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="38"/>
-          <com.kairos.planning.domain.Affinity>MEDIUM</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>MEDIUM</com.kairos.planner.domain.Affinity>
         </entry>
         <entry>
           <Citizen reference="39"/>
-          <com.kairos.planning.domain.Affinity>HIGH</com.kairos.planning.domain.Affinity>
+          <com.kairos.planner.domain.Affinity>HIGH</com.kairos.planner.domain.Affinity>
         </entry>
       </affinityMap>
       <location reference="108"/>

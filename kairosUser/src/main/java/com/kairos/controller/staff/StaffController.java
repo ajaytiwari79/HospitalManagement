@@ -2,6 +2,7 @@ package com.kairos.controller.staff;
 
 import com.kairos.persistence.model.organization.AddressDTO;
 import com.kairos.persistence.model.user.auth.User;
+import com.kairos.persistence.model.user.employment.EmploymentDTO;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
 
@@ -14,7 +15,9 @@ import com.kairos.service.staff.ApiExternalStaffService;
 import com.kairos.service.staff.EmploymentService;
 import com.kairos.service.staff.StaffAddressService;
 import com.kairos.service.staff.StaffService;
+import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.DateConverter;
+import com.kairos.util.DateUtil;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -60,6 +63,9 @@ public class StaffController {
     private OrganizationServiceService organizationServiceService;
     @Inject
     private EmploymentTypeService employmentTypeService;
+    @Inject
+    private UnitPositionService unitPositionService;
+
 
 
     @RequestMapping(value = "/{staffId}/employment_details", method = RequestMethod.PUT)
@@ -586,6 +592,19 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getStaffByExperties(@PathVariable Long unitId, @RequestBody List<Long> expertiesIds) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffByExperties(unitId, expertiesIds));
+    }
+
+    @RequestMapping(value = "/{staffId}/employment", method = RequestMethod.PUT)
+    @ApiOperation("update employment of staff")
+    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO) throws ParseException {
+
+        String employmentEndDate = employmentDTO.getEndDate();//(String)employmentDetail.get("endDate");
+        EmploymentUnitPositionDTO response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,employmentEndDate,unitId);
+        if (response == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+
     }
 
 

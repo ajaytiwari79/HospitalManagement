@@ -16,8 +16,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, Long> {
 
     @Query("MATCH (level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false}) where id(level)={0} AND id(payTable)<>{1}" +
-            " RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName")
-    List<PayTableResponse> findPayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
+            " RETURN id(payTable) as id,payTable.name as name,payTable.published as published,payTable.startDateMillis as startDateMillis,payTable.endDateMillis as endDateMillis,payTable.description as description,payTable.shortName as shortName ORDER BY startDateMillis DESC LIMIT 1")
+    PayTableResponse findPayTableByOrganizationLevel(Long organizationLevelId, Long payTableToExclude);
 
     @Query("MATCH (c:Country) where id(c)={0}\n" +
             " MATCH(c)-[:HAS_LEVEL]->(level:Level)<-[:" + IN_ORGANIZATION_LEVEL + "]-(payTable:PayTable{deleted:false,hasTempCopy:false}) where (payTable.name =~{2} OR payTable.shortName=~{3}) AND id(payTable)<>{1} " +

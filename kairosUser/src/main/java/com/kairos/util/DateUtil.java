@@ -1,5 +1,6 @@
 package com.kairos.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,10 +11,7 @@ import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -195,10 +193,14 @@ public class DateUtil {
     }
 
     public static Long getIsoDateInLong(String dateReceived) throws ParseException {
-        DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
-        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date date = isoFormat.parse(dateReceived);
-        return date.getTime();
+        Long date = null;
+        if(!StringUtils.isEmpty(dateReceived)) {
+            DateFormat isoFormat = new SimpleDateFormat(ONLY_DATE);
+            isoFormat.setLenient(false);
+            isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            date = isoFormat.parse(dateReceived).getTime();
+        }
+        return date;
     }
 
 
@@ -257,6 +259,14 @@ public class DateUtil {
         calendar.setTime(dateTime.toDate());
 
         return calendar.getTime();
+    }
+    public static LocalDate getDateFromEpoch(Long dateLong) {
+
+        return Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    public static LocalDate getTimezonedCurrentDate(String timezone) {
+        return Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of(timezone)).toLocalDate();
     }
 
 }
