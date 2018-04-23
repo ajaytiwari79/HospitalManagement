@@ -137,6 +137,8 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                     break;
                 case MINIMUM_TIME_BANK:
                     break;
+                case BREAKS_IN_SHIFT:
+                    break;
                 default:
                     throw new DataNotFoundByIdException("Invalid TEMPLATE");
             }

@@ -63,6 +63,7 @@ public class RuleTemplateService extends UserBaseService {
     private WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
+    private List<Long> activities=new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger(RuleTemplateService.class);
 
     public boolean createRuleTemplate(long countryId) {
@@ -159,6 +160,10 @@ public class RuleTemplateService extends UserBaseService {
 
         MinimumTimeBank wta22 = new MinimumTimeBank(MINIMUM_TIME_BANK.getName(), MINIMUM_TIME_BANK.getTemplateType(), true, MINIMUM_TIME_BANK.getDescription(), TimeBankTypeEnum.HOURLY, 25, false, false);
         baseRuleTemplates.add(wta22);
+
+        BreaksInShift breaksInShift=new BreaksInShift(BREAKS_IN_SHIFT.getName(),BREAKS_IN_SHIFT.getTemplateType(),true,BREAKS_IN_SHIFT.getDescription(),270,1,30,120,270,activities);
+        baseRuleTemplates.add(breaksInShift);
+
         country.setWTABaseRuleTemplate(baseRuleTemplates);
         save(country);
 
@@ -394,6 +399,15 @@ public class RuleTemplateService extends UserBaseService {
                 minimumTimeBank.setForbid(templateDTO.isForbid());
                 minimumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
                 break;
+            case BREAKS_IN_SHIFT:
+                BreaksInShift breaksInShift=(BreaksInShift) oldTemplate;
+                breaksInShift.setDescription(templateDTO.getDescription());
+                breaksInShift.setShiftDuration(templateDTO.getShiftDuration());
+                breaksInShift.setNoOfBreaks(templateDTO.getNoOfBreaks());
+                breaksInShift.setBreakDuration(templateDTO.getBreakDuration());
+                breaksInShift.setEarliestDurationMinutes(templateDTO.getEarliestDurationMinutes());
+                breaksInShift.setLatestDurationMinutes(templateDTO.getLatestDurationMinutes());
+                breaksInShift.setActivities(templateDTO.getActivities());
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
@@ -598,6 +612,9 @@ public class RuleTemplateService extends UserBaseService {
                 wtaBaseRuleTemplate = new MinimumTimeBank(wtaRuleTemplateDTO.getName().trim(),
                         wtaRuleTemplateDTO.getTemplateType(), wtaRuleTemplateDTO.getDisabled(), wtaRuleTemplateDTO.getDescription(), wtaRuleTemplateDTO.getFrequency(), wtaRuleTemplateDTO.getYellowZone(), wtaRuleTemplateDTO.isForbid(), wtaRuleTemplateDTO.isAllowExtraActivity());
                 break;
+            case BREAKS_IN_SHIFT:
+                wtaBaseRuleTemplate=new BreaksInShift(wtaRuleTemplateDTO.getName().trim(),wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getShiftDuration(),
+                        wtaRuleTemplateDTO.getNoOfBreaks(),wtaRuleTemplateDTO.getBreakDuration(),wtaRuleTemplateDTO.getEarliestDurationMinutes(),wtaRuleTemplateDTO.getLatestDurationMinutes(),wtaRuleTemplateDTO.getActivities());
         }
         int number=getNumberFromlastInsertedTemplateType(lastInsertedTemplateType);
 

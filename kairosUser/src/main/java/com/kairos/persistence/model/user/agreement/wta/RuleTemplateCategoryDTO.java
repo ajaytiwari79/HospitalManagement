@@ -9,7 +9,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
@@ -66,6 +65,12 @@ public class RuleTemplateCategoryDTO {
     private Integer yellowZone;
     private Boolean forbid;
     private Boolean allowExtraActivity;
+    private Integer shiftDuration;
+    private Integer noOfBreaks;
+    private Integer breakDuration;
+    private Integer earliestDurationMinutes;
+    private Integer latestDurationMinutes;
+    private List<Long> activities;
 
 
     public int getRecommendedValue() {
@@ -421,6 +426,54 @@ public class RuleTemplateCategoryDTO {
 
     public void setAllowExtraActivity(Boolean allowExtraActivity) {
         this.allowExtraActivity = allowExtraActivity;
+    }
+
+    public Integer getShiftDuration() {
+        return shiftDuration;
+    }
+
+    public void setShiftDuration(Integer shiftDuration) {
+        this.shiftDuration = shiftDuration;
+    }
+
+    public Integer getNoOfBreaks() {
+        return noOfBreaks;
+    }
+
+    public void setNoOfBreaks(Integer noOfBreaks) {
+        this.noOfBreaks = noOfBreaks;
+    }
+
+    public Integer getBreakDuration() {
+        return breakDuration;
+    }
+
+    public void setBreakDuration(Integer breakDuration) {
+        this.breakDuration = breakDuration;
+    }
+
+    public Integer getEarliestDurationMinutes() {
+        return earliestDurationMinutes;
+    }
+
+    public void setEarliestDurationMinutes(Integer earliestDurationMinutes) {
+        this.earliestDurationMinutes = earliestDurationMinutes;
+    }
+
+    public Integer getLatestDurationMinutes() {
+        return latestDurationMinutes;
+    }
+
+    public void setLatestDurationMinutes(Integer latestDurationMinutes) {
+        this.latestDurationMinutes = latestDurationMinutes;
+    }
+
+    public List<Long> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<Long> activities) {
+        this.activities = activities;
     }
 
     @Override

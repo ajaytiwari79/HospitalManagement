@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.RuleTemplates.getByTemplateType;
 import static com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType.WTA;
 
@@ -528,6 +527,22 @@ public class WTAOrganizationService extends UserBaseService {
                     minimumTimeBank.setPhaseTemplateValues(phaseTemplateValues);
                     wtaBaseRuleTemplates.add(minimumTimeBank);
                     break;
+                case BREAKS_IN_SHIFT:
+                    BreaksInShift breaksInShift=new BreaksInShift();
+                    breaksInShift.setName(ruleTemplate.getName());
+                    breaksInShift.setTemplateType(ruleTemplate.getTemplateType());
+                    breaksInShift.setDescription(ruleTemplate.getDescription());
+                    breaksInShift.setRuleTemplateCategory(ruleTemplateCategory);
+                    breaksInShift.setDisabled(ruleTemplate.getDisabled());
+                    breaksInShift.setRecommendedValue(ruleTemplate.getRecommendedValue());
+                    breaksInShift.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
+                    breaksInShift.setShiftDuration(ruleTemplate.getShiftDuration());
+                    breaksInShift.setNoOfBreaks(ruleTemplate.getNoOfBreaks());
+                    breaksInShift.setBreakDuration(ruleTemplate.getBreakDuration());
+                    breaksInShift.setEarliestDurationMinutes(ruleTemplate.getEarliestDurationMinutes());
+                    breaksInShift.setLatestDurationMinutes(ruleTemplate.getLatestDurationMinutes());
+                    breaksInShift.setActivities(ruleTemplate.getActivities());
+                    wtaBaseRuleTemplates.add(breaksInShift);
                 default:
                     throw new DataNotFoundByIdException("Invalid TEMPLATE");
             }
