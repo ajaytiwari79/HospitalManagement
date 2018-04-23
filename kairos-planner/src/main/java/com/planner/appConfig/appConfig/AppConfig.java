@@ -19,10 +19,10 @@ public class AppConfig implements IAppConfig{
     @Value("${graphhopper.key}")
     private String graphhoperkey;
 
-    @Value("${cassandra.keyspace}")
+    //@Value("${cassandra.keyspace}")
     private String cassandraKeySpace;
 
-    @Value("${cassandra.contactpoint}")
+    //@Value("${cassandra.contactpoint}")
     private String cassandraContactPoint;
 
     private List<String> graphhoperKeys = Arrays.asList("4c0e9759-3e65-4ffb-b57a-883f28827ca7","cb87cd5e-a404-4da2-bc2f-db452ebd2c66","7ba37151-7141-4ea4-a89f-28a2ae297a0a");

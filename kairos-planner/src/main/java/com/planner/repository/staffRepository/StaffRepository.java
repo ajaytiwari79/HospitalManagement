@@ -1,8 +1,6 @@
 package com.planner.repository.staffRepository;
 
 
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select;
 import com.planner.domain.staff.PlanningStaff;
 import com.planner.domain.staff.UnitStaffRelationShip;
 import com.planner.repository.customRepository.BaseRepository;
@@ -32,23 +30,26 @@ public class StaffRepository extends BaseRepository {
 
 
     public UnitStaffRelationShip getOneUnitStaffRelationship(long unitId,String staffId){
-        Select select = QueryBuilder.select().from(UnitStaffRelationShip.class.getSimpleName()).allowFiltering();
+        /*Select select = QueryBuilder.select().from(UnitStaffRelationShip.class.getSimpleName()).allowFiltering();
         select.where(QueryBuilder.eq("unitid", unitId));
         select.where(QueryBuilder.eq("staffId", staffId));
-        return (UnitStaffRelationShip)findOne(select,UnitStaffRelationShip.class);
+        return (UnitStaffRelationShip)findOne(select,UnitStaffRelationShip.class);*/
+        return null;
     }
 
 
 
     public PlanningStaff getOneStaffByExternalId(long externalId){
-        Select select = QueryBuilder.select().from("planningstaff").allowFiltering();
+        /*Select select = QueryBuilder.select().from("planningstaff").allowFiltering();
         select.where(QueryBuilder.eq("externalid",externalId));
-        return (PlanningStaff) findByField(select,PlanningStaff.class);
+        return (PlanningStaff) findByField(select,PlanningStaff.class);*/
+        return null;
     }
 
    public List<PlanningStaff> getAllByIds(List<String> staffIds){
-       Select select = QueryBuilder.select().from("PlanningStaff").allowFiltering();
+       /*Select select = QueryBuilder.select().from("PlanningStaff").allowFiltering();
        select.where(QueryBuilder.in("id",staffIds));
-       return (List<PlanningStaff>)findAllByQuery(select,PlanningStaff.class);
+       return (List<PlanningStaff>)findAllByQuery(select,PlanningStaff.class);*/
+       return null;
    }
 }

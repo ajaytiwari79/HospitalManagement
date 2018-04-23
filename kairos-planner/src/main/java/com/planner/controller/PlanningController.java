@@ -23,6 +23,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(StaticField.PLANNING)
 public class PlanningController {
+/*
 
 	private static final Logger log = LoggerFactory.getLogger(PlanningController.class);
 
@@ -113,13 +114,14 @@ public class PlanningController {
 	}
 
 
+*/
 
 
 
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public void handleTodoNotFound(OptaNotFoundException ex) {
-		log.error("Handling error with message: {}", ex.getMessage());
+		//log.error("Handling error with message: {}", ex.getMessage());
 	}
 
 
