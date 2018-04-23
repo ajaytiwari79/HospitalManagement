@@ -1,5 +1,6 @@
 package com.kairos.service.auth;
 
+import com.kairos.constants.AppConstants;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
@@ -378,13 +379,11 @@ public class UserService extends UserBaseService {
         }
 
         long loggedinUserId = UserContext.getUserDetails().getId();
-        Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId);
+        Boolean isCountryAdmin = userGraphRepository.checkIfUserIsCountryAdmin(loggedinUserId, AppConstants.AG_COUNTRY_ADMIN);
         List<Organization> units = organizationGraphRepository.getUnitsWithBasicInfo(organizationId);
 
-
-        List<AccessPageQueryResult> mainModulePermissions = accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
-                //(organization.isKairosHub() || isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
-                //accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
+        List<AccessPageQueryResult> mainModulePermissions = (isCountryAdmin) ? accessPageRepository.getPermissionOfMainModuleForHubMembers() :
+                accessPageRepository.getPermissionOfMainModule(organizationId, loggedinUserId);
         Set<AccessPageQueryResult> unionOfPermissionOfModule = getUnionOfPermissions(mainModulePermissions);
         // USER HAS NO main module permission check his permission in current unit only via parent employment id
         Organization parentOrganization = (organization.isParentOrganization()) ? organization : organizationGraphRepository.getParentOfOrganization(organization.getId());
@@ -399,12 +398,11 @@ public class UserService extends UserBaseService {
         Map<String, Object> unitPermissionMap;
         for (Organization unit : units) {
             List<AccessPageQueryResult> accessPageQueryResults;
-            /*if (organization.isKairosHub() || isCountryAdmin) {
+            if (isCountryAdmin) {
                 accessPageQueryResults = accessPageRepository.getTabsPermissionForHubMember();
             } else {
                 accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId,parentOrganization.getId());
-            }*/
-            accessPageQueryResults = accessPageRepository.getTabPermissionForUnit(unit.getId(), loggedinUserId,parentOrganization.getId());
+            }
             unitPermissionMap = new HashMap<>();
             unitPermissionMap.put("id", unit.getId());
             unitPermissionMap.put("permissions", getUnionOfPermissions(accessPageQueryResults));
