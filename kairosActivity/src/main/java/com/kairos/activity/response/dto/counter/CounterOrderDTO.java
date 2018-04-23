@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 public class CounterOrderDTO {
-    private String id;
+    private BigInteger id;
     private String moduleId;
     private String tabId;
     private List<BigInteger> orderedCounterIds;
@@ -33,11 +33,11 @@ public class CounterOrderDTO {
         this.orderedCounterIds = orderedCounterIds;
     }
 
-    public String getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 }

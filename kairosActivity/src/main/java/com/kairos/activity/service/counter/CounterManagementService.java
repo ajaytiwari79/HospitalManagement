@@ -234,8 +234,26 @@ public class CounterManagementService extends MongoBaseService{
         return initialCountersDetailsDTO;
     }
 
-    public void updateCountersOrderForTab(){
-        // update tabwise counters order
+    private DefaultCounterOrder updateExistingOrder(DefaultCounterOrder oldOrder, CounterOrderDTO latestOrder){
+        oldOrder.setModuleId(latestOrder.getModuleId());
+        oldOrder.setTabId(latestOrder.getTabId());
+        oldOrder.setOrderedCounterIds(latestOrder.getOrderedCounterIds());
+        return oldOrder;
+    }
+
+    public void updateCountersOrderForCountry(CounterOrderDTO counterOrderDTO, BigInteger countryId){
+        DefaultCounterOrder order = (DefaultCounterOrder) counterRepository.getItemById(counterOrderDTO.getId(), DefaultCounterOrder.class);
+        if(counterOrderDTO.getId() == null){
+            //DefaultCounterOrder
+        }
+    }
+
+    public void updateCountersOrderForUnit(CounterOrderDTO counterOrderDTO){
+
+    }
+
+    public void updateCountersOrderForStaff(CounterOrderDTO counterOrderDTO){
+
     }
 
     public UserDetailsDTO getUserDetails(){
