@@ -25,6 +25,7 @@ public class FunctionDTO {
     private Date endDate;
     private List<Organization> unions;
     private List<Level> organizationLevels;
+    private String icon;
 
 
 
@@ -32,7 +33,7 @@ public class FunctionDTO {
         //Default Constructor
     }
 
-    public FunctionDTO(Long id, String name, String description, Date startDate, Date endDate, List<Organization> unions, List<Level> organizationLevels) {
+    public FunctionDTO(Long id, String name, String description, Date startDate, Date endDate, List<Organization> unions, List<Level> organizationLevels, String icon) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -40,6 +41,7 @@ public class FunctionDTO {
         this.endDate = endDate;
         this.unions = unions;
         this.organizationLevels = organizationLevels;
+        this.icon = icon;
     }
 
     public Long getId() {
@@ -98,4 +100,11 @@ public class FunctionDTO {
         this.organizationLevels = organizationLevels;
     }
 
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
 }
