@@ -21,6 +21,7 @@ import com.kairos.activity.util.time_bank.TimeBankCalculationService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -189,14 +191,12 @@ public class TimeBankService extends MongoBaseService {
 
     public UnitPositionWithCtaDetailsDTO getCostTimeAgreement(Long unitPositionId) {
         UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO = timeBankRestClient.getCTAbyUnitEmployementPosition(unitPositionId);
-        for (CTARuleTemplateCalulatedTimeBankDTO ctaRuleTemplateCalulatedTimeBankDTO : unitPositionWithCtaDetailsDTO.getCtaRuleTemplates()) {
-            if (ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds() != null) {
-                // TODO PRADEEP please change as required
-                List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllParentTimeTypeByTimeTypeId(ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds().get(0), unitPositionWithCtaDetailsDTO.getCountryId());
-                ctaRuleTemplateCalulatedTimeBankDTO.setTimeTypeIdsWithParentTimeType(timeTypeDTOS.stream().map(tt -> tt.getId()).collect(Collectors.toList()));
+       /* for (CTARuleTemplateCalulatedTimeBankDTO ctaRuleTemplateCalulatedTimeBankDTO : unitPositionWithCtaDetailsDTO.getCtaRuleTemplates()) {
+            if (ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds() != null && !ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds().isEmpty()) {
+                List<BigInteger> timeTypeIds = timeTypeService.getAllParentTimeTypeByTimeTypeId(ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds(), unitPositionWithCtaDetailsDTO.getCountryId());
+                ctaRuleTemplateCalulatedTimeBankDTO.setTimeTypeIdsWithParentTimeType(ctaRuleTemplateCalulatedTimeBankDTO.getTimeTypeIds());
             }
-            ctaRuleTemplateCalulatedTimeBankDTO.setDays(Arrays.asList(1, 2, 3, 4, 5, 6, 7));//Todo it should be removed when cta daytype implemented
-        }
+        }*/
         return unitPositionWithCtaDetailsDTO;
     }
 
@@ -212,8 +212,10 @@ public class TimeBankService extends MongoBaseService {
         if(new DateTime(startDate).isAfter(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()))){
             Interval interval = new Interval(DateUtils.toJodaDateTime(unitPositionWithCtaDetailsDTO.getUnitPositionStartDate()),new DateTime(startDate));
             //totaltimebank is timebank without daily timebank entries
-            int totalTimeBank = timeBankCalculationService.calculateTimeBankForInterval(interval, unitPositionWithCtaDetailsDTO);
             List<DailyTimeBankEntry> dailyTimeBanksBeforeStartDate = timeBankMongoRepository.findAllByUnitPositionAndBeforeDate(unitPositionId, new DateTime(startDate).toDate());
+
+            int totalTimeBank = timeBankCalculationService.calculateTimeBankForInterval(interval, unitPositionWithCtaDetailsDTO,false,dailyTimeBanksBeforeStartDate,false);
+
             totalTimeBankBeforeStartDate = dailyTimeBanksBeforeStartDate != null && !dailyTimeBanksBeforeStartDate.isEmpty()
                     ? dailyTimeBanksBeforeStartDate.stream().mapToInt(dailyTimeBank -> dailyTimeBank.getTotalTimeBankMin()).sum() : 0;
             totalTimeBankBeforeStartDate = totalTimeBankBeforeStartDate - totalTimeBank;

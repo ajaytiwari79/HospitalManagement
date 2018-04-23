@@ -2263,7 +2263,7 @@ public class PlannerService extends MongoBaseService {
     }
 
     /**
-     * to save settings of planner of actual planning, like {confirmation on delete exception} etc
+     * to save settings of planner of actual planner, like {confirmation on delete exception} etc
      *
      * @param unitId
      * @param plannerSettings

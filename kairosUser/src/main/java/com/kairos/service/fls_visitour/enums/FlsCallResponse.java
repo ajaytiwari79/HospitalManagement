@@ -7,7 +7,7 @@ public enum FlsCallResponse {
        ZERO(0, "Function successful", false),
        ONE(1, "Function successful, call geocoded only by city center", false),
        TWO(2, "Call not geocoded"),
-       THREE(3, "Appointments invalid due to date or period errors, e.g. date invalid, planning in past not allowed"),
+       THREE(3, "Appointments invalid due to date or period errors, e.g. date invalid, planner in past not allowed"),
        ONEZERO(10, "No valid suggestions for appointment could be found. FunctionCode 1 only. See infotext."),
        TWOZERO(20, "No valid suggestions for appointment could be found. Confirmation of appointment failed. FixedDate empty and FunctionCode 2 only. See infotext)"),
        THREEZERO(30, "Requested call not found."),

@@ -19,6 +19,7 @@ public class StaffUnitPositionDetails {
     private Long endDateMillis;
     private Long lastModificationDate;
     private int totalWeeklyHours;
+    private int fullTimeWeeklyMinutes;
     private float avgDailyWorkingHours;
     private float hourlyWages;
     private long id;
@@ -32,6 +33,15 @@ public class StaffUnitPositionDetails {
     public StaffUnitPositionDetails(int workingDaysInWeek, int totalWeeklyHours) {
         this.workingDaysInWeek = workingDaysInWeek;
         this.totalWeeklyHours = totalWeeklyHours;
+    }
+
+
+    public int getFullTimeWeeklyMinutes() {
+        return fullTimeWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
     }
 
     public Long getStartDateMillis() {
