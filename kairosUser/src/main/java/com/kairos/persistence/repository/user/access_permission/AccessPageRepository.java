@@ -258,7 +258,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("Match (emp:Employment)-[:BELONGS_TO]->(staff:Staff)-[:BELONGS_TO]->(user:User) where id(user)={0}\n" +
             "Match (emp)-[:HAS_UNIT_PERMISSIONS]->(unitPermission:UnitPermission)-[:APPLICABLE_IN_UNIT]->(unit:Organization) where id(unit)={1}\n" +
-            "Match (unitPermission)-[:HAS_ACCESS_PERMISSION]->(accessPermission:AccessPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup)\n" +
+            "Match (unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup:AccessGroup)\n" +
             "Match (module:AccessPage{isModule:true})-[:SUB_PAGE]->(subPage:AccessPage)\n" +
             "optional Match (accessPermission)-[r:HAS_ACCESS_PAGE_PERMISSION]->(module)\n" +
             "optional Match (subPage)<-[r2:HAS_ACCESS_PAGE_PERMISSION]-(accessPermission)with {name:subPage.name,active:subPage.active,moduleId:subPage.moduleId,read:case when r2.isRead then r2.isRead else false end,write:case when r2.isWrite then r2.isWrite else false end,id:id(subPage)} as data,accessGroup,module,r,r2\n" +
