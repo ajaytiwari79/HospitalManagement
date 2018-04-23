@@ -13,9 +13,6 @@ import java.util.List;
 /**
  * Created by vipul on 26/7/17.
  */
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Document(collection = "wtaRuleTemplate")
 public class WTABaseRuleTemplate extends MongoBaseEntity{
 
     protected String name;

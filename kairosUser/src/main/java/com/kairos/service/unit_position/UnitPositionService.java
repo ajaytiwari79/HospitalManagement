@@ -3,6 +3,7 @@ package com.kairos.service.unit_position;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
 import com.kairos.persistence.model.user.country.DayType;
@@ -20,9 +21,6 @@ import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.*;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
-import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientMinimumDTO;
 import com.kairos.persistence.model.user.country.EmploymentType;
@@ -58,6 +56,7 @@ import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepositor
 
 import com.kairos.response.dto.web.PositionWrapper;
 
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
 import com.kairos.service.organization.OrganizationService;
@@ -81,7 +80,6 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -108,8 +106,8 @@ public class UnitPositionService extends UserBaseService {
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private UnitPermissionGraphRepository unitPermissionGraphRepository;
-    @Inject
-    private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
+    /*@Inject
+    private WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;*/
     @Inject
     private CollectiveTimeAgreementGraphRepository costTimeAgreementGraphRepository;
     @Inject
@@ -147,6 +145,7 @@ public class UnitPositionService extends UserBaseService {
     @Inject private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
+    @Inject private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
 
 
     public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
@@ -176,6 +175,11 @@ public class UnitPositionService extends UserBaseService {
         if (!Optional.ofNullable(employmentType).isPresent()) {
             throw new DataNotFoundByIdException("Employment Type does not exist in unit " + unitPositionDTO.getEmploymentTypeId());
         }
+        WTAResponseDTO wta = workingTimeAgreementRestClient.assignWTAToUnitPosition(unitPositionDTO.getWtaId());
+        if (!Optional.ofNullable(wta).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid wta id ");
+        }
+        unitPosition.setWorkingTimeAgreementId(wta.getId());
 
         preparePosition(unitPosition, unitPositionDTO, organization, parentOrganization, createFromTimeCare);
 
@@ -188,7 +192,7 @@ public class UnitPositionService extends UserBaseService {
         UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
 
-        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, relationShip, parentOrganization.getId());
+        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, relationShip, parentOrganization.getId(),wta);
 //        timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(), organization.getId()));
 
         //      UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
@@ -279,7 +283,8 @@ public class UnitPositionService extends UserBaseService {
         preparePosition(oldUnitPosition, unitPositionDTO);
         save(oldUnitPosition);
         employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO);
-        return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null));
+        WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.getWTAById(oldUnitPosition.getWorkingTimeAgreementId());
+        return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null,wtaResponseDTO));
 
     }
 
@@ -293,15 +298,15 @@ public class UnitPositionService extends UserBaseService {
         return true;
     }
 
-    private void copyAndLinkNewWTA(UnitPosition unitPosition, WorkingTimeAgreement workingTimeAgreement) {
+    /*private void copyAndLinkNewWTA(UnitPosition unitPosition, WorkingTimeAgreement workingTimeAgreement) {
         WorkingTimeAgreement newWta = new WorkingTimeAgreement();
         wtaService.copyWta(workingTimeAgreement, newWta);
         if (workingTimeAgreement.getRuleTemplates().size() > 0) {
             List<WTABaseRuleTemplate> ruleTemplates = wtaService.copyRuleTemplate(workingTimeAgreement.getRuleTemplates());
             newWta.setRuleTemplates(ruleTemplates);
         }
-        unitPosition.setWorkingTimeAgreement(newWta);
-    }
+        unitPosition.setWorkingTimeAgreementId(newWta);
+    }*/
 
     private UnitPosition preparePosition(UnitPosition unitPosition, UnitPositionDTO unitPositionDTO, Organization organization, Organization parentOrganization, Boolean createFromTimeCare) {
 
@@ -319,11 +324,6 @@ public class UnitPositionService extends UserBaseService {
         }
         unitPosition.setUnit(unitPositionInOrganization.get());
 
-        Optional<WorkingTimeAgreement> wta = workingTimeAgreementGraphRepository.findById(unitPositionDTO.getWtaId());
-        if (!wta.isPresent()) {
-            throw new DataNotFoundByIdException("Invalid wta id ");
-        }
-        copyAndLinkNewWTA(unitPosition, wta.get());
 
 
         CostTimeAgreement cta = (unitPositionDTO.getCtaId() == null) ? null :
@@ -543,7 +543,7 @@ public class UnitPositionService extends UserBaseService {
     public PositionCtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId) {
         PositionCtaWtaQueryResult positionCtaWtaQueryResult = new PositionCtaWtaQueryResult();
         positionCtaWtaQueryResult.setCta(unitPositionGraphRepository.getCtaByExpertise(unitId, expertiseId));
-        positionCtaWtaQueryResult.setWta(unitPositionGraphRepository.getWtaByExpertise(unitId, expertiseId));
+        positionCtaWtaQueryResult.setWta(workingTimeAgreementRestClient.getWTAByExpertise(expertiseId));
 
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
         SeniorityLevel appliedSeniorityLevel = getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
@@ -555,45 +555,25 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
-    public UnitPositionQueryResult updateUnitPositionWTA(Long unitId, Long unitPositionId, Long wtaId, WTADTO updateDTO) {
+    public UnitPositionQueryResult updateUnitPositionWTA(Long unitId, Long unitPositionId, BigInteger wtaId, WTADTO updateDTO) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
             throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitPositionId);
         }
-        WorkingTimeAgreement oldWta = workingTimeAgreementGraphRepository.findOne(wtaId, 2);
-        if (!Optional.ofNullable(oldWta).isPresent()) {
-            logger.info("wta not found while updating unit Employment Position for staff %d", unitPositionId);
-            throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);
-        }
-
-        WorkingTimeAgreement newWta = new WorkingTimeAgreement();
-
-        if (oldWta.getExpertise().getId() != updateDTO.getExpertiseId()) {
-            logger.info("Expertise cant be changed :", wtaId);
-            throw new ActionNotPermittedException("Expertise can't be changed");
-        }
-        logger.info(updateDTO.getName());
-        newWta = wtaService.copyWta(oldWta, updateDTO);
-        newWta.setExpertise(oldWta.getExpertise());
-        newWta.setParentWTA(oldWta);
-        newWta.setDisabled(false);
-        unitPosition.setWorkingTimeAgreement(newWta);
+        updateDTO.setId(wtaId);
+        WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO);
         save(unitPosition);
-        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
-        newWta.setParentWTA(oldWta.basicDetails());
-
-        newWta.setExpertise(newWta.getExpertise().retrieveBasicDetails());
-        unitPositionQueryResult.setWorkingTimeAgreement(newWta);
+        UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition,wtaResponseDTO);
         return unitPositionQueryResult;
     }
 
-    private UnitPositionQueryResult getBasicDetails(UnitPositionDTO unitPositionDTO, UnitPosition unitPosition, UnitPositionEmploymentTypeRelationShip relationShip, Long parentOrganizationId) {
+    private UnitPositionQueryResult getBasicDetails(UnitPositionDTO unitPositionDTO, UnitPosition unitPosition, UnitPositionEmploymentTypeRelationShip relationShip, Long parentOrganizationId,WTAResponseDTO wtaResponseDTO) {
 
 
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
                 unitPosition.getId(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
-                unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), unitPosition.getWorkingTimeAgreement());
+                unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), wtaResponseDTO);
         result.setUnitId(unitPosition.getUnit().getId());
         result.setReasonCodeId(unitPosition.getReasonCode() != null ? unitPosition.getReasonCode().getId() : null);
         result.setParentUnitId(parentOrganizationId);
@@ -615,12 +595,12 @@ public class UnitPositionService extends UserBaseService {
         return result;
     }
 
-    public UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition) {
+    public UnitPositionQueryResult getBasicDetails(UnitPosition unitPosition,WTAResponseDTO wtaResponseDTO) {
         UnitPositionQueryResult unitPositionQueryResult = unitPositionGraphRepository.getUnitIdAndParentUnitIdByUnitPositionId(unitPosition.getId());
         UnitPositionQueryResult result = new UnitPositionQueryResult(unitPosition.getExpertise().retrieveBasicDetails(), unitPosition.getStartDateMillis(), unitPosition.getWorkingDaysInWeek(),
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
                 unitPosition.getId(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
-                unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), unitPosition.getWorkingTimeAgreement());
+                unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(),wtaResponseDTO);
         result.setReasonCodeId(unitPosition.getReasonCode().getId());
         result.setUnitId(unitPositionQueryResult.getUnitId());
         result.setParentUnitId(unitPositionQueryResult.getParentUnitId());
@@ -634,8 +614,7 @@ public class UnitPositionService extends UserBaseService {
         if (!Optional.ofNullable(unitPosition).isPresent() || unitPosition.isDeleted() == true) {
             throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitEmploymentPositionId);
         }
-        WTAResponseDTO workingTimeAgreement = workingTimeAgreementGraphRepository.findWtaByUnitEmploymentPosition(unitEmploymentPositionId);
-        return workingTimeAgreement;
+        return workingTimeAgreementRestClient.getWTAById(unitPosition.getWorkingTimeAgreementId());
     }
 
     public UnitPositionWithCtaDetailsDTO getUnitPositionCTA(Long unitPositionId, Long unitId) {
@@ -714,7 +693,7 @@ public class UnitPositionService extends UserBaseService {
         return null;
     }
 
-    public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, Long wtaId, Long ctaId, Long unitId) {
+    public UnitPositionDTO convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(TimeCareEmploymentDTO timeCareEmploymentDTO, Long expertiseId, Long staffId, Long employmentTypeId, Long positionCodeId, BigInteger wtaId, Long ctaId, Long unitId) {
         Long startDateMillis = DateConverter.convertInUTCTimestamp(timeCareEmploymentDTO.getStartDate());
         Long endDateMillis = null;
         if (!timeCareEmploymentDTO.getEndDate().equals("0001-01-01T00:00:00")) {
@@ -745,9 +724,9 @@ public class UnitPositionService extends UserBaseService {
             throw new DataNotFoundByIdException("NO expertise found or Invalid expertise Id : " + expertiseId);
         }
 
-        WorkingTimeAgreement wta = unitPositionGraphRepository.getOneDefaultWTA(organization.getId(), expertise.getId());
+        WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.getWTAByExpertise(expertise.getId()).get(0);
         CostTimeAgreement cta = unitPositionGraphRepository.getOneDefaultCTA(organization.getId(), expertise.getId());
-        if (wta == null) {
+        if (wtaResponseDTO == null) {
             throw new DataNotFoundByIdException("NO WTA found for organization : " + organization.getId());
         }
         if (cta == null) {
@@ -764,7 +743,7 @@ public class UnitPositionService extends UserBaseService {
             if (staff == null) {
                 throw new DataNotFoundByIdException("NO staff exist with External Id : " + timeCareEmploymentDTO.getPersonID());
             }
-            UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId(), wta.getId(), cta.getId(), organization.getId());
+            UnitPositionDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), positionCode.getId(), wtaResponseDTO.getId(), cta.getId(), organization.getId());
             createUnitPosition(organization.getId(), "Organization", unitEmploymentPosition, true);
         }
         return true;

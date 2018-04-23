@@ -513,7 +513,7 @@ public class RuleTemplateService extends MongoBaseService {
         if (Optional.ofNullable(wtaBaseRuleTemplate1).isPresent()) {
             throw new DuplicateDataException("WTA Rule template already existed  " + wtaRuleTemplateDTO.getName());
         }
-        WTABaseRuleTemplate wtaBaseRuleTemplate = wtaBuilderService.copyRuleTemplate(wtaRuleTemplateDTO);
+        WTABaseRuleTemplate wtaBaseRuleTemplate = wtaBuilderService.copyRuleTemplate(wtaRuleTemplateDTO,"id");
         save(wtaBaseRuleTemplate);
         ruleTemplateCategory.getRuleTemplateIds().add(wtaBaseRuleTemplate.getId());
         save(ruleTemplateCategory);
