@@ -2,30 +2,13 @@ package com.planner.appConfig.dbConfig;
 
 
 
-import com.planner.appConfig.appConfig.AppConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.cassandra.config.*;
-import org.springframework.data.cassandra.core.CassandraAdminOperations;
-import org.springframework.data.cassandra.core.CassandraAdminTemplate;
-import org.springframework.data.cassandra.core.convert.CassandraConverter;
-import org.springframework.data.cassandra.core.convert.MappingCassandraConverter;
-import org.springframework.data.cassandra.core.mapping.BasicCassandraMappingContext;
-import org.springframework.data.cassandra.core.mapping.CassandraMappingContext;
-import org.springframework.data.cassandra.core.mapping.SimpleUserTypeResolver;
-import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
-import org.springframework.data.convert.CustomConversions;
 
 
-@PropertySource(value = { "classpath:cassandra.properties" })
-@Configuration
-@EnableCassandraRepositories(basePackages = { "com.planner.repository" })
-public class CassandraConfig extends AbstractCassandraConfiguration {
-    private static final Logger LOG = LoggerFactory.getLogger(CassandraConfig.class);
+//@PropertySource(value = { "classpath:cassandra.properties" })
+//@Configuration
+//@EnableCassandraRepositories(basePackages = { "com.planner.repository" })
+public class CassandraConfig{//} extends AbstractCassandraConfiguration {
+   /* private static final Logger LOG = LoggerFactory.getLogger(CassandraConfig.class);
 
     @Autowired
     private AppConfig appConfig;
@@ -42,15 +25,15 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 
     @Bean
     @Override
-    public CassandraMappingContext cassandraMapping() {
+    public CassandraMappingContext cassandraMapping() throws ClassNotFoundException {
 
-        /*BasicCassandraMappingContext mappingContext = new BasicCassandraMappingContext();
+        *//*BasicCassandraMappingContext mappingContext = new BasicCassandraMappingContext();
 
         mappingContext.setBeanClassLoader(getb);
-        mappingContext.setInitialEntitySet(CassandraEntityClassScanner.scan(getEntityBasePackages()));*/
+        mappingContext.setInitialEntitySet(CassandraEntityClassScanner.scan(getEntityBasePackages()));*//*
 
         CustomConversions customConversions = customConversions();
-        CassandraMappingContext mappingContext= cassandraMapping();
+        CassandraMappingContext mappingContext= super.cassandraMapping();
 
         mappingContext.setCustomConversions(customConversions);
         mappingContext.setSimpleTypeHolder(customConversions.getSimpleTypeHolder());
@@ -63,7 +46,12 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
     @Override
     public CassandraConverter cassandraConverter() {
 
-        MappingCassandraConverter mappingCassandraConverter = new MappingCassandraConverter(cassandraMapping());
+        MappingCassandraConverter mappingCassandraConverter = null;
+        try {
+            mappingCassandraConverter = new MappingCassandraConverter(cassandraMapping());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
         mappingCassandraConverter.setCustomConversions(customConversions());
 
@@ -104,6 +92,6 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
     }
     @Override
     public String[] getEntityBasePackages() {
-        return new String[] {"com.planner.domain"}; //com.example package contains the bean with @table annotation
-    }
+        return new String[] {"com.planner.domain"}; //com.example package contains the bean with //@Table annotation
+    }*/
 }

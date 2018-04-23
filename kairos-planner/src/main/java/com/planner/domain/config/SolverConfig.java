@@ -2,9 +2,9 @@ package com.planner.domain.config;
 
 import com.planner.domain.common.BaseEntity;
 import com.planner.enums.SolverConfigPhase;
-import org.springframework.data.cassandra.core.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table
+//@Table
 public class SolverConfig extends BaseEntity {
 
 

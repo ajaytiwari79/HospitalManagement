@@ -1,7 +1,5 @@
 package com.planner.repository.config;
 
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select;
 import com.planner.domain.config.Constraint;
 import com.planner.repository.customRepository.BaseRepository;
 import org.springframework.stereotype.Repository;
@@ -13,8 +11,9 @@ public class SolverConfigRepository extends BaseRepository{
 
 
     public List<Constraint> getAllContraintsBySolverConfigId(String solverConfigId) {
-        Select select = QueryBuilder.select().from("constraint").allowFiltering();
+        /*Select select = QueryBuilder.select().from("constraint").allowFiltering();
         select.where(QueryBuilder.in("solverconfigid",solverConfigId));
-        return findAllByQuery(select,Constraint.class);
+        return findAllByQuery(select,Constraint.class);*/
+        return null;
     }
 }

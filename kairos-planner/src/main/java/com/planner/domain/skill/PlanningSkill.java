@@ -1,9 +1,9 @@
 package com.planner.domain.skill;
 
 import com.planner.domain.common.BaseEntity;
-import org.springframework.data.cassandra.core.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table
+//@Table
 public class PlanningSkill extends BaseEntity {
 
     private String name;

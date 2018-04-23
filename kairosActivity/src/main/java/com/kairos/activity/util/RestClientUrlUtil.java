@@ -13,7 +13,7 @@ public class RestClientUrlUtil {
     private static  String userServiceUrl;
     private static  String plannerServiceUrl;
     @Value("${gateway.plannerservice.url}")
-    public static void setPlannerServiceUrl(String plannerServiceUrl) {
+    public void setPlannerServiceUrl(String plannerServiceUrl) {
         RestClientUrlUtil.plannerServiceUrl = plannerServiceUrl;
     }
 

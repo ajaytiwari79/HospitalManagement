@@ -3,9 +3,9 @@ package com.planner.domain.taskPlanning;
 import com.planner.domain.common.BaseEntity;
 
 import com.planner.enums.PlanningStatus;
-import org.springframework.data.cassandra.core.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table
+//@Table
 public class PlanningProblem extends BaseEntity {
 
 	private String callBackUrl;

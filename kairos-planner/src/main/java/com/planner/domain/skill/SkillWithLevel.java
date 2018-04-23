@@ -2,9 +2,9 @@ package com.planner.domain.skill;
 
 import com.planner.domain.common.BaseEntity;
 import com.planner.enums.SkillLevel;
-import org.springframework.data.cassandra.core.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table
+//@Table
 public class SkillWithLevel extends BaseEntity {
 
     private String skillId;

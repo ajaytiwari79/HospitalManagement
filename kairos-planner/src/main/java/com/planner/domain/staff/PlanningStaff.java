@@ -1,11 +1,11 @@
 package com.planner.domain.staff;
 
 import com.planner.domain.common.BaseEntity;
-import org.springframework.data.cassandra.core.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.List;
 
-@Table
+//@Table
 public class PlanningStaff extends BaseEntity {
 
     private String firstName;
