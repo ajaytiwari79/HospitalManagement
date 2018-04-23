@@ -90,7 +90,7 @@ public class StaffingLevelController {
     @ApiOperation("update staffing_level")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid StaffingLevelDto staffingLevelDto,
         @PathVariable Long unitId,@PathVariable BigInteger staffingLevelId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+      return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffingLevelService.updateStaffingLevel(staffingLevelId,unitId,staffingLevelDto));
     }
 

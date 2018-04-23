@@ -4,6 +4,7 @@ package com.kairos.service.expertise;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -34,6 +35,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.util.DateUtil;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,9 +96,15 @@ public class ExpertiseService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid country Id");
         }
         ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
+
+
         Expertise expertise = null;
 
         if (!Optional.ofNullable(expertiseDTO.getId()).isPresent()) {
+            boolean isExpertiseExists = expertiseGraphRepository.checkExpertiseNameUniqueInOrganizationLevel(expertiseDTO.getOrganizationLevelId(), "(?i)" + expertiseDTO.getName().trim(), -1L);
+            if (isExpertiseExists) {
+                throw new DuplicateDataException("Already a expertise is available with same name");
+            }
             expertise = new Expertise();
             expertise.setCountry(country);
             prepareExpertiseWhileCreate(expertise, expertiseDTO, countryId);
@@ -129,6 +137,7 @@ public class ExpertiseService extends UserBaseService {
 
         return expertiseResponseDTO;
     }
+
 
     private void validateSeniorityLevel(List<SeniorityLevel> seniorityLevels, SeniorityLevelDTO seniorityLevelDTO, Long currentSeniorityLevelId) {
         Collections.sort(seniorityLevels);
@@ -380,6 +389,12 @@ public class ExpertiseService extends UserBaseService {
         if (!Optional.ofNullable(currentExpertise).isPresent() || currentExpertise.isDeleted()) {
             throw new DataNotFoundByIdException("Invalid expertise Id");
         }
+        if (!currentExpertise.getName().equalsIgnoreCase(expertiseDTO.getName().trim())) {
+            boolean isExpertiseExists = expertiseGraphRepository.checkExpertiseNameUniqueInOrganizationLevel(expertiseDTO.getOrganizationLevelId(), "(?i)" + expertiseDTO.getName().trim(), expertiseDTO.getId());
+            if (isExpertiseExists) {
+                throw new DuplicateDataException("Already a expertise is available with same name");
+            }
+        }
 
         Optional<SeniorityLevel> seniorityLevelToUpdate =
                 currentExpertise.getSeniorityLevel().stream().filter(seniorityLevel -> seniorityLevel.getId().equals(expertiseDTO.getSeniorityLevel().getId())).findFirst();
@@ -543,12 +558,12 @@ public class ExpertiseService extends UserBaseService {
             throw new ActionNotPermittedException("Expertise can't be removed, Its already published");
 
         }
-        ExpertiseQueryResult parentExpertise= expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
-        if (Optional.ofNullable(parentExpertise).isPresent()){
+        ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
+        if (Optional.ofNullable(parentExpertise).isPresent()) {
             // remove link and unlink
-            expertiseGraphRepository.unlinkExpertiseAndMakeEditable(parentExpertise.getId(), true,false);
+            expertiseGraphRepository.unlinkExpertiseAndMakeEditable(parentExpertise.getId(), false, false);
 
-            parentExpertise.setHistory(true);
+            parentExpertise.setHistory(false);
         }
         expertise.setDeleted(true);
         if (Optional.ofNullable(expertise.getSeniorityLevel()).isPresent() && !expertise.getSeniorityLevel().isEmpty()) {
@@ -682,6 +697,7 @@ public class ExpertiseService extends UserBaseService {
             expertiseGraphRepository.setEndDateToExpertise(parentExpertise.getId(), publishedDateMillis - ONE_DAY);
             parentExpertise.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY).getTime());
             parentExpertise.setPublished(true);
+            parentExpertise.setHistory(true);
         }
         return parentExpertise;
     }

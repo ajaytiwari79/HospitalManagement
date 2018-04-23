@@ -151,10 +151,11 @@ public class ShiftService extends MongoBaseService {
                 timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
             }
             shifts.add(shift);
-            timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+            //timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
             applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null));
         }
         save(shifts);
+        timeBankService.saveTimeBanks(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts);
         shifts.stream().forEach(s -> shiftQueryResults.add(s.getShiftQueryResult()));
         return shiftQueryResults;
     }
@@ -451,7 +452,7 @@ public class ShiftService extends MongoBaseService {
 
         }
         if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)) {
-            Interval shiftInterval = new Interval(new DateTime(fromDate).withTimeAtStartOfDay(), new DateTime(fromDate).plusDays(1).withTimeAtStartOfDay());
+            Interval shiftInterval = new Interval(new DateTime(shiftDTO.getStartDate()), new DateTime(shiftDTO.getEndDate()));
             Optional<ShiftQueryResult> shift = shifts.stream().filter(s -> shiftInterval.contains(s.getStartDate()) || shiftInterval.contains(s.getEndDate())).findFirst();
             if (shift.isPresent()) {
                 throw new ActionNotPermittedException("Shifts Already Exists in this interval");
