@@ -251,7 +251,7 @@ public class TimeBankCalculationService {
         int calculateTimeBankForInterval = calculateTimeBankForInterval(interval, unitPositionWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
         timeBankDTO.setTotalTimeBankMin(-calculateTimeBankForInterval);
         if (dailyTimeBankEntries != null && !dailyTimeBankEntries.isEmpty()) {
-            timeBankDTO.getCostTimeAgreement().setMinutesFromCta(dailyTimeBankEntries.stream().mapToInt(t -> t.getTimeBankMinWithCta()).sum());
+            timeBankDTO.setMinutesFromCta(dailyTimeBankEntries.stream().mapToInt(t -> t.getTimeBankMinWithCta()).sum());
             int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(ti -> ti.getTotalTimeBankMin()).sum();
             int totalTimeBank = calculatedTimeBank - calculateTimeBankForInterval;
             timeBankDTO.setTotalTimeBankAfterCtaMin(totalTimeBank + totalTimeBankBeforeStartDate);
@@ -448,6 +448,7 @@ public class TimeBankCalculationService {
                 timeBankIntervalDTO.setTitle(getTitle(query, interval));
                 int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(ti -> ti.getTotalTimeBankMin()).sum();
                 int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
+                timeBankIntervalDTO.setMinutesFromCta(dailyTimeBankEntries.stream().mapToInt(t -> t.getTimeBankMinWithCta()).sum());
                 timeBankIntervalDTO.setTotalTimeBankAfterCtaMin(totalTimeBankBefore + totalTimeBank);
                 timeBankIntervalDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBefore);
                 timeBankIntervalDTO.setTotalTimeBankMin(totalTimeBank);
@@ -643,7 +644,7 @@ public class TimeBankCalculationService {
     private List<DailyTimeBankEntry> getTimeBanksByInterval(Interval interval, List<DailyTimeBankEntry> dailyTimeBankEntries) {
         List<DailyTimeBankEntry> dailyTimeBanks1Entry = new ArrayList<>();
         dailyTimeBankEntries.forEach(tb -> {
-            if (interval.contains(DateUtils.asDate(tb.getDate()).getTime()) || interval.getStart().equals(new DateTime(DateUtils.asDate(tb.getDate())))) {
+            if (interval.contains(DateUtils.asDate(tb.getDate()).getTime()) || interval.getStart().equals(DateUtils.toJodaDateTime(tb.getDate()))) {
                 dailyTimeBanks1Entry.add(tb);
             }
         });
