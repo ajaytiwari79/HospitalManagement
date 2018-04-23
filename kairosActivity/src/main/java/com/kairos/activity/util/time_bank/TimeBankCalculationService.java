@@ -371,7 +371,9 @@ public class TimeBankCalculationService {
             if (endDate.toLocalDate().isAfter(new DateTime().toLocalDate())) {
                 endDate = new DateTime().withTimeAtStartOfDay();
             }
-            updatedInterval = new Interval(startDate, endDate);
+            if(startDate.isBefore(endDate)) {
+                updatedInterval = new Interval(startDate, endDate);
+            }
         }
         return updatedInterval;
     }
