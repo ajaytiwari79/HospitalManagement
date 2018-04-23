@@ -1,9 +1,10 @@
-package com.kairos.activity.config.mongo;
+package com.kairos.planner.config.mongo;
 
 import com.kairos.activity.config.mongo_converter.*;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.planner.repository.staffinglevel.StaffingLevelRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,7 @@ import java.util.List;
  * Created by prabjot on 4/10/16.
  */
 @Configuration
-@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
+//@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
 public class MongoConfig extends AbstractMongoConfiguration implements EnvironmentAware {
     @Value("spring.data.mongodb.database")
     private String DB_NAME;

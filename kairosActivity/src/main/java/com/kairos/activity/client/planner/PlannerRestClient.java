@@ -1,6 +1,8 @@
 package com.kairos.activity.client.planner;
 
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
+import com.kairos.activity.enums.IntegrationOperation;
+import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,31 +17,52 @@ import org.springframework.web.client.RestTemplate;
 import static com.kairos.activity.util.RestClientUrlUtil.getPlannerBaseUrl;
 @Service
 public class PlannerRestClient {
-    private Logger logger= LoggerFactory.getLogger(PlannerRestClient.class);
+    private Logger logger = LoggerFactory.getLogger(PlannerRestClient.class);
 
     @Autowired
     RestTemplate restTemplate;
 
-    public <T,V>  RestTemplateResponseEnvelope<V> publish(T t,Long unitId){
-        final String baseUrl=getPlannerBaseUrl();
+    public <T, V> RestTemplateResponseEnvelope<V> publish(T t, Long unitId, IntegrationOperation integrationOperation) {
+        final String baseUrl = getPlannerBaseUrl();
 
         try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>(){};
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
+            };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + unitId+"/staffing_level/",
-                            HttpMethod.POST,
+                            baseUrl + unitId + "/"+getActionName(t.getClass().getSimpleName())+"/",
+                            getHttpMethod(integrationOperation),
                             new HttpEntity<>(t), typeReference);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
             if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException(response.getMessage());
             }
             return response;
-        }catch (HttpClientErrorException e) {
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in user micro service "+e.getMessage());
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
         }
 
+    }
+
+    public static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
+        switch (integrationOperation) {
+            case CREATE:
+                return HttpMethod.POST;
+            case DELETE:
+                return HttpMethod.DELETE;
+            case UPDATE:
+                return HttpMethod.PUT;
+            default:return null;
+
+        }
+    }
+    public static String getActionName(String className){
+
+        switch (className){
+            case "StaffingLevel": return "staffing_level";
+        }
+        return null;
     }
 }

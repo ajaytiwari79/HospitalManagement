@@ -16,12 +16,7 @@ public class PlannerSyncService {
     private PlannerRestClient plannerRestClient;
     @Async
     public void publishStaffingLevel( Long unitId, StaffingLevelDto staffingLevelDto, IntegrationOperation integrationOperation){
-        plannerRestClient.publish(staffingLevelDto,unitId);
-
-    }
-    @Async
-    public void publishActivity(Long unitId, ActivityDTO staffingLevelDto, IntegrationOperation integrationOperation){
-
+        plannerRestClient.publish(staffingLevelDto,unitId,integrationOperation);
 
     }
 }
