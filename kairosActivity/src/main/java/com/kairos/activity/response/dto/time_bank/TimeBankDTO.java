@@ -35,6 +35,7 @@ public class TimeBankDTO {
     private int totalTimeBankMaxLimit;
     private int totalTimeBankInPercent = 10;
     private int totalTimeBankDiff;
+    private int minutesFromCta;
 
     //Distributed min on the basis of Interval;
     private List<TimeBankIntervalDTO> timeIntervals = new ArrayList<>();
@@ -52,6 +53,14 @@ public class TimeBankDTO {
         this.staffId = staffId;
         this.workingDaysInWeek = workingDaysInWeek;
         this.totalWeeklyMin = totalWeeklyMins;
+    }
+
+    public int getMinutesFromCta() {
+        return minutesFromCta;
+    }
+
+    public void setMinutesFromCta(int minutesFromCta) {
+        this.minutesFromCta = minutesFromCta;
     }
 
     public int getTotalTimeBankDiff() {
