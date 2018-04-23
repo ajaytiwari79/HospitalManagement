@@ -625,7 +625,6 @@ public class BootDataService {
 
     private void createCountryLevelOrganization() {
 
-
         kairosCountryLevel = new Organization();
         kairosCountryLevel.setKairosHub(true);
         kairosCountryLevel.setFormalName("Kairos (HUB)");
@@ -661,9 +660,10 @@ public class BootDataService {
         createCountryAdminAccessGroup();
         createEmployment();
         createTeam();
-        createGroup();
+
         linkingOfStaffAndTeam();
         createUnitEmploymentForCountryLevel();
+//        createGroup();
     }
 
     private void createUser() {
@@ -841,7 +841,7 @@ public class BootDataService {
     }
 
     private void createCountryAdminAccessGroup() {
-        AccessGroup accessGroup = new AccessGroup(AppConstants.AG_COUNTRY_ADMIN, "Country Admin Access Group", AccessGroupRole.MANAGEMENT);
+        accessGroup = new AccessGroup(AppConstants.AG_COUNTRY_ADMIN, "Country Admin Access Group", AccessGroupRole.MANAGEMENT);
         accessGroup.setCreationDate(DateUtil.getCurrentDate().getTime());
         accessGroup.setLastModificationDate(DateUtil.getCurrentDate().getTime());
         accessGroupRepository.save(accessGroup);
@@ -855,18 +855,18 @@ public class BootDataService {
 
     private void createUnitEmploymentForCountryLevel() {
 
-        accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
+//        accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(kairosCountryLevel);
-
+        unitPermission.setAccessGroup(accessGroup);
 //        accessGroup = accessGroupRepository.findAccessGroupByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
 
 
-        AccessPermission accessPermission = new AccessPermission(accessGroup);
+//        AccessPermission accessPermission = new AccessPermission(accessGroup);
         unitPermissionGraphRepository.save(unitPermission);
-        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
-        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
-        accessPageService.setPagePermissionToAdmin(accessPermission);
+//        UnitEmpAccessRelationship unitEmpAccessRelationship = new UnitEmpAccessRelationship(unitPermission, accessPermission);
+//        unitEmpAccessGraphRepository.save(unitEmpAccessRelationship);
+//        accessPageService.setPagePermissionToAdmin(accessPermission);
         employmentForAdmin.getUnitPermissions().add(unitPermission);
         kairosCountryLevel.getEmployments().add(employmentForAdmin);
         organizationGraphRepository.save(kairosCountryLevel);

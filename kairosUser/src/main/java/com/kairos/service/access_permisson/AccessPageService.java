@@ -239,7 +239,7 @@ public class AccessPageService extends UserBaseService {
         while (iterator.hasNext()){
             allPermissions.addAll(iterator.next().getValue());
         }
-        createEmploymentWithNewOrganization(newUnit,userId,permissionByAccessGroup,parentOrganizationId);
+//        createEmploymentWithNewOrganization(newUnit,userId,permissionByAccessGroup,parentOrganizationId);
         return preparePermissionList(allPermissions);
     }
 
@@ -287,7 +287,7 @@ public class AccessPageService extends UserBaseService {
         return tabPermissionToProceed.values().stream().collect(Collectors.toList());
     }
 
-    private void createEmploymentWithNewOrganization(Organization organization,Long userId,
+    /*private void createEmploymentWithNewOrganization(Organization organization,Long userId,
                                                      Map<Long,List<StaffPermissionQueryResult>> accessPermissionByGroup,Long parentOrganizationId){
 
         Staff staff;
@@ -344,7 +344,7 @@ public class AccessPageService extends UserBaseService {
         }
         unitEmpAccessGraphRepository.saveAll(unitEmpAccessRelationships);
         employmentPageGraphRepository.saveAll(employmentAccessPageRelations);
-    }
+    }*/
 
     private List<StaffPermissionDTO> getPermissionForHubMember(){
         List<StaffPermissionQueryResult> staffPermissionQueryResults = accessPageRepository.getTabsPermissionForHubUserForUnit();
