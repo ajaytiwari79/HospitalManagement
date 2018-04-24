@@ -84,6 +84,8 @@ public class RuleTemplateService extends MongoBaseService {
         long daysCount = 10;
         long dateInMillis = DateUtils.getCurrentDate().getTime();
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates1 = new ArrayList<>();
+        List<AgeRange> ageRange=new ArrayList<>();
+        List<Long> activities=new ArrayList<>();
 
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
         phaseTemplateValues.add(new PhaseTemplateValue(1,"REQUEST",(short) 0,(short)0,true,0,false));
@@ -175,6 +177,16 @@ public class RuleTemplateService extends MongoBaseService {
         timeBankWTATemplate.setCountryId(countryDTO.getId());
         timeBankWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         wtaBaseRuleTemplates1.add(timeBankWTATemplate);
+
+        MaximumSeniorDaysPerYear maximumSeniorDaysPerYear=new MaximumSeniorDaysPerYear("Senior Days per Year",true,true,"Senior Days In Year",ageRange,activities,dateInMillis,12);
+        maximumSeniorDaysPerYear.setCountryId(countryDTO.getId());
+        maximumSeniorDaysPerYear.setPhaseTemplateValues(phaseTemplateValues);
+        wtaBaseRuleTemplates1.add(maximumSeniorDaysPerYear);
+
+        CareDaysCheck careDaysCheck=new CareDaysCheck("Care Days Check",true,true,"Care Days Check",ageRange,activities,dateInMillis,12);
+        careDaysCheck.setCountryId(countryDTO.getId());
+        careDaysCheck.setPhaseTemplateValues(phaseTemplateValues);
+        wtaBaseRuleTemplates1.add(careDaysCheck);
         save(wtaBaseRuleTemplates1);
         List<BigInteger> ruleTemplateIds = wtaBaseRuleTemplates1.stream().map(t->t.getId()).collect(Collectors.toList());
         ruleTemplateCategory.setRuleTemplateIds(ruleTemplateIds);
