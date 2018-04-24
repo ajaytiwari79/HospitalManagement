@@ -91,11 +91,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return null;//result.getMappedResults();
     }
 
-    public Shift findShiftBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate) {
+    /*public Shift findShiftBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate) {
         Query query = new Query();
         query.addCriteria(Criteria.where("deleted").is(false).and("isMainShift").is(true).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").exists(true).
                 andOperator(Criteria.where("startDate").gte(startDate),Criteria.where("startDate").lt(endDate)),Criteria.where("endDate").exists(true).andOperator(
                 Criteria.where("endDate").gt(startDate),Criteria.where("endDate").lte(endDate))));
                       return (Shift) mongoTemplate.findOne(query,Shift.class);
-    }
+    }*/
 }

@@ -17,6 +17,5 @@ public interface CustomShiftMongoRepository {
     List<ShiftQueryResult> findAllActivityBetweenDuration(Long staffId, Date startDate, Date endDate, Long unitId);
     List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEP(Long unitEmploymentPositionId, Date startDate, Date endDate);
     List<ShiftQueryResultWithActivity> findAllShiftsBetweenDurationByUEPs(List<Long> unitEmploymentPositionId, Date startDate, Date endDate);
-    Shift findShiftBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate);
 
 }
