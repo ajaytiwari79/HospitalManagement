@@ -14,7 +14,6 @@ import com.kairos.persistence.model.user.staff.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -33,7 +32,8 @@ public class UnitPosition extends UserBaseEntity {
     @Relationship(type = HAS_CTA)
     private CostTimeAgreement cta;
 
-    private BigInteger workingTimeAgreementId;
+    @Relationship(type = HAS_WTA)
+    private WorkingTimeAgreement workingTimeAgreement;
 
     @Relationship(type = HAS_POSITION_CODE)
     private PositionCode positionCode;
@@ -153,12 +153,12 @@ public class UnitPosition extends UserBaseEntity {
         this.cta = cta;
     }
 
-    public BigInteger getWorkingTimeAgreementId() {
-        return workingTimeAgreementId;
+    public WorkingTimeAgreement getWorkingTimeAgreement() {
+        return workingTimeAgreement;
     }
 
-    public void setWorkingTimeAgreementId(BigInteger workingTimeAgreementId) {
-        this.workingTimeAgreementId = workingTimeAgreementId;
+    public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
+        this.workingTimeAgreement = workingTimeAgreement;
     }
 
     public Long getStartDateMillis() {

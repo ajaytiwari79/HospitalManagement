@@ -28,7 +28,6 @@ public class TimeBankRestClient {
     RestTemplate restTemplate;
 
 
-/*
     @Async
     public Boolean createBlankTimeBank(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO){
         String baseUrl = getBaseUrl(true);
@@ -79,7 +78,6 @@ public class TimeBankRestClient {
         }
 
     }
-*/
 
 
 

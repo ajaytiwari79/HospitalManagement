@@ -17,7 +17,6 @@ import com.google.api.services.calendar.model.Events;
 import com.kairos.persistence.model.user.country.CountryHolidayCalender;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
-import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 

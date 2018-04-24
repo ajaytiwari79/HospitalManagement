@@ -2,13 +2,13 @@ package com.kairos.activity.persistence.model.wta;
 
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 //@JsonInclude(JsonInclude.Include.NON_NULL)
@@ -40,9 +40,9 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private WTAOrganization organization;
 
-    private List<BigInteger> ruleTemplateIds;
+    private List<BigInteger> ruleTemplates;
 
-    private List<WTABaseRuleTemplate> ruleTemplates;
+    private List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
 
 
     // to make a history
@@ -55,25 +55,25 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private List<BigInteger> tags = new ArrayList<>();
 
-    private Date startDate;
-    private Date endDate;
-    private Date expiryDate;
+    private Long startDateMillis;
+    private Long endDateMillis;
+    private Long expiryDate;
 
-    public List<BigInteger> getRuleTemplateIds() {
-        return ruleTemplateIds;
-    }
-
-    public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {
-        this.ruleTemplateIds = ruleTemplateIds;
-    }
-
-
-    public List<WTABaseRuleTemplate> getRuleTemplates() {
+    public List<BigInteger> getRuleTemplates() {
         return ruleTemplates;
     }
 
-    public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
+    public void setRuleTemplates(List<BigInteger> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
+    }
+
+
+    public List<WTABaseRuleTemplate> getWtaBaseRuleTemplates() {
+        return wtaBaseRuleTemplates;
+    }
+
+    public void setWtaBaseRuleTemplates(List<WTABaseRuleTemplate> wtaBaseRuleTemplates) {
+        this.wtaBaseRuleTemplates = wtaBaseRuleTemplates;
     }
 
     public WTAOrganization getOrganization() {
@@ -126,27 +126,27 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     }
 
 
-    public Date getStartDate() {
-        return startDate;
+    public Long getStartDateMillis() {
+        return startDateMillis;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartDateMillis(Long startDateMillis) {
+        this.startDateMillis = startDateMillis;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Long getEndDateMillis() {
+        return endDateMillis;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndDateMillis(Long endDateMillis) {
+        this.endDateMillis = endDateMillis;
     }
 
-    public Date getExpiryDate() {
+    public Long getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(Long expiryDate) {
         this.expiryDate = expiryDate;
     }
 
@@ -199,12 +199,12 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     }
 
 
-    public WorkingTimeAgreement(BigInteger id, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description, Date startDate, Date endDate, Date expiryDate) {
+    public WorkingTimeAgreement(BigInteger id, @NotNull(message = "error.WorkingTimeAgreement.name.notnull") String name, String description, Long startDateMillis, Long endDateMillis, Long expiryDate) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
         this.expiryDate = expiryDate;
     }
 
@@ -212,7 +212,7 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         //default
     }
     public WorkingTimeAgreement basicDetails() {
-        return new WorkingTimeAgreement(this.id, this.name, this.description, this.startDate, this.endDate, this.expiryDate);
+        return new WorkingTimeAgreement(this.id, this.name, this.description, this.startDateMillis, this.endDateMillis, this.expiryDate);
     }
 
 

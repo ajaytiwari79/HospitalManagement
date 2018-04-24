@@ -3,7 +3,6 @@ package com.kairos.persistence.model.user.agreement.wta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -12,8 +11,6 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WTADTO {
-
-    private BigInteger id;
     private String name;
     private String description;
     private long expertiseId;
@@ -27,14 +24,6 @@ public class WTADTO {
 
     public WTADTO() {
         //default cons
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
     }
 
     public String getName() {
