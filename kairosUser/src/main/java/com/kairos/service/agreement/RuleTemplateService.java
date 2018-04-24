@@ -404,6 +404,7 @@ public class RuleTemplateService extends UserBaseService {
                 BreaksInShift breaksInShift=(BreaksInShift) oldTemplate;
                 breaksInShift.setDescription(templateDTO.getDescription());
                 breaksInShift.setBreakTemplateValues(templateDTO.getBreakTemplateValues());
+                break;
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
