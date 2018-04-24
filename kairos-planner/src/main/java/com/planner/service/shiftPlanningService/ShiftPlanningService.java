@@ -139,14 +139,14 @@ public class ShiftPlanningService {
         }
     }
 
-    /*private Map<String, Object> getStaffingLevelSetting(StaffingLevel staffingLevel) {
+    /*private Map<String, Object> getStaffingLevelSetting(staffinglevel staffingLevel) {
         Map<String, Object> staffingLevelSettingMap = new HashMap<>();
         staffingLevelSettingMap.put("detailLevelMinutes", 15);
         staffingLevelSettingMap.put("duration", getStaffingLevelDuration(staffingLevel.getDate(), staffingLevel.getDate()));
         return staffingLevelSettingMap;
     }*/
 
-    /*private Map<String,Object> getStaffingLevel(StaffingLevel staffingLevel){
+    /*private Map<String,Object> getStaffingLevel(staffinglevel staffingLevel){
         Map<String,Object> staffingLevelMap = new HashMap<>();
         staffingLevelMap.put("date",staffingLevel.getDate().toDate());
         staffingLevelMap.put("id",staffingLevel.getId());

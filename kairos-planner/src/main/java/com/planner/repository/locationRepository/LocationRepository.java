@@ -1,8 +1,8 @@
 package com.planner.repository.locationRepository;
 
 
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select;
+/*import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;*/
 import com.planner.domain.location.LocationDistance;
 import com.planner.domain.location.PlanningLocation;
 import com.planner.repository.customRepository.BaseRepository;
@@ -34,24 +34,28 @@ public class LocationRepository extends BaseRepository {
 
 
     public List<PlanningLocation> getAllByUnitId(long unitId){
-        Select select = QueryBuilder.select().from("PlanningLocation").allowFiltering();
+        /*Select select = QueryBuilder.select().from("PlanningLocation").allowFiltering();
         select.where(QueryBuilder.eq("unitId",unitId));
-        return (List<PlanningLocation>)findAllByQuery(select,PlanningLocation.class);
+        return (List<PlanningLocation>)findAllByQuery(select,PlanningLocation.class);*/
+        return null;
     }
 
     public PlanningLocation getUnitAddressBy(long unitId){
-        Select select = QueryBuilder.select().from("PlanningLocation").allowFiltering();
+        /*Select select = QueryBuilder.select().from("PlanningLocation").allowFiltering();
         select.where(QueryBuilder.eq("unitId",unitId)).and(QueryBuilder.eq("isUnitAddress",true));
-        return (PlanningLocation) findOne(select,PlanningLocation.class);
+        return (PlanningLocation) findOne(select,PlanningLocation.class);*/
+        return null;
     }
 
     public PlanningLocation getLocationByLatLong(double latitude,double longitude){
-        Select select = QueryBuilder.select().from("PlanningLocation").allowFiltering();
+    /*    Select select = QueryBuilder.select().from("PlanningLocation").allowFiltering();
         select.where(QueryBuilder.eq("latitude",latitude)).and(QueryBuilder.eq("longitude",longitude));
-        return (PlanningLocation) findOne(select,PlanningLocation.class);
+        return (PlanningLocation) findOne(select,PlanningLocation.class);*/
+        return null;
     }
 
     public List<LocationDistance> getAllLocationDistances(){
-        return (List<LocationDistance>)findAll(LocationDistance.class);
+        /*return (List<LocationDistance>)findAll(LocationDistance.class);*/
+        return null;
     }
 }

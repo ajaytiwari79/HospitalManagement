@@ -11,8 +11,13 @@ import org.springframework.stereotype.Component;
 public class RestClientUrlUtil {
 
     private static  String userServiceUrl;
+    private static  String plannerServiceUrl;
+    @Value("${gateway.plannerservice.url}")
+    public void setPlannerServiceUrl(String plannerServiceUrl) {
+        RestClientUrlUtil.plannerServiceUrl = plannerServiceUrl;
+    }
 
-        @Value("${gateway.userservice.url}")
+    @Value("${gateway.userservice.url}")
     public  void setUserServiceUrl(String userServiceUrl) {
         RestClientUrlUtil.userServiceUrl = userServiceUrl;
     }
@@ -30,16 +35,14 @@ public class RestClientUrlUtil {
     }
     public static final String getBaseUrl() {
         return userServiceUrl;
-
-
     }
-
-
     public static final String getDefaultSchedulerUrl(){
-
         String baseUrl=new StringBuilder(userServiceUrl+"organization/123").toString();
         return baseUrl;
-
+    }
+    public static final String getPlannerBaseUrl(){
+        String baseUrl=new StringBuilder(plannerServiceUrl+"unit/").toString();
+        return baseUrl;
 
     }
 
