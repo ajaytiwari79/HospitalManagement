@@ -958,7 +958,7 @@ public class StaffService extends UserBaseService {
             setBasicDetailsOfUser(user, staffCreationPOJOData);
             userGraphRepository.save(user);
         }
-        createUnitManagerAndEmployment(organizationId, user.getId());
+        createUnitManagerAndEmployment(organizationId, user);
         return user;
     }
 
@@ -1095,10 +1095,9 @@ public class StaffService extends UserBaseService {
     }
 
 
-    private void createUnitManagerAndEmployment(Long organizationId, Long userId) {
+    private void createUnitManagerAndEmployment(Long organizationId, User user) {
 
         Organization organization = organizationGraphRepository.findOne(organizationId);
-        User user = userGraphRepository.findOne(userId);
         Organization parent;
         if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organizationId);
@@ -1110,17 +1109,14 @@ public class StaffService extends UserBaseService {
             parent = organization;
         }
 
-        Staff staff = new Staff();
-        staff.setFirstName(user.getFirstName());
-        staff.setLastName(user.getLastName());
-        staff.setEmail(user.getEmail());
-        staff.setCprNumber(user.getCprNumber());
+        Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
+                user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
 
         Employment employment = new Employment();
         employment.setStaff(staff);
         staff.setUser(user);
 
-        employment.setName("Working as Unit Manager");
+        employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
 
@@ -1130,7 +1126,6 @@ public class StaffService extends UserBaseService {
         unitPermission.setOrganization(parent);
         AccessGroup accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByRole(parent.getId(), AccessGroupRole.MANAGEMENT.toString()); // findOne(accessGroupId);
         if (Optional.ofNullable(accessGroup).isPresent()) {
-            //throw new DataNotFoundByIdException("Access group not found " + accessGroupId);
             unitPermission.setAccessGroup(accessGroup);
         }
 
