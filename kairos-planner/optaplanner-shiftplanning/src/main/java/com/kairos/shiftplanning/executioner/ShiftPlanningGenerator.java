@@ -637,7 +637,7 @@ public class ShiftPlanningGenerator {
         return objects;
     }
     //@Deprecated
-    /*public List<DailyStaffingLine> generateActivityLine(List<StaffingLevel> staffingLevels){
+    /*public List<DailyStaffingLine> generateActivityLine(List<staffinglevel> staffingLevels){
         List<DailyStaffingLine> dailyStaffingLines = new ArrayList<>();
         staffingLevels.forEach(staffingLevel -> {
             DailyActivityLine dailyActivityLine= new DailyActivityLine(staffingLevel.getDate(),new ArrayList<>());
