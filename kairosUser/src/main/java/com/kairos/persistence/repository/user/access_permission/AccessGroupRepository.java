@@ -58,17 +58,17 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
     List<Map<String,Object>> setAccessPagePermission(long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
-            "OPTIONAL Match (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForHub=true WITH accessGroup,accessPage \n" +
+            "MATCH (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForHub=true WITH accessGroup,accessPage \n" +
             "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForHubAccessGroup(Long countryId, Long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
-            "OPTIONAL Match (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForUnion=true WITH accessGroup,accessPage \n" +
+            "MATCH (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForUnion=true WITH accessGroup,accessPage \n" +
             "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForUnionAccessGroup(Long countryId, Long accessGroupId);
 
     @Query("Match (accessGroup:AccessGroup) where id(accessGroup)={1} WITH accessGroup\n" +
-            "OPTIONAL Match (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForOrganization=true WITH accessGroup,accessPage \n" +
+            "MATCH (c:Country)-[r:"+HAS_ACCESS_FOR_ORG_CATEGORY+"]-(accessPage:AccessPage) WHERE id(c)={0} AND r.accessibleForOrganization=true WITH accessGroup,accessPage \n" +
             "create unique (accessGroup)-[r:"+HAS_ACCESS_OF_TABS+"{isEnabled:false, read:true, write:true}]->(accessPage) return r")
     List<Map<String,Object>> setAccessPageForOrganizationAccessGroup(Long countryId, Long accessGroupId);
 
@@ -267,6 +267,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup,L
             "Match(unitPermission)-[rel_has_access_group:" + HAS_ACCESS_GROUP + " ]-(ag:AccessGroup) optional Match(unitPermission)-[rel_has_customized_permission:" + HAS_CUSTOMIZED_PERMISSION + "]-" +
             "(accesspage:AccessPage) delete rel_has_access_group, rel_has_customized_permission")
     void deleteAccessGroupRelationAndCustomizedPermissionRelation(List<Long> empIds );
+
+    @Query("Match (o:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(ag:AccessGroup {deleted:false}) WHERE id(o)={0} AND ag.role={1} return ag LIMIT 1")
+    AccessGroup getAccessGroupOfOrganizationByRole(Long orgId, String role);
 }
 
 
