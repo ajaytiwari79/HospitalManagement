@@ -1,8 +1,6 @@
 package com.planner.repository.skillRepository;
 
 
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select;
 import com.planner.domain.skill.PlanningSkill;
 import com.planner.repository.customRepository.BaseRepository;
 import com.planner.domain.skill.SkillWithLevel;
@@ -30,15 +28,17 @@ public class SkillRepository extends BaseRepository {
     }*/
 
    public List<SkillWithLevel> getAllSKillWithLevelByUnitId(Long unitId){
-       Select select = QueryBuilder.select().from("skillwithlevel").allowFiltering();
+      /* Select select = QueryBuilder.select().from("skillwithlevel").allowFiltering();
        select.where(QueryBuilder.eq("unitid",unitId));
-       return (List<SkillWithLevel>)findAllByQuery(select,SkillWithLevel.class);
+       return (List<SkillWithLevel>)findAllByQuery(select,SkillWithLevel.class);*/
+      return null;
    }
 
     public PlanningSkill findOneByExternalId(Long externalId){
-        Select select = QueryBuilder.select().from("planningskill").allowFiltering();
+        /*Select select = QueryBuilder.select().from("planningskill").allowFiltering();
         select.where(QueryBuilder.eq("externalid",externalId));
-        return ((PlanningSkill) findByField(select,PlanningSkill.class));
+        return ((PlanningSkill) findByField(select,PlanningSkill.class));*/
+        return null;
     }
 
     public boolean deleteByExternalId(Long externalId){
@@ -48,17 +48,19 @@ public class SkillRepository extends BaseRepository {
     }
 
    public List<PlanningSkill> getAllByUnitId(long unitId){
-       Select select = QueryBuilder.select().from("planningskill").allowFiltering();
+       /*Select select = QueryBuilder.select().from("planningskill").allowFiltering();
        select.where(QueryBuilder.eq("unitid",unitId));
-       return (List<PlanningSkill>)findAllByQuery(select,PlanningSkill.class);
+       return (List<PlanningSkill>)findAllByQuery(select,PlanningSkill.class);*/
+       return null;
    }
 
     public SkillWithLevel getOneSkillWithLevel(String optaSkillId, String skillLevel, long unitId){
-        Select select = QueryBuilder.select().from("skillwithlevel").allowFiltering();
+        /*Select select = QueryBuilder.select().from("skillwithlevel").allowFiltering();
         select.where(QueryBuilder.eq("unitId",unitId));
         select.where(QueryBuilder.eq("skillId",optaSkillId));
         select.where(QueryBuilder.eq("skillLevel",skillLevel));
-        return (SkillWithLevel) findOne(select,SkillWithLevel.class);
+        return (SkillWithLevel) findOne(select,SkillWithLevel.class);*/
+        return null;
     }
 
 }

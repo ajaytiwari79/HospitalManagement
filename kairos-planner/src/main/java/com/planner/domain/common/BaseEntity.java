@@ -1,12 +1,12 @@
 package com.planner.domain.common;
 
-import org.springframework.data.cassandra.mapping.PrimaryKey;
+//import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 
 import java.util.Date;
 
 public class BaseEntity {
 
-    @PrimaryKey
+    //@PrimaryKey
     private String id;
     private Date createdDate;
     private Date updatedDate;

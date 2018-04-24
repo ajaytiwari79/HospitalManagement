@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.auth;
 
+import com.kairos.constants.AppConstants;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.auth.TabPermission;
 import com.kairos.persistence.model.user.auth.User;
@@ -70,7 +71,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("Match (staff:Staff)-[:"+BELONGS_TO+"]->(user:User) where id(staff)={0} return user")
     User getUserByStaffId(Long staffId);
 
-    @Query("MATCH (u:User),(ag:AccessGroup) WHERE id(u) = {0} AND ag.name='AG_COUNTRY_ADMIN' WITH u,ag\n" +
-            "MATCH (ag)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(org:Organization)-[:HAS_EMPLOYMENTS]-(e:Employment)-[:BELONGS_TO]-(s:Staff)-[r:BELONGS_TO]-(u)  RETURN COUNT(u)>0")
-    Boolean checkIfUserIsCountryAdmin(Long userId);
+    @Query("MATCH (u:User),(ag:AccessGroup) WHERE id(u) = {0} AND ag.name={1} WITH u,ag\n" +
+            "MATCH (ag)<-[:HAS_ACCESS_GROUP]-(up:UnitPermission)<-[:HAS_UNIT_PERMISSIONS]-(e:Employment)-[:BELONGS_TO]->(s:Staff)-[r:BELONGS_TO]-(u)  RETURN COUNT(u)>0")
+    Boolean checkIfUserIsCountryAdmin(Long userId, String accessGroupName);
 }

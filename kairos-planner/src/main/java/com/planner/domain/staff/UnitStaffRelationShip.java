@@ -1,9 +1,9 @@
 package com.planner.domain.staff;
 
 import com.planner.domain.common.BaseEntity;
-import org.springframework.data.cassandra.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table("unit_staff")
+//@Table("unit_staff")
 public class UnitStaffRelationShip extends BaseEntity {
 
     private String staffId;

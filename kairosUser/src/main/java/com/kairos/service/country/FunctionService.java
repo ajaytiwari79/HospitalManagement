@@ -48,10 +48,10 @@ public class FunctionService extends UserBaseEntity{
         if(!functionDTO.getUnionIds().isEmpty()){
             unions= organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
-        Function function=new Function(functionDTO.getName(),functionDTO.getDescription(),functionDTO.getStartDate(),functionDTO.getEndDate(),unions,levels,country);
+        Function function=new Function(functionDTO.getName(),functionDTO.getDescription(),functionDTO.getStartDate(),functionDTO.getEndDate(),unions,levels,country,functionDTO.getIcon());
         functionGraphRepository.save(function);
         FunctionDTO functionResponseDTO=new FunctionDTO(function.getId(),function.getName(),function.getDescription(),
-                function.getStartDate(),function.getEndDate(),function.getUnions(),function.getOrganizationLevels());
+                function.getStartDate(),function.getEndDate(),function.getUnions(),function.getOrganizationLevels(),function.getIcon());
 
         return functionResponseDTO;
     }
@@ -93,9 +93,10 @@ public class FunctionService extends UserBaseEntity{
         function.setEndDate(functionDTO.getEndDate());
         function.setUnions(unions);
         function.setOrganizationLevels(levels);
+        function.setIcon(functionDTO.getIcon());
         functionGraphRepository.save(function);
         FunctionDTO functionResponseDTO=new FunctionDTO(function.getId(),function.getName(),function.getDescription(),
-                function.getStartDate(),function.getEndDate(),function.getUnions(),function.getOrganizationLevels());
+                function.getStartDate(),function.getEndDate(),function.getUnions(),function.getOrganizationLevels(),function.getIcon());
 
         return functionResponseDTO;
     }
