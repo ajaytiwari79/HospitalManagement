@@ -161,4 +161,19 @@ public class WTAController {
     }
 
 
+    @ApiOperation(value = "get WTA of Organization by Expertise")
+    @GetMapping(value = UNIT_URL + "/expertise/{expertiseId}/wta")
+    public ResponseEntity<Map<String, Object>> getAllWtaOfOrganizationByExpertise(@PathVariable long unitId, @PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaOrganizationService.getAllWtaOfOrganizationByExpertise(unitId,expertiseId));
+    }
+
+    @ApiOperation(value = "Update WTA of Organization by Expertise")
+    @PutMapping(value = UNIT_URL + "/wta")
+    public ResponseEntity<Map<String, Object>> updateWtaOfUnitPosition(@PathVariable long unitId, @RequestBody WTADTO wtadto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfUnitPosition(unitId,wtadto));
+    }
+
+
+
+
 }

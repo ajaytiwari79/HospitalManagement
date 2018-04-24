@@ -15,15 +15,15 @@ import java.util.Map;
  * Created by pawanmandhan on 27/7/17.
  */
 @Repository
-public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository<WorkingTimeAgreement, BigInteger> {
+public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository<WorkingTimeAgreement, BigInteger>,CustomWorkingTimeAgreementMongoRepostory {
 
     @Query("{name:?0,countryId:?1,deleted:false}")
     WorkingTimeAgreement getWtaByName(String wtaName, Long countryId);
 
-    @Query("{}")
+    @Query("{name:?0,countryId:?1,deleted:false,id:?2,organizationType.Id:?3,organizationSubType.Id:?4}")
     WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
 
-    @Query("{organizationType.id:?0,deleted:false}")
+/*    @Query("{organizationType.id:?0,deleted:false}")
     List<WTAResponseDTO> getAllWTAByOrganizationTypeId(long organizationId);
 
     @Query("{countryId:?0,deleted:false}")
@@ -38,6 +38,9 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     @Query("{countryId:?0,id:?1,deleted:false}")
     List<Map<String, Object>> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
 
+    @Query("{countryId:?0,id:?1,deleted:false}")
+    WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId);*/
+
   /*  @Query("{}")
     WorkingTimeAgreement checkUniquenessOfData(long orgSubTypeId, long orgTypeId, long expertiseId, long countryId);
 
@@ -51,8 +54,8 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
 
 
 
-    @Query("{organization.id:?0,deleted:false}")
-    List<WTAResponseDTO> getWtaByOrganization(Long organizationId);
+    /*@Query("{organization.id:?0,deleted:false}")
+    List<WTAResponseDTO> getWtaByOrganization(Long organizationId);*/
 
     @Query("{name:?0,organization.id:?1,id:?2,deleted:false}")
     boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
@@ -61,13 +64,12 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     void removeOldWorkingTimeAgreement(BigInteger wtaId, Long organizationId, Long endDateInMillis);
 */
     @Query("{id:?0,deleted:false}")
-    void removeOldParentWTAMapping(BigInteger wtaId);
+    WorkingTimeAgreement removeOldParentWTAMapping(BigInteger wtaId);
 
     @Query("{organization.id:?0,id:?1,deleted:false}")
     WorkingTimeAgreement getOrganizationCopyOfWTA(Long unitId, BigInteger wtaId);
 
-    @Query("{id:?0,deleted:false}")
-    WTAResponseDTO getVersionOfWTA(BigInteger organizationId);
+
 
     /*@Query("")
     WTAResponseDTO findWtaByUnitEmploymentPosition(Long unitEmploymentPositionId);

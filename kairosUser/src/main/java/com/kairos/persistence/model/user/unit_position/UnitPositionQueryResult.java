@@ -8,8 +8,10 @@ import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.math.BigInteger;
 import java.util.Map;
 
 /**
@@ -38,7 +40,7 @@ public class UnitPositionQueryResult {
     private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
-    private WorkingTimeAgreement workingTimeAgreement;
+    private WTAResponseDTO workingTimeAgreement;
     private CostTimeAgreement costTimeAgreement;
     private Organization union;
     private Long lastWorkingDateMillis;
@@ -145,11 +147,11 @@ public class UnitPositionQueryResult {
         this.id = id;
     }
 
-    public WorkingTimeAgreement getWorkingTimeAgreement() {
+    public WTAResponseDTO getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 
-    public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
+    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 
@@ -244,7 +246,7 @@ public class UnitPositionQueryResult {
     }
 
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WorkingTimeAgreement wta) {
+    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WTAResponseDTO wta) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;
