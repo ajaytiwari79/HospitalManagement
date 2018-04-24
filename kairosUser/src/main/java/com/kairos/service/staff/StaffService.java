@@ -13,13 +13,13 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.model.user.country.Day;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -951,6 +951,17 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
+    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationPOJOData staffCreationPOJOData){
+        User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
+        if(!Optional.ofNullable(user).isPresent()){
+            user = new User();
+            setBasicDetailsOfUser(user, staffCreationPOJOData);
+            userGraphRepository.save(user);
+        }
+        createUnitManagerAndEmployment(organizationId, user);
+        return user;
+    }
+
     private void setBasicDetailsOfUser(User user, StaffCreationPOJOData staffCreationDTO) {
         user.setEmail(staffCreationDTO.getPrivateEmail());
         user.setUserName(staffCreationDTO.getPrivateEmail());
@@ -1083,6 +1094,44 @@ public class StaffService extends UserBaseService {
 //        }
     }
 
+
+    private void createUnitManagerAndEmployment(Long organizationId, User user) {
+
+        Organization organization = organizationGraphRepository.findOne(organizationId);
+        Organization parent;
+        if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organizationId);
+
+        } else {
+            parent = organizationGraphRepository.getParentOfOrganization(organizationId);
+        }
+        if(!Optional.ofNullable(parent).isPresent()){
+            parent = organization;
+        }
+
+        Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
+                user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
+
+        Employment employment = new Employment();
+        employment.setStaff(staff);
+        staff.setUser(user);
+
+        employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
+        employment.setStaff(staff);
+        employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
+
+        parent.getEmployments().add(employment);
+
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(parent);
+        AccessGroup accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByRole(parent.getId(), AccessGroupRole.MANAGEMENT.toString()); // findOne(accessGroupId);
+        if (Optional.ofNullable(accessGroup).isPresent()) {
+            unitPermission.setAccessGroup(accessGroup);
+        }
+
+        employment.getUnitPermissions().add(unitPermission);
+        save(employment);
+    }
 
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
