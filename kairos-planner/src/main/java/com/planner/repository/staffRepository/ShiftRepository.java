@@ -1,7 +1,5 @@
 package com.planner.repository.staffRepository;
 
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select;
 import com.planner.domain.staff.PlanningShift;
 import com.planner.repository.customRepository.BaseRepository;
 import org.slf4j.Logger;
@@ -29,16 +27,18 @@ public class ShiftRepository extends BaseRepository{
     }*/
 
     public boolean exist(Long externalId,long unitId){
-        Select select = QueryBuilder.select().from("planningshift");
+        /*Select select = QueryBuilder.select().from("planningshift");
         select.where(QueryBuilder.eq("externalid",externalId));
         select.where(QueryBuilder.in("unitid",unitId));
-        return ((PlanningShift) findByField(select,PlanningShift.class))!=null;
+        return ((PlanningShift) findByField(select,PlanningShift.class))!=null;*/
+        return false;
     }
 
 
    public List<PlanningShift> getAllByUnitId(Date startDate,Date endDate,long unitId){
-       Select select = QueryBuilder.select().from("PlanningShift");
+      /* Select select = QueryBuilder.select().from("PlanningShift");
        select.where(QueryBuilder.eq("unitid",unitId)).and(QueryBuilder.eq("unitId",unitId));
-       return (List<PlanningShift>)findAllByQuery(select,PlanningShift.class);
+       return (List<PlanningShift>)findAllByQuery(select,PlanningShift.class);*/
+       return null;
    }
 }

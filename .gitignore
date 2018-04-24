@@ -17,3 +17,4 @@ out/
 .sonar
 classes/
 kairosActivity.iml
+*.iml

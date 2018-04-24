@@ -1,14 +1,14 @@
 package com.planner.domain.common;
 
-import org.springframework.data.cassandra.mapping.PrimaryKey;
-import org.springframework.data.cassandra.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+////import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.math.BigInteger;
 
-@Table
+////@Table
 public class TestTodo {
 
-    @PrimaryKey
+    //@PrimaryKey
     private BigInteger id;
 
     private String name;
