@@ -142,6 +142,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (n:Country{isEnabled:true}) where id(n)={0} with n " +
             "Match (n)-[:HAS_RULE_TEMPLATE]->(t:WTABaseRuleTemplate) with t " +
             "Match (t)<-[:"+HAS_RULE_TEMPLATES+"]-(r:RuleTemplateCategory{deleted:false,ruleTemplateCategoryType:'WTA'}) with t,r " +
+            "Optional MATCH(t)-[:"+HAS_BREAK_MATRIX+"]-(breakTemplateValue:BreakTemplateValue)" +
             "Return id(t) as id ,"+
             "t.timeLimit as timeLimit,"+
             "t.balanceType as balanceType,"+
@@ -178,7 +179,8 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "t.shiftAffiliation as shiftAffiliation,"+
             "t.shiftsLimit as shiftsLimit,"+
             "t.activityCode as activityCode,"+
-            "t.onlyCompositeShifts as onlyCompositeShifts")
+            "t.onlyCompositeShifts as onlyCompositeShifts, " +
+            "CASE when breakTemplateValue IS NULL THEN [] else collect(breakTemplateValue) END as breakTemplateValues")
     List<RuleTemplateCategoryDTO> getRuleTemplatesAndCategories (long countryId);
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level)={1} return level")

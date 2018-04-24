@@ -536,12 +536,7 @@ public class WTAOrganizationService extends UserBaseService {
                     breaksInShift.setDisabled(ruleTemplate.getDisabled());
                     breaksInShift.setRecommendedValue(ruleTemplate.getRecommendedValue());
                     breaksInShift.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
-                    breaksInShift.setShiftDuration(ruleTemplate.getShiftDuration());
-                    breaksInShift.setNoOfBreaks(ruleTemplate.getNoOfBreaks());
-                    breaksInShift.setBreakDuration(ruleTemplate.getBreakDuration());
-                    breaksInShift.setEarliestDurationMinutes(ruleTemplate.getEarliestDurationMinutes());
-                    breaksInShift.setLatestDurationMinutes(ruleTemplate.getLatestDurationMinutes());
-                    breaksInShift.setActivities(ruleTemplate.getActivities());
+                    breaksInShift.setBreakTemplateValues(ruleTemplate.getBreakTemplateValues());
                     wtaBaseRuleTemplates.add(breaksInShift);
                 default:
                     throw new DataNotFoundByIdException("Invalid TEMPLATE");

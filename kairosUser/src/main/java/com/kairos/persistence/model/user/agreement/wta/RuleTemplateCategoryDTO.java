@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.agreement.wta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
+import com.kairos.persistence.model.user.agreement.wta.templates.BreakTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -65,12 +66,8 @@ public class RuleTemplateCategoryDTO {
     private Integer yellowZone;
     private Boolean forbid;
     private Boolean allowExtraActivity;
-    private Integer shiftDuration;
-    private Integer noOfBreaks;
-    private Integer breakDuration;
-    private Integer earliestDurationMinutes;
-    private Integer latestDurationMinutes;
-    private List<Long> activities;
+    private List<BreakTemplateValue> breakTemplateValues;
+
 
 
     public int getRecommendedValue() {
@@ -428,52 +425,12 @@ public class RuleTemplateCategoryDTO {
         this.allowExtraActivity = allowExtraActivity;
     }
 
-    public Integer getShiftDuration() {
-        return shiftDuration;
+    public List<BreakTemplateValue> getBreakTemplateValues() {
+        return breakTemplateValues;
     }
 
-    public void setShiftDuration(Integer shiftDuration) {
-        this.shiftDuration = shiftDuration;
-    }
-
-    public Integer getNoOfBreaks() {
-        return noOfBreaks;
-    }
-
-    public void setNoOfBreaks(Integer noOfBreaks) {
-        this.noOfBreaks = noOfBreaks;
-    }
-
-    public Integer getBreakDuration() {
-        return breakDuration;
-    }
-
-    public void setBreakDuration(Integer breakDuration) {
-        this.breakDuration = breakDuration;
-    }
-
-    public Integer getEarliestDurationMinutes() {
-        return earliestDurationMinutes;
-    }
-
-    public void setEarliestDurationMinutes(Integer earliestDurationMinutes) {
-        this.earliestDurationMinutes = earliestDurationMinutes;
-    }
-
-    public Integer getLatestDurationMinutes() {
-        return latestDurationMinutes;
-    }
-
-    public void setLatestDurationMinutes(Integer latestDurationMinutes) {
-        this.latestDurationMinutes = latestDurationMinutes;
-    }
-
-    public List<Long> getActivities() {
-        return activities;
-    }
-
-    public void setActivities(List<Long> activities) {
-        this.activities = activities;
+    public void setBreakTemplateValues(List<BreakTemplateValue> breakTemplateValues) {
+        this.breakTemplateValues = breakTemplateValues;
     }
 
     @Override
