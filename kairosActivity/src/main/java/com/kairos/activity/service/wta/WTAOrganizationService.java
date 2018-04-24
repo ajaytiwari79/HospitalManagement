@@ -70,7 +70,7 @@ public class WTAOrganizationService extends MongoBaseService {
             logger.info("Duplicate WTA name in organization :", wtaId);
             throw new DuplicateDataException("Duplicate WTA name in organization " + updateDTO.getName());
         }
-        WorkingTimeAgreement oldWta = workingTimeAgreementMongoRepository.getOne(wtaId);
+        WorkingTimeAgreement oldWta = workingTimeAgreementMongoRepository.findOne(wtaId);
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating at unit %d", wtaId);
             throw new DataNotFoundByIdException("Invalid wtaId  " + wtaId);

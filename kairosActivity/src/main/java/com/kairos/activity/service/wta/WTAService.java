@@ -228,7 +228,7 @@ public class WTAService extends MongoBaseService {
         BeanUtils.copyProperties(oldWta,wtaResponseDTO,"ruleTemplates");
 
         //wtaResponseDTO.setRuleTemplateIds( wtaBuilderService.getRuleTemplateDTO(oldWta));
-        WorkingTimeAgreement parentWTA = wtaRepository.getOne(oldWta.getParentWTA());
+        WTAQueryResultDTO parentWTA = wtaRepository.getOne(oldWta.getParentWTA());
         BeanUtils.copyProperties(parentWTA,wtaResponseDTO);
         wtaResponseDTO.setParentWTA(wtaResponseDTO);
         //assignUpdatedWTAToOrganization(newWta, updateDTO.getOrganizationSubType(), oldWta.getId());
@@ -347,7 +347,7 @@ public class WTAService extends MongoBaseService {
         if (!Optional.ofNullable(wtaBasicDetailsDTO.getOrganizationSubType()).isPresent()) {
             throw new DataNotFoundByIdException("Invalid organisation Sub type Id " + organizationSubTypeId);
         }
-        WorkingTimeAgreement wta = wtaRepository.getOne(wtaId);
+        WorkingTimeAgreement wta = wtaRepository.findOne(wtaId);
         //TODO need to again activate check
         //checkUniquenessOfData(countryId, organizationSubTypeId, wta.getOrganizationType().getId(), wta.getExpertise().getId());
         if (!Optional.ofNullable(wta).isPresent()) {
@@ -430,7 +430,7 @@ public class WTAService extends MongoBaseService {
     }*/
 
     public WTAResponseDTO updateWtaOfUnitPosition(Long unitId,WTADTO wtadto){
-        WorkingTimeAgreement oldWta = wtaRepository.getOne(wtadto.getId());
+        WorkingTimeAgreement oldWta = wtaRepository.findOne(wtadto.getId());
         if (!Optional.ofNullable(oldWta).isPresent()) {
             logger.info("wta not found while updating unit Employment Position for staff %d");
             throw new DataNotFoundByIdException("Invalid wtaId  " + wtadto.getId());
@@ -449,7 +449,7 @@ public class WTAService extends MongoBaseService {
         newWta.setDisabled(false);
         newWta.setParentWTA(oldWta.getId());
         save(newWta);
-        WorkingTimeAgreement workingTimeAgreement = wtaRepository.getOne(newWta.getId());
+        WorkingTimeAgreement workingTimeAgreement = wtaRepository.findOne(newWta.getId());
         WTAResponseDTO wtaResponseDTO = new WTAResponseDTO();
         BeanUtils.copyProperties(workingTimeAgreement,wtaResponseDTO);
         WTAResponseDTO parentWta = new WTAResponseDTO();
