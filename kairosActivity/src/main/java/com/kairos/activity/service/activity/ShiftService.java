@@ -102,7 +102,7 @@ public class ShiftService extends MongoBaseService {
                 shiftQueryResults = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activity, shiftFromDate);
             }
         } else {
-            Shift shiftOld = shiftMongoRepository.findShiftBetweenDurationByStaff(shiftDTO.getStaffId(),shiftDTO.getStartDate(),shiftDTO.getEndDate());
+            Shift shiftOld = shiftMongoRepository.findShiftBetweenDurationByUnitPosition(shiftDTO.getUnitPositionId(),shiftDTO.getStartDate(),shiftDTO.getEndDate());
             if(Optional.ofNullable(shiftOld).isPresent()) {
                 throw new DuplicateDataException(" Shift already exists between duration- startDate: "+shiftOld.getStartDate()+" endDate: "+shiftOld.getEndDate());
             }
