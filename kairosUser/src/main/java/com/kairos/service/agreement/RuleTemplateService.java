@@ -91,6 +91,8 @@ public class RuleTemplateService extends UserBaseService {
         long timeInMins = 10;
         long daysCount = 10;
         long dateInMillis = DateUtil.getCurrentDate().getTime();
+        AgeRange ageRange=new AgeRange(0,0);
+        List<Long> activities=new ArrayList<>();
 
 
         MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = new MaximumShiftLengthWTATemplate(MAXIMUM_SHIFT_LENGTH.getName(), MAXIMUM_SHIFT_LENGTH.getTemplateType(), true, MAXIMUM_SHIFT_LENGTH.getDescription(), timeInMins, balanceTypes, true);
@@ -159,6 +161,13 @@ public class RuleTemplateService extends UserBaseService {
 
         MinimumTimeBank wta22 = new MinimumTimeBank(MINIMUM_TIME_BANK.getName(), MINIMUM_TIME_BANK.getTemplateType(), true, MINIMUM_TIME_BANK.getDescription(), TimeBankTypeEnum.HOURLY, 25, false, false);
         baseRuleTemplates.add(wta22);
+
+        MaximumSeniorDaysPerYearDaysUnit maximumSeniorDaysPerYearDaysUnit=new MaximumSeniorDaysPerYearDaysUnit(MAXIMUM_SENIOR_DAYS_PER_YEAR_DAYS_UNIT.getName(),MAXIMUM_SENIOR_DAYS_PER_YEAR_DAYS_UNIT.getTemplateType(),true,MAXIMUM_SENIOR_DAYS_PER_YEAR_DAYS_UNIT.getDescription(),ageRange,activities,0,dateInMillis,12);
+        baseRuleTemplates.add(maximumSeniorDaysPerYearDaysUnit);
+
+        ChildCareDaysCheck childCareDaysCheck=new ChildCareDaysCheck(CHILD_CARE_DAYS_CHECK.getName(),CARE_DAYS_CHECK.getTemplateType(),true,CHILD_CARE_DAYS_CHECK.getDescription(),ageRange,activities,0,dateInMillis,12);
+        baseRuleTemplates.add(childCareDaysCheck);
+
         country.setWTABaseRuleTemplate(baseRuleTemplates);
         save(country);
 
