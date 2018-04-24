@@ -1,7 +1,6 @@
 package com.kairos.activity.service.staffing_level;
 
 import com.kairos.activity.KairosActivityApplication;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuration;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSetting;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
@@ -25,7 +24,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.inject.Inject;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -89,7 +87,7 @@ public class StaffingLevelIntegrationTest {
                 LocalTime.now()) );
         staffingLevelTimeSlots.add(timeSlotDTO1);staffingLevelTimeSlots.add(timeSlotDTO2);
         staffingLevelTimeSlots.add(timeSlotDTO3); staffingLevelTimeSlots.add(timeSlotDTO4);
-        dto.setStaffingLevelInterval(staffingLevelTimeSlots);
+        dto.setPresenceStaffingLevelInterval(staffingLevelTimeSlots);
         return dto;
     }
 

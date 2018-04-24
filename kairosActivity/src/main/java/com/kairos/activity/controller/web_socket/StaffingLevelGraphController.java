@@ -48,7 +48,7 @@ public class StaffingLevelGraphController {
             timeSlotDTO1.getStaffingLevelActivities().add(activity);
             staffingLevelTimeSlots.add(timeSlotDTO1);
         }
-        dto.setStaffingLevelInterval(staffingLevelTimeSlots);
+        dto.setPresenceStaffingLevelInterval(staffingLevelTimeSlots);
         return dto;
     }
 

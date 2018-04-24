@@ -21,7 +21,19 @@ public class StaffingLevel extends MongoBaseEntity {
     private Long unitId;
     private Long phaseId;
     private StaffingLevelSetting staffingLevelSetting;
-    private List<StaffingLevelInterval> staffingLevelInterval =new ArrayList<>();
+    private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
+
+    public List<StaffingLevelInterval> getAbsenceStaffingLevelInterval() {
+        return absenceStaffingLevelInterval;
+    }
+
+    public void setAbsenceStaffingLevelInterval(List<StaffingLevelInterval> absenceStaffingLevelInterval) {
+        this.absenceStaffingLevelInterval = absenceStaffingLevelInterval;
+    }
+
+    private List<StaffingLevelInterval> absenceStaffingLevelInterval;
+
+
 
     public StaffingLevel() {
         //default constructor
@@ -35,6 +47,13 @@ public class StaffingLevel extends MongoBaseEntity {
         this.unitId = organizationId;
         this.phaseId = phaseId;
         this.staffingLevelSetting = staffingLevelSetting;
+    }
+    public StaffingLevel(Date currentDate, Long weekCount,
+                         Long organizationId, Long phaseId) {
+        this.currentDate = currentDate;
+        this.weekCount = weekCount;
+        this.unitId = organizationId;
+        this.phaseId = phaseId;
     }
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
     public Date getCurrentDate() {
@@ -77,19 +96,19 @@ public class StaffingLevel extends MongoBaseEntity {
         this.staffingLevelSetting = staffingLevelSetting;
     }
 
-    public List<StaffingLevelInterval> getStaffingLevelInterval() {
-        return staffingLevelInterval;
+    public List<StaffingLevelInterval> getPresenceStaffingLevelInterval() {
+        return presenceStaffingLevelInterval;
     }
 
-    public void setStaffingLevelInterval(List<StaffingLevelInterval> staffingLevelInterval) {
-        this.staffingLevelInterval = staffingLevelInterval;
+    public void setPresenceStaffingLevelInterval(List<StaffingLevelInterval> presenceStaffingLevelInterval) {
+        this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
     }
 
     public void addStaffingLevelTimeSlot(StaffingLevelInterval staffingLevelTimeSlot) {
         if (staffingLevelTimeSlot == null)
             throw new NullPointerException("Can't add null staffLevelActivity");
 
-        this.getStaffingLevelInterval().add(staffingLevelTimeSlot);
+        this.getPresenceStaffingLevelInterval().add(staffingLevelTimeSlot);
 
     }
 
@@ -97,7 +116,7 @@ public class StaffingLevel extends MongoBaseEntity {
         if (staffingLevelTimeSlots == null)
             throw new NullPointerException("Can't add null staffLevelActivity");
 
-        this.getStaffingLevelInterval().addAll(staffingLevelTimeSlots);
+        this.getPresenceStaffingLevelInterval().addAll(staffingLevelTimeSlots);
 
     }
 
@@ -135,7 +154,7 @@ public class StaffingLevel extends MongoBaseEntity {
                 .append("unitId", unitId)
                 .append("phaseId", phaseId)
                 .append("staffingLevelSetting", staffingLevelSetting)
-                .append("staffingLevelInterval", staffingLevelInterval)
+                .append("presenceStaffingLevelInterval", presenceStaffingLevelInterval)
                 .toString();
     }
 }

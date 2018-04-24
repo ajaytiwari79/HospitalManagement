@@ -37,7 +37,7 @@ public class StaffingLevelController {
 
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    @ApiOperation("Create staffing_level")
+    @ApiOperation("Create staffing_level for presence")
     public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid StaffingLevelDto staffingLevelDto,
                                                                 @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,

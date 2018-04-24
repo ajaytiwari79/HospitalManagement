@@ -79,7 +79,7 @@ public class StaffingLevelTemplateIT {
                 LocalTime.now()) );
         staffingLevelTimeSlots.add(timeSlotDTO1);staffingLevelTimeSlots.add(timeSlotDTO2);
         staffingLevelTimeSlots.add(timeSlotDTO3); staffingLevelTimeSlots.add(timeSlotDTO4);
-        dto.setStaffingLevelInterval(staffingLevelTimeSlots);
+        dto.setPresenceStaffingLevelInterval(staffingLevelTimeSlots);
         return dto;
     }
 
