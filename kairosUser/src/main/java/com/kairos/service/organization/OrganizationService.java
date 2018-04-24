@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.client.dto.organization.CompanyType;
@@ -187,6 +188,8 @@ public class OrganizationService extends UserBaseService {
     CollectiveTimeAgreementGraphRepository collectiveTimeAgreementGraphRepository;
     @Inject
     WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
+    @Inject
+    PeriodRestClient periodRestClient;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -272,8 +275,11 @@ public class OrganizationService extends UserBaseService {
         creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
         // DO NOT CREATE PHASE for UNION
-        if (!orgDetails.getUnion())
+        if (!orgDetails.getUnion()) {
             phaseRestClient.createDefaultPhases(organization.getId());
+            periodRestClient.createDefaultPeriodSettings(organization.getId());
+        }
+
 
 
         HashMap<String, Object> orgResponse = new HashMap<>();
@@ -567,6 +573,7 @@ public class OrganizationService extends UserBaseService {
         accessGroupService.createDefaultAccessGroups(unit);
         timeSlotService.createDefaultTimeSlots(unit);
         phaseRestClient.createDefaultPhases(unit.getId());
+        periodRestClient.createDefaultPeriodSettings(unit.getId());
 
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
@@ -1259,6 +1266,14 @@ public class OrganizationService extends UserBaseService {
     // For Test Cases
     public Organization getOneParentUnitByCountry(Long countryId){
         return organizationGraphRepository.getOneParentUnitByCountry(countryId);
+    }
+
+    public ZoneId getTimeZoneStringOfUnit(Long unitId) {
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
+        }
+        return unit.getTimeZone(); //(Optional.ofNullable(unit.getTimeZone()).isPresent() ? unit.getTimeZone().toString() : "") ;
     }
 }
 

@@ -100,7 +100,7 @@ public class AppConstants {
     //development and production
     public static final String IMPORT_TIMECARE_SHIFTS_PATH = "/opt/infra/data-integration/GetAllWorkShiftsByWorkPlaceId.ktr";
 
-    //Absence planning
+    //Absence planner
     public static final String TASK_TYPE_MISSING_MESSAGE = "Please update taskType details of task just imported from TimeCare";
     public static final String STAFF_MISSING_MESSAGE = "Please update staff details of task just imported from TimeCare";
     public static final String TASK_TYPE_MISSING_STATUS = "Task Type Missing";
@@ -165,7 +165,7 @@ public class AppConstants {
 
     public static final String WEEK = "Week";
     public static final String MINUTES = "MINUTES";
-    public static final String PERCENTAGE = "PERCENTAGE";
+    public static final String PERCENT = "PERCENT";
     public static final String DAILY = "daily";
     public static final String ANNUALLY = "annually";
     public static final String QUATERLY = "quaterly";
@@ -212,13 +212,16 @@ public class AppConstants {
     public static final String FULL_DAY_CALCULATION = "FULL_DAY";
     public static final String ENTERED_MANUALLY = "ENTERED_MANUALLY";
     public static final String FULL_WEEK = "FULL_WEEK";
-    public static final String TIMEBANK_ACCOUNT = "TimeBank Account";
+    public static final String TIMEBANK_ACCOUNT = "TIMEBANK_ACCOUNT";
 
     //TimeCare date importing constants
-    public static final String CalculatedTime = "ENTERED_TIMES";
-    public static final String WeeklyWorkTime = "WeeklyWorkTime";
-    public static final String FixedTime = "FixedTime";
-    public static final String FullTimeHour = "FullTimeHour";
+    public static final String CALCULATED_TIME = "CalculatedTime";
+    public static final String WEEKLY_WORK_TIME = "WeeklyWorkTime";
+    public static final String FIXED_TIME_FOR_TIMECARE = "FixedTime";
+    public static final String FULL_TIME_HOUR = "FullTimeHour";
 
+    // Default Settings of period for unit
+    public static final int PRESENCE_LIMIT_IN_YEAR = 1;
+    public static final int ABSENCE_LIMIT_IN_YEAR = 2;
 
 }

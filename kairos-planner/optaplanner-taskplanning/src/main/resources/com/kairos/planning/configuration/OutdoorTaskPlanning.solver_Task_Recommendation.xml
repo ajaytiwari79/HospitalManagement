@@ -8,8 +8,8 @@
 
 
   <scoreDirectorFactory>
-   <!-- <scoreDrl>com/kairos/planning/rules/taskplanning.drl</scoreDrl>-->
-      <!--<scoreDrl>com/kairos/planning/rules/taskplanning-employeeinvehicle.drl</scoreDrl>-->
+   <!-- <scoreDrl>com/kairos/planner/rules/taskplanning.drl</scoreDrl>-->
+      <!--<scoreDrl>com/kairos/planner/rules/taskplanning-employeeinvehicle.drl</scoreDrl>-->
       <scoreDrl>com/kairos/planning/rules/taskplanning-vehicleinemployee.drl</scoreDrl>
       <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
   </scoreDirectorFactory>
@@ -25,7 +25,7 @@
             <changeMoveSelector>
                 <cacheType>PHASE</cacheType>
                 <selectionOrder>RANDOM</selectionOrder>
-                <filterClass>com.kairos.planning.domain.TaskChangeMoveFilterFilter</filterClass>
+                <filterClass>com.kairos.planner.domain.TaskChangeMoveFilterFilter</filterClass>
                 &lt;!&ndash;<valueSelector>
                     <variableName>employee</variableName>
                 </valueSelector>&ndash;&gt;
@@ -38,7 +38,7 @@
         <queuedEntityPlacer>
 
             <entitySelector id="taskEntitySelector">
-                <entityClass>com.kairos.planning.domain.Task</entityClass>
+                <entityClass>com.kairos.planner.domain.Task</entityClass>
             </entitySelector>
             <changeMoveSelector>
                 <entitySelector mimicSelectorRef="taskEntitySelector"/>
@@ -58,7 +58,7 @@
                 <cacheType>PHASE</cacheType>
                 <selectionOrder>SORTED</selectionOrder>
                 <sorterManner>DECREASING_DIFFICULTY</sorterManner>
-                <!--<sorterComparatorClass>com.kairos.planning.domain.VehicleComparator</sorterComparatorClass>-->
+                <!--<sorterComparatorClass>com.kairos.planner.domain.VehicleComparator</sorterComparatorClass>-->
 
             </entitySelector>
             <changeMoveSelector>
@@ -70,7 +70,7 @@
                     <selectionOrder>SORTED</selectionOrder>
                     <sorterManner>INCREASING_STRENGTH</sorterManner>
                     <!--<sorterOrder>DESCENDING</sorterOrder>-->
-                    <!--<sorterComparatorClass>com.kairos.planning.domain.VehicleComparator</sorterComparatorClass>-->
+                    <!--<sorterComparatorClass>com.kairos.planner.domain.VehicleComparator</sorterComparatorClass>-->
 
 
                 </valueSelector>
@@ -101,11 +101,11 @@
                     <variableName>previousTaskOrEmployee</variableName>
                     <!--<nearbySelection>
                         <originEntitySelector mimicSelectorRef="taskChainEntitySelector"/>
-                        <nearbyDistanceMeterClass>com.kairos.planning.domain.NearbyTaskSelection</nearbyDistanceMeterClass>
+                        <nearbyDistanceMeterClass>com.kairos.planner.domain.NearbyTaskSelection</nearbyDistanceMeterClass>
                         <parabolicDistributionSizeMaximum>40</parabolicDistributionSizeMaximum>
                     </nearbySelection>-->
                 </valueSelector>
-                <!--<filterClass>com.kairos.planning.domain.TaskMoveCHFilter</filterClass>-->
+                <!--<filterClass>com.kairos.planner.domain.TaskMoveCHFilter</filterClass>-->
             </changeMoveSelector>
         </queuedEntityPlacer>
         <!--<forager>

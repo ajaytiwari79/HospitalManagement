@@ -712,12 +712,12 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Organization findByIdAndUnionTrueAndIsEnableTrue(Long unionId);
 
 
-    @Query("match(o:Organization)-[:" + HAS_SUB_ORGANIZATION + "*]-(s:Organization{isEnable:true,isKairosHub:false,union:false}) where id(o)={0} \n" +
+    @Query("match(o:Organization)-[:" + HAS_SUB_ORGANIZATION + "*]->(s:Organization{isEnable:true,isKairosHub:false,union:false}) where id(o)={0} \n" +
             "return s.name as name ,id(s) as id")
     List<OrganizationBasicResponse> getOrganizationHierarchy(Long parentOrganizationId);
 
     @Query("match(o:Organization)-[:HAS_SUB_ORGANIZATION]-(parentOrganization:Organization{isEnable:true,isKairosHub:false,union:false}) where id(o)={0} \n"
-            + "match(parentOrganization)-[:HAS_SUB_ORGANIZATION]-(units:Organization{isEnable:true,isKairosHub:false,union:false}) " +
+            + "match(parentOrganization)-[:"+HAS_SUB_ORGANIZATION+"]-(units:Organization{isEnable:true,isKairosHub:false,union:false}) " +
             " with parentOrganization ,collect (units)  as data " +
             " return parentOrganization as parent,data as childUnits")
     OrganizationHierarchyData getChildHierarchyByChildUnit(Long childUnitId);

@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.repository.phase;
 
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
 import com.kairos.activity.client.dto.organization.OrganizationPhaseDTO;
+import com.kairos.activity.persistence.model.period.PlanningPeriod;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.query_result.PhaseWrapper;
 import org.slf4j.Logger;
@@ -14,9 +15,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  * Created by vipul on 26/9/17.
@@ -33,10 +35,10 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
         return result.getMappedResults();
 
     }
-    public  List<PhaseDTO> getPhasesByUnit(Long unitId)
+    public  List<PhaseDTO> getPhasesByUnit(Long unitId, Sort.Direction direction)
     {
         Query query = Query.query(Criteria.where("organizationId").is(unitId));
-        query.with(new Sort(Sort.DEFAULT_DIRECTION,"sequence"));
+        query.with(new Sort(direction,"sequence"));
         return mongoTemplate.find(query,PhaseDTO.class,"phases");
     }
 
@@ -47,10 +49,24 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
         return mongoTemplate.find(query,PhaseDTO.class,"phases");
     }
 
+    public List<PhaseDTO> getNextApplicablePhasesOfUnitBySequence(Long unitId, int sequence)
+    {
+        Query query = Query.query(Criteria.where("organizationId").is(unitId).and("sequence").gt(sequence).and("duration").gt(0));
+        query.with(new Sort(Sort.Direction.ASC,"sequence"));
+        query.limit(1);
+        return mongoTemplate.find(query, PhaseDTO.class,"phases");
+
+    }
+
     public List<OrganizationPhaseDTO> getPhasesGroupByOrganization(){
         Aggregation aggregation = Aggregation.newAggregation(group("$organizationId").push("$$ROOT").as("phases"));
         AggregationResults<OrganizationPhaseDTO> result = mongoTemplate.aggregate(aggregation,Phase.class ,OrganizationPhaseDTO.class);
         return result.getMappedResults();
 
+    }
+
+    public  Boolean checkPhaseByName(BigInteger phaseId, String name){
+        Query query = Query.query(Criteria.where("name").is(name).and("id").is(phaseId));
+        return mongoTemplate.exists(query, Phase.class);
     }
 }

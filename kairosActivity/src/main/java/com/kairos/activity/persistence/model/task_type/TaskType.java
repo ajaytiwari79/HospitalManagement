@@ -151,7 +151,7 @@ public class TaskType extends MongoBaseEntity implements Cloneable {
     private boolean isArrival;
     private int hours;
     private int minutes;
-    //planning rules tab
+    //planner rules tab
     private boolean isAssignedToClipBoard;
     private boolean useInShiftPlanning;
     private List<TaskTypeEnum.ShiftPlanningPhase> shiftPlanningPhases = Collections.EMPTY_LIST;

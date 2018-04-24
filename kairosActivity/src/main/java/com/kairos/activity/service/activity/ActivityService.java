@@ -25,11 +25,11 @@ import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.response.dto.tag.TagDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.organization.OrganizationActivityService;
-import com.kairos.activity.service.phase.DurationType;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
 import com.kairos.activity.util.timeCareShift.TimeCareActivity;
 import com.kairos.activity.util.timeCareShift.Transstatus;
+import com.kairos.persistence.model.enums.DurationType;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -867,16 +867,16 @@ public class ActivityService extends MongoBaseService {
     private String durationCalculationMethod(String method) {
         String calculationType = null;
         switch (method) {
-            case FixedTime:
+            case FIXED_TIME_FOR_TIMECARE:
                 calculationType = FIXED_TIME;
                 break;
-            case FullTimeHour:
+            case WEEKLY_WORK_TIME:
                 calculationType = FULL_DAY_CALCULATION;
                 break;
-            case WeeklyWorkTime:
+            case FULL_TIME_HOUR:
                 calculationType = WEEKLY_HOURS;
                 break;
-            case CalculatedTime:
+            case CALCULATED_TIME:
                 calculationType = ENTERED_TIMES;
                 break;
        /*     case "":
