@@ -288,7 +288,7 @@ public class OrganizationService extends UserBaseService {
         // Check if user exists or Create User
         StaffCreationPOJOData staffCreationPOJOData = new StaffCreationPOJOData("Andreas","L. Jacobsen", "0108572361",
                 "Sam", "andreas@gmail.com", Gender.MALE, "andreas@gmail.com",null, 0L );
-        User user = staffService.createEmploymentForNewOrganization(organization.getId(), staffCreationPOJOData);*/
+        User user = staffService.createUnitManagerForNewOrganization(organization.getId(), staffCreationPOJOData);*/
 
         HashMap<String, Object> orgResponse = new HashMap<>();
         orgResponse.put("orgData", organizationResponse(organization, orgDetails));

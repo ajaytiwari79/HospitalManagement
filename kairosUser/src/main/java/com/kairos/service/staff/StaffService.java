@@ -20,7 +20,6 @@ import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
-import com.kairos.persistence.model.user.country.Day;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -952,14 +951,14 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
-    public User createEmploymentForNewOrganization(Long organizationId, StaffCreationPOJOData staffCreationPOJOData){
+    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationPOJOData staffCreationPOJOData){
         User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
         if(!Optional.ofNullable(user).isPresent()){
             user = new User();
             setBasicDetailsOfUser(user, staffCreationPOJOData);
             userGraphRepository.save(user);
         }
-        createStaffAndEmployment(organizationId, user.getId(), 0l);
+        createUnitManagerAndEmployment(organizationId, user.getId());
         return user;
     }
 
@@ -1096,7 +1095,7 @@ public class StaffService extends UserBaseService {
     }
 
 
-    private void createStaffAndEmployment(Long organizationId,Long userId, Long accessGroupId) {
+    private void createUnitManagerAndEmployment(Long organizationId, Long userId) {
 
         Organization organization = organizationGraphRepository.findOne(organizationId);
         User user = userGraphRepository.findOne(userId);
@@ -1121,7 +1120,7 @@ public class StaffService extends UserBaseService {
         employment.setStaff(staff);
         staff.setUser(user);
 
-        employment.setName("Working as staff");
+        employment.setName("Working as Unit Manager");
         employment.setStaff(staff);
         employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
 
