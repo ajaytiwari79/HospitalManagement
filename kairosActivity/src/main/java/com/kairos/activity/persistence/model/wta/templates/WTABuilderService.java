@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.activity.constants.AppConstants.COPY_OF;
+import static com.kairos.activity.persistence.enums.WTATemplateType.MAXIMUM_SENIOR_DAYS_PER_YEAR;
+import static com.kairos.activity.persistence.enums.WTATemplateType.SHIFT_LENGTH;
 
 /**
  * @author pradeep
@@ -145,6 +147,13 @@ public class WTABuilderService extends MongoBaseService {
                 timeBankWTATemplate.setWTARuleTemplateCategory(ruleTemplate.getRuleTemplateCategory().getId());
                 wtaBaseRuleTemplate = timeBankWTATemplate;
                 break;
+            case MAXIMUM_SENIOR_DAYS_PER_YEAR:
+                MaximumSeniorDaysPerYear maximumSeniorDaysPerYear=new MaximumSeniorDaysPerYear();
+                BeanUtils.copyProperties(ruleTemplate,maximumSeniorDaysPerYear,id);
+                maximumSeniorDaysPerYear.setWTARuleTemplateCategory(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate=maximumSeniorDaysPerYear;
+                break;
+
 
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
