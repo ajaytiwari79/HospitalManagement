@@ -18,10 +18,7 @@ import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMo
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.ActivityCategoryListDTO;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
-import com.kairos.activity.response.dto.staffing_level.AbsenceStaffingLevelDto;
-import com.kairos.activity.response.dto.staffing_level.ShiftPlanningStaffingLevelDTO;
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.activity.response.dto.staffing_level.*;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.phase.PhaseService;
@@ -113,19 +110,18 @@ public class StaffingLevelService extends MongoBaseService {
 
 
     /**
-     * @param staffingLevelDTO
+     * @param presenceStaffingLevelDTO
      * @param unitId
      */
-    public StaffingLevelDto createStaffingLevel(StaffingLevelDto staffingLevelDTO, Long unitId) {
+    public PresenceStaffingLevelDto createStaffingLevel(PresenceStaffingLevelDto presenceStaffingLevelDTO, Long unitId) {
         logger.debug("saving staffing level organizationId {}", unitId);
         StaffingLevel staffingLevel = null;
-        staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalseCustom(unitId, DateUtils.onlyDate(staffingLevelDTO.getCurrentDate()));
-        if(!Optional.ofNullable(staffingLevel.getPresenceStaffingLevelInterval()).isPresent()) {
+        staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalseCustom(unitId, DateUtils.onlyDate(presenceStaffingLevelDTO.getCurrentDate()));
 
-            if(Optional.ofNullable(staffingLevel).isPresent()) {
-
+        if (Optional.ofNullable(staffingLevel).isPresent()) {
+            if (staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
                 List<StaffingLevelInterval> presenceStaffingLevelIntervals = new ArrayList<StaffingLevelInterval>();
-                for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : staffingLevelDTO.getPresenceStaffingLevelInterval()) {
+                for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : presenceStaffingLevelDTO.getPresenceStaffingLevelInterval()) {
                     StaffingLevelInterval presenceStaffingLevelInterval = new StaffingLevelInterval(staffingLevelTimeSlotDTO.getSequence(), staffingLevelTimeSlotDTO.getMinNoOfStaff(),
                             staffingLevelTimeSlotDTO.getMaxNoOfStaff(), staffingLevelTimeSlotDTO.getStaffingLevelDuration()
                     );
@@ -134,23 +130,20 @@ public class StaffingLevelService extends MongoBaseService {
                     presenceStaffingLevelIntervals.add(presenceStaffingLevelInterval);
                 }
                 staffingLevel.setPresenceStaffingLevelInterval(presenceStaffingLevelIntervals);
+            } else {
+                throw new DuplicateDataException("Presence Staffing level already exists with current date " + presenceStaffingLevelDTO.getCurrentDate());
             }
+        } else {
+            staffingLevel = StaffingLevelUtil.buildPresenceStaffingLevels(presenceStaffingLevelDTO, unitId);
 
-            else {
-                staffingLevel = StaffingLevelUtil.buildPresenceStaffingLevels(staffingLevelDTO, unitId);
-            }
-            this.save(staffingLevel);
-            BeanUtils.copyProperties(staffingLevel, staffingLevelDTO, new String[]{"presenceStaffingLevelInterval","absenceStaffingLevelInterval"});
-            staffingLevelDTO.setPresenceStaffingLevelInterval(staffingLevelDTO.getPresenceStaffingLevelInterval().stream()
-                    .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
-            plannerSyncService.publishStaffingLevel(unitId,staffingLevelDTO,IntegrationOperation.CREATE);
         }
-        else {
-            throw new DuplicateDataException("Presence Staffing level already exists with current date " + staffingLevelDTO.getCurrentDate());
-        }
+        this.save(staffingLevel);
+        BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDTO, new String[]{"presenceStaffingLevelInterval", "absenceStaffingLevelInterval"});
+        presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().stream()
+                .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
+        plannerSyncService.publishStaffingLevel(unitId, presenceStaffingLevelDTO, IntegrationOperation.CREATE);
 
-        return staffingLevelDTO;
-
+        return presenceStaffingLevelDTO;
     }
 
     /**
@@ -159,8 +152,7 @@ public class StaffingLevelService extends MongoBaseService {
      * @auther Anil Maurya
      */
 
-
-    public Map<String, StaffingLevel> getStaffingLevel(Long unitId, Date startDate, Date endDate) {
+    public Map<String, StaffingLevel> getPresenceStaffingLevel(Long unitId, Date startDate, Date endDate) {
         logger.debug("getting staffing level organizationId ,startDate ,endDate {},{},{}", unitId, startDate, endDate);
         List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, startDate, endDate);
         Map<String, StaffingLevel> staffingLevelsMap = staffingLevels.parallelStream().collect(Collectors.toMap(staffingLevel -> {
@@ -174,38 +166,38 @@ public class StaffingLevelService extends MongoBaseService {
         return staffingLevelsMap;
     }
 
-    public StaffingLevel getStaffingLevel(Long unitId, Date currentDate) {
+    public StaffingLevel getPresenceStaffingLevel(Long unitId, Date currentDate) {
         logger.debug("getting staffing level organizationId ,startDate ,endDate {},{},{}", unitId);
 
         return staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId, currentDate);
 
     }
 
-    public StaffingLevel getStaffingLevel(BigInteger staffingLevelId) {
+    public StaffingLevel getPresenceStaffingLevel(BigInteger staffingLevelId) {
         logger.debug("getting staffing level staffingLevelId {}", staffingLevelId);
 
         return staffingLevelMongoRepository.findById(staffingLevelId).get();
     }
 
     /**
-     * @param staffingLevelDTO
+     * @param presenceStaffingLevelDTO
      * @param unitId
      */
-    public StaffingLevelDto updateStaffingLevel(BigInteger staffingLevelId, Long unitId
-            , StaffingLevelDto staffingLevelDTO) {
+    public PresenceStaffingLevelDto updatePresenceStaffingLevel(BigInteger staffingLevelId, Long unitId
+            , PresenceStaffingLevelDto presenceStaffingLevelDTO) {
         logger.info("updating staffing level organizationId and staffingLevelId is {} ,{}", unitId, staffingLevelId);
         StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).get();
-        if (!staffingLevel.getCurrentDate().equals(staffingLevelDTO.getCurrentDate())) {
-            logger.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), staffingLevelDTO.getCurrentDate());
+        if (!staffingLevel.getCurrentDate().equals(presenceStaffingLevelDTO.getCurrentDate())) {
+            logger.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), presenceStaffingLevelDTO.getCurrentDate());
             throw new UnsupportedOperationException("we can not modified the current date of staffing level");
         }
-        staffingLevel = StaffingLevelUtil.updateStaffingLevels(staffingLevelId, staffingLevelDTO, unitId, staffingLevel);
+        staffingLevel = StaffingLevelUtil.updateStaffingLevels(staffingLevelId, presenceStaffingLevelDTO, unitId, staffingLevel);
         this.save(staffingLevel);
-        BeanUtils.copyProperties(staffingLevel, staffingLevelDTO);
-        staffingLevelDTO.setPresenceStaffingLevelInterval(staffingLevelDTO.getPresenceStaffingLevelInterval().stream()
+        BeanUtils.copyProperties(staffingLevel, presenceStaffingLevelDTO);
+        presenceStaffingLevelDTO.setPresenceStaffingLevelInterval(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval().stream()
                 .sorted(Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence)).collect(Collectors.toList()));
-        plannerSyncService.publishStaffingLevel(unitId,staffingLevelDTO,IntegrationOperation.UPDATE);
-        return staffingLevelDTO;
+        plannerSyncService.publishStaffingLevel(unitId, presenceStaffingLevelDTO, IntegrationOperation.UPDATE);
+        return presenceStaffingLevelDTO;
     }
 
     public void updateStaffingLevelAvailableStaffCount(ShiftNotificationEvent shiftNotificationEvent) {
@@ -429,8 +421,8 @@ public class StaffingLevelService extends MongoBaseService {
 
     private void createStaffingLevelObject(List<Map<String, String>> processedData, long unitId) {
 
-        List<StaffingLevelDto> staffingDtoList = new ArrayList<StaffingLevelDto>();
-        StaffingLevelDto staffingDTO;
+        List<PresenceStaffingLevelDto> staffingDtoList = new ArrayList<PresenceStaffingLevelDto>();
+        PresenceStaffingLevelDto staffingDTO;
         List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlList = new ArrayList<StaffingLevelTimeSlotDTO>();
         StaffingLevelTimeSlotDTO staffingLevelTimeSlot;
         StaffingLevelDuration duration;
@@ -458,7 +450,7 @@ public class StaffingLevelService extends MongoBaseService {
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         long currentWeekCount = dateInLocal.get(weekOfYear);
 
-        staffingDTO = new StaffingLevelDto(null, date, currentWeekCount, staffingLevelSetting);
+        staffingDTO = new PresenceStaffingLevelDto(null, date, currentWeekCount, staffingLevelSetting);
 
         for (Map<String, String> singleData : processedData) {
 
@@ -468,7 +460,7 @@ public class StaffingLevelService extends MongoBaseService {
                 staffingDtoList.add(staffingDTO);
 
                 seq = 0;
-                staffingDTO = new StaffingLevelDto();
+                staffingDTO = new PresenceStaffingLevelDto();
                 staffingLevelTimeSlList = new ArrayList<StaffingLevelTimeSlotDTO>();
                 duration = new StaffingLevelDuration(LocalTime.MIN, LocalTime.MAX);
                 staffingLevelSetting = new StaffingLevelSetting(15, duration);
@@ -480,7 +472,7 @@ public class StaffingLevelService extends MongoBaseService {
                 dateInLocal = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
                 currentWeekCount = dateInLocal.get(weekOfYear);
-                staffingDTO = new StaffingLevelDto(null, date, currentWeekCount, staffingLevelSetting);
+                staffingDTO = new PresenceStaffingLevelDto(null, date, currentWeekCount, staffingLevelSetting);
             } else {
                 i++;
             }
@@ -521,9 +513,9 @@ public class StaffingLevelService extends MongoBaseService {
                 String keyTemp = keyFirstItr.next();
                 if (!keyTemp.equals("to") && !keyTemp.equals("from") && !keyTemp.equals("min")
                         && !keyTemp.equals("max") && !keyTemp.equals("forDay")) {
-                    Activity activityDB = activityMongoRepository.getActivityByNameAndUnitId( unitId,keyTemp.trim());
+                    Activity activityDB = activityMongoRepository.getActivityByNameAndUnitId(unitId, keyTemp.trim());
                     if (activityDB != null) {
-                        StaffingLevelActivity staffingLevelActivity = new StaffingLevelActivity(activityDB.getId().longValue(),keyTemp,Integer.parseInt(singleData.get(keyTemp)),Integer.parseInt(singleData.get(keyTemp)));
+                        StaffingLevelActivity staffingLevelActivity = new StaffingLevelActivity(activityDB.getId().longValue(), keyTemp, Integer.parseInt(singleData.get(keyTemp)), Integer.parseInt(singleData.get(keyTemp)));
                         activitySet.add(staffingLevelActivity);
                     }
                 }
@@ -534,98 +526,98 @@ public class StaffingLevelService extends MongoBaseService {
         staffingDTO.setPresenceStaffingLevelInterval(staffingLevelTimeSlList);
         staffingDtoList.add(staffingDTO);
 
-        staffingDtoList.forEach(staffingLevelDto->{
-            createStaffingLevel(staffingLevelDto,unitId);
+        staffingDtoList.forEach(staffingLevelDto -> {
+            createStaffingLevel(staffingLevelDto, unitId);
         });
     }
 
     public void processStaffingLevel(MultipartFile file, long unitId) throws IOException {
 
-            CSVParser csvRecords = CSVFormat.DEFAULT.parse(new InputStreamReader(file.getInputStream()));
-            List<Map<Date, Long>> recordSizeByDate = new ArrayList<>();
-            List<CSVRecord> timeRecords = csvRecords.getRecords();
-            CSVRecord headerRecord = timeRecords.get(1);
-            CSVRecord columnActivityNameRecord = timeRecords.get(2);
-            List<Map<String, String>> recordIndexes = new ArrayList<>();
+        CSVParser csvRecords = CSVFormat.DEFAULT.parse(new InputStreamReader(file.getInputStream()));
+        List<Map<Date, Long>> recordSizeByDate = new ArrayList<>();
+        List<CSVRecord> timeRecords = csvRecords.getRecords();
+        CSVRecord headerRecord = timeRecords.get(1);
+        CSVRecord columnActivityNameRecord = timeRecords.get(2);
+        List<Map<String, String>> recordIndexes = new ArrayList<>();
 
-            Map<String, String> columnEntry = null;
-            for (int i = 2; i < headerRecord.size(); i++) {
-                if (!headerRecord.get(i).isEmpty()) {
-                    columnEntry = new HashMap<>();
-                    columnEntry.put("startIndex", String.valueOf(i));
-                    columnEntry.put("selectedDay", headerRecord.get(i));
-                    columnEntry.put(headerRecord.get(i), String.valueOf(i));
-                    recordIndexes.add(columnEntry);
-                }
+        Map<String, String> columnEntry = null;
+        for (int i = 2; i < headerRecord.size(); i++) {
+            if (!headerRecord.get(i).isEmpty()) {
+                columnEntry = new HashMap<>();
+                columnEntry.put("startIndex", String.valueOf(i));
+                columnEntry.put("selectedDay", headerRecord.get(i));
+                columnEntry.put(headerRecord.get(i), String.valueOf(i));
+                recordIndexes.add(columnEntry);
             }
+        }
 
-            Map<String, String> lastIndexEntry = new HashMap<>();
-            lastIndexEntry.put("startIndex", String.valueOf(headerRecord.size()));
-            lastIndexEntry.put("selectedDay", recordIndexes.get(recordIndexes.size() - 1).get("selectedDay"));
-            recordIndexes.add(lastIndexEntry);
+        Map<String, String> lastIndexEntry = new HashMap<>();
+        lastIndexEntry.put("startIndex", String.valueOf(headerRecord.size()));
+        lastIndexEntry.put("selectedDay", recordIndexes.get(recordIndexes.size() - 1).get("selectedDay"));
+        recordIndexes.add(lastIndexEntry);
 
-            int allRecordsFor = recordIndexes.size();
-            List<Map<String, String>> staffingLevelRecordByFromToTimeAndActivity = new ArrayList<>();
-            Map<String, String> fromToTimeRecord;
-            Set<String> activitiesNameList = new HashSet<>();
-            int n = 0;
-            int min = 0, max = 0;
-            // logger.debug("runningFor Day index "+recordIndexes.toString());
-            processRecords:
-            for (Map<String, String> dayRecord : recordIndexes) {
+        int allRecordsFor = recordIndexes.size();
+        List<Map<String, String>> staffingLevelRecordByFromToTimeAndActivity = new ArrayList<>();
+        Map<String, String> fromToTimeRecord;
+        Set<String> activitiesNameList = new HashSet<>();
+        int n = 0;
+        int min = 0, max = 0;
+        // logger.debug("runningFor Day index "+recordIndexes.toString());
+        processRecords:
+        for (Map<String, String> dayRecord : recordIndexes) {
 
-                fromToTimeRecord = new HashMap<>();
-                fromToTimeRecord.put("forDay", dayRecord.get("selectedDay"));
-                List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>(timeRecords.size());
-                for (CSVRecord csvRecord : timeRecords) {
-                    if (csvRecord.getRecordNumber() > 3 && csvRecord.getRecordNumber() < 100) {
-                        fromToTimeRecord.put("from", csvRecord.get(0));
-                        fromToTimeRecord.put("to", csvRecord.get(1));
-                        min = Integer.parseInt(csvRecord.get(Integer.parseInt(dayRecord.get("startIndex"))));
-                        max = Integer.parseInt(csvRecord.get(Integer.parseInt(dayRecord.get("startIndex")) + 1));
-                        fromToTimeRecord.put("min", csvRecord.get(Integer.parseInt(dayRecord.get("startIndex"))));
+            fromToTimeRecord = new HashMap<>();
+            fromToTimeRecord.put("forDay", dayRecord.get("selectedDay"));
+            List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>(timeRecords.size());
+            for (CSVRecord csvRecord : timeRecords) {
+                if (csvRecord.getRecordNumber() > 3 && csvRecord.getRecordNumber() < 100) {
+                    fromToTimeRecord.put("from", csvRecord.get(0));
+                    fromToTimeRecord.put("to", csvRecord.get(1));
+                    min = Integer.parseInt(csvRecord.get(Integer.parseInt(dayRecord.get("startIndex"))));
+                    max = Integer.parseInt(csvRecord.get(Integer.parseInt(dayRecord.get("startIndex")) + 1));
+                    fromToTimeRecord.put("min", csvRecord.get(Integer.parseInt(dayRecord.get("startIndex"))));
 
-                        //setting max value as min if min > max
-                        fromToTimeRecord.put("max", String.valueOf( min>max ? min : max ));
+                    //setting max value as min if min > max
+                    fromToTimeRecord.put("max", String.valueOf(min > max ? min : max));
 
-                        boolean initialCountAdded = false;
-                        int startPos = 0;
-                        DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
-                                .appendValue(HOUR_OF_DAY)
-                                .appendValue(MINUTE_OF_HOUR, 2)
-                                .toFormatter();
-                        LocalTime fromTime = LocalTime.parse("0000" + (String) csvRecord.get(0), dateTimeFormatter);
-                        LocalTime toTime = LocalTime.parse("0000" + (String) csvRecord.get(1), dateTimeFormatter);
+                    boolean initialCountAdded = false;
+                    int startPos = 0;
+                    DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
+                            .appendValue(HOUR_OF_DAY)
+                            .appendValue(MINUTE_OF_HOUR, 2)
+                            .toFormatter();
+                    LocalTime fromTime = LocalTime.parse("0000" + (String) csvRecord.get(0), dateTimeFormatter);
+                    LocalTime toTime = LocalTime.parse("0000" + (String) csvRecord.get(1), dateTimeFormatter);
 
-                        StaffingLevelDuration staffingLevelIntervalDuration = new StaffingLevelDuration(fromTime, toTime);
-                        StaffingLevelInterval staffingLevelInterval = new StaffingLevelInterval(new Integer(csvRecord.get(2)), new Integer(csvRecord.get(3)), staffingLevelIntervalDuration);
+                    StaffingLevelDuration staffingLevelIntervalDuration = new StaffingLevelDuration(fromTime, toTime);
+                    StaffingLevelInterval staffingLevelInterval = new StaffingLevelInterval(new Integer(csvRecord.get(2)), new Integer(csvRecord.get(3)), staffingLevelIntervalDuration);
 
-                        if (initialCountAdded == false) {
-                            startPos = 2 + Integer.parseInt(recordIndexes.get(n).get(dayRecord.keySet().toArray()[0]));
-                        } else {
-                            startPos = Integer.parseInt(recordIndexes.get(n).get(dayRecord.keySet().toArray()[0]));
-                        }
-                        Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
-                        int runFor = Integer.parseInt(recordIndexes.get(n + 1).get(recordIndexes.get(n + 1).keySet().toArray()[0]));
-                        for (int j = startPos; j < runFor; j++) {
-                            staffingLevelActivities.add(new StaffingLevelActivity(columnActivityNameRecord.get(j), new Integer(csvRecord.get(j)),new Integer(csvRecord.get(j))));
-                            fromToTimeRecord.put(columnActivityNameRecord.get(j), csvRecord.get(j));
-                            activitiesNameList.add(columnActivityNameRecord.get(j));
-                        }
-                        staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
-                        staffingLevelIntervals.add(staffingLevelInterval);
-                        staffingLevelRecordByFromToTimeAndActivity.add(fromToTimeRecord);
-                        if (csvRecord.getRecordNumber() < 99)
-                            fromToTimeRecord = new HashMap<String, String>();
+                    if (initialCountAdded == false) {
+                        startPos = 2 + Integer.parseInt(recordIndexes.get(n).get(dayRecord.keySet().toArray()[0]));
+                    } else {
+                        startPos = Integer.parseInt(recordIndexes.get(n).get(dayRecord.keySet().toArray()[0]));
                     }
+                    Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
+                    int runFor = Integer.parseInt(recordIndexes.get(n + 1).get(recordIndexes.get(n + 1).keySet().toArray()[0]));
+                    for (int j = startPos; j < runFor; j++) {
+                        staffingLevelActivities.add(new StaffingLevelActivity(columnActivityNameRecord.get(j), new Integer(csvRecord.get(j)), new Integer(csvRecord.get(j))));
+                        fromToTimeRecord.put(columnActivityNameRecord.get(j), csvRecord.get(j));
+                        activitiesNameList.add(columnActivityNameRecord.get(j));
+                    }
+                    staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
+                    staffingLevelIntervals.add(staffingLevelInterval);
+                    staffingLevelRecordByFromToTimeAndActivity.add(fromToTimeRecord);
+                    if (csvRecord.getRecordNumber() < 99)
+                        fromToTimeRecord = new HashMap<String, String>();
                 }
-                n++;
-                if (n == allRecordsFor - 1) {
-                    break processRecords;
-                }
-
             }
-            createStaffingLevelObject(staffingLevelRecordByFromToTimeAndActivity, unitId);
+            n++;
+            if (n == allRecordsFor - 1) {
+                break processRecords;
+            }
+
+        }
+        createStaffingLevelObject(staffingLevelRecordByFromToTimeAndActivity, unitId);
     }
 
     public void submitShiftPlanningInfoToPlanner(Long unitId, Date startDate, Date endDate) {
@@ -738,7 +730,27 @@ public class StaffingLevelService extends MongoBaseService {
         logger.debug("saving staffing level organizationId {}", unitId);
         StaffingLevel staffingLevel = null;
         staffingLevel = staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalseCustom(unitId, DateUtils.onlyDate(absenceStaffingLevelDto.getCurrentDate()));
-        if(!Optional.ofNullable(staffingLevel.getAbsenceStaffingLevelInterval()).isPresent()) {
+
+        if (Optional.ofNullable(staffingLevel).isPresent()) {
+            if (staffingLevel.getAbsenceStaffingLevelInterval().isEmpty()) {
+                StaffingLevelDuration staffingLevelDuration = new StaffingLevelDuration(LocalTime.MIN, LocalTime.MAX);
+                List<StaffingLevelInterval> absenceStaffingLevelIntervals = new ArrayList<StaffingLevelInterval>();
+                StaffingLevelInterval absenceStaffingLevelInterval = new StaffingLevelInterval(0, absenceStaffingLevelDto.getMinNoOfStaff(),
+                        absenceStaffingLevelDto.getMaxNoOfStaff(), staffingLevelDuration);
+                absenceStaffingLevelInterval.setStaffingLevelActivities(absenceStaffingLevelDto.getStaffingLevelActivities());
+                absenceStaffingLevelIntervals.add(absenceStaffingLevelInterval);
+                staffingLevel.setAbsenceStaffingLevelInterval(absenceStaffingLevelIntervals);
+            } else {
+                throw new DuplicateDataException("Absence Staffing level already exists with current date " + absenceStaffingLevelDto.getCurrentDate());
+            }
+        } else {
+            staffingLevel = StaffingLevelUtil.buildAbsenceStaffingLevels(absenceStaffingLevelDto, unitId);
+
+        }
+        this.save(staffingLevel);
+
+
+        /*if(!Optional.ofNullable(staffingLevel.getAbsenceStaffingLevelInterval()).isPresent()) {
             if(Optional.ofNullable(staffingLevel).isPresent()&&isValidStaffingLevelAbsence(staffingLevel,absenceStaffingLevelDto)) {
 
                     StaffingLevelDuration staffingLevelDuration = new StaffingLevelDuration(LocalTime.MIN, LocalTime.MAX);
@@ -758,14 +770,81 @@ public class StaffingLevelService extends MongoBaseService {
         }
         else {
             throw new DuplicateDataException("Absence Staffing level already exixts with current date " + absenceStaffingLevelDto.getCurrentDate());
-        }
+        }*/
 
         return absenceStaffingLevelDto;
 
     }
 
-    public boolean isValidStaffingLevelAbsence(StaffingLevel absenceStaffingLevel, AbsenceStaffingLevelDto absenceStaffingLevelDto) {
+  /*  public boolean isValidStaffingLevelAbsence(StaffingLevel absenceStaffingLevel, AbsenceStaffingLevelDto absenceStaffingLevelDto) {
       return  !(absenceStaffingLevel.getPhaseId()!=absenceStaffingLevelDto.getPhaseId()||(absenceStaffingLevelDto.getId()!=null&&absenceStaffingLevelDto.getId()!=absenceStaffingLevel.getId())||absenceStaffingLevel.getWeekCount()!=absenceStaffingLevelDto.getWeekCount());
 
+    }*/
+
+    /**
+     * @param staffingLevelId
+     * @param unitId
+     */
+    public AbsenceStaffingLevelDto updateAbsenceStaffingLevel(BigInteger staffingLevelId, Long unitId
+            , AbsenceStaffingLevelDto absenceStaffingLevelDto) {
+        logger.info("updating staffing level organizationId and staffingLevelId is {} ,{}", unitId, staffingLevelId);
+        StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).get();
+        if (!staffingLevel.getCurrentDate().equals(absenceStaffingLevelDto.getCurrentDate())) {
+            logger.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), absenceStaffingLevelDto.getCurrentDate());
+            throw new UnsupportedOperationException("we can not modified the current date of staffing level");
+        }
+        staffingLevel = StaffingLevelUtil.updateAbsenceStaffingLevels(staffingLevelId, absenceStaffingLevelDto, unitId, staffingLevel);
+        this.save(staffingLevel);
+
+        // plannerSyncService.publishStaffingLevel(unitId,staffingLevelDTO,IntegrationOperation.UPDATE);
+        return absenceStaffingLevelDto;
     }
- }
+
+
+    public Map<String, StaffingLevel> getAbsenceStaffingLevel(Long unitId, Date startDate, Date endDate) {
+        logger.debug("getting staffing level organizationId ,startDate ,endDate {},{},{}", unitId, startDate, endDate);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, startDate, endDate);
+        Map<String, StaffingLevel> staffingLevelsMap = staffingLevels.parallelStream().collect(Collectors.toMap(staffingLevel -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDateTime dateTime = DateUtils.asLocalDateTime(staffingLevel.getCurrentDate());
+            return dateTime.format(formatter);
+        }, staffingLevel -> {
+
+            return staffingLevel;
+        }));
+        return staffingLevelsMap;
+    }
+
+    public StaffingLevelDto getStaffingLevel(Long unitId, Date startDate, Date endDate) {
+        logger.debug("getting staffing level organizationId ,startDate ,endDate {},{},{}", unitId, startDate, endDate);
+        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndCurrentDateBetweenAndDeletedFalse(unitId, startDate, endDate);
+        List<PresenceStaffingLevelDto> presenceStaffingLevelDtos = new ArrayList<PresenceStaffingLevelDto>();
+        List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos = new ArrayList<AbsenceStaffingLevelDto>();
+        Map<String,PresenceStaffingLevelDto> presenceStaffingLevelMap = new HashMap<String, PresenceStaffingLevelDto>();
+        Map<String,AbsenceStaffingLevelDto> absenceStaffingLevelMap = new HashMap<String, AbsenceStaffingLevelDto>();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        for(StaffingLevel staffingLevel:staffingLevels) {
+
+            if(!staffingLevel.getPresenceStaffingLevelInterval().isEmpty()) {
+                PresenceStaffingLevelDto presenceStaffingLevelDto = new PresenceStaffingLevelDto();
+                BeanUtils.copyProperties(staffingLevel,presenceStaffingLevelDto);
+                presenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(),"yyyy-MM-dd"),presenceStaffingLevelDto);
+            }
+            if(!staffingLevel.getAbsenceStaffingLevelInterval().isEmpty()) {
+                AbsenceStaffingLevelDto absenceStaffingLevelDto = new AbsenceStaffingLevelDto(staffingLevel.getId(),staffingLevel.getPhaseId(),staffingLevel.getUnitID(),
+                        staffingLevel.getCurrentDate(), staffingLevel.getWeekCount());
+                absenceStaffingLevelDto.setMinNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMinNoOfStaff());
+                absenceStaffingLevelDto.setMaxNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMaxNoOfStaff());
+                absenceStaffingLevelDto.setAbsentNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getAvailableNoOfStaff());
+                absenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
+                absenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(absenceStaffingLevelDto.getCurrentDate(),"yyyy-MM-dd"),absenceStaffingLevelDto);
+            }
+        }
+
+        StaffingLevelDto staffingLevelDto = new StaffingLevelDto(presenceStaffingLevelMap,absenceStaffingLevelMap);
+
+        return staffingLevelDto;
+    }
+}

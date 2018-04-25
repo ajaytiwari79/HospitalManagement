@@ -20,6 +20,32 @@ public class AbsenceStaffingLevelDto {
     private Long weekCount;
     private int minNoOfStaff;
     private int maxNoOfStaff;
+    private int absentNoOfStaff;
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
+
+    private Long unitId;
+
+    public AbsenceStaffingLevelDto() {
+
+    }
+
+    public AbsenceStaffingLevelDto(BigInteger id, Long phaseId,Long unitId, Date currentDate, Long weekCount) {
+
+        this.id = id;
+        this.phaseId = phaseId;
+        this.currentDate = currentDate;
+        this.weekCount = weekCount;
+        this.minNoOfStaff = minNoOfStaff;
+        this.maxNoOfStaff = maxNoOfStaff;
+        this.staffingLevelActivities = staffingLevelActivities;
+    }
 
     public BigInteger getId() {
         return id;
@@ -69,14 +95,7 @@ public class AbsenceStaffingLevelDto {
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
-    public int getAvailableNoOfStaff() {
-        return absentNoOfStaff;
-    }
 
-    public void setAvailableNoOfStaff(int availableNoOfStaff) {
-        this.absentNoOfStaff = availableNoOfStaff;
-
-    }
 
     public Set<StaffingLevelActivity> getStaffingLevelActivities() {
         return staffingLevelActivities;
@@ -86,7 +105,14 @@ public class AbsenceStaffingLevelDto {
         this.staffingLevelActivities = staffingLevelActivities;
     }
 
-    private int absentNoOfStaff;
+    public int getAbsentNoOfStaff() {
+        return absentNoOfStaff;
+    }
+
+    public void setAbsentNoOfStaff(int absentNoOfStaff) {
+        this.absentNoOfStaff = absentNoOfStaff;
+    }
+
     private Set<StaffingLevelActivity> staffingLevelActivities=new HashSet<>();
 
 }

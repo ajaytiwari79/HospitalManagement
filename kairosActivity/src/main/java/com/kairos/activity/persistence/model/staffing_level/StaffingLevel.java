@@ -31,7 +31,7 @@ public class StaffingLevel extends MongoBaseEntity {
         this.absenceStaffingLevelInterval = absenceStaffingLevelInterval;
     }
 
-    private List<StaffingLevelInterval> absenceStaffingLevelInterval;
+    private List<StaffingLevelInterval> absenceStaffingLevelInterval =new ArrayList<>();;
 
 
 

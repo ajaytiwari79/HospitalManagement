@@ -3,7 +3,7 @@ package com.kairos.activity.service.staffing_level;
 import com.kairos.activity.KairosActivityApplication;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuration;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSetting;
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
+import com.kairos.activity.response.dto.staffing_level.PresenceStaffingLevelDto;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.util.DateUtils;
@@ -43,7 +43,7 @@ public class StaffingLevelIntegrationTest {
     public void addStaffingLevel() {
         String baseUrl=getBaseUrl(95L,95L);
 
-        HttpEntity<StaffingLevelDto> entity = new HttpEntity<StaffingLevelDto>(getStaffingLevelDTO());
+        HttpEntity<PresenceStaffingLevelDto> entity = new HttpEntity<PresenceStaffingLevelDto>(getStaffingLevelDTO());
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl+"/staffing_level/",
@@ -71,11 +71,11 @@ public class StaffingLevelIntegrationTest {
     }
 
 
-    private StaffingLevelDto getStaffingLevelDTO(){
+    private PresenceStaffingLevelDto getStaffingLevelDTO(){
 
         StaffingLevelDuration duration=new StaffingLevelDuration(LocalTime.now(),LocalTime.now());
         StaffingLevelSetting staffingLevelSetting=new StaffingLevelSetting(15,duration);
-        StaffingLevelDto dto=new StaffingLevelDto(1L, DateUtils.getDate(),20L,staffingLevelSetting);
+        PresenceStaffingLevelDto dto=new PresenceStaffingLevelDto(1L, DateUtils.getDate(),20L,staffingLevelSetting);
         List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlots=new ArrayList<>();
         StaffingLevelTimeSlotDTO timeSlotDTO1=new StaffingLevelTimeSlotDTO(0,5,10,new StaffingLevelDuration(LocalTime.now(),
                 LocalTime.now()) );
