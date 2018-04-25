@@ -211,10 +211,11 @@ public class RuleTemplateService extends MongoBaseService {
     public void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList,List<RuleTemplateResponseDTO> templateList){
         for (RuleTemplateCategoryTagDTO ruleTemplateCategoryTagDTO : categoryList) {
             for (RuleTemplateResponseDTO ruleTemplateResponseDTO : templateList) {
-                if(ruleTemplateCategoryTagDTO.getRuleTemplates()!=null && ruleTemplateCategoryTagDTO.getRuleTemplates().contains(ruleTemplateResponseDTO.getId())){
+                if(ruleTemplateCategoryTagDTO.getRuleTemplateIds()!=null && ruleTemplateCategoryTagDTO.getRuleTemplateIds().contains(ruleTemplateResponseDTO.getId())){
                     RuleTemplateCategoryDTO ruleTemplateCategoryDTO = new RuleTemplateCategoryDTO();
                     BeanUtils.copyProperties(ruleTemplateCategoryTagDTO,ruleTemplateCategoryDTO);
                     ruleTemplateResponseDTO.setRuleTemplateCategory(ruleTemplateCategoryDTO);
+                    ruleTemplateResponseDTO.setTemplateType("MAXIMUM_SHIFT_LENGTH");
                 }
             }
         }

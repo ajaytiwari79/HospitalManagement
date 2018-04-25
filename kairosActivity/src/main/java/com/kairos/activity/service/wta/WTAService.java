@@ -363,9 +363,10 @@ public class WTAService extends MongoBaseService {
             newWtaObject.setOrganizationSubType(new WTAOrganizationType(wtaBasicDetailsDTO.getOrganizationSubType().getId(),wtaBasicDetailsDTO.getOrganizationSubType().getName(),wtaBasicDetailsDTO.getOrganizationSubType().getDescription()));
             wtaBuilderService.copyRuleTemplateToNewWTA(wta,newWtaObject);
             save(newWtaObject);
+            WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wta.getId());
             newWtaObject.setCountryId(null);
             map.put("wta", newWtaObject);
-            map.put("ruleTemplate", wtaBuilderService.getRuleTemplateDTO(wta));
+            map.put("ruleTemplate", wtaBuilderService.getRuleTemplateDTO(wtaQueryResultDTO));
         } else {
             wta.setDeleted(true);
             save(wta);

@@ -14,17 +14,17 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RuleTemplateCategoryTagDTO {
 
-    private Long id;
+    private BigInteger id;
     private String name;
     private String description;
     private List<TagDTO> tags = new ArrayList<>();
-    private List<BigInteger> ruleTemplates;
+    private List<BigInteger> ruleTemplateIds;
 
-    public Long getId() {
+    public BigInteger getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(BigInteger id) {
         this.id = id;
     }
 
@@ -40,12 +40,12 @@ public class RuleTemplateCategoryTagDTO {
         return description;
     }
 
-    public List<BigInteger> getRuleTemplates() {
-        return ruleTemplates;
+    public List<BigInteger> getRuleTemplateIds() {
+        return ruleTemplateIds;
     }
 
-    public void setRuleTemplates(List<BigInteger> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
+    public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {
+        this.ruleTemplateIds = ruleTemplateIds;
     }
 
     public void setDescription(String description) {
