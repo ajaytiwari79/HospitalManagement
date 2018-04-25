@@ -23,6 +23,10 @@ public interface WTABaseRuleTemplateMongoRepository extends MongoBaseRepository<
     @Query("{}")
     List<WTABaseRuleTemplate> getWtaBaseRuleTemplateByIds(List<BigInteger> templateIds);
 
+
+    @Query("{WTARuleTemplateCategoryId:?0,deleted:false}")
+    List<WTABaseRuleTemplate> findAllByCategoryId(BigInteger categoryId);
+
     @Query("{}")
     void deleteOldCategories(List<BigInteger> ruleTemplateIds);
 

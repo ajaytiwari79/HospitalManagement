@@ -1,6 +1,5 @@
 package com.kairos.activity.persistence.model.wta.templates;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import org.springframework.beans.BeanUtils;
@@ -20,7 +19,7 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     protected String name;
     protected String description;
     protected boolean disabled;
-    protected BigInteger WTARuleTemplateCategory;
+    protected BigInteger WTARuleTemplateCategoryId;
     protected List<PartOfDay> partOfDays;
     protected Long countryId;
     protected int lastInsertedValue;
@@ -71,12 +70,12 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         this.disabled = disabled;
     }
 
-    public BigInteger getWTARuleTemplateCategory() {
-        return WTARuleTemplateCategory;
+    public BigInteger getWTARuleTemplateCategoryId() {
+        return WTARuleTemplateCategoryId;
     }
 
-    public void setWTARuleTemplateCategory(BigInteger WTARuleTemplateCategory) {
-        this.WTARuleTemplateCategory = WTARuleTemplateCategory;
+    public void setWTARuleTemplateCategoryId(BigInteger WTARuleTemplateCategoryId) {
+        this.WTARuleTemplateCategoryId = WTARuleTemplateCategoryId;
     }
 
     public WTABaseRuleTemplate(){}

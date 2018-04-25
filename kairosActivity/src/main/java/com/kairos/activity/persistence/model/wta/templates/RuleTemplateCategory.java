@@ -26,7 +26,6 @@ public class RuleTemplateCategory extends MongoBaseEntity {
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
     private Long countryId;
-    private List<BigInteger> ruleTemplateIds;
     public RuleTemplateCategory(String name, String description, RuleTemplateCategoryType ruleTemplateCategoryType) {
         this.name = name;
         this.description = description;
@@ -36,14 +35,6 @@ public class RuleTemplateCategory extends MongoBaseEntity {
 
     public RuleTemplateCategory() {
         //default
-    }
-
-    public List<BigInteger> getRuleTemplateIds() {
-        return ruleTemplateIds;
-    }
-
-    public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {
-        this.ruleTemplateIds = ruleTemplateIds;
     }
 
     public RuleTemplateCategory(String name) {

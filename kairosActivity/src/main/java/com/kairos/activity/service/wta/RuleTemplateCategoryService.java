@@ -6,6 +6,7 @@ import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategory;
+import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
 import com.kairos.activity.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
@@ -66,6 +67,11 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         BeanUtils.copyProperties(ruleTemplateCategoryDTO, ruleTemplateCategory);
         ruleTemplateCategory.setCountryId(country.getId());
         save(ruleTemplateCategory);
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>)wtaBaseRuleTemplateMongoRepository.findAllById(ruleTemplateCategoryDTO.getRuleTemplateIds());
+        wtaBaseRuleTemplates.forEach(rt->{
+            rt.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        });
+        save(wtaBaseRuleTemplates);
         ruleTemplateCategoryDTO.setId(ruleTemplateCategory.getId());
         return ruleTemplateCategoryDTO;
 
@@ -90,23 +96,29 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         if (ruleTemplateCategory == null) {
             throw new DataNotFoundByIdException("RULE template ruleTemplateCategory does not exist" + templateCategoryId);
         }
+
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
             throw new ActionNotPermittedException("Can't delete none template category " + templateCategoryId);
         }
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(templateCategoryId);
         RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
-        if(ruleTemplateCategory.getRuleTemplateIds()!=null && !ruleTemplateCategory.getRuleTemplateIds().isEmpty()) {
+        wtaBaseRuleTemplates.forEach(rt->{
+            rt.setWTARuleTemplateCategoryId(noneRuleTemplateCategory.getId());
+        });
+        save(wtaBaseRuleTemplates);
+        /*if(ruleTemplateCategory.getRuleTemplateIds()!=null && !ruleTemplateCategory.getRuleTemplateIds().isEmpty()) {
             Set<BigInteger> ruleTemplateIds = new HashSet<>(noneRuleTemplateCategory.getRuleTemplateIds());
             ruleTemplateIds.addAll(ruleTemplateCategory.getRuleTemplateIds());
             noneRuleTemplateCategory.setRuleTemplateIds(new ArrayList<>(ruleTemplateIds));
             save(noneRuleTemplateCategory);
-        }
+        }*/
         ruleTemplateCategory.setDeleted(true);
         save(ruleTemplateCategory);
         return true;
 
     }
 
-    public UpdateRuleTemplateCategoryDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId, UpdateRuleTemplateCategoryDTO ruleTemplateCategory) {
+    public RuleTemplateCategoryDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId, RuleTemplateCategoryDTO ruleTemplateCategory) {
         if (countryRestClient.getCountryById(countryId) == null) {
             throw new DataNotFoundByIdException("Country does not exist");
         }
@@ -123,9 +135,14 @@ public class RuleTemplateCategoryService extends MongoBaseService {
                 throw new DuplicateDataException("ruleTemplateCategory name already  exists " + ruleTemplateCategory.getName());
             }
         }
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>)wtaBaseRuleTemplateMongoRepository.findAllById(ruleTemplateCategory.getRuleTemplateIds());
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategory.getDescription());
         save(ruleTemplateCategoryObj);
+        wtaBaseRuleTemplates.forEach(rt->{
+            rt.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        });
+        save(wtaBaseRuleTemplates);
         ruleTemplateCategory.setId(ruleTemplateCategoryObj.getId());
         return ruleTemplateCategory;
 
@@ -160,7 +177,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
             // Break Previous Relation
             wtaBaseRuleTemplateMongoRepository.deleteOldCategories(ruleTemplateDTO.getRuleTemplateIds());
             for (WTABaseRuleTemplate wtaBaseRuleTemplate : wtaBaseRuleTemplates) {
-                wtaBaseRuleTemplate.setWTARuleTemplateCategory(previousRuleTemplateCategory.getId());
+                wtaBaseRuleTemplate.setWTARuleTemplateCategoryId(previousRuleTemplateCategory.getId());
             }
             save(wtaBaseRuleTemplates);
             save(previousRuleTemplateCategory);
