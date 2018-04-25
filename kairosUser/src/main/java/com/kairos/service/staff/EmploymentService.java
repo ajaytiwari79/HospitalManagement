@@ -10,6 +10,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
@@ -85,6 +86,8 @@ public class EmploymentService extends UserBaseService {
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Inject
     private UnitPositionGraphRepository unitPositionGraphRepository;
+    @Inject
+    private StaffService staffService;
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
@@ -333,6 +336,8 @@ public class EmploymentService extends UserBaseService {
 
         return list;
     }
+
+
 
     public void createEmploymentForUnitManager(Staff staff, Organization parent, Organization unit, long accessGroupId) {
 
