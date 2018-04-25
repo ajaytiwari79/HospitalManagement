@@ -1,11 +1,9 @@
 package com.kairos.controller.country;
 
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.OrgTypeExpertiseDTO;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.ParentOrganizationDTO;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.user.country.*;
+import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.expertise.ExpertiseSkillDTO;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
@@ -333,12 +331,12 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createParentOrganization(@PathVariable Long organizationId,
                                                                         @PathVariable long countryId,
-                                                                        @Valid @RequestBody ParentOrganizationDTO organization) {
-        if (organization == null) {
+                                                                        @RequestBody OrganizationRequestWrapper organizationRequestWrapper) {
+        /*if (organization == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
-        }
+        }*/
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, organizationService.
-                createParentOrganization(organization, countryId, organizationId));
+                createParentOrganization(organizationRequestWrapper, countryId, organizationId));
     }
 
     @ApiOperation(value = "Update Parent Organization")

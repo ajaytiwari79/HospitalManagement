@@ -1,8 +1,5 @@
 package com.kairos.persistence.model.user.auth;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.springframework.data.neo4j.annotation.QueryResult;
-
 /**
  * Created by prabjot on 31/10/17.
  */

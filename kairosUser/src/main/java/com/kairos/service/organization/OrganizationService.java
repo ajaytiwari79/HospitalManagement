@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.activity.util.DateUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
@@ -8,7 +9,6 @@ import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
-import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
@@ -19,8 +19,8 @@ import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ContactAddress;
+import com.kairos.persistence.model.user.client.ContactAddressDTO;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
@@ -28,7 +28,6 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.StaffCreationPOJOData;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -77,6 +76,7 @@ import javax.inject.Inject;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
 
@@ -245,7 +245,9 @@ public class OrganizationService extends UserBaseService {
         return organization;
     }
 
-    public HashMap<String, Object> createParentOrganization(ParentOrganizationDTO orgDetails, long countryId, Long organizationId) {
+    public HashMap<String, Object> createParentOrganization(OrganizationRequestWrapper organizationRequestWrapper, long countryId, Long organizationId) {
+
+        ParentOrganizationDTO orgDetails = organizationRequestWrapper.getCompany();
 
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
@@ -324,7 +326,7 @@ public class OrganizationService extends UserBaseService {
 
     }
 
-    public HashMap<String, Object> updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId, long countryId) {
+    public OrganizationResponseDTO updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId, long countryId) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new InternalError("Organization not found by Id " + organizationId);
@@ -337,44 +339,41 @@ public class OrganizationService extends UserBaseService {
         return organizationResponse(organization, orgDetails);
     }
 
-    private HashMap<String, Object> organizationResponse(Organization organization, ParentOrganizationDTO parentOrganizationDTO) {
+    private OrganizationResponseDTO organizationResponse(Organization organization, ParentOrganizationDTO parentOrganizationDTO) {
 
-        HashMap<String, Object> response = new HashMap<>();
-        response.put("name", organization.getName());
-        response.put("id", organization.getId());
-        response.put("prekairos", organization.isPrekairos());
-        response.put("kairosHub", organization.isKairosHub());
-        response.put("description", organization.getDescription());
-
-        List<Long> businessTypeIds = new ArrayList<>();
-        for (BusinessType businessType : organization.getBusinessTypes()) {
-            businessTypeIds.add(businessType.getId());
-        }
-        response.put("businessTypeIds", businessTypeIds);
-        response.put("typeId", parentOrganizationDTO.getTypeId());
-        response.put("subTypeId", parentOrganizationDTO.getSubTypeId());
-        response.put("externalId", organization.getExternalId());
-        response.put("homeAddress", filterContactAddressInfo(organization.getContactAddress()));
-        response.put("levelId", (organization.getLevel() == null) ? organization.getLevel() : organization.getLevel().getId());
-        return response;
+        OrganizationResponseDTO organizationResponseDTO = new OrganizationResponseDTO();
+        organizationResponseDTO.setName(organization.getName());
+        organizationResponseDTO.setId(organization.getId());
+        organizationResponseDTO.setPrekairos(organization.isPrekairos());
+        organizationResponseDTO.setKairosHub( organization.isKairosHub());
+        organizationResponseDTO.setDescription(organization.getDescription());
+        organizationResponseDTO.setBusinessTypeIds(organization.getBusinessTypes().stream().map(businessType-> businessType.getId()).collect(Collectors.toList()));
+        organizationResponseDTO.setTypeId(parentOrganizationDTO.getTypeId());
+        organizationResponseDTO.setSubTypeId(parentOrganizationDTO.getSubTypeId());
+        organizationResponseDTO.setExternalId(organization.getExternalId());
+        organizationResponseDTO.setHomeAddress(filterContactAddressInfo(organization.getContactAddress()));
+        organizationResponseDTO.setLevelId((organization.getLevel() == null) ? null : organization.getLevel().getId());
+        return organizationResponseDTO;
     }
 
-    private HashMap<String, Object> filterContactAddressInfo(ContactAddress contactAddress) {
+    private ContactAddressDTO filterContactAddressInfo(ContactAddress contactAddress) {
 
-        HashMap<String, Object> organizationContactAddress = new HashMap<>();
-        organizationContactAddress.put("houseNumber", contactAddress.getHouseNumber());
-        organizationContactAddress.put("floorNumber", contactAddress.getFloorNumber());
-        organizationContactAddress.put("city", contactAddress.getCity());
-        organizationContactAddress.put("zipCode", contactAddress.getZipCode().getId());
-        organizationContactAddress.put("zipCodeValue", contactAddress.getZipCode().getZipCode());
-        organizationContactAddress.put("regionName", contactAddress.getRegionName());
-        organizationContactAddress.put("province", contactAddress.getProvince());
-        organizationContactAddress.put("municipalityName", contactAddress.getMunicipality().getName());
-        organizationContactAddress.put("isAddressProtected", contactAddress.isAddressProtected());
-        organizationContactAddress.put("longitude", contactAddress.getLongitude());
-        organizationContactAddress.put("street1", contactAddress.getStreet1());
-        organizationContactAddress.put("latitude", contactAddress.getLatitude());
-        return organizationContactAddress;
+        ContactAddressDTO contactAddressDTO = new ContactAddressDTO();
+        contactAddressDTO.setHouseNumber(contactAddress.getHouseNumber());
+        contactAddressDTO.setFloorNumber(contactAddress.getFloorNumber());
+        contactAddressDTO.setCity(contactAddress.getCity());
+        contactAddressDTO.setZipCodeId(contactAddress.getZipCode().getId());
+        contactAddressDTO.setRegionName(contactAddress.getRegionName());
+        contactAddressDTO.setProvince(contactAddress.getProvince());
+        contactAddressDTO.setAddressProtected(contactAddress.isAddressProtected());
+        contactAddressDTO.setStreet1(contactAddress.getStreet1());
+        contactAddressDTO.setLatitude(contactAddress.getLatitude());
+        contactAddressDTO.setLongitude(contactAddress.getLongitude());
+        contactAddressDTO.setZipCodeValue(contactAddress.getZipCode().getZipCode());
+        contactAddressDTO.setMunicipalityName(contactAddress.getMunicipality().getName());
+        return contactAddressDTO;
+
+
     }
 
     private Organization saveOrganizationDetails(Organization organization, ParentOrganizationDTO orgDetails, boolean isUpdateOperation, long countryId) {
