@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_B
  */
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BreaksInShift extends WTABaseRuleTemplate{
     @Relationship(type = HAS_BREAK_MATRIX)
     private List<BreakTemplateValue> breakTemplateValues;
