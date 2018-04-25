@@ -149,7 +149,7 @@ public class UnitPositionService extends UserBaseService {
     private EmploymentGraphRepository employmentGraphRepository;
 
 
-    public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
+    public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
 
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Organization parentOrganization;
@@ -183,19 +183,20 @@ public class UnitPositionService extends UserBaseService {
 
         unitPosition.setUnit(organization);
         save(unitPosition);
-        employmentService.updateEmploymentEndDate(organization, unitPositionDTO);
+        Employment employment = employmentService.updateEmploymentEndDate(organization, unitPositionDTO);
 
         UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
 
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, relationShip, parentOrganization.getId());
+        PositionWrapper positionWrapper = new PositionWrapper(unitPositionQueryResult,new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis()));
 //        timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(), organization.getId()));
 
         //      UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
         //timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(),id));
 
 
-        return unitPositionQueryResult;
+        return positionWrapper;
     }
 
 
@@ -278,8 +279,10 @@ public class UnitPositionService extends UserBaseService {
         }
         preparePosition(oldUnitPosition, unitPositionDTO);
         save(oldUnitPosition);
-        employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO);
-        return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null));
+        Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO);
+        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
+
+        return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null),employmentQueryResult);
 
     }
 
@@ -807,7 +810,6 @@ public class UnitPositionService extends UserBaseService {
 
         Integer experienceInMonth = Months.monthsBetween(expertiseStartDate, currentDate).getMonths() + staffSelectedExpertise.getRelevantExperienceInMonths();
         logger.info("user has current experience in months :{}", experienceInMonth);
-
         SeniorityLevel appliedSeniorityLevel = null;
         for (SeniorityLevel seniorityLevel : currentExpertise.getSeniorityLevel()) {
             if (seniorityLevel.getTo() == null) {
