@@ -1450,7 +1450,7 @@ public class StaffService extends UserBaseService {
         if(activityDayTypes!=null && !activityDayTypes.isEmpty()) {
             List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(activityDayTypes);
             if(dayTypes!=null && !dayTypes.isEmpty()){
-                List<DayOfWeek> days = dayTypes.stream().flatMap(dt->dt.getValidDays().stream().map(d->DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
+                List<DayOfWeek> days = dayTypes.stream().filter(dt->!dt.isHolidayType()).flatMap(dt->dt.getValidDays().stream().map(d->DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
                 staffAdditionalInfoQueryResult.setActivityDayTypes(days);
             }
         }
