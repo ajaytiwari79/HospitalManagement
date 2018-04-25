@@ -245,7 +245,7 @@ public class OrganizationService extends UserBaseService {
         return organization;
     }
 
-    public HashMap<String, Object> createParentOrganization(OrganizationRequestWrapper organizationRequestWrapper, long countryId, Long organizationId) {
+    public OrganizationResponseWrapper createParentOrganization(OrganizationRequestWrapper organizationRequestWrapper, long countryId, Long organizationId) {
 
         ParentOrganizationDTO orgDetails = organizationRequestWrapper.getCompany();
 
@@ -296,11 +296,10 @@ public class OrganizationService extends UserBaseService {
                 "Sam", "andreas@gmail.com", Gender.MALE, "andreas@gmail.com",null, 0L );
         User user = staffService.createUnitManagerForNewOrganization(organization.getId(), staffCreationPOJOData);*/
 
-        HashMap<String, Object> orgResponse = new HashMap<>();
-        orgResponse.put("orgData", organizationResponse(organization, orgDetails));
-        orgResponse.put("permissions", accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
-//        orgResponse.put("permissions", accessPageService.getPermissionOfUserInUnit(organization.getId(), user.getId()));
-        return orgResponse;
+        OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
+        organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails));
+        organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
+        return organizationResponseWrapper;
     }
 
     List<WorkingTimeAgreement> getWTAWithExpertise(List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults){
