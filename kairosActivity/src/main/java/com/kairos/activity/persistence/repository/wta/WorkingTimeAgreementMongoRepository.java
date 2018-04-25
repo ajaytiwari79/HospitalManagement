@@ -36,10 +36,10 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     List<Map<String, Object>> getAllWTAWithOrganization(long countryId);
 
     @Query("{countryId:?0,id:?1,deleted:false}")
-    List<Map<String, Object>> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
+    List<Map<String, Object>> getAllWTAWithWTAId(long countryId, BigInteger wtaId);*/
 
     @Query("{countryId:?0,id:?1,deleted:false}")
-    WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId);*/
+    WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId);
 
   /*  @Query("{}")
     WorkingTimeAgreement checkUniquenessOfData(long orgSubTypeId, long orgTypeId, long expertiseId, long countryId);

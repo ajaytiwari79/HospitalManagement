@@ -42,9 +42,6 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
 
     private List<BigInteger> ruleTemplateIds;
 
-    private List<WTABaseRuleTemplate> ruleTemplates;
-
-
     // to make a history
     private BigInteger parentWTA;
 
@@ -67,14 +64,6 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
         this.ruleTemplateIds = ruleTemplateIds;
     }
 
-
-    public List<WTABaseRuleTemplate> getRuleTemplates() {
-        return ruleTemplates;
-    }
-
-    public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
-    }
 
     public WTAOrganization getOrganization() {
         return organization;

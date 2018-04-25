@@ -1,5 +1,6 @@
 package com.kairos.activity.persistence.repository.wta;
 
+import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -36,12 +37,12 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     }
 
     @Override
-    public WorkingTimeAgreement getOne(BigInteger wtaId) {
+    public WTAQueryResultDTO getOne(BigInteger wtaId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("id").is(wtaId)),
                 lookup("WTABaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WorkingTimeAgreement> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WorkingTimeAgreement.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults().get(0);
     }
 
@@ -95,13 +96,12 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         return result.getMappedResults();
     }
 
-    @Override
-    public WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId) {
+    public WTAQueryResultDTO getWTAByCountryId(long countryId, BigInteger wtaId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("countryId").is(countryId).and("id").is(wtaId)),
                 lookup("WTABaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WorkingTimeAgreement> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WorkingTimeAgreement.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults().get(0);
     }
 

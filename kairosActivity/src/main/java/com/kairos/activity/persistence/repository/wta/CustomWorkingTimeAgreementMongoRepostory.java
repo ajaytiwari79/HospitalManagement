@@ -1,5 +1,6 @@
 package com.kairos.activity.persistence.repository.wta;
 
+import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.mongodb.repository.Query;
@@ -16,7 +17,7 @@ import java.util.Map;
 public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAResponseDTO> getWtaByOrganization(Long organizationId);
-    WorkingTimeAgreement getOne(BigInteger wtaId);
+    WTAQueryResultDTO getOne(BigInteger wtaId);
 
     List<WTAResponseDTO> getAllWTAByOrganizationTypeId(long organizationId);
 
@@ -28,7 +29,7 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAResponseDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
 
-    WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId);
+    /*WTAQueryResultDTO getWTAByCountryId(long countryId, BigInteger wtaId);*/
 
     WTAResponseDTO getVersionOfWTA(BigInteger wtaId);
     List<WTAResponseDTO> getAllWtaOfOrganizationByExpertise(Long unitId,Long expertiseId);

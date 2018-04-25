@@ -8,6 +8,7 @@ import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,8 +25,8 @@ public class WTAQueryResultDTO {
     private WTAQueryResultDTO organizationParentWTA;
 
 
-    private Long startDateMillis;
-    private Long endDateMillis;
+    private Date startDate;
+    private Date endDate;
     private Long expiryDate;
     private String name;
     private String description;
@@ -34,16 +35,17 @@ public class WTAQueryResultDTO {
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
 
-    private List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
+    private List<WTABaseRuleTemplate> ruleTemplates
+    ;
 
     private List<Tag> tags = new ArrayList<>();
 
-    public List<WTABaseRuleTemplate> getWtaBaseRuleTemplates() {
-        return wtaBaseRuleTemplates;
+    public List<WTABaseRuleTemplate> getRuleTemplates() {
+        return ruleTemplates;
     }
 
-    public void setWtaBaseRuleTemplates(List<WTABaseRuleTemplate> wtaBaseRuleTemplates) {
-        this.wtaBaseRuleTemplates = wtaBaseRuleTemplates;
+    public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
+        this.ruleTemplates = ruleTemplates;
     }
 
     public WTAQueryResultDTO getCountryParentWTA() {
@@ -78,20 +80,20 @@ public class WTAQueryResultDTO {
         this.parentWTA = parentWTA;
     }
 
-    public Long getStartDateMillis() {
-        return startDateMillis;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setStartDateMillis(Long startDateMillis) {
-        this.startDateMillis = startDateMillis;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
-    public Long getEndDateMillis() {
-        return endDateMillis;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setEndDateMillis(Long endDateMillis) {
-        this.endDateMillis = endDateMillis;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public Long getExpiryDate() {

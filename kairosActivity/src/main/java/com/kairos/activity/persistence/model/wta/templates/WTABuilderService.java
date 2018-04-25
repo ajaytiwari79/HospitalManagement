@@ -36,7 +36,7 @@ public class WTABuilderService extends MongoBaseService {
 
         }
         if(wtaBaseRuleTemplates!=null){
-            wtaQueryResultDTO.setWtaBaseRuleTemplates(wtaBaseRuleTemplates);
+            wtaQueryResultDTO.setRuleTemplates(wtaBaseRuleTemplates);
         }
         return wtaBaseRuleTemplates;
     }
@@ -187,9 +187,9 @@ public class WTABuilderService extends MongoBaseService {
     }*/
 
 
-    public static List<WTARuleTemplateDTO> getRuleTemplateDTO(WorkingTimeAgreement workingTimeAgreement) {
+    public static List<WTARuleTemplateDTO> getRuleTemplateDTO(WTAQueryResultDTO wtaQueryResultDTO) {
         List<WTARuleTemplateDTO> wtaRuleTemplateDTOS = new ArrayList<>();
-        BeanUtils.copyProperties(workingTimeAgreement.getRuleTemplates(),wtaRuleTemplateDTOS);
+        BeanUtils.copyProperties(wtaQueryResultDTO.getRuleTemplates(),wtaRuleTemplateDTOS);
         return wtaRuleTemplateDTOS;
     }
 
