@@ -3,6 +3,8 @@ package com.kairos.persistence.model.organization;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.kairos.client.dto.organization.CompanyType;
+import com.kairos.client.dto.organization.CompanyUnitType;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -29,6 +31,16 @@ public class ParentOrganizationDTO {
     AddressDTO homeAddress;
     Long levelId;
     private  Boolean union;
+
+
+    private String desiredUrl;
+    private String shortCompanyName;
+    private Long companyCategoryId;
+    private Integer kairosCompanyId;
+    private CompanyType companyType;
+
+    private String vatId;
+
     public ParentOrganizationDTO() {
         //default constructor
     }
@@ -155,5 +167,53 @@ public class ParentOrganizationDTO {
 
     public void setUnion(Boolean union) {
         this.union = union;
+    }
+
+    public String getDesiredUrl() {
+        return desiredUrl;
+    }
+
+    public void setDesiredUrl(String desiredUrl) {
+        this.desiredUrl = desiredUrl;
+    }
+
+    public String getShortCompanyName() {
+        return shortCompanyName;
+    }
+
+    public void setShortCompanyName(String shortCompanyName) {
+        this.shortCompanyName = shortCompanyName;
+    }
+
+    public Long getCompanyCategoryId() {
+        return companyCategoryId;
+    }
+
+    public void setCompanyCategoryId(Long companyCategoryId) {
+        this.companyCategoryId = companyCategoryId;
+    }
+
+    public Integer getKairosCompanyId() {
+        return kairosCompanyId;
+    }
+
+    public void setKairosCompanyId(Integer kairosCompanyId) {
+        this.kairosCompanyId = kairosCompanyId;
+    }
+
+    public CompanyType getCompanyType() {
+        return companyType;
+    }
+
+    public void setCompanyType(CompanyType companyType) {
+        this.companyType = companyType;
+    }
+
+    public String getVatId() {
+        return vatId;
+    }
+
+    public void setVatId(String vatId) {
+        this.vatId = vatId;
     }
 }

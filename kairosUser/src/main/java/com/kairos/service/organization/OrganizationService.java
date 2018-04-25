@@ -196,6 +196,8 @@ public class OrganizationService extends UserBaseService {
     PeriodRestClient periodRestClient;
     @Inject
     StaffService staffService;
+    @Inject
+    CompanyCategoryGraphRepository companyCategoryGraphRepository;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -453,7 +455,18 @@ public class OrganizationService extends UserBaseService {
         organization.setOrganizationTypes(organizationTypes);
         organization.setOrganizationSubTypes(organizationSubTypes);
         organization.setBusinessTypes(businessTypes);
-        logger.info(organization.toString());
+
+        CompanyCategory companyCategory =  companyCategoryGraphRepository.findOne(orgDetails.getCompanyCategoryId());
+        if (!Optional.ofNullable(companyCategory).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid Company category " + orgDetails.getCompanyCategoryId());
+        }
+
+        organization.setDesiredUrl(orgDetails.getDesiredUrl());
+        organization.setShortCompanyName(orgDetails.getShortCompanyName());
+        organization.setKairosCompanyId(orgDetails.getKairosCompanyId());
+        organization.setCompanyCategory(companyCategory);
+        organization.setCompanyType(orgDetails.getCompanyType());
+        organization.setVatId(orgDetails.getVatId());
 
         return organization;
     }

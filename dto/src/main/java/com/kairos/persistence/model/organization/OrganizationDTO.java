@@ -158,4 +158,76 @@ public class OrganizationDTO {
     public void setNightEndTime(LocalTime nightEndTime) {
         this.nightEndTime = nightEndTime;
     }
+
+    public String getDesiredUrl() {
+        return desiredUrl;
+    }
+
+    public void setDesiredUrl(String desiredUrl) {
+        this.desiredUrl = desiredUrl;
+    }
+
+    public String getShortCompanyName() {
+        return shortCompanyName;
+    }
+
+    public void setShortCompanyName(String shortCompanyName) {
+        this.shortCompanyName = shortCompanyName;
+    }
+
+    public Long getCompanyCategoryId() {
+        return companyCategoryId;
+    }
+
+    public void setCompanyCategoryId(Long companyCategoryId) {
+        this.companyCategoryId = companyCategoryId;
+    }
+
+    public Integer getKairosCompanyId() {
+        return kairosCompanyId;
+    }
+
+    public void setKairosCompanyId(Integer kairosCompanyId) {
+        this.kairosCompanyId = kairosCompanyId;
+    }
+
+    public CompanyType getCompanyType() {
+        return companyType;
+    }
+
+    public void setCompanyType(CompanyType companyType) {
+        this.companyType = companyType;
+    }
+
+    public String getVatId() {
+        return vatId;
+    }
+
+    public void setVatId(String vatId) {
+        this.vatId = vatId;
+    }
+
+    public boolean isCostCenter() {
+        return costCenter;
+    }
+
+    public void setCostCenter(boolean costCenter) {
+        this.costCenter = costCenter;
+    }
+
+    public Integer getCostCenterId() {
+        return costCenterId;
+    }
+
+    public void setCostCenterId(Integer costCenterId) {
+        this.costCenterId = costCenterId;
+    }
+
+    public CompanyUnitType getCompanyUnitType() {
+        return companyUnitType;
+    }
+
+    public void setCompanyUnitType(CompanyUnitType companyUnitType) {
+        this.companyUnitType = companyUnitType;
+    }
 }

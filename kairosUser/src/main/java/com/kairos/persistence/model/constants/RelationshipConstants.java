@@ -44,6 +44,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_EMPLOYMENT_TYPE = "HAS_EMPLOYMENT_TYPE";
     public final static String ORGANIZATION_HAS_TAG = "ORGANIZATION_HAS_TAG";
     public final static String HAS_CUSTOM_SERVICE_NAME_FOR = "HAS_CUSTOM_SERVICE_NAME_FOR";
+    public final static String HAS_COMPANY_CATEGORY = "HAS_COMPANY_CATEGORY";
 
 
     public final static String HAS_POSITION_CODE = "HAS_POSITION_CODE";
