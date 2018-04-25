@@ -91,7 +91,7 @@ public class RuleTemplateService extends UserBaseService {
         long timeInMins = 10;
         long daysCount = 10;
         long dateInMillis = DateUtil.getCurrentDate().getTime();
-        AgeRange ageRange=new AgeRange(0,0);
+        AgeRange ageRange=new AgeRange(0,0,0);
         List<Long> activities=new ArrayList<>();
 
 

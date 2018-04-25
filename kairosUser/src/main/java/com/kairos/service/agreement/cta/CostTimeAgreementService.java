@@ -799,7 +799,7 @@ public class CostTimeAgreementService extends UserBaseService {
         unitPosition.setCta(costTimeAgreement);
         unitPositionService.save(unitPosition);
 
-        UnitPositionQueryResult unitPositionQueryResult = unitPositionService.getBasicDetails(unitPosition,null);
+        UnitPositionQueryResult unitPositionQueryResult = unitPositionService.getBasicDetails(unitPosition);
         CostTimeAgreement responseCTA = new CostTimeAgreement(costTimeAgreement.getId(), costTimeAgreement.getName());
 
         unitPositionQueryResult.setCostTimeAgreement(responseCTA);

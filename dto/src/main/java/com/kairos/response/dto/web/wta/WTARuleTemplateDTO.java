@@ -2,8 +2,8 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
+import com.kairos.response.dto.web.AgeRangeDTO;
 import com.kairos.response.dto.web.enums.WTATemplateType;
 
 
@@ -63,7 +63,7 @@ public class WTARuleTemplateDTO {
     private Integer yellowZone;
     private Boolean forbid;
     private Boolean allowExtraActivity;
-    private List<AgeRange> ageRange;
+    private List<AgeRangeDTO> ageRange;
     private List<Long> activities;
 
     public WTATemplateType getWtaTemplateType() {
@@ -437,11 +437,11 @@ public class WTARuleTemplateDTO {
         this.allowExtraActivity = allowExtraActivity;
     }
 
-    public List<AgeRange> getAgeRange() {
+    public List<AgeRangeDTO> getAgeRange() {
         return ageRange;
     }
 
-    public void setAgeRange(List<AgeRange> ageRange) {
+    public void setAgeRange(List<AgeRangeDTO> ageRange) {
         this.ageRange = ageRange;
     }
 

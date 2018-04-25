@@ -84,7 +84,9 @@ public class RuleTemplateService extends MongoBaseService {
         long daysCount = 10;
         long dateInMillis = DateUtils.getCurrentDate().getTime();
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates1 = new ArrayList<>();
+        AgeRange range=new AgeRange(0,0,0);
         List<AgeRange> ageRange=new ArrayList<>();
+        ageRange.add(range);
         List<Long> activities=new ArrayList<>();
 
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
@@ -425,14 +427,18 @@ public class RuleTemplateService extends MongoBaseService {
                 break;
             case MAXIMUM_SENIOR_DAYS_PER_YEAR:
                 MaximumSeniorDaysPerYear maximumSeniorDaysPerYear=(MaximumSeniorDaysPerYear) oldTemplate;
-                maximumSeniorDaysPerYear.setAgeRange(templateDTO.getAgeRange());
+                List<AgeRange> ageRanges = new ArrayList<>();
+                BeanUtils.copyProperties(ageRanges,templateDTO.getAgeRange());
+                maximumSeniorDaysPerYear.setAgeRange(ageRanges);
                 maximumSeniorDaysPerYear.setActivities(templateDTO.getActivities());
                 maximumSeniorDaysPerYear.setNumberOfWeeks(templateDTO.getNumberOfWeeks());
                 maximumSeniorDaysPerYear.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
                 break;
             case CHILD_CARE_DAYS_CHECK:
                 CareDaysCheck careDaysCheck=(CareDaysCheck) oldTemplate;
-                careDaysCheck.setAgeRange(templateDTO.getAgeRange());
+                List<AgeRange> ageRangeList = new ArrayList<>();
+                BeanUtils.copyProperties(ageRangeList,templateDTO.getAgeRange());
+                careDaysCheck.setAgeRange(ageRangeList);
                 careDaysCheck.setActivities(templateDTO.getActivities());
                 careDaysCheck.setNumberOfWeeks(templateDTO.getNumberOfWeeks());
                 careDaysCheck.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
