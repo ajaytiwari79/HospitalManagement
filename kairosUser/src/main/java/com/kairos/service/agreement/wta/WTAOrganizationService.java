@@ -10,6 +10,7 @@ import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
 import com.kairos.persistence.model.user.agreement.wta.WTADTO;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.user.agreement.wta.templates.BreakTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
@@ -189,6 +190,7 @@ public class WTAOrganizationService extends UserBaseService {
             RuleTemplateCategory ruleTemplateCategory = null;
             ruleTemplateCategory = getCategory(ruleTemplates, ruleTemplate.getId(), ruleTemplate.getRuleTemplateCategory().getName());
             List<PhaseTemplateValue> phaseTemplateValues = copyPhaseTemplateValue(ruleTemplate.getPhaseTemplateValues());
+
             RuleTemplates ruleTemplateType = getByTemplateType(ruleTemplate.getTemplateType());
             switch (ruleTemplateType) {
                 case MAXIMUM_SHIFT_LENGTH:
@@ -529,21 +531,41 @@ public class WTAOrganizationService extends UserBaseService {
                     break;
                 case BREAKS_IN_SHIFT:
                     BreaksInShift breaksInShift=new BreaksInShift();
+                    List<BreakTemplateValue> breakTemplateValues=null;
+                    if(!ruleTemplate.getBreakTemplateValues().isEmpty() || !Optional.ofNullable(ruleTemplate.getBreakTemplateValues()).isPresent()){
+                        breakTemplateValues=copyBreakTemplateValues(ruleTemplate.getBreakTemplateValues());
+                    }
                     breaksInShift.setName(ruleTemplate.getName());
                     breaksInShift.setTemplateType(ruleTemplate.getTemplateType());
                     breaksInShift.setDescription(ruleTemplate.getDescription());
                     breaksInShift.setRuleTemplateCategory(ruleTemplateCategory);
                     breaksInShift.setDisabled(ruleTemplate.getDisabled());
                     breaksInShift.setRecommendedValue(ruleTemplate.getRecommendedValue());
-                    breaksInShift.setPhaseTemplateValues(ruleTemplate.getPhaseTemplateValues());
-                    breaksInShift.setBreakTemplateValues(ruleTemplate.getBreakTemplateValues());
+                    breaksInShift.setPhaseTemplateValues(phaseTemplateValues);
+                    breaksInShift.setBreakTemplateValues(breakTemplateValues);
                     wtaBaseRuleTemplates.add(breaksInShift);
+                    break;
                 default:
                     throw new DataNotFoundByIdException("Invalid TEMPLATE");
             }
 
         }
         return wtaBaseRuleTemplates;
+    }
+    public List<BreakTemplateValue> copyBreakTemplateValues(List<BreakTemplateValue> breakTemplateValues) {
+        List<BreakTemplateValue> breaks = new ArrayList<>();
+        for (BreakTemplateValue breakTemplateValue : breakTemplateValues) {
+            BreakTemplateValue newBreakTemplateValue = new BreakTemplateValue();
+            newBreakTemplateValue.setShiftDuration(breakTemplateValue.getShiftDuration());
+            newBreakTemplateValue.setBreakDuration(breakTemplateValue.getBreakDuration());
+            newBreakTemplateValue.setBreaksAllowed(breakTemplateValue.getBreaksAllowed());
+            newBreakTemplateValue.setEarliestDurationMinutes(breakTemplateValue.getEarliestDurationMinutes());
+            newBreakTemplateValue.setLatestDurationMinutes(breakTemplateValue.getLatestDurationMinutes());
+            newBreakTemplateValue.setActivities(breakTemplateValue.getActivities());
+
+            breaks.add(newBreakTemplateValue);
+        }
+        return breaks;
     }
 
 

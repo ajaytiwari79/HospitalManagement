@@ -611,6 +611,7 @@ public class RuleTemplateService extends UserBaseService {
                 break;
             case BREAKS_IN_SHIFT:
                 wtaBaseRuleTemplate=new BreaksInShift(wtaRuleTemplateDTO.getName().trim(),wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBreakTemplateValues());
+                break;
         }
         int number=getNumberFromlastInsertedTemplateType(lastInsertedTemplateType);
 
