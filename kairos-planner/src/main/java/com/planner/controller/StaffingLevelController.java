@@ -31,11 +31,11 @@ public class StaffingLevelController {
         return ResponseHandler.generateResponse("Success",HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{staffingLevelId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{staffingLevelKairosId}", method = RequestMethod.PUT)
     @ApiOperation("update staffing_level")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid StaffingLevelDto staffingLevelDto,
-                                                                   @PathVariable Long unitId, @PathVariable BigInteger staffingLevelId) {
-        staffingLevelService.updateStaffingLevel(staffingLevelId,unitId,staffingLevelDto);
+                                                                   @PathVariable Long unitId, @PathVariable BigInteger staffingLevelKairosId) {
+        staffingLevelService.updateStaffingLevel(staffingLevelKairosId,unitId,staffingLevelDto);
         return ResponseHandler.generateResponse("Success",HttpStatus.OK);
 
     }

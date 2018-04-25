@@ -16,7 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 @EnableScheduling
 @SpringBootApplication
-@EnableMongoRepositories(basePackages ={"com.planner.repository.staffinglevel"})
+@EnableMongoRepositories(basePackages ={"com.planner.repository"})
 
 public class PlanningAppConfig {
     public static void main(String[] args) {
