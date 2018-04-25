@@ -10,14 +10,16 @@ import org.neo4j.ogm.annotation.NodeEntity;
 public class AgeRange extends UserBaseEntity{
     private int from;
     private int to;
+    private int numberOfLeaves;
 
     public AgeRange() {
         //Default Constructor
     }
 
-    public AgeRange(int from, int to) {
+    public AgeRange(int from, int to, int numberOfLeaves) {
         this.from = from;
         this.to = to;
+        this.numberOfLeaves = numberOfLeaves;
     }
 
     public int getFrom() {
@@ -34,5 +36,13 @@ public class AgeRange extends UserBaseEntity{
 
     public void setTo(int to) {
         this.to = to;
+    }
+
+    public int getNumberOfLeaves() {
+        return numberOfLeaves;
+    }
+
+    public void setNumberOfLeaves(int numberOfLeaves) {
+        this.numberOfLeaves = numberOfLeaves;
     }
 }

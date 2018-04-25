@@ -16,7 +16,6 @@ import java.util.List;
 public class ChildCareDaysCheck extends WTABaseRuleTemplate{
     private AgeRange ageRange;
     private List<Long> activities;
-    private int numberOfLeaves;
     private long validationStartDateMillis;
     private int numberOfWeeks;
 
@@ -30,7 +29,6 @@ public class ChildCareDaysCheck extends WTABaseRuleTemplate{
         this.disabled=disabled;
         this.ageRange = ageRange;
         this.activities = activities;
-        this.numberOfLeaves = numberOfLeaves;
         this.validationStartDateMillis = validationStartDateMillis;
         this.numberOfWeeks = numberOfWeeks;
     }
@@ -49,14 +47,6 @@ public class ChildCareDaysCheck extends WTABaseRuleTemplate{
 
     public void setActivities(List<Long> activities) {
         this.activities = activities;
-    }
-
-    public int getNumberOfLeaves() {
-        return numberOfLeaves;
-    }
-
-    public void setNumberOfLeaves(int numberOfLeaves) {
-        this.numberOfLeaves = numberOfLeaves;
     }
 
     public long getValidationStartDateMillis() {

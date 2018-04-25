@@ -13,14 +13,14 @@ public class CareDaysCheck extends WTABaseRuleTemplate{
     private List<AgeRange> ageRange;
     private List<Long> activities;
     private long validationStartDateMillis;
-    private int numberOfWeeks;
+    private Long numberOfWeeks;
     private WTATemplateType wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
 
     public CareDaysCheck() {
         //Default Constructor
     }
 
-    public CareDaysCheck(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activities,  long validationStartDateMillis, int numberOfWeeks) {
+    public CareDaysCheck(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activities, long validationStartDateMillis, Long numberOfWeeks) {
         super(name, minimum, description);
         this.disabled=disabled;
         this.ageRange = ageRange;
@@ -55,11 +55,11 @@ public class CareDaysCheck extends WTABaseRuleTemplate{
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public int getNumberOfWeeks() {
+    public Long getNumberOfWeeks() {
         return numberOfWeeks;
     }
 
-    public void setNumberOfWeeks(int numberOfWeeks) {
+    public void setNumberOfWeeks(Long numberOfWeeks) {
         this.numberOfWeeks = numberOfWeeks;
     }
 

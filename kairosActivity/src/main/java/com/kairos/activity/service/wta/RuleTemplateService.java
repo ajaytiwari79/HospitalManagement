@@ -178,12 +178,12 @@ public class RuleTemplateService extends MongoBaseService {
         timeBankWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         wtaBaseRuleTemplates1.add(timeBankWTATemplate);
 
-        MaximumSeniorDaysPerYear maximumSeniorDaysPerYear=new MaximumSeniorDaysPerYear("Senior Days per Year",true,true,"Senior Days In Year",ageRange,activities,dateInMillis,12);
+        MaximumSeniorDaysPerYear maximumSeniorDaysPerYear=new MaximumSeniorDaysPerYear("Senior Days per Year",true,true,"Senior Days In Year",ageRange,activities,dateInMillis,12L);
         maximumSeniorDaysPerYear.setCountryId(countryDTO.getId());
         maximumSeniorDaysPerYear.setPhaseTemplateValues(phaseTemplateValues);
         wtaBaseRuleTemplates1.add(maximumSeniorDaysPerYear);
 
-        CareDaysCheck careDaysCheck=new CareDaysCheck("Care Days Check",true,true,"Care Days Check",ageRange,activities,dateInMillis,12);
+        CareDaysCheck careDaysCheck=new CareDaysCheck("Care Days Check",true,true,"Care Days Check",ageRange,activities,dateInMillis,12L);
         careDaysCheck.setCountryId(countryDTO.getId());
         careDaysCheck.setPhaseTemplateValues(phaseTemplateValues);
         wtaBaseRuleTemplates1.add(careDaysCheck);
@@ -422,6 +422,21 @@ public class RuleTemplateService extends MongoBaseService {
                 minimumTimeBank.setForbid(templateDTO.isForbid());
                 minimumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
                 break;
+            case MAXIMUM_SENIOR_DAYS_PER_YEAR:
+                MaximumSeniorDaysPerYear maximumSeniorDaysPerYear=(MaximumSeniorDaysPerYear) oldTemplate;
+                maximumSeniorDaysPerYear.setAgeRange(templateDTO.getAgeRange());
+                maximumSeniorDaysPerYear.setActivities(templateDTO.getActivities());
+                maximumSeniorDaysPerYear.setNumberOfWeeks(templateDTO.getNumberOfWeeks());
+                maximumSeniorDaysPerYear.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
+                break;
+            case CHILD_CARE_DAYS_CHECK:
+                CareDaysCheck careDaysCheck=(CareDaysCheck) oldTemplate;
+                careDaysCheck.setAgeRange(templateDTO.getAgeRange());
+                careDaysCheck.setActivities(templateDTO.getActivities());
+                careDaysCheck.setNumberOfWeeks(templateDTO.getNumberOfWeeks());
+                careDaysCheck.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
+                break;
+
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }

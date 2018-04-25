@@ -153,6 +153,12 @@ public class WTABuilderService extends MongoBaseService {
                 maximumSeniorDaysPerYear.setWTARuleTemplateCategory(ruleTemplate.getRuleTemplateCategory().getId());
                 wtaBaseRuleTemplate=maximumSeniorDaysPerYear;
                 break;
+            case CHILD_CARE_DAYS_CHECK:
+                CareDaysCheck  careDaysCheck=new CareDaysCheck();
+                BeanUtils.copyProperties(ruleTemplate,careDaysCheck,id);
+                careDaysCheck.setWTARuleTemplateCategory(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate=careDaysCheck;
+                break;
 
 
             default:

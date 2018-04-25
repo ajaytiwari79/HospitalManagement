@@ -13,7 +13,7 @@ public class MaximumSeniorDaysPerYear extends WTABaseRuleTemplate{
     private List<AgeRange> ageRange;
     private List<Long> activities;
     private long validationStartDateMillis;
-    private int numberOfWeeks;
+    private Long numberOfWeeks;
     private WTATemplateType wtaTemplateType = WTATemplateType.MAXIMUM_SENIOR_DAYS_PER_YEAR;
 
     public MaximumSeniorDaysPerYear() {
@@ -21,7 +21,7 @@ public class MaximumSeniorDaysPerYear extends WTABaseRuleTemplate{
     }
 
     public MaximumSeniorDaysPerYear(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activities,
-                                     long validationStartDateMillis, int numberOfWeeks) {
+                                    long validationStartDateMillis, Long numberOfWeeks) {
         super(name,minimum , description);
         this.disabled=disabled;
         this.ageRange = ageRange;
@@ -54,11 +54,11 @@ public class MaximumSeniorDaysPerYear extends WTABaseRuleTemplate{
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public int getNumberOfWeeks() {
+    public Long getNumberOfWeeks() {
         return numberOfWeeks;
     }
 
-    public void setNumberOfWeeks(int numberOfWeeks) {
+    public void setNumberOfWeeks(Long numberOfWeeks) {
         this.numberOfWeeks = numberOfWeeks;
     }
 
