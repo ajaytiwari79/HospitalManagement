@@ -7,6 +7,7 @@ import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
@@ -1294,6 +1295,16 @@ public class OrganizationService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
         }
         return unit.getTimeZone(); //(Optional.ofNullable(unit.getTimeZone()).isPresent() ? unit.getTimeZone().toString() : "") ;
+    }
+
+    public OrganizationCategory getOrganizationCategory(Boolean isUnion, Boolean isKairosHub){
+        if(isUnion){
+            return OrganizationCategory.UNION;
+        } else if(isKairosHub){
+            return OrganizationCategory.HUB;
+        } else{
+            return OrganizationCategory.ORGANIZATION;
+        }
     }
 }
 
