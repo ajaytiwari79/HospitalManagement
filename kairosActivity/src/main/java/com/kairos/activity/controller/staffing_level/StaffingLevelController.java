@@ -134,7 +134,7 @@ public class StaffingLevelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
-    @RequestMapping(value = "/absence", method = RequestMethod.POST)
+    @RequestMapping(value = "/absences", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level for absence")
     public ResponseEntity<Map<String, Object>> addAbsenceStaffingLevel(@RequestBody @Valid AbsenceStaffingLevelDto absenceStaffingLevelDto,
                                                                        @PathVariable Long unitId) {
