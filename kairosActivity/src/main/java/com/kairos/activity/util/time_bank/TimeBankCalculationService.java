@@ -177,7 +177,7 @@ public class TimeBankCalculationService {
         return dailyTimeBankEntry;
     }
 
-    private Interval getCTAInterval(CTAIntervalDTO ctaIntervalDTO,Interval interval){
+    public Interval getCTAInterval(CTAIntervalDTO ctaIntervalDTO,Interval interval){
         int ctaStart = ctaIntervalDTO.getStartTime();
         int ctaEnd = ctaIntervalDTO.getStartTime()>ctaIntervalDTO.getEndTime()? 1440+ctaIntervalDTO.getEndTime() : ctaIntervalDTO.getEndTime();
         return new Interval(interval.getStart().withTimeAtStartOfDay().plusMinutes(ctaStart), interval.getStart().plusMinutes(ctaEnd));
