@@ -48,16 +48,8 @@ public class TimeCareController {
 
     @RequestMapping(value = "/unit/{unitId}/time_care/getShifts/{controlPanelId}", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_XML_VALUE})
     ResponseEntity<Map<String, Object>> getShiftsFromTimeCare(@RequestBody GetWorkShiftsFromWorkPlaceByIdResponse shifts) {
-
-        try {
             logger.info("Executing Shifts getting from Time care count is----> " + shifts.getGetWorkShiftsFromWorkPlaceByIdResult().size());
-
             return ResponseHandler.generateResponse(HttpStatus.OK, false, taskService.importShiftsFromTimeCare(shifts));
-
-        } catch (Exception exception) {
-            logger.warn("Exception while hitting rest", exception);
-        }
-        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, "Received");
     }
 
     @RequestMapping(value = "/time_care/staffing_levels", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_XML_VALUE})
