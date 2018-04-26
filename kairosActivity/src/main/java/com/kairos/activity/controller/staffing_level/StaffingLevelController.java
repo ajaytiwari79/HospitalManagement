@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import static com.kairos.activity.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -35,7 +36,7 @@ public class StaffingLevelController {
     @Autowired private StaffingLevelService staffingLevelService;
 
 
-    @RequestMapping(value = "/presnce", method = RequestMethod.POST)
+    @RequestMapping(value = "/presence", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level for presence")
     public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto,
                                                                 @PathVariable Long unitId) {
@@ -49,9 +50,9 @@ public class StaffingLevelController {
      * @param unitId
      * @return
      */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/presence", method = RequestMethod.GET)
     @ApiOperation("getting  staffing_level between date unit wise ")
-    public ResponseEntity<Map<String, Object>> getStaffingLevels(@PathVariable Long unitId
+    public ResponseEntity<Map<String, Object>> getPresenceStaffingLevels(@PathVariable Long unitId
     , @RequestParam("startDate")@DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam("endDate")@DateTimeFormat(pattern="yyyy-MM-dd")Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffingLevelService.getPresenceStaffingLevel(unitId,startDate,endDate));
@@ -141,11 +142,24 @@ public class StaffingLevelController {
                 staffingLevelService.createAbsenceStaffingLevel(absenceStaffingLevelDto,unitId));
     }
 
-    @RequestMapping(value = "absence/{staffingLevelId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/absence", method = RequestMethod.POST)
     @ApiOperation("update staffing_level")
-    public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid AbsenceStaffingLevelDto absenceStaffingLevelDto,
-                                                                   @PathVariable Long unitId,@PathVariable BigInteger staffingLevelId) {
+    public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos,
+                                                                   @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                staffingLevelService.updateAbsenceStaffingLevel(staffingLevelId,unitId,absenceStaffingLevelDto));
+                staffingLevelService.updateAbsenceStaffingLevel(unitId,absenceStaffingLevelDtos));
+    }
+
+    /**
+     * get staffing level between date and unit.
+     * @param unitId
+     * @return
+     */
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @ApiOperation("getting  staffing_level between date unit wise ")
+    public ResponseEntity<Map<String, Object>> getStaffingLevels(@PathVariable Long unitId
+            , @RequestParam("startDate")@DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam("endDate")@DateTimeFormat(pattern="yyyy-MM-dd")Date endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                staffingLevelService.getStaffingLevel(unitId,startDate,endDate));
     }
 }

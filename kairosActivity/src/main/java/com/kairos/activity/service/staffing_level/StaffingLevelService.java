@@ -37,6 +37,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.poi.ss.formula.functions.T;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -782,22 +783,48 @@ public class StaffingLevelService extends MongoBaseService {
     }*/
 
     /**
-     * @param staffingLevelId
      * @param unitId
+     * @param absenceStaffingLevelDtos
      */
-    public AbsenceStaffingLevelDto updateAbsenceStaffingLevel(BigInteger staffingLevelId, Long unitId
-            , AbsenceStaffingLevelDto absenceStaffingLevelDto) {
-        logger.info("updating staffing level organizationId and staffingLevelId is {} ,{}", unitId, staffingLevelId);
-        StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).get();
+    public List<AbsenceStaffingLevelDto> updateAbsenceStaffingLevel( Long unitId
+            , List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos) {
+        logger.info("updating staffing level organizationId  {} ,{}", unitId);
+  /*      StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).get();
         if (!staffingLevel.getCurrentDate().equals(absenceStaffingLevelDto.getCurrentDate())) {
             logger.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), absenceStaffingLevelDto.getCurrentDate());
             throw new UnsupportedOperationException("we can not modified the current date of staffing level");
         }
         staffingLevel = StaffingLevelUtil.updateAbsenceStaffingLevels(staffingLevelId, absenceStaffingLevelDto, unitId, staffingLevel);
         this.save(staffingLevel);
+*/
+        List<StaffingLevel> staffingLevels = new ArrayList<StaffingLevel>();
+        StaffingLevel staffingLevel;
+        for(AbsenceStaffingLevelDto absenceStaffingLevelDto : absenceStaffingLevelDtos ) {
+            if(Optional.ofNullable(absenceStaffingLevelDto.getId()).isPresent()) {
+
+                staffingLevel = staffingLevelMongoRepository.findById(absenceStaffingLevelDto.getId()).get();
+                if (!staffingLevel.getCurrentDate().equals(absenceStaffingLevelDto.getCurrentDate())) {
+                    logger.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), absenceStaffingLevelDto.getCurrentDate());
+                    throw new UnsupportedOperationException("we can not modified the current date of staffing level");
+                }
+                staffingLevel = StaffingLevelUtil.updateAbsenceStaffingLevels(absenceStaffingLevelDto,unitId,staffingLevel);
+            }
+            else {
+                staffingLevel =  staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(unitId,absenceStaffingLevelDto.getCurrentDate());
+                if(Optional.ofNullable(staffingLevel).isPresent()) {
+                    staffingLevel = StaffingLevelUtil.updateAbsenceStaffingLevels(absenceStaffingLevelDto,unitId,staffingLevel);
+                }
+                else {
+                    staffingLevel = StaffingLevelUtil.buildAbsenceStaffingLevels(absenceStaffingLevelDto,unitId);
+                }
+            }
+            staffingLevels.add(staffingLevel);
+           }
+           this.save(staffingLevels);
+           absenceStaffingLevelDtos = StaffingLevelUtil.buildAbsenceStaffingLevelDto(staffingLevels);
 
         // plannerSyncService.publishStaffingLevel(unitId,staffingLevelDTO,IntegrationOperation.UPDATE);
-        return absenceStaffingLevelDto;
+        return absenceStaffingLevelDtos;
     }
 
 
@@ -833,7 +860,7 @@ public class StaffingLevelService extends MongoBaseService {
                 presenceStaffingLevelMap.put(DateUtils.getDateStringWithFormat(presenceStaffingLevelDto.getCurrentDate(),"yyyy-MM-dd"),presenceStaffingLevelDto);
             }
             if(!staffingLevel.getAbsenceStaffingLevelInterval().isEmpty()) {
-                AbsenceStaffingLevelDto absenceStaffingLevelDto = new AbsenceStaffingLevelDto(staffingLevel.getId(),staffingLevel.getPhaseId(),staffingLevel.getUnitID(),
+                AbsenceStaffingLevelDto absenceStaffingLevelDto = new AbsenceStaffingLevelDto(staffingLevel.getId(),staffingLevel.getPhaseId(),
                         staffingLevel.getCurrentDate(), staffingLevel.getWeekCount());
                 absenceStaffingLevelDto.setMinNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMinNoOfStaff());
                 absenceStaffingLevelDto.setMaxNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMaxNoOfStaff());

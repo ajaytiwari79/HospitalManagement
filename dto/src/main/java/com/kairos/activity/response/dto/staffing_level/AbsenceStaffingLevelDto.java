@@ -36,7 +36,7 @@ public class AbsenceStaffingLevelDto {
 
     }
 
-    public AbsenceStaffingLevelDto(BigInteger id, Long phaseId,Long unitId, Date currentDate, Long weekCount) {
+    public AbsenceStaffingLevelDto(BigInteger id, Long phaseId, Date currentDate, Long weekCount) {
 
         this.id = id;
         this.phaseId = phaseId;

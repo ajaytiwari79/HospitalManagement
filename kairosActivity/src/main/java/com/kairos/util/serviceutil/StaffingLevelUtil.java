@@ -5,7 +5,9 @@ import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuratio
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.response.dto.staffing_level.AbsenceStaffingLevelDto;
 import com.kairos.activity.response.dto.staffing_level.PresenceStaffingLevelDto;
+import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.math.BigInteger;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 public class StaffingLevelUtil {
+
     public static StaffingLevel buildPresenceStaffingLevels(PresenceStaffingLevelDto presenceStaffingLevelDTO, Long orgId){
 
         StaffingLevel staffingLevel=new StaffingLevel(presenceStaffingLevelDTO.getCurrentDate(), presenceStaffingLevelDTO.getWeekCount()
@@ -50,6 +53,7 @@ public class StaffingLevelUtil {
         staffingLevel.setAbsenceStaffingLevelInterval(absenceStaffingLevelIntervals);
         return staffingLevel;
     }
+
     public static StaffingLevel updateStaffingLevels(BigInteger staffingLevelId, PresenceStaffingLevelDto presenceStaffingLevelDTO,
                                                      Long unitId, StaffingLevel staffingLevel){
 
@@ -59,7 +63,8 @@ public class StaffingLevelUtil {
         return staffingLevel;
 
     }
-    public static StaffingLevel updateAbsenceStaffingLevels(BigInteger staffingLevelId, AbsenceStaffingLevelDto absenceStaffingLevelDto,
+
+    public static StaffingLevel updateAbsenceStaffingLevels(AbsenceStaffingLevelDto absenceStaffingLevelDto,
                                                      Long unitId, StaffingLevel staffingLevel){
 
         staffingLevel.setPhaseId(absenceStaffingLevelDto.getPhaseId());
@@ -75,6 +80,23 @@ public class StaffingLevelUtil {
         staffingLevel.setAbsenceStaffingLevelInterval(absenceStaffingLevelIntervals);
 
         return staffingLevel;
+
+    }
+
+    public static List<AbsenceStaffingLevelDto> buildAbsenceStaffingLevelDto(List<StaffingLevel> staffingLevels) {
+        List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos = new ArrayList<AbsenceStaffingLevelDto>();
+
+        for(StaffingLevel staffingLevel : staffingLevels) {
+            AbsenceStaffingLevelDto absenceStaffingLevelDto = new AbsenceStaffingLevelDto(staffingLevel.getId(),staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(),staffingLevel.getWeekCount());
+            absenceStaffingLevelDto.setMinNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMinNoOfStaff());
+            absenceStaffingLevelDto.setMinNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getMaxNoOfStaff());
+            absenceStaffingLevelDto.setAbsentNoOfStaff(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getAvailableNoOfStaff());
+            absenceStaffingLevelDto.setStaffingLevelActivities(staffingLevel.getAbsenceStaffingLevelInterval().get(0).getStaffingLevelActivities());
+            absenceStaffingLevelDtos.add(absenceStaffingLevelDto);
+
+        }
+
+        return absenceStaffingLevelDtos;
 
     }
 }
