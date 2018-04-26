@@ -19,5 +19,4 @@ public interface CustomPlanningPeriodMongoRepository {
     UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, Date startDate, Date endDate);
     PlanningPeriod getFirstPlanningPeriod(Long unitId);
     PlanningPeriod getLastPlanningPeriod(Long unitId);
-    List<PlanningPeriod> getPlanningPeriodToFlipPhases(Long unitId, Date date);
 }

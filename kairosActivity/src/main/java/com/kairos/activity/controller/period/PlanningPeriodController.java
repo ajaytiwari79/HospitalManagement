@@ -69,11 +69,11 @@ public class PlanningPeriodController {
     }
 
     @ApiOperation(value = "update period's flipping Date")
-    @PutMapping(value = "/period/{periodId}/timestamp/{timestamp}")
+    @PutMapping(value = "/period/{periodId}/flip_phase/{timestamp}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable Long unitId, @PathVariable Long timestamp) {
+    public ResponseEntity<Map<String, Object>> updateFlippingDates(@PathVariable BigInteger periodId, @PathVariable Long unitId, @PathVariable Long timestamp) {
         Date date = new Date(timestamp);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updateFlippingDates(unitId, date));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.updateFlippingDate(periodId, unitId, date));
 
     }
 

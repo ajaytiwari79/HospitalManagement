@@ -443,38 +443,25 @@ public class PlanningPeriodService extends MongoBaseService {
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
-    public boolean updateFlippingDates(Long unitId, Date date){
-        List<PhaseDTO> phases = phaseService.getPhasesByUnit(unitId);
+    public boolean updateFlippingDate(BigInteger periodId, Long unitId, Date date){
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
+        boolean updateCurrentAndNextPhases = false;
+        BigInteger nextPhaseId = null;
+        for(PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()){
 
-        // Prepare map for phases with id as key and sequence as value
-        Map<BigInteger,Integer> phaseIdAndSequenceMap = getMapOfPhasesIdAndSequence(phases);
-
-//        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.getPlanningPeriodToFlipPhases(unitId, DateUtils.addWeeksInDate(new Date(), 7));
-        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.getPlanningPeriodToFlipPhases(unitId, date);
-
-
-        for (PlanningPeriod planningPeriod : planningPeriods){
-            BigInteger currentPhaseId = planningPeriod.getNextPhaseId();
-            BigInteger nextPhaseId = null;
-            int sequenceOfNextPhase = 0;
-            boolean updateCurrentAndNextPhases = false;
-            for(PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()){
-
-                if(currentPhaseId == phaseFlippingDate.getPhaseId()){
-                    if(phaseFlippingDate.getFlippingDate().compareTo(date) <= 0){
-                        updateCurrentAndNextPhases = true;
-                    }
-                    break;
+            if(planningPeriod.getNextPhaseId().equals(phaseFlippingDate.getPhaseId()) ){
+                if(phaseFlippingDate.getFlippingDate().compareTo(date) <= 0){
+                    updateCurrentAndNextPhases = true;
                 }
-                nextPhaseId = phaseFlippingDate.getPhaseId();
+                break;
             }
-            if(updateCurrentAndNextPhases){
-                planningPeriod.setNextPhaseId(nextPhaseId);
-                planningPeriod.setCurrentPhaseId(currentPhaseId);
-            }
-
+            nextPhaseId = phaseFlippingDate.getPhaseId();
         }
-        save(planningPeriods);
+        if(updateCurrentAndNextPhases){
+            planningPeriod.setCurrentPhaseId(planningPeriod.getNextPhaseId());
+            planningPeriod.setNextPhaseId(nextPhaseId);
+            save(planningPeriod);
+        }
         return true;
     }
 
