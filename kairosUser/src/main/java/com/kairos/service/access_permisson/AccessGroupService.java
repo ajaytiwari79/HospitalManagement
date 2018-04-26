@@ -81,8 +81,9 @@ public class AccessGroupService extends UserBaseService {
             Long countryId = organizationService.getCountryIdOfOrganization(organization.getId());
             setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(),getOrganizationCategory(organization.isUnion(), organization.isKairosHub()));
             return accessGroup;
+        } else {
+            throw new ActionNotPermittedException("Access Group can be created at Parent Organization");
         }
-        return null;
     }
 
     public AccessGroup updateAccessGroup(long accessGroupId, Long unitId, AccessGroupDTO accessGroupDTO) {
@@ -161,7 +162,7 @@ public class AccessGroupService extends UserBaseService {
             organization.setAccessGroups(accessGroups);
         }
         save(organization);
-        return accessGroupList;
+        return organization.getAccessGroups();
     }
 
     public List<AccessGroup> getAccessGroups(long organizationId) {

@@ -18,6 +18,7 @@ public class FunctionDTO {
     private Date endDate;
     private List<Long> unionIds;
     private List<Long> organizationLevelIds;
+    private String icon;
 
     public FunctionDTO() {
         //Default Constructor
@@ -77,5 +78,13 @@ public class FunctionDTO {
 
     public void setOrganizationLevelIds(List<Long> organizationLevelIds) {
         this.organizationLevelIds = organizationLevelIds;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }

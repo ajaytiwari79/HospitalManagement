@@ -1,11 +1,11 @@
 package com.planner.domain.config;
 
 import com.planner.domain.common.BaseEntity;
-import org.springframework.data.cassandra.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.List;
 
-@Table
+//@Table
 public class Constraint extends BaseEntity {
 
     private String categoryId;

@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.user.staff.EmploymentGraphRepository;
+
 import com.kairos.response.dto.web.UnitPositionDTO;
 import com.kairos.client.TimeBankRestClient;
 
@@ -68,12 +71,15 @@ import org.joda.time.Interval;
 import org.joda.time.Months;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
+
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -138,8 +144,10 @@ public class UnitPositionService extends UserBaseService {
     private StaffExpertiseRelationShipGraphRepository staffExpertiseRelationShipGraphRepository;
     @Inject
     private EmploymentService employmentService;
+    @Inject private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
+
 
     public UnitPositionQueryResult createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
 
@@ -483,7 +491,7 @@ public class UnitPositionService extends UserBaseService {
                 throw new ActionNotPermittedException("Please select region with end date");
             }
 
-            if (!oldUnitPosition.getReasonCode().getId().equals(unitPositionDTO.getReasonCodeId())) {
+            if (oldUnitPosition.getReasonCode()==null  || !oldUnitPosition.getReasonCode().getId().equals(unitPositionDTO.getReasonCodeId())) {
                 Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(unitPositionDTO.getReasonCodeId(), 0);
                 if (!Optional.ofNullable(reasonCode).isPresent()) {
                     throw new DataNotFoundByIdException("Invalid reasonCode Id" + unitPositionDTO.getReasonCodeId());
@@ -491,8 +499,8 @@ public class UnitPositionService extends UserBaseService {
                 oldUnitPosition.setReasonCode(reasonCode.get());
             }
         }
-        oldUnitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
-        oldUnitPosition.setTotalWeeklyMinutes(unitPositionDTO.getTotalWeeklyMinutes() + (unitPositionDTO.getTotalWeeklyHours() * 60));
+        //oldUnitPosition.setWorkingDaysInWeek(unitPositionDTO.getWorkingDaysInWeek());
+        oldUnitPosition.setTotalWeeklyMinutes((unitPositionDTO.getTotalWeeklyHours() * 60));
         oldUnitPosition.setAvgDailyWorkingHours(unitPositionDTO.getAvgDailyWorkingHours());
         oldUnitPosition.setHourlyWages(unitPositionDTO.getHourlyWages());
         oldUnitPosition.setSalary(unitPositionDTO.getSalary());
@@ -631,6 +639,7 @@ public class UnitPositionService extends UserBaseService {
     }
 
     public UnitPositionWithCtaDetailsDTO getUnitPositionCTA(Long unitPositionId, Long unitId) {
+        BeanUtils.copyProperties(new Object(),new Object(),"id");
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         CTAListQueryResult ctaQueryResults = costTimeAgreementGraphRepository.getCTAByUnitPositionId(unitPositionId);
         Long countryId = organizationService.getCountryIdOfOrganization(unitId);
@@ -653,26 +662,28 @@ public class UnitPositionService extends UserBaseService {
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = new ArrayList<>(ctaListQueryResult.getRuleTemplates().size());
         List<CTARuleTemplateQueryResult> ruleTemplateQueryResults = getObjects(ctaListQueryResult.getRuleTemplates(), new TypeReference<List<CTARuleTemplateQueryResult>>() {
         });
-        ruleTemplateQueryResults.forEach(rt -> {
+        ruleTemplateQueryResults.forEach(ruleTemplateQueryResult -> {
             CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO();
-            ctaRuleTemplateDTO.setGranularity((int) rt.getCompensationTable().get("granularityLevel"));
-            ctaRuleTemplateDTO.setActivityIds(rt.getActivityIds().stream().map(ac -> new BigInteger(ac.toString())).collect(Collectors.toList()));
-            ctaRuleTemplateDTO.setName(rt.getName());
-            ctaRuleTemplateDTO.setId(rt.getId());
-            //ctaRuleTemplateDTO.setDays(rt.getCalculateOnDayTypes());
-            ctaRuleTemplateDTO.setTimeTypeIds(rt.getTimeTypeIds() != null ? rt.getTimeTypeIds().stream().map(t -> new BigInteger(t.toString())).collect(Collectors.toList()) : null);
+            ctaRuleTemplateDTO.setGranularity((int) ruleTemplateQueryResult.getCompensationTable().get("granularityLevel"));
+            ctaRuleTemplateDTO.setActivityIds(ruleTemplateQueryResult.getActivityIds().stream().map(ac -> new BigInteger(ac.toString())).collect(Collectors.toList()));
+            ctaRuleTemplateDTO.setName(ruleTemplateQueryResult.getName());
+            ctaRuleTemplateDTO.setId(ruleTemplateQueryResult.getId());
+            if(ruleTemplateQueryResult.getDayTypeIds()!=null && !ruleTemplateQueryResult.getDayTypeIds().isEmpty()) {
+                List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(ruleTemplateQueryResult.getDayTypeIds());
+                ctaRuleTemplateDTO.setDays(dayTypes.stream().filter(dt->!dt.isHolidayType()).flatMap(dt -> dt.getValidDays().stream().map(day -> DayOfWeek.valueOf(day.name()).getValue())).collect(Collectors.toList()));
+            }
+            ctaRuleTemplateDTO.setTimeTypeIds(ruleTemplateQueryResult.getTimeTypeIds() != null ? ruleTemplateQueryResult.getTimeTypeIds().stream().map(t -> new BigInteger(t.toString())).collect(Collectors.toList()) : null);
             //ctaRuleTemplateDTO.setPublicHolidays();
 
-//            ctaRuleTemplateDTO.setCtaIntervalDTOS(rt.getCtaIntervalDto((List<CompensationTableInterval>) rt.getCompensationTable().get("compensationTableInterval")));
-            ctaRuleTemplateDTO.setPlannedTimeIds(rt.getPlannedTimeIds());
+            ctaRuleTemplateDTO.setPlannedTimeIds(ruleTemplateQueryResult.getPlannedTimeIds());
 
-            ctaRuleTemplateDTO.setCtaIntervalDTOS(getCtaInterval((List<CompensationTableInterval>) rt.getCompensationTable().get("compensationTableInterval")));
+            ctaRuleTemplateDTO.setCtaIntervalDTOS(getCtaInterval((List<CompensationTableInterval>) ruleTemplateQueryResult.getCompensationTable().get("compensationTableInterval")));
 
 
-            ctaRuleTemplateDTO.setCalculateScheduledHours(rt.isCalculateScheduledHours());
-            ctaRuleTemplateDTO.setEmploymentTypes(rt.getEmploymentTypes());
-            if (rt.getPlannedTimeWithFactor().getAccountType() != null) {
-                ctaRuleTemplateDTO.setAccountType(rt.getPlannedTimeWithFactor().getAccountType().name());
+            ctaRuleTemplateDTO.setCalculateScheduledHours(ruleTemplateQueryResult.isCalculateScheduledHours());
+            ctaRuleTemplateDTO.setEmploymentTypes(ruleTemplateQueryResult.getEmploymentTypes());
+            if (ruleTemplateQueryResult.getPlannedTimeWithFactor().getAccountType() != null) {
+                ctaRuleTemplateDTO.setAccountType(ruleTemplateQueryResult.getPlannedTimeWithFactor().getAccountType().name());
             }
             ctaRuleTemplateDTOS.add(ctaRuleTemplateDTO);
         });
@@ -830,11 +841,10 @@ public class UnitPositionService extends UserBaseService {
         Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
         employment.setEndDateMillis(endDateMillis);
         employmentGraphRepository.save(employment);
-        LocalDate curDate = DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString());
         if(DateUtil.getDateFromEpoch(endDateMillis).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0) {
             //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-            List<Long> empIds = Stream.of(employment.getId()).collect(Collectors.toList());
-            employmentService.moveToReadOnlyAccessGroup(empIds);
+            List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
+            employmentService.moveToReadOnlyAccessGroup(employmentIds);
         }
         User user = userGraphRepository.getUserByStaffId(staffId);
         EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());

@@ -1,12 +1,9 @@
 package com.kairos.activity.util;
 
-import com.kairos.activity.custom_exception.InvalidRequestException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -26,12 +23,10 @@ import static java.time.temporal.TemporalAdjusters.firstInMonth;
  * Created by oodles on 1/2/17.
  */
 public class DateUtils {
+    //TODO gotta add logger
     public static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String ONLY_DATE = "yyyy-MM-dd";
-
-    private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
-
     public static Date getEndOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
         LocalDateTime endOfDay = localDateTime.with(LocalTime.MAX);
@@ -157,9 +152,7 @@ public class DateUtils {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MONGODB_QUERY_DATE_FORMAT);
 
         Date date = simpleDateFormat.parse(receivedDate);
-        logger.info("selected date is " + date);
         timestampedDate = timestampedDate + (((date.getHours() * 60 * 60) + (date.getMinutes() * 60) + date.getSeconds()) * 1000);
-        logger.info("selected date timestamp" + timestampedDate);
         date.setTime(timestampedDate);
 
         return date;
@@ -369,6 +362,7 @@ public class DateUtils {
         return Instant.ofEpochMilli(date.toDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
+
     public static Long getDifferenceBetweenDatesInMinute(Date startDate, Date endDate) {
         return ((endDate.getTime() - startDate.getTime()) / (1000 * 60));
     }
@@ -378,13 +372,9 @@ public class DateUtils {
     }
 
     public static String getDateStringByTimeZone(Date date,ZoneId zoneId, String dateFormatString){
-        try {
             DateTime dateTime = new DateTime(date).withZone(DateTimeZone.forID(zoneId.getId()));
             DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormatString);
             return dateTime.toString(formatter);
-        } catch (Exception e){
-            throw new InvalidRequestException(e.getMessage());
-        }
     }
 
     public static Date convertUTCTOTimeZone(Date date,  TimeZone toTimeZone)

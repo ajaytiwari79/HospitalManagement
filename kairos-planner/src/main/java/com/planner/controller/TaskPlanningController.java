@@ -33,7 +33,7 @@ import java.util.Map;
 @RequestMapping(StaticField.INTEGRATION)
 public class TaskPlanningController {
 
-    private static final Logger log = LoggerFactory.getLogger(TaskPlanningController.class);
+   /* private static final Logger log = LoggerFactory.getLogger(TaskPlanningController.class);
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -190,7 +190,7 @@ public class TaskPlanningController {
     Map<String, Object> saveLocationDistance() {
         applicationContext.getBean(LocationService.class).saveLocationDistances();
         return ResponseHandler.generateResponse(StaticField.DELETE_SUCCESS, HttpStatus.ACCEPTED, false,null);
-    }
+    }*/
 
     /*@RequestMapping(value = "/saveWorkingTimeAgreement", method = RequestMethod.POST)
     Map<String, Object> saveWorkingTimeAgreement(@RequestBody WorkingTimeAggrementDTO workingTimeAggrementDTO) {

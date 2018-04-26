@@ -226,6 +226,19 @@ public class AccessPageService extends UserBaseService {
         return tabId;
     }
 
+    // TODO Uncomment and integrate
+    /*public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long organizationId, Long userId){
+        List<StaffPermissionQueryResult> staffPermissions = accessPageRepository.getAccessPermissionOfUserForUnit(userId,organizationId);
+        Map<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = staffPermissions.stream().collect(Collectors.groupingBy(StaffPermissionQueryResult::getAccessGroupId));
+        Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = permissionByAccessGroup.entrySet();
+        Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
+        List<StaffPermissionQueryResult> allPermissions = new ArrayList<>();
+        while (iterator.hasNext()){
+            allPermissions.addAll(iterator.next().getValue());
+        }
+        return preparePermissionList(allPermissions);
+    }*/
+
     public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long parentOrganizationId,Organization newUnit,Long userId){
         Organization parentOrganization = organizationGraphRepository.findOne(parentOrganizationId);
         if(isHubMember(userId)){
@@ -239,7 +252,7 @@ public class AccessPageService extends UserBaseService {
         while (iterator.hasNext()){
             allPermissions.addAll(iterator.next().getValue());
         }
-        createEmploymentWithNewOrganization(newUnit,userId,permissionByAccessGroup,parentOrganizationId);
+//        createEmploymentWithNewOrganization(newUnit,userId,permissionByAccessGroup,parentOrganizationId);
         return preparePermissionList(allPermissions);
     }
 
@@ -309,6 +322,7 @@ public class AccessPageService extends UserBaseService {
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         employment.getUnitPermissions().add(unitPermission);
+
         Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = accessPermissionByGroup.entrySet();
         Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
         ObjectMapper objectMapper = new ObjectMapper();

@@ -3,11 +3,11 @@ package com.planner.domain.staff;
 import com.planner.domain.common.BaseEntity;
 import com.planner.enums.ShiftType;
 import org.joda.time.DateTime;
-import org.springframework.data.cassandra.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.Date;
 
-@Table
+//@Table
 public class PlanningShift extends BaseEntity {
 
     private String staffId;

@@ -13,6 +13,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
+import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
 import com.kairos.persistence.model.user.agreement.wta.WTAResponseDTO;
 import com.kairos.persistence.model.user.auth.User;
@@ -948,15 +949,27 @@ public class StaffService extends UserBaseService {
         staffGraphRepository.save(staff);
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getIsoDateInLong(payload.getEmployedSince()), isEmploymentExist);
         staff.setUser(null); // removing user to send in FE
+        staff.setGender(user.getGender());
 
         return staff;
+    }
+
+    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationPOJOData staffCreationPOJOData){
+        User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
+        if(!Optional.ofNullable(user).isPresent()){
+            user = new User();
+            setBasicDetailsOfUser(user, staffCreationPOJOData);
+            userGraphRepository.save(user);
+        }
+        createUnitManagerAndEmployment(organizationId, user);
+        return user;
     }
 
     private void setBasicDetailsOfUser(User user, StaffCreationPOJOData staffCreationDTO) {
         user.setEmail(staffCreationDTO.getPrivateEmail());
         user.setUserName(staffCreationDTO.getPrivateEmail());
         user.setFirstName(staffCreationDTO.getFirstName());
-        user.setGender(staffCreationDTO.getGender());
+        user.setGender(Integer.valueOf(staffCreationDTO.getCprNumber().substring(staffCreationDTO.getCprNumber().length() - 1))%2==0?Gender.FEMALE:Gender.MALE);
         user.setLastName(staffCreationDTO.getLastName());
         String defaultPassword = user.getFirstName().trim() + "@kairos";
         user.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
@@ -1084,6 +1097,44 @@ public class StaffService extends UserBaseService {
 //        }
     }
 
+
+    private void createUnitManagerAndEmployment(Long organizationId, User user) {
+
+        Organization organization = organizationGraphRepository.findOne(organizationId);
+        Organization parent;
+        if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organizationId);
+
+        } else {
+            parent = organizationGraphRepository.getParentOfOrganization(organizationId);
+        }
+        if(!Optional.ofNullable(parent).isPresent()){
+            parent = organization;
+        }
+
+        Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(),
+                user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
+
+        Employment employment = new Employment();
+        employment.setStaff(staff);
+        staff.setUser(user);
+
+        employment.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
+        employment.setStaff(staff);
+        employment.setStartDateMillis(DateUtil.getCurrentDateMillis());
+
+        parent.getEmployments().add(employment);
+
+        UnitPermission unitPermission = new UnitPermission();
+        unitPermission.setOrganization(parent);
+        AccessGroup accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByRole(parent.getId(), AccessGroupRole.MANAGEMENT.toString()); // findOne(accessGroupId);
+        if (Optional.ofNullable(accessGroup).isPresent()) {
+            unitPermission.setAccessGroup(accessGroup);
+        }
+
+        employment.getUnitPermissions().add(unitPermission);
+        save(employment);
+    }
 
     public Staff createStaffObject(User user, Staff staff, Long engineerTypeId, Organization unit) {
         ContactAddress contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
@@ -1448,11 +1499,11 @@ public class StaffService extends UserBaseService {
             WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
-        List<DayOfWeek> days;
-        if (activityDayTypes != null && !activityDayTypes.isEmpty()) {
+
+        if(activityDayTypes!=null && !activityDayTypes.isEmpty()) {
             List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(activityDayTypes);
-            if (dayTypes != null && !dayTypes.isEmpty()) {
-                days = dayTypes.stream().flatMap(dt -> dt.getValidDays().stream().map(d -> DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
+            if(dayTypes!=null && !dayTypes.isEmpty()){
+                List<DayOfWeek> days = dayTypes.stream().filter(dt->!dt.isHolidayType()).flatMap(dt->dt.getValidDays().stream().map(d->DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
                 staffAdditionalInfoQueryResult.setActivityDayTypes(days);
             }
         }

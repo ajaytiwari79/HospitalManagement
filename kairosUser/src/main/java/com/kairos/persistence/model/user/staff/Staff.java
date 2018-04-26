@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.Client;
@@ -11,10 +12,13 @@ import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.language.Language;
+import com.kairos.util.CPRUtil;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -96,6 +100,8 @@ public class Staff extends UserBaseEntity {
     @DateLong
     private Date dateOfBirth;
     private String careOfName;
+    private Integer age;
+    private Gender gender;
 
 
     public Staff(String firstName) {
@@ -488,5 +494,18 @@ public class Staff extends UserBaseEntity {
 
     public void setSecondaryContactAddress(ContactAddress secondaryContactAddress) {
         this.secondaryContactAddress = secondaryContactAddress;
+    }
+
+    public Integer getAge() {
+        this.age = this.cprNumber != null ? Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears() : null;
+        return age;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 }
