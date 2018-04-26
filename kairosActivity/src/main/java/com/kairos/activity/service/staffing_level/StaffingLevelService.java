@@ -22,13 +22,12 @@ import com.kairos.activity.response.dto.staffing_level.ShiftPlanningStaffingLeve
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.activity.service.MongoBaseService;
-import com.kairos.activity.service.integration.PlannerSyncService;
+import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.event.ShiftNotificationEvent;
 import com.kairos.activity.util.timeCareShift.Transstatus;
 import com.kairos.util.serviceutil.StaffingLevelUtil;
-import com.netflix.discovery.converters.Auto;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
