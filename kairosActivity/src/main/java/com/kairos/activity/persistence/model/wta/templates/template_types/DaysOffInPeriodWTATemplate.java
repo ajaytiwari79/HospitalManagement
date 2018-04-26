@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,7 +24,33 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     private long validationStartDateMillis;
     private long daysLimit;
     private WTATemplateType wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
+    protected List<PartOfDay> partOfDays;
+    protected float recommendedValue;
+    protected boolean minimum;
 
+    public List<PartOfDay> getPartOfDays() {
+        return partOfDays;
+    }
+
+    public void setPartOfDays(List<PartOfDay> partOfDays) {
+        this.partOfDays = partOfDays;
+    }
+
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    public boolean isMinimum() {
+        return minimum;
+    }
+
+    public void setMinimum(boolean minimum) {
+        this.minimum = minimum;
+    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;

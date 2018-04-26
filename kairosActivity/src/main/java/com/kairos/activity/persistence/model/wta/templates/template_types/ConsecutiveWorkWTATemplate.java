@@ -2,10 +2,13 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -18,9 +21,33 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     private boolean checkAgainstTimeRules;
     private long limitCount;//no of days
     private WTATemplateType wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
+    protected List<PartOfDay> partOfDays;
+    protected float recommendedValue;
+    protected boolean minimum;
 
+    public List<PartOfDay> getPartOfDays() {
+        return partOfDays;
+    }
 
+    public void setPartOfDays(List<PartOfDay> partOfDays) {
+        this.partOfDays = partOfDays;
+    }
 
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    public boolean isMinimum() {
+        return minimum;
+    }
+
+    public void setMinimum(boolean minimum) {
+        this.minimum = minimum;
+    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -52,7 +79,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     }
 
     public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {
-        super(name, minimum, description);
+        super(name, description);
         this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.limitCount = limitCount;
     }

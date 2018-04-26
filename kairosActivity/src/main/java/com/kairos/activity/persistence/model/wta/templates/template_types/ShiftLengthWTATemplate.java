@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,8 +23,33 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     private boolean checkAgainstTimeRules;
     private WTATemplateType wtaTemplateType = WTATemplateType.SHIFT_LENGTH;;
     private List<Long> dayTypes;
+    protected List<PartOfDay> partOfDays;
+    protected float recommendedValue;
+    protected boolean minimum;
 
+    public List<PartOfDay> getPartOfDays() {
+        return partOfDays;
+    }
 
+    public void setPartOfDays(List<PartOfDay> partOfDays) {
+        this.partOfDays = partOfDays;
+    }
+
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    public boolean isMinimum() {
+        return minimum;
+    }
+
+    public void setMinimum(boolean minimum) {
+        this.minimum = minimum;
+    }
 
     public List<Long> getDayTypes() {
         return dayTypes;
@@ -61,7 +87,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     }
 
     public ShiftLengthWTATemplate(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules) {
-        super(name, minimum, description);
+        super(name, description);
         this.timeLimit = timeLimit;
         this.checkAgainstTimeRules = checkAgainstTimeRules;
     }

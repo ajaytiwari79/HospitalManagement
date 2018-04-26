@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -28,6 +29,10 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     private List<BigInteger> timeTypeIds;
     private List<BigInteger> activityIds;
     private List<Long> plannedTimeIds;
+    protected List<PartOfDay> partOfDays;
+    protected float recommendedValue;
+    protected boolean minimum;
+
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;

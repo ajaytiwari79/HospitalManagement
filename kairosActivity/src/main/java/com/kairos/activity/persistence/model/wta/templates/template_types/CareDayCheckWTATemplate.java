@@ -20,6 +20,7 @@ public class CareDayCheckWTATemplate extends WTABaseRuleTemplate {
     private String intervalUnit;
     private long validationStartDateMillis;
     private WTATemplateType wtaTemplateType = WTATemplateType.CARE_DAYS_CHECK;
+    protected boolean minimum;
 
 
     public WTATemplateType getWtaTemplateType() {

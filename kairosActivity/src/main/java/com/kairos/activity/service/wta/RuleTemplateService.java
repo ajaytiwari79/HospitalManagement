@@ -292,7 +292,6 @@ public class RuleTemplateService extends MongoBaseService {
 
 
     public WTARuleTemplateDTO updateRuleTemplate(long countryId, WTARuleTemplateDTO templateDTO) {
-
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country");
@@ -437,7 +436,7 @@ public class RuleTemplateService extends MongoBaseService {
         oldTemplate.setPhaseTemplateValues(phaseTemplateValues);
         oldTemplate.setDisabled(templateDTO.getDisabled());
         oldTemplate.setWTARuleTemplateCategoryId(ruleTemplateCategoryId);
-        oldTemplate.setRecommendedValue(templateDTO.getRecommendedValue());
+        //oldTemplate.setRecommendedValue(templateDTO.getRecommendedValue());
 
         oldTemplate.setLastUpdatedBy(currentUserDetails.getFirstName());
 

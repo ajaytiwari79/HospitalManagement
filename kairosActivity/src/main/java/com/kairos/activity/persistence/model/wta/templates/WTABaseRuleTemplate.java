@@ -20,23 +20,12 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     protected String description;
     protected boolean disabled;
     protected BigInteger WTARuleTemplateCategoryId;
-    protected List<PartOfDay> partOfDays;
+    protected String lastUpdatedBy;
     protected Long countryId;
-    protected int lastInsertedValue;
 
     protected List<PhaseTemplateValue> phaseTemplateValues;
-    protected int recommendedValue;
-    protected String lastUpdatedBy;
-    protected boolean minimum;
 
 
-    public int getLastInsertedValue() {
-        return lastInsertedValue;
-    }
-
-    public void setLastInsertedValue(int lastInsertedValue) {
-        this.lastInsertedValue = lastInsertedValue;
-    }
 
     public Long getCountryId() {
         return countryId;
@@ -46,21 +35,6 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         this.countryId = countryId;
     }
 
-    public boolean isMinimum() {
-        return minimum;
-    }
-
-    public void setMinimum(boolean minimum) {
-        this.minimum = minimum;
-    }
-
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
 
     public boolean isDisabled() {
         return disabled;
@@ -80,9 +54,8 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
 
     public WTABaseRuleTemplate(){}
 
-    public WTABaseRuleTemplate(String name, boolean minimum, String description) {
+    public WTABaseRuleTemplate(String name,String description) {
         this.name = name;
-        this.minimum = minimum;
         this.description = description;
     }
 
@@ -103,13 +76,7 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     public void setDescription(String description) {
         this.description = description;
     }
-    public int getRecommendedValue() {
-        return recommendedValue;
-    }
 
-    public void setRecommendedValue(int recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
 
     public List<PhaseTemplateValue> getPhaseTemplateValues() {
         return phaseTemplateValues;
