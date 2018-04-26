@@ -164,7 +164,7 @@ public class PlanningPeriodService extends MongoBaseService {
             throw new ActionNotPermittedException("Period already exist between given dates ");
         }
 
-        if(Optional.ofNullable(firstPlanningPeriod).isPresent() && !planningPeriodDTO.getEndDate().before(firstPlanningPeriod.getStartDate()) && firstPlanningPeriod.getEndDate().getTime() - planningPeriodDTO.getStartDate().getTime() > 1){
+        if(Optional.ofNullable(firstPlanningPeriod).isPresent() && planningPeriodDTO.getEndDate().before(firstPlanningPeriod.getStartDate()) && firstPlanningPeriod.getStartDate().getTime() - planningPeriodDTO.getEndDate().getTime() > 1){
             throw new ActionNotPermittedException("Invalid duration for period to be created");
         }
 
