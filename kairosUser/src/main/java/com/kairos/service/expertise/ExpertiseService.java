@@ -122,6 +122,7 @@ public class ExpertiseService extends UserBaseService {
                 throw new DataNotFoundByIdException("Invalid expertise Id");
             }
             validateSeniorityLevel(expertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), -1L);
+
             if (expertise.isPublished()) {
                 expertiseResponseDTO = createCopyOfExpertise(expertise, expertiseDTO, countryId);
                 // Expertise is already published Now we need to maintain a tempCopy of it.
@@ -296,10 +297,18 @@ public class ExpertiseService extends UserBaseService {
 
 
     private void prepareExpertiseWhileCreate(Expertise expertise, CountryExpertiseDTO expertiseDTO, Long countryId) {
+        validateSeniorDaysValues(expertiseDTO.getSeniorDaysValues());
+        validateChildCareDaysDays(expertiseDTO.getChildCareDays());
         expertise.setName(expertiseDTO.getName().trim());
         expertise.setDescription(expertiseDTO.getDescription());
         expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
         expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
+        List<SeniorDaysValue> seniorDaysValue=new ArrayList<>();
+        BeanUtils.copyProperties(seniorDaysValue,expertiseDTO.getSeniorDaysValues());
+        expertise.setSeniorDaysValues(seniorDaysValue);
+        List<ChildCareDaysValue> childCareDaysValues=new ArrayList<>();
+        BeanUtils.copyProperties(childCareDaysValues,expertiseDTO.getChildCareDays());
+        expertise.setChildCareDaysValues(childCareDaysValues);
         Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
             throw new DataNotFoundByIdException("Invalid level id " + expertiseDTO.getOrganizationLevelId());
@@ -326,6 +335,7 @@ public class ExpertiseService extends UserBaseService {
             seniorityLevel = addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
 
         }
+
         save(expertise);
         expertiseDTO.setId(expertise.getId());
         expertiseDTO.setPublished(expertise.isPublished());
@@ -723,6 +733,27 @@ public class ExpertiseService extends UserBaseService {
     public List<ExpertiseQueryResult> getUnpublishedExpertise(Long countryId) {
         return expertiseGraphRepository.getUnpublishedExpertise(countryId);
     }
+
+    public void validateSeniorDaysValues(List<SeniorDaysValueDTO> seniorDaysValues){
+        Collections.sort(seniorDaysValues);
+        for(int i=0;i<seniorDaysValues.size();i++){
+            if(seniorDaysValues.size()<2)
+                break;
+            if(i<seniorDaysValues.size() && seniorDaysValues.get(i).getTo()>seniorDaysValues.get(++i).getFrom())
+                throw new ActionNotPermittedException("Invalid Range");
+        }
+    }
+
+    public void validateChildCareDaysDays(List<ChildCareDaysDTO> childCareDaysValues){
+        Collections.sort(childCareDaysValues);
+        for(int i=0;i<childCareDaysValues.size();i++){
+            if(childCareDaysValues.size()<2)
+                break;
+            if(i<childCareDaysValues.size() && childCareDaysValues.get(i).getTo()>childCareDaysValues.get(++i).getFrom())
+                throw new ActionNotPermittedException("Invalid Range");
+        }
+    }
+
 
 
 }
