@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+    <!--<environmentMode>FULL_ASSERT</environmentMode>-->
+    <solutionClass>com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution</solutionClass>
+    <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
+    <entityClass>com.kairos.shiftplanning.domain.SkillLineInterval</entityClass>
+    <entityClass>com.kairos.shiftplanning.domain.ShiftRequestPhase</entityClass>
+    <!--<entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>-->
+    <!--
+    Intervals on assigned back to null will not reduce shift length if they are in mid of shift and hence causing score corruption, which is fine
+    <environmentMode>FULL_ASSERT</environmentMode>-->
+    <!--<environmentMode>FAST_ASSERT</environmentMode>-->
+    <!--<environmentMode>FULL_ASSERT</environmentMode>-->
+    <scoreDirectorFactory>
+        <scoreDrl>com/kairos/shiftplanning/rules/shiftplanning_activityLine.drl</scoreDrl>
+        <scoreDrl>com/kairos/shiftplanning/rules/wtaConstraintsRule.drl</scoreDrl>
+        <!--<scoreDrl>com/kairos/shiftplanning/rules/ctaConstraintsRule.drl</scoreDrl>-->
+        <scoreDrl>com/kairos/shiftplanning/rules/activityConstraintsRule.drl</scoreDrl>
+        <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
+    </scoreDirectorFactory>
+    <constructionHeuristic>
+        <queuedEntityPlacer>
+            <entitySelector id="activityLineIntervalSelector">
+                <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
+            </entitySelector>
+            <changeMoveSelector>
+                <entitySelector mimicSelectorRef="activityLineIntervalSelector"/>
+                <valueSelector>
+                    <variableName>shift</variableName>
+                </valueSelector>
+            </changeMoveSelector>
+        </queuedEntityPlacer>
+    </constructionHeuristic>
+    <constructionHeuristic>
+        <queuedEntityPlacer>
+            <entitySelector id="skillLineIntervalSelector">
+                <entityClass>com.kairos.shiftplanning.domain.SkillLineInterval</entityClass>
+            </entitySelector>
+            <changeMoveSelector>
+                <entitySelector mimicSelectorRef="skillLineIntervalSelector"/>
+                <valueSelector>
+                    <variableName>shift</variableName>
+                </valueSelector>
+            </changeMoveSelector>
+        </queuedEntityPlacer>
+    </constructionHeuristic>
+    <!--<constructionHeuristic>
+        <queuedEntityPlacer>
+            <entitySelector id="shiftBreakSelector">
+                <entityClass>com.kairos.shiftplanning.domain.ShiftBreak</entityClass>
+            </entitySelector>
+            <changeMoveSelector>
+                <entitySelector mimicSelectorRef="shiftBreakSelector"/>
+                <valueSelector>
+                    <variableName>shift</variableName>
+                </valueSelector>
+            </changeMoveSelector>
+        </queuedEntityPlacer>
+    </constructionHeuristic>-->
+    <!--<constructionHeuristic>
+        <queuedEntityPlacer>
+            <entitySelector id="indirectActivitySelector">
+                <entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>
+            </entitySelector>
+            <changeMoveSelector>
+                <entitySelector mimicSelectorRef="indirectActivitySelector"/>
+                <valueSelector>
+                    <variableName>startTime</variableName>
+                </valueSelector>
+            </changeMoveSelector>
+        </queuedEntityPlacer>
+    </constructionHeuristic>-->
+    <!--<changeMoveSelector>
+                <entitySelector>
+                    <entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>
+                </entitySelector>
+                <valueSelector>
+                    <variableName>startTime</variableName>
+                </valueSelector>
+            </changeMoveSelector>-->
+    <localSearch>
+        <unionMoveSelector>
+            <moveIteratorFactory>
+                <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalChangeMoveIteratorFactory</moveIteratorFactoryClass>
+            </moveIteratorFactory>
+            <moveIteratorFactory>
+                <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalPillarMoveIteratorFactory</moveIteratorFactoryClass>
+            </moveIteratorFactory>
+            <moveIteratorFactory>
+                <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalSwapMoveIteratorFactory</moveIteratorFactoryClass>
+            </moveIteratorFactory>
+        </unionMoveSelector>
+        <acceptor>
+            <lateAcceptanceSize>5000</lateAcceptanceSize>
+        </acceptor>
+        <forager>
+            <acceptedCountLimit>200</acceptedCountLimit>
+        </forager>
+        <termination>
+            <unimprovedSecondsSpentLimit>100</unimprovedSecondsSpentLimit>
+        </termination>
+    </localSearch>
+    <!-- <localSearch>
+         <unionMoveSelector>
+             <moveIteratorFactory>
+                 <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalChangeMoveIteratorFactory</moveIteratorFactoryClass>
+             </moveIteratorFactory>
+             <moveIteratorFactory>
+                 <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalSwapMoveIteratorFactory</moveIteratorFactoryClass>
+             </moveIteratorFactory>
+         </unionMoveSelector>
+         <acceptor>
+             <lateAcceptanceSize>6000</lateAcceptanceSize>
+         </acceptor>
+         <forager>
+             <acceptedCountLimit>200</acceptedCountLimit>
+         </forager>
+         <termination>
+             <unimprovedSecondsSpentLimit>20</unimprovedSecondsSpentLimit>
+         </termination>
+     </localSearch>-->
+
+
+    <!-- any non custom move does not unassign previous... so not to be used. Yes, it puts multiple alis of same interval in same shift. in case we ;re swapping some of alis of a shift to a day off of other shift-->
+    <!--<swapMoveSelector>
+        <entitySelector>
+            <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
+        </entitySelector>
+        <selectedCountLimit>200</selectedCountLimit>
+        <secondaryEntitySelector>
+            <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
+        </secondaryEntitySelector>
+        <variableNameInclude>shift</variableNameInclude>
+        <filterClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalSwapMoveFilter</filterClass>
+    </swapMoveSelector>-->
+    <termination>
+        <secondsSpentLimit>150</secondsSpentLimit>
+    </termination>
+    <!-- <localSearch>
+        <unionMoveSelector>
+            &lt;!&ndash;<selectionOrder>ORIGINAL</selectionOrder>&ndash;&gt;
+            <moveIteratorFactory>
+                <moveIteratorFactoryClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalChangeMoveIteratorFactoryactory</moveIteratorFactoryClass>
+            </moveIteratorFactory>
+
+        </unionMoveSelector>
+        <acceptor>
+            <lateAcceptanceSize>800</lateAcceptanceSize>
+        </acceptor>
+        <forager>
+            &lt;!&ndash; no matter what your acceptedCount of forager is, it'll only pick one move per step and if it's more than 1 , it'll pick 1 randomly.. SO freaking useful check AcceptedForager.pickMove()
+            &ndash;&gt;
+            <acceptedCountLimit>1</acceptedCountLimit>
+        </forager>
+        <termination>
+            <unimprovedSecondsSpentLimit>600</unimprovedSecondsSpentLimit>
+        </termination>
+    </localSearch>-->
+    <!--<localSearch>
+    <unionMoveSelector>
+       &lt;!&ndash; <changeMoveSelector>
+            <entitySelector>
+                <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
+            </entitySelector>
+                <selectedCountLimit>1000</selectedCountLimit>
+            <valueSelector>
+                <variableName>shift</variableName>
+            </valueSelector>
+            <filterClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalChangeMoveFilter</filterClass>
+        </changeMoveSelector>&ndash;&gt;
+        <swapMoveSelector>
+            <entitySelector>
+                <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
+            </entitySelector>
+            <selectedCountLimit>1000</selectedCountLimit>
+            <secondaryEntitySelector>
+                <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
+            </secondaryEntitySelector>
+            <variableNameInclude>shift</variableNameInclude>
+            <filterClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalSwapMoveFilter</filterClass>
+        </swapMoveSelector>
+    </unionMoveSelector>
+        <acceptor>
+            <lateAcceptanceSize>400</lateAcceptanceSize>
+        </acceptor>
+        <termination>
+            <unimprovedSecondsSpentLimit>10</unimprovedSecondsSpentLimit>
+        </termination>
+    </localSearch>-->
+    <!--<pillarChangeMoveSelector>
+                        <pillarSelector>
+                            <entitySelector>
+                                <entityClass>com.kairos.shiftplanning.domain.ActivityLineInterval</entityClass>
+                                &lt;!&ndash;<cacheType>STEP</cacheType>&ndash;&gt;
+                            </entitySelector>
+                            &lt;!&ndash;well, if you use filter, you cant use subpillar and without subpillar pillar size is max which makes no sense.
+                             if you dont use filter, it'll assign a interval from start of week and a interval at end of week.. making shift goes days and days.&ndash;&gt;
+                            <subPillarEnabled>false</subPillarEnabled>
+                            &lt;!&ndash;<subPillarEnabled>true</subPillarEnabled>
+                            <minimumSubPillarSize>1</minimumSubPillarSize>
+                            <maximumSubPillarSize>40</maximumSubPillarSize>&ndash;&gt;
+                        </pillarSelector>
+                        <selectedCountLimit>1000</selectedCountLimit>
+                        <valueSelector variableName="shift">
+                        </valueSelector>
+                        <filterClass>com.kairos.shiftplanning.domain.move.ActivityLineIntervalPillarMoveFilter</filterClass>
+                    </pillarChangeMoveSelector>-->
+</solver>

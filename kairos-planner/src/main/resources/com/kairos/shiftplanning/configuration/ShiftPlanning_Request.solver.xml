@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+  <!--<environmentMode>FULL_ASSERT</environmentMode>-->
+  <solutionClass>com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution</solutionClass>
+  <entityClass>com.kairos.shiftplanning.domain.ShiftRequestPhase</entityClass>
+  <entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>
+  <scoreDirectorFactory>
+      <scoreDrl>com/kairos/shiftplanning/rules/shiftplanning.drl</scoreDrl>
+      <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
+  </scoreDirectorFactory>
+
+
+    <constructionHeuristic>
+        <queuedEntityPlacer>
+            <entitySelector id="shiftEntitySelector">
+                <entityClass>com.kairos.shiftplanning.domain.ShiftRequestPhase</entityClass>
+            </entitySelector>
+            <changeMoveSelector>
+                <entitySelector mimicSelectorRef="shiftEntitySelector"/>
+                <valueSelector>
+                    <variableName>startTime</variableName>
+                </valueSelector>
+            </changeMoveSelector>
+            <changeMoveSelector>
+                <entitySelector mimicSelectorRef="shiftEntitySelector"/>
+                <valueSelector>
+                    <variableName>endTime</variableName>
+                </valueSelector>
+            </changeMoveSelector>
+        </queuedEntityPlacer>
+    </constructionHeuristic>
+    <constructionHeuristic>
+        <queuedEntityPlacer>
+            <entitySelector id="indirectActivityEntitySelector">
+                <entityClass>com.kairos.shiftplanning.domain.IndirectActivity</entityClass>
+            </entitySelector>
+            <changeMoveSelector>
+                <entitySelector mimicSelectorRef="indirectActivityEntitySelector"/>
+                <valueSelector>
+                    <variableName>startTime</variableName>
+                </valueSelector>
+            </changeMoveSelector>
+        </queuedEntityPlacer>
+    </constructionHeuristic>
+    <localSearch></localSearch>
+    <termination>
+        <!--<secondsSpentLimit>300</secondsSpentLimit>-->
+        <secondsSpentLimit>30</secondsSpentLimit>
+    </termination>
+</solver>

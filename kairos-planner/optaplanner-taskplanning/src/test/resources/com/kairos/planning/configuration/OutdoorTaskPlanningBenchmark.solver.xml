@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plannerBenchmark>
+    <benchmarkDirectory>local/data/taskassigning</benchmarkDirectory>
+    <!--<parallelBenchmarkCount>AUTO</parallelBenchmarkCount>-->
+
+    <inheritedSolverBenchmark>
+        <problemBenchmarks>
+            <xStreamAnnotatedClass>com.kairos.planning.solution.TaskPlanningSolution</xStreamAnnotatedClass>
+            <inputSolutionFile>E:\temp\problem.xml</inputSolutionFile>
+            <problemStatisticType>BEST_SCORE</problemStatisticType>
+            <!--<problemStatisticType>STEP_SCORE</problemStatisticType>-->
+            <!--<problemStatisticType>SCORE_CALCULATION_SPEED</problemStatisticType>-->
+            <!--<problemStatisticType>BEST_SOLUTION_MUTATION</problemStatisticType>-->
+            <!--<problemStatisticType>MOVE_COUNT_PER_STEP</problemStatisticType>-->
+            <!--<problemStatisticType>MEMORY_USE</problemStatisticType>-->
+            <!--<singleStatisticType>CONSTRAINT_MATCH_TOTAL_BEST_SCORE</singleStatisticType>-->
+            <!--<singleStatisticType>CONSTRAINT_MATCH_TOTAL_STEP_SCORE</singleStatisticType>-->
+            <!--<singleStatisticType>PICKED_MOVE_TYPE_BEST_SCORE_DIFF</singleStatisticType>-->
+            <!--<singleStatisticType>PICKED_MOVE_TYPE_STEP_SCORE_DIFF</singleStatisticType>-->
+        </problemBenchmarks>
+
+        <solver>
+        <!--<environmentMode>FULL_ASSERT</environmentMode>-->
+        <solutionClass>com.kairos.planning.solution.TaskPlanningSolution</solutionClass>
+        <entityClass>com.kairos.planning.domain.TaskOrEmployee</entityClass>
+        <entityClass>com.kairos.planning.domain.Task</entityClass>
+        <entityClass>com.kairos.planning.domain.Employee</entityClass>
+
+
+        <scoreDirectorFactory>
+            <scoreDrl>com/kairos/planning/rules/taskplanning-vehicleinemployee.drl</scoreDrl>
+        </scoreDirectorFactory>
+            <termination>
+                <secondsSpentLimit>700</secondsSpentLimit>
+            </termination>
+        </solver>
+
+    </inheritedSolverBenchmark>
+
+    <solverBenchmark>
+        <name>UnCached_Forager_5_accepted_800</name>
+        <solver>
+            <constructionHeuristic>
+                <queuedEntityPlacer>
+                    <entitySelector id="employeeEntitySelector">
+                        <entityClass>com.kairos.planning.domain.Employee</entityClass>
+                        <!--<cacheType>PHASE</cacheType>
+                        <selectionOrder>SORTED</selectionOrder>
+                        <sorterManner>DECREASING_DIFFICULTY</sorterManner>-->
+                        <!--<sorterComparatorClass>com.kairos.planner.domain.VehicleComparator</sorterComparatorClass>-->
+
+                    </entitySelector>
+                    <changeMoveSelector>
+                        <entitySelector mimicSelectorRef="employeeEntitySelector"/>
+                        <selectedCountLimit>100</selectedCountLimit>
+                        <valueSelector>
+                            <variableName>vehicle</variableName>
+                            <!--<cacheType>PHASE</cacheType>
+                            <selectionOrder>SORTED</selectionOrder>
+                            <sorterManner>INCREASING_STRENGTH</sorterManner>-->
+                            <!--<sorterOrder>DESCENDING</sorterOrder>-->
+                            <!--<sorterComparatorClass>com.kairos.planner.domain.VehicleComparator</sorterComparatorClass>-->
+
+
+                        </valueSelector>
+                    </changeMoveSelector>
+                </queuedEntityPlacer>
+            </constructionHeuristic>
+            <constructionHeuristic>
+
+                <queuedEntityPlacer>
+                    <entitySelector id="taskChainEntitySelector">
+                        <!--<cacheType>PHASE</cacheType>-->
+
+                        <entityClass>com.kairos.planning.domain.Task</entityClass>
+                    </entitySelector>
+                    <changeMoveSelector>
+
+                        <entitySelector mimicSelectorRef="taskChainEntitySelector"/>
+                        <valueSelector>
+                            <!-- This will break many hard contraints as phase caching will only fewer steps.-->
+                            <!--<cacheType>PHASE</cacheType>
+                            <selectionOrder>RANDOM</selectionOrder>-->
+                            <variableName>previousTaskOrEmployee</variableName>
+                        </valueSelector>
+                        <filterClass>com.kairos.planning.domain.TaskMoveCHFilter</filterClass>
+                    </changeMoveSelector>
+                </queuedEntityPlacer>
+            </constructionHeuristic>
+            <localSearch>
+                <unionMoveSelector>
+
+
+                    <changeMoveSelector>
+                        <!-- <cacheType>PHASE</cacheType>
+                         <selectionOrder>SHUFFLED</selectionOrder>-->
+                        <entitySelector>
+                            <entityClass>com.kairos.planning.domain.Employee</entityClass>
+                        </entitySelector>
+                        <valueSelector>
+                            <variableName>vehicle</variableName>
+                        </valueSelector>
+
+                    </changeMoveSelector>
+                    <swapMoveSelector>
+                        <!-- <cacheType>PHASE</cacheType>
+                         <selectionOrder>SHUFFLED</selectionOrder>-->
+                        <entitySelector>
+                            <entityClass>com.kairos.planning.domain.Employee</entityClass>
+                        </entitySelector>
+                        <secondaryEntitySelector>
+                            <entityClass>com.kairos.planning.domain.Employee</entityClass>
+                        </secondaryEntitySelector>
+                        <variableNameInclude>vehicle</variableNameInclude>
+                    </swapMoveSelector>
+
+                    <changeMoveSelector>
+                        <!--<cacheType>PHASE</cacheType>
+                        <selectionOrder>SHUFFLED</selectionOrder>-->
+                        <entitySelector>
+                            <entityClass>com.kairos.planning.domain.Task</entityClass>
+                        </entitySelector>
+                        <valueSelector>
+                            <variableName>previousTaskOrEmployee</variableName>
+                        </valueSelector>
+                        <filterClass>com.kairos.planning.domain.TaskChangeMoveFilter</filterClass>
+                    </changeMoveSelector>
+                    <swapMoveSelector>
+                        <!--<cacheType>PHASE</cacheType>
+                        <selectionOrder>SHUFFLED</selectionOrder>-->
+                        <entitySelector>
+                            <entityClass>com.kairos.planning.domain.Task</entityClass>
+                        </entitySelector>
+                        <secondaryEntitySelector>
+                            <entityClass>com.kairos.planning.domain.Task</entityClass>
+                        </secondaryEntitySelector>
+                        <variableNameInclude>previousTaskOrEmployee</variableNameInclude>
+                        <filterClass>com.kairos.planning.domain.TaskSwapMoveFilter</filterClass>
+                    </swapMoveSelector>
+
+                    <subChainChangeMoveSelector>
+                        <entityClass>com.kairos.planning.domain.Task</entityClass>
+                        <subChainSelector>
+                            <valueSelector>
+                                <variableName>previousTaskOrEmployee</variableName>
+                            </valueSelector>
+                            <minimumSubChainSize>1</minimumSubChainSize>
+                            <maximumSubChainSize>20</maximumSubChainSize>
+                        </subChainSelector>
+                        <selectReversingMoveToo>true</selectReversingMoveToo>
+                    </subChainChangeMoveSelector>
+                    <subChainSwapMoveSelector>
+                        <entityClass>com.kairos.planning.domain.Task</entityClass>
+                        <subChainSelector>
+                            <valueSelector>
+                                <variableName>previousTaskOrEmployee</variableName>
+                            </valueSelector>
+                            <minimumSubChainSize>1</minimumSubChainSize>
+                            <maximumSubChainSize>20</maximumSubChainSize>
+                        </subChainSelector>
+                        <selectReversingMoveToo>true</selectReversingMoveToo>
+                    </subChainSwapMoveSelector>
+                </unionMoveSelector>
+                <acceptor>
+                    <lateAcceptanceSize>800</lateAcceptanceSize>
+                    <entityTabuSize>5</entityTabuSize>
+                </acceptor>
+                <forager>
+                    <!--<pickEarlyType>FIRST_BEST_SCORE_IMPROVING</pickEarlyType>-->
+                    <acceptedCountLimit>5</acceptedCountLimit>
+                </forager>
+                <termination>
+                    <unimprovedSecondsSpentLimit>30</unimprovedSecondsSpentLimit>
+                </termination>
+            </localSearch>
+        </solver>
+    </solverBenchmark>
+
+
+
+    <solverBenchmark>
+        <name>Cached_Forager_2_accepted_200</name>
+        <solver>
+            <constructionHeuristic>
+                <queuedEntityPlacer>
+                    <entitySelector id="employeeEntitySelector">
+                        <entityClass>com.kairos.planning.domain.Employee</entityClass>
+                        <cacheType>PHASE</cacheType>
+                        <selectionOrder>SORTED</selectionOrder>
+                        <sorterManner>DECREASING_DIFFICULTY</sorterManner>
+                        <!--<sorterComparatorClass>com.kairos.planner.domain.VehicleComparator</sorterComparatorClass>-->
+
+                    </entitySelector>
+                    <changeMoveSelector>
+                        <entitySelector mimicSelectorRef="employeeEntitySelector"/>
+                        <selectedCountLimit>100</selectedCountLimit>
+                        <valueSelector>
+                            <variableName>vehicle</variableName>
+                            <cacheType>PHASE</cacheType>
+                            <selectionOrder>SORTED</selectionOrder>
+                            <sorterManner>INCREASING_STRENGTH</sorterManner>
+                            <!--<sorterOrder>DESCENDING</sorterOrder>-->
+                            <!--<sorterComparatorClass>com.kairos.planner.domain.VehicleComparator</sorterComparatorClass>-->
+
+
+                        </valueSelector>
+                    </changeMoveSelector>
+                </queuedEntityPlacer>
+            </constructionHeuristic>
+            <constructionHeuristic>
+
+                <queuedEntityPlacer>
+                    <entitySelector id="taskChainEntitySelector">
+                        <cacheType>PHASE</cacheType>
+
+                        <entityClass>com.kairos.planning.domain.Task</entityClass>
+                    </entitySelector>
+                    <changeMoveSelector>
+
+                        <entitySelector mimicSelectorRef="taskChainEntitySelector"/>
+                        <valueSelector>
+                            <!-- This will break many hard contraints as phase caching will only fewer steps.-->
+                            <!--<cacheType>PHASE</cacheType>
+                            <selectionOrder>RANDOM</selectionOrder>-->
+                            <variableName>previousTaskOrEmployee</variableName>
+                        </valueSelector>
+                        <filterClass>com.kairos.planning.domain.TaskMoveCHFilter</filterClass>
+                    </changeMoveSelector>
+                </queuedEntityPlacer>
+            </constructionHeuristic>
+            <localSearch>
+                <unionMoveSelector>
+
+
+                    <changeMoveSelector>
+                         <cacheType>PHASE</cacheType>
+                         <selectionOrder>SHUFFLED</selectionOrder>
+                        <entitySelector>
+                            <entityClass>com.kairos.planning.domain.Employee</entityClass>
+                        </entitySelector>
+                        <valueSelector>
+                            <variableName>vehicle</variableName>
+                        </valueSelector>
+
+                    </changeMoveSelector>
+                    <swapMoveSelector>
+                         <cacheType>PHASE</cacheType>
+                         <selectionOrder>SHUFFLED</selectionOrder>
+                        <entitySelector>
+                            <entityClass>com.kairos.planning.domain.Employee</entityClass>
+                        </entitySelector>
+                        <secondaryEntitySelector>
+                            <entityClass>com.kairos.planning.domain.Employee</entityClass>
+                        </secondaryEntitySelector>
+                        <variableNameInclude>vehicle</variableNameInclude>
+                    </swapMoveSelector>
+
+                    <changeMoveSelector>
+                        <cacheType>PHASE</cacheType>
+                        <selectionOrder>SHUFFLED</selectionOrder>
+                        <entitySelector>
+                            <entityClass>com.kairos.planning.domain.Task</entityClass>
+                        </entitySelector>
+                        <valueSelector>
+                            <variableName>previousTaskOrEmployee</variableName>
+                        </valueSelector>
+                        <filterClass>com.kairos.planning.domain.TaskChangeMoveFilter</filterClass>
+                    </changeMoveSelector>
+                    <swapMoveSelector>
+                        <cacheType>PHASE</cacheType>
+                        <selectionOrder>SHUFFLED</selectionOrder>
+                        <entitySelector>
+                            <entityClass>com.kairos.planning.domain.Task</entityClass>
+                        </entitySelector>
+                        <secondaryEntitySelector>
+                            <entityClass>com.kairos.planning.domain.Task</entityClass>
+                        </secondaryEntitySelector>
+                        <variableNameInclude>previousTaskOrEmployee</variableNameInclude>
+                        <filterClass>com.kairos.planning.domain.TaskSwapMoveFilter</filterClass>
+                    </swapMoveSelector>
+
+                    <subChainChangeMoveSelector>
+                        <entityClass>com.kairos.planning.domain.Task</entityClass>
+                        <subChainSelector>
+                            <valueSelector>
+                                <variableName>previousTaskOrEmployee</variableName>
+                            </valueSelector>
+                            <minimumSubChainSize>1</minimumSubChainSize>
+                            <maximumSubChainSize>20</maximumSubChainSize>
+                        </subChainSelector>
+                        <selectReversingMoveToo>true</selectReversingMoveToo>
+                    </subChainChangeMoveSelector>
+                    <subChainSwapMoveSelector>
+                        <entityClass>com.kairos.planning.domain.Task</entityClass>
+                        <subChainSelector>
+                            <valueSelector>
+                                <variableName>previousTaskOrEmployee</variableName>
+                            </valueSelector>
+                            <minimumSubChainSize>1</minimumSubChainSize>
+                            <maximumSubChainSize>20</maximumSubChainSize>
+                        </subChainSelector>
+                        <selectReversingMoveToo>true</selectReversingMoveToo>
+                    </subChainSwapMoveSelector>
+                </unionMoveSelector>
+                <acceptor>
+                    <lateAcceptanceSize>200</lateAcceptanceSize>
+                    <entityTabuSize>5</entityTabuSize>
+                </acceptor>
+                <forager>
+                    <!--<pickEarlyType>FIRST_BEST_SCORE_IMPROVING</pickEarlyType>-->
+                    <acceptedCountLimit>2</acceptedCountLimit>
+                </forager>
+                <termination>
+                    <unimprovedSecondsSpentLimit>30</unimprovedSecondsSpentLimit>
+                </termination>
+            </localSearch>
+        </solver>
+    </solverBenchmark>
+    <!--<solverBenchmark>
+        <name>First Fit Decreasing</name>
+        <solver>
+            <constructionHeuristic>
+                <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType>
+            </constructionHeuristic>
+        </solver>
+    </solverBenchmark>
+
+    <solverBenchmark>
+        <name>Late Acceptance</name>
+        <solver>
+        </solver>
+    </solverBenchmark>-->
+</plannerBenchmark>
