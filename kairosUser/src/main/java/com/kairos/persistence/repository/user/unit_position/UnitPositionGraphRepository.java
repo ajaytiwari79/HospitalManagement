@@ -218,7 +218,10 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{deleted:false}) where id(staff)={0} and ( up.endDateMillis > {1} or up.endDateMillis is null)  return up")
     List<UnitPosition> getUnitPositionsFromEmploymentEndDate(Long staffId, Long endDateMillis);
 
-    @Query("Match(staff:Staff)-[:"+ BELONGS_TO_STAFF +"]->(up:UnitPosition{deleted:false}) where id(staff)={0} Match(staff)-[:"+BELONGS_TO+"]->(emp:Employment) return min(up.startDateMillis) as unitPositionMinStartDate, emp.endDateMillis as employmentEndDate")
+    @Query("Match(staff:Staff)-[:"+ BELONGS_TO_STAFF +"]->(up:UnitPosition{deleted:false}) where id(staff)={0} Match(staff)<-[:"+BELONGS_TO+"]-(emp:Employment) return min(up.startDateMillis) as earliestUnitPositionStartDateMillis, emp.endDateMillis as employmentEndDateMillis")
      EmploymentUnitPositionQueryResult getEarliestUnitPositionStartDateAndEmploymentByStaffId(Long staffId);
+
+    @Query("Match(staff:Staff)-[:"+ BELONGS_TO_STAFF +"]->(up:UnitPosition) where id(up)={0} return id(staff) as staffId")
+    Long getStaffIdFromUnitPosition(Long unitPositionId);
 
 }

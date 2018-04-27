@@ -286,14 +286,18 @@ public class UnitPositionService extends UserBaseService {
 
     }
 
-    public boolean removePosition(long positionId) {
+    public EmploymentQueryResult removePosition(long positionId, Long unitId) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(positionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
-            return false;
+            throw new DataNotFoundByIdException("UnitPosition doesn't exist with id: "+ positionId);
         }
         unitPosition.setDeleted(true);
         save(unitPosition);
-        return true;
+
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(positionId);
+        Employment employment = employmentService.updateEmploymentEndDate(unit,staffId);
+        return new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
     }
 
     private void copyAndLinkNewWTA(UnitPosition unitPosition, WorkingTimeAgreement workingTimeAgreement) {
