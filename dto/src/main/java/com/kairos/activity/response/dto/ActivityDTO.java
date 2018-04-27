@@ -2,10 +2,9 @@ package com.kairos.activity.response.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.activity.persistence.model.activity.Activity;
-import com.kairos.activity.persistence.model.activity.TimeType;
 import com.kairos.activity.persistence.model.activity.tabs.GeneralActivityTab;
 import com.kairos.activity.persistence.model.activity.tabs.SkillActivityTab;
+import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivityTab;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 
 import java.math.BigInteger;
@@ -29,6 +28,7 @@ public class ActivityDTO {
     private Long unitId = -1L;
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
+    private TimeCalculationActivityTab timeCalculationActivityTab;
     private List<ActivityDTO> compositeActivities;
     private Long countryActivityId;
     private SkillActivityTab skillActivityTab;
@@ -118,14 +118,7 @@ public class ActivityDTO {
         this.categoryName = categoryName;
     }
 
-    public Activity buildActivity() {
-        List<BigInteger> tags = new ArrayList<>();
-        for (Long tag : this.tags) {
-            tags.add(BigInteger.valueOf(tag));
-        }
-        Activity activity = new Activity(this.name, this.description, tags);
-        return activity;
-    }
+
 
     public List<BigInteger> getTags() {
         List<BigInteger> tags = new ArrayList<>();

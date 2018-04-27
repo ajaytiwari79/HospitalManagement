@@ -52,10 +52,10 @@ public class RuleTemplateController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.createRuleTemplateCategory(countryId,ruleTemplateDTO));
     }
 
-   /* @RequestMapping(value = UNIT_URL+"/rule_templates", method = RequestMethod.GET)
+    @RequestMapping(value = UNIT_URL+"/rule_templates", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getRulesTemplateCategoryByUnit(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplateCategoryByUnit(unitId));
-    }*/
+    }
 
     @RequestMapping(value = COUNTRY_URL+"/copy_rule_template", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> copyRuleTemplate(@PathVariable Long countryId, @Valid @RequestBody WTARuleTemplateDTO templateDTO) {

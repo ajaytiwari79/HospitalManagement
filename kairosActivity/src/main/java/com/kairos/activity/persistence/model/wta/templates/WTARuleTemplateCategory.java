@@ -25,7 +25,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WTARuleTemplateCategory extends MongoBaseEntity {
 
-     @NotNull(message = "error.WTARuleTemplateCategoryId.name.notnull")
+     @NotNull(message = "error.ruleTemplateCategoryId.name.notnull")
     private String name;
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType = RuleTemplateCategoryType.WTA;

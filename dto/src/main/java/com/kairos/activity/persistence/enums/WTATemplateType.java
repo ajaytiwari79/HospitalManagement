@@ -16,7 +16,7 @@ public enum WTATemplateType {
     NUMBER_OF_SHIFTS_IN_INTERVAL("Shifts in Interval"),
     TIME_BANK("Time Bank"),
     VETO_PER_PERIOD("Veto per period"),
-    CONSECUTIVE_NIGHTS_AND_DAYS("Consecutive Nights and days"),
+    /*CONSECUTIVE_NIGHTS_AND_DAYS("Consecutive Nights and days"),*/
     DAILY_RESTING_TIME("Daily Resting Time"),
     DURATION_BETWEEN_SHIFTS("Duration Between Shifts"),
     REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS("Rest In Consecutive Days and nights"),

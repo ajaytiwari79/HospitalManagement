@@ -18,6 +18,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RuleTemplateResponseDTO {
     private RuleTemplateCategoryDTO ruleTemplateCategory;
+    private BigInteger ruleTemplateCategoryId;
     private List<PhaseTemplateValueDTO> phaseTemplateValues;
     private WTATemplateType wtaTemplateType;
     private BigInteger id;
@@ -64,6 +65,15 @@ public class RuleTemplateResponseDTO {
     private Integer yellowZone;
     private Boolean forbid;
     private Boolean allowExtraActivity;
+
+
+    public BigInteger getRuleTemplateCategoryId() {
+        return ruleTemplateCategoryId;
+    }
+
+    public void setRuleTemplateCategoryId(BigInteger ruleTemplateCategoryId) {
+        this.ruleTemplateCategoryId = ruleTemplateCategoryId;
+    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;

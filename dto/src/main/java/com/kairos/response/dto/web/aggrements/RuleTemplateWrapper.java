@@ -1,7 +1,9 @@
 package com.kairos.response.dto.web.aggrements;
 
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
-import com.kairos.persistence.model.user.agreement.wta.templates.template_types.RuleTemplateResponseDTO;
+
+
+import com.kairos.activity.persistence.model.wta.templates.template_types.RuleTemplateResponseDTO;
+import com.kairos.response.dto.web.wta.RuleTemplateCategoryTagDTO;
 
 import java.util.List;
 

@@ -15,15 +15,18 @@ import com.kairos.activity.persistence.repository.wta.WTABaseRuleTemplateMongoRe
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.tag.TagService;
 import com.kairos.activity.util.DateUtils;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.userContext.CurrentUserDetails;
 import com.kairos.activity.util.userContext.UserContext;
 
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.response.dto.web.CountryDTO;
+import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
 import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.wta.WTARuleTemplateDTO;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryTagDTO;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -31,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,16 +72,16 @@ public class RuleTemplateService extends MongoBaseService {
         }
 
 
-        List<RuleTemplateResponseDTO> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(countryId);
+//        List<RuleTemplateResponseDTO> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(countryId);
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
         if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
             ruleTemplateCategory = new RuleTemplateCategory("NONE","", RuleTemplateCategoryType.WTA);
             ruleTemplateCategory.setCountryId(countryDTO.getId());
             save(ruleTemplateCategory);
         }
-        if (Optional.ofNullable(wtaBaseRuleTemplates).isPresent() && !wtaBaseRuleTemplates.isEmpty()) {
+        /*if (Optional.ofNullable(wtaBaseRuleTemplates).isPresent() && !wtaBaseRuleTemplates.isEmpty()) {
             throw new DataNotFoundByIdException("WTA Rule Template already exists");
-        }
+        }*/
 
         String MONTHS = "MONTHS";
         String TUESDAY = "TUESDAY";
@@ -95,19 +99,19 @@ public class RuleTemplateService extends MongoBaseService {
         ShiftLengthWTATemplate shiftLengthWTATemplate = new ShiftLengthWTATemplate("Maximum night shift’s length",true,"Maximum night shift’s length",400,true);
         shiftLengthWTATemplate.setCountryId(countryDTO.getId());
         shiftLengthWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        shiftLengthWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        shiftLengthWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(shiftLengthWTATemplate);
 
         ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days",true,"Maximum number of consecutive days",true,daysCount);
         consecutiveWorking.setCountryId(countryDTO.getId());
         consecutiveWorking.setPhaseTemplateValues(phaseTemplateValues);
-        consecutiveWorking.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        consecutiveWorking.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(consecutiveWorking);
 
         ConsecutiveRestPartOfDayWTATemplate restInConsecutiveDays = new ConsecutiveRestPartOfDayWTATemplate("Minimum rest after after consecutive days worked",true,"Minimum rest after after consecutive days worked",timeInMins, daysCount);
         restInConsecutiveDays.setCountryId(countryDTO.getId());
         restInConsecutiveDays.setPhaseTemplateValues(phaseTemplateValues);
-        restInConsecutiveDays.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        restInConsecutiveDays.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(restInConsecutiveDays);
 
         NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = new NumberOfPartOfDayShiftsWTATemplate("Maximum number of shifts per interval",true,"Maximum number of shifts per interval",daysCount);
@@ -116,81 +120,81 @@ public class RuleTemplateService extends MongoBaseService {
         numberOfPartOfDayShiftsWTATemplate.setIntervalUnit(MONTHS);
         numberOfPartOfDayShiftsWTATemplate.setCountryId(countryDTO.getId());
         numberOfPartOfDayShiftsWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        numberOfPartOfDayShiftsWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        numberOfPartOfDayShiftsWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(numberOfPartOfDayShiftsWTATemplate);
 
         DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = new DaysOffInPeriodWTATemplate("Minimum number of days off per period",true,"Minimum number of days off per period",12, dateInMillis, 12, MONTHS);
         daysOffInPeriodWTATemplate.setCountryId(countryDTO.getId());
         daysOffInPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        daysOffInPeriodWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        daysOffInPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(daysOffInPeriodWTATemplate);
 
         AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = new AverageScheduledTimeWTATemplate("Maximum average duration per week in an interval",true,"Maximum average duration per week in an interval",12, dateInMillis, true, true, timeInMins, MONTHS);
         averageScheduledTimeWTATemplate.setCountryId(countryDTO.getId());
         averageScheduledTimeWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        averageScheduledTimeWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        averageScheduledTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(averageScheduledTimeWTATemplate);
 
         VetoPerPeriodWTATemplate vetoPerPeriodWTATemplate = new VetoPerPeriodWTATemplate("Maximum veto per period",true,"Maximum veto per period",2.0);
         vetoPerPeriodWTATemplate.setCountryId(countryDTO.getId());
         vetoPerPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        vetoPerPeriodWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        vetoPerPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(vetoPerPeriodWTATemplate);
 
         NumberOfWeekendShiftsInPeriodWTATemplate numberofWeekendShiftsInPeriodWTATemplate = new NumberOfWeekendShiftsInPeriodWTATemplate("Weekend off Distribution",true,"Weekend off Distribution",12, 12, TUESDAY, 2, true, TUESDAY, 1);
         numberofWeekendShiftsInPeriodWTATemplate.setCountryId(countryDTO.getId());
         numberofWeekendShiftsInPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        numberofWeekendShiftsInPeriodWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        numberofWeekendShiftsInPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(numberofWeekendShiftsInPeriodWTATemplate);
 
         CareDayCheckWTATemplate careDayCheckWTATemplate = new CareDayCheckWTATemplate("Care days check",true,"Care days check",2, dateInMillis, MONTHS, 1);
         careDayCheckWTATemplate.setCountryId(countryDTO.getId());
         careDayCheckWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        careDayCheckWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        careDayCheckWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDayCheckWTATemplate);
 
         DailyRestingTimeWTATemplate dailyRestingTimeWTATemplate = new DailyRestingTimeWTATemplate("Minimum resting hours daily",true,"Minimum resting hours daily",timeInMins);
         dailyRestingTimeWTATemplate.setCountryId(countryDTO.getId());
         dailyRestingTimeWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        dailyRestingTimeWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        dailyRestingTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(dailyRestingTimeWTATemplate);
 
 
         DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate = new DurationBetweenShiftsWTATemplate("Minimum duuration between shifts",true,"Minimum duuration between shifts",timeInMins);
         durationBetweenShiftsWTATemplate.setCountryId(countryDTO.getId());
         durationBetweenShiftsWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        durationBetweenShiftsWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        durationBetweenShiftsWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(durationBetweenShiftsWTATemplate);
 
 
         WeeklyRestPeriodWTATemplate weeklyRestPeriodWTATemplate = new WeeklyRestPeriodWTATemplate("Minimum rest period in an interval",true,"Minimum rest period in an interval",timeInMins);
         weeklyRestPeriodWTATemplate.setCountryId(countryDTO.getId());
         weeklyRestPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        weeklyRestPeriodWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        weeklyRestPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(weeklyRestPeriodWTATemplate);
 
         ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = new ShortestAndAverageDailyRestWTATemplate("Shortest and Average daily Rest",true,"Shortest and Average daily Rest",1, "NA", dateInMillis, timeInMins, timeInMins, "");
         shortestAndAverageDailyRestWTATemplate.setCountryId(countryDTO.getId());
         shortestAndAverageDailyRestWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        shortestAndAverageDailyRestWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        shortestAndAverageDailyRestWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(shortestAndAverageDailyRestWTATemplate);
 
         ShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = new ShiftsInIntervalWTATemplate("Shifts In Interval",true,"Shifts In Interval",1, "NA", dateInMillis, 1, true);
         maximumShiftsInIntervalWTATemplate.setCountryId(countryDTO.getId());
         maximumShiftsInIntervalWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        maximumShiftsInIntervalWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        maximumShiftsInIntervalWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(maximumShiftsInIntervalWTATemplate);
 
         SeniorDaysInYearWTATemplate seniorDaysInYearWTATemplate = new SeniorDaysInYearWTATemplate("Maximum senior days per year",true,"Maximum senior days per year",1, "NA", dateInMillis, 1, "");
         seniorDaysInYearWTATemplate.setCountryId(countryDTO.getId());
         seniorDaysInYearWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        seniorDaysInYearWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        seniorDaysInYearWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(seniorDaysInYearWTATemplate);
 
         TimeBankWTATemplate timeBankWTATemplate = new TimeBankWTATemplate("Maximum Time Bank",true, "Maximum Time Bank",TimeBankTypeEnum.HOURLY,45, false, false);
         timeBankWTATemplate.setCountryId(countryDTO.getId());
         timeBankWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
-        timeBankWTATemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        timeBankWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(timeBankWTATemplate);
         save(wtaBaseRuleTemplates1);
 
@@ -198,7 +202,7 @@ public class RuleTemplateService extends MongoBaseService {
         return true;
     }
 
-    public Map getRuleTemplate(long countryId) {
+    public RuleTemplateWrapper getRuleTemplate(long countryId) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (country == null) {
             throw new DataNotFoundByIdException("Invalid Country");
@@ -216,21 +220,20 @@ public class RuleTemplateService extends MongoBaseService {
         }
 
         assignCategoryToRuleTemplate(categoryList,templateList);
-        Map response = new HashMap();
-        response.put("categoryList", categoryList);
-        response.put("templateList", templateList);
-
-        return response;
+        RuleTemplateWrapper wrapper = new RuleTemplateWrapper();
+        wrapper.setCategoryList(categoryList);
+        wrapper.setTemplateList(templateList);
+        return wrapper;
     }
 
     public void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList,List<RuleTemplateResponseDTO> templateList){
         for (RuleTemplateCategoryTagDTO ruleTemplateCategoryTagDTO : categoryList) {
             for (RuleTemplateResponseDTO ruleTemplateResponseDTO : templateList) {
-                if(ruleTemplateCategoryTagDTO.getRuleTemplateIds()!=null && ruleTemplateCategoryTagDTO.getRuleTemplateIds().contains(ruleTemplateResponseDTO.getId())){
+                if(ruleTemplateCategoryTagDTO.getId().equals(ruleTemplateResponseDTO.getRuleTemplateCategoryId())){
                     RuleTemplateCategoryDTO ruleTemplateCategoryDTO = new RuleTemplateCategoryDTO();
                     BeanUtils.copyProperties(ruleTemplateCategoryTagDTO,ruleTemplateCategoryDTO);
                     ruleTemplateResponseDTO.setRuleTemplateCategory(ruleTemplateCategoryDTO);
-                    ruleTemplateResponseDTO.setTemplateType("MAXIMUM_SHIFT_LENGTH");
+                    //ruleTemplateResponseDTO.setTemplateType("MAXIMUM_SHIFT_LENGTH");
                 }
             }
         }
@@ -429,13 +432,13 @@ public class RuleTemplateService extends MongoBaseService {
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
         BigInteger ruleTemplateCategoryId = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
-        oldTemplate.setWTARuleTemplateCategoryId(ruleTemplateCategoryId);
+        oldTemplate.setRuleTemplateCategoryId(ruleTemplateCategoryId);
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
         BeanUtils.copyProperties(phaseTemplateValues,templateDTO.getPhaseTemplateValues());
         oldTemplate.setPhaseTemplateValues(phaseTemplateValues);
         oldTemplate.setDisabled(templateDTO.getDisabled());
-        oldTemplate.setWTARuleTemplateCategoryId(ruleTemplateCategoryId);
+        oldTemplate.setRuleTemplateCategoryId(ruleTemplateCategoryId);
         //oldTemplate.setRecommendedValue(templateDTO.getRecommendedValue());
 
         oldTemplate.setLastUpdatedBy(currentUserDetails.getFirstName());
@@ -529,7 +532,7 @@ public class RuleTemplateService extends MongoBaseService {
             throw new DuplicateDataException("WTA Rule template already existed  " + wtaRuleTemplateDTO.getName());
         }
         WTABaseRuleTemplate wtaBaseRuleTemplate = wtaBuilderService.copyRuleTemplate(wtaRuleTemplateDTO,"id");
-        wtaBaseRuleTemplate.setWTARuleTemplateCategoryId(ruleTemplateCategory.getId());
+        wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         save(wtaBaseRuleTemplate);
         wtaRuleTemplateDTO.setId(wtaBaseRuleTemplate.getId());
         RuleTemplateCategoryDTO ruleTemplateCategoryDTO = new RuleTemplateCategoryDTO();

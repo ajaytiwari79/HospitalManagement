@@ -2,24 +2,31 @@ package com.kairos.activity.service.wta;
 
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.WTADetailRestClient;
+import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.custom_exception.InvalidRequestException;
+import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.tag.Tag;
 import com.kairos.activity.persistence.model.wta.*;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.templates.WTABuilderService;
+import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
 import com.kairos.activity.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
 import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
+import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.activity.ActivityService;
+import com.kairos.activity.service.activity.TimeTypeService;
 import com.kairos.activity.service.tag.TagService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.response.dto.web.wta.WTADTO;
+import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +65,8 @@ public class WTAService extends MongoBaseService {
     private WTAOrganizationService wtaOrganizationService;
     @Inject private WTADetailRestClient wtaDetailRestClient;
     @Inject private WTABuilderService wtaBuilderService;
+    @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject private TimeTypeService timeTypeService;
 
 
     private final Logger logger = LoggerFactory.getLogger(WTAService.class);
@@ -458,4 +467,14 @@ public class WTAService extends MongoBaseService {
         wtaResponseDTO.setParentWTA(parentWta);
         return wtaResponseDTO;
     }
+
+    public WTADefaultDataInfoDTO getDefaultWtaInfo(Long unitId,Long countryId){
+        List<Activity> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
+        List<ActivityDTO> activityDTOS = new ArrayList<>();
+        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeTypeByCountryId(countryId);
+      //  WTADefaultDataInfoDTO wtaDefaultDataInfoDTO =
+        return null;
+    }
+
+
 }

@@ -1,6 +1,5 @@
 package com.kairos.activity.persistence.model.wta.templates;
 
-import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,7 +18,7 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     protected String name;
     protected String description;
     protected boolean disabled;
-    protected BigInteger WTARuleTemplateCategoryId;
+    protected BigInteger ruleTemplateCategoryId;
     protected String lastUpdatedBy;
     protected Long countryId;
 
@@ -44,12 +43,12 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         this.disabled = disabled;
     }
 
-    public BigInteger getWTARuleTemplateCategoryId() {
-        return WTARuleTemplateCategoryId;
+    public BigInteger getRuleTemplateCategoryId() {
+        return ruleTemplateCategoryId;
     }
 
-    public void setWTARuleTemplateCategoryId(BigInteger WTARuleTemplateCategoryId) {
-        this.WTARuleTemplateCategoryId = WTARuleTemplateCategoryId;
+    public void setRuleTemplateCategoryId(BigInteger ruleTemplateCategoryId) {
+        this.ruleTemplateCategoryId = ruleTemplateCategoryId;
     }
 
     public WTABaseRuleTemplate(){}
