@@ -2,10 +2,15 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -17,10 +22,52 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     private boolean checkAgainstTimeRules;
     private long limitCount;//no of days
-    private WTATemplateType wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    protected float recommendedValue;
+    protected boolean minimum;
 
 
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
 
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
+    public List<PartOfDay> getPartOfDays() {
+        return partOfDays;
+    }
+
+    public void setPartOfDays(List<PartOfDay> partOfDays) {
+        this.partOfDays = partOfDays;
+    }
+
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    public boolean isMinimum() {
+        return minimum;
+    }
+
+    public void setMinimum(boolean minimum) {
+        this.minimum = minimum;
+    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -48,11 +95,11 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     }
 
     public ConsecutiveWorkWTATemplate() {
-
+        wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 
     public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {
-        super(name, minimum, description);
+        super(name, description);
         this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.limitCount = limitCount;
     }

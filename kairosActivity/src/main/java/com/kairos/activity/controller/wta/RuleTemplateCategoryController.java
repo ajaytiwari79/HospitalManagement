@@ -51,8 +51,8 @@ public class RuleTemplateCategoryController {
     }
 
     @RequestMapping(value = COUNTRY_URL+"/template_category/{templateCategoryId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> updateRuleTemplateCategory(@PathVariable long countryId, @PathVariable BigInteger templateCategoryId, @RequestBody UpdateRuleTemplateCategoryDTO ruleTemplateCategory) {
-        UpdateRuleTemplateCategoryDTO updatedRuleTemplate = ruleTemplateCategoryService.updateRuleTemplateCategory(countryId, templateCategoryId, ruleTemplateCategory);
+    ResponseEntity<Map<String, Object>> updateRuleTemplateCategory(@PathVariable long countryId, @PathVariable BigInteger templateCategoryId, @RequestBody RuleTemplateCategoryDTO ruleTemplateCategory) {
+        RuleTemplateCategoryDTO updatedRuleTemplate = ruleTemplateCategoryService.updateRuleTemplateCategory(countryId, templateCategoryId, ruleTemplateCategory);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, updatedRuleTemplate);
     }
 

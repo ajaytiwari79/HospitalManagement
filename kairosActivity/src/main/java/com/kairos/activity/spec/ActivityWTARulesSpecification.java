@@ -89,7 +89,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                     break;
                 case MINIMUM_REST_AFTER_CONSECUTIVE_DAYS_WORKED:
                     break;
-                case MAXIMUM_NIGHT_SHIFTS_LENGTH:  //ShiftLengthWTATemplate
+                case MAXIMUM_NIGHT_SHIFTS_LENGTH:  //ShiftLengthWTATemplateDTO
 //                    if (!currentWTARuleTemplate.getCheckAgainstTimeRules()) {
 //                        continue;
 //                    } else {

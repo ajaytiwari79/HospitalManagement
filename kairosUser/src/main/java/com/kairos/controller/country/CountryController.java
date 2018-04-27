@@ -1226,5 +1226,13 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getUnionAndOrganizationLevels(countryId));
 
     }
+
+    @ApiOperation(value = "Get DayType and Presence Type")
+    @RequestMapping(value = COUNTRY_URL + "/getWtaTemplateDefaultDataInfo", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getWtaTemplateDefaultDataInfo(countryId));
+
+    }
 }
 

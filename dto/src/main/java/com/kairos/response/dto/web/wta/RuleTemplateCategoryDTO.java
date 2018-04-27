@@ -30,7 +30,6 @@ public class RuleTemplateCategoryDTO{
     private Date createdAt;
     private Date updatedAt;
     private boolean deleted ;
-    private List<BigInteger> ruleTemplateIds;
     public RuleTemplateCategoryDTO(String name, String description, boolean deleted) {
         this.name = name;
         this.description = description;
@@ -41,13 +40,6 @@ public class RuleTemplateCategoryDTO{
         //default
     }
 
-    public List<BigInteger> getRuleTemplateIds() {
-        return ruleTemplateIds;
-    }
-
-    public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {
-        this.ruleTemplateIds = ruleTemplateIds;
-    }
 
     public BigInteger getId() {
         return id;

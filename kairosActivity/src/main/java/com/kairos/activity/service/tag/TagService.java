@@ -48,7 +48,7 @@ public class TagService extends MongoBaseService {
         if( tagMongoRepository.findTagByNameIgnoreCaseAndCountryIdAndMasterDataTypeAndDeletedAndCountryTagTrue(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false)  != null){
             throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
         }
-        return this.save(tagDTO.buildTag(tagDTO, true, countryId));
+        return this.save(buildTag(tagDTO, true, countryId));
     }
 
     public Tag  updateCountryTag(Long countryId, BigInteger tagId, TagDTO tagDTO) {
@@ -120,7 +120,7 @@ public class TagService extends MongoBaseService {
         if( tagMongoRepository.findTagByNameIgnoreCaseAndOrganizationIdAndMasterDataTypeAndDeletedAndCountryTagFalse(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)  != null){
             throw new DuplicateDataException("Tag already exists with same name " +tagDTO.getName() );
         }
-        return this.save(tagDTO.buildTag(tagDTO, false, organizationId));
+        return this.save(buildTag(tagDTO, false, organizationId));
     }
 
     public Tag  updateOrganizationTag(Long organizationId, BigInteger tagId, TagDTO tagDTO, String type) {
@@ -200,5 +200,9 @@ public class TagService extends MongoBaseService {
     public Tag getOrganizationTagByName(Long orgId, String nameOfTag, MasterDataTypeEnum masterDataTypeEnum){
         return tagMongoRepository.findTagByOrganizationIdAndNameAndMasterDataTypeAndDeletedAndCountryTagFalse(orgId, nameOfTag, masterDataTypeEnum.toString(), false);
 
+    }
+
+    public static Tag buildTag(TagDTO tagDTO, boolean countryTag, long countryOrOrgId){
+        return new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), countryTag, countryOrOrgId);
     }
 }

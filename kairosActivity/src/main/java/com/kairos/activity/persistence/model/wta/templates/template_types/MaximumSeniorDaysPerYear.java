@@ -22,7 +22,7 @@ public class MaximumSeniorDaysPerYear extends WTABaseRuleTemplate{
 
     public MaximumSeniorDaysPerYear(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activities,
                                     long validationStartDateMillis, Long numberOfWeeks) {
-        super(name,minimum , description);
+        super(name , description);
         this.disabled=disabled;
         this.ageRange = ageRange;
         this.activities = activities;

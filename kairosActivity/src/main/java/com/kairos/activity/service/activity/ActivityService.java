@@ -104,7 +104,7 @@ public class ActivityService extends MongoBaseService {
             logger.error("ActivityName already exist" + activityDTO.getName());
             throw new DuplicateDataException("ActivityName already exist : " + activityDTO.getName());
         }
-        activity = activityDTO.buildActivity();
+        activity = buildActivity(activityDTO);
         initializeActivityTabs(activity, countryId);
         save(activity);
         // Fetch tags detail
@@ -998,5 +998,14 @@ public class ActivityService extends MongoBaseService {
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(locationActivityTab);
         return activityTabsWrapper;
 
+    }
+
+    public Activity buildActivity(ActivityDTO activityDTO) {
+        List<BigInteger> tags = new ArrayList<>();
+        for (BigInteger tag : activityDTO.getTags()) {
+            tags.add(tag);
+        }
+        Activity activity = new Activity(activityDTO.getName(), activityDTO.getDescription(), tags);
+        return activity;
     }
 }

@@ -3,7 +3,6 @@ package com.kairos.activity.response.dto.tag;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.tag.MasterDataTypeEnum;
-import com.kairos.activity.persistence.model.tag.Tag;
 
 import java.math.BigInteger;
 
@@ -55,7 +54,5 @@ public class TagDTO {
     public TagDTO(){
 
     }
-    public static Tag buildTag(TagDTO tagDTO, boolean countryTag, long countryOrOrgId){
-        return new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), countryTag, countryOrOrgId);
-    }
+
 }

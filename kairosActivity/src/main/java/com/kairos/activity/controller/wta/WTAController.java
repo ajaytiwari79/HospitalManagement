@@ -174,6 +174,13 @@ public class WTAController {
     }
 
 
+    @ApiOperation(value = "Update WTA of Organization by Expertise")
+    @GetMapping(value = COUNTRY_URL + "/getDefaultWtaInfo")
+    public ResponseEntity<Map<String, Object>> getDefaultWtaInfo(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getDefaultWtaInfo(countryId));
+    }
+
+
 
 
 }

@@ -3,11 +3,13 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,8 +26,33 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     private long continuousDayRestHours;
     private long averageRest;//(hours number)
     private String shiftAffiliation;//(List checkbox)
-    private WTATemplateType wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;;
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    protected float recommendedValue;
+    protected boolean minimum;
 
+    public List<PartOfDay> getPartOfDays() {
+        return partOfDays;
+    }
+
+    public void setPartOfDays(List<PartOfDay> partOfDays) {
+        this.partOfDays = partOfDays;
+    }
+
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    public boolean isMinimum() {
+        return minimum;
+    }
+
+    public void setMinimum(boolean minimum) {
+        this.minimum = minimum;
+    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -97,7 +124,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         this.shiftAffiliation=shiftAffiliation;
     }
     public ShortestAndAverageDailyRestWTATemplate() {
-
+        wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     }
 
 }

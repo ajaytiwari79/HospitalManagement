@@ -228,7 +228,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     }
 
 
-    public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
+    /*public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new DataNotFoundByIdException("Organization does not exist");
@@ -241,7 +241,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
         return ruleTemplateWrapper;
 
-    }
+    }*/
     // creating default rule template category NONE
     public void createDefaultRuleTemplateCategory( RuleTemplateCategory ruleTemplateCategory) {
         save(ruleTemplateCategory);

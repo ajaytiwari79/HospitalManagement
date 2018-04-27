@@ -1,10 +1,10 @@
 package com.kairos.activity.persistence.model.wta;
 
-import com.kairos.activity.persistence.model.tag.Tag;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
+import com.kairos.response.dto.web.tag.TagDTO;
+import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -35,16 +35,16 @@ public class WTAQueryResultDTO {
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
 
-    private List<WTABaseRuleTemplate> ruleTemplates
+    private List<WTABaseRuleTemplateDTO> ruleTemplates
     ;
 
-    private List<Tag> tags = new ArrayList<>();
+    private List<TagDTO> tags = new ArrayList<>();
 
-    public List<WTABaseRuleTemplate> getRuleTemplates() {
+    public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
         return ruleTemplates;
     }
 
-    public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
+    public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 
@@ -64,11 +64,11 @@ public class WTAQueryResultDTO {
         this.organizationParentWTA = organizationParentWTA;
     }
 
-    public List<Tag> getTags() {
+    public List<TagDTO> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(List<TagDTO> tags) {
         this.tags = tags;
     }
 

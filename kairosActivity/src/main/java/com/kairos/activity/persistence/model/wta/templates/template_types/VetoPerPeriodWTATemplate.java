@@ -2,11 +2,13 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,11 +22,38 @@ import java.util.List;
 public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
     private double maximumVetoPercentage;
-    private WTATemplateType wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;;
+    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private List<BigInteger> activityIds = new ArrayList<>();
 
-    private List<BigInteger> timeTypeIds;
-    private List<BigInteger> activityIds;
-    private List<Long> plannedTimeIds;
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    protected float recommendedValue;
+    protected boolean minimum;
+
+
+    public List<PartOfDay> getPartOfDays() {
+        return partOfDays;
+    }
+
+    public void setPartOfDays(List<PartOfDay> partOfDays) {
+        this.partOfDays = partOfDays;
+    }
+
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    public boolean isMinimum() {
+        return minimum;
+    }
+
+    public void setMinimum(boolean minimum) {
+        this.minimum = minimum;
+    }
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
@@ -39,6 +68,7 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
     public void setActivityIds(List<BigInteger> activityIds) {
+
         this.activityIds = activityIds;
     }
 
@@ -57,6 +87,7 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
+
     public double getMaximumVetoPercentage() {
         return maximumVetoPercentage;
     }
@@ -70,10 +101,12 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.maximumVetoPercentage =maximumVetoPercentage;
+        this.maximumVetoPercentage = maximumVetoPercentage;
 
     }
+
     public VetoPerPeriodWTATemplate() {
+        wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
     }
 
 }

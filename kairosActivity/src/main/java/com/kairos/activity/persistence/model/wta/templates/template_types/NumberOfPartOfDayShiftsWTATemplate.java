@@ -2,12 +2,14 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,12 +25,37 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     private long intervalLength;
     private String intervalUnit;
     private long validationStartDateMillis;
-    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;
 
-    private List<BigInteger> timeTypeIds;
-    private List<BigInteger> activityIds;
-    private List<Long> plannedTimeIds;
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private List<BigInteger> activityIds = new ArrayList<>();
+    private List<Long> plannedTimeIds = new ArrayList<>();
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    protected float recommendedValue;
+    protected boolean minimum;
 
+    public List<PartOfDay> getPartOfDays() {
+        return partOfDays;
+    }
+
+    public void setPartOfDays(List<PartOfDay> partOfDays) {
+        this.partOfDays = partOfDays;
+    }
+
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    public boolean isMinimum() {
+        return minimum;
+    }
+
+    public void setMinimum(boolean minimum) {
+        this.minimum = minimum;
+    }
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
@@ -102,7 +129,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.description = description;
     }
     public NumberOfPartOfDayShiftsWTATemplate() {
-
+        wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;
     }
 
 

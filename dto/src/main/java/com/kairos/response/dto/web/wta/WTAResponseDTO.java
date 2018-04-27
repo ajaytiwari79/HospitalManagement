@@ -1,6 +1,7 @@
 package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.activity.persistence.model.wta.templates.template_types.RuleTemplateResponseDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.tag.TagDTO;
@@ -17,7 +18,7 @@ import java.util.List;
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WTAResponseDTO {
 
-    private List<WTARuleTemplateDTO> ruleTemplates;
+    private List<WTABaseRuleTemplateDTO> ruleTemplates;
 
     private WTAResponseDTO parentWTA;
 
@@ -120,11 +121,11 @@ public class WTAResponseDTO {
         this.organizationSubType = organizationSubType;
     }
 
-    public List<WTARuleTemplateDTO> getRuleTemplates() {
+    public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
         return ruleTemplates;
     }
 
-    public void setRuleTemplates(List<WTARuleTemplateDTO> ruleTemplates) {
+    public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 
