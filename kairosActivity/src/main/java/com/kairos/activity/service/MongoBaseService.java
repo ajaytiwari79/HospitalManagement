@@ -47,7 +47,7 @@ public class MongoBaseService {
          * */
         if(entity.getId() == null){
             if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
-                //Because WTABaseRuleTemplate extends by All RuleTemaplete
+                //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
                 className = entity.getClass().getSuperclass().getSimpleName();
             }
             entity.setId(mongoSequenceRepository.nextSequence(className));
@@ -113,7 +113,7 @@ public class MongoBaseService {
                      *  Set Id if entity don't have Id
                      * */
                     if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
-                        //Because WTABaseRuleTemplate extends by All RuleTemaplete
+                        //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
                         className = entity.getClass().getSuperclass().getSimpleName();
                     }
                     entity.setId(mongoSequenceRepository.nextSequence(className));

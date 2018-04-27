@@ -5,6 +5,7 @@ import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.templates.template_types.RuleTemplateResponseDTO;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
+import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
@@ -47,7 +48,7 @@ public interface WTABaseRuleTemplateMongoRepository extends MongoBaseRepository<
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByUnitId(Long unitId);
 
      @Query("{countryId:?0,deleted:false}")
-    List<RuleTemplateResponseDTO>getWTABaseRuleTemplateByCountryId(Long countryId);
+    List<WTABaseRuleTemplate> getWTABaseRuleTemplateByCountryId(Long countryId);
 
 
     @Query("{countryId:?0,name:?1,deleted:false}")

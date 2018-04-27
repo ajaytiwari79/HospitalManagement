@@ -1,49 +1,28 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by pawanmandhan on 5/8/17.
- * TEMPLATE3
+ * TEMPLATE5
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
+public class ShiftLengthWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
+    private long timeLimit;
     private boolean checkAgainstTimeRules;
-    private long limitCount;//no of days
+    private WTATemplateType wtaTemplateType = WTATemplateType.SHIFT_LENGTH;;
+    private List<Long> dayTypes = new ArrayList<>();
     protected List<PartOfDay> partOfDays = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();
-    private List<BigInteger> timeTypeIds = new ArrayList<>();
     protected float recommendedValue;
     protected boolean minimum;
-
-
-    public List<Long> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
-
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
-    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -69,6 +48,14 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         this.minimum = minimum;
     }
 
+    public List<Long> getDayTypes() {
+        return dayTypes;
+    }
+
+    public void setDayTypes(List<Long> dayTypes) {
+        this.dayTypes = dayTypes;
+    }
+
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
     }
@@ -76,7 +63,13 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
+    public long getTimeLimit() {
+        return timeLimit;
+    }
 
+    public void setTimeLimit(long timeLimit) {
+        this.timeLimit = timeLimit;
+    }
 
     public boolean isCheckAgainstTimeRules() {
         return checkAgainstTimeRules;
@@ -86,21 +79,13 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         this.checkAgainstTimeRules = checkAgainstTimeRules;
     }
 
-    public long getLimitCount() {
-        return limitCount;
+    public ShiftLengthWTATemplateDTO() {
+
     }
 
-    public void setLimitCount(long limitCount) {
-        this.limitCount = limitCount;
-    }
-
-    public ConsecutiveWorkWTATemplate() {
-        wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
-    }
-
-    public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {
+    public ShiftLengthWTATemplateDTO(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules) {
         super(name, description);
+        this.timeLimit = timeLimit;
         this.checkAgainstTimeRules = checkAgainstTimeRules;
-        this.limitCount = limitCount;
     }
 }

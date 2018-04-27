@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web.wta;
 
 import com.kairos.activity.response.dto.ActivityDTO;
-import com.kairos.persistence.model.timetype.TimeTypeDTO;
+import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
 
 import java.util.List;
@@ -16,6 +16,15 @@ public class WTADefaultDataInfoDTO {
     List<TimeTypeDTO> timeTypes;
     List<DayTypeDTO> dayTypes;
     List<PresenceTypeDTO> presenceTypes;
+
+
+    public WTADefaultDataInfoDTO() {
+    }
+
+    public WTADefaultDataInfoDTO(List<DayTypeDTO> dayTypes, List<PresenceTypeDTO> presenceTypes) {
+        this.dayTypes = dayTypes;
+        this.presenceTypes = presenceTypes;
+    }
 
     public List<ActivityDTO> getActivityList() {
         return activityList;

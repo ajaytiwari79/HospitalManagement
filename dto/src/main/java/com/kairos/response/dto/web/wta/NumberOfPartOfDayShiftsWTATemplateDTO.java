@@ -1,35 +1,35 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Created by pawanmandhan on 5/8/17.
- * TEMPLATE12
+ * TEMPLATE9
  */
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
+public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private double maximumVetoPercentage;
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private long noOfPartOfDayWorked;
+    private long intervalLength;
+    private String intervalUnit;
+    private long validationStartDateMillis;
+    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;
+
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
-
+    private List<Long> plannedTimeIds = new ArrayList<>();
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     protected boolean minimum;
-
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -68,7 +68,6 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
     public void setActivityIds(List<BigInteger> activityIds) {
-
         this.activityIds = activityIds;
     }
 
@@ -88,25 +87,49 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    public double getMaximumVetoPercentage() {
-        return maximumVetoPercentage;
+    public String getIntervalUnit() {
+        return intervalUnit;
     }
 
-    public void setMaximumVetoPercentage(double maximumVetoPercentage) {
-        this.maximumVetoPercentage = maximumVetoPercentage;
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
     }
 
-    public VetoPerPeriodWTATemplate(String name, boolean disabled,
-                                    String description, double maximumVetoPercentage) {
+
+    public long getNoOfPartOfDayWorked() {
+        return noOfPartOfDayWorked;
+    }
+
+    public void setNoOfPartOfDayWorked(long noOfPartOfDayWorked) {
+        this.noOfPartOfDayWorked = noOfPartOfDayWorked;
+    }
+
+    public long getIntervalLength() {
+        return intervalLength;
+    }
+
+    public void setIntervalLength(long intervalLength) {
+        this.intervalLength = intervalLength;
+    }
+
+    public long getValidationStartDateMillis() {
+        return validationStartDateMillis;
+    }
+
+    public void setValidationStartDateMillis(long validationStartDateMillis) {
+        this.validationStartDateMillis = validationStartDateMillis;
+    }
+
+    public NumberOfPartOfDayShiftsWTATemplateDTO(String name, boolean disabled, String description, long noOfPartOfDayWorked) {
+        this.noOfPartOfDayWorked = noOfPartOfDayWorked;
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.maximumVetoPercentage = maximumVetoPercentage;
+    }
+    public NumberOfPartOfDayShiftsWTATemplateDTO() {
 
     }
 
-    public VetoPerPeriodWTATemplate() {
-        wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
-    }
+
 
 }

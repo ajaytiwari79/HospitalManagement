@@ -1,16 +1,13 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -18,45 +15,22 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SeniorDaysInYearWTATemplate extends WTABaseRuleTemplate {
-
-    private long intervalLength;
+public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
+    private List<String> balanceType;//multiple check boxes
+    private long intervalLength;//
     private String intervalUnit;
     private long validationStartDateMillis;
-    private long daysLimit;
-    private String activityCode;
+    private long shiftsLimit;
+    private boolean onlyCompositeShifts;//(checkbox)
+    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
 
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    protected float recommendedValue;
+    protected boolean minimum;
 
-    private List<PartOfDay> partOfDays = new ArrayList<>();
-    private float recommendedValue;
-    private boolean minimum;
-
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-    public boolean isMinimum() {
-        return minimum;
-    }
-
-    public void setMinimum(boolean minimum) {
-        this.minimum = minimum;
-    }
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
@@ -89,6 +63,14 @@ public class SeniorDaysInYearWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
+    public List<String> getBalanceType() {
+        return balanceType;
+    }
+
+    public void setBalanceType(List<String> balanceType) {
+        this.balanceType = balanceType;
+    }
+
     public long getIntervalLength() {
         return intervalLength;
     }
@@ -113,38 +95,36 @@ public class SeniorDaysInYearWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public long getDaysLimit() {
-        return daysLimit;
+    public long getShiftsLimit() {
+        return shiftsLimit;
     }
 
-    public void setDaysLimit(long daysLimit) {
-        this.daysLimit = daysLimit;
+    public void setShiftsLimit(long shiftsLimit) {
+        this.shiftsLimit = shiftsLimit;
     }
 
-    public String getActivityCode() {
-        return activityCode;
+    public boolean isOnlyCompositeShifts() {
+        return onlyCompositeShifts;
     }
 
-    public void setActivityCode(String activityCode) {
-        this.activityCode = activityCode;
+    public void setOnlyCompositeShifts(boolean onlyCompositeShifts) {
+        this.onlyCompositeShifts = onlyCompositeShifts;
     }
 
-    public SeniorDaysInYearWTATemplate(String name,  boolean disabled,
-                                       String description, long intervalLength, String intervalUnit, long validationStartDateMillis,
-                                       long daysLimit, String activityCode) {
+    public ShiftsInIntervalWTATemplateDTO(String name, boolean disabled,
+                                          String description, long intervalLength, String intervalUnit,
+                                          long validationStartDateMillis, long shiftsLimit, boolean onlyCompositeShifts) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
+        this.balanceType = balanceType;
         this.intervalLength =intervalLength;
         this.intervalUnit=intervalUnit;
         this.validationStartDateMillis =validationStartDateMillis;
-        this.daysLimit =daysLimit;
-        this.activityCode=activityCode;
+        this.shiftsLimit =shiftsLimit;
+        this.onlyCompositeShifts=onlyCompositeShifts;
 
     }
-    public SeniorDaysInYearWTATemplate() {
-        wtaTemplateType = WTATemplateType.MAXIMUM_SENIOR_DAYS_IN_YEAR;
+    public ShiftsInIntervalWTATemplateDTO() {
     }
-
-
 }

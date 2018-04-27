@@ -1,40 +1,28 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Created by pawanmandhan on 5/8/17.
- * TEMPLATE16
+ * TEMPLATE15
  */
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
+public class DailyRestingTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private long durationBetweenShifts;
-
+    private long continuousDayRestHours;
+    private WTATemplateType wtaTemplateType = WTATemplateType.DAILY_RESTING_TIME;
     protected List<PartOfDay> partOfDays = new ArrayList<>();
-    private List<BigInteger> activityIds = new ArrayList<>();
     protected float recommendedValue;
     protected boolean minimum;
-
-
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
-
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -67,25 +55,25 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-
-
-    public long getDurationBetweenShifts() {
-        return durationBetweenShifts;
+    public long getContinuousDayRestHours() {
+        return continuousDayRestHours;
     }
 
-    public void setDurationBetweenShifts(long durationBetweenShifts) {
-        this.durationBetweenShifts = durationBetweenShifts;
+    public void setContinuousDayRestHours(long continuousDayRestHours) {
+        this.continuousDayRestHours = continuousDayRestHours;
     }
 
-    public DurationBetweenShiftsWTATemplate(String name, boolean disabled,
-                                            String description, long durationBetweenShifts) {
+    public DailyRestingTimeWTATemplateDTO(String name, boolean disabled,
+                                          String description, long continuousDayRestHours) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.durationBetweenShifts = durationBetweenShifts;
+        this.continuousDayRestHours=continuousDayRestHours;
+    }
+
+    public DailyRestingTimeWTATemplateDTO() {
+
 
     }
-    public DurationBetweenShiftsWTATemplate() {
-        wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
-    }
-    }
+
+}

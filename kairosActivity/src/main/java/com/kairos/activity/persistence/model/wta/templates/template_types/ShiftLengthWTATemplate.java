@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,9 +22,8 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
     private boolean checkAgainstTimeRules;
-    private WTATemplateType wtaTemplateType = WTATemplateType.SHIFT_LENGTH;;
-    private List<Long> dayTypes;
-    protected List<PartOfDay> partOfDays;
+    private List<Long> dayTypes = new ArrayList<>();
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     protected boolean minimum;
 
@@ -83,7 +83,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     }
 
     public ShiftLengthWTATemplate() {
-
+        wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 
     public ShiftLengthWTATemplate(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules) {

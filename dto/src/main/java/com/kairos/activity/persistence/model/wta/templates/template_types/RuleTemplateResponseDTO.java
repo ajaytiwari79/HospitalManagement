@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.response.dto.web.wta.PhaseTemplateValueDTO;
@@ -9,6 +10,7 @@ import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
 
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,7 +67,36 @@ public class RuleTemplateResponseDTO {
     private Integer yellowZone;
     private Boolean forbid;
     private Boolean allowExtraActivity;
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private List<BigInteger> activityIds = new ArrayList<>();
+    private List<Long> plannedTimeIds = new ArrayList<>();
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    protected boolean minimum;
 
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
+    public List<BigInteger> getActivityIds() {
+        return activityIds;
+    }
+
+    public void setActivityIds(List<BigInteger> activityIds) {
+        this.activityIds = activityIds;
+    }
+
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
 
     public BigInteger getRuleTemplateCategoryId() {
         return ruleTemplateCategoryId;

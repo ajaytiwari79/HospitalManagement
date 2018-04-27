@@ -7,6 +7,7 @@ import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -19,9 +20,8 @@ import java.util.List;
 public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
 
     private long continuousWeekRest;
-    private WTATemplateType wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;;
 
-    protected List<PartOfDay> partOfDays;
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     protected boolean minimum;
 
@@ -75,5 +75,6 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
     public WeeklyRestPeriodWTATemplate() {
+        wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
     }
 }

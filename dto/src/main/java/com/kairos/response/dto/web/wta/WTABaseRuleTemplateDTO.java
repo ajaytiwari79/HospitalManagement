@@ -1,30 +1,27 @@
-package com.kairos.activity.persistence.model.wta.templates;
+package com.kairos.response.dto.web.wta;
+
 
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.common.MongoBaseEntity;
-import org.springframework.beans.BeanUtils;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.List;
 
 
 /**
- * Created by vipul on 26/7/17.
+ * Created by Pradeep on 27/4/18.
  */
 
-@Document(collection = "wtaBaseRuleTemplate")
-public class WTABaseRuleTemplate extends MongoBaseEntity{
+public class WTABaseRuleTemplateDTO{
 
+    protected BigInteger id;
     protected String name;
     protected String description;
     protected boolean disabled;
     protected BigInteger ruleTemplateCategoryId;
     protected String lastUpdatedBy;
     protected Long countryId;
-    protected WTATemplateType wtaTemplateType;
-
-    protected List<PhaseTemplateValue> phaseTemplateValues;
+    protected RuleTemplateCategoryDTO ruleTemplateCategory;
+    private WTATemplateType wtaTemplateType;
 
 
     public WTATemplateType getWtaTemplateType() {
@@ -33,6 +30,24 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
 
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
+    }
+
+    protected List<PhaseTemplateValueDTO> phaseTemplateValues;
+
+    public RuleTemplateCategoryDTO getRuleTemplateCategory() {
+        return ruleTemplateCategory;
+    }
+
+    public void setRuleTemplateCategory(RuleTemplateCategoryDTO ruleTemplateCategory) {
+        this.ruleTemplateCategory = ruleTemplateCategory;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public Long getCountryId() {
@@ -60,9 +75,9 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         this.ruleTemplateCategoryId = ruleTemplateCategoryId;
     }
 
-    public WTABaseRuleTemplate(){}
+    public WTABaseRuleTemplateDTO(){}
 
-    public WTABaseRuleTemplate(String name,String description) {
+    public WTABaseRuleTemplateDTO(String name, String description) {
         this.name = name;
         this.description = description;
     }
@@ -86,11 +101,11 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     }
 
 
-    public List<PhaseTemplateValue> getPhaseTemplateValues() {
+    public List<PhaseTemplateValueDTO> getPhaseTemplateValues() {
         return phaseTemplateValues;
     }
 
-    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
+    public void setPhaseTemplateValues(List<PhaseTemplateValueDTO> phaseTemplateValues) {
         this.phaseTemplateValues = phaseTemplateValues;
     }
     public String getLastUpdatedBy() {
@@ -101,9 +116,5 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    public static WTABaseRuleTemplate copyProperties(WTABaseRuleTemplate source, WTABaseRuleTemplate target){
-        BeanUtils.copyProperties(source,target);
-        return target;
-    }
 
 }

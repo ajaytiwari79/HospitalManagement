@@ -1,11 +1,9 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +16,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplate {
+public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long numberShiftsPerPeriod;
     private long numberOfWeeks;
@@ -27,6 +25,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
     private boolean proportional;
     private long toTime;
     private String toDayOfWeek;
+    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
@@ -124,9 +123,9 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.proportional = proportional;
     }
 
-    public NumberOfWeekendShiftsInPeriodWTATemplate(String name, boolean disabled,
-                                                    String description, long numberShiftsPerPeriod, long numberOfWeeks, String fromDayOfWeek, long fromTime, boolean proportional,
-                                                    String toDayOfWeek, long toTime) {
+    public NumberOfWeekendShiftsInPeriodWTATemplateDTO(String name, boolean disabled,
+                                                       String description, long numberShiftsPerPeriod, long numberOfWeeks, String fromDayOfWeek, long fromTime, boolean proportional,
+                                                       String toDayOfWeek, long toTime) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
@@ -142,9 +141,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
 
 
     }
-    public NumberOfWeekendShiftsInPeriodWTATemplate() {
-        wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
-
+    public NumberOfWeekendShiftsInPeriodWTATemplateDTO() {
     }
 
 

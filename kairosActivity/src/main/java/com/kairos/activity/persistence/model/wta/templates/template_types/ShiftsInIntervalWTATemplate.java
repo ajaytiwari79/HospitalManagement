@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,12 +25,11 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     private long validationStartDateMillis;
     private long shiftsLimit;
     private boolean onlyCompositeShifts;//(checkbox)
-    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
 
-    private List<BigInteger> timeTypeIds;
-    private List<BigInteger> activityIds;
-    private List<Long> plannedTimeIds;
-    protected List<PartOfDay> partOfDays;
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private List<BigInteger> activityIds = new ArrayList<>();
+    private List<Long> plannedTimeIds = new ArrayList<>();
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     protected boolean minimum;
 
@@ -128,5 +128,6 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
 
     }
     public ShiftsInIntervalWTATemplate() {
+        wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
     }
 }

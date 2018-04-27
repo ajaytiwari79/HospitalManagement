@@ -20,11 +20,12 @@ import java.util.stream.IntStream;
 public class ObjectMapperUtils {
 
 
-    /*public static <T> List<T> copyProperties(List<T> objects1, List<Object> objects) {
-        List<T> objects = assignBlankObject(objects1.size(), t);
+    /*public static <T,E> List<T> copyProperties(List<T> objects1, List<E> objects) {
+        //List<T> objects = assignBlankObject(objects1.size(), t);
         for (int i = 0; i < objects1.size(); i++) {
             try {
-                PropertyUtils.copyProperties(objects1.get(i), objects.get(i));
+
+                PropertyUtils.copyProperties(objects1.get(i), );
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
@@ -36,9 +37,9 @@ public class ObjectMapperUtils {
         return objects;
     }*/
 
-    private static <T> List<T> assignBlankObject(int size, List<Object> objects) {
-        //List<T> objects = new ArrayList<>(size);
-        /*for (int i = 0; i < size; i++) {
+    /*private static <E> List<E> assignBlankObject(int size, List<E> objects) {
+        List<E> objects = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
             try {
                 objects.add(t.getClass().newInstance());
             } catch (InstantiationException e) {
@@ -47,9 +48,9 @@ public class ObjectMapperUtils {
                 e.printStackTrace();
             }
 
-        }*/
-        return null;//objects;
-    }
+        }
+        return objects;
+    }*/
 
     public static <T> List<T> copyList(Class<T> klazz) {
         List<T> list = new ArrayList<>();

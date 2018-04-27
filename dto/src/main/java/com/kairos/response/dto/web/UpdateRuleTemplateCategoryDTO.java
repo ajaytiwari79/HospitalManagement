@@ -19,7 +19,7 @@ public class UpdateRuleTemplateCategoryDTO {
     //@NotNull(message = "error.RuleTemplate.description.name.notnull")
     private String description;
 
-    //    private List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
+    //    private List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates;
     private List<Long> tags;
     private BigInteger id;
 

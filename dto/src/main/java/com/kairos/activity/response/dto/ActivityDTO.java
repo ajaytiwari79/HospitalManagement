@@ -42,6 +42,14 @@ public class ActivityDTO {
         //default constructor
     }
 
+    public TimeCalculationActivityTab getTimeCalculationActivityTab() {
+        return timeCalculationActivityTab;
+    }
+
+    public void setTimeCalculationActivityTab(TimeCalculationActivityTab timeCalculationActivityTab) {
+        this.timeCalculationActivityTab = timeCalculationActivityTab;
+    }
+
     public ActivityDTO(BigInteger id) {
         this.id = id;
     }

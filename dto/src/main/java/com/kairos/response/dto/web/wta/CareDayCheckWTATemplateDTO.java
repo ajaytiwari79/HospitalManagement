@@ -1,10 +1,8 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -13,12 +11,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CareDayCheckWTATemplate extends WTABaseRuleTemplate {
+public class CareDayCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long daysLimit;
     private long intervalLength;
     private String intervalUnit;
     private long validationStartDateMillis;
+    private WTATemplateType wtaTemplateType = WTATemplateType.CARE_DAYS_CHECK;
     protected boolean minimum;
 
 
@@ -61,8 +60,8 @@ public class CareDayCheckWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
     }
 
-    public CareDayCheckWTATemplate(String name, boolean isActive,
-                                   String description, long intervalLength, long validationStartDateMillis, String intervalUnit, long daysLimit) {
+    public CareDayCheckWTATemplateDTO(String name, boolean isActive,
+                                      String description, long intervalLength, long validationStartDateMillis, String intervalUnit, long daysLimit) {
         this.name = name;
         this.description = description;
         this.intervalLength =intervalLength;
@@ -71,7 +70,7 @@ public class CareDayCheckWTATemplate extends WTABaseRuleTemplate {
         this.daysLimit =daysLimit;
     }
 
-    public CareDayCheckWTATemplate() {
-        wtaTemplateType = WTATemplateType.CARE_DAYS_CHECK;
+    public CareDayCheckWTATemplateDTO() {
+
     }
 }

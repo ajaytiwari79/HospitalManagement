@@ -140,7 +140,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
 
 
     @Query("MATCH (n:Country{isEnabled:true}) where id(n)={0} with n " +
-            "Match (n)-[:HAS_RULE_TEMPLATE]->(t:WTABaseRuleTemplate) with t " +
+            "Match (n)-[:HAS_RULE_TEMPLATE]->(t:WTABaseRuleTemplateDTO) with t " +
             "Match (t)<-[:"+HAS_RULE_TEMPLATES+"]-(r:RuleTemplateCategory{deleted:false,ruleTemplateCategoryType:'WTA'}) with t,r " +
             "Return id(t) as id ,"+
             "t.timeLimit as timeLimit,"+

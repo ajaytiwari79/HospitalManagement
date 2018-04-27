@@ -1,28 +1,29 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Created by pawanmandhan on 5/8/17.
- * TEMPLATE3
+ * TEMPLATE4
  */
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
+public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private boolean checkAgainstTimeRules;
-    private long limitCount;//no of days
+    private long minimumRest;//hh:mm
+    private long daysWorked;
+    private WTATemplateType wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
     protected List<PartOfDay> partOfDays = new ArrayList<>();
+
     private List<Long> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     protected float recommendedValue;
@@ -76,31 +77,33 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-
-
-    public boolean isCheckAgainstTimeRules() {
-        return checkAgainstTimeRules;
+    public long getMinimumRest() {
+        return minimumRest;
     }
 
-    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
+
+    public void setMinimumRest(long minimumRest) {
+        this.minimumRest = minimumRest;
     }
 
-    public long getLimitCount() {
-        return limitCount;
+    public long getDaysWorked() {
+        return daysWorked;
     }
 
-    public void setLimitCount(long limitCount) {
-        this.limitCount = limitCount;
+    public void setDaysWorked(long daysWorked) {
+        this.daysWorked = daysWorked;
     }
 
-    public ConsecutiveWorkWTATemplate() {
-        wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
+
+    public ConsecutiveRestPartOfDayWTATemplateDTO(String name, boolean disabled, String description, long minimumRest, long daysWorked) {
+        this.name=name;
+        this.disabled=disabled;
+        this.description=description;
+        this.minimumRest = minimumRest;
+        this.daysWorked = daysWorked;
+
+    }
+    public ConsecutiveRestPartOfDayWTATemplateDTO() {
     }
 
-    public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {
-        super(name, description);
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-        this.limitCount = limitCount;
-    }
 }

@@ -8,6 +8,7 @@ import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,10 +24,10 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     private String intervalUnit;
     private long validationStartDateMillis;
     private long daysLimit;
-    private WTATemplateType wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
-    protected List<PartOfDay> partOfDays;
-    protected float recommendedValue;
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected boolean minimum;
+    protected float recommendedValue;
+
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -108,5 +109,6 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
     public DaysOffInPeriodWTATemplate() {
+        wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
     }
 }

@@ -4,6 +4,7 @@ package com.kairos.response.dto.web.aggrements;
 
 import com.kairos.activity.persistence.model.wta.templates.template_types.RuleTemplateResponseDTO;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryTagDTO;
+import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public class RuleTemplateWrapper {
     private List<RuleTemplateCategoryTagDTO> categoryList;
-    private List<RuleTemplateResponseDTO> templateList;
+    private List<WTABaseRuleTemplateDTO> templateList;
 
     public List<RuleTemplateCategoryTagDTO> getCategoryList() {
         return categoryList;
@@ -22,11 +23,11 @@ public class RuleTemplateWrapper {
         this.categoryList = categoryList;
     }
 
-    public List<RuleTemplateResponseDTO> getTemplateList() {
+    public List<WTABaseRuleTemplateDTO> getTemplateList() {
         return templateList;
     }
 
-    public void setTemplateList(List<RuleTemplateResponseDTO> templateList) {
+    public void setTemplateList(List<WTABaseRuleTemplateDTO> templateList) {
         this.templateList = templateList;
     }
 }

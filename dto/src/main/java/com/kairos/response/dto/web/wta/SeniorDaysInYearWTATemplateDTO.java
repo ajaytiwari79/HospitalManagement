@@ -1,11 +1,9 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -14,22 +12,25 @@ import java.util.List;
 
 /**
  * Created by pawanmandhan on 5/8/17.
- * TEMPLATE12
  */
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
+public class SeniorDaysInYearWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
-    private double maximumVetoPercentage;
-    private List<Long> plannedTimeIds = new ArrayList<>();
+    private long intervalLength;
+    private String intervalUnit;
+    private long validationStartDateMillis;
+    private long daysLimit;
+    private String activityCode;
+    private WTATemplateType wtaTemplateType = WTATemplateType.MAXIMUM_SENIOR_DAYS_IN_YEAR;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
+    private List<Long> plannedTimeIds = new ArrayList<>();
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     protected boolean minimum;
-
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -68,7 +69,6 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
     }
 
     public void setActivityIds(List<BigInteger> activityIds) {
-
         this.activityIds = activityIds;
     }
 
@@ -87,26 +87,61 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-
-    public double getMaximumVetoPercentage() {
-        return maximumVetoPercentage;
+    public long getIntervalLength() {
+        return intervalLength;
     }
 
-    public void setMaximumVetoPercentage(double maximumVetoPercentage) {
-        this.maximumVetoPercentage = maximumVetoPercentage;
+    public void setIntervalLength(long intervalLength) {
+        this.intervalLength = intervalLength;
     }
 
-    public VetoPerPeriodWTATemplate(String name, boolean disabled,
-                                    String description, double maximumVetoPercentage) {
+    public String getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
+
+    public long getValidationStartDateMillis() {
+        return validationStartDateMillis;
+    }
+
+    public void setValidationStartDateMillis(long validationStartDateMillis) {
+        this.validationStartDateMillis = validationStartDateMillis;
+    }
+
+    public long getDaysLimit() {
+        return daysLimit;
+    }
+
+    public void setDaysLimit(long daysLimit) {
+        this.daysLimit = daysLimit;
+    }
+
+    public String getActivityCode() {
+        return activityCode;
+    }
+
+    public void setActivityCode(String activityCode) {
+        this.activityCode = activityCode;
+    }
+
+    public SeniorDaysInYearWTATemplateDTO(String name, boolean disabled,
+                                          String description, long intervalLength, String intervalUnit, long validationStartDateMillis,
+                                          long daysLimit, String activityCode) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.maximumVetoPercentage = maximumVetoPercentage;
+        this.intervalLength =intervalLength;
+        this.intervalUnit=intervalUnit;
+        this.validationStartDateMillis =validationStartDateMillis;
+        this.daysLimit =daysLimit;
+        this.activityCode=activityCode;
 
     }
-
-    public VetoPerPeriodWTATemplate() {
-        wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
+    public SeniorDaysInYearWTATemplateDTO() {
     }
+
 
 }

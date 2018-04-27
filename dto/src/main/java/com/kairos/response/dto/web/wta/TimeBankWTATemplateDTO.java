@@ -1,12 +1,10 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +16,12 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class TimeBankWTATemplate extends WTABaseRuleTemplate {
+public class TimeBankWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private TimeBankTypeEnum frequency;
     private Integer yellowZone;
     private boolean forbid;
     private boolean allowExtraActivity;
+    private WTATemplateType wtaTemplateType = WTATemplateType.TIME_BANK;;
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
@@ -59,12 +58,11 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-    public TimeBankWTATemplate() {
-        wtaTemplateType = WTATemplateType.TIME_BANK;
+    public TimeBankWTATemplateDTO() {
         //Default Constructor
     }
 
-    public TimeBankWTATemplate(String name, boolean disabled, String description, TimeBankTypeEnum frequency, Integer yellowZone, boolean forbid, boolean allowExtraActivity) {
+    public TimeBankWTATemplateDTO(String name, boolean disabled, String description, TimeBankTypeEnum frequency, Integer yellowZone, boolean forbid, boolean allowExtraActivity) {
         this.name=name;
         this.disabled=disabled;
         this.description=description;

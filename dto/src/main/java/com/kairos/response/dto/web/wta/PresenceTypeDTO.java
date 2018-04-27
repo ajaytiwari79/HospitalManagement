@@ -31,6 +31,11 @@ public class PresenceTypeDTO {//extends UserBaseEntity {
     public PresenceTypeDTO() {
     }
 
+    public PresenceTypeDTO(@NotEmpty(message = "error.PresenceTypeDTO.name.notEmpty") @NotNull(message = "error.PresenceTypeDTO.name.notnull") String name, Long id) {
+        this.name = name;
+        this.id = id;
+    }
+
     public PresenceTypeDTO(String name) {
         this.name = name;
     }

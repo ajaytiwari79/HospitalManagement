@@ -1,12 +1,9 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -18,16 +15,16 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
+public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private boolean checkAgainstTimeRules;
     private long limitCount;//no of days
+    private WTATemplateType wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     protected float recommendedValue;
     protected boolean minimum;
-
 
     public List<Long> getPlannedTimeIds() {
         return plannedTimeIds;
@@ -94,11 +91,11 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         this.limitCount = limitCount;
     }
 
-    public ConsecutiveWorkWTATemplate() {
-        wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
+    public ConsecutiveWorkWTATemplateDTO() {
+
     }
 
-    public ConsecutiveWorkWTATemplate(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {
+    public ConsecutiveWorkWTATemplateDTO(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {
         super(name, description);
         this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.limitCount = limitCount;

@@ -5,7 +5,6 @@ import com.kairos.activity.service.wta.RuleTemplateService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.wta.WTARuleTemplateDTO;
-import com.kairos.response.dto.web.wta.RuleTemplateDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +41,7 @@ public class RuleTemplateController {
     }
 
     @RequestMapping(value = COUNTRY_URL+"/rule_templates/{templateType}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @Valid @RequestBody WTARuleTemplateDTO templateDTO) {
+    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @RequestBody Map templateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.updateRuleTemplate(countryId, templateDTO));
     }
 

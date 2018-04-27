@@ -1,32 +1,30 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by pawanmandhan on 5/8/17.
- * TEMPLATE11
+ * TEMPLATE10
  */
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
+public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long intervalLength;
     private String intervalUnit;
     private long validationStartDateMillis;
-    private boolean balanceAdjustment;
-    private boolean useShiftTimes;
-    private long maximumAvgTime;
+    private long daysLimit;
+    private WTATemplateType wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
     protected List<PartOfDay> partOfDays = new ArrayList<>();
-    protected float recommendedValue;
     protected boolean minimum;
+    protected float recommendedValue;
 
 
     public List<PartOfDay> getPartOfDays() {
@@ -61,6 +59,22 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = wtaTemplateType;
     }
 
+    public String getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
+
+    public long getDaysLimit() {
+        return daysLimit;
+    }
+
+    public void setDaysLimit(long daysLimit) {
+        this.daysLimit = daysLimit;
+    }
+
 
 
     public long getIntervalLength() {
@@ -75,62 +89,23 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         return validationStartDateMillis;
     }
 
-
-    public boolean isBalanceAdjustment() {
-        return balanceAdjustment;
-    }
-
-    public void setBalanceAdjustment(boolean balanceAdjustment) {
-        this.balanceAdjustment = balanceAdjustment;
-    }
-
     public void setValidationStartDateMillis(long validationStartDateMillis) {
         this.validationStartDateMillis = validationStartDateMillis;
     }
 
-    public boolean isUseShiftTimes() {
-        return useShiftTimes;
-    }
-
-    public void setUseShiftTimes(boolean useShiftTimes) {
-        this.useShiftTimes = useShiftTimes;
-    }
-
-    public AverageScheduledTimeWTATemplate(String name, boolean disabled,
-                                           String description, long intervalLength, long validationStartDateMillis
-            , boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime, String intervalUnit) {
+    public DaysOffInPeriodWTATemplateDTO(String name, boolean disabled,
+                                         String description, long intervalLength, long validationStartDateMillis, long minimumDaysOff, String intervalUnit) {
         this.intervalLength = intervalLength;
+        this.daysLimit = minimumDaysOff;
         this.validationStartDateMillis = validationStartDateMillis;
+
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.balanceAdjustment=balanceAdjustment;
-        this.useShiftTimes =useShiftTimes;
-        this.maximumAvgTime=maximumAvgTime;
-        this.intervalUnit=intervalUnit;
-
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
         this.intervalUnit = intervalUnit;
+
     }
 
-    public long getMaximumAvgTime() {
-        return maximumAvgTime;
+    public DaysOffInPeriodWTATemplateDTO() {
     }
-
-    public void setMaximumAvgTime(long maximumAvgTime) {
-        this.maximumAvgTime = maximumAvgTime;
-    }
-
-    public AverageScheduledTimeWTATemplate() {
-        wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
-    }
-
-
-
 }

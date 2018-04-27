@@ -1,11 +1,9 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -18,15 +16,15 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
+public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long durationBetweenShifts;
+    private WTATemplateType wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
     protected float recommendedValue;
     protected boolean minimum;
-
 
     public List<BigInteger> getActivityIds() {
         return activityIds;
@@ -77,15 +75,14 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
         this.durationBetweenShifts = durationBetweenShifts;
     }
 
-    public DurationBetweenShiftsWTATemplate(String name, boolean disabled,
-                                            String description, long durationBetweenShifts) {
+    public DurationBetweenShiftsWTATemplateDTO(String name, boolean disabled,
+                                               String description, long durationBetweenShifts) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
         this.durationBetweenShifts = durationBetweenShifts;
 
     }
-    public DurationBetweenShiftsWTATemplate() {
-        wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
+    public DurationBetweenShiftsWTATemplateDTO() {
     }
     }

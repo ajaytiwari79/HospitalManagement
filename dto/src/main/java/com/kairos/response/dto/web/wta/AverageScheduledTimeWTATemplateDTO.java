@@ -1,11 +1,9 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +14,7 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
+public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long intervalLength;
     private String intervalUnit;
@@ -24,6 +22,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     private boolean balanceAdjustment;
     private boolean useShiftTimes;
     private long maximumAvgTime;
+    private WTATemplateType wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     protected boolean minimum;
@@ -96,8 +95,8 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         this.useShiftTimes = useShiftTimes;
     }
 
-    public AverageScheduledTimeWTATemplate(String name, boolean disabled,
-                                           String description, long intervalLength, long validationStartDateMillis
+    public AverageScheduledTimeWTATemplateDTO(String name, boolean disabled,
+                                              String description, long intervalLength, long validationStartDateMillis
             , boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime, String intervalUnit) {
         this.intervalLength = intervalLength;
         this.validationStartDateMillis = validationStartDateMillis;
@@ -127,8 +126,8 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         this.maximumAvgTime = maximumAvgTime;
     }
 
-    public AverageScheduledTimeWTATemplate() {
-        wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
+    public AverageScheduledTimeWTATemplateDTO() {
+
     }
 
 

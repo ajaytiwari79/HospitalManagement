@@ -8,7 +8,6 @@ import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.activity.persistence.model.wta.templates.template_types.RuleTemplateResponseDTO;
 import com.kairos.activity.persistence.repository.wta.RuleTemplateCategoryMongoRepository;
 import com.kairos.activity.persistence.repository.wta.WTABaseRuleTemplateMongoRepository;
 import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
@@ -19,6 +18,7 @@ import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
 import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryTagDTO;
+import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,7 +162,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         }
         List<WTAResponseDTO> wtaResponseDTOS = workingTimeAgreementMongoRepository.getWtaByOrganization(organization.getId());
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.getRuleTemplateCategoryByUnitId(unitId);
-        List<RuleTemplateResponseDTO> templateList = wtaResponseDTOS.stream().flatMap(wtaResponseDTO ->wtaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
+        List<WTABaseRuleTemplateDTO> templateList = wtaResponseDTOS.stream().flatMap(wtaResponseDTO ->wtaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
         assignCategoryToRuleTemplate(categoryList,templateList);
         RuleTemplateWrapper ruleTemplateWrapper = new RuleTemplateWrapper();
         ruleTemplateWrapper.setCategoryList(categoryList);
@@ -172,9 +172,9 @@ public class RuleTemplateCategoryService extends MongoBaseService {
 
     }
 
-    public void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList,List<RuleTemplateResponseDTO> templateList){
+    public void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList,List<WTABaseRuleTemplateDTO> templateList){
         for (RuleTemplateCategoryTagDTO ruleTemplateCategoryTagDTO : categoryList) {
-            for (RuleTemplateResponseDTO ruleTemplateResponseDTO : templateList) {
+            for (WTABaseRuleTemplateDTO ruleTemplateResponseDTO : templateList) {
                 if(ruleTemplateCategoryTagDTO.getId().equals(ruleTemplateResponseDTO.getRuleTemplateCategoryId())){
                     RuleTemplateCategoryDTO ruleTemplateCategoryDTO = new RuleTemplateCategoryDTO();
                     BeanUtils.copyProperties(ruleTemplateCategoryTagDTO,ruleTemplateCategoryDTO);
@@ -202,7 +202,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
 
    /* private Map<String, Object> changeWTARuleTemplateCategory(Long countryId, RuleTemplateDTO ruleTemplateDTO) {
         Map<String, Object> response = new HashMap();
-        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.getWtaBaseRuleTemplateByIds(ruleTemplateDTO.getRuleTemplateIds());
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.getWtaBaseRuleTemplateByIds(ruleTemplateDTO.getRuleTemplateIds());
         RuleTemplateCategory previousRuleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "(?i)" + ruleTemplateDTO.getCategoryName(), RuleTemplateCategoryType.WTA);
         if (!Optional.ofNullable(previousRuleTemplateCategory).isPresent()) {  // Rule Template Category does not exist So creating  a new one and adding in country
             previousRuleTemplateCategory = new RuleTemplateCategory(ruleTemplateDTO.getCategoryName());
@@ -212,7 +212,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
             previousRuleTemplateCategory.setCountryId(country.getId());
             // Break Previous Relation
             wtaBaseRuleTemplateMongoRepository.deleteOldCategories(ruleTemplateDTO.getRuleTemplateIds());
-            for (WTABaseRuleTemplate wtaBaseRuleTemplate : wtaBaseRuleTemplates) {
+            for (WTABaseRuleTemplateDTO wtaBaseRuleTemplate : wtaBaseRuleTemplates) {
                 wtaBaseRuleTemplate.setRuleTemplateCategoryId(previousRuleTemplateCategory.getId());
             }
             save(wtaBaseRuleTemplates);
@@ -232,7 +232,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         return response;
     }*/
 
-    /*private List<WTARuleTemplateDTO> getJsonOfUpdatedTemplates(List<WTABaseRuleTemplate> wtaBaseRuleTemplates, RuleTemplateCategory ruleTemplateCategory) {
+    /*private List<WTARuleTemplateDTO> getJsonOfUpdatedTemplates(List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates, RuleTemplateCategory ruleTemplateCategory) {
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<WTARuleTemplateDTO> wtaBaseRuleTemplateDTOS = new ArrayList<>(wtaBaseRuleTemplates.size());

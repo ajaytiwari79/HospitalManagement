@@ -15,7 +15,6 @@ import com.kairos.activity.persistence.repository.wta.WTABaseRuleTemplateMongoRe
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.tag.TagService;
 import com.kairos.activity.util.DateUtils;
-import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.userContext.CurrentUserDetails;
 import com.kairos.activity.util.userContext.UserContext;
 
@@ -23,10 +22,7 @@ import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.response.dto.web.CountryDTO;
 import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
 import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
-import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
-import com.kairos.response.dto.web.wta.WTARuleTemplateDTO;
-import com.kairos.response.dto.web.wta.RuleTemplateCategoryTagDTO;
-import org.apache.commons.beanutils.PropertyUtils;
+import com.kairos.response.dto.web.wta.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -34,10 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.kairos.activity.persistence.enums.WTATemplateType.getByTemplateType;
 
@@ -214,21 +208,23 @@ public class RuleTemplateService extends MongoBaseService {
             throw new DataNotFoundByIdException("Category List is null");
         }
 
-        List<RuleTemplateResponseDTO> templateList = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(countryId);
+        List<WTABaseRuleTemplate> templateList = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(countryId);
         if (templateList == null) {
             throw new DataNotFoundByIdException("Template List is null");
         }
 
-        assignCategoryToRuleTemplate(categoryList,templateList);
+        //
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = wtaBuilderService.copyRuleTemplatesToDTO(templateList);
+        assignCategoryToRuleTemplate(categoryList,wtaBaseRuleTemplateDTOS);
         RuleTemplateWrapper wrapper = new RuleTemplateWrapper();
         wrapper.setCategoryList(categoryList);
-        wrapper.setTemplateList(templateList);
+        wrapper.setTemplateList(wtaBaseRuleTemplateDTOS);
         return wrapper;
     }
 
-    public void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList,List<RuleTemplateResponseDTO> templateList){
+    public void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList,List<WTABaseRuleTemplateDTO> templateList){
         for (RuleTemplateCategoryTagDTO ruleTemplateCategoryTagDTO : categoryList) {
-            for (RuleTemplateResponseDTO ruleTemplateResponseDTO : templateList) {
+            for (WTABaseRuleTemplateDTO ruleTemplateResponseDTO : templateList) {
                 if(ruleTemplateCategoryTagDTO.getId().equals(ruleTemplateResponseDTO.getRuleTemplateCategoryId())){
                     RuleTemplateCategoryDTO ruleTemplateCategoryDTO = new RuleTemplateCategoryDTO();
                     BeanUtils.copyProperties(ruleTemplateCategoryTagDTO,ruleTemplateCategoryDTO);
@@ -294,7 +290,7 @@ public class RuleTemplateService extends MongoBaseService {
     }
 
 
-    public WTARuleTemplateDTO updateRuleTemplate(long countryId, WTARuleTemplateDTO templateDTO) {
+    public WTARuleTemplateDTO updateRuleTemplate(long countryId, WTABaseRuleTemplateDTO templateDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country");
@@ -304,10 +300,9 @@ public class RuleTemplateService extends MongoBaseService {
         if (!Optional.ofNullable(oldTemplate).isPresent()) {
             throw new DataNotFoundByIdException("Invalid TemplateType id " + templateDTO.getId());
         }
-        String templateType=getTemplateType(templateDTO.getTemplateType());
-        WTATemplateType ruleTemplateType = getByTemplateType(templateType);
-        logger.info("templateType:"+templateType);
-        switch (ruleTemplateType) {
+       /* String templateType=getTemplateType(templateDTO.getTemplateType());
+        WTATemplateType ruleTemplateType = getByTemplateType(templateType);*/
+        switch (templateDTO.getWtaTemplateType()) {
             case SHIFT_LENGTH:
                 ShiftLengthWTATemplate shiftLengthWTATemplate = (ShiftLengthWTATemplate) oldTemplate;//oldTemplate;
                 shiftLengthWTATemplate.setDescription(templateDTO.getDescription());
@@ -431,14 +426,12 @@ public class RuleTemplateService extends MongoBaseService {
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
-        BigInteger ruleTemplateCategoryId = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
-        oldTemplate.setRuleTemplateCategoryId(ruleTemplateCategoryId);
+        //BigInteger ruleTemplateCategoryId = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
         BeanUtils.copyProperties(phaseTemplateValues,templateDTO.getPhaseTemplateValues());
         oldTemplate.setPhaseTemplateValues(phaseTemplateValues);
         oldTemplate.setDisabled(templateDTO.getDisabled());
-        oldTemplate.setRuleTemplateCategoryId(ruleTemplateCategoryId);
         //oldTemplate.setRecommendedValue(templateDTO.getRecommendedValue());
 
         oldTemplate.setLastUpdatedBy(currentUserDetails.getFirstName());
@@ -531,7 +524,7 @@ public class RuleTemplateService extends MongoBaseService {
         if (Optional.ofNullable(wtaBaseRuleTemplate1).isPresent()) {
             throw new DuplicateDataException("WTA Rule template already existed  " + wtaRuleTemplateDTO.getName());
         }
-        WTABaseRuleTemplate wtaBaseRuleTemplate = wtaBuilderService.copyRuleTemplate(wtaRuleTemplateDTO,"id");
+        WTABaseRuleTemplate wtaBaseRuleTemplate = wtaBuilderService.copyRuleTemplate(wtaRuleTemplateDTO,true);
         wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         save(wtaBaseRuleTemplate);
         wtaRuleTemplateDTO.setId(wtaBaseRuleTemplate.getId());
@@ -545,7 +538,7 @@ public class RuleTemplateService extends MongoBaseService {
 
 
     }
-    private String getTemplateType(String templateType){
+    /*private String getTemplateType(String templateType){
         if(!templateType.contains("_")){
             return templateType;
         }
@@ -560,7 +553,7 @@ public class RuleTemplateService extends MongoBaseService {
             }
         }
         return null;
-    }
+    }*/
 
 
     int getNumberFromlastInsertedTemplateType(String templateType) {

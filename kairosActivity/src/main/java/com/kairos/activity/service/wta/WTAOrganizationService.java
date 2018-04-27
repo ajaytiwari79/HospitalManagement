@@ -107,7 +107,7 @@ public class WTAOrganizationService extends MongoBaseService {
         oldWta.setDisabled(false);
 
         if (updateDTO.getRuleTemplates().size() > 0) {
-            List<WTABaseRuleTemplate> ruleTemplates = wtaBuilderService.copyRuleTemplates(null,updateDTO.getRuleTemplates(),true);
+            List<WTABaseRuleTemplate> ruleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(),true);
             save(ruleTemplates);
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate->ruleTemplate.getId()).collect(Collectors.toList());
             oldWta.setRuleTemplateIds(ruleTemplatesIds);
