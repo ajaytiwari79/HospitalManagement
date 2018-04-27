@@ -205,6 +205,7 @@ public class AppConstants {
     public static final Long DURATION_IN_WEEK=4L;
     public static final String COPY_OF = "copy of";
 
+    public static final int REQUEST_PHASE_SEQUENCE = 1;
 
     //Scheduled Hours Calculation constants
     public static final String ENTERED_TIMES = "ENTERED_TIMES";

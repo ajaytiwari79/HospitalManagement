@@ -19,4 +19,5 @@ public interface CustomPlanningPeriodMongoRepository {
     UpdateResult deletePlanningPeriodLiesBetweenDates(Long unitId, Date startDate, Date endDate);
     PlanningPeriod getFirstPlanningPeriod(Long unitId);
     PlanningPeriod getLastPlanningPeriod(Long unitId);
+    boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, Date startDate, Date endDate, int sequence);
 }
