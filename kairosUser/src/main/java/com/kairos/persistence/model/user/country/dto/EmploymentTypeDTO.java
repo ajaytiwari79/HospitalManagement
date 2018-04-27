@@ -26,7 +26,6 @@ public class EmploymentTypeDTO {
     private Set<EmploymentCategory> employmentCategories;
     private PaymentFrequency paymentFrequency;
 
-
     public Long getId() {
         return id;
     }
