@@ -1,7 +1,5 @@
 package com.kairos.activity.response.dto.pay_out;
 
-import com.kairos.activity.response.dto.time_bank.CTAIntervalDTO;
-
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;

@@ -1,7 +1,6 @@
 package com.kairos.activity.response.dto.pay_out;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.response.dto.time_bank.CTARuleTemplateCalulatedTimeBankDTO;
 import org.joda.time.DateTimeZone;
 
 import java.time.LocalDate;
