@@ -3,14 +3,10 @@ package com.kairos.activity.service.pay_out;
 import com.google.common.collect.Lists;
 import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.enums.TimeTypes;
-import com.kairos.activity.persistence.model.activity.Activity;
-import com.kairos.activity.persistence.model.activity.Shift;
-import com.kairos.activity.persistence.model.activity.tabs.BalanceSettingsActivityTab;
-import com.kairos.activity.persistence.model.pay_out.PayOutCTADistribution;
 import com.kairos.activity.persistence.model.pay_out.DailyPayOutEntry;
+import com.kairos.activity.persistence.model.pay_out.PayOutCTADistribution;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
-import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
 import com.kairos.activity.response.dto.pay_out.*;
 import com.kairos.activity.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -72,49 +68,6 @@ public class PayOutCalculationService {
         }
         return dailyPayOutEntry;
     }
-
-
-
-    public void calculateScheduleAndDurationHour(Shift shift, Activity activity, StaffUnitPositionDetails unitPosition){
-        int scheduledMinutes = 0;
-        int duration = 0;
-        switch (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) {
-            case ENTERED_MANUALLY:
-                duration = shift.getDurationMinutes();
-                scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                break;
-            case FIXED_TIME:
-                duration = activity.getTimeCalculationActivityTab().getFixedTimeValue().intValue();
-                scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                break;
-            case ENTERED_TIMES:
-                duration = (int) new Interval(shift.getStartDate().getTime(), shift.getEndDate().getTime()).toDuration().getStandardMinutes();
-                scheduledMinutes = new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                break;
-
-            case AppConstants.FULL_DAY_CALCULATION:
-                duration = new Double((unitPosition.getFullTimeWeeklyMinutes() / unitPosition.getWorkingDaysInWeek()) * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                scheduledMinutes = duration;
-                break;
-            case AppConstants.WEEKLY_HOURS:
-                duration = new Double(unitPosition.getTotalWeeklyMinutes() * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                scheduledMinutes = duration;
-                break;
-            case AppConstants.FULL_WEEK:
-                duration = new Double((unitPosition.getFullTimeWeeklyMinutes() / unitPosition.getWorkingDaysInWeek()) * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue();
-                scheduledMinutes = duration;
-                break;
-        }
-        shift.setDurationMinutes(duration);
-        shift.setScheduledMinutes(scheduledMinutes);
-    }
-
-    private void calculateEnteredManually(Shift shift, Activity activity) {
-        int duration = (int) new Interval(shift.getStartDate().getTime(), shift.getEndDate().getTime()).toDuration().getStandardMinutes();
-        shift.setDurationMinutes(duration);
-        shift.setScheduledMinutes(new Double(duration * activity.getTimeCalculationActivityTab().getMultiplyWithValue()).intValue());
-    }
-
 
     public List<PayOutCTADistribution> getDistribution(UnitPositionWithCtaDetailsDTO ctaDto) {
         List<PayOutCTADistribution> payOutCTADistributions = new ArrayList<>(ctaDto.getCtaRuleTemplates().size());
@@ -598,32 +551,6 @@ public class PayOutCalculationService {
         return scheduleTimeByTimeTypeDTOS;
     }
 
-/*
-    public List<TimeTypeIntervalDTO> getTimeTypeInterval(Interval interval, List<ShiftQueryResultWithActivity> shifts) {
-        List<TimeTypeIntervalDTO> timeTypeIntervalDTOS = new ArrayList<>();
-
-        return timeTypeIntervalDTOS;
-    }*/
-
-    private List<PayOutIntervalDTO> calculatePayOutByInterval(Map<Interval, List<DailyPayOutEntry>> payOutsIntervalMap, List<Interval> intervals) {
-        List<PayOutIntervalDTO> payOutIntervalDTOS = new ArrayList<>(intervals.size());
-        intervals.forEach(i -> {
-            List<DailyPayOutEntry> dailyPayOutEntries = payOutsIntervalMap.get(i);
-            PayOutIntervalDTO payOutIntervalDTO = new PayOutIntervalDTO(i.getStart().toDate(), i.getEnd().toDate());
-            payOutIntervalDTO.setTotalPayOutAfterCtaMin(0);//dailyPayOutEntries.stream().mapToInt(t->t.getPayOutMinWithCta()).sum());
-            payOutIntervalDTO.setTotalContractualMin(0);//dailyPayOutEntries.stream().mapToInt(t->t.getContractualMin()).sum());
-            payOutIntervalDTO.setTotalScheduledMin(0);//dailyPayOutEntries.stream().mapToInt(t->t.getScheduledMin()).sum());
-            payOutIntervalDTO.setTotalPayOutBeforeCtaMin(0);//dailyPayOutEntries.stream().mapToInt(t->t.getPayOutMinWithoutCta()).sum());
-            payOutIntervalDTO.setTotalPayOutMin(0);//dailyPayOutEntries.stream().mapToInt(t->t.getTotalPayOutMin()).sum());
-            //payOutIntervalDTO.setPayOutDistributions(getBlankPayOutDistribution(dailyPayOutEntries, null));
-            List<PayOutCTADistribution> payOutCTADistributions = dailyPayOutEntries.stream().flatMap(tb -> tb.getPayOutCTADistributionList().stream()).collect(Collectors.toList());
-            payOutCTADistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getCtaRuleTemplateId(), Collectors.summarizingInt(tb -> tb.getMinutes())));
-            payOutIntervalDTOS.add(payOutIntervalDTO);
-        });
-
-        return payOutIntervalDTOS;
-    }
-
     private List<PayOutCTADistributionDTO> getBlankPayOutDistribution(UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         List<PayOutCTADistributionDTO> payOutCTADistributionDTOS = new ArrayList<>();
         unitPositionWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
@@ -648,12 +575,6 @@ public class PayOutCalculationService {
             }
         });
         return dailyPayOuts1Entry;
-    }
-
-    private int getTotalPayOutsByInterval(Interval interval, List<DailyPayOutEntry> dailyPayOutEntries) {
-        int totalPayOut = 0;
-        totalPayOut = dailyPayOutEntries.stream().filter(dailyPayOutEntry -> (interval.contains(DateUtils.asDate(dailyPayOutEntry.getDate()).getTime()))).mapToInt(dailyPayOutEntry -> dailyPayOutEntry.getTotalPayOutMin()).sum();
-        return totalPayOut;
     }
 
     private Map<Interval, List<ShiftQueryResultWithActivity>> getShiftsIntervalMap(List<Interval> intervals, List<ShiftQueryResultWithActivity> shifts) {
@@ -717,34 +638,5 @@ public class PayOutCalculationService {
         }
         return quaterDateTime;
     }
-
-
-    private List<ShiftQueryResultWithActivity> getShifts() {
-        List<ShiftQueryResultWithActivity> shifts = new ArrayList<>(3);
-        ShiftQueryResultWithActivity shiftQueryResultWithActivity = new ShiftQueryResultWithActivity();
-        shiftQueryResultWithActivity.setStartDate(new DateTime().withTimeAtStartOfDay().plusHours(7).toDate());
-        shiftQueryResultWithActivity.setEndDate(new DateTime().withTimeAtStartOfDay().plusHours(18).toDate());
-        shiftQueryResultWithActivity.setActivityId(new BigInteger("123"));
-        shiftQueryResultWithActivity.setActivity(new Activity());
-        shiftQueryResultWithActivity.getActivity().setBalanceSettingsActivityTab(new BalanceSettingsActivityTab());
-        shifts.add(shiftQueryResultWithActivity);
-        shiftQueryResultWithActivity = new ShiftQueryResultWithActivity();
-        shiftQueryResultWithActivity.setStartDate(new DateTime().withTimeAtStartOfDay().plusHours(7).toDate());
-        shiftQueryResultWithActivity.setEndDate(new DateTime().withTimeAtStartOfDay().plusHours(18).toDate());
-        shiftQueryResultWithActivity.setActivityId(new BigInteger("123"));
-        shiftQueryResultWithActivity.setActivity(new Activity());
-        shiftQueryResultWithActivity.getActivity().setBalanceSettingsActivityTab(new BalanceSettingsActivityTab());
-        shifts.add(shiftQueryResultWithActivity);
-        shiftQueryResultWithActivity = new ShiftQueryResultWithActivity();
-        shiftQueryResultWithActivity.setStartDate(new DateTime().withTimeAtStartOfDay().plusHours(18).toDate());
-        shiftQueryResultWithActivity.setEndDate(new DateTime().withTimeAtStartOfDay().plusHours(27).toDate());
-        shiftQueryResultWithActivity.setActivityId(new BigInteger("123"));
-        shiftQueryResultWithActivity.setActivity(new Activity());
-        shiftQueryResultWithActivity.getActivity().setBalanceSettingsActivityTab(new BalanceSettingsActivityTab());
-        shifts.add(shiftQueryResultWithActivity);
-        return shifts;
-
-    }
-
 
 }
