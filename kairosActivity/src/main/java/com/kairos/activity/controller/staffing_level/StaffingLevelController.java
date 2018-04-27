@@ -134,16 +134,16 @@ public class StaffingLevelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 
-    @RequestMapping(value = "/absences", method = RequestMethod.POST)
+   /* @RequestMapping(value = "/absences", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level for absence")
     public ResponseEntity<Map<String, Object>> addAbsenceStaffingLevel(@RequestBody @Valid AbsenceStaffingLevelDto absenceStaffingLevelDto,
                                                                        @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true,
                 staffingLevelService.createAbsenceStaffingLevel(absenceStaffingLevelDto,unitId));
-    }
+    }*/
 
     @RequestMapping(value = "/absence", method = RequestMethod.POST)
-    @ApiOperation("update staffing_level")
+    @ApiOperation("update and create staffing_level")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid List<AbsenceStaffingLevelDto> absenceStaffingLevelDtos,
                                                                    @PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
