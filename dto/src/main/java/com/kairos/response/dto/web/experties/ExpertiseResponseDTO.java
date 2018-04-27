@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vipul on 29/3/18.
@@ -20,7 +21,7 @@ public class ExpertiseResponseDTO {
     //@DateLong
     private Date endDateMillis;
     private Long organizationLevelId;
-    private Long serviceId;
+    private Set<Long> organizationServiceIds;
     private Long unionId;
     private int fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
@@ -90,12 +91,12 @@ public class ExpertiseResponseDTO {
         this.organizationLevelId = organizationLevelId;
     }
 
-    public Long getServiceId() {
-        return serviceId;
+    public Set<Long> getOrganizationServiceIds() {
+        return organizationServiceIds;
     }
 
-    public void setServiceId(Long serviceId) {
-        this.serviceId = serviceId;
+    public void setOrganizationServiceIds(Set<Long> organizationServiceIds) {
+        this.organizationServiceIds = organizationServiceIds;
     }
 
     public Long getUnionId() {

@@ -18,6 +18,7 @@ import com.kairos.persistence.model.user.staff.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.model.user.staff.StaffExpertiseRelationShip;
 
+import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
@@ -69,6 +70,8 @@ public class ExpertiseService extends UserBaseService {
     StaffGraphRepository staffGraphRepository;
     @Inject
     OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    OrganizationServiceRepository organizationServiceRepository;
     @Inject
     OrganizationServiceService organizationServiceService;
     @Inject
@@ -305,11 +308,11 @@ public class ExpertiseService extends UserBaseService {
             throw new DataNotFoundByIdException("Invalid level id " + expertiseDTO.getOrganizationLevelId());
         }
         expertise.setOrganizationLevel(level);
-        OrganizationService organizationService = organizationServiceService.findOne(expertiseDTO.getServiceId());
-        if (!Optional.ofNullable(organizationService).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid service id " + expertiseDTO.getServiceId());
+        Set<OrganizationService> organizationService = organizationServiceRepository.findAllOrganizationServicesByIds(expertiseDTO.getOrganizationServiceIds());
+        if (!Optional.ofNullable(organizationService).isPresent() || organizationService.size() != expertiseDTO.getOrganizationServiceIds().size()) {
+            throw new DataNotFoundByIdException("All services are not found");
         }
-        expertise.setOrganizationService(organizationService);
+        expertise.setOrganizationServices(organizationService);
         Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(expertiseDTO.getUnionId());
         if (!Optional.ofNullable(union).isPresent()) {
             throw new DataNotFoundByIdException("Invalid union id " + expertiseDTO.getUnionId());
@@ -526,14 +529,16 @@ public class ExpertiseService extends UserBaseService {
             }
             expertise.setOrganizationLevel(level);
         }
-        if (!expertise.getOrganizationService().getId().equals(expertiseDTO.getServiceId())) {
-            OrganizationService organizationService = organizationServiceService.findOne(expertiseDTO.getServiceId());
-            if (!Optional.ofNullable(organizationService).isPresent()) {
-                throw new DataNotFoundByIdException("Invalid service id " + expertiseDTO.getServiceId());
-            }
-            expertise.setOrganizationService(organizationService);
 
+        Set<Long> previousOrganizationLevelIds = expertise.getOrganizationServices().stream().map(organizationService1 -> organizationService1.getId()).collect(Collectors.toSet());
+        if (!previousOrganizationLevelIds.equals(expertiseDTO.getOrganizationServiceIds())) {
+            Set<OrganizationService> organizationService = organizationServiceRepository.findAllOrganizationServicesByIds(expertiseDTO.getOrganizationServiceIds());
+            if (!Optional.ofNullable(organizationService).isPresent() || organizationService.size() != expertiseDTO.getOrganizationServiceIds().size()) {
+                throw new DataNotFoundByIdException("All services are not found");
+            }
+            expertise.setOrganizationServices(organizationService);
         }
+
         if (!expertise.getUnion().getId().equals(expertiseDTO.getUnionId())) {
             Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(expertiseDTO.getUnionId());
             if (!Optional.ofNullable(union).isPresent()) {

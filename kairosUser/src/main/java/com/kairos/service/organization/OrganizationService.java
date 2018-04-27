@@ -6,6 +6,7 @@ import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
+import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
@@ -16,6 +17,7 @@ import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
@@ -24,6 +26,7 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.staff.StaffCreationPOJOData;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -54,6 +57,7 @@ import com.kairos.service.country.DayTypeService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
@@ -188,6 +192,8 @@ public class OrganizationService extends UserBaseService {
     WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
     PeriodRestClient periodRestClient;
+    @Inject
+    StaffService staffService;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -235,7 +241,6 @@ public class OrganizationService extends UserBaseService {
         return organization;
     }
 
-
     public HashMap<String, Object> createParentOrganization(ParentOrganizationDTO orgDetails, long countryId, Long organizationId) {
 
         Country country = countryGraphRepository.findOne(countryId);
@@ -278,11 +283,17 @@ public class OrganizationService extends UserBaseService {
             periodRestClient.createDefaultPeriodSettings(organization.getId());
         }
 
-
+        /*// TODO Verify code to set Unit Manager of new organization
+        // Create Employment for Unit Manager
+        // Check if user exists or Create User
+        StaffCreationPOJOData staffCreationPOJOData = new StaffCreationPOJOData("Andreas","L. Jacobsen", "0108572361",
+                "Sam", "andreas@gmail.com", Gender.MALE, "andreas@gmail.com",null, 0L );
+        User user = staffService.createUnitManagerForNewOrganization(organization.getId(), staffCreationPOJOData);*/
 
         HashMap<String, Object> orgResponse = new HashMap<>();
         orgResponse.put("orgData", organizationResponse(organization, orgDetails));
         orgResponse.put("permissions", accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
+//        orgResponse.put("permissions", accessPageService.getPermissionOfUserInUnit(organization.getId(), user.getId()));
         return orgResponse;
     }
 
@@ -593,6 +604,7 @@ public class OrganizationService extends UserBaseService {
         response.put("children", Collections.emptyList());
         response.put("permissions", accessPageService.getPermissionOfUserInUnit(parent.getId(), unit, UserContext.getUserDetails().getId()));
         return response;
+
     }
 
     public List<Map<String, Object>> getAllOrganization() {

@@ -10,6 +10,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
@@ -38,6 +39,8 @@ import javax.inject.Inject;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.TEAM;
@@ -85,6 +88,8 @@ public class EmploymentService extends UserBaseService {
     private UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Inject
     private UnitPositionGraphRepository unitPositionGraphRepository;
+    @Inject
+    private StaffService staffService;
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
@@ -333,6 +338,8 @@ public class EmploymentService extends UserBaseService {
 
         return list;
     }
+
+
 
     public void createEmploymentForUnitManager(Staff staff, Organization parent, Organization unit, long accessGroupId) {
 
@@ -716,7 +723,7 @@ public class EmploymentService extends UserBaseService {
         map.put("note", partialLeave.getNote());
         return map;
     }
-    public void updateEmploymentEndDate(Organization unit, UnitPositionDTO unitPositionDTO) {
+    public Employment updateEmploymentEndDate(Organization unit, UnitPositionDTO unitPositionDTO) {
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             throw new DataNotFoundByIdException("Parent organization not found  Unit ID: " + unit.getId());
@@ -738,6 +745,13 @@ public class EmploymentService extends UserBaseService {
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),unitPositionDTO.getStaffId());
         employment.setEndDateMillis(employmentEndDate);
         employmentGraphRepository.save(employment);
+
+        if(DateUtil.getDateFromEpoch(employmentEndDate).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0) {
+            //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
+            List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
+            moveToReadOnlyAccessGroup(employmentIds);
+        }
+        return employment;
     }
 
     

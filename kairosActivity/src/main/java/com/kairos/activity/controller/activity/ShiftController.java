@@ -45,12 +45,13 @@ public class ShiftController {
     @GetMapping(value = "/shift/staff/{staffId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getShiftByStaffId(@PathVariable Long staffId, @PathVariable Long unitId,
+                                                                 @RequestParam Long unitPositionId,
                                                                  @RequestParam("type") String type,
                                                                  @RequestParam(value = "week", required = false) Long week,
                                                                  @RequestParam(value = "startDate", required = false) String startDate,
                                                                  @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, week, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftByStaffId(unitId, staffId, startDate, endDate, week,unitPositionId, type));
     }
 
 

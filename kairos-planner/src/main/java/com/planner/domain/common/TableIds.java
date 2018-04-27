@@ -1,12 +1,11 @@
 package com.planner.domain.common;
 
 
-import org.springframework.data.cassandra.mapping.PrimaryKey;
 
 
 public class TableIds {
 
-    @PrimaryKey
+    //@PrimaryKey
     private long ids;
     private Long taskIds;
     private Long citizenIds;

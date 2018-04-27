@@ -6,6 +6,7 @@ import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.staff.StaffAdditionalInfoDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
+import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
@@ -104,6 +105,11 @@ public class ShiftService extends MongoBaseService {
                 shiftQueryResults = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activity, shiftFromDate);
             }
         } else {
+            List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByUnitPosition(shiftDTO.getUnitPositionId(),shiftDTO.getStartDate(),shiftDTO.getEndDate());
+            if(!shifts.isEmpty()) {
+                throw new DuplicateDataException(" Shift already exists between duration- startDate: "+shifts.get(0).getStartDate()+" endDate: "+shifts.get(0).getEndDate());
+            }
+
             if (shiftDTO.getStartDate().after(shiftDTO.getEndDate())) {
                 throw new InvalidRequestException(" Start date can't be greater than endDate");
             }
@@ -214,7 +220,7 @@ public class ShiftService extends MongoBaseService {
         return shiftQueryResult;
     }
 
-    public List<ShiftQueryResult> getShiftByStaffId(Long id, Long staffId, String startDateAsString, String endDateAsString, Long week, String type) throws ParseException {
+    public List<ShiftQueryResult> getShiftByStaffId(Long id, Long staffId, String startDateAsString, String endDateAsString, Long week,Long unitPositionId, String type) throws ParseException {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, type);
         if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent() || staffAdditionalInfoDTO.getUnitId() == null) {
             throw new DataNotFoundByIdException(staffId + " Staff Do not belong to " + type);
@@ -232,7 +238,7 @@ public class ShiftService extends MongoBaseService {
             }
 
         }
-        List<ShiftQueryResult> activities = shiftMongoRepository.findAllActivityBetweenDuration(staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
+        List<ShiftQueryResult> activities = shiftMongoRepository.findAllActivityBetweenDuration(unitPositionId,staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
         activities.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
         return activities;
     }
