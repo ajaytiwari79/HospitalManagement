@@ -22,8 +22,9 @@ public enum WTATemplateType {
     REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS("Rest In Consecutive Days and nights"),
     WEEKLY_REST_PERIOD("Weekly Rest Period"),
     NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD("Number Of Weekend Shift In Period"),
-    SHORTEST_AND_AVERAGE_DAILY_REST("Shortest And Average Daily Rest");
-
+    SHORTEST_AND_AVERAGE_DAILY_REST("Shortest And Average Daily Rest"),
+    MAXIMUM_SENIOR_DAYS_PER_YEAR("Maximum Senior Days Per Year"),
+    CHILD_CARE_DAYS_CHECK("Child Care Day Check");
     private String value;
 
     WTATemplateType(String value) {

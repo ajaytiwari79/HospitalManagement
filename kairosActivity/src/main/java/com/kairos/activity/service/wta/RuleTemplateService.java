@@ -83,6 +83,10 @@ public class RuleTemplateService extends MongoBaseService {
         long daysCount = 10;
         long dateInMillis = DateUtils.getCurrentDate().getTime();
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates1 = new ArrayList<>();
+        AgeRange range=new AgeRange(0,0,0);
+        List<AgeRange> ageRange=new ArrayList<>();
+        ageRange.add(range);
+        List<Long> activities=new ArrayList<>();
 
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
         phaseTemplateValues.add(new PhaseTemplateValue(1,"REQUEST",(short) 0,(short)0,true,0,false));
@@ -190,6 +194,16 @@ public class RuleTemplateService extends MongoBaseService {
         timeBankWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         timeBankWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(timeBankWTATemplate);
+
+        MaximumSeniorDaysPerYear maximumSeniorDaysPerYear=new MaximumSeniorDaysPerYear("Senior Days per Year",true,true,"Senior Days In Year",ageRange,activities,dateInMillis,12L);
+        maximumSeniorDaysPerYear.setCountryId(countryDTO.getId());
+        maximumSeniorDaysPerYear.setPhaseTemplateValues(phaseTemplateValues);
+        wtaBaseRuleTemplates1.add(maximumSeniorDaysPerYear);
+
+        CareDaysCheck careDaysCheck=new CareDaysCheck("Care Days Check",true,true,"Care Days Check",ageRange,activities,dateInMillis,12L);
+        careDaysCheck.setCountryId(countryDTO.getId());
+        careDaysCheck.setPhaseTemplateValues(phaseTemplateValues);
+        wtaBaseRuleTemplates1.add(careDaysCheck);
         save(wtaBaseRuleTemplates1);
 
 
@@ -423,6 +437,25 @@ public class RuleTemplateService extends MongoBaseService {
                 minimumTimeBank.setForbid(templateDTO.isForbid());
                 minimumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
                 break;
+            case MAXIMUM_SENIOR_DAYS_PER_YEAR:
+                MaximumSeniorDaysPerYear maximumSeniorDaysPerYear=(MaximumSeniorDaysPerYear) oldTemplate;
+                List<AgeRange> ageRanges = new ArrayList<>();
+                BeanUtils.copyProperties(ageRanges,templateDTO.getAgeRange());
+                maximumSeniorDaysPerYear.setAgeRange(ageRanges);
+                maximumSeniorDaysPerYear.setActivities(templateDTO.getActivities());
+                maximumSeniorDaysPerYear.setNumberOfWeeks(templateDTO.getNumberOfWeeks());
+                maximumSeniorDaysPerYear.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
+                break;
+            case CHILD_CARE_DAYS_CHECK:
+                CareDaysCheck careDaysCheck=(CareDaysCheck) oldTemplate;
+                List<AgeRange> ageRangeList = new ArrayList<>();
+                BeanUtils.copyProperties(ageRangeList,templateDTO.getAgeRange());
+                careDaysCheck.setAgeRange(ageRangeList);
+                careDaysCheck.setActivities(templateDTO.getActivities());
+                careDaysCheck.setNumberOfWeeks(templateDTO.getNumberOfWeeks());
+                careDaysCheck.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
+                break;
+
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }

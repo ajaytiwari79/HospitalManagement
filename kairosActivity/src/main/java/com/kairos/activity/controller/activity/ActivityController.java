@@ -349,4 +349,11 @@ public class ActivityController {
     ResponseEntity<Map<String, Object>> updateLocationsTabOfActivity(@RequestBody LocationActivityTabDTO locationActivityTabDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(locationActivityTabDTO));
     }
+
+    @ApiOperation("Get all absence activity")
+    @GetMapping(value = "/absence-activities")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityByCountry(countryId));
+    }
 }

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.activity.constants.AppConstants.COPY_OF;
-import static com.kairos.activity.persistence.enums.WTATemplateType.*;
 
 /**
  * @author pradeep
@@ -284,6 +283,19 @@ public class WTABuilderService extends MongoBaseService {
                 timeBankWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategoryId());
                 wtaBaseRuleTemplate = timeBankWTATemplate;
                 break;
+            case MAXIMUM_SENIOR_DAYS_PER_YEAR:
+                MaximumSeniorDaysPerYearDTO maximumSeniorDaysPerYear=new MaximumSeniorDaysPerYearDTO();
+                copyProperties(ruleTemplate,maximumSeniorDaysPerYear);
+                maximumSeniorDaysPerYear.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategoryId());
+                wtaBaseRuleTemplate=maximumSeniorDaysPerYear;
+                break;
+            case CHILD_CARE_DAYS_CHECK:
+                CareDaysCheckDTO  careDaysCheck=new CareDaysCheckDTO();
+                copyProperties(ruleTemplate,careDaysCheck);
+                careDaysCheck.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategoryId());
+                wtaBaseRuleTemplate=careDaysCheck;
+                break;
+
 
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
