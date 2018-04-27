@@ -213,7 +213,7 @@ public class ShiftService extends MongoBaseService {
         return shiftQueryResult;
     }
 
-    public List<ShiftQueryResult> getShiftByStaffId(Long id, Long staffId, String startDateAsString, String endDateAsString, Long week, String type) throws ParseException {
+    public List<ShiftQueryResult> getShiftByStaffId(Long id, Long staffId, String startDateAsString, String endDateAsString, Long week,Long unitPositionId, String type) throws ParseException {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(staffId, type);
         if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent() || staffAdditionalInfoDTO.getUnitId() == null) {
             throw new DataNotFoundByIdException(staffId + " Staff Do not belong to " + type);
@@ -231,7 +231,7 @@ public class ShiftService extends MongoBaseService {
             }
 
         }
-        List<ShiftQueryResult> activities = shiftMongoRepository.findAllActivityBetweenDuration(staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
+        List<ShiftQueryResult> activities = shiftMongoRepository.findAllActivityBetweenDuration(unitPositionId,staffId, startDateInISO, endDateInISO, staffAdditionalInfoDTO.getUnitId());
         activities.stream().map(s -> s.sortShifts()).collect(Collectors.toList());
         return activities;
     }

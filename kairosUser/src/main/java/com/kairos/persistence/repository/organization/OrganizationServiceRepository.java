@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -67,4 +68,10 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     @Query("MATCH (os:OrganizationService{imported:false})-[r:"+LINK_WITH_EXTERNAL_SERVICE+"]->(es:OrganizationService{hasMapped:true}) where id(es)={0}  delete r ")
     OrganizationExternalServiceRelationship removeOrganizationExternalServiceRelationship(Long organizationId);
 
+    @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}" +
+            "  return id(os)")
+    List<Long> getOrganizationServiceIdsByOrganizationId(Long organizationId);
+    @Query("MATCH (organizationService:OrganizationService{isEnabled:true}) where id(organizationService) IN {0}" +
+            " return organizationService")
+    Set<OrganizationService> findAllOrganizationServicesByIds(Set<Long> organizationServicesIds);
 }
