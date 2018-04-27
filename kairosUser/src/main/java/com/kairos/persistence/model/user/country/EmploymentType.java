@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.EmploymentCategory;
+import com.kairos.persistence.model.enums.PaymentFrequency;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.neo4j.ogm.annotation.NodeEntity;
 
@@ -26,6 +27,7 @@ public class EmploymentType extends UserBaseEntity {
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
     private Set<EmploymentCategory> employmentCategories;
+    private PaymentFrequency paymentFrequency;
 
 
     public String getName() {
@@ -74,5 +76,13 @@ public class EmploymentType extends UserBaseEntity {
 
     public void setEmploymentCategories(Set<EmploymentCategory> employmentCategories) {
         this.employmentCategories = employmentCategories;
+    }
+
+    public PaymentFrequency getPaymentFrequency() {
+        return paymentFrequency;
+    }
+
+    public void setPaymentFrequency(PaymentFrequency paymentFrequency) {
+        this.paymentFrequency = paymentFrequency;
     }
 }

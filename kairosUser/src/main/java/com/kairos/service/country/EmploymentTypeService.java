@@ -108,6 +108,7 @@ public class EmploymentTypeService extends UserBaseService {
         employmentTypeToUpdate.setAllowedForShiftPlan(employmentTypeDTO.isAllowedForShiftPlan());
         employmentTypeToUpdate.setAllowedForFlexPool(employmentTypeDTO.isAllowedForFlexPool());
         employmentTypeToUpdate.setEmploymentCategories(employmentTypeDTO.getEmploymentCategories());
+        employmentTypeToUpdate.setPaymentFrequency(employmentTypeDTO.getPaymentFrequency());
         return save(employmentTypeToUpdate);
     }
 
