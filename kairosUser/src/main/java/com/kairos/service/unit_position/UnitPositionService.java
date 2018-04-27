@@ -550,6 +550,7 @@ public class UnitPositionService extends UserBaseService {
         positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
         FunctionAndSeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
         positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
+        positionCtaWtaQueryResult.setUnion(currentExpertise.get().getUnion());
 
         return positionCtaWtaQueryResult;
     }
