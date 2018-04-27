@@ -39,6 +39,7 @@ import com.kairos.util.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.yaml.snakeyaml.introspector.PropertyUtils;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
@@ -724,5 +725,46 @@ public class ExpertiseService extends UserBaseService {
         return expertiseGraphRepository.getUnpublishedExpertise(countryId);
     }
 
+    public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId,List<AgeRangeDTO> ageRangeDTO,String type){
+        Expertise expertise=expertiseGraphRepository.findById(expertiseId).get();
+        if(!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()){
+            throw new  DataNotFoundByIdException("No expertise found" +expertiseId);
+        }
+        validateAgeRange(ageRangeDTO);
+        if(type.equals("seniorDays")){
+            List<SeniorDays> seniorDays=new ArrayList<>();
+            for(AgeRangeDTO ageRange:ageRangeDTO){
+                SeniorDays seniorDays1=new SeniorDays();
+                BeanUtils.copyProperties(ageRange,seniorDays1);
+                seniorDays.add(seniorDays1);
+            }
 
+            expertise.setSeniorDays(seniorDays);
+            BeanUtils.copyProperties(ageRangeDTO,seniorDays);
+        } else if(type.equals("childCare")){
+            List<ChildCareDays> childCareDays=new ArrayList<>();
+            for(AgeRangeDTO ageRange:ageRangeDTO){
+                ChildCareDays childCareDays1=new ChildCareDays();
+                BeanUtils.copyProperties(ageRange,childCareDays1);
+                childCareDays.add(childCareDays1);
+            }
+            BeanUtils.copyProperties(childCareDays,ageRangeDTO);
+            expertise.setChildCareDays(childCareDays);
+            BeanUtils.copyProperties(ageRangeDTO,childCareDays);
+        }
+        save(expertise);
+        return ageRangeDTO;
+    }
+    public void validateAgeRange(List<AgeRangeDTO> ageRangeDTO){
+        Collections.sort(ageRangeDTO);
+        for(int i=0;i<ageRangeDTO.size();i++){
+            if(ageRangeDTO.get(i).getTo()!=null && (ageRangeDTO.get(i).getFrom()>ageRangeDTO.get(i).getTo()))
+                throw new ActionNotPermittedException("Invalid Range: From "+ageRangeDTO.get(i).getFrom() +" to "+ageRangeDTO.get(i).getTo());
+            if(ageRangeDTO.size()<2)
+                break;
+            if(i<ageRangeDTO.size()-1)
+                if(ageRangeDTO.get(i).getTo()>ageRangeDTO.get(i+1).getFrom())
+                    throw new ActionNotPermittedException("Age Range overlap");
+        }
+    }
 }

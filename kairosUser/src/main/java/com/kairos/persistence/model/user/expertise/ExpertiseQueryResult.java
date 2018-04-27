@@ -27,6 +27,8 @@ public class ExpertiseQueryResult {
     private Boolean published;
     private Boolean history;
     private PaidOutFrequencyEnum paidOutFrequency;
+    private List<SeniorDays> seniorDays;
+    private List<ChildCareDays> childCareDays;
 
 
     private Level organizationLevel;
@@ -158,5 +160,21 @@ public class ExpertiseQueryResult {
 
     public ExpertiseQueryResult() {
         //default  const
+    }
+
+    public List<SeniorDays> getSeniorDays() {
+        return seniorDays;
+    }
+
+    public void setSeniorDays(List<SeniorDays> seniorDays) {
+        this.seniorDays = seniorDays;
+    }
+
+    public List<ChildCareDays> getChildCareDays() {
+        return childCareDays;
+    }
+
+    public void setChildCareDays(List<ChildCareDays> childCareDays) {
+        this.childCareDays = childCareDays;
     }
 }
