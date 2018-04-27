@@ -77,7 +77,8 @@ public class EmploymentTypeService extends UserBaseService {
         if(isAlreadyExists){
             throw new DuplicateDataException("EmploymentType already exists: "+employmentTypeDTO.getName().trim());
         }
-        EmploymentType employmentTypeToCreate = employmentTypeDTO.generateEmploymentTypeFromEmploymentTypeDTO();
+        EmploymentType employmentTypeToCreate = new EmploymentType(employmentTypeDTO.getName(),employmentTypeDTO.getDescription(),employmentTypeDTO.isAllowedForContactPerson(),
+                employmentTypeDTO.isAllowedForShiftPlan(),employmentTypeDTO.isAllowedForFlexPool(),employmentTypeDTO.getEmploymentCategories(),employmentTypeDTO.getPaymentFrequency());
         country.addEmploymentType(employmentTypeToCreate);
         countryGraphRepository.save(country);
 

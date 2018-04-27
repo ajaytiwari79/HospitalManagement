@@ -2,8 +2,7 @@ package com.kairos.persistence.model.user.country.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.enums.EmploymentCategory;
-import com.kairos.persistence.model.enums.PaymentFrequency;
-import com.kairos.persistence.model.user.country.EmploymentType;
+import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
@@ -24,7 +23,7 @@ public class EmploymentTypeDTO {
     private boolean allowedForShiftPlan;
     private boolean allowedForFlexPool;
     private Set<EmploymentCategory> employmentCategories;
-    private PaymentFrequency paymentFrequency;
+    private PaidOutFrequencyEnum paymentFrequency;
 
     public Long getId() {
         return id;
@@ -82,26 +81,14 @@ public class EmploymentTypeDTO {
         this.employmentCategories = employmentCategories;
     }
 
-    public PaymentFrequency getPaymentFrequency() {
+    public PaidOutFrequencyEnum getPaymentFrequency() {
         return paymentFrequency;
     }
 
-    public void setPaymentFrequency(PaymentFrequency paymentFrequency) {
+    public void setPaymentFrequency(PaidOutFrequencyEnum paymentFrequency) {
         this.paymentFrequency = paymentFrequency;
     }
 
-    public EmploymentType generateEmploymentTypeFromEmploymentTypeDTO() {
-        EmploymentType employmentType = new EmploymentType();
-        employmentType.setName(this.getName().trim());
-        employmentType.setDescription(this.getDescription());
-        employmentType.setAllowedForContactPerson(this.isAllowedForContactPerson());
-        employmentType.setAllowedForShiftPlan(this.isAllowedForShiftPlan());
-        employmentType.setAllowedForFlexPool(this.isAllowedForFlexPool());
-        employmentType.setEmploymentCategories(this.getEmploymentCategories());
-        employmentType.setPaymentFrequency(this.getPaymentFrequency());
-
-        return employmentType;
-    }
     @AssertTrue(message = "At least one role should be selected")
     public boolean isValid() {
         return (employmentCategories.isEmpty())?false:true;
