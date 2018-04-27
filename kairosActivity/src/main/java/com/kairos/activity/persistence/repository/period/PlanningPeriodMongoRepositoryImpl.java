@@ -59,7 +59,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return mongoTemplate.findOne(query, PlanningPeriod.class);
     }
 
-
     public List<PlanningPeriodDTO> findAllPeriodsOfUnit(Long unitId) {
 
         ProjectionOperation projectionOperation = Aggregation.project().
@@ -108,6 +107,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         return result.getMappedResults();
     }
 
+
     public  boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, Date startDate, Date endDate, int sequence) {
 
         Aggregation aggregation = Aggregation.newAggregation(
@@ -117,16 +117,25 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                                 Criteria.where("endDate").gte(startDate).lte(endDate)
                         )),
                 lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
-                match(Criteria.where("current_phase_data.sequence").ne(sequence)),count().as("countOfPhasesWithOtherSequence")
+                match(Criteria.where("current_phase_data.sequence").ne(sequence)), count().as("countOfPhasesWithOtherSequence")
         );
 
         AggregationResults<Map> result =
-                mongoTemplate.aggregate (aggregation, "planningPeriod", Map.class);
+                mongoTemplate.aggregate(aggregation, "planningPeriod", Map.class);
         Map resultData = result.getUniqueMappedResult();
-        if(Optional.ofNullable(resultData).isPresent()){
-            return (Integer)result.getUniqueMappedResult().get("countOfPhasesWithOtherSequence") > 0;
+        if (Optional.ofNullable(resultData).isPresent()) {
+            return (Integer) result.getUniqueMappedResult().get("countOfPhasesWithOtherSequence") > 0;
         } else {
             return false;
         }
+    }
+
+    public List<PlanningPeriod> getPlanningPeriodToFlipPhases(Long unitId, Date date){
+
+        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
+                and("phaseFlippingDate.flippingDate").lte(date));
+//        query.addCriteria(Criteria.where("this.nextPhaseId").is("this.phaseFlippingDate.phaseId"));
+        query.with(Sort.by(Sort.Direction.ASC,"startDate"));
+        return mongoTemplate.find(query, PlanningPeriod.class);
     }
 }
