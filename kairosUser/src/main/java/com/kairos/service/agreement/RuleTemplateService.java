@@ -45,6 +45,7 @@ import java.util.*;
 @Service
 public class RuleTemplateService extends UserBaseService {
 
+/*
 
     private List<String> balanceTypes = new ArrayList<String>();
     @Inject
@@ -436,11 +437,13 @@ public class RuleTemplateService extends UserBaseService {
         return ruleTemplateCategory;
     }
 
-    /*
+    */
+/*
     *
     * This method will change the category of rule Template when we change the rule template all existing rule templates wil set to none
      * and new rule temp wll be setted to  this new rule template category
-    * */
+    * *//*
+
     public Map<String, Object> updateRuleTemplateCategory(RuleTemplateDTO wtaRuleTemplateDTO, long countryId) {
         // This Method will get all the previous
         Map<String, Object> response = new HashMap();
@@ -660,5 +663,6 @@ public class RuleTemplateService extends UserBaseService {
 
         return 0;
     }
+*/
 
 }

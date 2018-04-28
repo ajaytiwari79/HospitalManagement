@@ -9,6 +9,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,6 +25,7 @@ import static com.kairos.client.RestClientURLUtil.getBaseUrl;
  * @date - 21/4/18
  */
 
+@Service
 public class WorkingTimeAgreementRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkingTimeAgreementRestClient.class);

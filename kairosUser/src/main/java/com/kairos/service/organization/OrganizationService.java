@@ -268,11 +268,10 @@ public class OrganizationService extends UserBaseService {
          * @Modified vipul
          * when creating an organization linking all existing wta with this subtype to organization
          */
-        List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
-        List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
-        List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
-        linkWTAToOrganization(allWtaCopy, allWta);
-        organization.setWorkingTimeAgreements(allWtaCopy);
+        //List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
+        //List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
+        //List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
+        //linkWTAToOrganization(allWtaCopy, allWta);
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
 
@@ -313,7 +312,7 @@ public class OrganizationService extends UserBaseService {
     }
 
 
-    private void linkWTAToOrganization(List<WorkingTimeAgreement> WTAList, List<WorkingTimeAgreement> allWta) {
+    /*private void linkWTAToOrganization(List<WorkingTimeAgreement> WTAList, List<WorkingTimeAgreement> allWta) {
         allWta.forEach(workingTimeAgreement -> {
             WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
             wtaService.copyWta(workingTimeAgreement, newWtaObject);
@@ -324,7 +323,7 @@ public class OrganizationService extends UserBaseService {
             WTAList.add(newWtaObject);
         });
 
-    }
+    }*/
 
     public HashMap<String, Object> updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId, long countryId) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
@@ -586,12 +585,12 @@ public class OrganizationService extends UserBaseService {
          * @Modified by vipul
          *  Added all wta of from parent organization
          */
-        List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
+       /* List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
         List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults=workingTimeAgreementGraphRepository.getAllWTAByOrganization(unitId);
         List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
         linkWTAToOrganization(allWtaCopy, allWta);
         unit.setWorkingTimeAgreements(allWtaCopy);
-
+*/
         //Assign Parent Organization's level to unit
         unit.setLevel(parent.getLevel());
 

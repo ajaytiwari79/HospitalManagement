@@ -5,11 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.agreement.cta.CostTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.position_code.PositionCode;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.math.BigInteger;
 import java.util.Map;
 
 /**
@@ -35,6 +36,7 @@ public class UnitPositionQueryResult {
 
     private Map<String, Object> employmentType;
     private Map<String, Object> seniorityLevel;
+    private BigInteger workingTimeAgreementId;
     private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
@@ -45,7 +47,24 @@ public class UnitPositionQueryResult {
     private Long parentUnitId;
     private Long unitId;
     private Long reasonCodeId;
+    private WTAResponseDTO workingTimeAgreement;
 
+
+    public WTAResponseDTO getWorkingTimeAgreement() {
+        return workingTimeAgreement;
+    }
+
+    public void setWorkingTimeAgreement(WTAResponseDTO workingTimeAgreement) {
+        this.workingTimeAgreement = workingTimeAgreement;
+    }
+
+    public BigInteger getWorkingTimeAgreementId() {
+        return workingTimeAgreementId;
+    }
+
+    public void setWorkingTimeAgreementId(BigInteger workingTimeAgreementId) {
+        this.workingTimeAgreementId = workingTimeAgreementId;
+    }
 
     public int getFullTimeWeeklyMinutes() {
         return fullTimeWeeklyMinutes;
@@ -244,7 +263,7 @@ public class UnitPositionQueryResult {
     }
 
 
-    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WorkingTimeAgreement wta) {
+    public UnitPositionQueryResult(Expertise expertise, Long startDateMillis, int workingDaysInWeek, Long endDateMillis, int totalWeeklyMinutes, float avgDailyWorkingHours, float hourlyWages, long id, Double salary, PositionCode positionCode, Organization union, Long lastWorkingDateMillis, CostTimeAgreement cta, WTAResponseDTO wta) {
         this.expertise = expertise;
         this.startDateMillis = startDateMillis;
         this.workingDaysInWeek = workingDaysInWeek;
@@ -258,7 +277,7 @@ public class UnitPositionQueryResult {
         this.positionCode = positionCode;
         this.union = union;
         this.costTimeAgreement = cta;
-       // this.workingTimeAgreement = wta;
+        this.workingTimeAgreement = wta;
     }
 
 }
