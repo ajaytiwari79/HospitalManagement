@@ -38,7 +38,7 @@ public class UnitPositionQueryResult {
     private Double salary;
     private int totalWeeklyMinutes;
     private PositionCode positionCode;
-    private WorkingTimeAgreement workingTimeAgreement;
+    /*private WorkingTimeAgreement workingTimeAgreement;*/
     private CostTimeAgreement costTimeAgreement;
     private Organization union;
     private Long lastWorkingDateMillis;
@@ -145,14 +145,14 @@ public class UnitPositionQueryResult {
         this.id = id;
     }
 
-    public WorkingTimeAgreement getWorkingTimeAgreement() {
+    /*public WorkingTimeAgreement getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 
     public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
     }
-
+*/
     public CostTimeAgreement getCostTimeAgreement() {
         return costTimeAgreement;
     }
@@ -258,7 +258,7 @@ public class UnitPositionQueryResult {
         this.positionCode = positionCode;
         this.union = union;
         this.costTimeAgreement = cta;
-        this.workingTimeAgreement = wta;
+       // this.workingTimeAgreement = wta;
     }
 
 }
