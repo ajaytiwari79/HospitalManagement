@@ -183,7 +183,7 @@ public class UnitPositionService extends UserBaseService {
 
         unitPosition.setUnit(organization);
         save(unitPosition);
-        Employment employment = employmentService.updateEmploymentEndDate(organization, unitPositionDTO);
+        Employment employment = employmentService.updateEmploymentEndDate(organization, unitPositionDTO.getStaffId(),unitPositionDTO.getEndDateMillis(),false);
 
         UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
@@ -279,7 +279,8 @@ public class UnitPositionService extends UserBaseService {
         }
         preparePosition(oldUnitPosition, unitPositionDTO);
         save(oldUnitPosition);
-        Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO);
+        Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
+                unitPositionDTO.getEndDateMillis(), false);
         EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
 
         return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null),employmentQueryResult);
@@ -296,7 +297,7 @@ public class UnitPositionService extends UserBaseService {
 
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(positionId);
-        Employment employment = employmentService.updateEmploymentEndDate(unit,staffId);
+        Employment employment = employmentService.updateEmploymentEndDate(unit,staffId,null,true);
         return new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
     }
 

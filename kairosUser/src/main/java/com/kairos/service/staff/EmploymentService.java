@@ -718,26 +718,33 @@ public class EmploymentService extends UserBaseService {
         map.put("note", partialLeave.getNote());
         return map;
     }
-    public Employment updateEmploymentEndDate(Organization unit, UnitPositionDTO unitPositionDTO) {
+    public Employment updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis,boolean isDeletedUnitPosition) {
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+        Long employmentEndDate = null;
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             throw new DataNotFoundByIdException("Parent organization not found  Unit ID: " + unit.getId());
         }
-        List<UnitPositionQueryResult> unitPositionsQuery = unitPositionGraphRepository.getAllUnitPositionsByStaffId(parentOrganization.getId(), unitPositionDTO.getStaffId());
-        Long maxEndDate = unitPositionsQuery.get(0).getEndDateMillis();
-        boolean isEndDateBlank = false;
-        //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
-        for(UnitPositionQueryResult unitPosition:unitPositionsQuery) {
-            if(!Optional.ofNullable(unitPosition.getEndDateMillis()).isPresent()) {
-                isEndDateBlank = true;
-                break;
-            }
-            if(maxEndDate < unitPosition.getEndDateMillis()){
-                maxEndDate = unitPosition.getEndDateMillis();
+        if(Optional.ofNullable(endDateMillis).isPresent()||isDeletedUnitPosition) {
+            List<UnitPositionQueryResult> unitPositionsQuery = unitPositionGraphRepository.getAllUnitPositionsByStaffId(parentOrganization.getId(), staffId);
+            if(!unitPositionsQuery.isEmpty()) {
+                Long maxEndDate = unitPositionsQuery.get(0).getEndDateMillis();
+                boolean isEndDateBlank = false;
+                //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
+                for(UnitPositionQueryResult unitPosition:unitPositionsQuery) {
+                    if(!Optional.ofNullable(unitPosition.getEndDateMillis()).isPresent()) {
+                        isEndDateBlank = true;
+                        break;
+                    }
+                    if(maxEndDate < unitPosition.getEndDateMillis()){
+                        maxEndDate = unitPosition.getEndDateMillis();
+                    }
+                }
+                employmentEndDate =  isEndDateBlank ? null : maxEndDate;
             }
         }
-        Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDateMillis()?maxEndDate:unitPositionDTO.getEndDateMillis());
-        Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),unitPositionDTO.getStaffId());
+
+       // Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDateMillis()?maxEndDate:unitPositionDTO.getEndDateMillis());
+        Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),staffId);
         employment.setEndDateMillis(employmentEndDate);
         employmentGraphRepository.save(employment);
 
@@ -786,43 +793,4 @@ public class EmploymentService extends UserBaseService {
             employmentGraphRepository.saveAll(employments);
         }
     }
-
-
-    public Employment updateEmploymentEndDate(Organization unit, Long staffId) {
-        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
-        if (!Optional.ofNullable(parentOrganization).isPresent()) {
-            throw new DataNotFoundByIdException("Parent organization not found  Unit ID: " + unit.getId());
-        }
-        List<UnitPositionQueryResult> unitPositionsQuery = unitPositionGraphRepository.getAllUnitPositionsByStaffId(parentOrganization.getId(), staffId);
-        Long employmentEndDate = null;
-        if(unitPositionsQuery.isEmpty()) {
-            employmentEndDate = null;
-        }else {
-            Long maxEndDate = unitPositionsQuery.get(0).getEndDateMillis();
-            boolean isEndDateBlank = false;
-            //TODO Get unit positions with date more than the sent unitposition's end date at query level itself
-            for(UnitPositionQueryResult unitPosition:unitPositionsQuery) {
-                if(!Optional.ofNullable(unitPosition.getEndDateMillis()).isPresent()) {
-                    isEndDateBlank = true;
-                    break;
-                }
-                if(maxEndDate < unitPosition.getEndDateMillis()){
-                    maxEndDate = unitPosition.getEndDateMillis();
-                }
-            }
-             employmentEndDate =  isEndDateBlank ? null : maxEndDate;
-        }
-
-        Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(), staffId);
-        employment.setEndDateMillis(employmentEndDate);
-        employmentGraphRepository.save(employment);
-
-        if(Optional.ofNullable(employmentEndDate).isPresent()&&(DateUtil.getDateFromEpoch(employmentEndDate).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0)) {
-            //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-            List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
-            moveToReadOnlyAccessGroup(employmentIds);
-        }
-        return employment;
-    }
-
 }
