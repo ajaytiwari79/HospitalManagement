@@ -1,9 +1,11 @@
 package com.kairos.activity.controller.wta;
 
+import com.kairos.activity.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.activity.service.wta.RuleTemplateCategoryService;
 import com.kairos.activity.service.wta.RuleTemplateService;
 import com.kairos.activity.util.response.ResponseHandler;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryDTO;
+import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
 import com.kairos.response.dto.web.wta.WTARuleTemplateDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,7 @@ public class RuleTemplateController {
     private RuleTemplateService ruleTemplateService;
     @Inject
     private RuleTemplateCategoryService ruleTemplateCategoryService;
+    @Inject private WTABuilderService wtaBuilderService;
 
     @RequestMapping(value = COUNTRY_URL+"/rule_templates", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> createRuleTemplate(@PathVariable Long countryId) {
@@ -41,8 +44,10 @@ public class RuleTemplateController {
     }
 
     @RequestMapping(value = COUNTRY_URL+"/rule_templates/{templateType}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @RequestBody Map templateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.updateRuleTemplate(countryId, templateDTO));
+    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable String templateType, @RequestBody Map template) {
+        WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO = new WTABaseRuleTemplateDTO();
+        WTABuilderService.copyProperties(template,wtaBaseRuleTemplateDTO);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.updateRuleTemplate(countryId, wtaBaseRuleTemplateDTO));
     }
 
 
@@ -57,8 +62,10 @@ public class RuleTemplateController {
     }
 
     @RequestMapping(value = COUNTRY_URL+"/copy_rule_template", method = RequestMethod.POST)
-    ResponseEntity<Map<String, Object>> copyRuleTemplate(@PathVariable Long countryId, @Valid @RequestBody WTARuleTemplateDTO templateDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.copyRuleTemplate(countryId,templateDTO));
+    ResponseEntity<Map<String, Object>> copyRuleTemplate(@PathVariable Long countryId,@RequestBody Map template) {
+        WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO = new WTABaseRuleTemplateDTO();
+        WTABuilderService.copyProperties(template,wtaBaseRuleTemplateDTO);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.copyRuleTemplate(countryId,wtaBaseRuleTemplateDTO));
     }
 
 

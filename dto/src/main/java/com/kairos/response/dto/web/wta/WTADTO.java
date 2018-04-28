@@ -2,9 +2,11 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.util.ObjectMapperUtils;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by vipul on 21/12/17.
@@ -19,7 +21,7 @@ public class WTADTO {
     private long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
-    private List<WTARuleTemplateDTO> ruleTemplates;
+    private List<Map> ruleTemplates;
     private Long organizationType;
     private Long organizationSubType;
     private List<BigInteger> tags;
@@ -84,11 +86,11 @@ public class WTADTO {
         this.expiryDate = expiryDate;
     }
 
-    public List<WTARuleTemplateDTO> getRuleTemplates() {
-        return ruleTemplates;
+    public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
+        return ObjectMapperUtils.copyPropertiesMapToDTO(this.ruleTemplates);
     }
 
-    public void setRuleTemplates(List<WTARuleTemplateDTO> ruleTemplates) {
+    public void setRuleTemplates(List<Map> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 
@@ -116,7 +118,7 @@ public class WTADTO {
         this.tags = tags;
     }
 
-    public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, Long expiryDate, List<WTARuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType) {
+    public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, Long expiryDate, List<Map> ruleTemplates, Long organizationType, Long organizationSubType) {
         this.name = name;
         this.description = description;
         this.expertiseId = expertiseId;

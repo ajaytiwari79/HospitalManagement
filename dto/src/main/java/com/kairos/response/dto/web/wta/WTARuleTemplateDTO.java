@@ -2,9 +2,9 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
 import com.kairos.response.dto.web.AgeRangeDTO;
-import com.kairos.response.dto.web.enums.WTATemplateType;
 
 
 import java.math.BigInteger;

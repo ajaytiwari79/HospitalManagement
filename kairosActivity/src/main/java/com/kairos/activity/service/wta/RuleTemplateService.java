@@ -304,167 +304,24 @@ public class RuleTemplateService extends MongoBaseService {
     }
 
 
-    public WTARuleTemplateDTO updateRuleTemplate(long countryId, WTABaseRuleTemplateDTO templateDTO) {
+    public WTABaseRuleTemplateDTO updateRuleTemplate(long countryId, WTABaseRuleTemplateDTO templateDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country");
         }
-
         WTABaseRuleTemplate oldTemplate = wtaBaseRuleTemplateMongoRepository.findOne(templateDTO.getId());
         if (!Optional.ofNullable(oldTemplate).isPresent()) {
             throw new DataNotFoundByIdException("Invalid TemplateType id " + templateDTO.getId());
         }
        /* String templateType=getTemplateType(templateDTO.getTemplateType());
         WTATemplateType ruleTemplateType = getByTemplateType(templateType);*/
-        switch (templateDTO.getWtaTemplateType()) {
-            case SHIFT_LENGTH:
-                ShiftLengthWTATemplate shiftLengthWTATemplate = (ShiftLengthWTATemplate) oldTemplate;//oldTemplate;
-                shiftLengthWTATemplate.setDescription(templateDTO.getDescription());
-                shiftLengthWTATemplate.setTimeLimit(templateDTO.getTimeLimit());
-                shiftLengthWTATemplate.setCheckAgainstTimeRules(templateDTO.getCheckAgainstTimeRules());
-                break;
-            case CONSECUTIVE_WORKING_PARTOFDAY:
-                ConsecutiveWorkWTATemplate consecutiveWorkingDays = (ConsecutiveWorkWTATemplate) oldTemplate;
-                consecutiveWorkingDays.setDescription(templateDTO.getDescription());
-                consecutiveWorkingDays.setLimitCount(templateDTO.getDaysLimit());
-                consecutiveWorkingDays.setCheckAgainstTimeRules(templateDTO.getCheckAgainstTimeRules());
-                break;
-            case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
-                ConsecutiveRestPartOfDayWTATemplate consecutiveRestPartOfDay = (ConsecutiveRestPartOfDayWTATemplate) oldTemplate;
-                consecutiveRestPartOfDay.setDescription(templateDTO.getDescription());
-                consecutiveRestPartOfDay.setMinimumRest(templateDTO.getMinimumRest());
-                consecutiveRestPartOfDay.setDaysWorked(templateDTO.getDaysWorked());
-                break;
-            case NUMBER_OF_PARTOFDAY:
-                NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShifts = (NumberOfPartOfDayShiftsWTATemplate) oldTemplate;
-                numberOfPartOfDayShifts.setDescription(templateDTO.getDescription());
-                numberOfPartOfDayShifts.setNoOfPartOfDayWorked(templateDTO.getNightsWorked());
-                numberOfPartOfDayShifts.setIntervalLength(templateDTO.getIntervalLength());
-                numberOfPartOfDayShifts.setIntervalUnit(templateDTO.getIntervalUnit());
-                numberOfPartOfDayShifts.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
-                break;
-            case DAYS_OFF_IN_PERIOD:
-                DaysOffInPeriodWTATemplate maximumDaysOffInPeriodWTATemplate = (DaysOffInPeriodWTATemplate) oldTemplate;
-                maximumDaysOffInPeriodWTATemplate.setDescription(templateDTO.getDescription());
-                maximumDaysOffInPeriodWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
-                maximumDaysOffInPeriodWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
-                maximumDaysOffInPeriodWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
-                maximumDaysOffInPeriodWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
-                break;
-            case AVERAGE_SHEDULED_TIME:
-                AverageScheduledTimeWTATemplate maximumAverageScheduledTimeWTATemplate = (AverageScheduledTimeWTATemplate) oldTemplate;
-                maximumAverageScheduledTimeWTATemplate.setDescription(templateDTO.getDescription());
-                maximumAverageScheduledTimeWTATemplate.setUseShiftTimes(templateDTO.getUseShiftTimes());
-                maximumAverageScheduledTimeWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
-                maximumAverageScheduledTimeWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
-                maximumAverageScheduledTimeWTATemplate.setMaximumAvgTime(templateDTO.getMaximumAvgTime());
-                maximumAverageScheduledTimeWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
-                maximumAverageScheduledTimeWTATemplate.setBalanceAdjustment(templateDTO.getBalanceAdjustment());
-                break;
-            case VETO_PER_PERIOD:
-                VetoPerPeriodWTATemplate maximumVetoPerPeriodWTATemplate = (VetoPerPeriodWTATemplate) oldTemplate;
-                maximumVetoPerPeriodWTATemplate.setDescription(templateDTO.getDescription());
-                maximumVetoPerPeriodWTATemplate.setMaximumVetoPercentage(templateDTO.getMaximumVetoPercentage());
-                break;
-            case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
-                NumberOfWeekendShiftsInPeriodWTATemplate numberOfWeekendShiftsInPeriodWTATemplate = (NumberOfWeekendShiftsInPeriodWTATemplate) oldTemplate;
-                numberOfWeekendShiftsInPeriodWTATemplate.setDescription(templateDTO.getDescription());
-                numberOfWeekendShiftsInPeriodWTATemplate.setNumberShiftsPerPeriod(templateDTO.getNumberShiftsPerPeriod());
-                numberOfWeekendShiftsInPeriodWTATemplate.setNumberOfWeeks(templateDTO.getNumberOfWeeks());
-                numberOfWeekendShiftsInPeriodWTATemplate.setFromDayOfWeek(templateDTO.getFromDayOfWeek());
-                numberOfWeekendShiftsInPeriodWTATemplate.setFromTime(templateDTO.getFromTime());
-                numberOfWeekendShiftsInPeriodWTATemplate.setToTime(templateDTO.getToTime());
-                numberOfWeekendShiftsInPeriodWTATemplate.setToDayOfWeek(templateDTO.getToDayOfWeek());
-                numberOfWeekendShiftsInPeriodWTATemplate.setProportional(templateDTO.getProportional());
-                break;
-            case CARE_DAYS_CHECK:
-                CareDayCheckWTATemplate careDayCheckWTATemplate = (CareDayCheckWTATemplate) oldTemplate;
-                careDayCheckWTATemplate.setDescription(templateDTO.getDescription());
-                careDayCheckWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
-                careDayCheckWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
-                careDayCheckWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
-                careDayCheckWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
-                break;
-            case DAILY_RESTING_TIME:
-                DailyRestingTimeWTATemplate minimumDailyRestingTimeWTATemplate = (DailyRestingTimeWTATemplate) oldTemplate;
-                minimumDailyRestingTimeWTATemplate.setId(oldTemplate.getId());
-                minimumDailyRestingTimeWTATemplate.setDescription(templateDTO.getDescription());
-                minimumDailyRestingTimeWTATemplate.setContinuousDayRestHours(templateDTO.getContinuousDayRestHours());
-                break;
-            case DURATION_BETWEEN_SHIFTS:
-                DurationBetweenShiftsWTATemplate minimumDurationBetweenShiftsWTATemplate = (DurationBetweenShiftsWTATemplate) oldTemplate;
-                minimumDurationBetweenShiftsWTATemplate.setDescription(templateDTO.getDescription());
-                minimumDurationBetweenShiftsWTATemplate.setDurationBetweenShifts(templateDTO.getMinimumDurationBetweenShifts());
-                break;
-            case WEEKLY_REST_PERIOD:
-                WeeklyRestPeriodWTATemplate minimumWeeklyRestPeriodWTATemplate = (WeeklyRestPeriodWTATemplate) oldTemplate;
-                minimumWeeklyRestPeriodWTATemplate.setDescription(templateDTO.getDescription());
-                minimumWeeklyRestPeriodWTATemplate.setContinuousWeekRest(templateDTO.getContinuousWeekRest());
-                break;
-            case SHORTEST_AND_AVERAGE_DAILY_REST:
-                ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = (ShortestAndAverageDailyRestWTATemplate) oldTemplate;
-                shortestAndAverageDailyRestWTATemplate.setDescription(templateDTO.getDescription());
-                shortestAndAverageDailyRestWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
-                shortestAndAverageDailyRestWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
-                shortestAndAverageDailyRestWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
-                shortestAndAverageDailyRestWTATemplate.setContinuousDayRestHours(templateDTO.getContinuousDayRestHours());
-                shortestAndAverageDailyRestWTATemplate.setAverageRest(templateDTO.getAverageRest());
-                shortestAndAverageDailyRestWTATemplate.setShiftAffiliation(templateDTO.getShiftAffiliation());
-                break;
-            case NUMBER_OF_SHIFTS_IN_INTERVAL:
-                ShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = (ShiftsInIntervalWTATemplate) oldTemplate;
-                maximumShiftsInIntervalWTATemplate.setDescription(templateDTO.getDescription());
-                maximumShiftsInIntervalWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
-                maximumShiftsInIntervalWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
-                maximumShiftsInIntervalWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
-                maximumShiftsInIntervalWTATemplate.setShiftsLimit(templateDTO.getShiftsLimit());
-                maximumShiftsInIntervalWTATemplate.setOnlyCompositeShifts(templateDTO.getOnlyCompositeShifts());
-                break;
-            case MAXIMUM_SENIOR_DAYS_IN_YEAR:
-                SeniorDaysInYearWTATemplate maximumSeniorDaysInYearWTATemplate = (SeniorDaysInYearWTATemplate) oldTemplate;
-                maximumSeniorDaysInYearWTATemplate.setDescription(templateDTO.getDescription());
-                maximumSeniorDaysInYearWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
-                maximumSeniorDaysInYearWTATemplate.setIntervalUnit(templateDTO.getIntervalUnit());
-                maximumSeniorDaysInYearWTATemplate.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
-                maximumSeniorDaysInYearWTATemplate.setDaysLimit(templateDTO.getDaysLimit());
-                maximumSeniorDaysInYearWTATemplate.setActivityCode(templateDTO.getActivityCode());
-                break;
-            case TIME_BANK:
-                TimeBankWTATemplate minimumTimeBank = (TimeBankWTATemplate) oldTemplate;
-                minimumTimeBank.setDescription(templateDTO.getDescription());
-                minimumTimeBank.setFrequency(templateDTO.getFrequency());
-                minimumTimeBank.setYellowZone(templateDTO.getYellowZone());
-                minimumTimeBank.setForbid(templateDTO.isForbid());
-                minimumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
-                break;
-            case MAXIMUM_SENIOR_DAYS_PER_YEAR:
-                MaximumSeniorDaysPerYear maximumSeniorDaysPerYear=(MaximumSeniorDaysPerYear) oldTemplate;
-                List<AgeRange> ageRanges = new ArrayList<>();
-                BeanUtils.copyProperties(ageRanges,templateDTO.getAgeRange());
-                maximumSeniorDaysPerYear.setAgeRange(ageRanges);
-                maximumSeniorDaysPerYear.setActivities(templateDTO.getActivities());
-                maximumSeniorDaysPerYear.setNumberOfWeeks(templateDTO.getNumberOfWeeks());
-                maximumSeniorDaysPerYear.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
-                break;
-            case CHILD_CARE_DAYS_CHECK:
-                CareDaysCheck careDaysCheck=(CareDaysCheck) oldTemplate;
-                List<AgeRange> ageRangeList = new ArrayList<>();
-                BeanUtils.copyProperties(ageRangeList,templateDTO.getAgeRange());
-                careDaysCheck.setAgeRange(ageRangeList);
-                careDaysCheck.setActivities(templateDTO.getActivities());
-                careDaysCheck.setNumberOfWeeks(templateDTO.getNumberOfWeeks());
-                careDaysCheck.setValidationStartDateMillis(templateDTO.getValidationStartDateMillis());
-                break;
-
-            default:
-                throw new DataNotFoundByIdException("Invalid TEMPLATE");
-        }
+        oldTemplate = wtaBuilderService.copyDTOToRuleTemplate(templateDTO);
         //BigInteger ruleTemplateCategoryId = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
         BeanUtils.copyProperties(phaseTemplateValues,templateDTO.getPhaseTemplateValues());
         oldTemplate.setPhaseTemplateValues(phaseTemplateValues);
-        oldTemplate.setDisabled(templateDTO.getDisabled());
+        oldTemplate.setDisabled(templateDTO.isDisabled());
         //oldTemplate.setRecommendedValue(templateDTO.getRecommendedValue());
 
         oldTemplate.setLastUpdatedBy(currentUserDetails.getFirstName());
@@ -540,7 +397,7 @@ public class RuleTemplateService extends MongoBaseService {
         return wtaBaseRuleTemplateDTOS;
     }*/
 
-    public WTARuleTemplateDTO copyRuleTemplate(Long countryId, WTARuleTemplateDTO wtaRuleTemplateDTO) {
+    public WTABaseRuleTemplateDTO copyRuleTemplate(Long countryId, WTABaseRuleTemplateDTO wtaRuleTemplateDTO) {
         CountryDTO country = countryRestClient.getCountryById(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Country");
@@ -589,7 +446,7 @@ public class RuleTemplateService extends MongoBaseService {
     }*/
 
 
-    int getNumberFromlastInsertedTemplateType(String templateType) {
+  /*  int getNumberFromlastInsertedTemplateType(String templateType) {
         if (!templateType.contains("_")) {
             return 0;
         }
@@ -605,6 +462,6 @@ public class RuleTemplateService extends MongoBaseService {
         }
 
         return 0;
-    }
+    }*/
 
 }

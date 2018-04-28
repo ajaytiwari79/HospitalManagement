@@ -1,6 +1,7 @@
 package com.kairos.activity.persistence.model.wta.templates;
 
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
+import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
@@ -13,10 +14,13 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.activity.constants.AppConstants.COPY_OF;
+import static com.kairos.activity.persistence.enums.WTATemplateType.*;
 
 /**
  * @author pradeep
@@ -28,16 +32,16 @@ public class WTABuilderService extends MongoBaseService {
 
     @Inject private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
 
-    public  List<WTABaseRuleTemplate> copyRuleTemplates(List<WTARuleTemplateDTO> WTARuleTemplateDTOS,boolean ignoreId) {
+    public  List<WTABaseRuleTemplate> copyRuleTemplates(List<WTABaseRuleTemplateDTO> WTARuleTemplateDTOS,boolean ignoreId) {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
-        for (WTARuleTemplateDTO ruleTemplate : WTARuleTemplateDTOS) {
+        for (WTABaseRuleTemplateDTO ruleTemplate : WTARuleTemplateDTOS) {
             wtaBaseRuleTemplates.add(copyRuleTemplate(ruleTemplate,ignoreId));
 
         }
         return wtaBaseRuleTemplates;
     }
 
-    public WTABaseRuleTemplate copyRuleTemplate(WTARuleTemplateDTO ruleTemplate,Boolean isIdnull){
+    public WTABaseRuleTemplate copyRuleTemplate(WTABaseRuleTemplateDTO ruleTemplate,Boolean isIdnull){
         WTABaseRuleTemplate wtaBaseRuleTemplate = new WTABaseRuleTemplate();
         switch (ruleTemplate.getWtaTemplateType()) {
             case SHIFT_LENGTH:
@@ -55,13 +59,13 @@ public class WTABuilderService extends MongoBaseService {
                 wtaBaseRuleTemplate = consecutiveWorkWTATemplate;
                 break;
 
-            case CONSECUTIVE_NIGHTS_AND_DAYS:
+         /*   case CONSECUTIVE_NIGHTS_AND_DAYS:
                 ConsecutiveRestPartOfDayWTATemplate consecutiveRestPartOfDayWTATemplate = new ConsecutiveRestPartOfDayWTATemplate();
                 copyProperties(ruleTemplate,consecutiveRestPartOfDayWTATemplate);
                 consecutiveRestPartOfDayWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
                 consecutiveRestPartOfDayWTATemplate.setId(null);
                 wtaBaseRuleTemplate = consecutiveRestPartOfDayWTATemplate;
-                break;
+                break;*/
             case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
                 ConsecutiveRestPartOfDayWTATemplate consecutiveRestPartOfDayWTATemplate1 = new ConsecutiveRestPartOfDayWTATemplate();
                 copyProperties(ruleTemplate,consecutiveRestPartOfDayWTATemplate1);
@@ -174,6 +178,120 @@ public class WTABuilderService extends MongoBaseService {
 
         }
         return wtaBaseRuleTemplates;
+    }
+
+
+    public WTABaseRuleTemplate copyDTOToRuleTemplate(WTABaseRuleTemplateDTO ruleTemplate){
+        WTABaseRuleTemplate wtaBaseRuleTemplate = new WTABaseRuleTemplate();
+        switch (ruleTemplate.getWtaTemplateType()) {
+            case SHIFT_LENGTH:
+                ShiftLengthWTATemplate shiftLengthWTATemplate = new ShiftLengthWTATemplate();
+                copyProperties((ShiftLengthWTATemplateDTO)ruleTemplate,shiftLengthWTATemplate);
+                shiftLengthWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = shiftLengthWTATemplate;
+                break;
+            case CONSECUTIVE_WORKING_PARTOFDAY:
+                ConsecutiveWorkWTATemplate consecutiveWorkWTATemplate = new ConsecutiveWorkWTATemplate();
+                copyProperties((ConsecutiveWorkWTATemplateDTO)ruleTemplate,consecutiveWorkWTATemplate);
+                consecutiveWorkWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = consecutiveWorkWTATemplate;
+                break;
+
+            /*case CONSECUTIVE_NIGHTS_AND_DAYS:
+                ConsecutiveRestPartOfDayWTATemplate consecutiveRestPartOfDayWTATemplate = new ConsecutiveRestPartOfDayWTATemplate();
+                copyProperties(ruleTemplate,consecutiveRestPartOfDayWTATemplate);
+                consecutiveRestPartOfDayWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = consecutiveRestPartOfDayWTATemplate;
+                break;*/
+            case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
+                ConsecutiveRestPartOfDayWTATemplate consecutiveRestPartOfDayWTATemplate1 = new ConsecutiveRestPartOfDayWTATemplate();
+                copyProperties((ConsecutiveRestPartOfDayWTATemplateDTO)ruleTemplate,consecutiveRestPartOfDayWTATemplate1);
+                consecutiveRestPartOfDayWTATemplate1.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = consecutiveRestPartOfDayWTATemplate1;
+                break;
+            case NUMBER_OF_PARTOFDAY:
+                NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate = new NumberOfPartOfDayShiftsWTATemplate();
+                copyProperties((NumberOfPartOfDayShiftsWTATemplateDTO)ruleTemplate,numberOfPartOfDayShiftsWTATemplate);
+                numberOfPartOfDayShiftsWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = numberOfPartOfDayShiftsWTATemplate;
+                break;
+            case DAYS_OFF_IN_PERIOD:
+                DaysOffInPeriodWTATemplate daysOffInPeriodWTATemplate = new DaysOffInPeriodWTATemplate();
+                copyProperties((DaysOffInPeriodWTATemplateDTO)ruleTemplate,daysOffInPeriodWTATemplate);
+                daysOffInPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = daysOffInPeriodWTATemplate;
+                break;
+            case AVERAGE_SHEDULED_TIME:
+                AverageScheduledTimeWTATemplate averageScheduledTimeWTATemplate = new AverageScheduledTimeWTATemplate();
+                copyProperties((AverageScheduledTimeWTATemplateDTO)ruleTemplate,averageScheduledTimeWTATemplate);
+                averageScheduledTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = averageScheduledTimeWTATemplate;
+                break;
+            case VETO_PER_PERIOD:
+                VetoPerPeriodWTATemplate vetoPerPeriodWTATemplate = new VetoPerPeriodWTATemplate();
+                copyProperties((VetoPerPeriodWTATemplateDTO)ruleTemplate,vetoPerPeriodWTATemplate);
+                vetoPerPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = vetoPerPeriodWTATemplate;
+                break;
+            case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
+                NumberOfWeekendShiftsInPeriodWTATemplate numberOfWeekendShiftsInPeriodWTATemplate = new NumberOfWeekendShiftsInPeriodWTATemplate();
+                copyProperties((NumberOfWeekendShiftsInPeriodWTATemplateDTO)ruleTemplate,numberOfWeekendShiftsInPeriodWTATemplate);
+                numberOfWeekendShiftsInPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = numberOfWeekendShiftsInPeriodWTATemplate;
+                break;
+            case CARE_DAYS_CHECK:
+                CareDayCheckWTATemplate careDayCheckWTATemplate = new CareDayCheckWTATemplate();
+                copyProperties((CareDayCheckWTATemplateDTO)ruleTemplate,careDayCheckWTATemplate);
+                careDayCheckWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = careDayCheckWTATemplate;
+                break;
+            case DAILY_RESTING_TIME:
+                DailyRestingTimeWTATemplate dailyRestingTimeWTATemplate = new DailyRestingTimeWTATemplate();
+                copyProperties((DailyRestingTimeWTATemplateDTO)ruleTemplate,dailyRestingTimeWTATemplate);
+                dailyRestingTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = dailyRestingTimeWTATemplate;
+                break;
+            case DURATION_BETWEEN_SHIFTS:
+                DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate = new DurationBetweenShiftsWTATemplate();
+                copyProperties((DurationBetweenShiftsWTATemplateDTO)ruleTemplate,durationBetweenShiftsWTATemplate);
+                durationBetweenShiftsWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = durationBetweenShiftsWTATemplate;
+                break;
+            case WEEKLY_REST_PERIOD:
+                WeeklyRestPeriodWTATemplate weeklyRestPeriodWTATemplate = new WeeklyRestPeriodWTATemplate();
+                copyProperties((WeeklyRestPeriodWTATemplateDTO)ruleTemplate,weeklyRestPeriodWTATemplate);
+                weeklyRestPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = weeklyRestPeriodWTATemplate;
+                break;
+            case SHORTEST_AND_AVERAGE_DAILY_REST:
+                ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = new ShortestAndAverageDailyRestWTATemplate();
+                copyProperties((ShortestAndAverageDailyRestWTATemplateDTO)ruleTemplate,shortestAndAverageDailyRestWTATemplate);
+                shortestAndAverageDailyRestWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = shortestAndAverageDailyRestWTATemplate;
+                break;
+            case NUMBER_OF_SHIFTS_IN_INTERVAL:
+                ShiftsInIntervalWTATemplate shiftsInIntervalWTATemplate = new ShiftsInIntervalWTATemplate();
+                copyProperties((ShiftsInIntervalWTATemplateDTO)ruleTemplate,shiftsInIntervalWTATemplate);
+                shiftsInIntervalWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = shiftsInIntervalWTATemplate;
+                break;
+            case MAXIMUM_SENIOR_DAYS_IN_YEAR:
+                SeniorDaysInYearWTATemplate seniorDaysInYearWTATemplate = new SeniorDaysInYearWTATemplate();
+                copyProperties((SeniorDaysInYearWTATemplateDTO)ruleTemplate,seniorDaysInYearWTATemplate);
+                seniorDaysInYearWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = seniorDaysInYearWTATemplate;
+                break;
+            case TIME_BANK:
+                TimeBankWTATemplate timeBankWTATemplate = new TimeBankWTATemplate();
+                copyProperties((TimeBankWTATemplateDTO)ruleTemplate,timeBankWTATemplate);
+                timeBankWTATemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategory().getId());
+                wtaBaseRuleTemplate = timeBankWTATemplate;
+                break;
+
+            default:
+                throw new DataNotFoundByIdException("Invalid TEMPLATE");
+        }
+        return wtaBaseRuleTemplate;
     }
 
 
@@ -309,7 +427,144 @@ public class WTABuilderService extends MongoBaseService {
 
     }
 
-    private static void copyProperties(Object source,Object destination){
+    public static List<WTABaseRuleTemplateDTO> copyPropertiesMapToDTO(List<Map> templates){
+            List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates = new ArrayList<>();
+            for (Map ruleTemplate : templates) {
+                wtaBaseRuleTemplates.add(copyRuleTemplateMapToDTO(ruleTemplate));
+
+            }
+            return wtaBaseRuleTemplates;
+
+    }
+
+
+    public static WTABaseRuleTemplateDTO copyRuleTemplateMapToDTO(Map ruleTemplate){
+        WTABaseRuleTemplateDTO wtaBaseRuleTemplate = new WTABaseRuleTemplateDTO();
+        switch ((WTATemplateType)ruleTemplate.get("wtaTemplateType")) {
+            case SHIFT_LENGTH:
+                ShiftLengthWTATemplateDTO shiftLengthWTATemplate = new ShiftLengthWTATemplateDTO();
+                copyProperties(ruleTemplate,shiftLengthWTATemplate);
+                shiftLengthWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = shiftLengthWTATemplate;
+                break;
+            case CONSECUTIVE_WORKING_PARTOFDAY:
+                ConsecutiveWorkWTATemplateDTO consecutiveWorkWTATemplate = new ConsecutiveWorkWTATemplateDTO();
+                copyProperties(ruleTemplate,consecutiveWorkWTATemplate);
+                consecutiveWorkWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = consecutiveWorkWTATemplate;
+                break;
+
+          /*  case CONSECUTIVE_NIGHTS_AND_DAYS:
+                ConsecutiveRestPartOfDayWTATemplateDTO consecutiveRestPartOfDayWTATemplate = new ConsecutiveRestPartOfDayWTATemplateDTO();
+                copyProperties(ruleTemplate,consecutiveRestPartOfDayWTATemplate);
+                consecutiveRestPartOfDayWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = consecutiveRestPartOfDayWTATemplate;
+                break;*/
+            case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
+                ConsecutiveRestPartOfDayWTATemplateDTO consecutiveRestPartOfDayWTATemplate1 = new ConsecutiveRestPartOfDayWTATemplateDTO();
+                copyProperties(ruleTemplate,consecutiveRestPartOfDayWTATemplate1);
+                consecutiveRestPartOfDayWTATemplate1.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = consecutiveRestPartOfDayWTATemplate1;
+                break;
+            case NUMBER_OF_PARTOFDAY:
+                NumberOfPartOfDayShiftsWTATemplateDTO numberOfPartOfDayShiftsWTATemplate = new NumberOfPartOfDayShiftsWTATemplateDTO();
+                copyProperties(ruleTemplate,numberOfPartOfDayShiftsWTATemplate);
+                numberOfPartOfDayShiftsWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = numberOfPartOfDayShiftsWTATemplate;
+                break;
+            case DAYS_OFF_IN_PERIOD:
+                DaysOffInPeriodWTATemplateDTO daysOffInPeriodWTATemplate = new DaysOffInPeriodWTATemplateDTO();
+                copyProperties(ruleTemplate,daysOffInPeriodWTATemplate);
+                daysOffInPeriodWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = daysOffInPeriodWTATemplate;
+                break;
+            case AVERAGE_SHEDULED_TIME:
+                AverageScheduledTimeWTATemplateDTO averageScheduledTimeWTATemplate = new AverageScheduledTimeWTATemplateDTO();
+                copyProperties(ruleTemplate,averageScheduledTimeWTATemplate);
+                averageScheduledTimeWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = averageScheduledTimeWTATemplate;
+                break;
+            case VETO_PER_PERIOD:
+                VetoPerPeriodWTATemplateDTO vetoPerPeriodWTATemplate = new VetoPerPeriodWTATemplateDTO();
+                copyProperties(ruleTemplate,vetoPerPeriodWTATemplate);
+                vetoPerPeriodWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = vetoPerPeriodWTATemplate;
+                break;
+            case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
+                NumberOfWeekendShiftsInPeriodWTATemplateDTO numberOfWeekendShiftsInPeriodWTATemplate = new NumberOfWeekendShiftsInPeriodWTATemplateDTO();
+                copyProperties(ruleTemplate,numberOfWeekendShiftsInPeriodWTATemplate);
+                numberOfWeekendShiftsInPeriodWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = numberOfWeekendShiftsInPeriodWTATemplate;
+                break;
+            case CARE_DAYS_CHECK:
+                CareDayCheckWTATemplateDTO careDayCheckWTATemplate = new CareDayCheckWTATemplateDTO();
+                copyProperties(ruleTemplate,careDayCheckWTATemplate);
+                careDayCheckWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = careDayCheckWTATemplate;
+                break;
+            case DAILY_RESTING_TIME:
+                DailyRestingTimeWTATemplateDTO dailyRestingTimeWTATemplate = new DailyRestingTimeWTATemplateDTO();
+                copyProperties(ruleTemplate,dailyRestingTimeWTATemplate);
+                dailyRestingTimeWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = dailyRestingTimeWTATemplate;
+                break;
+            case DURATION_BETWEEN_SHIFTS:
+                DurationBetweenShiftsWTATemplateDTO durationBetweenShiftsWTATemplate = new DurationBetweenShiftsWTATemplateDTO();
+                copyProperties(ruleTemplate,durationBetweenShiftsWTATemplate);
+                durationBetweenShiftsWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = durationBetweenShiftsWTATemplate;
+                break;
+            case WEEKLY_REST_PERIOD:
+                WeeklyRestPeriodWTATemplateDTO weeklyRestPeriodWTATemplate = new WeeklyRestPeriodWTATemplateDTO();
+                copyProperties(ruleTemplate,weeklyRestPeriodWTATemplate);
+                weeklyRestPeriodWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = weeklyRestPeriodWTATemplate;
+                break;
+            case SHORTEST_AND_AVERAGE_DAILY_REST:
+                ShortestAndAverageDailyRestWTATemplateDTO shortestAndAverageDailyRestWTATemplate = new ShortestAndAverageDailyRestWTATemplateDTO();
+                copyProperties(ruleTemplate,shortestAndAverageDailyRestWTATemplate);
+                shortestAndAverageDailyRestWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = shortestAndAverageDailyRestWTATemplate;
+                break;
+            case NUMBER_OF_SHIFTS_IN_INTERVAL:
+                ShiftsInIntervalWTATemplateDTO shiftsInIntervalWTATemplate = new ShiftsInIntervalWTATemplateDTO();
+                copyProperties(ruleTemplate,shiftsInIntervalWTATemplate);
+                shiftsInIntervalWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = shiftsInIntervalWTATemplate;
+                break;
+            case MAXIMUM_SENIOR_DAYS_IN_YEAR:
+                SeniorDaysInYearWTATemplateDTO seniorDaysInYearWTATemplate = new SeniorDaysInYearWTATemplateDTO();
+                copyProperties(ruleTemplate,seniorDaysInYearWTATemplate);
+                seniorDaysInYearWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = seniorDaysInYearWTATemplate;
+                break;
+            case TIME_BANK:
+                TimeBankWTATemplateDTO timeBankWTATemplate = new TimeBankWTATemplateDTO();
+                copyProperties(ruleTemplate,timeBankWTATemplate);
+                timeBankWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = timeBankWTATemplate;
+                break;
+            case MAXIMUM_SENIOR_DAYS_PER_YEAR:
+                MaximumSeniorDaysPerYearDTO maximumSeniorDaysPerYear=new MaximumSeniorDaysPerYearDTO();
+                copyProperties(ruleTemplate,maximumSeniorDaysPerYear);
+                maximumSeniorDaysPerYear.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate=maximumSeniorDaysPerYear;
+                break;
+            case CHILD_CARE_DAYS_CHECK:
+                CareDaysCheckDTO  careDaysCheck=new CareDaysCheckDTO();
+                copyProperties(ruleTemplate,careDaysCheck);
+                careDaysCheck.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate=careDaysCheck;
+                break;
+
+
+            default:
+                throw new DataNotFoundByIdException("Invalid TEMPLATE");
+        }
+        return wtaBaseRuleTemplate;
+    }
+
+    public static void copyProperties(Object source,Object destination){
         try {
             PropertyUtils.copyProperties(destination,source);
         } catch (IllegalAccessException e) {
