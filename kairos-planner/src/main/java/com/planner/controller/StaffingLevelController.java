@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.planner.constants.ApiConstants.API_UNIT_URL;
@@ -28,6 +29,13 @@ public class StaffingLevelController {
     public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody @Valid StaffingLevelDto staffingLevelDto,
                                                 @PathVariable Long unitId) {
         staffingLevelService.createStaffingLevel(unitId,staffingLevelDto);
+        return ResponseHandler.generateResponse("Success",HttpStatus.CREATED);
+    }
+    @RequestMapping(value = "/multiple/", method = RequestMethod.POST)
+    @ApiOperation("Create staffing_level")
+    public ResponseEntity<Map<String, Object>> addStaffingLevels(@RequestBody @Valid List<StaffingLevelDto> staffingLevelDtos,
+                                                                 @PathVariable Long unitId) {
+        staffingLevelService.createStaffingLevels(unitId,staffingLevelDtos);
         return ResponseHandler.generateResponse("Success",HttpStatus.CREATED);
     }
 

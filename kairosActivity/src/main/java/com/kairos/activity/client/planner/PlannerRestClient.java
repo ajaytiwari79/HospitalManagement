@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+
 import static com.kairos.activity.util.RestClientUrlUtil.getPlannerBaseUrl;
 @Service
 public class PlannerRestClient {
@@ -65,6 +67,8 @@ public class PlannerRestClient {
             uri= "staffing_level";
         }else if(t instanceof ActivityNoTabsDTO){
             uri= "activity";
+        }else if(t instanceof ArrayList && t.getClass().getGenericSuperclass().equals(StaffingLevelDto.class)){
+            uri= "staffing_level/multiple";
         }
         return uri;
     }

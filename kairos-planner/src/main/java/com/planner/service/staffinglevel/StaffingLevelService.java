@@ -6,6 +6,9 @@ import com.planner.repository.staffinglevel.StaffingLevelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class StaffingLevelService {
     @Autowired
@@ -19,5 +22,14 @@ public class StaffingLevelService {
         sl.setStaffingLevelInterval(staffingLevelDto.getStaffingLevelInterval());
         sl.setStaffingLevelSetting(staffingLevelDto.getStaffingLevelSetting());
         staffingLevelRepository.save(sl);
+    }
+
+    public void createStaffingLevels(Long unitId, List<StaffingLevelDto> staffingLevelDtos) {
+        List<StaffingLevel> staffingLevels= new ArrayList<>();
+        for (StaffingLevelDto staffingLevelDto:staffingLevelDtos){
+            StaffingLevel sl = new StaffingLevel(BigInteger.valueOf(unitId),staffingLevelDto.getPhaseId(),staffingLevelDto.getCurrentDate(),staffingLevelDto.getWeekCount(),staffingLevelDto.getStaffingLevelSetting(),staffingLevelDto.getStaffingLevelInterval(),staffingLevelDto.getId());
+            staffingLevels.add(sl);
+        }
+        staffingLevelRepository.saveAll(staffingLevels);
     }
 }
