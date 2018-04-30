@@ -766,7 +766,7 @@ public class OrganizationController {
     }
 
     @ApiOperation(value = "Get integration services")
-    @RequestMapping(value = "/integration_service", method = RequestMethod.GET)
+    @RequestMapping(value = "/unit/{unitId}/integration_service", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getIntegrationServices() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, integrationConfigurationService.getAllIntegrationServices());

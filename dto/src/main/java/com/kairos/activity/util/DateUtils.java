@@ -404,4 +404,10 @@ public class DateUtils {
     public static Date getDateByLocalDateAndLocalTime(LocalDate localDate,LocalTime localTime){
         return new DateTime(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth(),localTime.getHour(),localTime.getMinute()).toDate();
     }
+
+    public static String getDateStringWithFormat(Date date, String dateFormat) {
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
+            DateTime dateTime = new DateTime(date);
+            return dateTime.toString(formatter);
+    }
 }
