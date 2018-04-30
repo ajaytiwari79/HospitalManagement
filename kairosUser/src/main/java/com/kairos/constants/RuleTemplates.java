@@ -27,8 +27,11 @@ public enum RuleTemplates{
     MAXIMUM_SENIOR_DAYS_PER_YEAR("MAXIMUM_SENIOR_DAYS_PER_YEAR","Maximum senior days per year","Maximum amount of senior days per year"),
     MAXIMUM_TIME_BANK("MAXIMUM_TIME_BANK","Maximum time bank","Maximum time bank for staff"),
     MINIMUM_TIME_BANK("MINIMUM_TIME_BANK","Minimum time bank","Minimum time bank for staff"),
+
     MAXIMUM_SENIOR_DAYS_PER_YEAR_DAYS_UNIT("MAXIMUM_SENIOR_DAYS_PER_YEAR_DAYS_UNIT","Maximum senior days per year - Days Unit (Days)","Maximum senior days per year - Days Unit (Days)"),
-    CHILD_CARE_DAYS_CHECK("CHILD_CARE_DAYS_CHECK","Care days check - Days Unit (Days)","Care days check - Days Unit (Days)");
+    CHILD_CARE_DAYS_CHECK("CHILD_CARE_DAYS_CHECK","Care days check - Days Unit (Days)","Care days check - Days Unit (Days)"),
+    BREAKS_IN_SHIFT("BREAKS_IN_SHIFT","Breaks in shift","Breaks in shift");
+
 
 
 
