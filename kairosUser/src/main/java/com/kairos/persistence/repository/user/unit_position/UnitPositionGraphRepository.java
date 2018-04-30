@@ -135,7 +135,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
                     "match (unitPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement) \n" +
                     "OPTIONAL MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
                     "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement) \n" +
-                    "optional match (unitPosition)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
+                    "optional match (expertise)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
                     "optional match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function)" +
                     "with expertise ,org,subOrg,reasonCode,unitPosition,wta,cta,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData " +
                     "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union, positionCode as positionCode, \n" +
@@ -157,7 +157,7 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
                     "MATCH (unitPosition)-[:" + HAS_WTA + "]->(wta:WorkingTimeAgreement) \n" +
                     "OPTIONAL MATCH (unitPosition)-[:" + HAS_REASON_CODE + "]->(reasonCode:ReasonCode) \n" +
                     "optional match (unitPosition)-[:" + HAS_CTA + "]->(cta:CostTimeAgreement) \n" +
-                    "optional match (unitPosition)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
+                    "optional match (expertise)-[:" + SUPPORTED_BY_UNION + "]->(unionData:Organization{isEnable:true,union:true}) \n" +
                     "optional match(unitPosition)-[rel:" + HAS_FUNCTION + "]->(functions:Function)" +
                     "with expertise ,org,reasonCode,unitPosition,wta,cta,positionCode ,unionData ,seniorityLevel,employmentRel,employmentType,payGrade,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:rel.amount }) END as functionData " +
                     "return expertise as expertise,wta as workingTimeAgreement,cta as costTimeAgreement,unionData as union, positionCode as positionCode,\n" +
