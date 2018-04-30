@@ -261,8 +261,11 @@ public class DateUtil {
         return calendar.getTime();
     }
     public static LocalDate getDateFromEpoch(Long dateLong) {
-
-        return Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate date = null;
+        if(Optional.ofNullable(dateLong).isPresent()) {
+            date = Instant.ofEpochMilli(dateLong).atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return date;
     }
 
     public static LocalDate getTimezonedCurrentDate(String timezone) {

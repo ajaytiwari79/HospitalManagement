@@ -171,7 +171,19 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
                     "unitPosition.lastWorkingDateMillis as lastWorkingDateMillis,unitPosition.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes, \n" +
                     "id(org) as parentUnitId,id(org) as unitId ")
     List<UnitPositionQueryResult> getAllUnitPositionsByUser(long userId);
+   /*
+    @Query("match(staff:Staff)-[r1:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={1} \n" +
+            "Match(org:Organization)-[r2:" + HAS_SUB_ORGANIZATION + "]->(suborg:Organization)<-[r3:" + IN_UNIT + "]-(up) where id(org)={0}  return \n" +
+            "up.endDateMillis as endDateMillis \n"+
+            "UNION \n" +
+            "Match(staff:Staff)-[r11:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff) = {1} Match(org:Organization)<-[r22:" + IN_UNIT + "]-(up) where id(org)= {0} return  \n"+
+            "up.endDateMillis as endDateMillis" )*/
+   @Query("Match(staff:Staff)-[:"+ BELONGS_TO_STAFF+"]->(up:UnitPosition{deleted:false}) where id(staff)={0} return up.endDateMillis as endDateMillis")
+    List<Long> getAllUnitPositionsByStaffId(Long staffId);
+
 //id:id(seniorityLevel)," +
+
+
 
     @Query("MATCH(unitPosition:UnitPosition)-[:" + IN_UNIT + "]->(subOrg:Organization) where id(unitPosition)={0} " +
             "MATCH(unitPosition)<-[:" + BELONGS_TO_STAFF + "]-(staff:Staff) " +
@@ -179,32 +191,6 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
             "MATCH(employment)<-[:" + HAS_EMPLOYMENTS + "]-(org:Organization) " +
             "RETURN id(subOrg) as unitId,id(org) as parentUnitId")
     UnitPositionQueryResult getUnitIdAndParentUnitIdByUnitPositionId(Long unitPositionId);
-
-
-
-    @Query("match(staff:Staff)-[r1:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff)={1} \n" +
-            "Match(org:Organization)-[r2:" + HAS_SUB_ORGANIZATION + "]->(suborg:Organization)<-[r3:" + IN_UNIT + "]-(up) where id(org)={0}  return \n" +
-            "up.totalWeeklyMinutes as totalWeeklyMinutes, \n" +
-            "up.startDateMillis as startDateMillis, \n" +
-            "up.endDateMillis as endDateMillis, \n" +
-            "up.salary as salary, \n" +
-            "up.workingDaysInWeek as workingDaysInWeek, \n" +
-            "up.hourlyWages as hourlyWages, \n" +
-            "id(up)   as id, \n" +
-            "up.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
-            "up.lastWorkingDateMillis as lastWorkingDateMillis \n" +
-            "UNION \n" +
-            "Match(staff:Staff)-[r11:" + BELONGS_TO_STAFF + "]->(up:UnitPosition{deleted:false}) where id(staff) = {1} Match(org:Organization)<-[r22:" + IN_UNIT + "]-(up) where id(org)= {0} return  \n"+
-            "up.totalWeeklyMinutes as totalWeeklyMinutes, \n" +
-            "up.startDateMillis as startDateMillis, \n" +
-            "up.endDateMillis as endDateMillis, \n" +
-            "up.salary as salary, \n" +
-            "up.workingDaysInWeek as workingDaysInWeek, \n" +
-            "up.hourlyWages as hourlyWages, \n" +
-            "id(up)   as id, \n" +
-            "up.avgDailyWorkingHours as avgDailyWorkingHours, \n" +
-            "up.lastWorkingDateMillis as lastWorkingDateMillis ")
-    List<UnitPositionQueryResult> getAllUnitPositionsByStaffId(Long organizationId, Long staffId);
 
     @Query("match(unitPosition)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)  where id(unitPosition)={0} return unitPosition,employmentRel,employmentType")
     UnitPositionEmploymentTypeRelationShip findEmploymentTypeByUnitPositionId(Long unitPositionId);
@@ -218,7 +204,10 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
     @Query("Match(staff:Staff)-[:"+BELONGS_TO_STAFF+"]->(up:UnitPosition{deleted:false}) where id(staff)={0} and ( up.endDateMillis > {1} or up.endDateMillis is null)  return up")
     List<UnitPosition> getUnitPositionsFromEmploymentEndDate(Long staffId, Long endDateMillis);
 
-    @Query("Match(staff:Staff)-[:"+ BELONGS_TO_STAFF +"]->(up:UnitPosition{deleted:false}) where id(staff)={0} Match(staff)-[:"+BELONGS_TO+"]->(emp:Employment) return min(up.startDateMillis) as unitPositionMinStartDate, emp.endDateMillis as employmentEndDate")
+    @Query("Match(staff:Staff)-[:"+ BELONGS_TO_STAFF +"]->(up:UnitPosition{deleted:false}) where id(staff)={0} Match(staff)<-[:"+BELONGS_TO+"]-(emp:Employment) return min(up.startDateMillis) as earliestUnitPositionStartDateMillis, emp.endDateMillis as employmentEndDateMillis")
      EmploymentUnitPositionQueryResult getEarliestUnitPositionStartDateAndEmploymentByStaffId(Long staffId);
+
+    @Query("Match(staff:Staff)-[:"+ BELONGS_TO_STAFF +"]->(up:UnitPosition) where id(up)={0} return id(staff) as staffId")
+    Long getStaffIdFromUnitPosition(Long unitPositionId);
 
 }
