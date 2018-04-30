@@ -166,5 +166,9 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "return expertise order by expertise.creationDate")
     List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds);
 
+    @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false}) where id(country) = {0}" +
+            "match(expertise)-[:" + ORG_TYPE_HAS_EXPERTISE + "]-(orgSubType:OrganizationType) where id(orgSubType) = {1} \n" +
+            "return id(expertise) as id, expertise.name as name order by expertise.creationDate")
+    List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId,Long organizationSubTypeId);
 
 }
