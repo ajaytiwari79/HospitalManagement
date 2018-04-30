@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.response.dto.web.enums.RuleTemplateCategoryType.CTA;
+import static com.kairos.response.dto.web.enums.RuleTemplateCategoryType.WTA;
 
 
 /**
@@ -73,7 +74,7 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         BeanUtils.copyProperties(ruleTemplateCategoryDTO, ruleTemplateCategory);
         ruleTemplateCategory.setCountryId(country.getId());
         save(ruleTemplateCategory);
-        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>)wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(ruleTemplateCategory.getId());
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>)wtaBaseRuleTemplateMongoRepository.findAllById(ruleTemplateCategoryDTO.getRuleTemplateIds());
         wtaBaseRuleTemplates.forEach(rt->{
             rt.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         });
@@ -128,9 +129,9 @@ public class RuleTemplateCategoryService extends MongoBaseService {
         if (countryRestClient.getCountryById(countryId) == null) {
             throw new DataNotFoundByIdException("Country does not exist");
         }
-        RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryMongoRepository.findOne(templateCategoryId);
+        RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryMongoRepository.findByName(countryId,ruleTemplateCategory.getName(),RuleTemplateCategoryType.WTA);
         if (!Optional.ofNullable(ruleTemplateCategoryObj).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid category " + templateCategoryId);
+            throw new DataNotFoundByIdException("Invalid category " + ruleTemplateCategoryObj.getName());
         }
         if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategory.getName().equals("NONE")) {
             throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
@@ -141,14 +142,25 @@ public class RuleTemplateCategoryService extends MongoBaseService {
                 throw new DuplicateDataException("ruleTemplateCategory name already  exists " + ruleTemplateCategory.getName());
             }
         }
-        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>)wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(ruleTemplateCategory.getId());
+        if(ruleTemplateCategory.getRuleTemplateIds()!=null && !ruleTemplateCategory.getRuleTemplateIds().isEmpty()){
+            RuleTemplateCategory defaultCategory = ruleTemplateCategoryMongoRepository
+                    .findByName(countryId, "NONE", WTA);
+            List<WTABaseRuleTemplate> wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>)wtaBaseRuleTemplateMongoRepository.findAllByCategoryId(ruleTemplateCategoryObj.getId());
+            wtaBaseRuleTemplates.forEach(wtaBaseRuleTemplate -> {
+                if(!ruleTemplateCategory.getRuleTemplateIds().contains(wtaBaseRuleTemplate.getId())){
+                    wtaBaseRuleTemplate.setRuleTemplateCategoryId(defaultCategory.getId());
+                }
+            });
+            save(wtaBaseRuleTemplates);
+            wtaBaseRuleTemplates = (List<WTABaseRuleTemplate>)wtaBaseRuleTemplateMongoRepository.findAllById(ruleTemplateCategory.getRuleTemplateIds());
+            wtaBaseRuleTemplates.forEach(rt->{
+                rt.setRuleTemplateCategoryId(ruleTemplateCategoryObj.getId());
+            });
+            save(wtaBaseRuleTemplates);
+        }
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
         ruleTemplateCategoryObj.setDescription(ruleTemplateCategory.getDescription());
         save(ruleTemplateCategoryObj);
-        wtaBaseRuleTemplates.forEach(rt->{
-            rt.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        });
-        save(wtaBaseRuleTemplates);
         ruleTemplateCategory.setId(ruleTemplateCategoryObj.getId());
         return ruleTemplateCategory;
 

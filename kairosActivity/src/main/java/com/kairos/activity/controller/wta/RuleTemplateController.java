@@ -53,7 +53,7 @@ public class RuleTemplateController {
 
     @RequestMapping(value = COUNTRY_URL+"/rule_templates/category", method = RequestMethod.POST)
     ResponseEntity<Map<String,Object>> updateRuleTemplateCategory(@Valid @RequestBody RuleTemplateCategoryDTO ruleTemplateDTO, @PathVariable long countryId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.createRuleTemplateCategory(countryId,ruleTemplateDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.updateRuleTemplateCategory(countryId,null,ruleTemplateDTO));
     }
 
     @RequestMapping(value = UNIT_URL+"/rule_templates", method = RequestMethod.GET)

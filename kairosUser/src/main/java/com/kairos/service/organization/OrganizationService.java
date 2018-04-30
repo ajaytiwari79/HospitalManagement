@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
@@ -70,6 +71,7 @@ import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -1337,7 +1339,11 @@ public class OrganizationService extends UserBaseService {
            }
            if(organizations!=null){
                List<OrganizationDTO> organizationDTOS = new ArrayList<>();
-               BeanUtils.copyProperties(organizations,organizationDTOS);
+               organizations.forEach(organization->{
+                   OrganizationDTO organizationDTO = new OrganizationDTO();
+                   ObjectMapperUtils.copyProperties(organization,organizationDTO);
+                    organizationDTOS.add(organizationDTO);
+               });
                wtaBasicDetailsDTO.setOrganizations(organizationDTOS);
            }
         }
