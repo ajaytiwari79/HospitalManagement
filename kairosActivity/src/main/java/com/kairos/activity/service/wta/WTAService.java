@@ -2,6 +2,7 @@ package com.kairos.activity.service.wta;
 
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.WTADetailRestClient;
+import com.kairos.activity.response.dto.WTADTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
@@ -25,7 +26,6 @@ import com.kairos.activity.util.DateUtils;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
-import com.kairos.response.dto.web.wta.WTADTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.apache.commons.beanutils.PropertyUtils;

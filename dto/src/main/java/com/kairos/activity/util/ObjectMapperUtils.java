@@ -1,6 +1,7 @@
 package com.kairos.activity.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.template_types.CareDaysCheckDTO;
@@ -9,6 +10,7 @@ import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.response.dto.web.wta.*;
 import org.apache.commons.beanutils.PropertyUtils;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -215,6 +217,17 @@ public class ObjectMapperUtils {
                 break;
         }
         return wtaBaseRuleTemplate;
+    }
+
+    public static <T> T copyPropertiesByMapper(Object object,Class<T> valueType){
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        try {
+            return objectMapper.readValue(objectMapper.writeValueAsString(object), valueType);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void copyProperties(Object source,Object destination){

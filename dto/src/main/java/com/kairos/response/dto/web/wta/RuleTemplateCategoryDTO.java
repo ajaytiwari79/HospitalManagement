@@ -3,6 +3,7 @@ package com.kairos.response.dto.web.wta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.kairos.response.dto.web.enums.RuleTemplateCategoryType;
 
 import javax.validation.constraints.NotNull;
@@ -23,7 +24,7 @@ import java.util.List;
 public class RuleTemplateCategoryDTO{
 
     @NotNull(message = "error.RuleTemplateCategory.name.notnull")
-    @JsonProperty(value = "categoryName")
+   // @JsonProperty(value = "categoryName")
     private String name;
     private String description;
     private RuleTemplateCategoryType ruleTemplateCategoryType;
@@ -37,6 +38,13 @@ public class RuleTemplateCategoryDTO{
         this.name = name;
         this.description = description;
         this.deleted = deleted;
+    }
+
+    public RuleTemplateCategoryDTO(@NotNull(message = "error.RuleTemplateCategory.name.notnull") String name, String description, Long country, BigInteger id) {
+        this.name = name;
+        this.description = description;
+        this.country = country;
+        this.id = id;
     }
 
     public RuleTemplateCategoryDTO() {
@@ -88,6 +96,14 @@ public class RuleTemplateCategoryDTO{
         return name;
     }
 
+    @JsonSetter("categoryName")
+    public void setCategoryategoryName(String name) {
+        if(this.name==null) {
+            this.name = name;
+        }
+    }
+
+    @JsonSetter("name")
     public void setName(String name) {
         this.name = name;
     }

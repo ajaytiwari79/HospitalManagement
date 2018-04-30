@@ -55,7 +55,6 @@ public class RuleTemplateService extends MongoBaseService {
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
-    @Inject private WTABuilderService wtaBuilderService;
     private final Logger logger = LoggerFactory.getLogger(RuleTemplateService.class);
 
     public boolean createRuleTemplate(long countryId) {
@@ -228,7 +227,7 @@ public class RuleTemplateService extends MongoBaseService {
         }
 
         //
-        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = wtaBuilderService.copyRuleTemplatesToDTO(templateList);
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = WTABuilderService.copyRuleTemplatesToDTO(templateList);
         assignCategoryToRuleTemplate(categoryList,wtaBaseRuleTemplateDTOS);
         RuleTemplateWrapper wrapper = new RuleTemplateWrapper();
         wrapper.setCategoryList(categoryList);
@@ -315,7 +314,7 @@ public class RuleTemplateService extends MongoBaseService {
         }
        /* String templateType=getTemplateType(templateDTO.getTemplateType());
         WTATemplateType ruleTemplateType = getByTemplateType(templateType);*/
-        oldTemplate = wtaBuilderService.copyDTOToRuleTemplate(templateDTO);
+        oldTemplate = WTABuilderService.copyDTOToRuleTemplate(templateDTO);
         //BigInteger ruleTemplateCategoryId = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
@@ -414,13 +413,13 @@ public class RuleTemplateService extends MongoBaseService {
         if (Optional.ofNullable(wtaBaseRuleTemplate1).isPresent()) {
             throw new DuplicateDataException("WTA Rule template already existed  " + wtaRuleTemplateDTO.getName());
         }
-        WTABaseRuleTemplate wtaBaseRuleTemplate = wtaBuilderService.copyRuleTemplate(wtaRuleTemplateDTO,true);
+        WTABaseRuleTemplate wtaBaseRuleTemplate = WTABuilderService.copyRuleTemplate(wtaRuleTemplateDTO,true);
         wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         save(wtaBaseRuleTemplate);
         wtaRuleTemplateDTO.setId(wtaBaseRuleTemplate.getId());
-        RuleTemplateCategoryDTO ruleTemplateCategoryDTO = new RuleTemplateCategoryDTO();
-        BeanUtils.copyProperties(ruleTemplateCategory,ruleTemplateCategoryDTO);
-        wtaRuleTemplateDTO.setRuleTemplateCategory(ruleTemplateCategoryDTO);
+       // RuleTemplateCategoryDTO ruleTemplateCategoryDTO = new RuleTemplateCategoryDTO();
+        //BeanUtils.copyProperties(ruleTemplateCategory,ruleTemplateCategoryDTO);
+        wtaRuleTemplateDTO.setRuleTemplateCategory(wtaRuleTemplateDTO.getRuleTemplateCategory());
         /*int number=getNumberFromlastInsertedTemplateType(lastInsertedTemplateType);
 
         String templateTypeToBeSet=originalTemplateType+"_";*/
