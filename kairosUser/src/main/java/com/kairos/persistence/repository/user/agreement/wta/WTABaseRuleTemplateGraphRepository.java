@@ -91,8 +91,9 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
     @Query("MATCH (o:Organization)-[:" + BELONGS_TO + "]-(c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE]-(t:WTABaseRuleTemplateDTO) where id(o)={0} " +
             "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory)  " +
             "Optional Match (t)-[: " + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "with tempValue ORDER BY tempValue.sequence ,t,c,r "+
-            "with t,c,r, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
+            "Optional MATCH(t)-[:"+HAS_BREAK_MATRIX+"]-(breakTemplateValue:BreakTemplateValue) " +
+            "with tempValue ORDER BY tempValue.sequence ,t,c,r,breakTemplateValue "+
+            "with t,c,r,breakTemplateValue, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
             "t.balanceType as balanceType," +
@@ -136,14 +137,16 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.yellowZone as yellowZone," +
             "t.forbid as forbid," +
             "t.allowExtraActivity as allowExtraActivity," +
-            "phaseTemplateValues as phaseTemplateValues")
+            "phaseTemplateValues as phaseTemplateValues, " +
+            "CASE when breakTemplateValue IS NULL THEN [] else collect(breakTemplateValue) END as breakTemplateValues")
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByUnitId(Long unitId);
 
     @Query("MATCH (c:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE + "]-(t:WTABaseRuleTemplateDTO) where id(c)={0} " +
             "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory{ruleTemplateCategoryType:'WTA'})  " +
             "Optional Match (t)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "with tempValue ORDER BY tempValue.sequence ,t,c,r "+
-            "with t,c,r, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
+            "Optional MATCH(t)-[:"+HAS_BREAK_MATRIX+"]-(breakTemplateValue:BreakTemplateValue) " +
+            "with tempValue ORDER BY tempValue.sequence,t,c,r,breakTemplateValue "+
+            "with t,c,r,breakTemplateValue, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
             "t.balanceType as balanceType," +
@@ -187,7 +190,8 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.yellowZone as yellowZone," +
             "t.forbid as forbid," +
             "t.allowExtraActivity as allowExtraActivity," +
-            "phaseTemplateValues as phaseTemplateValues"
+            "phaseTemplateValues as phaseTemplateValues, " +
+            "CASE when breakTemplateValue IS NULL THEN [] else collect(breakTemplateValue) END as breakTemplateValues"
     )
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByCountryId(Long countryId);
 
