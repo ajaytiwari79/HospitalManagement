@@ -25,7 +25,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.client.AddressVerificationService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
-import com.kairos.activity.service.integration.IntegrationService;
+import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;

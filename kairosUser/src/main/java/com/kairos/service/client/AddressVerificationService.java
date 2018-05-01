@@ -12,7 +12,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.country.HousingTypeService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
-import com.kairos.activity.service.integration.IntegrationService;
+import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.region.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
