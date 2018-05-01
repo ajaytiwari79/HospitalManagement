@@ -25,7 +25,7 @@ import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.response.dto.tag.TagDTO;
 import com.kairos.activity.service.MongoBaseService;
-import com.kairos.service.integration.PlannerSyncService;
+import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.organization.OrganizationActivityService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;

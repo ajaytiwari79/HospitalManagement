@@ -10,7 +10,7 @@ import com.kairos.persistence.repository.user.control_panel.ControlPanelGraphRep
 import com.kairos.persistence.repository.user.control_panel.jobDetails.JobDetailsRepository;
 import com.kairos.persistence.repository.user.tpa_services.IntegrationConfigurationGraphRepository;
 import com.kairos.service.UserBaseService;
-import com.kairos.service.integration.IntegrationService;
+import com.kairos.activity.service.integration.IntegrationService;
 import com.kairos.util.timeCareShift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
