@@ -6,8 +6,8 @@ package com.kairos.persistence.model.organization;
 public class OrganizationRequestWrapper {
 
     ParentOrganizationDTO company;
-    ParentOrganizationDTO workCenterUnit;
-    ParentOrganizationDTO gdprUnit;
+    OrganizationDTO workCenterUnit;
+    OrganizationDTO gdprUnit;
 
     public ParentOrganizationDTO getCompany() {
         return company;
@@ -17,19 +17,19 @@ public class OrganizationRequestWrapper {
         this.company = company;
     }
 
-    public ParentOrganizationDTO getWorkCenterUnit() {
+    public OrganizationDTO getWorkCenterUnit() {
         return workCenterUnit;
     }
 
-    public void setWorkCenterUnit(ParentOrganizationDTO workCenterUnit) {
+    public void setWorkCenterUnit(OrganizationDTO workCenterUnit) {
         this.workCenterUnit = workCenterUnit;
     }
 
-    public ParentOrganizationDTO getGdprUnit() {
+    public OrganizationDTO getGdprUnit() {
         return gdprUnit;
     }
 
-    public void setGdprUnit(ParentOrganizationDTO gdprUnit) {
+    public void setGdprUnit(OrganizationDTO gdprUnit) {
         this.gdprUnit = gdprUnit;
     }
 }

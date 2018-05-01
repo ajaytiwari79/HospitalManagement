@@ -24,7 +24,7 @@ public class OrganizationDTO {
     private List<Long> organizationTypeId;
     private List<Long> organizationSubTypeId;
     private List<Long> businessTypeId;
-    private AddressDTO contactAddress;
+    private AddressDTO homeAddress;
     private int dayShiftTimeDeduction = 4; //in percentage
 
     private int nightShiftTimeDeduction = 7; //in percentage
@@ -67,16 +67,16 @@ public class OrganizationDTO {
         return name;
     }
 
-    public AddressDTO getContactAddress() {
-        return contactAddress;
+    public AddressDTO getHomeAddress() {
+        return homeAddress;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setContactAddress(AddressDTO contactAddress) {
-        this.contactAddress = contactAddress;
+    public void setHomeAddress(AddressDTO homeAddress) {
+        this.homeAddress = homeAddress;
     }
 
     public boolean isPreKairos() {

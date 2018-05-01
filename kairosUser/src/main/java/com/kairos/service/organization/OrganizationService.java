@@ -1,6 +1,5 @@
 package com.kairos.service.organization;
 
-import com.kairos.activity.util.DateUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
@@ -245,7 +244,9 @@ public class OrganizationService extends UserBaseService {
         return organization;
     }
 
-    public OrganizationResponseWrapper createParentOrganization(OrganizationRequestWrapper organizationRequestWrapper, long countryId, Long organizationId) {
+    public Map<String,OrganizationResponseWrapper> createParentOrganization(OrganizationRequestWrapper organizationRequestWrapper, long countryId, Long organizationId) {
+
+        Map<String,OrganizationResponseWrapper> organizationResponseMap = new HashMap<>();
 
         ParentOrganizationDTO orgDetails = organizationRequestWrapper.getCompany();
 
@@ -299,7 +300,36 @@ public class OrganizationService extends UserBaseService {
         OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
         organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails));
         organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
-        return organizationResponseWrapper;
+
+        organizationResponseMap.put("company",organizationResponseWrapper);
+
+        if(organizationRequestWrapper.getWorkCenterUnit()!=null){
+            Map<String, Object>  workCenterUnitMap = createNewUnit(organizationRequestWrapper.getWorkCenterUnit(), organization.getId());
+            Long workCenterUnitId = Long.parseLong(workCenterUnitMap.get("id")+"");;
+
+            Organization workCenterUnit = organizationGraphRepository.findOne(workCenterUnitId);
+
+            organizationResponseWrapper = new OrganizationResponseWrapper();
+
+            organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails));
+            organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, workCenterUnit, UserContext.getUserDetails().getId()));
+            organizationResponseMap.put("workCenterUnit",organizationResponseWrapper);
+        }
+
+        if(organizationRequestWrapper.getGdprUnit()!=null){
+            Map<String, Object>  gdprUnitMap = createNewUnit(organizationRequestWrapper.getGdprUnit(), organization.getId());
+            Long gdprUnitId = Long.parseLong(gdprUnitMap.get("id")+"");;
+
+            Organization gdprUnit = organizationGraphRepository.findOne(gdprUnitId);
+            organizationResponseWrapper = new OrganizationResponseWrapper();
+            organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails));
+            organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, gdprUnit, UserContext.getUserDetails().getId()));
+            organizationResponseMap.put("gdprUnit",organizationResponseWrapper);
+
+        }
+
+
+        return organizationResponseMap;
     }
 
     List<WorkingTimeAgreement> getWTAWithExpertise(List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults){
@@ -484,12 +514,13 @@ public class OrganizationService extends UserBaseService {
         unit.setDescription(organizationDTO.getDescription());
         unit.setPrekairos(organizationDTO.isPreKairos());
 
-        AddressDTO addressDTO = organizationDTO.getContactAddress();
+        AddressDTO addressDTO = organizationDTO.getHomeAddress();
 
 
         // Verify Address here
+        addressDTO.setVerifiedByGoogleMap(true);
         if (addressDTO.isVerifiedByGoogleMap()) {
-            ZipCode zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
+            ZipCode zipCode =  zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
             if (zipCode == null) {
                 logger.info("ZipCode Not Found returning null");
                 return null;
