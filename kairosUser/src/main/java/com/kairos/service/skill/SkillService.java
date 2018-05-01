@@ -30,7 +30,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
-import com.kairos.activity.service.integration.IntegrationService;
+import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.organization.TimeSlotService;
