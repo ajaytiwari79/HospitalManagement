@@ -45,7 +45,7 @@ import com.kairos.response.dto.web.client.ClientPersonalCalenderPrerequisiteDTO;
 import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CitizenStatusService;
-import com.kairos.activity.service.integration.IntegrationService;
+import com.kairos.service.integration.IntegrationService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateUtil;

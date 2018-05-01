@@ -1,4 +1,4 @@
-package com.kairos.activity.service.integration;
+package com.kairos.service.integration;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.integration.TimeCare;
 import com.kairos.persistence.model.user.integration.Twillio;
