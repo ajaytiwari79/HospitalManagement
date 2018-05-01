@@ -3,6 +3,7 @@ package com.planner.service.shiftPlanningService;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.response.dto.staffing_level.PresenceStaffingLevelDto;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
 import com.kairos.shiftplanning.domain.*;
 import com.kairos.shiftplanning.domain.activityConstraint.ActivityConstraints;
@@ -51,7 +52,7 @@ public class ShiftRequestPhasePlanningSolutionService {
         ObjectMapper mapper = new ObjectMapper();
         List<ActivityDTO> activityDTOS = mapper.convertValue(shiftPlanningInfo.get("activities"),new TypeReference<List<ActivityDTO>>(){});
         //mapper.registerModule(new JavaTimeModule());
-        List<StaffingLevelDto> staffingLevelDtos = mapper.convertValue(shiftPlanningInfo.get("staffingLevel"),new TypeReference<List<StaffingLevelDto>>(){});
+        List<PresenceStaffingLevelDto> staffingLevelDtos = mapper.convertValue(shiftPlanningInfo.get("staffingLevel"),new TypeReference<List<StaffingLevelDto>>(){});
         Map<BigInteger,Activity> activityMap = getActivityMap(activityDTOS);
         List<StaffDTO> staffDTOS = mapper.convertValue(shiftPlanningInfo.get("staffs"),new TypeReference<List<StaffDTO>>(){});
         Object[] objects = getStaffingLevel(staffingLevelDtos,activityMap);
@@ -136,13 +137,13 @@ public class ShiftRequestPhasePlanningSolutionService {
 
     }
 
-    public Object[] getStaffingLevel(List<StaffingLevelDto> staffingLevelDtos, Map<BigInteger,Activity> activityMap){
+    public Object[] getStaffingLevel(List<PresenceStaffingLevelDto> staffingLevelDtos, Map<BigInteger,Activity> activityMap){
         List<ActivityLineInterval> activityLineIntervals = new ArrayList<>();
         List<SkillLineInterval> skillLineIntervals = new ArrayList<>();
         Set<LocalDate> weekDates = new HashSet<>(staffingLevelDtos.size());
         Set<Activity> activities = new HashSet<>();
         staffingLevelDtos.forEach(stl->{
-            stl.getStaffingLevelInterval().forEach(sli->{
+            stl.getPresenceStaffingLevelInterval().forEach(sli->{
                 sli.getStaffingLevelActivities().forEach(sla->{
                     IntStream.range(0,sla.getMinNoOfStaff()).forEachOrdered(i->{
                         Activity activity = activityMap.get(new BigInteger(sla.getActivityId().toString()));

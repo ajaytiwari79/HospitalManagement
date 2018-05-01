@@ -4,8 +4,7 @@ import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.client.planner.PlannerRestClient;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
-import com.kairos.activity.response.dto.ActivityDTO;
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
+import com.kairos.activity.response.dto.staffing_level.PresenceStaffingLevelDto;
 import com.kairos.activity.service.organization.OrganizationActivityService;
 import com.kairos.client.dto.activity.ActivityNoTabsDTO;
 import org.slf4j.Logger;
@@ -28,11 +27,11 @@ public class PlannerSyncService {
     @Autowired
     private PlannerRestClient plannerRestClient;
     @Async
-    public Future<RestTemplateResponseEnvelope<Map>> publishStaffingLevel(Long unitId, StaffingLevelDto staffingLevelDto, IntegrationOperation integrationOperation){
+    public Future<RestTemplateResponseEnvelope<Map>> publishStaffingLevel(Long unitId, PresenceStaffingLevelDto staffingLevelDto, IntegrationOperation integrationOperation){
         return new AsyncResult(plannerRestClient.publish(staffingLevelDto,unitId,integrationOperation));
     }
     @Async
-    public void publishStaffingLevels(Long unitId, List<StaffingLevelDto> staffingLevelDtos, IntegrationOperation integrationOperation){
+    public void publishStaffingLevels(Long unitId, List<PresenceStaffingLevelDto> staffingLevelDtos, IntegrationOperation integrationOperation){
         plannerRestClient.publish(staffingLevelDtos,unitId,integrationOperation);
     }
     @Async
