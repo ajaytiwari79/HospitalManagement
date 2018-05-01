@@ -3,11 +3,11 @@ package com.kairos.service.integration;
 import com.kairos.client.planner.PlannerRestClient;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.staff.Staff;
-import com.kairos.persistence.model.user.staff.StaffCreationDTO;
 import com.kairos.persistence.model.user.staff.StaffDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +21,7 @@ import java.util.List;
 public class PlannerSyncService {
     private final Logger logger = LoggerFactory.getLogger(PlannerSyncService.class);
     @Autowired
+    @Qualifier("optaplannerServiceRestClient")
     private PlannerRestClient plannerRestClient;
     @Async
     public <T> void  publishStaff(Long unitId, Staff staff, IntegrationOperation integrationOperation) {

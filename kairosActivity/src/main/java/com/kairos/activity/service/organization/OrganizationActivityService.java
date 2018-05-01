@@ -22,7 +22,7 @@ import com.kairos.activity.response.dto.activity.GeneralActivityTabDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.service.activity.TimeTypeService;
-import com.kairos.service.integration.PlannerSyncService;
+import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

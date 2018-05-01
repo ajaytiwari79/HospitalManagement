@@ -1,6 +1,5 @@
 package com.kairos.service.skill;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.client.SkillServiceTemplateClient;
 import com.kairos.client.TaskDemandRestClient;
 import com.kairos.config.env.EnvConfig;
