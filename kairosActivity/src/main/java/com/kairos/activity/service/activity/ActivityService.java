@@ -14,6 +14,7 @@ import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DataNotFoundException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.*;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
@@ -24,6 +25,7 @@ import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.*;
 import com.kairos.activity.response.dto.tag.TagDTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.activity.service.organization.OrganizationActivityService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.timeCareShift.GetAllActivitiesResponse;
@@ -38,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -92,6 +93,8 @@ public class ActivityService extends MongoBaseService {
     private SkillRestClient skillRestClient;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject
+    private PlannerSyncService plannerSyncService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -540,7 +543,9 @@ public class ActivityService extends MongoBaseService {
         activity.setLevels(organizationMappingActivityDTO.getLevel());
         activity.setEmploymentTypes(organizationMappingActivityDTO.getEmploymentTypes());
         save(activity);
-
+        if(activity.getUnitId()!=null){
+            plannerSyncService.publishActivity(activity.getUnitId(),activity,IntegrationOperation.UPDATE);
+        }
 
     }
 

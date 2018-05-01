@@ -5,6 +5,7 @@ import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.activityType.PresenceTypeWithTimeTypeDTO;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.*;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
@@ -21,6 +22,7 @@ import com.kairos.activity.response.dto.activity.GeneralActivityTabDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.service.activity.TimeTypeService;
+import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +56,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private TimeTypeService timeTypeService;
     @Inject
     private ActivityCategoryRepository activityCategoryRepository;
+    @Inject
+    private PlannerSyncService plannerSyncService;
 
     public HashMap copyActivity(Long unitId, BigInteger activityId, boolean checked) {
         logger.info("activityId,{}", activityId);
@@ -69,6 +73,7 @@ public class OrganizationActivityService extends MongoBaseService {
                 activity.setState(ActivityStateEnum.LIVE);
                 save(activity);
             }
+            plannerSyncService.publishActivity(unitId,activity,IntegrationOperation.CREATE);
             return activityCopied.retrieveBasicDetails();
 
         } else {
@@ -78,10 +83,7 @@ public class OrganizationActivityService extends MongoBaseService {
 
         }
         return null;
-
     }
-
-
     public ActivityWithSelectedDTO getActivityMappingDetails(Long unitId, String type) {
         ActivityWithSelectedDTO activityDetails = new ActivityWithSelectedDTO();
         ActivityWithUnitIdDTO activities = activityService.getActivityByUnitId(unitId, type);
@@ -97,7 +99,6 @@ public class OrganizationActivityService extends MongoBaseService {
     public List<Activity> getActivityByUnitId(Long unitId, String type) {
         List<Activity> activities = activityMongoRepository.findByDeletedFalseAndUnitId(unitId);
         return activities;
-
     }
 
     public Map<String, Object> getAllActivityByUnitAndDeleted(Long unitId) {
@@ -122,7 +123,7 @@ public class OrganizationActivityService extends MongoBaseService {
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalTab, activityId, activityCategories);
         return activityTabsWrapper;
     }
-
+    //TODO Need to make sure that its fine to not copy expertise/skills/employmentTypes
     private Activity copyAllActivitySettingsInUnit(Activity activity, Long unitId) {
         Activity activityCopied = new Activity();
         Activity.copyProperties(activity, activityCopied, "id", "organizationTypes", "organizationSubTypes");
@@ -135,7 +136,6 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setRegions(null);
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
-
         return activityCopied;
     }
 
