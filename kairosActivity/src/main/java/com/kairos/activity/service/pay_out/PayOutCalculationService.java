@@ -72,7 +72,7 @@ public class PayOutCalculationService {
     public List<PayOutCTADistribution> getDistribution(UnitPositionWithCtaDetailsDTO ctaDto) {
         List<PayOutCTADistribution> payOutCTADistributions = new ArrayList<>(ctaDto.getCtaRuleTemplates().size());
         ctaDto.getCtaRuleTemplates().forEach(rt -> {
-            payOutCTADistributions.add(new PayOutCTADistribution(rt.getName(), 0, rt.getId()));
+            payOutCTADistributions.add(new PayOutCTADistribution(rt.getName(), 0, rt.getId(), rt.getPayrollSystem(), rt.getPayrollType()));
         });
         return payOutCTADistributions;
     }
@@ -139,7 +139,7 @@ public class PayOutCalculationService {
     private List<PayOutCTADistribution> getBlankPayOutDistribution(List<CTARuleTemplateCalulatedPayOutDTO> ctaRuleTemplateCalulatedPayOutDTOS, Map<Long, Integer> ctaPayOutMinMap) {
         List<PayOutCTADistribution> payOutCTADistributions = new ArrayList<>(ctaRuleTemplateCalulatedPayOutDTOS.size());
         for (CTARuleTemplateCalulatedPayOutDTO ruleTemplate : ctaRuleTemplateCalulatedPayOutDTOS) {
-            payOutCTADistributions.add(new PayOutCTADistribution(ruleTemplate.getName(), ctaPayOutMinMap.containsKey(ruleTemplate.getId())?ctaPayOutMinMap.get(ruleTemplate.getId()):0, ruleTemplate.getId()));
+            payOutCTADistributions.add(new PayOutCTADistribution(ruleTemplate.getName(), ctaPayOutMinMap.containsKey(ruleTemplate.getId())?ctaPayOutMinMap.get(ruleTemplate.getId()):0, ruleTemplate.getId(), ruleTemplate.getPayrollSystem(), ruleTemplate.getPayrollType()));
         }
         return payOutCTADistributions;
     }

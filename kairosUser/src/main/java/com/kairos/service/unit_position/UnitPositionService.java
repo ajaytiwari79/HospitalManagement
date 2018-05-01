@@ -667,6 +667,8 @@ public class UnitPositionService extends UserBaseService {
         });
         ruleTemplateQueryResults.forEach(ruleTemplateQueryResult -> {
             CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO();
+            ctaRuleTemplateDTO.setPayrollSystem(ruleTemplateQueryResult.getPayrollSystem());
+            ctaRuleTemplateDTO.setPayrollType(ruleTemplateQueryResult.getPayrollType());
             ctaRuleTemplateDTO.setGranularity((int) ruleTemplateQueryResult.getCompensationTable().get("granularityLevel"));
             ctaRuleTemplateDTO.setActivityIds(ruleTemplateQueryResult.getActivityIds().stream().map(ac -> new BigInteger(ac.toString())).collect(Collectors.toList()));
             ctaRuleTemplateDTO.setName(ruleTemplateQueryResult.getName());

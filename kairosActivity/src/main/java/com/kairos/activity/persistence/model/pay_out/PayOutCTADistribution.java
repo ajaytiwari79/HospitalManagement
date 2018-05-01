@@ -7,11 +7,15 @@ public class PayOutCTADistribution {
     private String ctaName;
     private int minutes;
     private Long ctaRuleTemplateId;
+    private String payrollType;
+    private String payrollSystem;
 
-    public PayOutCTADistribution(String ctaName, int minutes, Long ctaRuleTemplateId) {
+    public PayOutCTADistribution(String ctaName, int minutes, Long ctaRuleTemplateId, String payrollSystem, String payrollType) {
         this.ctaName = ctaName;
         this.minutes = minutes;
         this.ctaRuleTemplateId = ctaRuleTemplateId;
+        this.payrollSystem = payrollSystem;
+        this.payrollType = payrollType;
     }
 
     public PayOutCTADistribution() {
@@ -59,5 +63,20 @@ public class PayOutCTADistribution {
                 .append(ctaRuleTemplateId, that.ctaRuleTemplateId)
                 .isEquals();
     }
-    
+
+    public String getPayrollType() {
+        return payrollType;
+    }
+
+    public void setPayrollType(String payrollType) {
+        this.payrollType = payrollType;
+    }
+
+    public String getPayrollSystem() {
+        return payrollSystem;
+    }
+
+    public void setPayrollSystem(String payrollSystem) {
+        this.payrollSystem = payrollSystem;
+    }
 }
