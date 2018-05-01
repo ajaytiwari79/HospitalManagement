@@ -2,6 +2,7 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
@@ -20,11 +21,20 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private boolean checkAgainstTimeRules;
     private long limitCount;//no of days
     private WTATemplateType wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    private List<PartOfDay> partOfDays = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-    protected float recommendedValue;
-    protected boolean minimum;
+    private float recommendedValue;
+    private MinMaxSetting minMaxSetting;
+
+
+    public MinMaxSetting getMinMaxSetting() {
+        return minMaxSetting;
+    }
+
+    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
+        this.minMaxSetting = minMaxSetting;
+    }
 
     public List<Long> getPlannedTimeIds() {
         return plannedTimeIds;
@@ -58,13 +68,7 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.recommendedValue = recommendedValue;
     }
 
-    public boolean isMinimum() {
-        return minimum;
-    }
 
-    public void setMinimum(boolean minimum) {
-        this.minimum = minimum;
-    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;

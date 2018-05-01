@@ -6,6 +6,7 @@ import com.kairos.activity.persistence.model.wta.templates.WTABuilderService;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ public class WTADTO {
     private long startDateMillis;
     private Long endDateMillis;
     private Long expiryDate;
+    @NotNull(message = "error.RuleTemplate.description.notnull")
     private List<Map> ruleTemplates;
     private Long organizationType;
     private Long organizationSubType;

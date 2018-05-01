@@ -109,10 +109,8 @@ public interface WorkingTimeAgreementGraphRepository extends Neo4jBaseRepository
     @Query("match(c:Country) where id(c)={0}\n" +
             "match(c)<-[:" + BELONGS_TO + "]-(or:OrganizationType{isEnable:true})\n" +
             "optional match(or)-[:" + HAS_SUB_TYPE + "]->(ora:OrganizationType{isEnable:true})\n" +
-            "optional match(w:WorkingTimeAgreement{deleted:false})-[:" + BELONGS_TO_ORG_SUB_TYPE + "]->(ora)\n" +
-            "with or,ora,w\n" +
-            "with or,ora,{WTA:CASE WHEN w IS NOT NULL THEN collect({id:id(w),name:w.name}) ELSE [] END} as oraRes\n" +
-            "WITH {name: or.name,id:id(or), children: CASE WHEN ora IS NOT NULL THEN collect({id:id(ora),name:ora.name,wtaa:oraRes}) ELSE [] END} as orga\n" +
+            "with or,ora\n" +
+            "WITH {name: or.name,id:id(or), children: CASE WHEN ora IS NOT NULL THEN collect({id:id(ora),name:ora.name}) ELSE [] END} as orga\n" +
             "RETURN orga as result")
     List<Map<String, Object>> getAllWTAWithOrganization(long countryId);
 

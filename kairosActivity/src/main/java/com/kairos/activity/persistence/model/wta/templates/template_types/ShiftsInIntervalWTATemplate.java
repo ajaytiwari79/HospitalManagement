@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -31,7 +32,16 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     private List<Long> plannedTimeIds = new ArrayList<>();
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
-    protected boolean minimum;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+
+
+    public MinMaxSetting getMinMaxSetting() {
+        return minMaxSetting;
+    }
+
+    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
+        this.minMaxSetting = minMaxSetting;
+    }
 
 
     public List<BigInteger> getTimeTypeIds() {

@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
@@ -24,9 +25,18 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     private boolean forbid;
     private boolean allowExtraActivity;
 
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
-    protected float recommendedValue;
-    protected boolean minimum;
+    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private float recommendedValue;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+
+
+    public MinMaxSetting getMinMaxSetting() {
+        return minMaxSetting;
+    }
+
+    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
+        this.minMaxSetting = minMaxSetting;
+    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -42,14 +52,6 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
 
     public void setRecommendedValue(float recommendedValue) {
         this.recommendedValue = recommendedValue;
-    }
-
-    public boolean isMinimum() {
-        return minimum;
-    }
-
-    public void setMinimum(boolean minimum) {
-        this.minimum = minimum;
     }
 
     public WTATemplateType getWtaTemplateType() {

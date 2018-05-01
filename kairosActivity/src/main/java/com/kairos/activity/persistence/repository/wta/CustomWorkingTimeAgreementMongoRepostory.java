@@ -33,4 +33,6 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     WTAResponseDTO getVersionOfWTA(BigInteger wtaId);
     List<WTAResponseDTO> getAllWtaOfOrganizationByExpertise(Long unitId,Long expertiseId);
+
+    WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
 }

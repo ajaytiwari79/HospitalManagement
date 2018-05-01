@@ -2,6 +2,7 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
@@ -23,10 +24,18 @@ public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private boolean useShiftTimes;
     private long maximumAvgTime;
     private WTATemplateType wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
-    protected float recommendedValue;
-    protected boolean minimum;
+    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private float recommendedValue;
+    private MinMaxSetting minMaxSetting;
 
+
+    public MinMaxSetting getMinMaxSetting() {
+        return minMaxSetting;
+    }
+
+    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
+        this.minMaxSetting = minMaxSetting;
+    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -42,14 +51,6 @@ public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     public void setRecommendedValue(float recommendedValue) {
         this.recommendedValue = recommendedValue;
-    }
-
-    public boolean isMinimum() {
-        return minimum;
-    }
-
-    public void setMinimum(boolean minimum) {
-        this.minimum = minimum;
     }
 
     public WTATemplateType getWtaTemplateType() {

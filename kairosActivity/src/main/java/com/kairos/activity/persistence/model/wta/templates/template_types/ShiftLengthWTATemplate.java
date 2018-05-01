@@ -2,13 +2,12 @@ package com.kairos.activity.persistence.model.wta.templates.template_types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +21,19 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
     private boolean checkAgainstTimeRules;
-    private List<Long> dayTypes = new ArrayList<>();
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
-    protected float recommendedValue;
-    protected boolean minimum;
+    private List<Long> dayTypeIds = new ArrayList<>();
+    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private float recommendedValue;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+
+
+    public MinMaxSetting getMinMaxSetting() {
+        return minMaxSetting;
+    }
+
+    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
+        this.minMaxSetting = minMaxSetting;
+    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -43,20 +51,12 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         this.recommendedValue = recommendedValue;
     }
 
-    public boolean isMinimum() {
-        return minimum;
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
     }
 
-    public void setMinimum(boolean minimum) {
-        this.minimum = minimum;
-    }
-
-    public List<Long> getDayTypes() {
-        return dayTypes;
-    }
-
-    public void setDayTypes(List<Long> dayTypes) {
-        this.dayTypes = dayTypes;
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
     }
 
     public WTATemplateType getWtaTemplateType() {

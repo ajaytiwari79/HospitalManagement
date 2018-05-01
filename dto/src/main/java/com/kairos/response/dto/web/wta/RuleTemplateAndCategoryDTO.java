@@ -12,6 +12,9 @@ public class RuleTemplateAndCategoryDTO {
     private List<WTABaseRuleTemplateDTO> templateList;
 
 
+    public RuleTemplateAndCategoryDTO() {
+    }
+
     public RuleTemplateAndCategoryDTO(RuleTemplateCategoryDTO category, List<WTABaseRuleTemplateDTO> templateList) {
         this.category = category;
         this.templateList = templateList;

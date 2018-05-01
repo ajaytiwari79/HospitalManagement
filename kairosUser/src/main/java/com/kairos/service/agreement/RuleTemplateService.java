@@ -154,7 +154,7 @@ public class RuleTemplateService extends UserBaseService {
         MaximumShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = new MaximumShiftsInIntervalWTATemplate(MAXIMUM_NUMBER_OF_SHIFTS_PER_INTERVAL.getName(), MAXIMUM_NUMBER_OF_SHIFTS_PER_INTERVAL.getTemplateType(), true, MAXIMUM_NUMBER_OF_SHIFTS_PER_INTERVAL.getDescription(), balanceTypes, 1, "NA", dateInMillis, 1, true);
         baseRuleTemplates.add(maximumShiftsInIntervalWTATemplate);
 
-        MaximumSeniorDaysInYearWTATemplate wta20 = new MaximumSeniorDaysInYearWTATemplate(MAXIMUM_SENIOR_DAYS_PER_YEAR.getName(), MAXIMUM_SENIOR_DAYS_PER_YEAR.getTemplateType(), true, MAXIMUM_SENIOR_DAYS_PER_YEAR.getDescription(), 1, "NA", dateInMillis, 1, "");
+        MaximumSeniorDaysInYearWTATemplate wta20 = new MaximumSeniorDaysInYearWTATemplate(SENIOR_DAYS_PER_YEAR.getName(), SENIOR_DAYS_PER_YEAR.getTemplateType(), true, SENIOR_DAYS_PER_YEAR.getDescription(), 1, "NA", dateInMillis, 1, "");
         baseRuleTemplates.add(wta20);
 
         MaximumTimeBank wta21 = new MaximumTimeBank(MAXIMUM_TIME_BANK.getName(), MAXIMUM_TIME_BANK.getTemplateType(), true, MAXIMUM_TIME_BANK.getDescription(), TimeBankTypeEnum.HOURLY, 45, false, false);
@@ -379,7 +379,7 @@ public class RuleTemplateService extends UserBaseService {
                 maximumShiftsInIntervalWTATemplate.setShiftsLimit(templateDTO.getShiftsLimit());
                 maximumShiftsInIntervalWTATemplate.setOnlyCompositeShifts(templateDTO.getOnlyCompositeShifts());
                 break;
-            case MAXIMUM_SENIOR_DAYS_PER_YEAR:
+            case SENIOR_DAYS_PER_YEAR:
                 MaximumSeniorDaysInYearWTATemplate maximumSeniorDaysInYearWTATemplate = (MaximumSeniorDaysInYearWTATemplate) oldTemplate;
                 maximumSeniorDaysInYearWTATemplate.setDescription(templateDTO.getDescription());
                 maximumSeniorDaysInYearWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
@@ -598,7 +598,7 @@ public class RuleTemplateService extends UserBaseService {
                 wtaBaseRuleTemplate = new MaximumShiftsInIntervalWTATemplate(wtaRuleTemplateDTO.getName().trim(),
                         wtaRuleTemplateDTO.getTemplateType(), wtaRuleTemplateDTO.getDisabled(), wtaRuleTemplateDTO.getDescription(), wtaRuleTemplateDTO.getBalanceType(), wtaRuleTemplateDTO.getIntervalLength(), wtaRuleTemplateDTO.getIntervalUnit(), wtaRuleTemplateDTO.getValidationStartDateMillis(), wtaRuleTemplateDTO.getShiftsLimit(), wtaRuleTemplateDTO.getOnlyCompositeShifts());
                 break;
-            case MAXIMUM_SENIOR_DAYS_PER_YEAR:
+            case SENIOR_DAYS_PER_YEAR:
                 wtaBaseRuleTemplate = new MaximumSeniorDaysInYearWTATemplate(wtaRuleTemplateDTO.getName().trim(),
                         wtaRuleTemplateDTO.getTemplateType(), wtaRuleTemplateDTO.getDisabled(), wtaRuleTemplateDTO.getDescription(), wtaRuleTemplateDTO.getIntervalLength(), wtaRuleTemplateDTO.getIntervalUnit(), wtaRuleTemplateDTO.getValidationStartDateMillis(), wtaRuleTemplateDTO.getDaysLimit(), wtaRuleTemplateDTO.getActivityCode());
                 break;

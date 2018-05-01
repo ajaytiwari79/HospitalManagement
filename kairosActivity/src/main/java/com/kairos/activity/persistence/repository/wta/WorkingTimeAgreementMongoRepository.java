@@ -20,8 +20,7 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     @Query("{name:?0,countryId:?1,deleted:false}")
     WorkingTimeAgreement getWtaByName(String wtaName, Long countryId);
 
-    @Query("{name:?0,countryId:?1,deleted:false,id:?2,organizationType.Id:?3,organizationSubType.Id:?4}")
-    WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
+
 
 /*    @Query("{organizationType.id:?0,deleted:false}")
     List<WTAResponseDTO> getAllWTAByOrganizationTypeId(long organizationId);

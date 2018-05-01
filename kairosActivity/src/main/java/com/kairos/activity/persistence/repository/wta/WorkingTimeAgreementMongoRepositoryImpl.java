@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -123,5 +124,10 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         );
         AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
         return result.getMappedResults();
+    }
+
+    @Override
+    public WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId) {
+        return mongoTemplate.findOne(new Query(Criteria.where("name").is(wtaName).and("countryId").is(countryId).and("deleted").is(false).and("organizationType.Id").is(organizationTypeId).and("organizationSubType.Id").is(subOrganizationTypeId).and("_id").ne(wtaId)),WorkingTimeAgreement.class);
     }
 }

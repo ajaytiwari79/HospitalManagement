@@ -9,6 +9,7 @@ import com.kairos.response.dto.web.tag.TagDTO;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +25,8 @@ public class WTAResponseDTO {
 
     private Long startDateMillis;
     private Long endDateMillis;
+    private Date startDate;
+    private Date endDate;
     private Long expiryDate;
     private String name;
     private String description;
@@ -34,6 +37,24 @@ public class WTAResponseDTO {
 
     private List<TagDTO> tags;
 
+
+
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 
     public WTAResponseDTO() {
         //default

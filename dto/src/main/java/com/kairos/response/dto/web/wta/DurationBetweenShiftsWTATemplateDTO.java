@@ -2,6 +2,7 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
@@ -21,10 +22,19 @@ public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO 
     private long durationBetweenShifts;
     private WTATemplateType wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
 
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    private List<PartOfDay> partOfDays = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
-    protected float recommendedValue;
-    protected boolean minimum;
+    private float recommendedValue;
+    private MinMaxSetting minMaxSetting;
+
+
+    public MinMaxSetting getMinMaxSetting() {
+        return minMaxSetting;
+    }
+
+    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
+        this.minMaxSetting = minMaxSetting;
+    }
 
     public List<BigInteger> getActivityIds() {
         return activityIds;
@@ -48,14 +58,6 @@ public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO 
 
     public void setRecommendedValue(float recommendedValue) {
         this.recommendedValue = recommendedValue;
-    }
-
-    public boolean isMinimum() {
-        return minimum;
-    }
-
-    public void setMinimum(boolean minimum) {
-        this.minimum = minimum;
     }
 
     public WTATemplateType getWtaTemplateType() {

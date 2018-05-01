@@ -6,12 +6,12 @@ package com.kairos.activity.persistence.enums;
  */
 
 public enum WTATemplateType {
-    CARE_DAYS_CHECK("Care Day Check"),
+    //CARE_DAYS_CHECK("Care Day Check"),
     AVERAGE_SHEDULED_TIME("Average Sheduled Time"),
     CONSECUTIVE_WORKING_PARTOFDAY("Consecutive Working"),
     DAYS_OFF_IN_PERIOD("Days Off In Period"),
     NUMBER_OF_PARTOFDAY("Number Of Nights And Days"),
-    MAXIMUM_SENIOR_DAYS_IN_YEAR("Maximum Senior Days In Year"),
+   // MAXIMUM_SENIOR_DAYS_IN_YEAR("Maximum Senior Days In Year"),
     SHIFT_LENGTH("Shift length"),
     NUMBER_OF_SHIFTS_IN_INTERVAL("Shifts in Interval"),
     TIME_BANK("Time Bank"),
@@ -23,7 +23,7 @@ public enum WTATemplateType {
     WEEKLY_REST_PERIOD("Weekly Rest Period"),
     NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD("Number Of Weekend Shift In Period"),
     SHORTEST_AND_AVERAGE_DAILY_REST("Shortest And Average Daily Rest"),
-    MAXIMUM_SENIOR_DAYS_PER_YEAR("Maximum Senior Days Per Year"),
+    SENIOR_DAYS_PER_YEAR("Maximum Senior Days Per Year"),
     CHILD_CARE_DAYS_CHECK("Child Care Day Check");
 
     private String value;

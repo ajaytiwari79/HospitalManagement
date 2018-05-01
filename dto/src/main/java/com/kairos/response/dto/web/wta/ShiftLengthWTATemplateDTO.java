@@ -2,6 +2,7 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
@@ -19,10 +20,19 @@ public class ShiftLengthWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private long timeLimit;
     private boolean checkAgainstTimeRules;
     private WTATemplateType wtaTemplateType = WTATemplateType.SHIFT_LENGTH;;
-    private List<Long> dayTypes = new ArrayList<>();
+    private List<Long> dayTypeIds = new ArrayList<>();
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
-    protected boolean minimum;
+    private MinMaxSetting minMaxSetting;
+
+
+    public MinMaxSetting getMinMaxSetting() {
+        return minMaxSetting;
+    }
+
+    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
+        this.minMaxSetting = minMaxSetting;
+    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -40,20 +50,13 @@ public class ShiftLengthWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.recommendedValue = recommendedValue;
     }
 
-    public boolean isMinimum() {
-        return minimum;
+
+    public List<Long> getDayTypeIds() {
+        return dayTypeIds;
     }
 
-    public void setMinimum(boolean minimum) {
-        this.minimum = minimum;
-    }
-
-    public List<Long> getDayTypes() {
-        return dayTypes;
-    }
-
-    public void setDayTypes(List<Long> dayTypes) {
-        this.dayTypes = dayTypes;
+    public void setDayTypeIds(List<Long> dayTypeIds) {
+        this.dayTypeIds = dayTypeIds;
     }
 
     public WTATemplateType getWtaTemplateType() {

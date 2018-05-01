@@ -1,40 +1,40 @@
-package com.kairos.activity.persistence.model.wta.templates.template_types;
+package com.kairos.response.dto.web.wta;
 
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.activity.persistence.model.wta.templates.AgeRange;
-import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.response.dto.web.AgeRangeDTO;
+import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
 
 import java.util.List;
 
 /**
  * Created by pavan on 24/4/18.
  */
-public class MaximumSeniorDaysPerYear extends WTABaseRuleTemplate{
-    private List<AgeRange> ageRange;
+public class ChildCareDayCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
+    private List<AgeRangeDTO> ageRange;
     private List<Long> activities;
     private long validationStartDateMillis;
     private Long numberOfWeeks;
-    private WTATemplateType wtaTemplateType = WTATemplateType.MAXIMUM_SENIOR_DAYS_PER_YEAR;
+    private WTATemplateType wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
 
-    public MaximumSeniorDaysPerYear() {
+    public ChildCareDayCheckWTATemplateDTO() {
         //Default Constructor
     }
 
-    public MaximumSeniorDaysPerYear(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activities,
-                                    long validationStartDateMillis, Long numberOfWeeks) {
-        super(name , description);
+    public ChildCareDayCheckWTATemplateDTO(String name, boolean minimum, boolean disabled, String description, List<AgeRangeDTO> ageRange, List<Long> activities, long validationStartDateMillis, Long numberOfWeeks) {
+        super(name, description);
         this.disabled=disabled;
         this.ageRange = ageRange;
         this.activities = activities;
+
         this.validationStartDateMillis = validationStartDateMillis;
         this.numberOfWeeks = numberOfWeeks;
     }
 
-    public List<AgeRange> getAgeRange() {
+    public List<AgeRangeDTO> getAgeRange() {
         return ageRange;
     }
 
-    public void setAgeRange(List<AgeRange> ageRange) {
+    public void setAgeRange(List<AgeRangeDTO> ageRange) {
         this.ageRange = ageRange;
     }
 
@@ -45,6 +45,7 @@ public class MaximumSeniorDaysPerYear extends WTABaseRuleTemplate{
     public void setActivities(List<Long> activities) {
         this.activities = activities;
     }
+
 
     public long getValidationStartDateMillis() {
         return validationStartDateMillis;

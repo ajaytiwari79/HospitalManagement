@@ -2,6 +2,7 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
@@ -22,7 +23,16 @@ public class WeeklyRestPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
-    protected boolean minimum;
+    private MinMaxSetting minMaxSetting;
+
+
+    public MinMaxSetting getMinMaxSetting() {
+        return minMaxSetting;
+    }
+
+    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
+        this.minMaxSetting = minMaxSetting;
+    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -40,13 +50,6 @@ public class WeeklyRestPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.recommendedValue = recommendedValue;
     }
 
-    public boolean isMinimum() {
-        return minimum;
-    }
-
-    public void setMinimum(boolean minimum) {
-        this.minimum = minimum;
-    }
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;

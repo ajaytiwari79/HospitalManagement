@@ -57,6 +57,14 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("MATCH (pot:OrganizationType),(ot:OrganizationType) WHERE id(ot)={0} AND id(pot)={1} Create (pot)-[:HAS_SUB_TYPE]->(ot) return ot")
     OrganizationType createSubTypeRelation(Long subTypeId, Long parentTypeId);
 
+    @Query("match(c:Country) where id(c)={0}\n" +
+            "match(c)<-[:" + BELONGS_TO + "]-(or:OrganizationType{isEnable:true})\n" +
+            "optional match(or)-[:" + HAS_SUB_TYPE + "]->(ora:OrganizationType{isEnable:true})\n" +
+            "with or,ora\n" +
+            "WITH {name: or.name,id:id(or), children: CASE WHEN ora IS NOT NULL THEN collect({id:id(ora),name:ora.name}) ELSE [] END} as orga\n" +
+            "RETURN orga as result")
+    List<Map<String, Object>> getAllWTAWithOrganization(long countryId);
+
     @Query("Match (organization:Organization) where id(organization)={0} with organization\n" +
             "Match (organization)-[:TYPE_OF]->(organizationType:OrganizationType) with organizationType,organization\n" +
             "optional match (organizationType)-[:HAS_SUB_TYPE]->(subType:OrganizationType)<-[:SUB_TYPE_OF]-(organization) with subType,organizationType,organization\n" +
