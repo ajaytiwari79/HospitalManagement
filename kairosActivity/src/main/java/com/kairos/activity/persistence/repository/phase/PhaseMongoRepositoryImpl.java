@@ -69,4 +69,9 @@ public class PhaseMongoRepositoryImpl implements CustomPhaseMongoRepository{
         Query query = Query.query(Criteria.where("name").is(name).and("id").is(phaseId));
         return mongoTemplate.exists(query, Phase.class);
     }
+
+    public  Boolean checkPhaseBySequence(BigInteger phaseId, int sequence){
+        Query query = Query.query(Criteria.where("sequence").is(sequence).and("id").is(phaseId));
+        return mongoTemplate.exists(query, Phase.class);
+    }
 }
