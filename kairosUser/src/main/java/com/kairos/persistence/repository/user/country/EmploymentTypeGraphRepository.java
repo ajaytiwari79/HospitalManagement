@@ -37,7 +37,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
         @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND et.deleted={2}  with et\n" +
                 "MATCH (o:Organization)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n"+
                 "o,et,r \n" +
-                "return id(et) as id, et.name as name, et.description as description,\n" +
+                "return id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories , et.paymentFrequency as paymentFrequency, \n" +
                 "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +
                 "CASE WHEN r IS null THEN et.allowedForShiftPlan ELSE r.allowedForShiftPlan  END AS allowedForShiftPlan,\n" +
                 "CASE WHEN r IS null THEN et.allowedForFlexPool ELSE r.allowedForFlexPool  END AS allowedForFlexPool")
@@ -46,7 +46,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
         @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND  NOT (ID(et) IN {3}) AND et.deleted={2}  with et\n" +
                 "OPTIONAL MATCH (o:Organization)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n"+
                 "o,et,r \n" +
-                "return id(et) as id, et.name as name, et.description as description,\n" +
+                "return id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories , et.paymentFrequency as paymentFrequency, \n" +
                 "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +
                 "CASE WHEN r IS null THEN et.allowedForShiftPlan ELSE r.allowedForShiftPlan  END AS allowedForShiftPlan,\n" +
                 "CASE WHEN r IS null THEN et.allowedForFlexPool ELSE r.allowedForFlexPool  END AS allowedForFlexPool")
