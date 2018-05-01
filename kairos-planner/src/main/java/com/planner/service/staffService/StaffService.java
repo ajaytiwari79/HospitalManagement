@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Deprecated
 public class StaffService {
 
     private static Logger log = LoggerFactory.getLogger(StaffService.class);

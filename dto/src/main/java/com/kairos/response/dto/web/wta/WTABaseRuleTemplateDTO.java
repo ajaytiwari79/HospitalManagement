@@ -1,6 +1,8 @@
 package com.kairos.response.dto.web.wta;
 
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
 import java.math.BigInteger;
@@ -10,7 +12,12 @@ import java.util.List;
 /**
  * Created by Pradeep on 27/4/18.
  */
-
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "wtaTemplateType")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = AverageScheduledTimeWTATemplateDTO.class, name = "AVERAGE_SHEDULED_TIME")})
 public class WTABaseRuleTemplateDTO{
 
     protected BigInteger id;

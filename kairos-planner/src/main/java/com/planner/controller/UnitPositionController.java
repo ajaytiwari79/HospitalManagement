@@ -1,6 +1,6 @@
 package com.planner.controller;
 
-import com.kairos.response.dto.web.UnitPositionDTO;
+import com.kairos.response.dto.web.UnitPositionWtaDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.staff.UnitPositionService;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +18,7 @@ public class UnitPositionController {
     private UnitPositionService unitPositionService;
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ApiOperation("add unit position")
-    public ResponseEntity<Map<String, Object>> addUnitPosition(@RequestBody UnitPositionDTO unitPositionDTO,
+    public ResponseEntity<Map<String, Object>> addUnitPosition(@RequestBody UnitPositionWtaDTO unitPositionDTO,
                                                                @PathVariable Long unitId,@PathVariable(name = "staffId") Long staffKairosId) {
         unitPositionService.addUnitPosition(staffKairosId,unitId,unitPositionDTO);
         return ResponseHandler.generateResponse("Success",HttpStatus.OK);
@@ -26,7 +26,7 @@ public class UnitPositionController {
     }
     @RequestMapping(value = "/{unitPositionKairosId}", method = RequestMethod.PUT)
     @ApiOperation("update unit position")
-    public ResponseEntity<Map<String, Object>> updateUnitPosition(@RequestBody UnitPositionDTO unitPositionDTO,
+    public ResponseEntity<Map<String, Object>> updateUnitPosition(@RequestBody UnitPositionWtaDTO unitPositionDTO,
                                                                @PathVariable Long unitId,@PathVariable(name = "staffId") Long staffKairosId,@PathVariable Long unitPositionKairosId) {
         unitPositionService.updateUnitPosition(staffKairosId,unitId,unitPositionKairosId,unitPositionDTO);
         return ResponseHandler.generateResponse("Success",HttpStatus.OK);

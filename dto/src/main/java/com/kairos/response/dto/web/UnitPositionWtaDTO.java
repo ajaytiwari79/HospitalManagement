@@ -1,19 +1,18 @@
-package com.planner.domain.staff;
+package com.kairos.response.dto.web;
+
 
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
-import com.planner.domain.MongoBaseEntity;
 
-import java.util.List;
-
-public class UnitPosition  extends MongoBaseEntity {
-
+public class UnitPositionWtaDTO {
+    private Long id;
     private Long expertiseId;
     private Long positionCodeId;
     private Long startDateMillis;
     private Long endDateMillis;
     private int totalWeeklyMinutes;
     private int totalWeeklyHours;
+
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
     private float hourlyWages;
@@ -23,6 +22,15 @@ public class UnitPosition  extends MongoBaseEntity {
     private Long seniorityLevelId;
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
     private WTAResponseDTO wtaResponseDTO;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Long getExpertiseId() {
         return expertiseId;
     }
@@ -143,5 +151,22 @@ public class UnitPosition  extends MongoBaseEntity {
         this.wtaResponseDTO = wtaResponseDTO;
     }
 
-
+    public UnitPositionWtaDTO(Long id, Long expertiseId, Long positionCodeId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary, Long employmentTypeId, Long unitId, Long seniorityLevelId, PaidOutFrequencyEnum paidOutFrequencyEnum,WTAResponseDTO wtaResponseDTO) {
+        this.id = id;
+        this.expertiseId = expertiseId;
+        this.positionCodeId = positionCodeId;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.hourlyWages = hourlyWages;
+        this.salary = salary;
+        this.employmentTypeId = employmentTypeId;
+        this.unitId = unitId;
+        this.seniorityLevelId = seniorityLevelId;
+        this.paidOutFrequencyEnum = paidOutFrequencyEnum;
+        this.wtaResponseDTO=wtaResponseDTO;
+    }
 }

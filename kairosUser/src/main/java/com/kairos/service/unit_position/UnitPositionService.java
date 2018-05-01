@@ -3,6 +3,7 @@ package com.kairos.service.unit_position;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
@@ -60,6 +61,7 @@ import com.kairos.response.dto.web.PositionWrapper;
 
 import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
+import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.EmploymentService;
@@ -148,6 +150,8 @@ public class UnitPositionService extends UserBaseService {
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
     @Inject private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
+    @Inject
+    private PlannerSyncService plannerSyncService;
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
 
@@ -195,7 +199,7 @@ public class UnitPositionService extends UserBaseService {
         //      UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
         //timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(),id));
 
-
+        plannerSyncService.publishUnitPosition(id,unitPosition,employmentType,IntegrationOperation.CREATE);
         return positionWrapper;
     }
 
