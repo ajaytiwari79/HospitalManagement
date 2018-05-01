@@ -23,6 +23,7 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -1520,26 +1521,26 @@ public class StaffService extends UserBaseService {
     }
 
     public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long organizationId) {
-        /*StaffFavouriteFilters alreadyExistFilter = staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, staffFilterDTO.getModuleId());
+        /*StaffFavouriteFilter alreadyExistFilter = staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, staffFilterDTO.getModuleId());
         if(Optional.ofNullable(alreadyExistFilter).isPresent()){
-            throw new DuplicateDataException("StaffFavouriteFilters already exist !");
+            throw new DuplicateDataException("StaffFavouriteFilter already exist !");
         }*/
 
 
-        StaffFavouriteFilters staffFavouriteFilters = new StaffFavouriteFilters();
+        StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter();
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
         AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
-        staffFavouriteFilters.setAccessPage(accessPage);
-        staffFavouriteFilters.setFilterJson(staffFilterDTO.getFilterJson());
-        staffFavouriteFilters.setName(staffFilterDTO.getName());
-        save(staffFavouriteFilters);
-        staff.addFavouriteFilters(staffFavouriteFilters);
+//        staffFavouriteFilter.setAccessPage(accessPage);
+//        staffFavouriteFilter.setFilterJson(staffFilterDTO.getFilterJson());
+        staffFavouriteFilter.setName(staffFilterDTO.getName());
+        save(staffFavouriteFilter);
+        staff.addFavouriteFilters(staffFavouriteFilter);
         save(staff);
-        staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
+//        staffFilterDTO.setFilterJson(staffFavouriteFilter.getFilterJson());
         staffFilterDTO.setModuleId(accessPage.getModuleId());
-        staffFilterDTO.setName(staffFavouriteFilters.getName());
-        staffFilterDTO.setId(staffFavouriteFilters.getId());
+        staffFilterDTO.setName(staffFavouriteFilter.getName());
+        staffFilterDTO.setId(staffFavouriteFilter.getId());
         return staffFilterDTO;
 
 
@@ -1548,17 +1549,17 @@ public class StaffService extends UserBaseService {
     public StaffFilterDTO updateStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long organizationId) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
-        StaffFavouriteFilters staffFavouriteFilters = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFilterDTO.getId());
-        if (!Optional.ofNullable(staffFavouriteFilters).isPresent()) {
-            throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFilterDTO.getId());
+        StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFilterDTO.getId());
+        if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
+            throw new DataNotFoundByIdException("StaffFavouriteFilter  not found  with ID: " + staffFilterDTO.getId());
         }
         /*AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
-        staffFavouriteFilters.setAccessPage(accessPage);*/
-        staffFavouriteFilters.setFilterJson(staffFilterDTO.getFilterJson());
-        staffFavouriteFilters.setName(staffFilterDTO.getName());
-        staffFavouriteFilters.setEnabled(true);
-        save(staffFavouriteFilters);
-        staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
+        staffFavouriteFilter.setAccessPage(accessPage);*/
+//        staffFavouriteFilter.setFilterJson(staffFilterDTO.getFilterJson());
+        staffFavouriteFilter.setName(staffFilterDTO.getName());
+//        staffFavouriteFilter.setEnabled(true);
+        save(staffFavouriteFilter);
+//        staffFilterDTO.setFilterJson(staffFavouriteFilter.getFilterJson());
         // staffFilterDTO.setModuleId(accessPage.getModuleId());
         return staffFilterDTO;
 
@@ -1567,18 +1568,18 @@ public class StaffService extends UserBaseService {
     public boolean removeStaffFavouriteFilters(Long staffFavouriteFilterId, long organizationId) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
-        StaffFavouriteFilters staffFavouriteFilters = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
-        if (!Optional.ofNullable(staffFavouriteFilters).isPresent()) {
-            throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFavouriteFilterId);
+        StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
+        if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
+            throw new DataNotFoundByIdException("StaffFavouriteFilter  not found  with ID: " + staffFavouriteFilterId);
         }
 
-        staffFavouriteFilters.setEnabled(false);
-        save(staffFavouriteFilters);
+//        staffFavouriteFilter.setEnabled(false);
+        save(staffFavouriteFilter);
         return true;
 
     }
 
-    public List<StaffFavouriteFilters> getStaffFavouriteFilters(String moduleId, long organizationId) {
+    public List<FavoriteFilterQueryResult> getStaffFavouriteFilters(String moduleId, long organizationId) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
         return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staff.getId(), moduleId);

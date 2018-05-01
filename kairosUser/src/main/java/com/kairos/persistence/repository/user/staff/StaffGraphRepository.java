@@ -6,6 +6,7 @@ import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ClientStaffRelation;
 import com.kairos.persistence.model.user.client.ContactDetail;
+import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -361,12 +362,16 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     List<StaffPersonalDetailDTO> getAllMainEmploymentStaffDetailByUnitId(long unitId);
 
 
-    @Query("MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilters:StaffFavouriteFilters{enabled:true}) where id(staff)={0} with staffFavouriteFilters\n" +
-            "MATCH (staffFavouriteFilters)-[:" + FILTER_BY_PAGE + "]->(accessPage:AccessPage) where accessPage.moduleId={1} return staffFavouriteFilters\n")
-    List<StaffFavouriteFilters> getStaffFavouriteFiltersByStaffAndView(Long staffId, String moduleId);
+    /*@Query("MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilters:StaffFavouriteFilter{deleted:false}) where id(staff)={0} with staffFavouriteFilters\n" +
+            "MATCH (staffFavouriteFilters)-[:" + HAS_FILTER_GROUP + "]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) where accessPage.moduleId={1} return staffFavouriteFilters\n")*/
+    @Query("MATCH (staff:Staff)-[:"+HAS_FAVOURITE_FILTERS+"]->(staffFavouriteFilters:StaffFavouriteFilter{deleted:false}) where id(staff)={0} with staffFavouriteFilters \n" +
+            "MATCH (staffFavouriteFilters)-[:HAS_FILTER_GROUP]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) where accessPage.moduleId={1} \n" +
+            "MATCH (staffFavouriteFilters)-[:FILTER_DETAIL]-(filterDetail:FilterDetail) with staffFavouriteFilters, collect({id:id(filterDetail), name:filterDetail.name, value:filterDetail.value}) as filterDetails\n" +
+            "return id(staffFavouriteFilters) as id, staffFavouriteFilters.name as name, filterDetails as filtersData")
+    List<FavoriteFilterQueryResult> getStaffFavouriteFiltersByStaffAndView(Long staffId, String moduleId);
 
-    @Query("MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilters:StaffFavouriteFilters) where id(staff)={0} AND id(staffFavouriteFilters)={1} return staffFavouriteFilters")
-    StaffFavouriteFilters getStaffFavouriteFiltersById(Long staffId, Long staffFavouriteFiltersId);
+    @Query("MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilters:StaffFavouriteFilter) where id(staff)={0} AND id(staffFavouriteFilters)={1} return staffFavouriteFilters")
+    StaffFavouriteFilter getStaffFavouriteFiltersById(Long staffId, Long staffFavouriteFiltersId);
 
 
     @Query("MATCH (u:User)-[:BELONGS_TO]-(s:Staff) where id(u)={0} return s ")
@@ -394,8 +399,21 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long> {
     @Query("match(staff:Staff)-[:BELONGS_TO_STAFF]-(unitPosition:UnitPosition{deleted:false}) where staff.externalId={0} AND unitPosition.timeCareExternalId={1} " +
             "return unitPosition,staff ")
     StaffUnitPositionWrapper getStaff(Long externalId, Long timeCareExternalId);
+
     @Query("Match(staff:Staff)-[:BELONGS_TO]-(emp:Employment) where id(staff) = {0} return staff, emp.startDateMillis")
     StaffEmploymentDTO findStaffAndEmploymentByStaffId(Long staffId);
 
+
+
+    @Query("Match (organization:Organization)-[:" + HAS_EMPLOYMENTS + "]->(emp:Employment)-[:" + BELONGS_TO + "]->(staff:Staff)"+
+            "where id(organization)={1}" +
+            "Match (staff)-[:" + BELONGS_TO + "]->(user:User) where id(user)={0} "+
+            "MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilter:StaffFavouriteFilter{deleted:false}) "+
+            "WHERE id(staffFavouriteFilter) = {2} return staffFavouriteFilter")
+   StaffFavouriteFilter getStaffFavouriteFiltersOfStaffInOrganizationById(Long userId, Long organizationId, Long staffFavouriteFilterId);
+
+    @Query("MATCH (staffFavouriteFilter:StaffFavouriteFilter)-[r:"+FILTER_DETAIL+"]->(filterDetail:FilterDetail) WHERE id(staffFavouriteFilter)={0} \n"+
+            "DELETE r,filterDetail")
+    void detachStaffFavouriteFilterDetails(Long staffFavouriteFilterId);
 
 }
