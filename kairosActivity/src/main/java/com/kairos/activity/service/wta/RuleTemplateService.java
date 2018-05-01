@@ -224,7 +224,7 @@ public class RuleTemplateService extends MongoBaseService {
 
         //
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = WTABuilderService.copyRuleTemplatesToDTO(templateList);
-        assignCategoryToRuleTemplate(categoryList,wtaBaseRuleTemplateDTOS);
+        //assignCategoryToRuleTemplate(categoryList,wtaBaseRuleTemplateDTOS);
         RuleTemplateWrapper wrapper = new RuleTemplateWrapper();
         wrapper.setCategoryList(categoryList);
         wrapper.setTemplateList(wtaBaseRuleTemplateDTOS);
