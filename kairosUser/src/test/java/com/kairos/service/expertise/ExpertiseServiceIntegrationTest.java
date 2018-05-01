@@ -26,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -58,7 +59,7 @@ public class ExpertiseServiceIntegrationTest {
     @OrderTest(order = 1)
     public void saveExpertise() throws Exception {
         SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO(1, 4, 1L, new BigDecimal(1.5), new BigDecimal(2.5), new BigDecimal(5.6));
-        CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, serviceId
+        CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, Collections.singleton(serviceId)
                 , unionId, 12, 12, PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
         HttpEntity<CountryExpertiseDTO> entity = new HttpEntity<>(expertiseDTO);
         ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryExpertiseDTO>> typeReference =
@@ -79,7 +80,7 @@ public class ExpertiseServiceIntegrationTest {
     public void addSeniorityLevelInExpertise() throws Exception {
         expertiseId = 2955L;
         SeniorityLevelDTO seniorityLevelDTO = new SeniorityLevelDTO(0, 6, 1L, new BigDecimal(1.5), new BigDecimal(2.5), new BigDecimal(5.6));
-        CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, serviceId
+        CountryExpertiseDTO expertiseDTO = new CountryExpertiseDTO("Ex1", "", DateUtil.getCurrentDate(), null, organizationLevelId, Collections.singleton(serviceId)
                 , unionId, 12, 12, PaidOutFrequencyEnum.MONTHLY, seniorityLevelDTO);
         expertiseDTO.setId(expertiseId);
         HttpEntity<CountryExpertiseDTO> entity = new HttpEntity<>(expertiseDTO);
