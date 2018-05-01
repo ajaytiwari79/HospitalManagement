@@ -25,4 +25,11 @@ public class SkillActivityTab implements Serializable {
     public void setActivitySkills(List<ActivitySkill> activitySkills) {
         this.activitySkills = activitySkills;
     }
+    public List<Long> getActivitySkillIds() {
+        List<Long> skillIds=new ArrayList<>();
+        for (ActivitySkill activitySkill:activitySkills){
+            skillIds.add(activitySkill.getSkillId());
+        }
+        return skillIds;
+    }
 }

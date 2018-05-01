@@ -183,7 +183,7 @@ public class UnitPositionService extends UserBaseService {
 
         unitPosition.setUnit(organization);
         save(unitPosition);
-        Employment employment = employmentService.updateEmploymentEndDate(organization, unitPositionDTO);
+        Employment employment = employmentService.updateEmploymentEndDate(organization, unitPositionDTO.getStaffId(),unitPositionDTO.getEndDateMillis());
 
         UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
@@ -279,21 +279,26 @@ public class UnitPositionService extends UserBaseService {
         }
         preparePosition(oldUnitPosition, unitPositionDTO);
         save(oldUnitPosition);
-        Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO);
+        Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
+                unitPositionDTO.getEndDateMillis());
         EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
 
         return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null),employmentQueryResult);
 
     }
 
-    public boolean removePosition(long positionId) {
+    public EmploymentQueryResult removePosition(long positionId, Long unitId) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(positionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
-            return false;
+            throw new DataNotFoundByIdException("UnitPosition doesn't exist with id: "+ positionId);
         }
         unitPosition.setDeleted(true);
         save(unitPosition);
-        return true;
+
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(positionId);
+        Employment employment = employmentService.updateEmploymentEndDate(unit,staffId);
+        return new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
     }
 
    /* private void copyAndLinkNewWTA(UnitPosition unitPosition, WorkingTimeAgreement workingTimeAgreement) {
@@ -558,6 +563,7 @@ public class UnitPositionService extends UserBaseService {
         positionCtaWtaQueryResult.setExpertise(currentExpertise.get().retrieveBasicDetails());
         FunctionAndSeniorityLevelQueryResult seniorityLevel = (appliedSeniorityLevel != null) ? seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId()) : null;
         positionCtaWtaQueryResult.setApplicableSeniorityLevel(seniorityLevel);
+        positionCtaWtaQueryResult.setUnion(currentExpertise.get().getUnion());
 
         return positionCtaWtaQueryResult;
     }
@@ -850,7 +856,7 @@ public class UnitPositionService extends UserBaseService {
         Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
         employment.setEndDateMillis(endDateMillis);
         employmentGraphRepository.save(employment);
-        if(DateUtil.getDateFromEpoch(endDateMillis).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0) {
+        if(Optional.ofNullable(employmentEndDate).isPresent()&&(DateUtil.getDateFromEpoch(endDateMillis).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0)) {
             //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
             List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
             employmentService.moveToReadOnlyAccessGroup(employmentIds);

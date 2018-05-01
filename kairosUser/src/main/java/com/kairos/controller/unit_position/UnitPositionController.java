@@ -49,8 +49,8 @@ public class UnitPositionController {
 
     @ApiOperation(value = "Remove unit_position")
     @DeleteMapping(value = "/unit_position/{unitPositionId}")
-    public ResponseEntity<Map<String, Object>> deleteUnitPosition(@PathVariable Long unitPositionId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removePosition(unitPositionId));
+    public ResponseEntity<Map<String, Object>> deleteUnitPosition(@PathVariable Long unitId, @PathVariable Long unitPositionId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPositionService.removePosition(unitPositionId,unitId));
     }
 
 
