@@ -20,7 +20,7 @@ import com.kairos.activity.response.dto.activity.ActivityCategoryListDTO;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
 import com.kairos.activity.response.dto.staffing_level.*;
 import com.kairos.activity.service.MongoBaseService;
-import com.kairos.service.integration.PlannerSyncService;
+import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.event.ShiftNotificationEvent;
