@@ -23,7 +23,7 @@ import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
-import com.kairos.service.integration.IntegrationService;
+import com.kairos.activity.service.integration.IntegrationService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;

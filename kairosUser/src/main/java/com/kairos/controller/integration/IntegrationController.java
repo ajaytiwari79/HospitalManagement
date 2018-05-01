@@ -3,7 +3,7 @@ package com.kairos.controller.integration;
 import com.kairos.persistence.model.user.integration.TimeCare;
 import com.kairos.persistence.model.user.integration.Twillio;
 import com.kairos.persistence.model.user.integration.Visitour;
-import com.kairos.service.integration.IntegrationService;
+import com.kairos.activity.service.integration.IntegrationService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

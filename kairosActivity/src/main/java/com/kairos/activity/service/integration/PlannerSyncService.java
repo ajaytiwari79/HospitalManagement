@@ -1,4 +1,4 @@
-package com.kairos.service.integration;
+package com.kairos.activity.service.integration;
 
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.client.planner.PlannerRestClient;

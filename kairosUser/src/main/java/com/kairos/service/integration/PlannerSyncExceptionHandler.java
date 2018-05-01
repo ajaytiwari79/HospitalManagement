@@ -1,4 +1,4 @@
-package com.kairos.service.integration;
+package com.kairos.activity.service.integration;
 
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class PlannerSyncExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(PlannerSyncExceptionHandler.class);
-        @AfterThrowing(pointcut = "execution(* com.kairos.service.integration.*.*(..))", throwing = "ex")
+        @AfterThrowing(pointcut = "execution(* com.kairos.activity.service.integration.*.*(..))", throwing = "ex")
         public void logError(Exception ex) {
             logger.error("Exception while syncing to planner.",ex);
     }
