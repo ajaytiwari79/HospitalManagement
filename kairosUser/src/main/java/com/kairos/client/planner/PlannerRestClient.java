@@ -1,8 +1,8 @@
-package com.kairos.activity.client.planner;
+package com.kairos.client.planner;
 
-import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
+import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.activity.ActivityNoTabsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
+import static com.kairos.client.RestClientURLUtil.getPlannerBaseUrl;
 
-import static com.kairos.activity.util.RestClientUrlUtil.getPlannerBaseUrl;
+
 @Service
 public class PlannerRestClient {
     private Logger logger = LoggerFactory.getLogger(PlannerRestClient.class);
@@ -67,8 +67,6 @@ public class PlannerRestClient {
             uri= "staffing_level";
         }else if(t instanceof ActivityNoTabsDTO){
             uri= "activity";
-        }else if(t instanceof ArrayList && t.getClass().getGenericSuperclass().equals(StaffingLevelDto.class)){
-            uri= "staffing_level/multiple";
         }
         return uri;
     }

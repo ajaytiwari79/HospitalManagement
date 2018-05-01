@@ -20,14 +20,14 @@ public class StaffingLevel extends MongoBaseEntity {
     public StaffingLevel() {
     }
 
-    public StaffingLevel(BigInteger id, BigInteger unitId, Long phaseId, Date currentDate, Long weekCount, StaffingLevelSetting staffingLevelSetting, List<StaffingLevelTimeSlotDTO> staffingLevelInterval) {
-        this.id=id;
+    public StaffingLevel(BigInteger unitId, Long phaseId, Date currentDate, Long weekCount, StaffingLevelSetting staffingLevelSetting, List<StaffingLevelTimeSlotDTO> staffingLevelInterval,BigInteger kariosId) {
         this.phaseId = phaseId;
         this.currentDate = currentDate;
         this.weekCount = weekCount;
         this.staffingLevelSetting = staffingLevelSetting;
         this.staffingLevelInterval = staffingLevelInterval;
         this.unitId=unitId;
+        this.kairosId=kariosId;
     }
 
     public Long getPhaseId() {
