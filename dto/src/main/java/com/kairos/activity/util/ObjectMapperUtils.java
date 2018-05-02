@@ -2,6 +2,7 @@ package com.kairos.activity.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -69,6 +70,7 @@ public class ObjectMapperUtils {
     public static <T extends Object,E extends Object> List<E> copyPropertiesByObjectMapper(List<T> objects1, E Objects) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        //mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         try {
             return mapper.convertValue(mapper.writeValueAsString(objects1), new TypeReference<List<E>>() {});
         } catch (JsonProcessingException e) {
@@ -83,6 +85,7 @@ public class ObjectMapperUtils {
     public static <T> T copyPropertiesByMapper(Object object,Class<T> valueType){
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        //objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         try {
             return objectMapper.readValue(objectMapper.writeValueAsString(object), valueType);
         } catch (IOException e) {

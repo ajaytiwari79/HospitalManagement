@@ -3,6 +3,8 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
 
@@ -13,6 +15,7 @@ import java.util.List;
 /**
  * Created by Pradeep on 27/4/18.
  */
+//@JsonDeserialize(using = JsonDeserializer.class)
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,

@@ -36,12 +36,12 @@ public class WorkingTimeAgreementRestClient {
     public List<WTAResponseDTO> getWTAByExpertise(Long expertiseId){
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<Long> request = new HttpEntity<>(expertiseId);
+            //HttpEntity<Long> request = new HttpEntity<>(expertiseId);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/expertise/{expertiseId}/wta",
-                            HttpMethod.GET, request, typeReference);
+                            HttpMethod.GET, null, typeReference,expertiseId);
 
             RestTemplateResponseEnvelope<List<WTAResponseDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
@@ -60,14 +60,40 @@ public class WorkingTimeAgreementRestClient {
     public WTAResponseDTO getWTAById(BigInteger wtaId){
         String baseUrl = getBaseUrl(true);
         try {
-            HttpEntity<BigInteger> request = new HttpEntity<>(wtaId);
+           // HttpEntity<BigInteger> request = new HttpEntity<>(wtaId);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<WTAResponseDTO>>() {};
             ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/wta/{wtaId}",
-                            HttpMethod.GET, request, typeReference);
+                            HttpMethod.GET, null, typeReference,wtaId);
 
             RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+
+    }
+
+    public List<WTAResponseDTO> getWTAByIds(List<BigInteger> wtaIds){
+        String baseUrl = getBaseUrl(true);
+        String param = wtaIds.toString().replace("[","").replace("]","");
+        try {
+            //HttpEntity<List<BigInteger>> request = new HttpEntity<>(wtaIds);
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<WTAResponseDTO>>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<List<WTAResponseDTO>>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/wta/getWTAByIds?wtaIds="+param,
+                            HttpMethod.GET, null, typeReference);
+
+            RestTemplateResponseEnvelope<List<WTAResponseDTO>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
@@ -90,7 +116,7 @@ public class WorkingTimeAgreementRestClient {
             ResponseEntity<RestTemplateResponseEnvelope<WTAResponseDTO>> restExchange =
                     restTemplate.exchange(
                             baseUrl + "/wta/{wtaId}",
-                            HttpMethod.POST, request, typeReference);
+                            HttpMethod.POST, null, typeReference,wtaId);
 
             RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {

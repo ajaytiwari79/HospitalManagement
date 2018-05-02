@@ -135,6 +135,14 @@ public class OrganizationController {
                 organizationService.getOrganizationById(unitId));
     }
 
+    @ApiOperation(value = "Get Organization with countryId")
+    @RequestMapping(value = UNIT_URL+"/getOrganisationWithCountryId", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationWithCountryId(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationWithCountryId(unitId));
+    }
+
     @ApiOperation(value = "Get Organization's showCountryTag setting by Id")
     @RequestMapping(value = UNIT_URL + "/show_country_tags", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

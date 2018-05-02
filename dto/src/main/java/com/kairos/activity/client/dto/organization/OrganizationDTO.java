@@ -1,6 +1,8 @@
 package com.kairos.activity.client.dto.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.response.dto.web.OrganizationTypeDTO;
 
 import java.util.List;
 
@@ -22,6 +24,16 @@ public class OrganizationDTO {
     private int nightShiftTimeDeduction = 7; //in percentage
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
     private boolean isOneTimeSyncPerformed;
+    private Long countryId;
+
+
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
+    }
 
     public Long getId() {
         return id;
