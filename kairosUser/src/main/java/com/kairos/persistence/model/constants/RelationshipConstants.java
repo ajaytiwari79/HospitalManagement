@@ -235,6 +235,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_SENIORITY_LEVEL = "HAS_SENIORITY_LEVEL";
     public final static String HAS_REASON_CODE = "HAS_REASON_CODE";
     public final static String HAS_PAYMENT_SETTINGS = "HAS_PAYMENT_SETTINGS";
+    public final static String HAS_PERSONALIZED_SETTINGS = "HAS_PERSONALIZED_SETTINGS";
 
 
     /**

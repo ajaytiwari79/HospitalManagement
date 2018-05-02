@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StaffCreationPOJOData {
+public class StaffCreationDTO {
     @NotNull(message = "error.staff.firstname.notnull")
     private String firstName;
     @NotNull(message = "error.staff.lastname.notnull")
@@ -49,7 +49,7 @@ public class StaffCreationPOJOData {
         this.accessGroupId = accessGroupId;
     }
 
-    public StaffCreationPOJOData() {
+    public StaffCreationDTO() {
     }
 
     public String getFirstName() {
@@ -176,7 +176,7 @@ public class StaffCreationPOJOData {
         this.currentStatus = currentStatus;
     }
 
-    public StaffCreationPOJOData(@NotNull(message = "error.staff.firstname.notnull") String firstName, @NotNull(message = "error.staff.lastname.notnull") String lastName, @NotNull(message = "error.staff.cprNumber.notnull") String cprNumber, String familyName, @Email(message = "error.email.valid") String privateEmail, Gender gender, String userName, @NotNull(message = "error.staff.externalid.notnull") Long externalId, @NotNull(message = "error.staff.accessGroup.id.notnull") Long accessGroupId) {
+    public StaffCreationDTO(@NotNull(message = "error.staff.firstname.notnull") String firstName, @NotNull(message = "error.staff.lastname.notnull") String lastName, @NotNull(message = "error.staff.cprNumber.notnull") String cprNumber, String familyName, @Email(message = "error.email.valid") String privateEmail, Gender gender, String userName, @NotNull(message = "error.staff.externalid.notnull") Long externalId, @NotNull(message = "error.staff.accessGroup.id.notnull") Long accessGroupId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.cprNumber = cprNumber;
