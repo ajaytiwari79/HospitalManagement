@@ -60,6 +60,7 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.unit_position.UnitPositionService;
 
+import com.kairos.service.user_filter.UserFilterService;
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
@@ -145,6 +146,8 @@ public class StaffService extends UserBaseService {
     private StaffAddressService staffAddressService;
     @Inject
     private AccessGroupService accessGroupService;
+    @Inject
+    UserFilterService userFilterService;
 
     @Autowired
     UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
@@ -368,6 +371,43 @@ public class StaffService extends UserBaseService {
             return null;
         }
         return staff.retrieveNotes();
+    }
+
+
+    public Map<String, Object> getStaffWithFilter(Long unitId, String type, long id, Boolean allStaffRequired, StaffFilterDTO staffFilterDTO) {
+
+        List<StaffPersonalDetailDTO> staff = null;
+        Long countryId = null;
+        List<AccessGroup> roles = null;
+        List<EngineerType> engineerTypes = null;
+        Map<String, Object> map = new HashMap();
+        if (ORGANIZATION.equalsIgnoreCase(type)) {
+//            staff = getStaffWithBasicInfo(id, allStaffRequired);
+            map.put("staffList", userFilterService.getAllStaffByUnitId( unitId, allStaffRequired, staffFilterDTO));
+            roles = accessGroupService.getAccessGroups(id);
+            countryId = countryGraphRepository.getCountryIdByUnitId(id);
+            engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
+        } else if (GROUP.equalsIgnoreCase(type)) {
+            staff = staffGraphRepository.getStaffByGroupId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+            Organization organization = organizationGraphRepository.getOrganizationByGroupId(id).getOrganization();
+            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
+            roles = accessGroupService.getAccessGroups(organization.getId());
+        } else if (TEAM.equalsIgnoreCase(type)) {
+            staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+            Organization organization = organizationGraphRepository.getOrganizationByTeamId(id);
+            roles = accessGroupService.getAccessGroups(organization.getId());
+            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
+        }
+
+
+        if(Optional.ofNullable(staff).isPresent()){
+            map.put("staffList", staff);
+        }
+
+        map.put("engineerTypes", engineerTypes);
+        map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
+        map.put("roles", roles);
+        return map;
     }
 
 
@@ -1457,6 +1497,22 @@ public class StaffService extends UserBaseService {
 
         return unitManagers;
     }
+
+    /*public List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired) {
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
+        }
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = new ArrayList<>();
+        if (allStaffRequired) {
+            Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+            // unit is parent so fetching all staff from itself
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentOrganization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        } else {
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffHavingUnitPositionByUnitId(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        }
+        return staffPersonalDetailDTOS;
+    }*/
 
     public List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired) {
         Organization unit = organizationGraphRepository.findOne(unitId);

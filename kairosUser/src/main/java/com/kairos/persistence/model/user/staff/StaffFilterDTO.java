@@ -18,7 +18,7 @@ public class StaffFilterDTO {
     private String filterJson;
     private List<FilterDetail> filtersData;
     private long id;
-    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
+//    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;
 
     public long getId() {

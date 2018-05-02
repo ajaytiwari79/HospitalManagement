@@ -87,6 +87,13 @@ public class UserFilterController {
     public ResponseEntity<Map<String, Object>> deleteFavouriteFilter(@PathVariable Long filterId,@PathVariable Long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.deleteFavouriteFilter(filterId, organizationId));
     }
+
+    @RequestMapping(value = UNIT_URL+"/staff_list_with_filter", method = RequestMethod.POST)
+    @ApiOperation("Get All staff List available in Org")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId, @RequestParam("unitPosition") boolean allStaffRequired, @RequestBody StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, allStaffRequired, staffFilterDTO));
+    }
     /*@RequestMapping(value = "/filter/{filterId}", method = RequestMethod.DELETE)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
