@@ -28,16 +28,21 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     @Inject
     private Session session;
 
+    public String appendWhereOrAndPreFixOnQueryString(int countOfSubString){
+        String subString =  (countOfSubString == 0 ?  " WHEN" : ((countOfSubString > 0) ?  " AND" : "") );
+        return subString;
+    }
 
     public String getMatchQueryForPropertiesOfStaffByFilters(Map<FilterEntityType, List<String>> filters){
         String matchQueryForStaff = "";
-//        Boolean enable
+        int countOfSubString = 0;
         if(Optional.ofNullable(filters.get(FilterEntityType.STAFF_STATUS)).isPresent()){
-            matchQueryForStaff+= " WHERE staff.currentStatus IN {staffStatusList} ";
+            matchQueryForStaff+= appendWhereOrAndPreFixOnQueryString(countOfSubString) + "  staff.currentStatus IN {staffStatusList} ";
+            countOfSubString+= 1;
         }
         if(Optional.ofNullable(filters.get(FilterEntityType.GENDER)).isPresent()){
-            matchQueryForStaff+= " AND user.gender IN {genderList} ";
-
+            matchQueryForStaff+= appendWhereOrAndPreFixOnQueryString(countOfSubString) + " user.gender IN {genderList} ";
+//            countOfSubString+= 1;
         }
         return matchQueryForStaff;
     }
@@ -54,7 +59,6 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             matchRelationshipQueryForStaff+= " MATCH (unitPos)-[HAS_EXPERTISE_IN]-(expertise:Expertise) "+
                     "WHERE id(expertise) IN {expertiseIds} with user, staff, unitPos";
         }
-
         return matchRelationshipQueryForStaff;
     }
 
@@ -91,7 +95,6 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }
         queryParameters.put("imagePath", imagePath);
 
-
         String query = "";
         if(fetchStaffHavingUnitPosition){
             query+= " MATCH (staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization:Organization) where id(organization)={unitId}"+
@@ -101,8 +104,8 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             query+= " MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff) where id(organization)={parentOrganizationId} "+
                     " MATCH (staff)-[:BELONGS_TO]->(user:User)  "+ getMatchQueryForPropertiesOfStaffByFilters(filters)+
                     " with user, staff OPTIONAL MATCH (staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization:Organization) where id(organization)={unitId} with user, staff, unitPos";
-
         }
+
         query+= getMatchQueryForRelationshipOfStaffByFilters(filters);
 
         query+= " Optional MATCH (staff)-[:HAS_CONTACT_ADDRESS]-(contactAddress:ContactAddress) ";
@@ -119,13 +122,6 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                 "cprNumber:staff.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, "+
                 "gender:user.gender, profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType) } as staff\n";
 
-
-        /*query+= " return distinct id(staff) as id, contactAddress.city as city,contactAddress.province as province ,"+
-                "staff.firstName as firstName,staff.lastName as lastName,staff.employedSince as employedSince,"+
-                "staff.badgeNumber as badgeNumber, staff.userName as userName,staff.externalId as externalId,"+
-                "staff.cprNumber as cprNumber,staff.visitourTeamId as visitourTeamId,staff.familyName as familyName, "+
-                "user.gender as gender, {imagePath} + staff.profilePic as profilePic, id(engineerType) as engineerType with params\n";
-*/
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class , query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map> toList());
     }
 
