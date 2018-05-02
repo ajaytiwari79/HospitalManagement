@@ -65,7 +65,7 @@ public class StaffingLevelServiceTest {
             staffingLevelInterval.setAvailableNoOfStaff(0);
             StaffingLevelIntervals.add(staffingLevelInterval);
         }
-        staffingLevel.setStaffingLevelInterval(StaffingLevelIntervals);
+        staffingLevel.setPresenceStaffingLevelInterval(StaffingLevelIntervals);
 
     }
 
@@ -77,7 +77,7 @@ public class StaffingLevelServiceTest {
       //shift.setEndDate(DateUtils.asDate(LocalTime.MAX));
       shiftNotificationEvent.setShift(shift);
       StaffingLevel staffingLevel1=staffingLevelService.updateStaffingLevelAvailableStaffCountForNewlyCreatedShift(staffingLevel,shiftNotificationEvent);
-      staffingLevel1.getStaffingLevelInterval().stream().forEach(staffingLevelInterval -> Assert.assertEquals(1L,staffingLevelInterval.getAvailableNoOfStaff()));
+      staffingLevel1.getPresenceStaffingLevelInterval().stream().forEach(staffingLevelInterval -> Assert.assertEquals(1L,staffingLevelInterval.getAvailableNoOfStaff()));
 
     }
 
@@ -96,7 +96,7 @@ public class StaffingLevelServiceTest {
         shiftNotificationEvent.setPreviousStateShift(shift);
         shiftNotificationEvent.setShift(updatedShift);
         StaffingLevel updatedStaffingLevel2=staffingLevelService.updateStaffingLevelAvailableStaffCountForUpdatedShift(updatedStaffingLevel1,shiftNotificationEvent);
-        updatedStaffingLevel2.getStaffingLevelInterval().stream().forEach(staffingLevelInterval -> {
+        updatedStaffingLevel2.getPresenceStaffingLevelInterval().stream().forEach(staffingLevelInterval -> {
             if(staffingLevelInterval.getStaffingLevelDuration().getFrom().compareTo(LocalTime.NOON)<0){
                         Assert.assertEquals(1L,staffingLevelInterval.getAvailableNoOfStaff());
                     }

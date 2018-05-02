@@ -8,6 +8,11 @@ import org.springframework.stereotype.Component;
 public class RestClientURLUtil {
 
     private static  String userServiceUrl;
+    private static  String plannerServiceUrl;
+    @Value("${gateway.plannerservice.url}")
+    public void setPlannerServiceUrl(String plannerServiceUrl) {
+        RestClientURLUtil.plannerServiceUrl = plannerServiceUrl;
+    }
     @Value("${gateway.activityservice.url}")
     public  void setUserServiceUrl(String userServiceUrl) {
         RestClientURLUtil.userServiceUrl = userServiceUrl;
@@ -24,5 +29,10 @@ public class RestClientURLUtil {
     }
     public final static String getBaseUrl(){
             return userServiceUrl;
+    }
+    public static final String getPlannerBaseUrl(){
+        String baseUrl=new StringBuilder(plannerServiceUrl+"unit/").toString();
+        return baseUrl;
+
     }
 }

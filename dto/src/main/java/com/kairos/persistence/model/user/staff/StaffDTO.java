@@ -174,4 +174,28 @@ public class StaffDTO {
     public void setCurrentStatus(StaffStatusEnum currentStatus) {
         this.currentStatus = currentStatus;
     }
+
+    public StaffDTO() {
+    }
+
+    public StaffDTO(Long id, String firstName, String lastName, BigInteger cprNumber,String familyName, String privateEmail, Integer privatePhone,
+                    String workEmail, Integer workPhone, Date employedSince,Long inactiveFrom,Long teamId, List<Long> skills,
+                    Long unit, Long anonymousStaffId,StaffStatusEnum currentStatus) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.cprNumber = cprNumber;
+        this.familyName = familyName;
+        this.privateEmail = privateEmail;
+        this.privatePhone = privatePhone;
+        this.workEmail = workEmail;
+        this.workPhone = workPhone;
+        this.employedSince = employedSince;
+        this.inactiveFrom = inactiveFrom;
+        this.teamId = teamId;
+        this.skills = skills;
+        this.unit = unit;
+        this.anonymousStaffId = anonymousStaffId;
+        this.currentStatus = currentStatus;
+    }
 }

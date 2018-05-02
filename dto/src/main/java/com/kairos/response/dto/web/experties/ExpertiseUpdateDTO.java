@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by vipul on 30/3/18.
@@ -30,7 +31,7 @@ public class ExpertiseUpdateDTO {
     private Long organizationLevelId;
 
     @NotNull(message = "services can not be null")
-    private Long serviceId;
+    private Set<Long> organizationServiceIds;
 
     @NotNull(message = "union can not be null")
     private Long unionId;
@@ -99,12 +100,12 @@ public class ExpertiseUpdateDTO {
         this.organizationLevelId = organizationLevelId;
     }
 
-    public Long getServiceId() {
-        return serviceId;
+    public Set<Long> getOrganizationServiceIds() {
+        return organizationServiceIds;
     }
 
-    public void setServiceId(Long serviceId) {
-        this.serviceId = serviceId;
+    public void setOrganizationServiceIds(Set<Long> organizationServiceIds) {
+        this.organizationServiceIds = organizationServiceIds;
     }
 
     public Long getUnionId() {

@@ -17,7 +17,6 @@ import com.kairos.service.staff.StaffAddressService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.DateConverter;
-import com.kairos.util.DateUtil;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -477,8 +476,8 @@ public class StaffController {
 
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationPOJOData staffCreationPOJOData) throws ParseException {
-        Staff staff = staffService.createStaffFromWeb(unitId, staffCreationPOJOData);
+    public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) throws ParseException {
+        Staff staff = staffService.createStaffFromWeb(unitId, staffCreationDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staff);
     }
 

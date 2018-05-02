@@ -13,6 +13,7 @@ public class UnitPositionDTO {
     private Long endDateMillis;
     private Long lastWorkingDateMillis;
     private int totalWeeklyMinutes;
+    private int fullTimeWeeklyMinutes;
 
     private float avgDailyWorkingHours;
     private int workingDaysInWeek;
@@ -22,6 +23,15 @@ public class UnitPositionDTO {
     private Long timeCareExternalId;
 
     public UnitPositionDTO() {
+    }
+
+
+    public int getFullTimeWeeklyMinutes() {
+        return fullTimeWeeklyMinutes;
+    }
+
+    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
     }
 
     public Long getId() {
