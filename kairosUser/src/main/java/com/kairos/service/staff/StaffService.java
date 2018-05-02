@@ -962,7 +962,7 @@ public class StaffService extends UserBaseService {
     }
 
 
-    public Staff createStaffFromWeb(Long unitId, StaffCreationPOJOData payload) throws ParseException {
+    public Staff createStaffFromWeb(Long unitId, StaffCreationDTO payload) throws ParseException {
 
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
@@ -995,7 +995,7 @@ public class StaffService extends UserBaseService {
         return staff;
     }
 
-    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationPOJOData staffCreationPOJOData){
+    public User createUnitManagerForNewOrganization(Long organizationId, StaffCreationDTO staffCreationPOJOData){
         User user = userGraphRepository.findByEmail(staffCreationPOJOData.getPrivateEmail().trim());
         if(!Optional.ofNullable(user).isPresent()){
             user = new User();
@@ -1006,7 +1006,7 @@ public class StaffService extends UserBaseService {
         return user;
     }
 
-    private void setBasicDetailsOfUser(User user, StaffCreationPOJOData staffCreationDTO) {
+    private void setBasicDetailsOfUser(User user, StaffCreationDTO staffCreationDTO) {
         user.setEmail(staffCreationDTO.getPrivateEmail());
         user.setUserName(staffCreationDTO.getPrivateEmail());
         user.setFirstName(staffCreationDTO.getFirstName());
@@ -1019,7 +1019,7 @@ public class StaffService extends UserBaseService {
         }
     }
 
-    private Staff createStaffObject(Organization parent, Organization unit, StaffCreationPOJOData payload) {
+    private Staff createStaffObject(Organization parent, Organization unit, StaffCreationDTO payload) {
 
         StaffQueryResult staffQueryResult;
         if (Optional.ofNullable(parent).isPresent()) {
@@ -1684,7 +1684,7 @@ public class StaffService extends UserBaseService {
             } else {
                 timeCareStaffDTO.setGender(null);
             }
-            StaffCreationPOJOData payload = objectMapper.convertValue(timeCareStaffDTO, StaffCreationPOJOData.class);
+            StaffCreationDTO payload = objectMapper.convertValue(timeCareStaffDTO, StaffCreationDTO.class);
             payload.setAccessGroupId(accessGroup.getId());
             payload.setPrivateEmail(email);
             setBasicDetailsOfUser(user, payload);
