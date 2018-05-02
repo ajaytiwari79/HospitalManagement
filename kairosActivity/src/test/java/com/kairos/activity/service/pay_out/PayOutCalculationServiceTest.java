@@ -6,7 +6,7 @@ import com.kairos.activity.persistence.model.pay_out.DailyPayOutEntry;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
-import com.kairos.activity.response.dto.pay_out.UnitPositionWithCtaDetailsDTO;
+import com.kairos.response.dto.pay_out.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.util.DateUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;

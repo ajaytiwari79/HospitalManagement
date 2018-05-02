@@ -1,4 +1,4 @@
-package com.kairos.activity.response.dto.pay_out;
+package com.kairos.response.dto.pay_out;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

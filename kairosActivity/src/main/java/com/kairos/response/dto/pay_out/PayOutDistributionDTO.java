@@ -1,22 +1,22 @@
-package com.kairos.activity.response.dto.pay_out;
+package com.kairos.response.dto.pay_out;
 
-public class PayOutCTADistributionDTO {
+public class PayOutDistributionDTO {
 
     //cta ruletemplate based distributions
     private Long id;
     private String name;
     private int minutes;
 
-    public PayOutCTADistributionDTO() {
+    public PayOutDistributionDTO() {
     }
 
-    public PayOutCTADistributionDTO(Long id, String name, int minutes) {
+    public PayOutDistributionDTO(Long id, String name, int minutes) {
         this.id = id;
         this.name = name;
         this.minutes = minutes;
     }
 
-    public PayOutCTADistributionDTO(Long id, int minutes) {
+    public PayOutDistributionDTO(Long id, int minutes) {
         this.id = id;
         this.minutes = minutes;
     }

@@ -1,8 +1,8 @@
 package com.kairos.activity.service.pay_out;
 
 import com.kairos.activity.persistence.model.activity.Shift;
-import com.kairos.activity.response.dto.pay_out.CalculatedPayOutByDateDTO;
-import com.kairos.activity.response.dto.pay_out.UnitPositionWithCtaDetailsDTO;
+import com.kairos.response.dto.pay_out.CalculatedPayOutByDateDTO;
+import com.kairos.response.dto.pay_out.UnitPositionWithCtaDetailsDTO;
 import com.kairos.activity.util.DateUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;

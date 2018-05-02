@@ -1,4 +1,4 @@
-package com.kairos.activity.response.dto.pay_out;
+package com.kairos.response.dto.pay_out;
 
 import com.kairos.activity.util.TimeInterval;
 
