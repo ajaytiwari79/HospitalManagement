@@ -207,10 +207,12 @@ public class UserFilterService extends UserBaseService{
     }
 
     public StaffFilterDTO updateFavouriteFilter(Long filterId, Long organizationId, StaffFilterDTO favouriteFilterDTO){
-        // TODO update favourite filter
         Long userId = UserContext.getUserDetails().getId();
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
                 userId, organizationId, filterId);
+        if(!Optional.ofNullable(staffFavouriteFilter).isPresent()){
+            throw new InvalidRequestException("Invalid id of favourite filter : "+filterId);
+        }
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
         List<FilterDetail> filters =  favouriteFilterDTO.getFiltersData();
         filters.forEach(filterDetail -> {filterDetail.setId(null);});
@@ -220,8 +222,21 @@ public class UserFilterService extends UserBaseService{
         return favouriteFilterDTO;
     }
 
+    public Boolean deleteFavouriteFilter(Long filterId, Long organizationId){
+        Long userId = UserContext.getUserDetails().getId();
+        StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
+                userId, organizationId, filterId);
+        if(!Optional.ofNullable(staffFavouriteFilter).isPresent()){
+            throw new InvalidRequestException("Invalid id of favourite filter : "+filterId);
+        }
+        staffFavouriteFilter.setDeleted(true);
+        save(staffFavouriteFilter);
+        return true;
+    }
+
     public List<FilterDetailQueryResult> getEmploymenTypeFiltersDataByCountry(Long countryId){
         return employmentTypeGraphRepository.getEmploymentTypeByCountryIdForFilters(countryId);
     }
+
 
 }

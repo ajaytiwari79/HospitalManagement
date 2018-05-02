@@ -59,18 +59,21 @@ public class UserFilterController {
     public ResponseEntity<Map<String, Object>> getAllFilters(@PathVariable long organizationId, @PathVariable String moduleId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getStaffFavouriteFilters(moduleId, organizationId));
     }*/
+
     @RequestMapping(value = "/filter", method = RequestMethod.POST)
     @ApiOperation("To add favourite filters")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addFavouriteFilter(@RequestBody StaffFilterDTO staffFilterDTO,@PathVariable Long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.addFavouriteFilter(organizationId, staffFilterDTO));
     }
+
     @RequestMapping(value = "/filter/{filterId}", method = RequestMethod.PUT)
     @ApiOperation("To update favourite filters ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateFavouriteFilter(@PathVariable Long filterId,@PathVariable Long organizationId, @RequestBody StaffFilterDTO staffFilterDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.updateFavouriteFilter(filterId, organizationId, staffFilterDTO));
     }
+
     @RequestMapping(value = "/all_filter/{moduleId}", method = RequestMethod.GET)
     @ApiOperation("To get all and favourite filters")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -78,6 +81,12 @@ public class UserFilterController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllAndFavouriteFilters(moduleId, organizationId));
     }
 
+    @RequestMapping(value = "/filter/{filterId}", method = RequestMethod.DELETE)
+    @ApiOperation("To delete favourite filters ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteFavouriteFilter(@PathVariable Long filterId,@PathVariable Long organizationId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.deleteFavouriteFilter(filterId, organizationId));
+    }
     /*@RequestMapping(value = "/filter/{filterId}", method = RequestMethod.DELETE)
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
