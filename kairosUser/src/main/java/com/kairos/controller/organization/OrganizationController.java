@@ -1298,6 +1298,22 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getTimeZoneStringOfUnit(unitId));
     }
+//    @Pavan
+//    Add Apis for Time slots for Shift planning
+
+    @ApiOperation(value = "Get Organization Time Slot sets")
+    @RequestMapping(value = "/unit/{unitId}/shift_planning/time_slot_set", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotSetsByUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotSetsByUnit(unitId));
+    }
+
+    @ApiOperation(value = "Get Organization Time Slots")
+    @RequestMapping(value = "/unit/{unitId}/time_slot_set/{timeSlotSetId}/shift_planning/time_slot", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotsByUnit(@PathVariable Long timeSlotSetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotsByUnit(timeSlotSetId));
+    }
 }
 
 
