@@ -15,5 +15,13 @@ public class SelfRosteringViewDto {
     public void setAbsenceViewSettings(AbsenceViewSettings absenceViewSettings) {
         this.absenceViewSettings = absenceViewSettings;
     }
+    public SelfRosteringViewDto() {
+
+    }
+
+    public SelfRosteringViewDto(AbsenceViewSettings absenceViewSettings) {
+        this.absenceViewSettings = absenceViewSettings;
+
+    }
 
 }

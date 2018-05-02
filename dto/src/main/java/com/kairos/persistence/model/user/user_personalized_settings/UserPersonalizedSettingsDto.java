@@ -13,4 +13,11 @@ public class UserPersonalizedSettingsDto {
     }
 
     private SelfRosteringViewDto selfRosteringView;
+
+    public UserPersonalizedSettingsDto() {
+
+    }
+    public UserPersonalizedSettingsDto(SelfRosteringViewDto selfRosteringView) {
+        this.selfRosteringView = selfRosteringView;
+    }
 }
