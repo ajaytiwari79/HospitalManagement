@@ -600,6 +600,7 @@ public class UnitPositionService extends UserBaseService {
 */        //unitPosition.setWorkingTimeAgreement(newWta);
         updateDTO.setId(wtaId);
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO);
+        unitPosition.setWorkingTimeAgreementId(wtaResponseDTO.getId());
         save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
         //newWta.setParentWTA(oldWta.basicDetails());
@@ -643,7 +644,7 @@ public class UnitPositionService extends UserBaseService {
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
                 unitPosition.getId(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
                 unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), null/*unitPosition.getWorkingTimeAgreement()*/);
-        result.setReasonCodeId(unitPosition.getReasonCode().getId());
+       // result.setReasonCodeId(unitPosition.getReasonCode().getId());
         result.setUnitId(unitPositionQueryResult.getUnitId());
         result.setParentUnitId(unitPositionQueryResult.getParentUnitId());
 

@@ -510,17 +510,29 @@ public class WTAService extends MongoBaseService {
         if(wtadto.getEndDateMillis()!=null){
             oldWta.setEndDate(new Date(wtadto.getEndDateMillis()));
         }
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
+        if (wtadto.getRuleTemplates().size() > 0) {
+            wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), true);
+            save(wtaBaseRuleTemplates);
+            List<BigInteger> ruleTemplatesIds = wtaBaseRuleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
+            newWta.setRuleTemplateIds(ruleTemplatesIds);
+        }
         save(oldWta);
         newWta.setParentWTA(oldWta.getId());
         newWta.setDisabled(false);
         newWta.setParentWTA(oldWta.getId());
         save(newWta);
         //WorkingTimeAgreement workingTimeAgreement = wtaRepository.findOne(newWta.getId());
-        WTAResponseDTO wtaResponseDTO = new WTAResponseDTO();
         //BeanUtils.copyProperties(workingTimeAgreement,wtaResponseDTO);
         //WTAResponseDTO parentWta = new WTAResponseDTO();
         //BeanUtils.copyProperties(oldWta,parentWta);
         //wtaResponseDTO.setParentWTA(parentWta);
+        WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(newWta, WTAResponseDTO.class);
+        wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(wtaBaseRuleTemplates));
+        wtaResponseDTO.setStartDateMillis(oldWta.getStartDate().getTime());
+        if (oldWta.getEndDate() != null) {
+            wtaResponseDTO.setEndDateMillis(oldWta.getEndDate().getTime());
+        }
         return wtaResponseDTO;
     }
 
