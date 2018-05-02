@@ -259,9 +259,9 @@ public class WTAService extends MongoBaseService {
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(oldWta,WTAResponseDTO.class);
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
         //wtaResponseDTO.setRuleTemplateIds( wtaBuilderService.getRuleTemplateDTO(oldWta));
-        WTAQueryResultDTO parentWTA = wtaRepository.getOne(oldWta.getParentWTA());
-        WTAResponseDTO PrentDTO = ObjectMapperUtils.copyPropertiesByMapper(parentWTA,WTAResponseDTO.class);
-        wtaResponseDTO.setParentWTA(PrentDTO);
+        //WTAQueryResultDTO parentWTA = wtaRepository.getOne(oldWta.getParentWTA());
+        //WTAResponseDTO PrentDTO = ObjectMapperUtils.copyPropertiesByMapper(parentWTA,WTAResponseDTO.class);
+        //wtaResponseDTO.setParentWTA(PrentDTO);
         //assignUpdatedWTAToOrganization(newWta, updateDTO.getOrganizationSubType(), oldWta.getId());
 //        oldWta.setCountryId(null);
 //        oldWta.setOrganizationType(null);
@@ -395,7 +395,7 @@ public class WTAService extends MongoBaseService {
             WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wta.getId());
             newWtaObject.setCountryId(null);
             map.put("wta", newWtaObject);
-            map.put("ruleTemplate", wtaBuilderService.getRuleTemplateDTO(wtaQueryResultDTO));
+            map.put("ruleTemplate", wtaQueryResultDTO.getRuleTemplates());
         } else {
             wta.setDeleted(true);
             save(wta);
@@ -479,12 +479,12 @@ public class WTAService extends MongoBaseService {
         newWta.setDisabled(false);
         newWta.setParentWTA(oldWta.getId());
         save(newWta);
-        WorkingTimeAgreement workingTimeAgreement = wtaRepository.findOne(newWta.getId());
+        //WorkingTimeAgreement workingTimeAgreement = wtaRepository.findOne(newWta.getId());
         WTAResponseDTO wtaResponseDTO = new WTAResponseDTO();
-        BeanUtils.copyProperties(workingTimeAgreement,wtaResponseDTO);
-        WTAResponseDTO parentWta = new WTAResponseDTO();
-        BeanUtils.copyProperties(oldWta,parentWta);
-        wtaResponseDTO.setParentWTA(parentWta);
+        //BeanUtils.copyProperties(workingTimeAgreement,wtaResponseDTO);
+        //WTAResponseDTO parentWta = new WTAResponseDTO();
+        //BeanUtils.copyProperties(oldWta,parentWta);
+        //wtaResponseDTO.setParentWTA(parentWta);
         return wtaResponseDTO;
     }
 

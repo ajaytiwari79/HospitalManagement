@@ -3,13 +3,11 @@ package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kairos.activity.persistence.enums.WTATemplateType;
+import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
 
 import java.math.BigInteger;
 import java.util.List;
-
-import static com.kairos.activity.persistence.enums.WTATemplateType.AVERAGE_SHEDULED_TIME;
 
 
 /**
@@ -35,7 +33,8 @@ import static com.kairos.activity.persistence.enums.WTATemplateType.AVERAGE_SHED
         @JsonSubTypes.Type(value = NumberOfWeekendShiftsInPeriodWTATemplateDTO.class, name = "NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD"),
         @JsonSubTypes.Type(value = ShortestAndAverageDailyRestWTATemplateDTO.class, name = "SHORTEST_AND_AVERAGE_DAILY_REST"),
         @JsonSubTypes.Type(value = SeniorDaysPerYearWTATemplateDTO.class, name = "SENIOR_DAYS_PER_YEAR"),
-        @JsonSubTypes.Type(value = ChildCareDayCheckWTATemplateDTO.class, name = "CHILD_CARE_DAYS_CHECK")
+        @JsonSubTypes.Type(value = ChildCareDaysCheckWTATemplateDTO.class, name = "CHILD_CARE_DAYS_CHECK"),
+        @JsonSubTypes.Type(value = BreaksInShiftWTATemplateDTO.class, name = "BREAK_IN_SHIFT"),
 
 })
 public class WTABaseRuleTemplateDTO{
@@ -49,7 +48,7 @@ public class WTABaseRuleTemplateDTO{
     protected Long countryId;
 
     protected RuleTemplateCategoryDTO ruleTemplateCategory;
-    private WTATemplateType wtaTemplateType;
+    protected WTATemplateType wtaTemplateType;
 
 
     public WTATemplateType getWtaTemplateType() {
@@ -60,7 +59,7 @@ public class WTABaseRuleTemplateDTO{
         this.wtaTemplateType = wtaTemplateType;
     }
 
-    protected List<PhaseTemplateValueDTO> phaseTemplateValues;
+    protected List<PhaseTemplateValue> phaseTemplateValues;
 
     public RuleTemplateCategoryDTO getRuleTemplateCategory() {
         return ruleTemplateCategory;
@@ -129,11 +128,11 @@ public class WTABaseRuleTemplateDTO{
     }
 
 
-    public List<PhaseTemplateValueDTO> getPhaseTemplateValues() {
+    public List<PhaseTemplateValue> getPhaseTemplateValues() {
         return phaseTemplateValues;
     }
 
-    public void setPhaseTemplateValues(List<PhaseTemplateValueDTO> phaseTemplateValues) {
+    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
         this.phaseTemplateValues = phaseTemplateValues;
     }
     public String getLastUpdatedBy() {

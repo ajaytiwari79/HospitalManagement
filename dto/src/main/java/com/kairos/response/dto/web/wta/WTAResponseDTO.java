@@ -1,7 +1,6 @@
 package com.kairos.response.dto.web.wta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.persistence.model.wta.templates.template_types.RuleTemplateResponseDTO;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.tag.TagDTO;
@@ -21,7 +20,7 @@ public class WTAResponseDTO {
 
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
 
-    private WTAResponseDTO parentWTA;
+    private BigInteger parentWTA;
 
     private Long startDateMillis;
     private Long endDateMillis;
@@ -34,11 +33,16 @@ public class WTAResponseDTO {
     private ExpertiseResponseDTO expertise;
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
-
+    private WTAResponseDTO parentWTAResponse;
     private List<TagDTO> tags;
 
+    public WTAResponseDTO getParentWTAResponse() {
+        return parentWTAResponse;
+    }
 
-
+    public void setParentWTAResponse(WTAResponseDTO parentWTAResponse) {
+        this.parentWTAResponse = parentWTAResponse;
+    }
 
     public Date getStartDate() {
         return startDate;
@@ -158,11 +162,11 @@ public class WTAResponseDTO {
         this.tags = tags;
     }
 
-    public WTAResponseDTO getParentWTA() {
+    public BigInteger getParentWTA() {
         return parentWTA;
     }
 
-    public void setParentWTA(WTAResponseDTO parentWTA) {
+    public void setParentWTA(BigInteger parentWTA) {
         this.parentWTA = parentWTA;
     }
 
