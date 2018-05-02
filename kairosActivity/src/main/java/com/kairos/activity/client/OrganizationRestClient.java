@@ -69,6 +69,30 @@ public class OrganizationRestClient {
         }
     }
 
+    public OrganizationDTO getOrganizationWithCountryId(long unitId) {
+
+        final String baseUrl = RestClientUrlUtil.getBaseUrl(false);
+
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<OrganizationDTO>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/unit/{unitId}/getOrganisationWithCountryId",
+                            HttpMethod.GET, null, typeReference, unitId);
+            RestTemplateResponseEnvelope<OrganizationDTO> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
+        }
+    }
+
 
     /**
      * @param unitId

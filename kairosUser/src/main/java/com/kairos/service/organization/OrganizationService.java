@@ -206,6 +206,14 @@ public class OrganizationService extends UserBaseService {
         return organizationGraphRepository.findOne(id);
     }
 
+    public com.kairos.activity.client.dto.organization.OrganizationDTO getOrganizationWithCountryId(long id) {
+        Organization organization = organizationGraphRepository.findOne(id);
+        Country country = organizationGraphRepository.getCountry(organization.getId());
+        com.kairos.activity.client.dto.organization.OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(organization, com.kairos.activity.client.dto.organization.OrganizationDTO.class);
+        organizationDTO.setCountryId(country.getId());
+        return organizationDTO;
+    }
+
     public boolean showCountryTagForOrganization(long id) {
         Organization organization = organizationGraphRepository.findOne(id);
         if (organization.isShowCountryTags()) {

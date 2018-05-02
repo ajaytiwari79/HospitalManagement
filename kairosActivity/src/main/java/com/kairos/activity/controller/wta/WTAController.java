@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.activity.constants.ApiConstants.*;
@@ -180,6 +181,20 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> getDefaultWtaInfo(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getDefaultWtaInfo(countryId));
     }
+
+    @ApiOperation(value = "get Wta By Ids")
+    @GetMapping(value = UNIT_URL + "/wta/getWTAByIds")
+    public ResponseEntity<Map<String, Object>> getWTAByIds(@RequestParam List<BigInteger> wtaIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAByIds(wtaIds));
+    }
+
+    @ApiOperation(value = "get Wta By Ids")
+    @PostMapping(value = UNIT_URL + "/wta/{wtaId}")
+    public ResponseEntity<Map<String, Object>> assignWTAToUnitPosition(@PathVariable BigInteger wtaId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignWTAToUnitPosition(wtaId));
+    }
+
+
 
 
 

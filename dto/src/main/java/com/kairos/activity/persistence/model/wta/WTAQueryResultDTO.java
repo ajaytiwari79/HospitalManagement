@@ -1,6 +1,5 @@
 package com.kairos.activity.persistence.model.wta;
 
-import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.tag.TagDTO;

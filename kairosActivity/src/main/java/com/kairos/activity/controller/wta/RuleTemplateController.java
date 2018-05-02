@@ -58,7 +58,7 @@ public class RuleTemplateController {
 
     @RequestMapping(value = UNIT_URL+"/rule_templates", method = RequestMethod.GET)
     ResponseEntity<Map<String, Object>> getRulesTemplateCategoryByUnit(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateCategoryService.getRulesTemplateCategoryByUnit(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.getRulesTemplateCategoryByUnit(unitId));
     }
 
     @RequestMapping(value = COUNTRY_URL+"/copy_rule_template", method = RequestMethod.POST)

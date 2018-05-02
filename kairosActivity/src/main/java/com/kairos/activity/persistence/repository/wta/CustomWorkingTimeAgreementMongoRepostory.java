@@ -17,7 +17,7 @@ import java.util.Map;
 public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAResponseDTO> getWtaByOrganization(Long organizationId);
-    WTAQueryResultDTO getOne(BigInteger wtaId);
+    WTAResponseDTO getOne(BigInteger wtaId);
 
     List<WTAResponseDTO> getAllWTAByOrganizationTypeId(long organizationId);
 
@@ -35,4 +35,8 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
     List<WTAResponseDTO> getAllWtaOfOrganizationByExpertise(Long unitId,Long expertiseId);
 
     WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
+
+    boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
+
+    List<WTAResponseDTO> getAllWTAByIds(List<BigInteger> wtaIds);
 }

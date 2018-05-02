@@ -60,15 +60,13 @@ public class RuleTemplateService extends UserBaseService {
         long timeInMins = 10;
         long daysCount = 10;
         long dateInMillis = DateUtil.getCurrentDate().getTime();
-<<<<<<< HEAD
+
         AgeRange ageRange=new AgeRange(0,0,0);
         List<Long> activities=new ArrayList<>();
-=======
         List<BreakTemplateValue> breakTemplateValues=new ArrayList<>();
         BreakTemplateValue breakTemplateValue=new BreakTemplateValue();
         breakTemplateValues.add(breakTemplateValue);
 
->>>>>>> KP-3090
 
 
         MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = new MaximumShiftLengthWTATemplate(MAXIMUM_SHIFT_LENGTH.getName(), MAXIMUM_SHIFT_LENGTH.getTemplateType(), true, MAXIMUM_SHIFT_LENGTH.getDescription(), timeInMins, balanceTypes, true);

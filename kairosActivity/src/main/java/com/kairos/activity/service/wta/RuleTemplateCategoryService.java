@@ -196,22 +196,6 @@ public class RuleTemplateCategoryService extends MongoBaseService {
     }
 
 
-    public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
-        OrganizationDTO organization = organizationRestClient.getOrganization(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            throw new DataNotFoundByIdException("Organization does not exist");
-        }
-        List<WTAResponseDTO> wtaResponseDTOS = workingTimeAgreementMongoRepository.getWtaByOrganization(organization.getId());
-        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.getRuleTemplateCategoryByUnitId(unitId);
-        List<WTABaseRuleTemplateDTO> templateList = wtaResponseDTOS.stream().flatMap(wtaResponseDTO ->wtaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
-        assignCategoryToRuleTemplate(categoryList,templateList);
-        RuleTemplateWrapper ruleTemplateWrapper = new RuleTemplateWrapper();
-        ruleTemplateWrapper.setCategoryList(categoryList);
-        ruleTemplateWrapper.setTemplateList(templateList);
-
-        return ruleTemplateWrapper;
-
-    }
 
     public void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList,List<WTABaseRuleTemplateDTO> templateList){
         for (RuleTemplateCategoryTagDTO ruleTemplateCategoryTagDTO : categoryList) {

@@ -56,8 +56,6 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
     /*@Query("{organization.id:?0,deleted:false}")
     List<WTAResponseDTO> getWtaByOrganization(Long organizationId);*/
 
-    @Query("{name:?0,organization.id:?1,id:?2,deleted:false}")
-    boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
 
    /* @Query("{}")
     void removeOldWorkingTimeAgreement(BigInteger wtaId, Long organizationId, Long endDateInMillis);
