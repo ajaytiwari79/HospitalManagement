@@ -195,7 +195,11 @@ public class WTAController {
     }
 
 
-
+    @ApiOperation(value = "get Wta By Id")
+    @GetMapping(value = UNIT_URL + "/wta/{wtaId}")
+    public ResponseEntity<Map<String, Object>> getWTAById(@PathVariable BigInteger wtaId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWta(wtaId));
+    }
 
 
 

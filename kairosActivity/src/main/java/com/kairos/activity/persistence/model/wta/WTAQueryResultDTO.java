@@ -1,5 +1,6 @@
 package com.kairos.activity.persistence.model.wta;
 
+import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.tag.TagDTO;
@@ -17,11 +18,11 @@ import java.util.List;
 
 public class WTAQueryResultDTO {
 
-    private WTAQueryResultDTO parentWTA;
+    private BigInteger parentWTA;
 
-    private WTAQueryResultDTO countryParentWTA;
+    private BigInteger countryParentWTA;
 
-    private WTAQueryResultDTO organizationParentWTA;
+    private BigInteger organizationParentWTA;
 
 
     private Date startDate;
@@ -34,32 +35,32 @@ public class WTAQueryResultDTO {
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
 
-    private List<WTABaseRuleTemplateDTO> ruleTemplates
+    private List<WTABaseRuleTemplate> ruleTemplates
     ;
 
     private List<TagDTO> tags = new ArrayList<>();
 
-    public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
+    public List<WTABaseRuleTemplate> getRuleTemplates() {
         return ruleTemplates;
     }
 
-    public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
+    public void setRuleTemplates(List<WTABaseRuleTemplate> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 
-    public WTAQueryResultDTO getCountryParentWTA() {
+    public BigInteger getCountryParentWTA() {
         return countryParentWTA;
     }
 
-    public void setCountryParentWTA(WTAQueryResultDTO countryParentWTA) {
+    public void setCountryParentWTA(BigInteger countryParentWTA) {
         this.countryParentWTA = countryParentWTA;
     }
 
-    public WTAQueryResultDTO getOrganizationParentWTA() {
+    public BigInteger getOrganizationParentWTA() {
         return organizationParentWTA;
     }
 
-    public void setOrganizationParentWTA(WTAQueryResultDTO organizationParentWTA) {
+    public void setOrganizationParentWTA(BigInteger organizationParentWTA) {
         this.organizationParentWTA = organizationParentWTA;
     }
 
@@ -71,11 +72,11 @@ public class WTAQueryResultDTO {
         this.tags = tags;
     }
 
-    public WTAQueryResultDTO getParentWTA() {
+    public BigInteger getParentWTA() {
         return parentWTA;
     }
 
-    public void setParentWTA(WTAQueryResultDTO parentWTA) {
+    public void setParentWTA(BigInteger parentWTA) {
         this.parentWTA = parentWTA;
     }
 
