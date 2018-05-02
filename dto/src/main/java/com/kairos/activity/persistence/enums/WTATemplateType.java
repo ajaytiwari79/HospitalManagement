@@ -24,7 +24,8 @@ public enum WTATemplateType {
     NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD("Number Of Weekend Shift In Period"),
     SHORTEST_AND_AVERAGE_DAILY_REST("Shortest And Average Daily Rest"),
     SENIOR_DAYS_PER_YEAR("Maximum Senior Days Per Year"),
-    CHILD_CARE_DAYS_CHECK("Child Care Day Check");
+    CHILD_CARE_DAYS_CHECK("Child Care Day Check"),
+    BREAK_IN_SHIFT("Break In Shift");
 
     private String value;
 

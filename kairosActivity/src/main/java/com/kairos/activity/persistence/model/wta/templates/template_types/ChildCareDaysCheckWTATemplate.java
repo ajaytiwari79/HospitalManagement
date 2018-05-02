@@ -6,6 +6,8 @@ import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,10 +18,29 @@ import java.util.List;
 public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
     private List<Long> activities;
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private List<Long> plannedTimeIds = new ArrayList<>();;
     private long validationStartDateMillis;
     private int numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
+
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
 
     public boolean isCarryForwardLeave() {
         return carryForwardLeave;

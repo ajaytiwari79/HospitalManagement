@@ -182,6 +182,19 @@ public class RuleTemplateCategoryService extends MongoBaseService {
 
     }
 
+    public RuleTemplateCategoryDTO updateRuleTemplateCategory(Long countryId, BigInteger templateCategoryId,RuleTemplateCategoryDTO ruleTemplateCategory){
+        CountryDTO country = countryRestClient.getCountryById(countryId);
+        if (!Optional.ofNullable(country).isPresent()) {
+            throw new ActionNotPermittedException("Country not exists " + countryId);
+        }
+        RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryMongoRepository.findById(templateCategoryId).get();
+        ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
+        ruleTemplateCategoryObj.setDescription(ruleTemplateCategory.getDescription());
+        save(ruleTemplateCategoryObj);
+        ruleTemplateCategory.setId(ruleTemplateCategoryObj.getId());
+        return ruleTemplateCategory;
+    }
+
 
     public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
         OrganizationDTO organization = organizationRestClient.getOrganization(unitId);

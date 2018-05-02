@@ -2,7 +2,6 @@ package com.kairos.response.dto.web.aggrements;
 
 
 
-import com.kairos.activity.persistence.model.wta.templates.template_types.RuleTemplateResponseDTO;
 import com.kairos.response.dto.web.wta.RuleTemplateCategoryTagDTO;
 import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
 

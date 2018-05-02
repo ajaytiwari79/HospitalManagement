@@ -128,7 +128,7 @@ public class RuleTemplateService extends MongoBaseService {
 
         VetoPerPeriodWTATemplate vetoPerPeriodWTATemplate = new VetoPerPeriodWTATemplate("Maximum veto per period",true,"Maximum veto per period",2.0);
         vetoPerPeriodWTATemplate.setCountryId(countryDTO.getId());
-        vetoPerPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+        //vetoPerPeriodWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         vetoPerPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(vetoPerPeriodWTATemplate);
 
@@ -196,9 +196,15 @@ public class RuleTemplateService extends MongoBaseService {
 
         ChildCareDaysCheckWTATemplate careDaysCheck=new ChildCareDaysCheckWTATemplate("Child Care Days Check",true,"Child Care Days Check",Arrays.asList(range),new ArrayList<>(),5,dateInMillis,12);
         careDaysCheck.setCountryId(countryDTO.getId());
-        careDaysCheck.setPhaseTemplateValues(phaseTemplateValues);
+        //careDaysCheck.setPhaseTemplateValues(phaseTemplateValues);
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
+
+        BreaksInShiftWTATemplate breaksInShiftWTATemplate = new BreaksInShiftWTATemplate("Break In Shift",true,"Break In Shift",Arrays.asList(new BreakTemplateValue()));
+        breaksInShiftWTATemplate.setCountryId(countryDTO.getId());
+        breaksInShiftWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+        breaksInShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+        wtaBaseRuleTemplates1.add(breaksInShiftWTATemplate);
         save(wtaBaseRuleTemplates1);
 
 
@@ -224,7 +230,7 @@ public class RuleTemplateService extends MongoBaseService {
 
         //
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = WTABuilderService.copyRuleTemplatesToDTO(templateList);
-        //assignCategoryToRuleTemplate(categoryList,wtaBaseRuleTemplateDTOS);
+        assignCategoryToRuleTemplate(categoryList,wtaBaseRuleTemplateDTOS);
         RuleTemplateWrapper wrapper = new RuleTemplateWrapper();
         wrapper.setCategoryList(categoryList);
         wrapper.setTemplateList(wtaBaseRuleTemplateDTOS);
@@ -310,7 +316,7 @@ public class RuleTemplateService extends MongoBaseService {
         }
        /* String templateType=getTemplateType(templateDTO.getTemplateType());
         WTATemplateType ruleTemplateType = getByTemplateType(templateType);*/
-        oldTemplate = WTABuilderService.copyDTOToRuleTemplate(templateDTO);
+        oldTemplate = WTABuilderService.copyRuleTemplate(templateDTO,false);
         //BigInteger ruleTemplateCategoryId = checkAndAssignRuleTemplateCategory(oldTemplate, templateDTO);
         CurrentUserDetails currentUserDetails = UserContext.getUserDetails();
         //List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();

@@ -32,6 +32,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("organization.id").is(organizationId)),
                 lookup("WTABaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
+
         );
         AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
         return result.getMappedResults();
@@ -61,8 +62,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     public List<WTAResponseDTO> getAllWTAByCountryId(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("countryId").is(countryId)),
-                lookup("WTABaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates"),
-                project().andExclude("parentWTA")
+                lookup("WTABaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
         AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
         return result.getMappedResults();

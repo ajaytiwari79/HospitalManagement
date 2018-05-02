@@ -68,6 +68,7 @@ public class ObjectMapperUtils {
 
     public static <T extends Object,E extends Object> List<E> copyPropertiesByObjectMapper(List<T> objects1, E Objects) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
             return mapper.convertValue(mapper.writeValueAsString(objects1), new TypeReference<List<E>>() {});
         } catch (JsonProcessingException e) {

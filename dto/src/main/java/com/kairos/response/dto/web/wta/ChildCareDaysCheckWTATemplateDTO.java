@@ -1,49 +1,68 @@
 package com.kairos.response.dto.web.wta;
 
 import com.kairos.activity.persistence.enums.WTATemplateType;
-import com.kairos.response.dto.web.AgeRangeDTO;
-import com.kairos.response.dto.web.wta.WTABaseRuleTemplateDTO;
+import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
  * Created by pavan on 24/4/18.
  */
-public class ChildCareDayCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
-    private List<AgeRangeDTO> ageRange;
-    private List<Long> activities;
+public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
+    private List<AgeRange> ageRange;
+    private List<Long> activitieIds;
     private long validationStartDateMillis;
     private Long numberOfWeeks;
     private WTATemplateType wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
+    private List<BigInteger> timeTypeIds;
+    private List<Long> plannedTimeIds;
 
-    public ChildCareDayCheckWTATemplateDTO() {
+    public ChildCareDaysCheckWTATemplateDTO() {
         //Default Constructor
     }
 
-    public ChildCareDayCheckWTATemplateDTO(String name, boolean minimum, boolean disabled, String description, List<AgeRangeDTO> ageRange, List<Long> activities, long validationStartDateMillis, Long numberOfWeeks) {
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
+    }
+
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
+    }
+
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public ChildCareDaysCheckWTATemplateDTO(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activitieIds, long validationStartDateMillis, Long numberOfWeeks) {
         super(name, description);
         this.disabled=disabled;
         this.ageRange = ageRange;
-        this.activities = activities;
+        this.activitieIds = activitieIds;
 
         this.validationStartDateMillis = validationStartDateMillis;
         this.numberOfWeeks = numberOfWeeks;
     }
 
-    public List<AgeRangeDTO> getAgeRange() {
+    public List<AgeRange> getAgeRange() {
         return ageRange;
     }
 
-    public void setAgeRange(List<AgeRangeDTO> ageRange) {
+    public void setAgeRange(List<AgeRange> ageRange) {
         this.ageRange = ageRange;
     }
 
-    public List<Long> getActivities() {
-        return activities;
+    public List<Long> getActivitieIds() {
+        return activitieIds;
     }
 
-    public void setActivities(List<Long> activities) {
-        this.activities = activities;
+    public void setActivitieIds(List<Long> activitieIds) {
+        this.activitieIds = activitieIds;
     }
 
 

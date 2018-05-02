@@ -3,8 +3,9 @@ package com.kairos.response.dto.web.wta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.enums.WTATemplateType;
+import com.kairos.activity.persistence.model.wta.templates.AgeRange;
+import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
-import com.kairos.response.dto.web.AgeRangeDTO;
 
 
 import java.math.BigInteger;
@@ -17,7 +18,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WTARuleTemplateDTO {
-    private List<PhaseTemplateValueDTO> phaseTemplateValues;
+    private List<PhaseTemplateValue> phaseTemplateValues;
 
     private RuleTemplateCategoryDTO ruleTemplateCategory;
     private WTATemplateType wtaTemplateType;
@@ -63,7 +64,7 @@ public class WTARuleTemplateDTO {
     private Integer yellowZone;
     private Boolean forbid;
     private Boolean allowExtraActivity;
-    private List<AgeRangeDTO> ageRange;
+    private List<AgeRange> ageRange;
     private List<Long> activities;
 
     public WTATemplateType getWtaTemplateType() {
@@ -397,11 +398,11 @@ public class WTARuleTemplateDTO {
     public void setActivityCode(String activityCode) {
         this.activityCode = activityCode;
     }
-    public List<PhaseTemplateValueDTO> getPhaseTemplateValues() {
+    public List<PhaseTemplateValue> getPhaseTemplateValues() {
         return phaseTemplateValues;
     }
 
-    public void setPhaseTemplateValues(List<PhaseTemplateValueDTO> phaseTemplateValues) {
+    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
         this.phaseTemplateValues = phaseTemplateValues;
     }
 
@@ -437,11 +438,11 @@ public class WTARuleTemplateDTO {
         this.allowExtraActivity = allowExtraActivity;
     }
 
-    public List<AgeRangeDTO> getAgeRange() {
+    public List<AgeRange> getAgeRange() {
         return ageRange;
     }
 
-    public void setAgeRange(List<AgeRangeDTO> ageRange) {
+    public void setAgeRange(List<AgeRange> ageRange) {
         this.ageRange = ageRange;
     }
 
