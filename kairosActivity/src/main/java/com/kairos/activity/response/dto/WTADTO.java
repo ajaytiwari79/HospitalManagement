@@ -25,7 +25,7 @@ public class WTADTO {
     private Long endDateMillis;
     private Long expiryDate;
     @NotNull(message = "error.RuleTemplate.description.notnull")
-    private List<Map> ruleTemplates;
+    private List<WTABaseRuleTemplateDTO> ruleTemplates;
     private Long organizationType;
     private Long organizationSubType;
     private List<BigInteger> tags;
@@ -91,10 +91,10 @@ public class WTADTO {
     }
 
     public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
-        return WTABuilderService.copyPropertiesMapToDTO(this.ruleTemplates);
+        return this.ruleTemplates;
     }
 
-    public void setRuleTemplates(List<Map> ruleTemplates) {
+    public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
         this.ruleTemplates = ruleTemplates;
     }
 
@@ -122,7 +122,7 @@ public class WTADTO {
         this.tags = tags;
     }
 
-    public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, Long expiryDate, List<Map> ruleTemplates, Long organizationType, Long organizationSubType) {
+    public WTADTO(String name, String description, long expertiseId, long startDateMillis, Long endDateMillis, Long expiryDate, List<WTABaseRuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType) {
         this.name = name;
         this.description = description;
         this.expertiseId = expertiseId;
