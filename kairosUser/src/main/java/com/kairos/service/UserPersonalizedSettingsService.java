@@ -24,9 +24,7 @@ public class UserPersonalizedSettingsService extends UserBaseService{
 
     public UserPersonalizedSettingsDto getAllSettingsByUser(Long userId) {
 
-        User user= userGraphRepository.findById(userId).get();
         UserPersonalizedSettingsQueryResult userPersonalizedSettingsQueryResult =  userPersonalizedSettingsRepository.findAllByUser(userId);
-        //UserPersonalizedSettingsDto userPersonalizedSettingsDto = new UserPersonalizedSettingsDto(new SelfRosteringViewDto());
         UserPersonalizedSettingsDto userPersonalizedSettingsDto = new UserPersonalizedSettingsDto( new SelfRosteringViewDto(userPersonalizedSettingsQueryResult.getSelfRosteringView().getAbsenceViewSettings()));
         return userPersonalizedSettingsDto;
     }
