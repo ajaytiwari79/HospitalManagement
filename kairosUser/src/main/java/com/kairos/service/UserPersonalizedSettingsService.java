@@ -1,9 +1,7 @@
 package com.kairos.service;
 
 import com.kairos.persistence.model.user.auth.User;
-import com.kairos.persistence.model.user.user_personalized_settings.SelfRosteringView;
-import com.kairos.persistence.model.user.user_personalized_settings.UserPersonalizedSettings;
-import com.kairos.persistence.model.user.user_personalized_settings.UserPersonalizedSettingsDto;
+import com.kairos.persistence.model.user.user_personalized_settings.*;
 import com.kairos.persistence.repository.user.UserPersonalizedSettingsRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import org.springframework.beans.BeanUtils;
@@ -24,16 +22,19 @@ public class UserPersonalizedSettingsService extends UserBaseService{
     private UserGraphRepository userGraphRepository;
 
 
-    public UserPersonalizedSettings getAllSettingsByUser(Long userId) {
+    public UserPersonalizedSettingsDto getAllSettingsByUser(Long userId) {
 
-        UserPersonalizedSettings userPersonalizedSettings =  userPersonalizedSettingsRepository.findByUser(userId);
-        return userPersonalizedSettings;
+        User user= userGraphRepository.findById(userId).get();
+        UserPersonalizedSettingsQueryResult userPersonalizedSettingsQueryResult =  userPersonalizedSettingsRepository.findAllByUser(userId);
+        //UserPersonalizedSettingsDto userPersonalizedSettingsDto = new UserPersonalizedSettingsDto(new SelfRosteringViewDto());
+        UserPersonalizedSettingsDto userPersonalizedSettingsDto = new UserPersonalizedSettingsDto( new SelfRosteringViewDto(userPersonalizedSettingsQueryResult.getSelfRosteringView().getAbsenceViewSettings()));
+        return userPersonalizedSettingsDto;
     }
 
 
     public UserPersonalizedSettings updateUserPersonalizedSettings(Long userId, UserPersonalizedSettingsDto userPersonalizedSettingsDto) {
 
-        UserPersonalizedSettings userPersonalizedSettings = userPersonalizedSettingsRepository.findByUser(userId);
+        UserPersonalizedSettings userPersonalizedSettings = userPersonalizedSettingsRepository.findById(5489L).get();
         if(Optional.ofNullable(userPersonalizedSettings).isPresent()) {
             BeanUtils.copyProperties(userPersonalizedSettingsDto,userPersonalizedSettings);
             save(userPersonalizedSettings);
