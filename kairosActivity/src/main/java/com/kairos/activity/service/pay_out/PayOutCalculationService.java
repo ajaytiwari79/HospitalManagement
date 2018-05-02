@@ -7,7 +7,6 @@ import com.kairos.activity.persistence.model.pay_out.DailyPayOutEntry;
 import com.kairos.activity.persistence.model.pay_out.PayOutCTADistribution;
 import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
-import com.kairos.activity.response.dto.pay_out.*;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.response.dto.pay_out.*;
 import org.apache.commons.lang3.StringUtils;
@@ -27,8 +26,7 @@ import static com.kairos.activity.constants.AppConstants.*;
 
 
 /*
-* Created By Pradeep singh rajawat
-*  Date-27/01/2018
+* Created By Mohit Shakya
 *
 * */
 
@@ -131,7 +129,7 @@ public class PayOutCalculationService {
         return dailyPayOutEntry;
     }
 
-    public Interval getCTAInterval(CTAIntervalDTO ctaIntervalDTO,Interval interval){
+    public Interval getCTAInterval(CTAIntervalDTO ctaIntervalDTO, Interval interval){
         int ctaStart = ctaIntervalDTO.getStartTime();
         int ctaEnd = ctaIntervalDTO.getStartTime()>ctaIntervalDTO.getEndTime()? 1440+ctaIntervalDTO.getEndTime() : ctaIntervalDTO.getEndTime();
         return new Interval(interval.getStart().withTimeAtStartOfDay().plusMinutes(ctaStart), interval.getStart().plusMinutes(ctaEnd));
