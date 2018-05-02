@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class StaffRepository extends BaseRepository {
+public class TaskStaffRepository extends BaseRepository {
 
-    private static Logger logger = LoggerFactory.getLogger(StaffRepository.class);
+    private static Logger logger = LoggerFactory.getLogger(TaskStaffRepository.class);
 
    /* public PlanningStaff findById(long id){
         Select select = QueryBuilder.select().from("PlanningStaff");

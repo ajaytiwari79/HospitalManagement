@@ -3,9 +3,12 @@ package com.planner.domain.staff;
 import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.planner.domain.MongoBaseEntity;
+import com.planner.domain.wta.templates.WorkingTimeAgreement;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
 import java.util.List;
-
+@Document
 public class UnitPosition  extends MongoBaseEntity {
 
     private Long expertiseId;
@@ -22,7 +25,30 @@ public class UnitPosition  extends MongoBaseEntity {
     private Long unitId;
     private Long seniorityLevelId;
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
-    private WTAResponseDTO wtaResponseDTO;
+    private WorkingTimeAgreement workingTimeAgreement;
+
+    public UnitPosition() {
+    }
+
+    public UnitPosition(Long expertiseId, Long positionCodeId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary, Long employmentTypeId, Long unitId, Long seniorityLevelId, PaidOutFrequencyEnum paidOutFrequencyEnum, WorkingTimeAgreement workingTimeAgreement, BigInteger kairosId) {
+        this.expertiseId = expertiseId;
+        this.positionCodeId = positionCodeId;
+        this.startDateMillis = startDateMillis;
+        this.endDateMillis = endDateMillis;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
+        this.totalWeeklyHours = totalWeeklyHours;
+        this.avgDailyWorkingHours = avgDailyWorkingHours;
+        this.workingDaysInWeek = workingDaysInWeek;
+        this.hourlyWages = hourlyWages;
+        this.salary = salary;
+        this.employmentTypeId = employmentTypeId;
+        this.unitId = unitId;
+        this.seniorityLevelId = seniorityLevelId;
+        this.paidOutFrequencyEnum = paidOutFrequencyEnum;
+        this.workingTimeAgreement = workingTimeAgreement;
+        this.kairosId=kairosId;
+    }
+
     public Long getExpertiseId() {
         return expertiseId;
     }
@@ -135,13 +161,12 @@ public class UnitPosition  extends MongoBaseEntity {
         this.paidOutFrequencyEnum = paidOutFrequencyEnum;
     }
 
-    public WTAResponseDTO getWtaResponseDTO() {
-        return wtaResponseDTO;
+
+    public WorkingTimeAgreement getWorkingTimeAgreement() {
+        return workingTimeAgreement;
     }
 
-    public void setWtaResponseDTO(WTAResponseDTO wtaResponseDTO) {
-        this.wtaResponseDTO = wtaResponseDTO;
+    public void setWorkingTimeAgreement(WorkingTimeAgreement workingTimeAgreement) {
+        this.workingTimeAgreement = workingTimeAgreement;
     }
-
-
 }

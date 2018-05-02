@@ -22,6 +22,7 @@ public class UnitPositionWtaDTO {
     private Long seniorityLevelId;
     private PaidOutFrequencyEnum paidOutFrequencyEnum;
     private WTAResponseDTO wtaResponseDTO;
+    private Long staffId;
 
     public Long getId() {
         return id;
@@ -151,7 +152,7 @@ public class UnitPositionWtaDTO {
         this.wtaResponseDTO = wtaResponseDTO;
     }
 
-    public UnitPositionWtaDTO(Long id, Long expertiseId, Long positionCodeId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary, Long employmentTypeId, Long unitId, Long seniorityLevelId, PaidOutFrequencyEnum paidOutFrequencyEnum,WTAResponseDTO wtaResponseDTO) {
+    public UnitPositionWtaDTO(Long id, Long expertiseId, Long positionCodeId, Long startDateMillis, Long endDateMillis, int totalWeeklyMinutes, int totalWeeklyHours, float avgDailyWorkingHours, int workingDaysInWeek, float hourlyWages, Double salary, Long employmentTypeId, Long unitId, Long seniorityLevelId, PaidOutFrequencyEnum paidOutFrequencyEnum, WTAResponseDTO wtaResponseDTO, Long staffId) {
         this.id = id;
         this.expertiseId = expertiseId;
         this.positionCodeId = positionCodeId;
@@ -168,5 +169,14 @@ public class UnitPositionWtaDTO {
         this.seniorityLevelId = seniorityLevelId;
         this.paidOutFrequencyEnum = paidOutFrequencyEnum;
         this.wtaResponseDTO=wtaResponseDTO;
+        this.staffId = staffId;
+    }
+
+    public Long getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 }

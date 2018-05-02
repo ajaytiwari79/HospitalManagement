@@ -4,6 +4,8 @@ import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.client.dto.activity.ActivityNoTabsDTO;
+import com.kairos.persistence.model.user.staff.StaffBasicDetailsDTO;
+import com.kairos.response.dto.web.UnitPositionWtaDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.MessageFormat;
+
 import static com.kairos.client.RestClientURLUtil.getPlannerBaseUrl;
 
 
@@ -27,7 +31,7 @@ public class PlannerRestClient {
     @Autowired
     RestTemplate restTemplate;
 
-    public <T, V> RestTemplateResponseEnvelope<V> publish(T t, Long unitId, IntegrationOperation integrationOperation) {
+    public <T, V> RestTemplateResponseEnvelope<V> publish(T t, Long unitId, IntegrationOperation integrationOperation,Object... pathParams) {
         final String baseUrl = getPlannerBaseUrl();
 
         try {
@@ -35,7 +39,7 @@ public class PlannerRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + unitId + "/"+ getURI(t)+"/",
+                            baseUrl + unitId + "/"+ getURI(t,pathParams)+"/",
                             getHttpMethod(integrationOperation),
                             new HttpEntity<>(t), typeReference);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
@@ -63,12 +67,12 @@ public class PlannerRestClient {
 
         }
     }
-    public static <T>String getURI(T t){
+    public static <T>String getURI(T t,Object... pathParams){
         String uri=null;
-        if(t instanceof StaffingLevelDto){
-            uri= "staffing_level";
-        }else if(t instanceof ActivityNoTabsDTO){
-            uri= "activity";
+        if(t instanceof StaffBasicDetailsDTO){
+            uri= "staff";
+        }else if(t instanceof UnitPositionWtaDTO){
+            uri= new MessageFormat("staff/{0}/unitposition").format(pathParams);
         }
         return uri;
     }

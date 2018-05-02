@@ -2,7 +2,7 @@ package com.planner.service.staffService;
 
 import com.planner.domain.staff.PlanningStaff;
 import com.planner.domain.staff.UnitStaffRelationShip;
-import com.planner.repository.staffRepository.StaffRepository;
+import com.planner.repository.staffRepository.TaskStaffRepository;
 import com.planner.responseDto.skillDto.OptaSkillDTO;
 import com.planner.responseDto.staffDto.OptaStaffDTO;
 import com.planner.service.skillService.SkillService;
@@ -16,33 +16,33 @@ import java.util.List;
 
 @Service
 @Deprecated
-public class StaffService {
+public class TaskStaffService {
 
-    private static Logger log = LoggerFactory.getLogger(StaffService.class);
+    private static Logger log = LoggerFactory.getLogger(TaskStaffService.class);
 
     @Autowired
-    private StaffRepository staffRepository;
+    private TaskStaffRepository taskStaffRepository;
     @Autowired
     private SkillService skillService;
 
     public void saveList(List<PlanningStaff> planningStaffs) {
-        staffRepository.saveList(planningStaffs);
+        taskStaffRepository.saveList(planningStaffs);
     }
 
     public void save(PlanningStaff planningSkill) {
-        staffRepository.save(planningSkill);
+        taskStaffRepository.save(planningSkill);
     }
 
     public PlanningStaff findOne(String id) {
-        return (PlanningStaff) staffRepository.findById(id, PlanningStaff.class);
+        return (PlanningStaff) taskStaffRepository.findById(id, PlanningStaff.class);
     }
 
     public List<PlanningStaff> findByIds(List<String> ids) {
-        return (List<PlanningStaff>) staffRepository.findByIds(ids, PlanningStaff.class);
+        return (List<PlanningStaff>) taskStaffRepository.findByIds(ids, PlanningStaff.class);
     }
 
     public void deleteList(List<PlanningStaff> planningSkills) {
-        staffRepository.deleteList(planningSkills);
+        taskStaffRepository.deleteList(planningSkills);
     }
 
 
@@ -50,7 +50,7 @@ public class StaffService {
         if (optaStaffDto.getOptaSkillDTOS() == null || skillService.exitsByIds(getOptaIds(optaStaffDto.getOptaSkillDTOS()))) {
             PlanningStaff planningStaff = null;
             if(optaStaffDto.getKairosId()!=null){
-                planningStaff = staffRepository.findByExternalId(optaStaffDto.getKairosId(),optaStaffDto.getUnitId(),UnitStaffRelationShip.class);
+                planningStaff = taskStaffRepository.findByExternalId(optaStaffDto.getKairosId(),optaStaffDto.getUnitId(),UnitStaffRelationShip.class);
             }if(planningStaff==null){
                 optaStaffDto.setOptaPlannerId(null);
                 return optaStaffDto;
@@ -65,7 +65,7 @@ public class StaffService {
             planningStaff.setExternalId(optaStaffDto.getKairosId());
             planningStaff.setFirstName(optaStaffDto.getFirstName());
             planningStaff.setLastName(optaStaffDto.getLastName());
-            planningStaff = (PlanningStaff) staffRepository.save(planningStaff);
+            planningStaff = (PlanningStaff) taskStaffRepository.save(planningStaff);
             optaStaffDto.setOptaPlannerId(planningStaff.getId());
         }else{
             log.warn("staff's Skills doesn't exists staffId "+optaStaffDto.getKairosId());
@@ -74,13 +74,13 @@ public class StaffService {
     }
 
     public List<PlanningStaff> getAllByUnitId(long unitId) {
-        List<UnitStaffRelationShip> unitStaffRelationShips = staffRepository.getAllByUnitId(unitId,UnitStaffRelationShip.class);
-        return staffRepository.getAllByIds(getStaffIds(unitStaffRelationShips));
+        List<UnitStaffRelationShip> unitStaffRelationShips = taskStaffRepository.getAllByUnitId(unitId,UnitStaffRelationShip.class);
+        return taskStaffRepository.getAllByIds(getStaffIds(unitStaffRelationShips));
     }
 
     public UnitStaffRelationShip getOneByUnitStaffRelation(Long unitId,Long staffId) {
-        PlanningStaff planningStaff = staffRepository.getOneStaffByExternalId(staffId);
-        UnitStaffRelationShip unitStaffRelationShips = staffRepository.getOneUnitStaffRelationship(unitId,planningStaff.getId());
+        PlanningStaff planningStaff = taskStaffRepository.getOneStaffByExternalId(staffId);
+        UnitStaffRelationShip unitStaffRelationShips = taskStaffRepository.getOneUnitStaffRelationship(unitId,planningStaff.getId());
         return unitStaffRelationShips;
     }
 
@@ -94,14 +94,14 @@ public class StaffService {
 
     public boolean exits(Long externalId, Long unitId) {
         if(externalId!=null || unitId == null) return false;
-        UnitStaffRelationShip unitStaffRelationShip = staffRepository.findByExternalId(externalId,unitId,UnitStaffRelationShip.class);
-        return staffRepository.findById(unitStaffRelationShip.getStaffId(),PlanningStaff.class)!=null;
+        UnitStaffRelationShip unitStaffRelationShip = taskStaffRepository.findByExternalId(externalId,unitId,UnitStaffRelationShip.class);
+        return taskStaffRepository.findById(unitStaffRelationShip.getStaffId(),PlanningStaff.class)!=null;
     }
 
     public boolean deleteByObject(OptaStaffDTO optaStaffDTO) {
-        UnitStaffRelationShip unitStaffRelationShip = staffRepository.findByExternalId(optaStaffDTO.getKairosId(),optaStaffDTO.getUnitId(),UnitStaffRelationShip.class);
-        staffRepository.deleteById(unitStaffRelationShip.getStaffId(),PlanningStaff.class);
-        staffRepository.deleteById(unitStaffRelationShip.getId(),UnitStaffRelationShip.class);
+        UnitStaffRelationShip unitStaffRelationShip = taskStaffRepository.findByExternalId(optaStaffDTO.getKairosId(),optaStaffDTO.getUnitId(),UnitStaffRelationShip.class);
+        taskStaffRepository.deleteById(unitStaffRelationShip.getStaffId(),PlanningStaff.class);
+        taskStaffRepository.deleteById(unitStaffRelationShip.getId(),UnitStaffRelationShip.class);
         return true;
     }
 
@@ -109,7 +109,7 @@ public class StaffService {
         if (optaStaffDto.getOptaSkillDTOS() == null || skillService.exitsByIds(getOptaIds(optaStaffDto.getOptaSkillDTOS()))) {
             PlanningStaff planningStaff = null;
             if(optaStaffDto.getOptaPlannerId()!=null){
-                UnitStaffRelationShip unitStaffRelationShip = staffRepository.findByExternalId(optaStaffDto.getKairosId(),optaStaffDto.getUnitId(),PlanningStaff.class);
+                UnitStaffRelationShip unitStaffRelationShip = taskStaffRepository.findByExternalId(optaStaffDto.getKairosId(),optaStaffDto.getUnitId(),PlanningStaff.class);
                 planningStaff = findOne(unitStaffRelationShip.getStaffId());
             }if(planningStaff==null){
                 planningStaff = new PlanningStaff();
@@ -123,7 +123,7 @@ public class StaffService {
             planningStaff.setFirstName(optaStaffDto.getFirstName());
             planningStaff.setLastName(optaStaffDto.getLastName());
             planningStaff.setUnitId(optaStaffDto.getUnitId());
-            planningStaff = (PlanningStaff) staffRepository.save(planningStaff);
+            planningStaff = (PlanningStaff) taskStaffRepository.save(planningStaff);
             optaStaffDto.setOptaPlannerId(planningStaff.getId());
         }else{
             log.warn("staff's Skills doesn't exists staffId "+optaStaffDto.getKairosId());
@@ -145,7 +145,7 @@ public class StaffService {
             if (optaStaffDto.getOptaSkillDTOS() == null || skillService.exitsByIds(getOptaIds(optaStaffDto.getOptaSkillDTOS()))) {
                 PlanningStaff planningStaff = null;
                 if(optaStaffDto.getOptaPlannerId()!=null){
-                    planningStaff = staffRepository.findByExternalId(optaStaffDto.getKairosId(),optaStaffDto.getUnitId(),PlanningStaff.class);
+                    planningStaff = taskStaffRepository.findByExternalId(optaStaffDto.getKairosId(),optaStaffDto.getUnitId(),PlanningStaff.class);
                 }if(planningStaff==null){
                     planningStaff = new PlanningStaff();
                 }
@@ -158,10 +158,10 @@ public class StaffService {
                 planningStaff.setFirstName(optaStaffDto.getFirstName());
                 planningStaff.setLastName(optaStaffDto.getLastName());
                 //planningStaff.setUnitId(optaStaffDto.getUnitId());
-                planningStaff = (PlanningStaff) staffRepository.save(planningStaff);
+                planningStaff = (PlanningStaff) taskStaffRepository.save(planningStaff);
                 UnitStaffRelationShip unitstaffRelationShip = new UnitStaffRelationShip(planningStaff.getId(),optaStaffDto.getUnitId());
                 unitstaffRelationShip.setExternalId(optaStaffDto.getKairosId());
-                staffRepository.save(unitstaffRelationShip);
+                taskStaffRepository.save(unitstaffRelationShip);
                 optaStaffDto.setOptaPlannerId(planningStaff.getId());
                 updatesOptaStaffDto.add(optaStaffDto);
             }else{
@@ -174,12 +174,12 @@ public class StaffService {
     /*public List<OptaStaffDTO> updateList(List<OptaStaffDTO> optaStaffDTOS) {
         List<OptaStaffDTO> updatedOptaStaffDTOS = new ArrayList<>();
         for (OptaStaffDTO optaStaffDTO : optaStaffDTOS) {
-            PlanningStaff planningStaff = staffRepository.findByExternalId(optaStaffDTO.getKairosId(),optaStaffDTO.getUnitId(),PlanningStaff.class);
+            PlanningStaff planningStaff = taskStaffRepository.findByExternalId(optaStaffDTO.getKairosId(),optaStaffDTO.getUnitId(),PlanningStaff.class);
             if (planningStaff == null) planningStaff = new PlanningStaff();
             planningStaff.setFirstName(optaStaffDTO.getFirstName());
             planningStaff.setLastName(optaStaffDTO.getLastName());
             planningStaff.setUnitId(optaStaffDTO.getUnitId());
-            planningStaff = (PlanningStaff) staffRepository.save(planningStaff);
+            planningStaff = (PlanningStaff) taskStaffRepository.save(planningStaff);
             optaStaffDTO.setOptaPlannerId(planningStaff.getId());
             updatedOptaStaffDTOS.add(optaStaffDTO);
         }

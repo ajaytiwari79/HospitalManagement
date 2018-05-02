@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.planner.service.staffService.TaskStaffService;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -44,7 +45,6 @@ import com.planner.service.locationService.GraphHopperService;
 import com.planner.service.locationService.LocationService;
 import com.planner.service.skillService.SkillService;
 import com.planner.service.staffService.ShiftService;
-import com.planner.service.staffService.StaffService;
 import com.planner.service.taskService.TaskService;
 import com.planner.service.taskService.TaskTypeService;
 import com.planner.service.vehicleService.VehicleService;
@@ -58,7 +58,7 @@ public class TaskPlanningService {
 	@Autowired private TaskService taskService;
 	@Autowired private TaskTypeService taskTypeService;
 	@Autowired private SkillService skillService;
-	@Autowired private StaffService staffService;
+	@Autowired private TaskStaffService taskStaffService;
 	@Autowired private VehicleService vehicleService;
 	@Autowired private CitizenService citizenService;
 	@Autowired private LocationService locationService;

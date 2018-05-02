@@ -5,6 +5,7 @@ import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.country.EmploymentType;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.staff.StaffBasicDetailsDTO;
 import com.kairos.persistence.model.user.staff.StaffDTO;
 import com.kairos.persistence.model.user.unit_position.UnitPosition;
 import com.kairos.response.dto.web.UnitPositionWtaDTO;
@@ -38,30 +39,30 @@ public class PlannerSyncService {
     }
     @Async
     public void  publishUnitPosition(Long unitId, UnitPosition unitPosition, EmploymentType employmentType, IntegrationOperation integrationOperation) {
-        plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId),unitId,integrationOperation);
+        plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId),unitId,integrationOperation,unitPosition.getStaff().getId());
     }
 
     private UnitPositionWtaDTO createUnitPositionDTO(UnitPosition unitPosition, EmploymentType employmentType,Long unitId) {
-        WTAResponseDTO wtaResponseDTO=null;//createWTADTO(unitPosition.getwo)
         UnitPositionWtaDTO unitPositionWtaDTO=new UnitPositionWtaDTO(unitPosition.getId(),unitPosition.getExpertise().getId(),unitPosition.getPositionCode().getId(),unitPosition.getStartDateMillis(),unitPosition.getEndDateMillis(),
                 unitPosition.getTotalWeeklyMinutes(),unitPosition.getTotalWeeklyMinutes()/60,unitPosition.getAvgDailyWorkingHours(),unitPosition.getWorkingDaysInWeek(),
-                unitPosition.getHourlyWages(),unitPosition.getSalary(),employmentType.getId(),unitId,unitPosition.getSeniorityLevel().getId(),employmentType.getPaymentFrequency(),null);
+                unitPosition.getHourlyWages(),unitPosition.getSalary(),employmentType.getId(),unitId,unitPosition.getSeniorityLevel().getId(),employmentType.getPaymentFrequency(),null, unitPosition.getStaff().getId());
         return unitPositionWtaDTO;
     }
     private WTAResponseDTO createWTADTO(WorkingTimeAgreement workingTimeAgreement) {
         return null;
     }
 
-    private List<StaffDTO> createStaffs(List<Staff> staff) {
-        List<StaffDTO> dtos= new ArrayList<>();
+    private List<StaffBasicDetailsDTO> createStaffs(List<Staff> staff) {
+        List<StaffBasicDetailsDTO> dtos= new ArrayList<>();
         for(Staff s:staff){
             dtos.add(createStaffDTO(s));
         }
         return dtos;
     }
 
-    private StaffDTO createStaffDTO(Staff staff){
-        return new StaffDTO(staff.getId(),staff.getFirstName(),staff.getLastName(),new BigInteger(staff.getCprNumber()),null,null,null,null,null,null,
-                null,null,null,staff.getOrganizationId(),null,staff.getCurrentStatus());
+    private StaffBasicDetailsDTO createStaffDTO(Staff staff){
+
+        return new StaffBasicDetailsDTO(staff.getId(),staff.getFirstName(),staff.getLastName(),null,staff.getCurrentStatus());
+
     }
 }
