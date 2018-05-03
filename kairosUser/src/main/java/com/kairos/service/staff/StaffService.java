@@ -60,7 +60,6 @@ import com.kairos.service.organization.TeamService;
 import com.kairos.service.skill.SkillService;
 import com.kairos.service.unit_position.UnitPositionService;
 
-import com.kairos.service.user_filter.UserFilterService;
 import com.kairos.util.CPRUtil;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
@@ -147,8 +146,7 @@ public class StaffService extends UserBaseService {
     @Inject
     private AccessGroupService accessGroupService;
     @Inject
-    UserFilterService userFilterService;
-
+    StaffFilterService staffFilterService;
     @Autowired
     UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Autowired
@@ -383,7 +381,7 @@ public class StaffService extends UserBaseService {
         Map<String, Object> map = new HashMap();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 //            staff = getStaffWithBasicInfo(id, allStaffRequired);
-            map.put("staffList", userFilterService.getAllStaffByUnitId( unitId, allStaffRequired, staffFilterDTO));
+            map.put("staffList", staffFilterService.getAllStaffByUnitId( unitId, allStaffRequired, staffFilterDTO));
             roles = accessGroupService.getAccessGroups(id);
             countryId = countryGraphRepository.getCountryIdByUnitId(id);
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);

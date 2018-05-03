@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.repository_impl;
 import com.kairos.persistence.model.enums.FilterEntityType;
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
 import com.kairos.response.dto.web.client.ClientFilterDTO;
-import com.kairos.service.user_filter.UserFilterService;
 import org.apache.commons.lang.StringUtils;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;

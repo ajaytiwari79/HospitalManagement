@@ -1,4 +1,4 @@
-package com.kairos.service.user_filter;
+package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.config.env.EnvConfig;
@@ -20,7 +20,6 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.staff.StaffFavouriteFilterGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.user_filter.FilterGroupGraphRepository;
-//import com.kairos.persistence.model.user.filter.FiltersAndFavouriteFiltersDTO;
 import com.kairos.response.dto.web.filter.FilterDetailDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -28,7 +27,6 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +39,7 @@ import java.util.stream.Collectors;
  */
 @Transactional
 @Service
-public class UserFilterService extends UserBaseService{
+public class StaffFilterService extends UserBaseService{
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -73,7 +71,7 @@ public class UserFilterService extends UserBaseService{
         FiltersAndFavouriteFiltersDTO filtersAndFavouriteFiltersDTO = new FiltersAndFavouriteFiltersDTO(
                 getAllFilters(moduleId, organizationService.getCountryIdOfOrganization(organizationId), organizationId),
                 getFavouriteFilters(moduleId, staff.getId()));
-         return filtersAndFavouriteFiltersDTO;
+        return filtersAndFavouriteFiltersDTO;
     }
 
     public List<FilterDetailQueryResult> dtoToQueryesultConverter(List<FilterDetailDTO> filterData, ObjectMapper objectMapper){
