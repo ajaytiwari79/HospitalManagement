@@ -1312,7 +1312,7 @@ public class OrganizationController {
     @RequestMapping(value = "/unit/{unitId}/time_slot_set/{timeSlotSetId}/shift_planning/time_slot", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotsByUnit(@PathVariable Long timeSlotSetId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotsByUnit(timeSlotSetId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotsById(timeSlotSetId));
     }
 }
 

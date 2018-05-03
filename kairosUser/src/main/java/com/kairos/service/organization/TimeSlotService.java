@@ -407,7 +407,7 @@ public class TimeSlotService extends UserBaseService {
          return timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(),TimeSlotType.SHIFT_PLANNING);
     }
 
-    public List<TimeSlotWrapper> getShiftPlanningTimeSlotsByUnit(Long timeSlotSetId) {
+    public List<TimeSlotWrapper> getShiftPlanningTimeSlotsById(Long timeSlotSetId) {
         return timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSetId);
     }
 }
