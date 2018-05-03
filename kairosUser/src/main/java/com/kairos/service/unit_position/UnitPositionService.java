@@ -286,7 +286,7 @@ public class UnitPositionService extends UserBaseService {
         Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
                 unitPositionDTO.getEndDateMillis());
         EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
-
+        plannerSyncService.publishUnitPosition(unitId,oldUnitPosition,unitPositionEmploymentTypeRelationShip.getEmploymentType(),IntegrationOperation.UPDATE);
         return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null),employmentQueryResult);
 
     }

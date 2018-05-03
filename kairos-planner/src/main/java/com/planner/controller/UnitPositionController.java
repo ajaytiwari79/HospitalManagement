@@ -4,6 +4,7 @@ import com.kairos.response.dto.web.UnitPositionWtaDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.staff.UnitPositionService;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import static com.planner.constants.ApiConstants.API_UNIT_URL;
 @RestController
 @RequestMapping(API_UNIT_URL + "/staff/{staffId}/unitposition")
 public class UnitPositionController {
+    @Autowired
     private UnitPositionService unitPositionService;
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ApiOperation("add unit position")

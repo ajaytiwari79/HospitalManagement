@@ -24,6 +24,9 @@ public class UnitPositionWtaDTO {
     private WTAResponseDTO wtaResponseDTO;
     private Long staffId;
 
+    public UnitPositionWtaDTO() {
+    }
+
     public Long getId() {
         return id;
     }

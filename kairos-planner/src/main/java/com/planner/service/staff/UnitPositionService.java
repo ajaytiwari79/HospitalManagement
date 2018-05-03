@@ -22,9 +22,8 @@ public class UnitPositionService  {
     @Autowired
     private UnitPositionRepository unitPositionRepository;
     public void addUnitPosition(Long staffKairosId, Long unitId, UnitPositionWtaDTO unitPositionWtaDTO) {
-        List<WTABaseRuleTemplate> templates=WTABuilderService.copyRuleTemplates(unitPositionWtaDTO.getWtaResponseDTO().getRuleTemplates());
-        WorkingTimeAgreement wta= new WorkingTimeAgreement(unitPositionWtaDTO.getWtaResponseDTO().getName(),unitPositionWtaDTO.getWtaResponseDTO().getDescription(),unitPositionWtaDTO.getWtaResponseDTO().getStartDate(),unitPositionWtaDTO.getWtaResponseDTO().getEndDate(),templates,unitPositionWtaDTO.getWtaResponseDTO().getId());
         UnitPosition unitPosition=new UnitPosition();
+        WorkingTimeAgreement wta= createWTA(unitPositionWtaDTO);
         BeanUtils.copyProperties(unitPositionWtaDTO,unitPosition,"id","wtaResponseDTO");
         unitPosition.setWorkingTimeAgreement(wta);
         unitPosition.setKairosId(BigInteger.valueOf(unitPositionWtaDTO.getId()));
@@ -32,5 +31,17 @@ public class UnitPositionService  {
     }
 
     public void updateUnitPosition(Long staffKairosId, Long unitId, Long unitPositionKairosId, UnitPositionWtaDTO unitPositionWtaDTO) {
+        UnitPosition unitPosition=unitPositionRepository.findByKairosId(BigInteger.valueOf(unitPositionKairosId)).get();
+        WorkingTimeAgreement wta= createWTA(unitPositionWtaDTO);
+        BeanUtils.copyProperties(unitPositionWtaDTO,unitPosition,"id","wtaResponseDTO");
+        unitPosition.setWorkingTimeAgreement(wta);
+        unitPosition.setKairosId(BigInteger.valueOf(unitPositionWtaDTO.getId()));
+        unitPositionRepository.save(unitPosition);
+    }
+
+    private WorkingTimeAgreement createWTA(UnitPositionWtaDTO unitPositionWtaDTO){
+        List<WTABaseRuleTemplate> templates=WTABuilderService.copyRuleTemplates(unitPositionWtaDTO.getWtaResponseDTO().getRuleTemplates());
+        WorkingTimeAgreement wta= new WorkingTimeAgreement(unitPositionWtaDTO.getWtaResponseDTO().getName(),unitPositionWtaDTO.getWtaResponseDTO().getDescription(),unitPositionWtaDTO.getWtaResponseDTO().getStartDate(),unitPositionWtaDTO.getWtaResponseDTO().getEndDate(),templates,unitPositionWtaDTO.getWtaResponseDTO().getId());
+        return wta;
     }
 }

@@ -26,7 +26,7 @@ import static com.kairos.client.RestClientURLUtil.getPlannerBaseUrl;
 
 @Service("optaplannerServiceRestClient")
 public class PlannerRestClient {
-    private Logger logger = LoggerFactory.getLogger(PlannerRestClient.class);
+    private static Logger logger = LoggerFactory.getLogger(PlannerRestClient.class);
 
     @Autowired
     RestTemplate restTemplate;
@@ -39,7 +39,7 @@ public class PlannerRestClient {
             };
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + unitId + "/"+ getURI(t,pathParams)+"/",
+                            baseUrl + unitId + "/"+ getURI(t,pathParams),
                             getHttpMethod(integrationOperation),
                             new HttpEntity<>(t), typeReference);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
@@ -68,11 +68,11 @@ public class PlannerRestClient {
         }
     }
     public static <T>String getURI(T t,Object... pathParams){
-        String uri=null;
+        String uri="";
         if(t instanceof StaffBasicDetailsDTO){
-            uri= "staff";
+            uri= "staff/";
         }else if(t instanceof UnitPositionWtaDTO){
-            uri= new MessageFormat("staff/{0}/unitposition").format(pathParams);
+            uri= String.format("staff/%s/unitposition/%s",pathParams);
         }
         return uri;
     }
