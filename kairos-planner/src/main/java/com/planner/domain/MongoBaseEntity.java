@@ -16,6 +16,16 @@ public class MongoBaseEntity {
     }
 
     protected BigInteger kairosId;
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    protected Boolean deleted;
     public String getId() {
         return id;
     }

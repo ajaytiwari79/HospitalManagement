@@ -2,6 +2,7 @@ package com.kairos.activity.service.wta;
 
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.WTADetailRestClient;
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.response.dto.WTADTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
@@ -20,6 +21,7 @@ import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoR
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.TimeTypeService;
+import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.tag.TagService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
@@ -73,6 +75,8 @@ public class WTAService extends MongoBaseService {
     private ActivityMongoRepository activityMongoRepository;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject
+    private PlannerSyncService plannerSyncService;
 
 
     private final Logger logger = LoggerFactory.getLogger(WTAService.class);
@@ -533,6 +537,7 @@ public class WTAService extends MongoBaseService {
         if (oldWta.getEndDate() != null) {
             wtaResponseDTO.setEndDateMillis(oldWta.getEndDate().getTime());
         }
+       // plannerSyncService.publishWTA(unitId,wtaResponseDTO,IntegrationOperation.UPDATE);
         return wtaResponseDTO;
     }
 

@@ -1,6 +1,7 @@
 package com.planner.controller;
 
 import com.kairos.response.dto.web.UnitPositionWtaDTO;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.staff.UnitPositionService;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +34,18 @@ public class UnitPositionController {
         unitPositionService.updateUnitPosition(staffKairosId,unitId,unitPositionKairosId,unitPositionDTO);
         return ResponseHandler.generateResponse("Success",HttpStatus.OK);
 
+    }
+    @ApiOperation(value = "Remove unit_position")
+    @RequestMapping(value = "/{unitPositionId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Map<String, Object>> deleteUnitPosition(@PathVariable Long unitId, @PathVariable Long unitPositionId) {
+        unitPositionService.removePosition(unitPositionId,unitId);
+        return ResponseHandler.generateResponse("Success",HttpStatus.OK);
+    }
+    @ApiOperation(value = "add wta")
+    @RequestMapping(value = "/{unitPositionId}/wta", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Object>> updateWTA(@PathVariable Long unitId, @PathVariable Long unitPositionId,@RequestBody WTAResponseDTO wtaResponseDTO) {
+        unitPositionService.updateWTA(unitPositionId,unitId,wtaResponseDTO);
+        return ResponseHandler.generateResponse("Success",HttpStatus.OK);
     }
 
 }

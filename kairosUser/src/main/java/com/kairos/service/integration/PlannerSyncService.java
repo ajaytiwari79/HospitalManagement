@@ -1,5 +1,6 @@
 package com.kairos.service.integration;
 
+import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.planner.PlannerRestClient;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
@@ -29,6 +30,8 @@ public class PlannerSyncService {
     @Autowired
     @Qualifier("optaplannerServiceRestClient")
     private PlannerRestClient plannerRestClient;
+    @Autowired
+    private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
     @Async
     public void  publishStaff(Long unitId, Staff staff, IntegrationOperation integrationOperation) {
         plannerRestClient.publish(createStaffDTO(staff),unitId,integrationOperation);
@@ -38,18 +41,27 @@ public class PlannerSyncService {
         plannerRestClient.publish(createStaffs(staff),unitId,integrationOperation);
     }
     @Async
+    public void publishWTA(Long unitId,Long unitPositionId, WTAResponseDTO wtaResponseDTO, IntegrationOperation integrationOperation){
+        plannerRestClient.publish(wtaResponseDTO,unitId,integrationOperation,unitPositionId);
+    }
+    @Async
     public void  publishUnitPosition(Long unitId, UnitPosition unitPosition, EmploymentType employmentType, IntegrationOperation integrationOperation) {
-        plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId),unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
+        if(integrationOperation.equals(IntegrationOperation.CREATE)){
+            plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId),unitId,integrationOperation,unitPosition.getStaff().getId());
+        }else if(integrationOperation.equals(IntegrationOperation.UPDATE)){
+            plannerRestClient.publish(createUnitPositionDTO(unitPosition,employmentType,unitId),unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
+        }
+        else if(integrationOperation.equals(IntegrationOperation.DELETE)){
+            plannerRestClient.publish(null,unitId,integrationOperation,unitPosition.getStaff().getId(),unitPosition.getId());
+        }
     }
 
     private UnitPositionWtaDTO createUnitPositionDTO(UnitPosition unitPosition, EmploymentType employmentType,Long unitId) {
+        WTAResponseDTO wtaResponseDTO=workingTimeAgreementRestClient.getWTAById(unitPosition.getWorkingTimeAgreementId());
         UnitPositionWtaDTO unitPositionWtaDTO=new UnitPositionWtaDTO(unitPosition.getId(),unitPosition.getExpertise().getId(),unitPosition.getPositionCode().getId(),unitPosition.getStartDateMillis(),unitPosition.getEndDateMillis(),
                 unitPosition.getTotalWeeklyMinutes(),unitPosition.getTotalWeeklyMinutes()/60,unitPosition.getAvgDailyWorkingHours(),unitPosition.getWorkingDaysInWeek(),
-                unitPosition.getHourlyWages(),unitPosition.getSalary(),employmentType.getId(),unitId,unitPosition.getSeniorityLevel().getId(),employmentType.getPaymentFrequency(),createWTADTO(unitPosition.getw), unitPosition.getStaff().getId());
+                unitPosition.getHourlyWages(),unitPosition.getSalary(),employmentType.getId(),unitId,unitPosition.getSeniorityLevel().getId(),employmentType.getPaymentFrequency(),wtaResponseDTO, unitPosition.getStaff().getId());
         return unitPositionWtaDTO;
-    }
-    private WTAResponseDTO createWTADTO(WorkingTimeAgreement workingTimeAgreement) {
-        return null;
     }
 
     private List<StaffBasicDetailsDTO> createStaffs(List<Staff> staff) {
