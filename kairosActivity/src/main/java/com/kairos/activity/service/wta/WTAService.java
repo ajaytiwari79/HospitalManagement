@@ -129,7 +129,7 @@ public class WTAService extends MongoBaseService {
         wta.setCountryId(countryId);
         save(wta);
         wtaResponseDTO.setId(wta.getId());
-        assignWTAToOrganization(wta, wtaDTO, wtaBasicDetailsDTO);
+        assignWTAToNewOrganization(wta, wtaDTO, wtaBasicDetailsDTO);
 
 
         // Adding this wta to all organization type
@@ -141,7 +141,7 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    private void assignWTAToOrganization(WorkingTimeAgreement wta, WTADTO wtadto, WTABasicDetailsDTO wtaBasicDetailsDTO) {
+    private void assignWTAToNewOrganization(WorkingTimeAgreement wta, WTADTO wtadto, WTABasicDetailsDTO wtaBasicDetailsDTO) {
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>(wtaBasicDetailsDTO.getOrganizations().size());
 
         wtaBasicDetailsDTO.getOrganizations().forEach(organization ->
@@ -582,6 +582,7 @@ public class WTAService extends MongoBaseService {
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
             workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
         }
+        workingTimeAgreement.setId(null);
         workingTimeAgreement.setOrganization(null);
         workingTimeAgreement.setOrganizationParentWTA(wtaResponseDTO.getId());
         workingTimeAgreement.setParentWTA(wtaResponseDTO.getId());
@@ -590,6 +591,34 @@ public class WTAService extends MongoBaseService {
         wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
         return wtaResponseDTO;
 
+    }
+
+    public Boolean assignWTAToNewOrganization(List<Long> subTypeIds, Long organisationId, Long countryId){
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTABySubType(subTypeIds,countryId);
+        List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
+        wtaQueryResultDTOS.forEach(w->{
+            WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(w,WTAResponseDTO.class);
+            WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO,WorkingTimeAgreement.class);
+            List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
+            if (wtaResponseDTO.getRuleTemplates().size() > 0) {
+                ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaResponseDTO.getRuleTemplates(), true);
+                save(ruleTemplates);
+                List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
+                workingTimeAgreement.setRuleTemplateIds(ruleTemplatesIds);
+            }
+            workingTimeAgreement.setId(null);
+            workingTimeAgreement.setOrganization(new WTAOrganization(organisationId,"",""));
+            workingTimeAgreement.setCountryParentWTA(w.getId());
+            workingTimeAgreement.setParentWTA(wtaResponseDTO.getId());
+            workingTimeAgreements.add(workingTimeAgreement);
+            //wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement,WTAResponseDTO.class);
+            //wtaResponseDTO.setRuleTemplates(WTABuilderService.copyRuleTemplatesToDTO(ruleTemplates));
+
+        });
+        if(!workingTimeAgreements.isEmpty()){
+            save(workingTimeAgreements);
+        }
+        return true;
     }
 
 

@@ -3,6 +3,7 @@ package com.kairos.service.organization;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
+import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -200,6 +201,7 @@ public class OrganizationService extends UserBaseService {
     WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
     PeriodRestClient periodRestClient;
+    @Inject private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
     @Inject
     StaffService staffService;
 
@@ -283,8 +285,11 @@ public class OrganizationService extends UserBaseService {
         //List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
         //List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
         //linkWTAToOrganization(allWtaCopy, allWta);
+
+
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
+        workingTimeAgreementRestClient.assignWTAToOrganization(orgDetails.getSubTypeId(),organization.getId(),countryId);
 
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         accessGroupService.createDefaultAccessGroups(organization);
@@ -613,7 +618,9 @@ public class OrganizationService extends UserBaseService {
         timeSlotService.createDefaultTimeSlots(unit,TimeSlotType.TASK_PLANNING);
         phaseRestClient.createDefaultPhases(unit.getId());
         periodRestClient.createDefaultPeriodSettings(unit.getId());
-
+        Organization organization = fetchParentOrganization(unit.getId());
+        Country country = organizationGraphRepository.getCountry(organization.getId());
+        workingTimeAgreementRestClient.assignWTAToOrganization(organizationDTO.getOrganizationSubTypeId(),unit.getId(),country.getId());
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
         response.put("name", unit.getName());

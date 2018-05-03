@@ -25,6 +25,7 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
 
     List<WTAQueryResultDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId);
 
+    List<WTAQueryResultDTO> getAllWTABySubType(List<Long> subTypeIds,Long countryId);
     List<WTAQueryResultDTO> getAllWTAWithOrganization(long countryId);
 
     List<WTAQueryResultDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
