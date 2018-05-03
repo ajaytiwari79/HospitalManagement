@@ -229,7 +229,7 @@ public class AccessPageService extends UserBaseService {
     // TODO Uncomment and integrate
     /*public List<StaffPermissionDTO> getPermissionOfUserInUnit(Long organizationId, Long userId){
         List<StaffPermissionQueryResult> staffPermissions = accessPageRepository.getAccessPermissionOfUserForUnit(userId,organizationId);
-        Map<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = staffPermissions.stream().collect(Collectors.groupingBy(StaffPermissionQueryResult::getAccessGroupId));
+        Map<Long,List<StaffPermissionQueryResult>> permissionByAccessGroup = staffPermissions.stream().collect(Collectors.groupingBy(StaffPermissionQueryResult::getAccessGroupIdOnEmploymentEnd));
         Set<Map.Entry<Long,List<StaffPermissionQueryResult>>> entries = permissionByAccessGroup.entrySet();
         Iterator<Map.Entry<Long,List<StaffPermissionQueryResult>>> iterator = entries.iterator();
         List<StaffPermissionQueryResult> allPermissions = new ArrayList<>();

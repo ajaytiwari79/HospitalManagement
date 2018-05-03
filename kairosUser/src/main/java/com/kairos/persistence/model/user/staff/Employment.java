@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.staff;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.enums.EmploymentStatus;
+import com.kairos.persistence.model.user.country.ReasonCode;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_REASON_CODE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT_PERMISSIONS;
 
 /**
@@ -27,6 +29,26 @@ public class Employment extends UserBaseEntity {
     private Staff staff;
     private Long endDateMillis;
     private Long startDateMillis;
+
+    public Long getAccessGroupIdOnEmploymentEnd() {
+        return accessGroupIdOnEmploymentEnd;
+    }
+
+    public void setAccessGroupIdOnEmploymentEnd(Long accessGroupIdOnEmploymentEnd) {
+        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
+    }
+
+    private Long accessGroupIdOnEmploymentEnd;
+    public ReasonCode getReasonCode() {
+        return reasonCode;
+    }
+
+    public void setReasonCode(ReasonCode reasonCode) {
+        this.reasonCode = reasonCode;
+    }
+
+    @Relationship(type = HAS_REASON_CODE)
+    private ReasonCode reasonCode;
 
     public Long getStartDateMillis() {
         return startDateMillis;
