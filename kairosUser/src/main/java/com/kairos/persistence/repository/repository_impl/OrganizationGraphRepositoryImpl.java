@@ -123,7 +123,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             query+= " OPTIONAL Match (staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) with engineerType,contactAddress, staff, user";
         }
 
-        query+= " return {id:id(staff), city:contactAddress.city,province:contactAddress.province, "+
+        query+= " return distinct {id:id(staff), city:contactAddress.city,province:contactAddress.province, "+
                 "firstName:staff.firstName,lastName:staff.lastName,employedSince :staff.employedSince,"+
                 "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId,"+
                 "cprNumber:staff.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, "+

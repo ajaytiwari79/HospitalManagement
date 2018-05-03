@@ -199,7 +199,7 @@ public class UserFilterService extends UserBaseService{
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup =  filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         filters.forEach(filterDetail -> {
-            if(filterGroup.getFilterTypes().contains(
+            if(!filterDetail.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
                     FilterEntityType.valueOf(filterDetail.getName()) ) ){
                 mapOfFilters.put(FilterEntityType.valueOf(filterDetail.getName()) , filterDetail.getValue() );
 
@@ -213,9 +213,9 @@ public class UserFilterService extends UserBaseService{
         if (!Optional.ofNullable(unit).isPresent()) {
             throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
         }
-        if (!Optional.ofNullable(unit).isPresent() &&
-                filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
-            throw new DataNotFoundByIdException("Invalid module Id");
+        if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
+                !filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
+            throw new DataNotFoundByIdException("Invalid module Id or Filter settings are not set");
         }
 
         Organization organization = organizationService.fetchParentOrganization(unitId);
