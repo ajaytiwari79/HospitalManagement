@@ -32,7 +32,7 @@ public class UserPersonalizedSettingsService extends UserBaseService{
 
     public UserPersonalizedSettings updateUserPersonalizedSettings(Long userId, UserPersonalizedSettingsDto userPersonalizedSettingsDto) {
 
-        UserPersonalizedSettings userPersonalizedSettings = userPersonalizedSettingsRepository.findById(5489L).get();
+        UserPersonalizedSettings userPersonalizedSettings = userPersonalizedSettingsRepository.findByUser(userId);
         if(Optional.ofNullable(userPersonalizedSettings).isPresent()) {
             BeanUtils.copyProperties(userPersonalizedSettingsDto,userPersonalizedSettings);
             save(userPersonalizedSettings);

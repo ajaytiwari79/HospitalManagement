@@ -864,6 +864,8 @@ public class UnitPositionService extends UserBaseService {
         unitPositionGraphRepository.saveAll(unitPositions);
         Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
         employment.setEndDateMillis(endDateMillis);
+        employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
+
         employment.setReasonCode(reasonCode);
         employment.setAccessGroupIdOnEmploymentEnd(accessGroupId);
 
