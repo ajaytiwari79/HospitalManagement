@@ -202,6 +202,9 @@ public abstract class RelationshipConstants {
     public final static String FILTER_BY_PAGE = "FILTER_BY_PAGE";
 
     public final static String HAS_FAVOURITE_FILTERS = "HAS_FAVOURITE_FILTERS";
+    public final static String FILTER_DETAIL= "FILTER_DETAIL";
+    public final static String APPLICABLE_FOR = "APPLICABLE_FOR";
+    public final static String HAS_FILTER_GROUP = "HAS_FILTER_GROUP";
 
     public final static String BELONGS_TO_STAFF = "BELONGS_TO_STAFF";
     public final static String UNAVAILABLE_ON = "UNAVAILABLE_ON";
