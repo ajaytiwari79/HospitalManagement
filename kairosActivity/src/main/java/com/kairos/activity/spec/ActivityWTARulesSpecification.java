@@ -9,8 +9,9 @@ import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.response.dto.shift.RuleTemplateCategoryDTO;
-import com.kairos.activity.response.dto.shift.WTAResponseDTO;
+
 import com.kairos.activity.util.DateUtils;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
         if (wtaResponseDTO.getEndDateMillis()!=null && new DateTime(wtaResponseDTO.getEndDateMillis()).isBefore(shift.getEndDate().getTime())) {
             throw new ActionNotPermittedException("WTA is Expired for unit employment.");
         }
-        List<RuleTemplateCategoryDTO> ruleTemplates = wtaResponseDTO.getRuleTemplates();
+       /* List<RuleTemplateCategoryDTO> ruleTemplates = wtaResponseDTO.getRuleTemplates();
         for (int i = 0; i < ruleTemplates.size(); i++) {
             RuleTemplateCategoryDTO currentWTARuleTemplate = ruleTemplates.get(i);
             String currentTemplateType=getTemplateType(currentWTARuleTemplate.getTemplateType());
@@ -89,7 +90,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                     break;
                 case MINIMUM_REST_AFTER_CONSECUTIVE_DAYS_WORKED:
                     break;
-                case MAXIMUM_NIGHT_SHIFTS_LENGTH:  //MaximumNightShiftLengthWTATemplate
+                case MAXIMUM_NIGHT_SHIFTS_LENGTH:  //ShiftLengthWTATemplateDTO
 //                    if (!currentWTARuleTemplate.getCheckAgainstTimeRules()) {
 //                        continue;
 //                    } else {
@@ -137,10 +138,12 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                     break;
                 case MINIMUM_TIME_BANK:
                     break;
+                case BREAKS_IN_SHIFT:
+                    break;
                 default:
                     throw new DataNotFoundByIdException("Invalid TEMPLATE");
             }
-        }
+        }*/
         return true;
     }
     private String getTemplateType(String templateType){

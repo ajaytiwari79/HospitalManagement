@@ -77,6 +77,18 @@ public class OrganizationTypeService extends UserBaseService {
 
     }
 
+    public List<Object> getAllWTAWithOrganization(long countryId) {
+        List<Map<String, Object>> map = organizationTypeGraphRepository.getAllWTAWithOrganization(countryId);
+        List<Object> objectList = new ArrayList<>();
+        for (Map<String, Object> result : map) {
+            objectList.add(result.get("result"));
+        }
+        return objectList;
+    }
+
+
+
+
     public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
         OrganizationType orgTypeToUpdate = organizationTypeGraphRepository.findOne(updateOrganizationTypeDTO.getId());
         if (!Optional.ofNullable(orgTypeToUpdate).isPresent()) {

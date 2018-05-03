@@ -216,6 +216,7 @@ public abstract class RelationshipConstants {
     public final static String RESOURCE_HAS_EQUIPMENT = "RESOURCE_HAS_EQUIPMENT";
     public final static String LOCATED_IN = "LOCATED_IN";
     public final static String ORGANIZATION_HAS_UNIONS = "ORGANIZATION_HAS_UNIONS";
+    public final static String BACKING_BY_UNION = "BACKING_BY_UNION";
 
 
     public final static String IN_UNIT = "IN_UNIT";
@@ -238,6 +239,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_SENIORITY_LEVEL = "HAS_SENIORITY_LEVEL";
     public final static String HAS_REASON_CODE = "HAS_REASON_CODE";
     public final static String HAS_PAYMENT_SETTINGS = "HAS_PAYMENT_SETTINGS";
+    public final static String HAS_BREAK_MATRIX="HAS_BREAK_MATRIX";
     public final static String HAS_PERSONALIZED_SETTINGS = "HAS_PERSONALIZED_SETTINGS";
 
 

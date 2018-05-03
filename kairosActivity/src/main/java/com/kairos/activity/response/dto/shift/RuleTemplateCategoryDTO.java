@@ -1,6 +1,7 @@
 package com.kairos.activity.response.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
 
 import java.util.List;
 
