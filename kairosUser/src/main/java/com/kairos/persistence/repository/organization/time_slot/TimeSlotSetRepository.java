@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.organization.time_slot;
 
+import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -26,7 +27,8 @@ public interface TimeSlotSetRepository extends Neo4jBaseRepository<TimeSlotSet,L
     TimeSlotSet findOneByEndDateAfter(Long unitId,Date endDate);
 
     @Query("Match (org:Organization)-[:"+HAS_TIME_SLOT_SET+"]->(timeSlotSet:TimeSlotSet) where id(org)={0} AND " +
-            "(timeSlotSet.startDate>={1} AND timeSlotSet.startDate < {2}) return timeSlotSet order by timeSlotSet.startDate")
-    List<TimeSlotSet> findTimeSlotSetByStartDateBetween(Long unitId,Date startDate, Date endDate);
+            "(timeSlotSet.startDate>={1} AND timeSlotSet.startDate < {2}) AND timeSlotSet.timeSlotType={3} " +
+            "return timeSlotSet order by timeSlotSet.startDate")
+    List<TimeSlotSet> findTimeSlotSetByStartDateBetween(Long unitId, Date startDate, Date endDate, TimeSlotType timeSlotType);
 
 }

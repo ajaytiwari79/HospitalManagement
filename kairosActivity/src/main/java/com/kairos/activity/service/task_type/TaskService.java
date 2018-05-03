@@ -43,6 +43,8 @@ import com.kairos.activity.serializers.MongoDateMapper;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.fls_visitour.schedule.Scheduler;
 import com.kairos.activity.service.fls_visitour.schedule.TaskConverterService;
+import com.kairos.activity.service.pay_out.PayOutCalculationService;
+import com.kairos.activity.service.pay_out.PayOutService;
 import com.kairos.activity.service.planner.TasksMergingService;
 import com.kairos.activity.service.time_bank.TimeBankService;
 import com.kairos.activity.spec.MergeTaskSpecification;
@@ -162,6 +164,10 @@ public class TaskService extends MongoBaseService {
     @Inject private TimeBankService timeBankService;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
+    @Inject
+    private PayOutService payOutService;
+    @Inject
+    private PayOutCalculationService payOutCalculationService;
 
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
         logger.info("Fetching tasks for ClientId: " + clientId);
@@ -708,11 +714,9 @@ public class TaskService extends MongoBaseService {
 
         }
         if (!shiftsToCreate.isEmpty()) {
-
             save(shiftsToCreate);
             timeBankService.saveTimeBanks(unitPositionDTO.getId(), shiftsToCreate);
-
-
+            payOutService.savePayOuts(unitPositionDTO.getId(), shiftsToCreate);
         }
     }
 

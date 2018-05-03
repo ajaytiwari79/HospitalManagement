@@ -81,7 +81,6 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -183,13 +182,14 @@ public class UnitPositionService extends UserBaseService {
 
         unitPosition.setUnit(organization);
         save(unitPosition);
-        Employment employment = employmentService.updateEmploymentEndDate(organization, unitPositionDTO.getStaffId(),unitPositionDTO.getEndDateMillis());
+        Employment employment = employmentService.updateEmploymentEndDate(organization, unitPositionDTO.getStaffId(),unitPositionDTO.getEndDateMillis(), unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupIdOnEmploymentEnd());
+        Long reasonCodeId = Optional.ofNullable(employment.getReasonCode()).isPresent()?employment.getReasonCode().getId():null;
 
         UnitPositionEmploymentTypeRelationShip relationShip = new UnitPositionEmploymentTypeRelationShip(unitPosition, employmentType, unitPositionDTO.getEmploymentTypeCategory());
         unitPositionEmploymentTypeRelationShipGraphRepository.save(relationShip);
 
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPositionDTO, unitPosition, relationShip, parentOrganization.getId());
-        PositionWrapper positionWrapper = new PositionWrapper(unitPositionQueryResult,new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis()));
+        PositionWrapper positionWrapper = new PositionWrapper(unitPositionQueryResult,new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis(),reasonCodeId,employment.getAccessGroupIdOnEmploymentEnd()));
 //        timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(), organization.getId()));
 
         //      UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
@@ -280,8 +280,10 @@ public class UnitPositionService extends UserBaseService {
         preparePosition(oldUnitPosition, unitPositionDTO);
         save(oldUnitPosition);
         Employment employment = employmentService.updateEmploymentEndDate(oldUnitPosition.getUnit(), unitPositionDTO.getStaffId(),
-                unitPositionDTO.getEndDateMillis());
-        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
+                unitPositionDTO.getEndDateMillis(),unitPositionDTO.getReasonCodeId(), unitPositionDTO.getAccessGroupIdOnEmploymentEnd());
+        Long reasonCodeId = Optional.ofNullable(employment.getReasonCode()).isPresent()?employment.getReasonCode().getId():null;
+
+        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis(),reasonCodeId,employment.getAccessGroupIdOnEmploymentEnd());
 
         return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null),employmentQueryResult);
 
@@ -527,8 +529,10 @@ public class UnitPositionService extends UserBaseService {
         }
 
         User user = userGraphRepository.getUserByStaffId(staffId);
-        Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
-        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
+        EmploymentReasonCodeQueryResult employmentReasonCode = employmentGraphRepository.findEmploymentreasonCodeByStaff(staffId);
+        Employment employment = employmentReasonCode.getEmployment();
+        Long reasonCodeId = Optional.ofNullable(employmentReasonCode.getReasonCode()).isPresent()?employmentReasonCode.getReasonCode().getId():null;
+        EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis(),reasonCodeId,employment.getAccessGroupIdOnEmploymentEnd());
         EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employmentQueryResult,unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) );
         return employmentUnitPositionDTO;
 
@@ -673,6 +677,8 @@ public class UnitPositionService extends UserBaseService {
         });
         ruleTemplateQueryResults.forEach(ruleTemplateQueryResult -> {
             CTARuleTemplateDTO ctaRuleTemplateDTO = new CTARuleTemplateDTO();
+            ctaRuleTemplateDTO.setPayrollSystem(ruleTemplateQueryResult.getPayrollSystem());
+            ctaRuleTemplateDTO.setPayrollType(ruleTemplateQueryResult.getPayrollType());
             ctaRuleTemplateDTO.setGranularity((int) ruleTemplateQueryResult.getCompensationTable().get("granularityLevel"));
             ctaRuleTemplateDTO.setActivityIds(ruleTemplateQueryResult.getActivityIds().stream().map(ac -> new BigInteger(ac.toString())).collect(Collectors.toList()));
             ctaRuleTemplateDTO.setName(ruleTemplateQueryResult.getName());
@@ -837,17 +843,34 @@ public class UnitPositionService extends UserBaseService {
 
         return appliedSeniorityLevel;
     }
-    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long unitId) throws ParseException {
+    public EmploymentUnitPositionDTO updateUnitPositionEndDateFromEmployment(Long staffId, String employmentEndDate, Long unitId, Long reasonCodeId,Long accessGroupId) throws ParseException {
 
         Organization unit = organizationGraphRepository.findOne(unitId);
         Long endDateMillis = DateUtil.getIsoDateInLong(employmentEndDate);
+        Long unitPositionStartDateMillisMax = unitPositionGraphRepository.getMaxUnitPositionStartDate(staffId);
+        if(Optional.ofNullable(unitPositionStartDateMillisMax).isPresent()&&endDateMillis<unitPositionStartDateMillisMax) {
+            throw new ActionNotPermittedException("Employment end date should be greater than unit position start date"+unitPositionStartDateMillisMax);
+        }
         List<UnitPosition> unitPositions =  unitPositionGraphRepository.getUnitPositionsFromEmploymentEndDate(staffId,endDateMillis);
+            ReasonCode reasonCode = reasonCodeGraphRepository.findById(reasonCodeId, 0).get();
+            if (!Optional.ofNullable(reasonCode).isPresent()) {
+                throw new DataNotFoundByIdException("Invalid reasonCode Id" + reasonCodeId);
+            }
+
         for(UnitPosition unitPosition:unitPositions) {
             unitPosition.setEndDateMillis(endDateMillis);
+            if(!Optional.ofNullable(unitPosition.getReasonCode()).isPresent()) {
+                unitPosition.setReasonCode(reasonCode);
+            }
         }
         unitPositionGraphRepository.saveAll(unitPositions);
         Employment employment = employmentGraphRepository.findEmploymentByStaff(staffId);
         employment.setEndDateMillis(endDateMillis);
+        employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
+
+        employment.setReasonCode(reasonCode);
+        employment.setAccessGroupIdOnEmploymentEnd(accessGroupId);
+
         employmentGraphRepository.save(employment);
         if(Optional.ofNullable(employmentEndDate).isPresent()&&(DateUtil.getDateFromEpoch(endDateMillis).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0)) {
             //employment = employmentGraphRepository.findEmploymentByStaff(staffId);
@@ -855,7 +878,7 @@ public class UnitPositionService extends UserBaseService {
             employmentService.moveToReadOnlyAccessGroup(employmentIds);
         }
         User user = userGraphRepository.getUserByStaffId(staffId);
-        EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
+        EmploymentQueryResult employmentUpdated = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis(),employment.getReasonCode().getId(),employment.getAccessGroupIdOnEmploymentEnd());
         EmploymentUnitPositionDTO employmentUnitPositionDTO = new EmploymentUnitPositionDTO(employmentUpdated,unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()) );
         return employmentUnitPositionDTO;
 

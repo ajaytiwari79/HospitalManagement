@@ -1,5 +1,7 @@
 package com.kairos.activity.persistence.model.activity.tabs;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -9,6 +11,7 @@ import java.util.List;
 /**
  * Created by vipul on 23/8/17.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TimeCalculationActivityTab implements Serializable {
 
     private String methodForCalculatingTime;
