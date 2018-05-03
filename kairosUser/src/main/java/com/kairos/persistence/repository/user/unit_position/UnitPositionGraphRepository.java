@@ -195,5 +195,6 @@ public interface UnitPositionGraphRepository extends Neo4jBaseRepository<UnitPos
 
     @Query("Match(staff:Staff)-[:"+ BELONGS_TO_STAFF +"]->(up:UnitPosition) where id(up)={0} return id(staff) as staffId")
     Long getStaffIdFromUnitPosition(Long unitPositionId);
-
+    @Query("Match(staff:Staff)-[:"+ BELONGS_TO_STAFF +"]->(up:UnitPosition{deleted:false}) where id(staff)={0} return max(up.startDateMillis) as maxStartDateMillis")
+    Long getMaxUnitPositionStartDate(Long staffId);
 }
