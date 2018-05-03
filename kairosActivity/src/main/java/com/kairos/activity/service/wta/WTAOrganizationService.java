@@ -6,6 +6,7 @@ import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
+import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.templates.WTABuilderService;
@@ -53,14 +54,18 @@ public class WTAOrganizationService extends MongoBaseService {
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new DataNotFoundByIdException("Invalid unit  " + unitId);
         }
-        List<WTAResponseDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWtaByOrganization(unitId);
-        workingTimeAgreements.forEach(wtaResponseDTO -> {
+        List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getWtaByOrganization(unitId);
+        List<WTAResponseDTO> wtaResponseDTOs = new ArrayList<>();
+        workingTimeAgreements.forEach(wta->{
+            wtaResponseDTOs.add(ObjectMapperUtils.copyPropertiesByMapper(wta,WTAResponseDTO.class));
+        });
+        wtaResponseDTOs.forEach(wtaResponseDTO -> {
             wtaResponseDTO.setStartDateMillis(wtaResponseDTO.getStartDate().getTime());
             if(wtaResponseDTO.getEndDate()!=null){
                 wtaResponseDTO.setEndDateMillis(wtaResponseDTO.getStartDate().getTime());
             }
         });
-        return workingTimeAgreements;
+        return wtaResponseDTOs;
     }
 
 
@@ -137,7 +142,12 @@ public class WTAOrganizationService extends MongoBaseService {
 
 
     public List<WTAResponseDTO> getAllWtaOfOrganizationByExpertise(Long unitId,Long expertiseId){
-        return workingTimeAgreementMongoRepository.getAllWtaOfOrganizationByExpertise(unitId,expertiseId);
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWtaOfOrganizationByExpertise(unitId,expertiseId);
+        List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
+        wtaQueryResultDTOS.forEach(wta->{
+            wtaResponseDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(wta,WTAResponseDTO.class));
+        });
+        return wtaResponseDTOS;
     }
 
 

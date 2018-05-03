@@ -28,73 +28,73 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     @Inject private MongoTemplate mongoTemplate;
 
     @Override
-    public List<WTAResponseDTO> getWtaByOrganization(Long organizationId) {
+    public List<WTAQueryResultDTO> getWtaByOrganization(Long organizationId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("organization.id").is(organizationId)),
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
 
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
 
     @Override
-    public WTAResponseDTO getOne(BigInteger wtaId) {
+    public WTAQueryResultDTO getOne(BigInteger wtaId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("id").is(wtaId)),
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults().get(0);
     }
 
     @Override
-    public List<WTAResponseDTO> getAllWTAByOrganizationTypeId(long organizationTypeId) {
+    public List<WTAQueryResultDTO> getAllWTAByOrganizationTypeId(long organizationTypeId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("organizationType.id").is(organizationTypeId)),
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
 
     @Override
-    public List<WTAResponseDTO> getAllWTAByCountryId(long countryId) {
+    public List<WTAQueryResultDTO> getAllWTAByCountryId(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("countryId").is(countryId)),
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
 
     @Override
-    public List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId) {
+    public List<WTAQueryResultDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("organizationSubType.id").is(organizationSubTypeId)),
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
 
     @Override
-    public List<WTAResponseDTO> getAllWTAWithOrganization(long countryId) {
+    public List<WTAQueryResultDTO> getAllWTAWithOrganization(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("countryId").is(countryId)),
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
 
     @Override
-    public List<WTAResponseDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId) {
+    public List<WTAQueryResultDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("id").is(wtaId)),
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
 
@@ -109,22 +109,22 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     }
 
     @Override
-    public WTAResponseDTO getVersionOfWTA(BigInteger wtaId) {
+    public WTAQueryResultDTO getVersionOfWTA(BigInteger wtaId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("id").is(wtaId)),
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults().get(0);
     }
 
     @Override
-    public List<WTAResponseDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId) {
+    public List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("organization.id").is(unitId).and("expertise.Id").is(expertiseId)),
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
 
@@ -139,12 +139,12 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     }
 
     @Override
-    public List<WTAResponseDTO> getAllWTAByIds(List<BigInteger> wtaIds) {
+    public List<WTAQueryResultDTO> getAllWTAByIds(List<BigInteger> wtaIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("_id").in(wtaIds)),
                 lookup("wtaBaseRuleTemplate","ruleTemplateIds","_id","ruleTemplates")
         );
-        AggregationResults<WTAResponseDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAResponseDTO.class);
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
     }
 }

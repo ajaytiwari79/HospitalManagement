@@ -16,27 +16,27 @@ import java.util.Map;
 
 public interface CustomWorkingTimeAgreementMongoRepostory {
 
-    List<WTAResponseDTO> getWtaByOrganization(Long organizationId);
-    WTAResponseDTO getOne(BigInteger wtaId);
+    List<WTAQueryResultDTO> getWtaByOrganization(Long organizationId);
+    WTAQueryResultDTO getOne(BigInteger wtaId);
 
-    List<WTAResponseDTO> getAllWTAByOrganizationTypeId(long organizationId);
+    List<WTAQueryResultDTO> getAllWTAByOrganizationTypeId(long organizationId);
 
-    List<WTAResponseDTO> getAllWTAByCountryId(long countryId);
+    List<WTAQueryResultDTO> getAllWTAByCountryId(long countryId);
 
-    List<WTAResponseDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId);
+    List<WTAQueryResultDTO> getAllWTAByOrganizationSubType(long organizationSubTypeId);
 
-    List<WTAResponseDTO> getAllWTAWithOrganization(long countryId);
+    List<WTAQueryResultDTO> getAllWTAWithOrganization(long countryId);
 
-    List<WTAResponseDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
+    List<WTAQueryResultDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId);
 
     /*WTAQueryResultDTO getWTAByCountryId(long countryId, BigInteger wtaId);*/
 
-    WTAResponseDTO getVersionOfWTA(BigInteger wtaId);
-    List<WTAResponseDTO> getAllWtaOfOrganizationByExpertise(Long unitId,Long expertiseId);
+    WTAQueryResultDTO getVersionOfWTA(BigInteger wtaId);
+    List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId,Long expertiseId);
 
     WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId);
 
     boolean checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId);
 
-    List<WTAResponseDTO> getAllWTAByIds(List<BigInteger> wtaIds);
+    List<WTAQueryResultDTO> getAllWTAByIds(List<BigInteger> wtaIds);
 }

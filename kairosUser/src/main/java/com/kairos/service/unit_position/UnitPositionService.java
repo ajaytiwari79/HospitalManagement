@@ -579,7 +579,7 @@ public class UnitPositionService extends UserBaseService {
     }
 
 
-    public UnitPositionQueryResult updateUnitPositionWTA(Long unitId, Long unitPositionId, Long wtaId, WTADTO updateDTO) {
+    public UnitPositionQueryResult updateUnitPositionWTA(Long unitId, Long unitPositionId, BigInteger wtaId, WTADTO updateDTO) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
             throw new DataNotFoundByIdException("Invalid unit Employment Position id" + unitPositionId);
@@ -602,7 +602,9 @@ public class UnitPositionService extends UserBaseService {
         newWta.setParentWTA(oldWta);
         newWta.setDisabled(false);
 */        //unitPosition.setWorkingTimeAgreement(newWta);
+        updateDTO.setId(wtaId);
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfUnitPosition(updateDTO);
+        unitPosition.setWorkingTimeAgreementId(wtaResponseDTO.getId());
         save(unitPosition);
         UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
         //newWta.setParentWTA(oldWta.basicDetails());
@@ -646,7 +648,7 @@ public class UnitPositionService extends UserBaseService {
                 unitPosition.getEndDateMillis(), unitPosition.getTotalWeeklyMinutes(), unitPosition.getAvgDailyWorkingHours(), unitPosition.getHourlyWages(),
                 unitPosition.getId(), unitPosition.getSalary(), unitPosition.getPositionCode(), unitPosition.getUnion(),
                 unitPosition.getLastWorkingDateMillis(), unitPosition.getCta(), null/*unitPosition.getWorkingTimeAgreement()*/);
-        result.setReasonCodeId(unitPosition.getReasonCode().getId());
+        result.setReasonCodeId(unitPosition.getReasonCode() != null ? unitPosition.getReasonCode().getId() : null);
         result.setUnitId(unitPositionQueryResult.getUnitId());
         result.setParentUnitId(unitPositionQueryResult.getParentUnitId());
 

@@ -67,7 +67,7 @@ public class ObjectMapperUtils {
         return list;
     }
 
-    public static <T extends Object,E extends Object> List<E> copyPropertiesByObjectMapper(List<T> objects1, E Objects) {
+    public static <T extends Object,E extends Object> List<E> copyPropertiesByMapper(List<T> objects1, E Objects) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         //mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);

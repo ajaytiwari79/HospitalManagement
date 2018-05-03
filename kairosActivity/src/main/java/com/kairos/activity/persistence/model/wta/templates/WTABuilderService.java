@@ -120,7 +120,7 @@ public class WTABuilderService extends MongoBaseService {
             wtaBaseRuleTemplates.add(ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,WTABaseRuleTemplateDTO.class));
 
         }
-        //List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates  = ObjectMapperUtils.copyPropertiesByObjectMapper(WTARuleTemplates,new WTABaseRuleTemplateDTO());
+        //List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates  = ObjectMapperUtils.copyPropertiesByMapper(WTARuleTemplates,new WTABaseRuleTemplateDTO());
         return wtaBaseRuleTemplates;
     }
 
