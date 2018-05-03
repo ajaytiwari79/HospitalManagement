@@ -30,9 +30,9 @@ public class StaffUnitPositionDetails {
 
     }
 
-    public StaffUnitPositionDetails(int workingDaysInWeek, int totalWeeklyHours) {
+    public StaffUnitPositionDetails(int workingDaysInWeek, int totalWeeklyMinutes) {
         this.workingDaysInWeek = workingDaysInWeek;
-        this.totalWeeklyHours = totalWeeklyHours;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
     }
 
 
