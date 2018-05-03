@@ -16,9 +16,11 @@ import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.response.dto.shift.ShiftQueryResult;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.time_bank.TimeBankService;
+import com.kairos.activity.service.wta.WTAService;
 import com.kairos.activity.spec.*;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.event.ShiftNotificationEvent;
@@ -73,6 +75,7 @@ public class ShiftService extends MongoBaseService {
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
+    @Inject private WTAService wtaService;
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
         /*boolean valid=staffingLevelMongoRepository.existsByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(),shiftStartDate);
@@ -84,6 +87,8 @@ public class ShiftService extends MongoBaseService {
             throw new DataNotFoundByIdException("Invalid activity Id ." + shiftDTO.getActivityId());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), activity.getTimeCalculationActivityTab().getDayTypes());
+        WTAResponseDTO wtaResponseDTO = wtaService.getWta(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             throw new DataNotFoundByIdException(shiftDTO.getStaffId() + " Staff Do not belong to unit ->" + shiftDTO.getUnitId());
         }
@@ -169,6 +174,8 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftQueryResult updateShift(Long organizationId, ShiftDTO shiftDTO, String type) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), null);
+        WTAResponseDTO wtaResponseDTO = wtaService.getWta(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             throw new DataNotFoundByIdException(shiftDTO.getStaffId() + " Staff Do not belong to unit ->" + shiftDTO.getUnitId());
         }
