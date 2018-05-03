@@ -20,6 +20,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -87,6 +88,7 @@ public class PayOutService extends MongoBaseService {
         if (shifts != null && !shifts.isEmpty()) {
             payOutCalculationService.getPayOutByInterval(unitPositionWithCtaDetailsDTO, interval, shifts, dailyPayOut);
             dailyPayOuts.add(dailyPayOut);
+
         }
         if (!startDate.toLocalDate().equals(endDate.toLocalDate())) {
             interval = new Interval(endDate, endDate.plusDays(1).withTimeAtStartOfDay());
