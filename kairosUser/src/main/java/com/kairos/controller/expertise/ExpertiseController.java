@@ -66,7 +66,7 @@ public class ExpertiseController {
     }
 
     @ApiOperation(value = "Get all expertise by orgSubType")
-    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise_by_organization_sub_type/{organizationSubTypeId}", method = RequestMethod.GET)
+    @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/expertise", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getExpertiseByOrganizationSubType(@PathVariable long countryId,@PathVariable long organizationSubTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByOrganizationSubType(countryId,organizationSubTypeId));
