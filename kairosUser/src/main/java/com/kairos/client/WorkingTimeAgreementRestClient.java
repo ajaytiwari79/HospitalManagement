@@ -3,6 +3,7 @@ package com.kairos.client;
 import com.kairos.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.response.dto.web.wta.WTADTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
+import com.kairos.util.userContext.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -143,6 +144,30 @@ public class WorkingTimeAgreementRestClient {
                             HttpMethod.PUT, request, typeReference);
 
             RestTemplateResponseEnvelope<WTAResponseDTO> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        }catch (HttpClientErrorException e) {
+
+            logger.info("status {}",e.getStatusCode());
+            logger.info("response {}",e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+        }
+    }
+
+    public Boolean assignWTAToOrganization(List<Long> subTypeIds,Long unitId,Long countryId){
+        String baseUrl = getBaseUrl(false)+"/country/"+countryId;
+        try {
+            HttpEntity<List<Long>> request = new HttpEntity<>(subTypeIds);
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {};
+            ResponseEntity<RestTemplateResponseEnvelope<Boolean>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/wta/organization/{unitId}",
+                            HttpMethod.POST, request, typeReference,unitId);
+
+            RestTemplateResponseEnvelope<Boolean> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
                 return response.getData();
             } else {
