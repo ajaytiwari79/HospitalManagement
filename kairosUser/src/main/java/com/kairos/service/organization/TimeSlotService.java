@@ -3,6 +3,7 @@ package com.kairos.service.organization;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.UnitNotFoundException;
+import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
@@ -62,7 +63,7 @@ public class TimeSlotService extends UserBaseService {
         if (organization == null) {
             throw new InternalError("Organization can not found");
         }
-        List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotsByOrganizationId(unitId, organization.getTimeSlotMode());
+        List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(),TimeSlotType.TASK_PLANNING);
         Map<String,Object> timeSlotSetData = new HashMap<>();
         timeSlotSetData.put("timeSlotSets",timeSlotSets);
         timeSlotSetData.put("standardTimeSlot", STANDARD.equals(organization.getTimeSlotMode()) ? true : false);
@@ -130,7 +131,8 @@ public class TimeSlotService extends UserBaseService {
             logger.error("Invalid time slot id " + timeSlotSetId);
             throw new DataNotFoundByIdException("Invalid time slot id");
         }
-        List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getEndDate(), timeSlotSetDTO.getEndDate());
+        List<TimeSlotSet> timeSlotSetsToValidate = timeSlotSetRepository.findTimeSlotSetByStartDateBetween(unitId, timeSlotSet.getEndDate(),
+                timeSlotSetDTO.getEndDate(),timeSlotSet.getTimeSlotType());
         List<TimeSlotSet> timeSlotSetsToUpdate = new ArrayList<>();
         for (TimeSlotSet timeSlotSetToValidate : timeSlotSetsToValidate) {
 
@@ -244,10 +246,11 @@ public class TimeSlotService extends UserBaseService {
         return response;
     }
 
-    public void createDefaultTimeSlots(Organization organization) {
+    public void createDefaultTimeSlots(Organization organization, TimeSlotType timeSlotType) {
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, new Date(),organization.getTimeSlotMode());
         timeSlotSet.setDefaultSet(true);
+        timeSlotSet.setTimeSlotType(timeSlotType);
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
         for (TimeSlot timeSlot : timeSlots) {
             TimeSlotSetTimeSlotRelationship timeSlotSetTimeSlotRelationship = new TimeSlotSetTimeSlotRelationship();
@@ -393,5 +396,18 @@ public class TimeSlotService extends UserBaseService {
 
     public List<TimeSlot> getTimeSlotsOfCountry(Long countryId){
         return timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
+    }
+
+
+    public List<TimeSlotSet> getShiftPlanningTimeSlotSetsByUnit(Long unitId){
+         Organization organization = organizationGraphRepository.findById(unitId, 0).get();
+         if(!Optional.ofNullable(organization).isPresent()){
+             throw new DataNotFoundByIdException("Organization not found");
+         }
+         return timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(),TimeSlotType.SHIFT_PLANNING);
+    }
+
+    public List<TimeSlotWrapper> getShiftPlanningTimeSlotsById(Long timeSlotSetId) {
+        return timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSetId);
     }
 }

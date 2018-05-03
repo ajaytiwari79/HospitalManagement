@@ -32,9 +32,11 @@ public class UserPersonalizedSettingsService extends UserBaseService{
 
     public UserPersonalizedSettings updateUserPersonalizedSettings(Long userId, UserPersonalizedSettingsDto userPersonalizedSettingsDto) {
 
-        UserPersonalizedSettings userPersonalizedSettings = userPersonalizedSettingsRepository.findById(5489L).get();
+        UserPersonalizedSettingsQueryResult userPersonalizedSettingsQueryResult =  userPersonalizedSettingsRepository.findAllByUser(userId);
+        UserPersonalizedSettings userPersonalizedSettings = userPersonalizedSettingsQueryResult.getUserPersonalizedSettings();
+        userPersonalizedSettings.setSelfRosteringView(userPersonalizedSettingsQueryResult.getSelfRosteringView());
         if(Optional.ofNullable(userPersonalizedSettings).isPresent()) {
-            BeanUtils.copyProperties(userPersonalizedSettingsDto,userPersonalizedSettings);
+           userPersonalizedSettings.getSelfRosteringView().setAbsenceViewSettings(userPersonalizedSettingsDto.getSelfRosteringView().getAbsenceViewSettings());
             save(userPersonalizedSettings);
 
         }
