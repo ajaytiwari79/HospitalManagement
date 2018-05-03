@@ -729,5 +729,7 @@ public class ExpertiseService extends UserBaseService {
         return expertiseGraphRepository.getUnpublishedExpertise(countryId);
     }
 
-
+    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId,Long organizationSubTypeId) {
+        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId,organizationSubTypeId);
+    }
 }
