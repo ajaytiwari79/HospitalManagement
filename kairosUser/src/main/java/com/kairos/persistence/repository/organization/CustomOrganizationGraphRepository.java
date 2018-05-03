@@ -15,5 +15,5 @@ public interface CustomOrganizationGraphRepository {
 
 
     List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, Boolean fetchStaffHavingUnitPosition,
-                                         Map<FilterEntityType, List<String>> filters, String imagePath);
+                                         Map<FilterEntityType, List<String>> filters, String searchText, String imagePath);
 }

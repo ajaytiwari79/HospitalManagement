@@ -213,9 +213,14 @@ public class UserFilterService extends UserBaseService{
         if (!Optional.ofNullable(unit).isPresent()) {
             throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
         }
+        if (!Optional.ofNullable(unit).isPresent() &&
+                filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
+            throw new DataNotFoundByIdException("Invalid module Id");
+        }
+
         Organization organization = organizationService.fetchParentOrganization(unitId);
         return organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(), !allStaffRequired,
-                getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()),
+                getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
 
     }

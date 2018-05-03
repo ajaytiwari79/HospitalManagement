@@ -18,6 +18,7 @@ public class StaffFilterDTO {
     private String filterJson;
     private List<FilterDetail> filtersData;
     private long id;
+    private String searchText;
 //    @NotEmpty(message = "error.name.notnull") @NotNull(message = "error.name.notnull")
     private String name;
 
@@ -61,6 +62,14 @@ public class StaffFilterDTO {
         this.filtersData = filtersData;
     }
 
+    public String getSearchText() {
+        return searchText;
+    }
+
+    public void setSearchText(String searchText) {
+        this.searchText = searchText;
+    }
+
     public StaffFilterDTO() {
     }
 
@@ -76,6 +85,7 @@ public class StaffFilterDTO {
         this.name = name;
         this.id = id;
     }
+
 
 }
 

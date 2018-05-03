@@ -29,11 +29,11 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     private Session session;
 
     public String appendWhereOrAndPreFixOnQueryString(int countOfSubString){
-        String subString =  (countOfSubString == 0 ?  " WHEN" : ((countOfSubString > 0) ?  " AND" : "") );
+        String subString =  (countOfSubString == 0 ?  " WHERE" : ((countOfSubString > 0) ?  " AND" : "") );
         return subString;
     }
 
-    public String getMatchQueryForPropertiesOfStaffByFilters(Map<FilterEntityType, List<String>> filters){
+    public String getMatchQueryForPropertiesOfStaffByFilters(Map<FilterEntityType, List<String>> filters, String searchText){
         String matchQueryForStaff = "";
         int countOfSubString = 0;
         if(Optional.ofNullable(filters.get(FilterEntityType.STAFF_STATUS)).isPresent()){
@@ -42,7 +42,13 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }
         if(Optional.ofNullable(filters.get(FilterEntityType.GENDER)).isPresent()){
             matchQueryForStaff+= appendWhereOrAndPreFixOnQueryString(countOfSubString) + " user.gender IN {genderList} ";
-//            countOfSubString+= 1;
+            countOfSubString+= 1;
+        }
+        if(StringUtils.isNotBlank(searchText)){
+            matchQueryForStaff+= appendWhereOrAndPreFixOnQueryString(countOfSubString) +
+                    // TODO check name by regex to improve search
+                    " ( staff.firstName=~{searchText} OR staff.lastName=~{searchText} OR staff.cprNumber STARTS WITH {searchText} )";
+            countOfSubString+= 1;
         }
         return matchQueryForStaff;
     }
@@ -50,12 +56,10 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterEntityType, List<String>> filters){
         String matchRelationshipQueryForStaff = "";
         if(Optional.ofNullable(filters.get(FilterEntityType.EMPLOYMENT_TYPE)).isPresent()){
-//            queryParameters.puervice.convertListOfStringIntoLong(filters.get(FilterEntityType.EMPLOYMENT_TYPE)));
             matchRelationshipQueryForStaff+= " MATCH (unitPos)-[HAS_EMPLOYMENT_TYPE]-(employmentType:EmploymentType) "+
                     "WHERE id(employmentType) IN {employmentTypeIds} with user, staff, unitPos";
         }
         if(Optional.ofNullable(filters.get(FilterEntityType.EXPERTISE)).isPresent()){
-//            queryParameters.puervice.convertListOfStringIntoLong(filters.get(FilterEntityType.EMPLOYMENT_TYPE)));
             matchRelationshipQueryForStaff+= " MATCH (unitPos)-[HAS_EXPERTISE_IN]-(expertise:Expertise) "+
                     "WHERE id(expertise) IN {expertiseIds} with user, staff, unitPos";
         }
@@ -67,7 +71,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     }
 
     public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, Boolean fetchStaffHavingUnitPosition,
-                                         Map<FilterEntityType, List<String>> filters, String imagePath){
+                                         Map<FilterEntityType, List<String>> filters, String searchText, String imagePath){
 
         Map<String, Object> queryParameters = new HashMap();
 
@@ -93,16 +97,19 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             queryParameters.put("expertiseIds",
                     convertListOfStringIntoLong(filters.get(FilterEntityType.EXPERTISE)));
         }
+        if(StringUtils.isNotBlank(searchText)){
+            queryParameters.put("searchText",searchText);
+        }
         queryParameters.put("imagePath", imagePath);
 
         String query = "";
         if(fetchStaffHavingUnitPosition){
             query+= " MATCH (staff:Staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization:Organization) where id(organization)={unitId}"+
-                    " MATCH (staff)-[:BELONGS_TO]->(user:User) " + getMatchQueryForPropertiesOfStaffByFilters(filters)+
+                    " MATCH (staff)-[:BELONGS_TO]->(user:User) " + getMatchQueryForPropertiesOfStaffByFilters(filters, searchText)+
                     " with user, staff, unitPos";
         } else {
             query+= " MATCH (organization:Organization)-[:HAS_EMPLOYMENTS]-(employment:Employment)-[:BELONGS_TO]-(staff:Staff) where id(organization)={parentOrganizationId} "+
-                    " MATCH (staff)-[:BELONGS_TO]->(user:User)  "+ getMatchQueryForPropertiesOfStaffByFilters(filters)+
+                    " MATCH (staff)-[:BELONGS_TO]->(user:User)  "+ getMatchQueryForPropertiesOfStaffByFilters(filters, searchText)+
                     " with user, staff OPTIONAL MATCH (staff)-[:BELONGS_TO_STAFF]-(unitPos:UnitPosition{deleted:false})-[:IN_UNIT]-(organization:Organization) where id(organization)={unitId} with user, staff, unitPos";
         }
 
