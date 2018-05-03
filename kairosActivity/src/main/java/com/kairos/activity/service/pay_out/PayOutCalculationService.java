@@ -106,6 +106,7 @@ public class PayOutCalculationService {
                                     } else if (ctaIntervalDTO.getCompensationType().equals(AppConstants.PERCENT)) {
                                         ctaPayOutMin += (int)(((double)Math.round((double) overlapTimeInMin / ruleTemplate.getGranularity())/100) * ctaIntervalDTO.getCompensationValue());
                                         totalDailyPayOut += ctaPayOutMin;
+
                                         break;
                                     }
 
@@ -637,5 +638,6 @@ public class PayOutCalculationService {
         }
         return quaterDateTime;
     }
+
 
 }

@@ -11,12 +11,14 @@ import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessPageQueryResult;
 import com.kairos.persistence.model.user.country.EngineerType;
+import com.kairos.persistence.model.user.country.ReasonCode;
 import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 import com.kairos.service.UserBaseService;
@@ -87,6 +89,8 @@ public class EmploymentService extends UserBaseService {
     private UnitPositionGraphRepository unitPositionGraphRepository;
     @Inject
     private StaffService staffService;
+    @Inject
+    private ReasonCodeGraphRepository reasonCodeGraphRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(EmploymentService.class);
 
@@ -722,7 +726,7 @@ public class EmploymentService extends UserBaseService {
     }
     public Employment updateEmploymentEndDate(Organization unit, Long staffId) {
         Long employmentEndDate = getMaxEmploymentEndDate(staffId);
-        return saveEmploymentEndDate(unit,employmentEndDate, staffId);
+        return saveEmploymentEndDate(unit,employmentEndDate, staffId,null,null,null);
     }
 
     
@@ -738,21 +742,33 @@ public class EmploymentService extends UserBaseService {
         List<Employment>  employments = expiredEmploymentsQueryResults.isEmpty() ? null : new ArrayList<Employment>();
         int currentElement;
         Employment employment;
+        //List<Organization> organizationsNew = expiredEmploymentsQueryResults.stream().flatMap(e->e.getOrganizations().stream()).collect(Collectors.toList());
+       /*
+        List<Organization> organizationsNew = new ArrayList<Organization>();
+        for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult :expiredEmploymentsQueryResults) {
+            organizationsNew.addAll(expiredEmploymentsQueryResult.getOrganizations());
+        }*/
+       //List<Long> orgIds =  organizationsNew.stream().map(organization -> organization.getId()).collect(Collectors.toList());
 
         for(ExpiredEmploymentsQueryResult expiredEmploymentsQueryResult: expiredEmploymentsQueryResults) {
             organizations = expiredEmploymentsQueryResult.getOrganizations();
             employment = expiredEmploymentsQueryResult.getEmployment();
             unitPermissions = expiredEmploymentsQueryResult.getUnitPermissions();
             currentElement = 0;
+            List<Long> orgIds =  organizations.stream().map(organization -> organization.getId()).collect(Collectors.toList());
 
-            for(AccessGroup accessGroup:expiredEmploymentsQueryResult.getAccessGroups()){
+            accessGroupRepository.createAccessGroupUnitRelation(orgIds,employment.getAccessGroupIdOnEmploymentEnd());
+            AccessGroup accessGroupDB = accessGroupRepository.findById(employment.getAccessGroupIdOnEmploymentEnd()).get();
+
+
+            for(Organization organziation:expiredEmploymentsQueryResult.getOrganizations()){
                 unitPermission = unitPermissions.get(currentElement);
                 if(!Optional.ofNullable(unitPermission).isPresent() ) {
                     unitPermission = new UnitPermission();
                     unitPermission.setOrganization(organizations.get(currentElement));
                     unitPermission.setStartDate(DateUtil.getCurrentDate().getTime());
                 }
-                unitPermission.setAccessGroup(accessGroup);
+                unitPermission.setAccessGroup(accessGroupDB);
                 employment.getUnitPermissions().add(unitPermission);
                 currentElement++;
             }
@@ -763,13 +779,14 @@ public class EmploymentService extends UserBaseService {
         }
     }
 
-    public Employment updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis) {
+    public Employment updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) {
         Long employmentEndDate = null;
         if(Optional.ofNullable(endDateMillis).isPresent()) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
         }
+
         // Long employmentEndDate =  isEndDateBlank||!(Optional.ofNullable(unitPositionDTO.getEndDateMillis()).isPresent()) ? null : (maxEndDate>unitPositionDTO.getEndDateMillis()?maxEndDate:unitPositionDTO.getEndDateMillis());
-        return saveEmploymentEndDate(unit,employmentEndDate,staffId);
+        return saveEmploymentEndDate(unit,employmentEndDate,staffId,reasonCodeId,endDateMillis,accessGroupId);
     }
 
     private Long getMaxEmploymentEndDate(Long staffId) {
@@ -794,14 +811,28 @@ public class EmploymentService extends UserBaseService {
 
     }
 
-    private Employment saveEmploymentEndDate(Organization unit, Long employmentEndDate, Long staffId) {
+    private Employment saveEmploymentEndDate(Organization unit, Long employmentEndDate, Long staffId,Long reasonCodeId, Long endDateMillis,Long accessGroupId) {
 
         Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+        ReasonCode reasonCode = null;
         if (!Optional.ofNullable(parentOrganization).isPresent()) {
             throw new DataNotFoundByIdException("Parent organization not found  Unit ID: " + unit.getId());
         }
+
         Employment employment = employmentGraphRepository.findEmployment(parentOrganization.getId(),staffId);
         employment.setEndDateMillis(employmentEndDate);
+        if(!Optional.ofNullable(employmentEndDate).isPresent()) {
+            employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
+            employment.setReasonCode(reasonCode);
+        }
+        else if(Optional.ofNullable(employmentEndDate).isPresent()&&Objects.equals(employmentEndDate,endDateMillis)) {
+            employmentGraphRepository.deleteEmploymentReasonCodeRelation(staffId);
+            reasonCode = reasonCodeGraphRepository.findById(reasonCodeId).get();
+            employment.setReasonCode(reasonCode);
+        }
+        if(Optional.ofNullable(accessGroupId).isPresent()) {
+            employment.setAccessGroupIdOnEmploymentEnd(accessGroupId);
+        }
         employmentGraphRepository.save(employment);
 
         if(Optional.ofNullable(employmentEndDate).isPresent()&&(DateUtil.getDateFromEpoch(employmentEndDate).compareTo(DateUtil.getTimezonedCurrentDate(unit.getTimeZone().toString()))==0)) {
