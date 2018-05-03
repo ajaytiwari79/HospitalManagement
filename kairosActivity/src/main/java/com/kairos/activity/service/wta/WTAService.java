@@ -609,6 +609,7 @@ public class WTAService extends MongoBaseService {
             workingTimeAgreement.setId(null);
             workingTimeAgreement.setOrganization(new WTAOrganization(organisationId,"",""));
             workingTimeAgreement.setCountryParentWTA(w.getId());
+            workingTimeAgreement.setCountryId(null);
             workingTimeAgreement.setParentWTA(wtaResponseDTO.getId());
             workingTimeAgreements.add(workingTimeAgreement);
             //wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(workingTimeAgreement,WTAResponseDTO.class);
