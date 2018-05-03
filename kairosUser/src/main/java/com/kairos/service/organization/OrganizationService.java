@@ -7,6 +7,7 @@ import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
@@ -235,7 +236,8 @@ public class OrganizationService extends UserBaseService {
             logger.info("Linked with region level " + count);
         }
         accessGroupService.createDefaultAccessGroups(organization);
-        timeSlotService.createDefaultTimeSlots(organization);
+        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         return organization;
     }
@@ -271,7 +273,8 @@ public class OrganizationService extends UserBaseService {
 
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         accessGroupService.createDefaultAccessGroups(organization);
-        timeSlotService.createDefaultTimeSlots(organization);
+        timeSlotService.createDefaultTimeSlots(organization,TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(organization,TimeSlotType.TASK_PLANNING);
         long creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
@@ -591,7 +594,8 @@ public class OrganizationService extends UserBaseService {
         organizationGraphRepository.save(unit);
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
-        timeSlotService.createDefaultTimeSlots(unit);
+        timeSlotService.createDefaultTimeSlots(unit,TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(unit,TimeSlotType.TASK_PLANNING);
         phaseRestClient.createDefaultPhases(unit.getId());
         periodRestClient.createDefaultPeriodSettings(unit.getId());
 
@@ -869,7 +873,8 @@ public class OrganizationService extends UserBaseService {
         Organization child = organizationGraphRepository.findOne(childId);
         organizationGraphRepository.createChildOrganization(parent.getId(), child.getId());
         accessGroupService.createDefaultAccessGroups(child);
-        timeSlotService.createDefaultTimeSlots(child);
+        timeSlotService.createDefaultTimeSlots(child,TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(child,TimeSlotType.TASK_PLANNING);
         return true;
     }
 
