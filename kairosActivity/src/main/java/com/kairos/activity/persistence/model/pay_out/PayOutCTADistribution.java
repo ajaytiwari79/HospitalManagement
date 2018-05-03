@@ -79,3 +79,4 @@ public class PayOutCTADistribution {
     public void setPayrollSystem(String payrollSystem) {
         this.payrollSystem = payrollSystem;
     }
+}
