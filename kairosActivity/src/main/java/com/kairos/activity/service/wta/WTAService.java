@@ -1,7 +1,9 @@
 package com.kairos.activity.service.wta;
 
 import com.kairos.activity.client.CountryRestClient;
+import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.WTADetailRestClient;
+import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.response.dto.WTADTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
@@ -24,7 +26,6 @@ import com.kairos.activity.service.tag.TagService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
-
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
@@ -73,6 +74,7 @@ public class WTAService extends MongoBaseService {
     private ActivityMongoRepository activityMongoRepository;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject private OrganizationRestClient organizationRestClient;
 
 
     private final Logger logger = LoggerFactory.getLogger(WTAService.class);
@@ -538,8 +540,8 @@ public class WTAService extends MongoBaseService {
 
     public WTADefaultDataInfoDTO getDefaultWtaInfo(Long countryId) {
         List<Activity> activities = activityMongoRepository.findByDeletedFalseAndUnitId(countryId);
-        List<ActivityDTO> activityDTOS = new ArrayList<>();
-        activities.forEach(a -> {
+        List<ActivityDTO> activityDTOS = ObjectMapperUtils.copyPropertiesByMapper(activities,new ActivityDTO());
+        /*activities.forEach(a -> {
             ActivityDTO activityDTO = new ActivityDTO();
             try {
                 PropertyUtils.copyProperties(activityDTO, a);
@@ -551,11 +553,21 @@ public class WTAService extends MongoBaseService {
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             }
-        });
+        });*/
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, countryId);
         WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = wtaDetailRestClient.getWtaTemplateDefaultDataInfo(countryId);
         wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
         wtaDefaultDataInfoDTO.setActivityList(activityDTOS);
+        return wtaDefaultDataInfoDTO;
+    }
+
+    public WTADefaultDataInfoDTO getDefaultWtaInfoForUnit(Long unitId) {
+        OrganizationDTO organizationDTO = organizationRestClient.getOrganizationWithCountryId(unitId);
+        List<ActivityDTO> activities = activityMongoRepository.findAllActivityByUnitId(unitId);
+        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, organizationDTO.getCountryId());
+        WTADefaultDataInfoDTO wtaDefaultDataInfoDTO = wtaDetailRestClient.getWtaTemplateDefaultDataInfo(organizationDTO.getCountryId());
+        wtaDefaultDataInfoDTO.setTimeTypes(timeTypeDTOS);
+        wtaDefaultDataInfoDTO.setActivityList(activities);
         return wtaDefaultDataInfoDTO;
     }
 

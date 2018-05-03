@@ -182,6 +182,12 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getDefaultWtaInfo(countryId));
     }
 
+    @ApiOperation(value = "Update WTA of Organization by Expertise")
+    @GetMapping(value = UNIT_URL + "/getDefaultWtaInfoForUnit")
+    public ResponseEntity<Map<String, Object>> getDefaultWtaInfoForUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getDefaultWtaInfoForUnit(unitId));
+    }
+
     @ApiOperation(value = "get Wta By Ids")
     @GetMapping(value = UNIT_URL + "/wta/getWTAByIds")
     public ResponseEntity<Map<String, Object>> getWTAByIds(@RequestParam List<BigInteger> wtaIds) {
