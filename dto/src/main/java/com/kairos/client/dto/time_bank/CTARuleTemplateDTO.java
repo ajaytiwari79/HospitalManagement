@@ -21,6 +21,8 @@ public class CTARuleTemplateDTO {
     private boolean calculateScheduledHours;
     private List<Long> plannedTimeIds;
     private List<Long> employmentTypes;
+    private String payrollSystem;
+    private String payrollType;
     private String accountType;
 
     public CTARuleTemplateDTO() {
@@ -144,5 +146,21 @@ public class CTARuleTemplateDTO {
 
     public void setCtaIntervalDTOS(List<CTAIntervalDTO> ctaIntervalDTOS) {
         this.ctaIntervalDTOS = ctaIntervalDTOS;
+    }
+
+    public String getPayrollSystem() {
+        return payrollSystem;
+    }
+
+    public void setPayrollSystem(String payrollSystem) {
+        this.payrollSystem = payrollSystem;
+    }
+
+    public String getPayrollType() {
+        return payrollType;
+    }
+
+    public void setPayrollType(String payrollType) {
+        this.payrollType = payrollType;
     }
 }
