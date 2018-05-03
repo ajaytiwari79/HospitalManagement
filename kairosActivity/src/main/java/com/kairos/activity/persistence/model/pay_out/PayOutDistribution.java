@@ -1,27 +1,24 @@
 package com.kairos.activity.persistence.model.pay_out;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class PayOutCTADistribution {
+public class PayOutDistribution {
 
     private String ctaName;
     private int minutes;
     private Long ctaRuleTemplateId;
-    private String payrollType;
-    private String payrollSystem;
 
-    public PayOutCTADistribution(String ctaName, int minutes, Long ctaRuleTemplateId, String payrollSystem, String payrollType) {
+    public PayOutDistribution(String ctaName, int minutes, Long ctaRuleTemplateId) {
         this.ctaName = ctaName;
         this.minutes = minutes;
         this.ctaRuleTemplateId = ctaRuleTemplateId;
-        this.payrollSystem = payrollSystem;
-        this.payrollType = payrollType;
     }
 
-    public PayOutCTADistribution() {
+    public PayOutDistribution() {
     }
 
-    public PayOutCTADistribution(Long ctaRuleTemplateId, int minutes) {
+    public PayOutDistribution(Long ctaRuleTemplateId, int minutes) {
         this.minutes = minutes;
         this.ctaRuleTemplateId = ctaRuleTemplateId;
     }
@@ -56,7 +53,7 @@ public class PayOutCTADistribution {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        PayOutCTADistribution that = (PayOutCTADistribution) o;
+        PayOutDistribution that = (PayOutDistribution) o;
 
         return new EqualsBuilder()
                 .append(ctaName, that.ctaName)
@@ -64,18 +61,11 @@ public class PayOutCTADistribution {
                 .isEquals();
     }
 
-    public String getPayrollType() {
-        return payrollType;
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(ctaName)
+                .append(ctaRuleTemplateId)
+                .toHashCode();
     }
-
-    public void setPayrollType(String payrollType) {
-        this.payrollType = payrollType;
-    }
-
-    public String getPayrollSystem() {
-        return payrollSystem;
-    }
-
-    public void setPayrollSystem(String payrollSystem) {
-        this.payrollSystem = payrollSystem;
-    }
+}

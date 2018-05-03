@@ -1,10 +1,11 @@
-package com.kairos.client.dto.time_bank;
+package com.kairos.response.dto.pay_out;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
-public class CTARuleTemplateDTO {
+public class CTARuleTemplateCalulatedPayOutDTO {
 
 
     private Long id;
@@ -19,20 +20,22 @@ public class CTARuleTemplateDTO {
     private int minutesFromCta;
     private List<BigInteger> timeTypeIdsWithParentTimeType;
     private boolean calculateScheduledHours;
+
     private List<Long> plannedTimeIds;
-    private List<Long> employmentTypes;
+    private List<Long> employmentTypes = new ArrayList<>();
     private String payrollSystem;
     private String payrollType;
+
     private String accountType;
 
-    public CTARuleTemplateDTO() {
+    public CTARuleTemplateCalulatedPayOutDTO() {
     }
 
-    public CTARuleTemplateDTO(Long id, String name, int granularity, List<BigInteger> timeTypeIds) {
+    public CTARuleTemplateCalulatedPayOutDTO(Long id, String name, int granularity) {
         this.id = id;
         this.name = name;
         this.granularity = granularity;
-        this.timeTypeIds = timeTypeIds;
+
     }
 
     public String getAccountType() {
@@ -82,6 +85,8 @@ public class CTARuleTemplateDTO {
     public void setEmploymentTypes(List<Long> employmentTypes) {
         this.employmentTypes = employmentTypes;
     }
+
+
 
     public int getMinutesFromCta() {
         return minutesFromCta;
