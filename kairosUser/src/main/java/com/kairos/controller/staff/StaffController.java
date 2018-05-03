@@ -598,7 +598,9 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO) throws ParseException {
 
         String employmentEndDate = employmentDTO.getEndDate();//(String)employmentDetail.get("endDate");
-        EmploymentUnitPositionDTO response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,employmentEndDate,unitId);
+        Long reasonCodeId = employmentDTO.getReasonCodeId();
+        Long accessGroupId = employmentDTO.getAccessGroupIdOnEmploymentEnd();
+        EmploymentUnitPositionDTO response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,employmentEndDate,unitId,reasonCodeId,accessGroupId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }
