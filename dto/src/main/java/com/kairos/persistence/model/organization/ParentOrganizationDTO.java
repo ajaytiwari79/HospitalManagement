@@ -40,6 +40,7 @@ public class ParentOrganizationDTO {
     private CompanyType companyType;
 
     private String vatId;
+    private boolean boardingCompleted;
 
     public ParentOrganizationDTO() {
         //default constructor
@@ -215,5 +216,13 @@ public class ParentOrganizationDTO {
 
     public void setVatId(String vatId) {
         this.vatId = vatId;
+    }
+
+    public boolean isBoardingCompleted() {
+        return boardingCompleted;
+    }
+
+    public void setBoardingCompleted(boolean boardingCompleted) {
+        this.boardingCompleted = boardingCompleted;
     }
 }

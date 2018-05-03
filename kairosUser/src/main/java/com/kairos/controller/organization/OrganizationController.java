@@ -569,6 +569,12 @@ public class OrganizationController {
                 organizationService.getParentOrganization(countryId));
     }
 
+    @RequestMapping(value = "/parent/{orgId}/country/{countryId}/gdpr_workcenter", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getOrganizationGdprAndWorkcenter(@PathVariable long orgId,@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationGdprAndWorkcenter(orgId, countryId));
+    }
+
     @RequestMapping(value = "/unit", method = RequestMethod.GET)
     @ApiOperation("get child units of parent organization")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

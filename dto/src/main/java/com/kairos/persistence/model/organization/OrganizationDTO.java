@@ -21,8 +21,8 @@ public class OrganizationDTO {
     private String name;
     private String description;
     private boolean isPreKairos;
-    private List<Long> organizationTypeId;
-    private List<Long> organizationSubTypeId;
+    private List<Long> typeId;
+    private List<Long> subTypeId;
     private List<Long> businessTypeId;
     private AddressDTO homeAddress;
     private int dayShiftTimeDeduction = 4; //in percentage
@@ -45,6 +45,14 @@ public class OrganizationDTO {
     private Integer costCenterId;
     private CompanyUnitType companyUnitType;
 
+
+    private List<Long> businessTypeIds;
+    private boolean isAddressProtected;
+    private boolean isVerifiedByGoogleMap;
+    private boolean kairosHub;
+    private Long levelId;
+    private  Boolean union;
+    private boolean boardingCompleted;
 
 
     public Long getId() {
@@ -87,24 +95,24 @@ public class OrganizationDTO {
         isPreKairos = preKairos;
     }
 
-    public List<Long> getOrganizationTypeId() {
-        return organizationTypeId;
+    public List<Long> getTypeId() {
+        return typeId;
     }
 
-    public List<Long> getOrganizationSubTypeId() {
-        return organizationSubTypeId;
+    public List<Long> getSubTypeId() {
+        return subTypeId;
     }
 
     public List<Long> getBusinessTypeId() {
         return businessTypeId;
     }
 
-    public void setOrganizationTypeId(List<Long> organizationTypeId) {
-        this.organizationTypeId = organizationTypeId;
+    public void setTypeId(List<Long> typeId) {
+        this.typeId = typeId;
     }
 
-    public void setOrganizationSubTypeId(List<Long> organizationSubTypeId) {
-        this.organizationSubTypeId = organizationSubTypeId;
+    public void setSubTypeId(List<Long> subTypeId) {
+        this.subTypeId = subTypeId;
     }
 
     public void setBusinessTypeId(List<Long> businessTypeId) {
@@ -229,5 +237,61 @@ public class OrganizationDTO {
 
     public void setCompanyUnitType(CompanyUnitType companyUnitType) {
         this.companyUnitType = companyUnitType;
+    }
+
+    public List<Long> getBusinessTypeIds() {
+        return businessTypeIds;
+    }
+
+    public void setBusinessTypeIds(List<Long> businessTypeIds) {
+        this.businessTypeIds = businessTypeIds;
+    }
+
+    public boolean isAddressProtected() {
+        return isAddressProtected;
+    }
+
+    public void setAddressProtected(boolean addressProtected) {
+        isAddressProtected = addressProtected;
+    }
+
+    public boolean isVerifiedByGoogleMap() {
+        return isVerifiedByGoogleMap;
+    }
+
+    public void setVerifiedByGoogleMap(boolean verifiedByGoogleMap) {
+        isVerifiedByGoogleMap = verifiedByGoogleMap;
+    }
+
+    public boolean isKairosHub() {
+        return kairosHub;
+    }
+
+    public void setKairosHub(boolean kairosHub) {
+        this.kairosHub = kairosHub;
+    }
+
+    public Long getLevelId() {
+        return levelId;
+    }
+
+    public void setLevelId(Long levelId) {
+        this.levelId = levelId;
+    }
+
+    public Boolean getUnion() {
+        return union;
+    }
+
+    public void setUnion(Boolean union) {
+        this.union = union;
+    }
+
+    public boolean isBoardingCompleted() {
+        return boardingCompleted;
+    }
+
+    public void setBoardingCompleted(boolean boardingCompleted) {
+        this.boardingCompleted = boardingCompleted;
     }
 }

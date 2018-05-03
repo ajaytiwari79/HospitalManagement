@@ -227,6 +227,10 @@ public class Organization extends UserBaseEntity {
     private Integer costCenterId;
     private CompanyUnitType companyUnitType;
 
+    private boolean boardingCompleted;
+    private boolean workCenterUnit;
+    private boolean gdprUnit;
+
     //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"
     public Organization(String name, List<Group> groupList, List<Organization> children) {
         this.name = name;
@@ -884,5 +888,29 @@ public class Organization extends UserBaseEntity {
 
     public void setCompanyCategory(CompanyCategory companyCategory) {
         this.companyCategory = companyCategory;
+    }
+
+    public boolean isBoardingCompleted() {
+        return boardingCompleted;
+    }
+
+    public void setBoardingCompleted(boolean boardingCompleted) {
+        this.boardingCompleted = boardingCompleted;
+    }
+
+    public boolean isWorkCenterUnit() {
+        return workCenterUnit;
+    }
+
+    public void setWorkCenterUnit(boolean workCenterUnit) {
+        this.workCenterUnit = workCenterUnit;
+    }
+
+    public boolean isGdprUnit() {
+        return gdprUnit;
+    }
+
+    public void setGdprUnit(boolean gdprUnit) {
+        this.gdprUnit = gdprUnit;
     }
 }
