@@ -319,14 +319,14 @@ public class OrganizationService extends UserBaseService {
         return orgResponse;
     }
 
-    List<WorkingTimeAgreement> getWTAWithExpertise(List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults){
+    /*List<WorkingTimeAgreement> getWTAWithExpertise(List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults){
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
         for (WTAAndExpertiseQueryResult allWtaExpertiseQueryResult : allWtaExpertiseQueryResults) {
             allWtaExpertiseQueryResult.getWorkingTimeAgreement().setExpertise(allWtaExpertiseQueryResult.getExpertise());
             workingTimeAgreements.add(allWtaExpertiseQueryResult.getWorkingTimeAgreement());
         }
         return workingTimeAgreements;
-    }
+    }*/
 
 
     /*private void linkWTAToOrganization(List<WorkingTimeAgreement> WTAList, List<WorkingTimeAgreement> allWta) {
