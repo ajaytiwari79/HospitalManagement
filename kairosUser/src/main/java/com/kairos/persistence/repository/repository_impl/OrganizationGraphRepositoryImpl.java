@@ -45,8 +45,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         }
         if(StringUtils.isNotBlank(searchText)){
             matchQueryForStaff+= appendWhereOrAndPreFixOnQueryString(countOfSubString) +
-                    // TODO check name by regex to improve search
-                    " ( staff.firstName=~{searchText} OR staff.lastName=~{searchText} OR staff.cprNumber STARTS WITH {searchText} )";
+            " ( LOWER(staff.firstName) CONTAINS LOWER({searchText}) OR LOWER(staff.lastName) CONTAINS LOWER({searchText}) OR staff.cprNumber STARTS WITH {searchText} )";
             countOfSubString+= 1;
         }
         return matchQueryForStaff;
