@@ -10,7 +10,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 public interface TemplateCategoryRelationGraphRepository extends Neo4jBaseRepository<TemplateCategoryRelation,Long> {
 
 
-    @Query("MATCH (template:WTABaseRuleTemplate) where id(template) = {0} with template " +
+    @Query("MATCH (template:WTABaseRuleTemplateDTO) where id(template) = {0} with template " +
             "Match (template)-[relation:HAS_RULE_TEMPLATE_CATEGORY]->(category:RuleTemplateCategory) with relation,category " +
             "Return relation")
     TemplateCategoryRelation getTemplateCategoryRelationById(long templateId);

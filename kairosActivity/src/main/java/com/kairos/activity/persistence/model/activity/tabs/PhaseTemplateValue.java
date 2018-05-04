@@ -6,6 +6,8 @@ import java.math.BigInteger;
 /**
  * Created by pavan on 7/2/18.
  */
+
+//This for Activity
 public class PhaseTemplateValue implements Serializable {
     private BigInteger phaseId;
     private String name;

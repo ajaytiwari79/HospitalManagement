@@ -9,7 +9,7 @@ import com.kairos.activity.client.TimeSlotRestClient;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.TimeSlot;
 import com.kairos.activity.client.dto.TimeSlotWrapper;
-import com.kairos.activity.client.dto.country.CountryDTO;
+import com.kairos.response.dto.web.CountryDTO;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.client.dto.organization.OrganizationLevel;
 import com.kairos.activity.client.dto.skill.Skill;

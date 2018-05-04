@@ -135,6 +135,14 @@ public class OrganizationController {
                 organizationService.getOrganizationById(unitId));
     }
 
+    @ApiOperation(value = "Get Organization with countryId")
+    @RequestMapping(value = UNIT_URL+"/getOrganisationWithCountryId", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getOrganizationWithCountryId(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getOrganizationWithCountryId(unitId));
+    }
+
     @ApiOperation(value = "Get Organization's showCountryTag setting by Id")
     @RequestMapping(value = UNIT_URL + "/show_country_tags", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -1291,12 +1299,36 @@ public class OrganizationController {
                 organizationService.getEmploymentTypeWithExpertise(unitId));
     }
 
+    @RequestMapping(value ="/WTARelatedInfo", method = RequestMethod.GET)
+    @ApiOperation("get  Wta related info")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWTARelatedInfo(@RequestParam Long countryId,@RequestParam Long organizationId,@RequestParam Long organizationSubTypeId,@RequestParam Long organizationTypeId,@RequestParam Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,
+                organizationService.getWTARelatedInfo(countryId, organizationId, organizationSubTypeId, organizationTypeId, expertiseId));
+    }
+
     @RequestMapping(value = UNIT_URL + "/time_zone", method = RequestMethod.GET)
     //@ApiOperation("Get Time Zone Organization")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getTimeZoneOfUnit(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 organizationService.getTimeZoneStringOfUnit(unitId));
+    }
+//    @Pavan
+//    Add Apis for Time slots for Shift planning
+
+    @ApiOperation(value = "Get Organization Time Slot sets")
+    @RequestMapping(value = "/unit/{unitId}/shift_planning/time_slot_set", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotSetsByUnit(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotSetsByUnit(unitId));
+    }
+
+    @ApiOperation(value = "Get Organization Time Slots")
+    @RequestMapping(value = "/unit/{unitId}/time_slot_set/{timeSlotSetId}/shift_planning/time_slot", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getShiftPlanningTimeSlotsByUnit(@PathVariable Long timeSlotSetId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getShiftPlanningTimeSlotsById(timeSlotSetId));
     }
 }
 

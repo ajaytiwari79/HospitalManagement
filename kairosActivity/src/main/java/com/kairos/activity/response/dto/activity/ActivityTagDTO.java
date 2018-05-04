@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.tabs.GeneralActivityTab;
+import com.kairos.activity.persistence.model.activity.tabs.TimeCalculationActivityTab;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.tag.TagDTO;
 import com.kairos.persistence.model.enums.ActivityStateEnum;
@@ -29,6 +30,16 @@ public class ActivityTagDTO {
     private Long unitId;
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
+
+    public TimeCalculationActivityTab getTimeCalculationActivityTab() {
+        return timeCalculationActivityTab;
+    }
+
+    public void setTimeCalculationActivityTab(TimeCalculationActivityTab timeCalculationActivityTab) {
+        this.timeCalculationActivityTab = timeCalculationActivityTab;
+    }
+
+    private TimeCalculationActivityTab timeCalculationActivityTab;
     private List<ActivityTagDTO> compositeActivities = new ArrayList<ActivityTagDTO>();
     private Long parentId;
     private ActivityStateEnum state;

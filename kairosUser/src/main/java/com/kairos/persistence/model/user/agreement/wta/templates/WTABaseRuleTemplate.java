@@ -40,7 +40,7 @@ public class WTABaseRuleTemplate extends RuleTemplate{
 
     @Override
     public String toString() {
-        return "WTABaseRuleTemplate{" +
+        return "WTABaseRuleTemplateDTO{" +
                 "phaseTemplateValues=" + phaseTemplateValues +
                 ", templateType='" + templateType + '\'' +
                 '}';

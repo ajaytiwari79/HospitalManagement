@@ -16,12 +16,13 @@ public class CTARuleTemplateCalulatedTimeBankDTO {
     private int granularity;
     private List<BigInteger> activityIds;
     private List<BigInteger> timeTypeIds;
+    private List<Long> plannedTimeIds;
     private List<CTAIntervalDTO> ctaIntervalDTOS;
     private int minutesFromCta;
     private List<BigInteger> timeTypeIdsWithParentTimeType;
     private boolean calculateScheduledHours;
 
-    private List<Long> plannedTimeIds;
+
     private List<Long> employmentTypes = new ArrayList<>();
 
 

@@ -1,5 +1,6 @@
 package com.kairos.response.dto.web.organization.time_slot;
 
+import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.enums.time_slot.TimeSlotMode;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -18,6 +19,7 @@ public class TimeSlotSetDTO {
     private Date endDate;
     private List<TimeSlotDTO> timeSlots;
     private TimeSlotMode timeSlotMode;
+    private TimeSlotType timeSlotType;
 
     public TimeSlotSetDTO() {
         //default constructor
@@ -78,5 +80,13 @@ public class TimeSlotSetDTO {
 
     public void setTimeSlotMode(TimeSlotMode timeSlotMode) {
         this.timeSlotMode = timeSlotMode;
+    }
+
+    public TimeSlotType getTimeSlotType() {
+        return timeSlotType;
+    }
+
+    public void setTimeSlotType(TimeSlotType timeSlotType) {
+        this.timeSlotType = timeSlotType;
     }
 }
