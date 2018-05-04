@@ -1,33 +1,8 @@
 package com.planner.controller;
 
 
-import com.planner.commonUtil.ResponseHandler;
 import com.planner.commonUtil.StaticField;
-import com.planner.responseDto.citizenDto.OptaCitizenDTO;
-import com.planner.responseDto.skillDto.OptaSkillDTO;
-import com.planner.responseDto.staffDto.OptaShiftDTO;
-import com.planner.responseDto.staffDto.OptaStaffDTO;
-import com.planner.responseDto.taskDto.OptaTaskDTO;
-import com.planner.responseDto.taskDto.OptaTaskTypeDTO;
-import com.planner.responseDto.vehicle.OptaVehicleDTO;
-import com.planner.service.citizenService.CitizenService;
-import com.planner.service.locationService.LocationService;
-import com.planner.service.skillService.SkillService;
-import com.planner.service.staffService.ShiftService;
-import com.planner.service.staffService.StaffService;
-import com.planner.service.taskService.TaskService;
-import com.planner.service.taskService.TaskTypeService;
-import com.planner.service.vehicleService.VehicleService;
-import com.planner.service.workingTimeAgreementService.WorkingTimeAgreementService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(StaticField.INTEGRATION)
@@ -44,7 +19,7 @@ public class TaskPlanningController {
     @Autowired
     private TaskTypeService taskTypeService;
     @Autowired
-    private StaffService staffService;
+    private TaskStaffService staffService;
     @Autowired
     private ShiftService shiftService;
     @Autowired
