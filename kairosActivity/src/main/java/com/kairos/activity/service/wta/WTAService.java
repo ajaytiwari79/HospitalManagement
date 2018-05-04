@@ -3,6 +3,7 @@ package com.kairos.activity.service.wta;
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.WTADetailRestClient;
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.response.dto.WTADTO;
 import com.kairos.activity.response.dto.activity.TimeTypeDTO;
@@ -22,10 +23,12 @@ import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoR
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.activity.TimeTypeService;
+import com.kairos.activity.service.integration.PlannerSyncService;
 import com.kairos.activity.service.tag.TagService;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.persistence.model.enums.MasterDataTypeEnum;
+
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
@@ -74,6 +77,8 @@ public class WTAService extends MongoBaseService {
     private ActivityMongoRepository activityMongoRepository;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject
+    private PlannerSyncService plannerSyncService;
     @Inject private OrganizationRestClient organizationRestClient;
 
 

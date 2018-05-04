@@ -35,8 +35,7 @@ public class WTAQueryResultDTO {
     private OrganizationTypeDTO organizationType;
     private OrganizationTypeDTO organizationSubType;
 
-    private List<WTABaseRuleTemplate> ruleTemplates
-    ;
+    private List<WTABaseRuleTemplate> ruleTemplates;
 
     private List<TagDTO> tags = new ArrayList<>();
 
