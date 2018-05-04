@@ -72,8 +72,9 @@ public class ObjectMapperUtils {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         //mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         try {
-            return mapper.convertValue(mapper.writeValueAsString(objects1), new TypeReference<List<E>>() {});
-        } catch (JsonProcessingException e) {
+            return mapper.readValue(mapper.writeValueAsString(objects1), mapper.getTypeFactory().constructCollectionType(
+                    List.class, Objects.getClass()));
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;

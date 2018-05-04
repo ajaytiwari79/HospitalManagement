@@ -18,6 +18,7 @@ import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.response.dto.shift.ShiftQueryResult;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.pay_out.PayOutService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.time_bank.TimeBankService;
 import com.kairos.activity.service.wta.WTAService;
@@ -71,6 +72,8 @@ public class ShiftService extends MongoBaseService {
     private PhaseService phaseService;
     @Inject
     private TimeBankService timeBankService;
+    @Inject
+    private PayOutService payOutService;
     @Inject
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
@@ -137,6 +140,8 @@ public class ShiftService extends MongoBaseService {
         }
         save(shift);
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+        payOutService.savePayOut(shift.getUnitPositionId(), shift);
+
 
         //anil m2 notify event for updating staffing level
         applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null));
@@ -167,6 +172,7 @@ public class ShiftService extends MongoBaseService {
         }
         save(shifts);
         timeBankService.saveTimeBanks(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts);
+        payOutService.savePayOuts(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts);
         shifts.stream().forEach(s -> shiftQueryResults.add(s.getShiftQueryResult()));
         return shiftQueryResults;
     }
@@ -209,6 +215,7 @@ public class ShiftService extends MongoBaseService {
         timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
         save(shift);
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+        payOutService.savePayOut(shift.getUnitPositionId(), shift);
         Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
         //anil m2 notify event for updating staffing level
         applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
@@ -251,6 +258,7 @@ public class ShiftService extends MongoBaseService {
         shift.setDeleted(true);
         save(shift);
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+        payOutService.savePayOut(shift.getUnitPositionId(), shift);
     }
 
     public Long countByActivityId(BigInteger activityId) {
@@ -323,6 +331,7 @@ public class ShiftService extends MongoBaseService {
             shiftQueryResult = geSubShiftResponse(shift, shifts);
         }
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+        payOutService.savePayOut(shift.getUnitPositionId(), shift);
         return shiftQueryResult;
     }
 

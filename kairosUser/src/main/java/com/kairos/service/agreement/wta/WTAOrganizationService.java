@@ -65,7 +65,7 @@ public class WTAOrganizationService extends UserBaseService {
     }
 
 
-    public WorkingTimeAgreement updateWtaOfOrganization(Long unitId, Long wtaId, WTADTO updateDTO) {
+    /*public WorkingTimeAgreement updateWtaOfOrganization(Long unitId, Long wtaId, WTADTO updateDTO) {
         Organization organization = organizationGraphRepository.findOne(unitId, 1);
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new DataNotFoundByIdException("Invalid unit  " + unitId);
@@ -138,7 +138,7 @@ public class WTAOrganizationService extends UserBaseService {
 
         oldWta.getExpertise().setCountry(null);
         return oldWta;
-    }
+    }*/
 
 
     private RuleTemplateCategory getCategory(List<WTABaseRuleTemplate> ruleTemplates, Long id, String ruleTemplateCategoryName) {

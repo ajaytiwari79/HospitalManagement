@@ -63,6 +63,15 @@ public class UnitPositionDTO {
 
     private Long timeCareExternalId;
 
+    public Long getAccessGroupIdOnEmploymentEnd() {
+        return accessGroupIdOnEmploymentEnd;
+    }
+
+    public void setAccessGroupIdOnEmploymentEnd(Long accessGroupIdOnEmploymentEnd) {
+        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
+    }
+
+    private Long accessGroupIdOnEmploymentEnd;
     public UnitPositionDTO() {
         //default cons
     }

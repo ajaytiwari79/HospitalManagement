@@ -1,5 +1,7 @@
 package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
+import com.kairos.persistence.model.user.filter.FilterDetailQueryResult;
+import com.kairos.response.dto.web.filter.FilterDetailDTO;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -70,6 +72,12 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
         @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} AND employmentType.name=~{1} AND id(employmentType) <> {2} " +
                 "with count(employmentType) as employmentTypeCount return CASE when employmentTypeCount>0 THEN  true ELSE false END as response")
         boolean findByNameExcludingCurrent(Long countryId,String name,Long employmentTypeId);
+
+
+        // Get Employment Type data for filters by countryId
+        @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} return toString(id(employmentType)) as id, employmentType.name as value")
+        List<FilterDetailQueryResult> getEmploymentTypeByCountryIdForFilters(Long countryId);
+
 
 
 }
