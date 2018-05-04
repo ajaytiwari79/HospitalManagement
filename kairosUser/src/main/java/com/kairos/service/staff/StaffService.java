@@ -86,6 +86,8 @@ import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -225,14 +227,11 @@ public class StaffService extends UserBaseService {
         for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
             Expertise expertise = expertiseGraphRepository.findOne(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
             StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
-            Date expertiseStartDate;
             Long id = null;
-            if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent()) {
-                expertiseStartDate = staffExperienceInExpertiseDTO.getExpertiseStartDate();
-                id = staffExperienceInExpertiseDTO.getId();
-            } else
-                expertiseStartDate = DateUtil.getCurrentDate();
+            if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent())
+                 id = staffExperienceInExpertiseDTO.getId();
 
+            Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
             StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(id, objectToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate);
             staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
 
@@ -340,7 +339,11 @@ public class StaffService extends UserBaseService {
         map.put("cprNumber", staff.getCprNumber());
         map.put("careOfName", staff.getCareOfName());
         List<StaffExperienceInExpertiseDTO> expertiseWithExperience = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffId(staff.getId());
-
+        expertiseWithExperience.forEach(expertiseWithExperience1 ->{
+            expertiseWithExperience1.setRelevantExperienceInMonths(Period.between(DateUtil.asLocalDate(expertiseWithExperience1.getExpertiseStartDate()), LocalDate.now()).getMonths());
+            Expertise expertise=expertiseGraphRepository.findById(expertiseWithExperience1.getExpertiseId()).get();
+            expertiseWithExperience1.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertise.getSeniorityLevel(),expertiseWithExperience1.getRelevantExperienceInMonths()));
+        });
         map.put("expertiseIds", expertiseWithExperience.stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
         map.put("expertiseWithExperience", expertiseWithExperience);
 

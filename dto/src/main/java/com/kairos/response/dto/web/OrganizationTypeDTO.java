@@ -1,7 +1,7 @@
 package com.kairos.response.dto.web;
 
-import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
