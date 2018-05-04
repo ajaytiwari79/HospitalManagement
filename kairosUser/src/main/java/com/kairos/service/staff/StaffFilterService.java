@@ -138,6 +138,9 @@ public class StaffFilterService extends UserBaseService{
         if(!Optional.ofNullable(staffFilterDTO.getName()).isPresent()){
             throw new InvalidRequestException("Name can not be empty");
         }
+        if(staffFilterDTO.getFiltersData().isEmpty()){
+            throw new InvalidRequestException("Please select some filters");
+        }
         if(staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithName(staffFilterDTO.getModuleId(), staffFilterDTO.getName())){
             throw new InvalidRequestException("Filter already exists with name : "+staffFilterDTO.getName());
         }
@@ -162,6 +165,9 @@ public class StaffFilterService extends UserBaseService{
         }
         if(!Optional.ofNullable(favouriteFilterDTO.getName()).isPresent()){
             throw new InvalidRequestException("Name can not be empty");
+        }
+        if(favouriteFilterDTO.getFiltersData().isEmpty()){
+            throw new InvalidRequestException("Please select some filters");
         }
         if(staffFavouriteFilterGraphRepository.checkIfFavouriteFilterExistsWithNameExceptId(favouriteFilterDTO.getModuleId(),
                 favouriteFilterDTO.getName(), staffFavouriteFilter.getId())){
