@@ -3,9 +3,11 @@ package com.kairos.service.unit_position;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.time_bank.CTAIntervalDTO;
 import com.kairos.client.dto.time_bank.UnitPositionWithCtaDetailsDTO;
+import com.kairos.client.planner.PlannerRestClient;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.model.user.staff.*;
@@ -60,6 +62,7 @@ import com.kairos.response.dto.web.PositionWrapper;
 
 import com.kairos.service.UserBaseService;
 import com.kairos.service.agreement.wta.WTAService;
+import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.position_code.PositionCodeService;
 import com.kairos.service.staff.EmploymentService;
@@ -147,6 +150,8 @@ public class UnitPositionService extends UserBaseService {
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
     @Inject private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
+    @Inject
+    private PlannerSyncService plannerSyncService;
 
     public PositionWrapper createUnitPosition(Long id, String type, UnitPositionDTO unitPositionDTO, Boolean createFromTimeCare) {
 
@@ -195,7 +200,7 @@ public class UnitPositionService extends UserBaseService {
         //      UnitPositionQueryResult unitPositionQueryResult = getBasicDetails(unitPosition);
         //timeBankRestClient.createBlankTimeBank(getUnitPositionCTA(unitPosition.getId(),id));
 
-
+        plannerSyncService.publishUnitPosition(id,unitPosition,employmentType,IntegrationOperation.CREATE);
         return positionWrapper;
     }
 
@@ -285,6 +290,8 @@ public class UnitPositionService extends UserBaseService {
 
         EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis(),reasonCodeId,employment.getAccessGroupIdOnEmploymentEnd());
 
+               // unitPositionDTO.getEndDateMillis());
+        plannerSyncService.publishUnitPosition(unitId,oldUnitPosition,unitPositionEmploymentTypeRelationShip.getEmploymentType(),IntegrationOperation.UPDATE);
         return new PositionWrapper(getBasicDetails(unitPositionDTO, oldUnitPosition, unitPositionEmploymentTypeRelationShip, null),employmentQueryResult);
 
     }
@@ -300,6 +307,7 @@ public class UnitPositionService extends UserBaseService {
         Organization unit = organizationGraphRepository.findOne(unitId, 0);
         Long staffId = unitPositionGraphRepository.getStaffIdFromUnitPosition(positionId);
         Employment employment = employmentService.updateEmploymentEndDate(unit,staffId);
+        plannerSyncService.publishUnitPosition(unitId,unitPosition,null,IntegrationOperation.DELETE);
         return new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis());
     }
 
@@ -579,7 +587,7 @@ public class UnitPositionService extends UserBaseService {
         return positionCtaWtaQueryResult;
     }
 
-
+    //TODO this must be moved to activity
     public UnitPositionQueryResult updateUnitPositionWTA(Long unitId, Long unitPositionId, BigInteger wtaId, WTADTO updateDTO) {
         UnitPosition unitPosition = unitPositionGraphRepository.findOne(unitPositionId);
         if (!Optional.ofNullable(unitPosition).isPresent()) {
@@ -612,6 +620,7 @@ public class UnitPositionService extends UserBaseService {
 
         //newWta.setExpertise(newWta.getExpertise().retrieveBasicDetails());
         //unitPositionQueryResult.setWorkingTimeAgreement(newWta);
+        plannerSyncService.publishWTA(unitId,unitPositionId,wtaResponseDTO,IntegrationOperation.UPDATE);
         return unitPositionQueryResult;
     }
 

@@ -7,6 +7,7 @@ import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.response.dto.staffing_level.PresenceStaffingLevelDto;
 import com.kairos.activity.service.organization.OrganizationActivityService;
 import com.kairos.client.dto.activity.ActivityNoTabsDTO;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,8 @@ public class PlannerSyncService {
     public void publishActivities(Long unitId, List<Activity> activities, IntegrationOperation integrationOperation){
         plannerRestClient.publish(createActivityDTOs(activities),unitId,integrationOperation);
     }
+
+
 
     public List<ActivityNoTabsDTO> createActivityDTOs(List<Activity> activities) {
         List<ActivityNoTabsDTO> dtos= new ArrayList<>();
