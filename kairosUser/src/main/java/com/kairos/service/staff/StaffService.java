@@ -23,6 +23,7 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
@@ -234,7 +235,10 @@ public class StaffService extends UserBaseService {
 
             StaffExpertiseRelationShip staffExpertiseRelationShip = new StaffExpertiseRelationShip(id, objectToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate);
             staffExpertiseRelationShipGraphRepository.save(staffExpertiseRelationShip);
+
             staffPersonalDetail.getExpertiseWithExperience().get(i).setId(staffExpertiseRelationShip.getId());
+            staffPersonalDetail.getExpertiseWithExperience().get(i).setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertise.getSeniorityLevel(),
+                    staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths()));
         }
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
@@ -336,6 +340,7 @@ public class StaffService extends UserBaseService {
         map.put("cprNumber", staff.getCprNumber());
         map.put("careOfName", staff.getCareOfName());
         List<StaffExperienceInExpertiseDTO> expertiseWithExperience = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffId(staff.getId());
+
         map.put("expertiseIds", expertiseWithExperience.stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
         map.put("expertiseWithExperience", expertiseWithExperience);
 
@@ -1765,6 +1770,17 @@ public class StaffService extends UserBaseService {
 
     public Set<SkillDTO> getSkillSet(List<Skill> skills) {
         return skills.stream().map(skill -> new SkillDTO(skill.getId(), skill.getName(), skill.getDescription())).collect(Collectors.toSet());
+    }
+
+    private Integer nextSeniorityLevelInMonths( List<SeniorityLevel> seniorityLevels,int currentExperienceInMonths){
+        Integer nextSeniorityLevelInMonths=null;
+        for(int i=0;i<seniorityLevels.size();i++){
+            if(currentExperienceInMonths < seniorityLevels.get(i).getFrom()*12){
+                nextSeniorityLevelInMonths= seniorityLevels.get(i).getFrom()*12-currentExperienceInMonths;
+                break;
+            }
+        }
+        return nextSeniorityLevelInMonths;
     }
 
 }
