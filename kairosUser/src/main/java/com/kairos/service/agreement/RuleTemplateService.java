@@ -1,42 +1,9 @@
 package com.kairos.service.agreement;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.config.security.CurrentUserDetails;
-import com.kairos.constants.RuleTemplates;
-import com.kairos.custom_exception.DataNotFoundByIdException;
-import com.kairos.custom_exception.DuplicateDataException;
-import com.kairos.persistence.model.enums.MasterDataTypeEnum;
-import com.kairos.persistence.model.enums.TimeBankTypeEnum;
-import com.kairos.persistence.model.user.agreement.cta.RuleTemplate;
-import com.kairos.persistence.model.user.agreement.cta.RuleTemplateCategoryType;
-import com.kairos.persistence.model.user.agreement.wta.RuleTemplateCategoryDTO;
-import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
-import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategoryTagDTO;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.user.agreement.wta.templates.template_types.*;
-import com.kairos.persistence.model.user.country.Country;
-import com.kairos.persistence.repository.user.agreement.wta.RuleTemplateCategoryGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.TemplateCategoryRelationGraphRepository;
-import com.kairos.persistence.repository.user.agreement.wta.WTABaseRuleTemplateGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.response.dto.web.RuleTemplateDTO;
 import com.kairos.service.UserBaseService;
-import com.kairos.service.agreement.wta.WTAOrganizationService;
-import com.kairos.service.country.tag.TagService;
-import com.kairos.util.ArrayUtil;
-import com.kairos.util.DateUtil;
-import com.kairos.util.userContext.UserContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.kairos.constants.RuleTemplates.*;
-
-import javax.inject.Inject;
-import java.util.*;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -45,6 +12,7 @@ import java.util.*;
 @Service
 public class RuleTemplateService extends UserBaseService {
 
+/*
 
     private List<String> balanceTypes = new ArrayList<String>();
     @Inject
@@ -63,6 +31,7 @@ public class RuleTemplateService extends UserBaseService {
     private WTABaseRuleTemplateGraphRepository wtaBaseRuleTemplateGraphRepository;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
+    private List<Long> activities=new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger(RuleTemplateService.class);
 
     public boolean createRuleTemplate(long countryId) {
@@ -91,6 +60,13 @@ public class RuleTemplateService extends UserBaseService {
         long timeInMins = 10;
         long daysCount = 10;
         long dateInMillis = DateUtil.getCurrentDate().getTime();
+
+        AgeRange ageRange=new AgeRange(0,0,0);
+        List<Long> activities=new ArrayList<>();
+        List<BreakTemplateValue> breakTemplateValues=new ArrayList<>();
+        BreakTemplateValue breakTemplateValue=new BreakTemplateValue();
+        breakTemplateValues.add(breakTemplateValue);
+
 
 
         MaximumShiftLengthWTATemplate maximumShiftLengthWTATemplate = new MaximumShiftLengthWTATemplate(MAXIMUM_SHIFT_LENGTH.getName(), MAXIMUM_SHIFT_LENGTH.getTemplateType(), true, MAXIMUM_SHIFT_LENGTH.getDescription(), timeInMins, balanceTypes, true);
@@ -151,7 +127,7 @@ public class RuleTemplateService extends UserBaseService {
         MaximumShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = new MaximumShiftsInIntervalWTATemplate(MAXIMUM_NUMBER_OF_SHIFTS_PER_INTERVAL.getName(), MAXIMUM_NUMBER_OF_SHIFTS_PER_INTERVAL.getTemplateType(), true, MAXIMUM_NUMBER_OF_SHIFTS_PER_INTERVAL.getDescription(), balanceTypes, 1, "NA", dateInMillis, 1, true);
         baseRuleTemplates.add(maximumShiftsInIntervalWTATemplate);
 
-        MaximumSeniorDaysInYearWTATemplate wta20 = new MaximumSeniorDaysInYearWTATemplate(MAXIMUM_SENIOR_DAYS_PER_YEAR.getName(), MAXIMUM_SENIOR_DAYS_PER_YEAR.getTemplateType(), true, MAXIMUM_SENIOR_DAYS_PER_YEAR.getDescription(), 1, "NA", dateInMillis, 1, "");
+        MaximumSeniorDaysInYearWTATemplate wta20 = new MaximumSeniorDaysInYearWTATemplate(SENIOR_DAYS_PER_YEAR.getName(), SENIOR_DAYS_PER_YEAR.getTemplateType(), true, SENIOR_DAYS_PER_YEAR.getDescription(), 1, "NA", dateInMillis, 1, "");
         baseRuleTemplates.add(wta20);
 
         MaximumTimeBank wta21 = new MaximumTimeBank(MAXIMUM_TIME_BANK.getName(), MAXIMUM_TIME_BANK.getTemplateType(), true, MAXIMUM_TIME_BANK.getDescription(), TimeBankTypeEnum.HOURLY, 45, false, false);
@@ -159,6 +135,18 @@ public class RuleTemplateService extends UserBaseService {
 
         MinimumTimeBank wta22 = new MinimumTimeBank(MINIMUM_TIME_BANK.getName(), MINIMUM_TIME_BANK.getTemplateType(), true, MINIMUM_TIME_BANK.getDescription(), TimeBankTypeEnum.HOURLY, 25, false, false);
         baseRuleTemplates.add(wta22);
+
+<<<<<<< HEAD
+        MaximumSeniorDaysPerYearDaysUnit maximumSeniorDaysPerYearDaysUnit=new MaximumSeniorDaysPerYearDaysUnit(MAXIMUM_SENIOR_DAYS_PER_YEAR_DAYS_UNIT.getName(),MAXIMUM_SENIOR_DAYS_PER_YEAR_DAYS_UNIT.getTemplateType(),true,MAXIMUM_SENIOR_DAYS_PER_YEAR_DAYS_UNIT.getDescription(),ageRange,activities,0,dateInMillis,12);
+        baseRuleTemplates.add(maximumSeniorDaysPerYearDaysUnit);
+
+        ChildCareDaysCheck childCareDaysCheck=new ChildCareDaysCheck(CHILD_CARE_DAYS_CHECK.getName(),CARE_DAYS_CHECK.getTemplateType(),true,CHILD_CARE_DAYS_CHECK.getDescription(),ageRange,activities,0,dateInMillis,12);
+        baseRuleTemplates.add(childCareDaysCheck);
+=======
+        BreaksInShift breaksInShift=new BreaksInShift(BREAKS_IN_SHIFT.getName(),BREAKS_IN_SHIFT.getTemplateType(),true,BREAKS_IN_SHIFT.getDescription(),breakTemplateValues);
+        baseRuleTemplates.add(breaksInShift);
+>>>>>>> KP-3090
+
         country.setWTABaseRuleTemplate(baseRuleTemplates);
         save(country);
 
@@ -170,19 +158,19 @@ public class RuleTemplateService extends UserBaseService {
 
     public Map getRuleTemplate(long countryId) {
 
-        List<RuleTemplateCategoryDTO> wtaResponse = null;
-
-        if (countryGraphRepository == null) {
-            System.out.println("country is " + countryGraphRepository);
-        }
-        try {
-            wtaResponse
-                    = countryGraphRepository.getRuleTemplatesAndCategories(countryId);
-        } catch (Exception e) {
-            System.out.println(e);
-
-
-        }
+//        List<RuleTemplateCategoryDTO> wtaResponse = null;
+//
+//        if (countryGraphRepository == null) {
+//            System.out.println("country is " + countryGraphRepository);
+//        }
+//        try {
+//            wtaResponse
+//                    = countryGraphRepository.getRuleTemplatesAndCategories(countryId);
+//        } catch (Exception e) {
+//            System.out.println(e);
+//
+//
+//        }
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
             throw new DataNotFoundByIdException("Invalid Country");
@@ -369,7 +357,7 @@ public class RuleTemplateService extends UserBaseService {
                 maximumShiftsInIntervalWTATemplate.setShiftsLimit(templateDTO.getShiftsLimit());
                 maximumShiftsInIntervalWTATemplate.setOnlyCompositeShifts(templateDTO.getOnlyCompositeShifts());
                 break;
-            case MAXIMUM_SENIOR_DAYS_PER_YEAR:
+            case SENIOR_DAYS_PER_YEAR:
                 MaximumSeniorDaysInYearWTATemplate maximumSeniorDaysInYearWTATemplate = (MaximumSeniorDaysInYearWTATemplate) oldTemplate;
                 maximumSeniorDaysInYearWTATemplate.setDescription(templateDTO.getDescription());
                 maximumSeniorDaysInYearWTATemplate.setIntervalLength(templateDTO.getIntervalLength());
@@ -393,6 +381,11 @@ public class RuleTemplateService extends UserBaseService {
                 minimumTimeBank.setYellowZone(templateDTO.getYellowZone());
                 minimumTimeBank.setForbid(templateDTO.isForbid());
                 minimumTimeBank.setAllowExtraActivity(templateDTO.isAllowExtraActivity());
+                break;
+            case BREAKS_IN_SHIFT:
+                BreaksInShift breaksInShift=(BreaksInShift) oldTemplate;
+                breaksInShift.setDescription(templateDTO.getDescription());
+                breaksInShift.setBreakTemplateValues(templateDTO.getBreakTemplateValues());
                 break;
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
@@ -427,11 +420,13 @@ public class RuleTemplateService extends UserBaseService {
         return ruleTemplateCategory;
     }
 
-    /*
+    */
+/*
     *
     * This method will change the category of rule Template when we change the rule template all existing rule templates wil set to none
      * and new rule temp wll be setted to  this new rule template category
-    * */
+    * *//*
+
     public Map<String, Object> updateRuleTemplateCategory(RuleTemplateDTO wtaRuleTemplateDTO, long countryId) {
         // This Method will get all the previous
         Map<String, Object> response = new HashMap();
@@ -586,7 +581,7 @@ public class RuleTemplateService extends UserBaseService {
                 wtaBaseRuleTemplate = new MaximumShiftsInIntervalWTATemplate(wtaRuleTemplateDTO.getName().trim(),
                         wtaRuleTemplateDTO.getTemplateType(), wtaRuleTemplateDTO.getDisabled(), wtaRuleTemplateDTO.getDescription(), wtaRuleTemplateDTO.getBalanceType(), wtaRuleTemplateDTO.getIntervalLength(), wtaRuleTemplateDTO.getIntervalUnit(), wtaRuleTemplateDTO.getValidationStartDateMillis(), wtaRuleTemplateDTO.getShiftsLimit(), wtaRuleTemplateDTO.getOnlyCompositeShifts());
                 break;
-            case MAXIMUM_SENIOR_DAYS_PER_YEAR:
+            case SENIOR_DAYS_PER_YEAR:
                 wtaBaseRuleTemplate = new MaximumSeniorDaysInYearWTATemplate(wtaRuleTemplateDTO.getName().trim(),
                         wtaRuleTemplateDTO.getTemplateType(), wtaRuleTemplateDTO.getDisabled(), wtaRuleTemplateDTO.getDescription(), wtaRuleTemplateDTO.getIntervalLength(), wtaRuleTemplateDTO.getIntervalUnit(), wtaRuleTemplateDTO.getValidationStartDateMillis(), wtaRuleTemplateDTO.getDaysLimit(), wtaRuleTemplateDTO.getActivityCode());
                 break;
@@ -597,6 +592,9 @@ public class RuleTemplateService extends UserBaseService {
             case MINIMUM_TIME_BANK:
                 wtaBaseRuleTemplate = new MinimumTimeBank(wtaRuleTemplateDTO.getName().trim(),
                         wtaRuleTemplateDTO.getTemplateType(), wtaRuleTemplateDTO.getDisabled(), wtaRuleTemplateDTO.getDescription(), wtaRuleTemplateDTO.getFrequency(), wtaRuleTemplateDTO.getYellowZone(), wtaRuleTemplateDTO.isForbid(), wtaRuleTemplateDTO.isAllowExtraActivity());
+                break;
+            case BREAKS_IN_SHIFT:
+                wtaBaseRuleTemplate=new BreaksInShift(wtaRuleTemplateDTO.getName().trim(),wtaRuleTemplateDTO.getTemplateType(),wtaRuleTemplateDTO.getDisabled(),wtaRuleTemplateDTO.getDescription(),wtaRuleTemplateDTO.getBreakTemplateValues());
                 break;
         }
         int number=getNumberFromlastInsertedTemplateType(lastInsertedTemplateType);
@@ -651,5 +649,6 @@ public class RuleTemplateService extends UserBaseService {
 
         return 0;
     }
+*/
 
 }

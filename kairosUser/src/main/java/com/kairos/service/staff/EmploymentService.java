@@ -840,6 +840,9 @@ public class EmploymentService extends UserBaseService {
             List<Long> employmentIds = Stream.of(employment.getId()).collect(Collectors.toList());
             moveToReadOnlyAccessGroup(employmentIds);
         }
+        EmploymentReasonCodeQueryResult employmentReasonCode = employmentGraphRepository.findEmploymentreasonCodeByStaff(staffId);
+        employment.setReasonCode(employmentReasonCode.getReasonCode());
+
         return employment;
 
     }

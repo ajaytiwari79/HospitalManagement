@@ -56,7 +56,7 @@ import static com.kairos.constants.AppConstants.COPY_OF;
 @Transactional
 @Service
 public class WTAService extends UserBaseService {
-    @Inject
+    /*@Inject
     private WorkingTimeAgreementGraphRepository wtaRepository;
     @Inject
     private OrganizationTypeGraphRepository organizationTypeRepository;
@@ -84,12 +84,12 @@ public class WTAService extends UserBaseService {
 
     private final Logger logger = LoggerFactory.getLogger(WTAService.class);
 
-    /**
+    *//**
      * @param countryId
      * @param wtaDTO
      * @return
      * @Author Vipul
-     */
+     *//*
     public WTAResponseDTO createWta(long countryId, WTADTO wtaDTO) {
         Country country = countryRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -481,5 +481,5 @@ public class WTAService extends UserBaseService {
         }
         return newWta;
 
-    }
+    }*/
 }

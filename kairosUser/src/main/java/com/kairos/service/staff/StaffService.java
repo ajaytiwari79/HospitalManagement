@@ -23,6 +23,7 @@ import com.kairos.persistence.model.user.client.ContactDetail;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.EngineerType;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -144,7 +145,8 @@ public class StaffService extends UserBaseService {
     private StaffAddressService staffAddressService;
     @Inject
     private AccessGroupService accessGroupService;
-
+    @Inject
+    StaffFilterService staffFilterService;
     @Autowired
     UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Autowired
@@ -367,6 +369,43 @@ public class StaffService extends UserBaseService {
             return null;
         }
         return staff.retrieveNotes();
+    }
+
+
+    public Map<String, Object> getStaffWithFilter(Long unitId, String type, long id, Boolean allStaffRequired, StaffFilterDTO staffFilterDTO) {
+
+        List<StaffPersonalDetailDTO> staff = null;
+        Long countryId = null;
+        List<AccessGroup> roles = null;
+        List<EngineerType> engineerTypes = null;
+        Map<String, Object> map = new HashMap();
+        if (ORGANIZATION.equalsIgnoreCase(type)) {
+//            staff = getStaffWithBasicInfo(id, allStaffRequired);
+            map.put("staffList", staffFilterService.getAllStaffByUnitId( unitId, allStaffRequired, staffFilterDTO));
+            roles = accessGroupService.getAccessGroups(id);
+            countryId = countryGraphRepository.getCountryIdByUnitId(id);
+            engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
+        } else if (GROUP.equalsIgnoreCase(type)) {
+            staff = staffGraphRepository.getStaffByGroupId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+            Organization organization = organizationGraphRepository.getOrganizationByGroupId(id).getOrganization();
+            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
+            roles = accessGroupService.getAccessGroups(organization.getId());
+        } else if (TEAM.equalsIgnoreCase(type)) {
+            staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+            Organization organization = organizationGraphRepository.getOrganizationByTeamId(id);
+            roles = accessGroupService.getAccessGroups(organization.getId());
+            countryId = countryGraphRepository.getCountryIdByUnitId(organization.getId());
+        }
+
+
+        if(Optional.ofNullable(staff).isPresent()){
+            map.put("staffList", staff);
+        }
+
+        map.put("engineerTypes", engineerTypes);
+        map.put("engineerList", engineerTypeGraphRepository.findEngineerTypeByCountry(countryId));
+        map.put("roles", roles);
+        return map;
     }
 
 
@@ -1457,6 +1496,22 @@ public class StaffService extends UserBaseService {
         return unitManagers;
     }
 
+    /*public List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired) {
+        Organization unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            throw new DataNotFoundByIdException("unit  not found  Unit ID: " + unitId);
+        }
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = new ArrayList<>();
+        if (allStaffRequired) {
+            Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+            // unit is parent so fetching all staff from itself
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentOrganization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        } else {
+            staffPersonalDetailDTOS = staffGraphRepository.getAllStaffHavingUnitPositionByUnitId(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        }
+        return staffPersonalDetailDTOS;
+    }*/
+
     public List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
@@ -1520,26 +1575,26 @@ public class StaffService extends UserBaseService {
     }
 
     public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long organizationId) {
-        /*StaffFavouriteFilters alreadyExistFilter = staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, staffFilterDTO.getModuleId());
+        /*StaffFavouriteFilter alreadyExistFilter = staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staffId, staffFilterDTO.getModuleId());
         if(Optional.ofNullable(alreadyExistFilter).isPresent()){
-            throw new DuplicateDataException("StaffFavouriteFilters already exist !");
+            throw new DuplicateDataException("StaffFavouriteFilter already exist !");
         }*/
 
 
-        StaffFavouriteFilters staffFavouriteFilters = new StaffFavouriteFilters();
+        StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter();
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
         AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
-        staffFavouriteFilters.setAccessPage(accessPage);
-        staffFavouriteFilters.setFilterJson(staffFilterDTO.getFilterJson());
-        staffFavouriteFilters.setName(staffFilterDTO.getName());
-        save(staffFavouriteFilters);
-        staff.addFavouriteFilters(staffFavouriteFilters);
+//        staffFavouriteFilter.setAccessPage(accessPage);
+//        staffFavouriteFilter.setFilterJson(staffFilterDTO.getFilterJson());
+        staffFavouriteFilter.setName(staffFilterDTO.getName());
+        save(staffFavouriteFilter);
+        staff.addFavouriteFilters(staffFavouriteFilter);
         save(staff);
-        staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
+//        staffFilterDTO.setFilterJson(staffFavouriteFilter.getFilterJson());
         staffFilterDTO.setModuleId(accessPage.getModuleId());
-        staffFilterDTO.setName(staffFavouriteFilters.getName());
-        staffFilterDTO.setId(staffFavouriteFilters.getId());
+        staffFilterDTO.setName(staffFavouriteFilter.getName());
+        staffFilterDTO.setId(staffFavouriteFilter.getId());
         return staffFilterDTO;
 
 
@@ -1548,17 +1603,17 @@ public class StaffService extends UserBaseService {
     public StaffFilterDTO updateStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long organizationId) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
-        StaffFavouriteFilters staffFavouriteFilters = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFilterDTO.getId());
-        if (!Optional.ofNullable(staffFavouriteFilters).isPresent()) {
-            throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFilterDTO.getId());
+        StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFilterDTO.getId());
+        if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
+            throw new DataNotFoundByIdException("StaffFavouriteFilter  not found  with ID: " + staffFilterDTO.getId());
         }
         /*AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
-        staffFavouriteFilters.setAccessPage(accessPage);*/
-        staffFavouriteFilters.setFilterJson(staffFilterDTO.getFilterJson());
-        staffFavouriteFilters.setName(staffFilterDTO.getName());
-        staffFavouriteFilters.setEnabled(true);
-        save(staffFavouriteFilters);
-        staffFilterDTO.setFilterJson(staffFavouriteFilters.getFilterJson());
+        staffFavouriteFilter.setAccessPage(accessPage);*/
+//        staffFavouriteFilter.setFilterJson(staffFilterDTO.getFilterJson());
+        staffFavouriteFilter.setName(staffFilterDTO.getName());
+//        staffFavouriteFilter.setEnabled(true);
+        save(staffFavouriteFilter);
+//        staffFilterDTO.setFilterJson(staffFavouriteFilter.getFilterJson());
         // staffFilterDTO.setModuleId(accessPage.getModuleId());
         return staffFilterDTO;
 
@@ -1567,18 +1622,18 @@ public class StaffService extends UserBaseService {
     public boolean removeStaffFavouriteFilters(Long staffFavouriteFilterId, long organizationId) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
-        StaffFavouriteFilters staffFavouriteFilters = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
-        if (!Optional.ofNullable(staffFavouriteFilters).isPresent()) {
-            throw new DataNotFoundByIdException("StaffFavouriteFilters  not found  with ID: " + staffFavouriteFilterId);
+        StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
+        if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
+            throw new DataNotFoundByIdException("StaffFavouriteFilter  not found  with ID: " + staffFavouriteFilterId);
         }
 
-        staffFavouriteFilters.setEnabled(false);
-        save(staffFavouriteFilters);
+//        staffFavouriteFilter.setEnabled(false);
+        save(staffFavouriteFilter);
         return true;
 
     }
 
-    public List<StaffFavouriteFilters> getStaffFavouriteFilters(String moduleId, long organizationId) {
+    public List<FavoriteFilterQueryResult> getStaffFavouriteFilters(String moduleId, long organizationId) {
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
         return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staff.getId(), moduleId);

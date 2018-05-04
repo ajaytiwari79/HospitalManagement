@@ -47,16 +47,16 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
     RuleTemplateCategory findByName(String name, RuleTemplateCategoryType ruleTemplateCategoryType);
 
     @Query("match(rc:RuleTemplateCategory) where id(rc)={0}\n" +
-            "match (w:WTABaseRuleTemplate) where id(w)={1}\n" +
+            "match (w:WTABaseRuleTemplateDTO) where id(w)={1}\n" +
             "create (rc)-[:" + HAS_RULE_TEMPLATES + "]->(w)")
     void setRuleTemplateCategoryWithRuleTemplate(Long templateCategoryId, Long ruleTemplateId);
 
-    @Query("MATCH (n:RuleTemplateCategory{deleted:false})-[:" + HAS_RULE_TEMPLATES + "]->(w:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATE + "]-(c:Country) where n.name={0} AND Id(c)={1} return Id(w)")
+    @Query("MATCH (n:RuleTemplateCategory{deleted:false})-[:" + HAS_RULE_TEMPLATES + "]->(w:WTABaseRuleTemplateDTO)<-[:" + HAS_RULE_TEMPLATE + "]-(c:Country) where n.name={0} AND Id(c)={1} return Id(w)")
     List<Long> findAllExistingRuleTemplateAddedToThiscategory(String ruleTemplateCategoryName, long countryId);
 
     @Query("MATCH (allRTC:RuleTemplateCategory{deleted:false})\n" +
             "match(newRTC:RuleTemplateCategory) where newRTC.name={1} \n" +
-            "Match(WBRT:WTABaseRuleTemplate)<-[r:HAS_RULE_TEMPLATES]-(allRTC)  where Id(WBRT) IN {0}\n" +
+            "Match(WBRT:WTABaseRuleTemplateDTO)<-[r:HAS_RULE_TEMPLATES]-(allRTC)  where Id(WBRT) IN {0}\n" +
             "delete r\n" +
             "MERGE(WBRT)<-[:HAS_RULE_TEMPLATES]-(newRTC)")
     void updateCategoryOfRuleTemplate(List<Long> wtaBaseRuleTemplateId, String ruleTemplateCategoryName);
@@ -91,7 +91,7 @@ public interface RuleTemplateCategoryGraphRepository extends Neo4jBaseRepository
     void detachRuleTemplateCategoryFromCTARuleTemplate(long ctaRuleTemplateId, long ruleTemplateCategoryId);
 
     @Query("match (wta:WorkingTimeAgreement) where id(wta)={0}\n" +
-            "optional match(wta)-[r:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplate)  detach DELETE r")
+            "optional match(wta)-[r:" + HAS_RULE_TEMPLATE + "]->(ruleTemp:WTABaseRuleTemplateDTO)  detach DELETE r")
     void detachPreviousRuleTemplates(Long wtaId);
 
     @Query("match(country:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE_CATEGORY + "]-(ruleTemplateCategory:RuleTemplateCategory{deleted:false}) Where id(country)={0} AND ruleTemplateCategory.ruleTemplateCategoryType={1} AND ruleTemplateCategory.name=~{2} AND id(ruleTemplateCategory) <> {3} \n" +

@@ -783,7 +783,7 @@ public class TaskService extends MongoBaseService {
                         engineerMetaData.put("prename", staff.getFirstName());
                         engineerMetaData.put("name", staff.getLastName());
                         //Address1 (Home)
-                        //  engineerMetaData.put("scountry", staff.getHomeAddress().getCountry());
+                        //  engineerMetaData.put("scountry", staff.getContactAddress().getCountryId());
                         engineerMetaData.put("scountry", "DK");
                         engineerMetaData.put("szip", officeZipCode.getZipCode());
                         engineerMetaData.put("scity", officeAddress.getCity());

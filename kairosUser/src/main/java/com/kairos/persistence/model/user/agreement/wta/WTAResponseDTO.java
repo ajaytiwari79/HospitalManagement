@@ -15,6 +15,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
+@Deprecated
 public class WTAResponseDTO {
 
     private List<RuleTemplateCategoryDTO> ruleTemplates;

@@ -26,7 +26,7 @@ public class OrganizationDTO {
     private List<Long> businessTypeId;
     private AddressDTO homeAddress;
     private int dayShiftTimeDeduction = 4; //in percentage
-
+    private boolean isKairosHub;
     private int nightShiftTimeDeduction = 7; //in percentage
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
     private boolean isOneTimeSyncPerformed;

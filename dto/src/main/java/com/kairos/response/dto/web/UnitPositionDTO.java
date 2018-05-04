@@ -4,6 +4,7 @@ import com.kairos.persistence.model.enums.EmploymentCategory;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,7 +38,7 @@ public class UnitPositionDTO {
     @NotNull(message = "employmentTypeCategory can't be null")
     private EmploymentCategory employmentTypeCategory;
     @NotNull(message = "wta can't be null")
-    private Long wtaId;
+    private BigInteger wtaId;
     private Long ctaId;
     @NotNull(message = "staffId is missing")
     @Range(min = 0, message = "staffId is missing")
@@ -92,7 +93,7 @@ public class UnitPositionDTO {
 
 
     public UnitPositionDTO(Long positionCodeId, Long expertiseId, Long startDateMillis, Long endDateMillis, int totalWeeklyHours, Long employmentTypeId,
-                           Long staffId, Long wtaId, Long ctaId, Long unitId, Long timeCareExternalId) {
+                           Long staffId, BigInteger wtaId, Long ctaId, Long unitId, Long timeCareExternalId) {
         this.positionCodeId = positionCodeId;
         this.expertiseId = expertiseId;
         this.employmentTypeId = employmentTypeId;
@@ -192,11 +193,11 @@ public class UnitPositionDTO {
         this.hourlyWages = hourlyWages;
     }
 
-    public Long getWtaId() {
+    public BigInteger getWtaId() {
         return wtaId;
     }
 
-    public void setWtaId(Long wtaId) {
+    public void setWtaId(BigInteger wtaId) {
         this.wtaId = wtaId;
     }
 

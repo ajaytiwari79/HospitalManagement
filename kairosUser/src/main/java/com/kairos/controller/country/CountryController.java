@@ -170,6 +170,16 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
     }
 
+    @RequestMapping(value = "/countryId/{countryId}", method = RequestMethod.GET)
+    @ApiOperation("Get country  by id")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryById(@PathVariable Long countryId) {
+        if (countryId != null) {
+                return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getCountryById(countryId));
+        }
+        return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, null);
+    }
+
     @RequestMapping(value = COUNTRY_URL, method = RequestMethod.DELETE)
     @ApiOperation("Delete country  by id")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -1212,6 +1222,14 @@ public class CountryController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> get(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getUnionAndOrganizationLevels(countryId));
+
+    }
+
+    @ApiOperation(value = "Get DayType and Presence Type")
+    @RequestMapping(value = COUNTRY_URL + "/getWtaTemplateDefaultDataInfo", method = RequestMethod.GET)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getWtaTemplateDefaultDataInfo(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getWtaTemplateDefaultDataInfo(countryId));
 
     }
 }
