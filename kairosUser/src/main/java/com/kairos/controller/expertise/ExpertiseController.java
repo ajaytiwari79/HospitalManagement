@@ -77,8 +77,8 @@ public class ExpertiseController {
 
     @ApiOperation(value = "Update Age range in Expertise")
     @PutMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/set_age_range")
-    public ResponseEntity<Map<String, Object>> updateUnitPosition(@PathVariable Long expertiseId, @RequestBody @Valid List<AgeRangeDTO> ageRangeDTO, @RequestParam("type") String type) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateAgeRangeInExpertise(expertiseId, ageRangeDTO,type));
+    public ResponseEntity<Map<String, Object>> updateUnitPosition(@PathVariable Long expertiseId, @RequestBody @Valid List<AgeRangeDTO> ageRangeDTO, @RequestParam("type") String wtaType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateAgeRangeInExpertise(expertiseId, ageRangeDTO,wtaType));
 
     }
 

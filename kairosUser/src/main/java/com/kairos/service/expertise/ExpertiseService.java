@@ -735,13 +735,13 @@ public class ExpertiseService extends UserBaseService {
         return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
     }
 
-    public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String type) {
+    public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String wtaType) {
         Expertise expertise = expertiseGraphRepository.findById(expertiseId).get();
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
             throw new DataNotFoundByIdException("No expertise found" + expertiseId);
         }
         validateAgeRange(ageRangeDTO);
-        if (type.equals("seniorDays")) {
+        if (wtaType.equals("seniorDays")) {
             List<SeniorDays> seniorDays = new ArrayList<>();
             for (AgeRangeDTO ageRange : ageRangeDTO) {
                 SeniorDays seniorDays1 = new SeniorDays();
@@ -753,7 +753,7 @@ public class ExpertiseService extends UserBaseService {
             for (int i = 0; i < expertise.getSeniorDays().size(); i++) {
                 BeanUtils.copyProperties(expertise.getSeniorDays().get(i), ageRangeDTO.get(i));
             }
-        } else if (type.equals("childCare")) {
+        } else if (wtaType.equals("childCare")) {
             List<ChildCareDays> childCareDays = new ArrayList<>();
             for (AgeRangeDTO ageRange : ageRangeDTO) {
                 ChildCareDays childCareDays1 = new ChildCareDays();
