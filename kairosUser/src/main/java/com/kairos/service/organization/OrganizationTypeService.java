@@ -84,6 +84,7 @@ public class OrganizationTypeService extends UserBaseService {
         }
         if (!updateOrganizationTypeDTO.getLevelsToDelete().isEmpty()) {
             organizationTypeGraphRepository.removeLevelRelationshipFromOrganizationType(updateOrganizationTypeDTO.getId(), updateOrganizationTypeDTO.getLevelsToDelete());
+            orgTypeToUpdate.setLevels(null);
         }
         if (!updateOrganizationTypeDTO.getLevelsToUpdate().isEmpty()) {
             List<Level> levels = countryGraphRepository.getLevelsByIdsIn(orgTypeToUpdate.getCountry().getId(), updateOrganizationTypeDTO.getLevelsToUpdate());
