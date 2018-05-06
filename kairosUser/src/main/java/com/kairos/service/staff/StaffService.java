@@ -1,6 +1,7 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -54,6 +55,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.fls_visitour.schedule.Scheduler;
 import com.kairos.service.integration.IntegrationService;
+import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.mail.MailService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
@@ -167,7 +169,8 @@ public class StaffService extends UserBaseService {
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private OrganizationServiceRepository organizationServiceRepository;
-
+    @Inject
+    private PlannerSyncService plannerSyncService;
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
@@ -989,7 +992,7 @@ public class StaffService extends UserBaseService {
         createEmployment(parent, unit, staff, payload.getAccessGroupId(), DateUtil.getIsoDateInLong(payload.getEmployedSince()), isEmploymentExist);
         staff.setUser(null); // removing user to send in FE
         staff.setGender(user.getGender());
-
+        plannerSyncService.publishStaff(unitId,staff,IntegrationOperation.CREATE);
         return staff;
     }
 

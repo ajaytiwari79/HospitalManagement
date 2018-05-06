@@ -1,10 +1,11 @@
 package com.planner.domain.staff;
 
 import com.planner.domain.MongoBaseEntity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 import java.util.Objects;
-
+@Document
 public class Staff extends MongoBaseEntity {
     private String firstName;
     private String lastName;

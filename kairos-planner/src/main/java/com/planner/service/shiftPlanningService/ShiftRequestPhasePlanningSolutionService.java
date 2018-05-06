@@ -13,7 +13,7 @@ import com.kairos.shiftplanning.enums.SkillType;
 import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
-import com.planner.repository.staffRepository.StaffRepository;
+import com.planner.repository.staffRepository.TaskStaffRepository;
 import com.planner.responseDto.PlanningDto.shiftPlanningDto.*;
 import com.planner.service.skillService.SkillService;
 import org.joda.time.DateTime;
@@ -40,7 +40,7 @@ public class ShiftRequestPhasePlanningSolutionService {
     private static Logger logger = LoggerFactory.getLogger(ShiftRequestPhasePlanningSolutionService.class);
 
     @Autowired
-    private StaffRepository staffRepository;
+    private TaskStaffRepository taskStaffRepository;
     @Autowired
     private SkillService skillService;
     @Autowired private ShiftWtaInfoService shiftWtaInfoService;
