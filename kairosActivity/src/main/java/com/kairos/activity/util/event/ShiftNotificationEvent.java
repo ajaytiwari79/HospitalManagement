@@ -10,17 +10,27 @@ public class ShiftNotificationEvent {
    private Shift shift;
    private boolean shiftUpdated;
    private Shift previousStateShift;
+   private boolean isShiftForPresence;
+
+    public boolean isShiftForPresence() {
+        return isShiftForPresence;
+    }
+
+    public void setShiftForPresence(boolean shiftForPresence) {
+        isShiftForPresence = shiftForPresence;
+    }
+
 
     public ShiftNotificationEvent() {
     }
 
     public ShiftNotificationEvent(Long unitId, Date currentDate, Shift shift,
-      boolean shiftUpdated, Shift previousStateShift) {
-        this.unitId = unitId;
+      boolean shiftUpdated, Shift previousStateShift, boolean isShiftForPresence) {
         this.currentDate = currentDate;
         this.shift = shift;
         this.shiftUpdated = shiftUpdated;
         this.previousStateShift = previousStateShift;
+        this.isShiftForPresence = isShiftForPresence;
     }
 
     public Long getUnitId() {

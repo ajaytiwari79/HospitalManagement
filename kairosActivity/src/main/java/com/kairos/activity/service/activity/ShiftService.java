@@ -144,7 +144,9 @@ public class ShiftService extends MongoBaseService {
 
 
         //anil m2 notify event for updating staffing level
-        applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null));
+        boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+
+                applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null,isShiftForPreence));
         return shift.getShiftQueryResult();
     }
 
@@ -168,7 +170,9 @@ public class ShiftService extends MongoBaseService {
             }
             shifts.add(shift);
             //timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
-            applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null));
+            boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+
+            applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null,isShiftForPreence));
         }
         save(shifts);
         timeBankService.saveTimeBanks(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts);
@@ -218,8 +222,9 @@ public class ShiftService extends MongoBaseService {
         payOutService.savePayOut(shift.getUnitPositionId(), shift);
         Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
         //anil m2 notify event for updating staffing level
+        boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
         applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
-                true, oldStateOfShift));
+                true, oldStateOfShift,isShiftForPreence));
         ShiftQueryResult shiftQueryResult = shift.getShiftQueryResult();
         shiftQueryResult.setName(activity.getName());
         shiftQueryResult.setDurationMinutes(shift.getDurationMinutes());
