@@ -341,7 +341,9 @@ public class StaffService extends UserBaseService {
         map.put("contactDetail", staffGraphRepository.getContactDetail(staff.getId()));
         map.put("cprNumber", staff.getCprNumber());
         map.put("careOfName", staff.getCareOfName());
+
         List<StaffExperienceInExpertiseDTO> expertiseWithExperience = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffId(staff.getId());
+        List<StaffExpertiseQueryResult> staffExpertiseQueryResults=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
         expertiseWithExperience.forEach(expertiseWithExperience1 ->{
             expertiseWithExperience1.setRelevantExperienceInMonths(Period.between(DateUtil.asLocalDate(expertiseWithExperience1.getExpertiseStartDate()), LocalDate.now()).getMonths());
             Expertise expertise=expertiseGraphRepository.findById(expertiseWithExperience1.getExpertiseId()).get();
