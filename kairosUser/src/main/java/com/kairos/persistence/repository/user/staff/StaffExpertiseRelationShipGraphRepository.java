@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.staff.StaffExperienceInExpertiseDTO;
+import com.kairos.persistence.model.user.staff.StaffExpertiseQueryResult;
 import com.kairos.persistence.model.user.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.FOR_SENIORITY_LEVEL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.STAFF_HAS_EXPERTISE;
 
 /**
@@ -30,4 +32,9 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
 
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} AND NOT id(expertise) IN{1} detach delete rel")
     void unlinkExpertiseFromStaffExcludingCurrent(Long staffId, List<Long> ids);
+
+    @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0}" +
+            "MATCH (expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) "+
+            " return id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths,expertise.seniorityLevel as seniorityLevels ")
+    List<StaffExpertiseQueryResult> getExpertiseWithExperience(Long staffId);
 }
