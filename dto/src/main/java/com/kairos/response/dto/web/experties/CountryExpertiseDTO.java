@@ -48,6 +48,10 @@ public class CountryExpertiseDTO {
 
     @Valid
     private SeniorityLevelDTO seniorityLevel;
+    @Valid
+    private List<SeniorDaysValueDTO> seniorDaysValues;
+    @Valid
+    private List<ChildCareDaysDTO> childCareDays;
 
 
     private List<Long> tags;
@@ -173,6 +177,22 @@ public class CountryExpertiseDTO {
 
     public void setNumberOfWorkingDaysInWeek(Integer numberOfWorkingDaysInWeek) {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+    }
+
+    public List<SeniorDaysValueDTO> getSeniorDaysValues() {
+        return seniorDaysValues;
+    }
+
+    public void setSeniorDaysValues(List<SeniorDaysValueDTO> seniorDaysValues) {
+        this.seniorDaysValues = seniorDaysValues;
+    }
+
+    public List<ChildCareDaysDTO> getChildCareDays() {
+        return childCareDays;
+    }
+
+    public void setChildCareDays(List<ChildCareDaysDTO> childCareDays) {
+        this.childCareDays = childCareDays;
     }
 
     public Boolean getPublished() {

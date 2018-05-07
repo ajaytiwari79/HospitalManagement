@@ -62,6 +62,12 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = VERSION_OF)
     private Expertise parentExpertise;
 
+    @Relationship(type = HAS_SENIOR_DAYS)
+    private List<SeniorDaysValue> seniorDaysValues;
+
+    @Relationship(type = HAS_CHILD_CARE_DAYS)
+    private List<ChildCareDaysValue> childCareDaysValues;
+
     private boolean published;
     private boolean hasDraftCopy;
     private boolean history;
@@ -218,6 +224,23 @@ public class Expertise extends UserBaseEntity {
         this.history = history;
     }
 
+
+    public List<SeniorDaysValue> getSeniorDaysValues() {
+        return seniorDaysValues;
+    }
+
+    public void setSeniorDaysValues(List<SeniorDaysValue> seniorDaysValues) {
+        this.seniorDaysValues = seniorDaysValues;
+    }
+
+    public List<ChildCareDaysValue> getChildCareDaysValues() {
+        return childCareDaysValues;
+    }
+
+    public void setChildCareDaysValues(List<ChildCareDaysValue> childCareDaysValues) {
+        this.childCareDaysValues = childCareDaysValues;
+    }
+
     public List<SeniorDays> getSeniorDays() {
         return seniorDays;
     }
@@ -232,9 +255,11 @@ public class Expertise extends UserBaseEntity {
 
     public void setChildCareDays(List<ChildCareDays> childCareDays) {
         this.childCareDays = childCareDays;
+
     }
 
     public Expertise() {
+        //Default Constructor
     }
 
 
