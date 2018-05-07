@@ -6,7 +6,6 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +27,46 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
     private boolean proportional;
     private long toTime;
     private String toDayOfWeek;
+    private long intervalLength;
+    private String intervalUnit;
+    private boolean isRestingTimeAllowed;
+    private int restingTime;
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
+    public boolean isRestingTimeAllowed() {
+        return isRestingTimeAllowed;
+    }
+
+    public void setRestingTimeAllowed(boolean restingTimeAllowed) {
+        isRestingTimeAllowed = restingTimeAllowed;
+    }
+
+    public int getRestingTime() {
+        return restingTime;
+    }
+
+    public void setRestingTime(int restingTime) {
+        this.restingTime = restingTime;
+    }
+
+    public long getIntervalLength() {
+        return intervalLength;
+    }
+
+    public void setIntervalLength(long intervalLength) {
+        this.intervalLength = intervalLength;
+    }
+
+    public String getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;

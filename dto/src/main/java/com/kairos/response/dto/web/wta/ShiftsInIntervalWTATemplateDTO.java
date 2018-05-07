@@ -7,6 +7,7 @@ import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,14 +21,14 @@ public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<String> balanceType;//multiple check boxes
     private long intervalLength;//
     private String intervalUnit;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
     private long shiftsLimit;
     private boolean onlyCompositeShifts;//(checkbox)
     private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
-
+    private List<Long> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
-    private List<Long> plannedTimeIds = new ArrayList<>();
+
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
@@ -97,12 +98,28 @@ public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.intervalUnit = intervalUnit;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
+    }
+
+    public List<PartOfDay> getPartOfDays() {
+        return partOfDays;
+    }
+
+    public void setPartOfDays(List<PartOfDay> partOfDays) {
+        this.partOfDays = partOfDays;
+    }
+
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
     }
 
     public long getShiftsLimit() {
@@ -121,20 +138,7 @@ public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.onlyCompositeShifts = onlyCompositeShifts;
     }
 
-    public ShiftsInIntervalWTATemplateDTO(String name, boolean disabled,
-                                          String description, long intervalLength, String intervalUnit,
-                                          long validationStartDateMillis, long shiftsLimit, boolean onlyCompositeShifts) {
-        this.name = name;
-        this.disabled = disabled;
-        this.description = description;
-        this.balanceType = balanceType;
-        this.intervalLength =intervalLength;
-        this.intervalUnit=intervalUnit;
-        this.validationStartDateMillis =validationStartDateMillis;
-        this.shiftsLimit =shiftsLimit;
-        this.onlyCompositeShifts=onlyCompositeShifts;
 
-    }
     public ShiftsInIntervalWTATemplateDTO() {
     }
 }

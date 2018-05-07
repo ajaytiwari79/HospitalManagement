@@ -4,6 +4,7 @@ import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
 public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
     private List<AgeRange> ageRange;
     private List<Long> activitieIds;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
     private Long numberOfWeeks;
     private WTATemplateType wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
     private List<BigInteger> timeTypeIds;
@@ -39,15 +40,7 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    public ChildCareDaysCheckWTATemplateDTO(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activitieIds, long validationStartDateMillis, Long numberOfWeeks) {
-        super(name, description);
-        this.disabled=disabled;
-        this.ageRange = ageRange;
-        this.activitieIds = activitieIds;
-
-        this.validationStartDateMillis = validationStartDateMillis;
-        this.numberOfWeeks = numberOfWeeks;
-    }
+    
 
     public List<AgeRange> getAgeRange() {
         return ageRange;
@@ -66,12 +59,12 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
     }
 
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
     public Long getNumberOfWeeks() {
