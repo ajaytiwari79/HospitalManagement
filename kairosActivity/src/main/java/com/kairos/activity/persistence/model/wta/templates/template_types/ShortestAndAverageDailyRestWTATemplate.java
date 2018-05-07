@@ -10,6 +10,7 @@ import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
 
     private long intervalLength;//
     private String intervalUnit;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
     private long continuousDayRestHours;
     private long averageRest;//(hours number)
     private String shiftAffiliation;//(List checkbox)
@@ -81,12 +82,12 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         this.intervalUnit = intervalUnit;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
     public long getContinuousDayRestHours() {
@@ -114,14 +115,14 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
     }
 
     public ShortestAndAverageDailyRestWTATemplate(String name,  boolean disabled,
-                                                  String description, long intervalLength, String intervalUnit, long validationStartDateMillis,
+                                                  String description, long intervalLength, String intervalUnit, LocalDate validationStartDate,
                                                   long continuousDayRestHours, long averageRest, String shiftAffiliation) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
         this.intervalLength =intervalLength;
         this.intervalUnit=intervalUnit;
-        this.validationStartDateMillis =validationStartDateMillis;
+        this.validationStartDate =validationStartDate;
         this.continuousDayRestHours=continuousDayRestHours;
         this.averageRest=averageRest;
         this.shiftAffiliation=shiftAffiliation;

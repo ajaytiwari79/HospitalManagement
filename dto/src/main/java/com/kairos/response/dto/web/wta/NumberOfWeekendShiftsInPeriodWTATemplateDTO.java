@@ -27,11 +27,46 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
     private long toTime;
     private String toDayOfWeek;
     private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
-
+    private long intervalLength;
+    private String intervalUnit;
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
+    private boolean isRestingTimeAllowed;
+    private int restingTime;
 
+
+    public boolean isRestingTimeAllowed() {
+        return isRestingTimeAllowed;
+    }
+
+    public void setRestingTimeAllowed(boolean restingTimeAllowed) {
+        isRestingTimeAllowed = restingTimeAllowed;
+    }
+
+    public int getRestingTime() {
+        return restingTime;
+    }
+
+    public void setRestingTime(int restingTime) {
+        this.restingTime = restingTime;
+    }
+
+    public long getIntervalLength() {
+        return intervalLength;
+    }
+
+    public void setIntervalLength(long intervalLength) {
+        this.intervalLength = intervalLength;
+    }
+
+    public String getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;

@@ -6,10 +6,11 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -24,13 +25,29 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
 
     private double maximumVetoPercentage;
     private List<Long> plannedTimeIds = new ArrayList<>();
-    private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
+    private int numberOfWeeks;
+    private LocalDate validationStartDate;
+    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private float recommendedValue;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
-    protected float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
+    public int getNumberOfWeeks() {
+        return numberOfWeeks;
+    }
+
+    public void setNumberOfWeeks(int numberOfWeeks) {
+        this.numberOfWeeks = numberOfWeeks;
+    }
+
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
+    }
+
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -56,13 +73,6 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.recommendedValue = recommendedValue;
     }
 
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
-    }
 
     public List<BigInteger> getActivityIds() {
         return activityIds;

@@ -7,7 +7,9 @@ import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -23,13 +25,30 @@ public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private double maximumVetoPercentage;
     private WTATemplateType wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;;
 
-    private List<BigInteger> timeTypeIds;
     private List<BigInteger> activityIds;
     private List<Long> plannedTimeIds;
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    protected List<PartOfDay> partOfDays;
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting;
+    private int numberOfWeeks;
+    private LocalDate validationStartDate;
 
+
+    public int getNumberOfWeeks() {
+        return numberOfWeeks;
+    }
+
+    public void setNumberOfWeeks(int numberOfWeeks) {
+        this.numberOfWeeks = numberOfWeeks;
+    }
+
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
+    }
+
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -54,15 +73,6 @@ public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     public void setRecommendedValue(float recommendedValue) {
         this.recommendedValue = recommendedValue;
-    }
-
-
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
     }
 
     public List<BigInteger> getActivityIds() {

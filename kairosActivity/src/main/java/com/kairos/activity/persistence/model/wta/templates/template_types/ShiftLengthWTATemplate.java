@@ -9,6 +9,7 @@ import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,9 +23,9 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     private long timeLimit;
     private boolean checkAgainstTimeRules;
     private List<Long> dayTypeIds = new ArrayList<>();
-    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.NIGHT);
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
 
     public MinMaxSetting getMinMaxSetting() {
