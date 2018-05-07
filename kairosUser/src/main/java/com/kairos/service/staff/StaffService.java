@@ -342,15 +342,14 @@ public class StaffService extends UserBaseService {
         map.put("cprNumber", staff.getCprNumber());
         map.put("careOfName", staff.getCareOfName());
 
-        List<StaffExperienceInExpertiseDTO> expertiseWithExperience = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffId(staff.getId());
+
         List<StaffExpertiseQueryResult> staffExpertiseQueryResults=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
-        expertiseWithExperience.forEach(expertiseWithExperience1 ->{
-            expertiseWithExperience1.setRelevantExperienceInMonths(Period.between(DateUtil.asLocalDate(expertiseWithExperience1.getExpertiseStartDate()), LocalDate.now()).getMonths());
-            Expertise expertise=expertiseGraphRepository.findById(expertiseWithExperience1.getExpertiseId()).get();
-            expertiseWithExperience1.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertise.getSeniorityLevel(),expertiseWithExperience1.getRelevantExperienceInMonths()));
+        staffExpertiseQueryResults.forEach(expertiseQueryResult ->{
+            expertiseQueryResult.setRelevantExperienceInMonths(Period.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()).getMonths());
+            expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(),expertiseQueryResult.getRelevantExperienceInMonths()));
         });
-        map.put("expertiseIds", expertiseWithExperience.stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
-        map.put("expertiseWithExperience", expertiseWithExperience);
+        map.put("expertiseIds", staffExpertiseQueryResults.stream().map(StaffExpertiseQueryResult::getExpertiseId).collect(Collectors.toList()));
+        map.put("expertiseWithExperience", staffExpertiseQueryResults);
 
         // Visitour Speed Profile
         map.put("speedPercent", staff.getSpeedPercent());
