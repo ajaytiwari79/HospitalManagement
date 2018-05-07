@@ -306,12 +306,6 @@ public class ExpertiseService extends UserBaseService {
         expertise.setDescription(expertiseDTO.getDescription());
         expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
         expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
-        List<SeniorDaysValue> seniorDaysValue=new ArrayList<>();
-        BeanUtils.copyProperties(seniorDaysValue,expertiseDTO.getSeniorDaysValues());
-        expertise.setSeniorDaysValues(seniorDaysValue);
-        List<ChildCareDaysValue> childCareDaysValues=new ArrayList<>();
-        BeanUtils.copyProperties(childCareDaysValues,expertiseDTO.getChildCareDays());
-        expertise.setChildCareDaysValues(childCareDaysValues);
         Level level = countryGraphRepository.getLevel(countryId, expertiseDTO.getOrganizationLevelId());
         if (!Optional.ofNullable(level).isPresent()) {
             throw new DataNotFoundByIdException("Invalid level id " + expertiseDTO.getOrganizationLevelId());
@@ -739,16 +733,11 @@ public class ExpertiseService extends UserBaseService {
         return expertiseGraphRepository.getUnpublishedExpertise(countryId);
     }
 
-
-
     public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
         return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
     }
 
-
-
-
-            public List<AgeRangeDTO> updateAgeRangeInExpertise (Long expertiseId, List < AgeRangeDTO > ageRangeDTO, String wtaType){
+    public List<AgeRangeDTO> updateAgeRangeInExpertise (Long expertiseId, List < AgeRangeDTO > ageRangeDTO, String wtaType){
                 Expertise expertise = expertiseGraphRepository.findById(expertiseId).get();
                 if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
                     throw new DataNotFoundByIdException("No expertise found" + expertiseId);
