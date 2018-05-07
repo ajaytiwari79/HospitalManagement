@@ -195,4 +195,6 @@ public class AppConstants {
 
     // Staff
     public static final String UNIT_MANAGER_EMPLOYMENT_DESCRIPTION = "Working as Unit Manager";
+    public static final String CHILD_CARE="childCare";
+    public static final String SENIOR_DAYS="seniorDays";
 }

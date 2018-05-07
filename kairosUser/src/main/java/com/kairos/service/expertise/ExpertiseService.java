@@ -48,8 +48,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstants.FULL_TIME_WEEKLY_MINUTES;
-import static com.kairos.constants.AppConstants.NUMBER_OF_WORKING_DAYS_IN_WEEK;
+import static com.kairos.constants.AppConstants.*;
 import static javax.management.timer.Timer.ONE_DAY;
 
 import java.util.ArrayList;
@@ -743,12 +742,12 @@ public class ExpertiseService extends UserBaseService {
                     throw new DataNotFoundByIdException("No expertise found" + expertiseId);
                 }
                 validateAgeRange(ageRangeDTO);
-                if (wtaType.equals("seniorDays")) {
+                if (wtaType.equals(SENIOR_DAYS)) {
                     List<SeniorDays> seniorDays =ObjectMapperUtils.copyPropertiesByMapper(ageRangeDTO, new SeniorDays());
                     expertise.setSeniorDays(seniorDays);
                     save(expertise);
                     ageRangeDTO = ObjectMapperUtils.copyPropertiesByMapper(expertise.getSeniorDays(), new AgeRangeDTO());
-                } else if (wtaType.equals("childCare")) {
+                } else if (wtaType.equals(CHILD_CARE)) {
                     List<ChildCareDays> childCareDays = ObjectMapperUtils.copyPropertiesByMapper(ageRangeDTO, new ChildCareDays());
                     expertise.setChildCareDays(childCareDays);
                     save(expertise);
@@ -757,16 +756,14 @@ public class ExpertiseService extends UserBaseService {
                 return ageRangeDTO;
             }
 
+            //Validating age range
             public void validateAgeRange (List < AgeRangeDTO > ageRangeDTO) {
                 Collections.sort(ageRangeDTO);
                 for (int i = 0; i < ageRangeDTO.size(); i++) {
                     if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
                         throw new ActionNotPermittedException("Invalid Range: From " + ageRangeDTO.get(i).getFrom() + " to " + ageRangeDTO.get(i).getTo());
-                    if (ageRangeDTO.size() < 2)
-                        break;
-                    if (i < ageRangeDTO.size() - 1)
-                        if (ageRangeDTO.get(i).getTo() > ageRangeDTO.get(i + 1).getFrom())
-                            throw new ActionNotPermittedException("Age Range overlap");
+                    if (ageRangeDTO.size() > 1 && i < ageRangeDTO.size() - 1 && ageRangeDTO.get(i).getTo() > ageRangeDTO.get(i + 1).getFrom())
+                        throw new ActionNotPermittedException("Age Range overlap");
                 }
 
             }
