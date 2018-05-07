@@ -2,6 +2,7 @@ package com.kairos.service.expertise;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
@@ -742,30 +743,17 @@ public class ExpertiseService extends UserBaseService {
         }
         validateAgeRange(ageRangeDTO);
         if (wtaType.equals("seniorDays")) {
-            List<SeniorDays> seniorDays = new ArrayList<>();
-            for (AgeRangeDTO ageRange : ageRangeDTO) {
-                SeniorDays seniorDays1 = new SeniorDays();
-                BeanUtils.copyProperties(ageRange, seniorDays1);
-                seniorDays.add(seniorDays1);
-            }
+            List<SeniorDays> seniorDays = ObjectMapperUtils.copyPropertiesByMapper(ageRangeDTO,new SeniorDays());
             expertise.setSeniorDays(seniorDays);
             save(expertise);
-            for (int i = 0; i < expertise.getSeniorDays().size(); i++) {
-                BeanUtils.copyProperties(expertise.getSeniorDays().get(i), ageRangeDTO.get(i));
+            ageRangeDTO=ObjectMapperUtils.copyPropertiesByMapper(expertise.getSeniorDays(),new AgeRangeDTO());
             }
-        } else if (wtaType.equals("childCare")) {
-            List<ChildCareDays> childCareDays = new ArrayList<>();
-            for (AgeRangeDTO ageRange : ageRangeDTO) {
-                ChildCareDays childCareDays1 = new ChildCareDays();
-                BeanUtils.copyProperties(ageRange, childCareDays1);
-                childCareDays.add(childCareDays1);
-            }
+            else if (wtaType.equals("childCare")) {
+            List<ChildCareDays> childCareDays =ObjectMapperUtils.copyPropertiesByMapper(ageRangeDTO,new ChildCareDays());
             expertise.setChildCareDays(childCareDays);
             save(expertise);
-            for (int i = 0; i < expertise.getChildCareDays().size(); i++) {
-                BeanUtils.copyProperties(expertise.getChildCareDays().get(i), ageRangeDTO.get(i));
+            ageRangeDTO=ObjectMapperUtils.copyPropertiesByMapper(expertise.getChildCareDays(),new AgeRangeDTO());
             }
-        }
         return ageRangeDTO;
     }
 
