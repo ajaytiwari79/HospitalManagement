@@ -20,18 +20,18 @@ public class OrganizationDTO {
     @NotNull(message = "error.name.notnull")
     private String name;
     private String description;
-    private boolean isPreKairos;
+    private boolean preKairos;
     private List<Long> typeId;
     private List<Long> subTypeId;
     private List<Long> businessTypeId;
     private AddressDTO homeAddress;
     private int dayShiftTimeDeduction = 4; //in percentage
-    private boolean isKairosHub;
     private int nightShiftTimeDeduction = 7; //in percentage
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
     private boolean isOneTimeSyncPerformed;
     private LocalTime nightStartTime;
     private LocalTime nightEndTime;
+    private String externalId;
 
     private String desiredUrl;
     private String shortCompanyName;
@@ -85,14 +85,6 @@ public class OrganizationDTO {
 
     public void setHomeAddress(AddressDTO homeAddress) {
         this.homeAddress = homeAddress;
-    }
-
-    public boolean isPreKairos() {
-        return isPreKairos;
-    }
-
-    public void setPreKairos(boolean preKairos) {
-        isPreKairos = preKairos;
     }
 
     public List<Long> getTypeId() {
@@ -293,5 +285,21 @@ public class OrganizationDTO {
 
     public void setBoardingCompleted(boolean boardingCompleted) {
         this.boardingCompleted = boardingCompleted;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public boolean isPreKairos() {
+        return preKairos;
+    }
+
+    public void setPreKairos(boolean preKairos) {
+        this.preKairos = preKairos;
     }
 }

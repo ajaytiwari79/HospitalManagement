@@ -73,7 +73,6 @@ import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -268,7 +267,7 @@ public class OrganizationService extends UserBaseService {
 
         Map<String,OrganizationResponseWrapper> organizationResponseMap = new HashMap<>();
 
-        ParentOrganizationDTO orgDetails = organizationRequestWrapper.getCompany();
+        OrganizationDTO orgDetails = organizationRequestWrapper.getCompany();
 
         Country country = countryGraphRepository.findOne(countryId);
         if (country == null) {
@@ -279,9 +278,8 @@ public class OrganizationService extends UserBaseService {
         organization.setCountry(country);
         organization.setBoardingCompleted(orgDetails.isBoardingCompleted());
         organization = saveOrganizationDetails(organization, orgDetails, false, countryId);
-        if (organization == null) {
-            return null;
-        }
+
+
 
         OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
         organization.setOrganizationSetting(organizationSetting);
@@ -384,7 +382,9 @@ public class OrganizationService extends UserBaseService {
 
     }*/
 
-    public OrganizationResponseDTO updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId, long countryId) {
+    public Map<String, OrganizationResponseDTO> updateParentOrganization(OrganizationRequestWrapper organizationRequestWrapper, long organizationId, long countryId) {
+        Map<String, OrganizationResponseDTO> organizationResponseDTOs = new HashMap<>();
+        OrganizationDTO orgDetails = organizationRequestWrapper.getCompany();
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new InternalError("Organization not found by Id " + organizationId);
@@ -394,7 +394,34 @@ public class OrganizationService extends UserBaseService {
             return null;
         }
         save(organization);
-        return organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId());
+        organizationResponseDTOs.put("company",organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId()));
+
+        if(organizationRequestWrapper.getGdprUnit()!=null) {
+            Organization gdprUnit = organizationGraphRepository.findOne(organizationRequestWrapper.getGdprUnit().getId(), 2);
+            if (!Optional.ofNullable(gdprUnit).isPresent()) {
+                throw new InternalError("Gdpr Unit not found by Id " + organizationRequestWrapper.getGdprUnit().getId());
+            }
+            gdprUnit = saveOrganizationDetails(gdprUnit, organizationRequestWrapper.getGdprUnit(), true, countryId);
+            if (!Optional.ofNullable(gdprUnit).isPresent()) {
+                return null;
+            }
+            save(gdprUnit);
+            organizationResponseDTOs.put("gdprUnit",organizationResponse(gdprUnit, organizationRequestWrapper.getGdprUnit().getTypeId(), organizationRequestWrapper.getGdprUnit().getSubTypeId(), organizationRequestWrapper.getGdprUnit().getCompanyCategoryId()));
+        }
+
+        if(organizationRequestWrapper.getWorkCenterUnit()!=null) {
+            Organization workCenterUnit = organizationGraphRepository.findOne(organizationRequestWrapper.getWorkCenterUnit().getId(), 2);
+            if (!Optional.ofNullable(workCenterUnit).isPresent()) {
+                throw new InternalError("WorkCenter Unit not found by Id " + organizationRequestWrapper.getWorkCenterUnit().getId());
+            }
+            workCenterUnit = saveOrganizationDetails(workCenterUnit, organizationRequestWrapper.getWorkCenterUnit(), true, countryId);
+            if (!Optional.ofNullable(workCenterUnit).isPresent()) {
+                return null;
+            }
+            save(workCenterUnit);
+            organizationResponseDTOs.put("workCenterUnit",organizationResponse(workCenterUnit, organizationRequestWrapper.getWorkCenterUnit().getTypeId(), organizationRequestWrapper.getWorkCenterUnit().getSubTypeId(), organizationRequestWrapper.getWorkCenterUnit().getCompanyCategoryId()));
+        }
+        return organizationResponseDTOs;
     }
 
     private OrganizationResponseDTO organizationResponse(Organization organization, List<Long> organizationTypeId, List<Long> organizationSubTypeId, Long companyCategoryId) {
@@ -447,7 +474,7 @@ public class OrganizationService extends UserBaseService {
 
     }
 
-    private Organization saveOrganizationDetails(Organization organization, ParentOrganizationDTO orgDetails, boolean isUpdateOperation, long countryId) {
+    private Organization saveOrganizationDetails(Organization organization, OrganizationDTO orgDetails, boolean isUpdateOperation, long countryId) {
         organization.setName(orgDetails.getName());
         if (!Optional.ofNullable(orgDetails.getUnion()).isPresent()) {
             throw new ActionNotPermittedException("Please specify this is union or organization");
@@ -467,7 +494,7 @@ public class OrganizationService extends UserBaseService {
             contactAddress = new ContactAddress();
         }
         organization.setKairosHub(orgDetails.isKairosHub());
-        organization.setPrekairos(orgDetails.isPrekairos());
+        organization.setPrekairos(orgDetails.isPreKairos());
         organization.setDescription(orgDetails.getDescription());
         organization.setExternalId(orgDetails.getExternalId());
 
@@ -686,7 +713,7 @@ public class OrganizationService extends UserBaseService {
         periodRestClient.createDefaultPeriodSettings(unit.getId());
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
-        workingTimeAgreementRestClient.assignWTAToOrganization(organizationDTO.getOrganizationSubTypeId(),unit.getId(),country.getId());
+        workingTimeAgreementRestClient.assignWTAToOrganization(organizationDTO.getSubTypeId(),unit.getId(),country.getId());
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
         response.put("name", unit.getName());
@@ -855,7 +882,7 @@ public class OrganizationService extends UserBaseService {
             HashMap<String, Object> orgBasicData = new HashMap<>();
             orgBasicData.put("orgData", organizationData);
             Map<String, Object> address = (Map<String, Object>) organizationData.get("homeAddress");
-            orgBasicData.put("municipalities", (address.get("zipCode") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCode"))));
+            orgBasicData.put("municipalities", (address.get("zipCodeId") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCodeId"))));
             orgData.add(orgBasicData);
         }
         data.put("globalData", organizationCreationData);
@@ -871,7 +898,7 @@ public class OrganizationService extends UserBaseService {
             HashMap<String, Object> orgBasicData = new HashMap<>();
             orgBasicData.put("orgData", organizationData);
             Map<String, Object> address = (Map<String, Object>) organizationData.get("homeAddress");
-            orgBasicData.put("municipalities", (address.get("zipCode") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCode"))));
+            orgBasicData.put("municipalities", (address.get("zipCodeId") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCodeId"))));
             if(organizationData.get("gdprUnit")!=null && (boolean)organizationData.get("gdprUnit")==true) {
                 data.put("gdprUnit", orgBasicData);
             }else if(organizationData.get("workCenterUnit")!=null && (boolean)organizationData.get("workCenterUnit")){

@@ -5,15 +5,15 @@ package com.kairos.persistence.model.organization;
  */
 public class OrganizationRequestWrapper {
 
-    ParentOrganizationDTO company;
+    OrganizationDTO company;
     OrganizationDTO workCenterUnit;
     OrganizationDTO gdprUnit;
 
-    public ParentOrganizationDTO getCompany() {
+    public OrganizationDTO getCompany() {
         return company;
     }
 
-    public void setCompany(ParentOrganizationDTO company) {
+    public void setCompany(OrganizationDTO company) {
         this.company = company;
     }
 

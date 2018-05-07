@@ -17,6 +17,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParentOrganizationDTO {
 
+    private Long id;
     private List<Long> businessTypeIds;
 
     //@NotEmpty(message = "error.description.notnull") @NotNull(message = "error.description.notnull")
@@ -42,6 +43,12 @@ public class ParentOrganizationDTO {
     private String vatId;
     private boolean boardingCompleted;
 
+    //list of ids of organization type
+    @Size(min=1, max=1)
+    private List<Long> typeId;
+    //list of ids of organization subtype
+    private List<Long> subTypeId;
+
     public ParentOrganizationDTO() {
         //default constructor
     }
@@ -53,13 +60,6 @@ public class ParentOrganizationDTO {
     public void setLevelId(Long levelId) {
         this.levelId = levelId;
     }
-
-    //list of ids of organization type
-    @Size(min=1, max=1)
-    private List<Long> typeId;
-    //list of ids of organization subtype
-    private List<Long> subTypeId;
-
 
     public boolean isKairosHub() {
         return kairosHub;
@@ -224,5 +224,13 @@ public class ParentOrganizationDTO {
 
     public void setBoardingCompleted(boolean boardingCompleted) {
         this.boardingCompleted = boardingCompleted;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
