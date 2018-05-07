@@ -1,7 +1,7 @@
 package com.planner.controller;
 
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
-import com.kairos.persistence.model.user.staff.StaffDTO;
+import com.kairos.persistence.model.user.staff.StaffBasicDetailsDTO;
 import com.kairos.response.dto.web.UnitPositionDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.staff.StaffService;
@@ -28,7 +28,7 @@ public class StaffController {
     private StaffService staffService;
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ApiOperation("Create staffing_level")
-    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody StaffDTO staffDTO,
+    public ResponseEntity<Map<String, Object>> addStaffingLevel(@RequestBody StaffBasicDetailsDTO staffDTO,
                                                                 @PathVariable Long unitId) {
         staffService.createStaff(unitId,staffDTO);
         return ResponseHandler.generateResponse("Success",HttpStatus.CREATED);
@@ -36,7 +36,7 @@ public class StaffController {
 
     @RequestMapping(value = "/{staffingLevelKairosId}", method = RequestMethod.PUT)
     @ApiOperation("update staffing_level")
-    public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody  StaffDTO staffDTO,
+    public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody  StaffBasicDetailsDTO staffDTO,
                                                                    @PathVariable Long unitId, @PathVariable Long staffKairosId) {
         staffService.updateStaff(staffKairosId,unitId,staffDTO);
         return ResponseHandler.generateResponse("Success",HttpStatus.OK);

@@ -16,9 +16,12 @@ import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.response.dto.shift.ShiftQueryResult;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.pay_out.PayOutService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.time_bank.TimeBankService;
+import com.kairos.activity.service.wta.WTAService;
 import com.kairos.activity.spec.*;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.event.ShiftNotificationEvent;
@@ -70,9 +73,12 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private TimeBankService timeBankService;
     @Inject
+    private PayOutService payOutService;
+    @Inject
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
+    @Inject private WTAService wtaService;
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
         /*boolean valid=staffingLevelMongoRepository.existsByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(),shiftStartDate);
@@ -84,6 +90,8 @@ public class ShiftService extends MongoBaseService {
             throw new DataNotFoundByIdException("Invalid activity Id ." + shiftDTO.getActivityId());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), activity.getTimeCalculationActivityTab().getDayTypes());
+        WTAResponseDTO wtaResponseDTO = wtaService.getWta(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             throw new DataNotFoundByIdException(shiftDTO.getStaffId() + " Staff Do not belong to unit ->" + shiftDTO.getUnitId());
         }
@@ -132,6 +140,8 @@ public class ShiftService extends MongoBaseService {
         }
         save(shift);
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+        payOutService.savePayOut(shift.getUnitPositionId(), shift);
+
 
         //anil m2 notify event for updating staffing level
         applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift, false, null));
@@ -162,6 +172,7 @@ public class ShiftService extends MongoBaseService {
         }
         save(shifts);
         timeBankService.saveTimeBanks(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts);
+        payOutService.savePayOuts(staffAdditionalInfoDTO.getUnitPosition().getId(), shifts);
         shifts.stream().forEach(s -> shiftQueryResults.add(s.getShiftQueryResult()));
         return shiftQueryResults;
     }
@@ -169,6 +180,8 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftQueryResult updateShift(Long organizationId, ShiftDTO shiftDTO, String type) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), null);
+        WTAResponseDTO wtaResponseDTO = wtaService.getWta(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             throw new DataNotFoundByIdException(shiftDTO.getStaffId() + " Staff Do not belong to unit ->" + shiftDTO.getUnitId());
         }
@@ -202,6 +215,7 @@ public class ShiftService extends MongoBaseService {
         timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
         save(shift);
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+        payOutService.savePayOut(shift.getUnitPositionId(), shift);
         Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
         //anil m2 notify event for updating staffing level
         applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
@@ -244,6 +258,7 @@ public class ShiftService extends MongoBaseService {
         shift.setDeleted(true);
         save(shift);
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+        payOutService.savePayOut(shift.getUnitPositionId(), shift);
     }
 
     public Long countByActivityId(BigInteger activityId) {
@@ -316,6 +331,7 @@ public class ShiftService extends MongoBaseService {
             shiftQueryResult = geSubShiftResponse(shift, shifts);
         }
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
+        payOutService.savePayOut(shift.getUnitPositionId(), shift);
         return shiftQueryResult;
     }
 

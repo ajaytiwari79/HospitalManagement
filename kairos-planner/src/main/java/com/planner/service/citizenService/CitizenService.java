@@ -4,7 +4,7 @@ package com.planner.service.citizenService;
 import com.planner.domain.citizen.PlanningCitizen;
 import com.planner.domain.staff.PlanningStaff;
 import com.planner.repository.citizenRepository.CitizenRepository;
-import com.planner.repository.staffRepository.StaffRepository;
+import com.planner.repository.staffRepository.TaskStaffRepository;
 import com.planner.responseDto.citizenDto.OptaCitizenDTO;
 import com.planner.service.locationService.LocationService;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ public class CitizenService {
     private CitizenRepository citizenRepository;
     @Autowired
     private LocationService locationService;
-    @Autowired private StaffRepository staffRepository;
+    @Autowired private TaskStaffRepository taskStaffRepository;
 
     public void saveList(List<PlanningCitizen> planningCitizens){
         citizenRepository.saveList(planningCitizens);
@@ -106,7 +106,7 @@ public class CitizenService {
     public List<String> getStaffIds(List<Long> staffExternalIds,Long unitId){
         List<String> staffIds = new ArrayList<>(staffExternalIds.size());
         for (Long staffExternalId:staffExternalIds) {
-            PlanningStaff planningStaff = staffRepository.findByExternalId(staffExternalId,unitId,PlanningStaff.class);
+            PlanningStaff planningStaff = taskStaffRepository.findByExternalId(staffExternalId,unitId,PlanningStaff.class);
             staffIds.add(planningStaff.getId());
         }
         return staffIds;

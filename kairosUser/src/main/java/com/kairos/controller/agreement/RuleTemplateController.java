@@ -26,7 +26,7 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 public class RuleTemplateController {
 
 
-    @Inject
+    /*@Inject
     private RuleTemplateService ruleTemplateService;
     @Inject
     private RuleTemplateCategoryService ruleTemplateCategoryService;
@@ -60,7 +60,7 @@ public class RuleTemplateController {
     @RequestMapping(value = COUNTRY_URL+"/copy_rule_template", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> copyRuleTemplate(@PathVariable Long countryId, @Valid @RequestBody RuleTemplateCategoryDTO templateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.copyRuleTemplate(countryId,templateDTO));
-    }
+    }*/
 
 
 }

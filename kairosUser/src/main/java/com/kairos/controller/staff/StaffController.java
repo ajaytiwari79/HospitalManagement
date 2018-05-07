@@ -285,6 +285,11 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaff(type, id,allStaffRequired));
     }
 
+    @RequestMapping(value = "/filter",method = RequestMethod.POST)
+    @ApiOperation("get staff")
+    public ResponseEntity<Map<String, Object>> getStaffWithFilters(@RequestBody StaffFilterDTO staffFilterDTO, @PathVariable Long unitId,@RequestParam String type, @RequestParam long id, @RequestParam("unitPosition") boolean allStaffRequired) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffWithFilter(unitId, type, id,allStaffRequired, staffFilterDTO));
+    }
 
     /**
      * unit manager can assign specific expertise to staff
@@ -598,7 +603,9 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable long staffId, @RequestBody EmploymentDTO employmentDTO) throws ParseException {
 
         String employmentEndDate = employmentDTO.getEndDate();//(String)employmentDetail.get("endDate");
-        EmploymentUnitPositionDTO response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,employmentEndDate,unitId);
+        Long reasonCodeId = employmentDTO.getReasonCodeId();
+        Long accessGroupId = employmentDTO.getAccessGroupIdOnEmploymentEnd();
+        EmploymentUnitPositionDTO response = unitPositionService.updateUnitPositionEndDateFromEmployment(staffId,employmentEndDate,unitId,reasonCodeId,accessGroupId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, Collections.EMPTY_MAP);
         }

@@ -49,7 +49,7 @@ public class SkillCategory {
         this.name = name;
     }
 
-  //  public void setCountry(Country country) {
+  //  public void setCountryId(Country country) {
      //   this.country = country;
    // }
 
@@ -57,7 +57,7 @@ public class SkillCategory {
         this.description = description;
     }
 
-   // public Country getCountry() {
+   // public Country getCountryId() {
       //  return country;
    // }
 

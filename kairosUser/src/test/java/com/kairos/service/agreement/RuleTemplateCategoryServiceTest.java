@@ -60,9 +60,9 @@ public class RuleTemplateCategoryServiceTest {
 
     }
 
-    @Test
+   // @Test
     public void createRuleTemplate() throws Exception {
-        ruleTemplateService.createRuleTemplate(53);
+       // ruleTemplateService.createRuleTemplate(53);
     }
 
     @Test

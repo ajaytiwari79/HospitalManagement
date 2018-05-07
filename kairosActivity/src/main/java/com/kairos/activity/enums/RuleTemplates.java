@@ -25,7 +25,8 @@ public enum RuleTemplates {
     MAXIMUM_NUMBER_OF_SHIFTS_PER_INTERVAL,
     MAXIMUM_SENIOR_DAYS_PER_YEAR,
     MAXIMUM_TIME_BANK,
-    MINIMUM_TIME_BANK;
+    MINIMUM_TIME_BANK,
+    BREAKS_IN_SHIFT;
 
 
     public static RuleTemplates getByTemplateType(String templateType) {

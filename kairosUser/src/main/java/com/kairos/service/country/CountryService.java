@@ -27,11 +27,13 @@ import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.response.dto.web.OrganizationLevelAndUnionWrapper;
 import com.kairos.response.dto.web.cta.*;
+import com.kairos.response.dto.web.wta.WTADefaultDataInfoDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.google_calender.GoogleCalenderService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.util.FormatUtil;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -505,6 +508,27 @@ public class CountryService extends UserBaseService {
         List<Level> organizationLevels=countryGraphRepository.getLevelsByCountry(countryId);
         OrganizationLevelAndUnionWrapper organizationLevelAndUnionWrapper =new OrganizationLevelAndUnionWrapper(unions,organizationLevels);
         return organizationLevelAndUnionWrapper;
+    }
+
+    public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId){
+        List<PresenceTypeDTO> presenceTypeDTOS = presenceTypeService.getAllPresenceTypeByCountry(countryId);
+        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+        List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
+        List<com.kairos.response.dto.web.wta.PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p->new com.kairos.response.dto.web.wta.PresenceTypeDTO(p.getName(),p.getId())).collect(Collectors.toList());
+        dayTypes.forEach(dayType -> {
+            DayTypeDTO dayTypeDTO = new DayTypeDTO();
+            try {
+                PropertyUtils.copyProperties(dayTypeDTO,dayType);
+                dayTypeDTOS.add(dayTypeDTO);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        });
+        return new WTADefaultDataInfoDTO(dayTypeDTOS,presenceTypeDTOS1);
     }
 
 
