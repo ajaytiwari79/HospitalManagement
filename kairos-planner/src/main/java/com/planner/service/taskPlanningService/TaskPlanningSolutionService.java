@@ -18,7 +18,7 @@ import com.planner.service.citizenService.CitizenService;
 import com.planner.service.locationService.LocationService;
 import com.planner.service.skillService.SkillService;
 import com.planner.service.staffService.ShiftService;
-import com.planner.service.staffService.StaffService;
+import com.planner.service.staffService.TaskStaffService;
 import com.planner.service.taskService.TaskService;
 import com.planner.service.taskService.TaskTypeService;
 import com.planner.service.vehicleService.VehicleService;
@@ -39,7 +39,7 @@ public class TaskPlanningSolutionService {
     @Autowired private TaskService taskService;
     @Autowired private TaskTypeService taskTypeService;
     @Autowired private SkillService skillService;
-    @Autowired private StaffService staffService;
+    @Autowired private TaskStaffService taskStaffService;
     @Autowired private VehicleService vehicleService;
     @Autowired private CitizenService citizenService;
     @Autowired private LocationService locationService;
@@ -288,7 +288,7 @@ public class TaskPlanningSolutionService {
     }
 
     private Map<String,Employee> getEmployeeMap(Long unitId,Map<String,Skill> skillMap){
-        List<PlanningStaff> planningStaffs = staffService.getAllByUnitId(unitId);
+        List<PlanningStaff> planningStaffs = taskStaffService.getAllByUnitId(unitId);
         Map<String,Employee> employeeMap = new HashMap<>(planningStaffs.size());
         for (PlanningStaff planningStaff:planningStaffs) {
             Employee employee = new Employee();

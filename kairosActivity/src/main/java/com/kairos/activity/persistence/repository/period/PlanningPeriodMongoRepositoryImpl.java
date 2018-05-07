@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.CountOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -17,6 +18,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
@@ -55,7 +58,6 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         query.limit(1);
         return mongoTemplate.findOne(query, PlanningPeriod.class);
     }
-
 
     public List<PlanningPeriodDTO> findAllPeriodsOfUnit(Long unitId) {
 
@@ -103,5 +105,37 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
 
         AggregationResults<com.kairos.response.dto.web.period.PlanningPeriodDTO> result = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, com.kairos.response.dto.web.period.PlanningPeriodDTO.class);
         return result.getMappedResults();
+    }
+
+
+    public  boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, Date startDate, Date endDate, int sequence) {
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
+                        .orOperator(
+                                Criteria.where("startDate").gte(startDate).lte(endDate),
+                                Criteria.where("endDate").gte(startDate).lte(endDate)
+                        )),
+                lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
+                match(Criteria.where("current_phase_data.sequence").ne(sequence)), count().as("countOfPhasesWithOtherSequence")
+        );
+
+        AggregationResults<Map> result =
+                mongoTemplate.aggregate(aggregation, "planningPeriod", Map.class);
+        Map resultData = result.getUniqueMappedResult();
+        if (Optional.ofNullable(resultData).isPresent()) {
+            return (Integer) result.getUniqueMappedResult().get("countOfPhasesWithOtherSequence") > 0;
+        } else {
+            return false;
+        }
+    }
+
+    public List<PlanningPeriod> getPlanningPeriodToFlipPhases(Long unitId, Date date){
+
+        Query query = Query.query(Criteria.where("unitId").is(unitId).and("deleted").is(false).
+                and("phaseFlippingDate.flippingDate").lte(date));
+//        query.addCriteria(Criteria.where("this.nextPhaseId").is("this.phaseFlippingDate.phaseId"));
+        query.with(Sort.by(Sort.Direction.ASC,"startDate"));
+        return mongoTemplate.find(query, PlanningPeriod.class);
     }
 }

@@ -203,7 +203,9 @@ public class AppConstants {
     public static final String REQUEST_TO_PUZZLE_PHASE = "REQUEST_TO_PUZZLE_PHASE";
     public static final String PUZZLE_TO_CONSTRUCTION_PHASE = "PUZZLE_TO_CONSTRUCTION_PHASE";
     public static final Long DURATION_IN_WEEK=4L;
+    public static final String COPY_OF = "copy of";
 
+    public static final int REQUEST_PHASE_SEQUENCE = 1;
 
     //Scheduled Hours Calculation constants
     public static final String ENTERED_TIMES = "ENTERED_TIMES";
@@ -213,6 +215,7 @@ public class AppConstants {
     public static final String ENTERED_MANUALLY = "ENTERED_MANUALLY";
     public static final String FULL_WEEK = "FULL_WEEK";
     public static final String TIMEBANK_ACCOUNT = "TIMEBANK_ACCOUNT";
+    public static final String PAIDOUT_ACCOUNT = "PAIDOUT_ACCOUNT";
 
     //TimeCare date importing constants
     public static final String CALCULATED_TIME = "CalculatedTime";

@@ -17,7 +17,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<WTABaseRuleTemplate, Long> {
 
 
-    @Query("MATCH (t:WTABaseRuleTemplate) where id(t)={0} with t " +
+    @Query("MATCH (t:WTABaseRuleTemplateDTO) where id(t)={0} with t " +
             "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory) with t,r " +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
@@ -58,41 +58,42 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.onlyCompositeShifts as onlyCompositeShifts")
     RuleTemplateCategoryDTO getRuleTemplateAndCategoryById(long templateId);
 
-    @Query("Match (n:WTABaseRuleTemplate) where id(n) in {0} return n")
+    @Query("Match (n:WTABaseRuleTemplateDTO) where id(n) in {0} return n")
     List<RuleTemplate> getWtaBaseRuleTemplateByIds(List<Long> templateIds);
 
-    @Query("MATCH (n:WTABaseRuleTemplate) where id(n) in {0}\n" +
+    @Query("MATCH (n:WTABaseRuleTemplateDTO) where id(n) in {0}\n" +
             "Match (n)<-[r:" + HAS_RULE_TEMPLATES + "]-(category:RuleTemplateCategory) detach  delete r")
     void deleteOldCategories(List<Long> ruleTemplateIds);
 
-    @Query("MATCH (n:WTABaseRuleTemplate) where id(n)={0}\n" +
+    @Query("MATCH (n:WTABaseRuleTemplateDTO) where id(n)={0}\n" +
             "Match (n)<-[r:" + HAS_RULE_TEMPLATES + "]-(category:RuleTemplateCategory) detach delete r with n \n" +
             "match  (catg:RuleTemplateCategory{deleted:false}) where  catg.ruleTemplateCategoryType='WTA' AND catg.name=~{2} \n" +
             "create (n)<-[:" + HAS_RULE_TEMPLATES + "]-(catg) ")
     void deleteCategoryFromTemplate(Long ruleTemplateId, Long previousRuleTemplateCategory, String newRuleTemplateCategory);
 
     @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
-            "match (r:WTABaseRuleTemplate)<-[:" + HAS_RULE_TEMPLATES + "]-(rt)\n" +
+            "match (r:WTABaseRuleTemplateDTO)<-[:" + HAS_RULE_TEMPLATES + "]-(rt)\n" +
             "return id(r) as IDs")
     List<Long> findAllWTABelongsByTemplateCategoryId(long ruleTemplateCategoryId);
 
     @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
-            "optional match (r:WTABaseRuleTemplate) where id(r) IN {1}\n" +
+            "optional match (r:WTABaseRuleTemplateDTO) where id(r) IN {1}\n" +
             "optional match(rt)-[rel:" + HAS_RULE_TEMPLATES + "]->(r)\n" +
             "delete rel set rt.deleted=true")
     void deleteRelationOfRuleTemplateCategoryAndWTA(long ruleTemplateId, List<Long> WTAIds);
 
     @Query("match (rt:RuleTemplateCategory) where id(rt)={0}\n" +
-            "match (r:WTABaseRuleTemplate) where id(r) IN {1}\n" +
+            "match (r:WTABaseRuleTemplateDTO) where id(r) IN {1}\n" +
             "create (rt)-[rq:" + HAS_RULE_TEMPLATES + "]->(r)")
     void setAllWTAWithCategoryNone(long ruleTemplateId, List<Long> WTAIds);
 
 
-    @Query("MATCH (o:Organization)-[:" + BELONGS_TO + "]-(c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE]-(t:WTABaseRuleTemplate) where id(o)={0} " +
+    @Query("MATCH (o:Organization)-[:" + BELONGS_TO + "]-(c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE]-(t:WTABaseRuleTemplateDTO) where id(o)={0} " +
             "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory)  " +
             "Optional Match (t)-[: " + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "with tempValue ORDER BY tempValue.sequence ,t,c,r "+
-            "with t,c,r, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
+            "Optional MATCH(t)-[:"+HAS_BREAK_MATRIX+"]-(breakTemplateValue:BreakTemplateValue) " +
+            "with tempValue ORDER BY tempValue.sequence ,t,c,r,breakTemplateValue "+
+            "with t,c,r,breakTemplateValue, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
             "t.balanceType as balanceType," +
@@ -136,14 +137,16 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.yellowZone as yellowZone," +
             "t.forbid as forbid," +
             "t.allowExtraActivity as allowExtraActivity," +
-            "phaseTemplateValues as phaseTemplateValues")
+            "phaseTemplateValues as phaseTemplateValues, " +
+            "CASE when breakTemplateValue IS NULL THEN [] else collect(breakTemplateValue) END as breakTemplateValues")
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByUnitId(Long unitId);
 
-    @Query("MATCH (c:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE + "]-(t:WTABaseRuleTemplate) where id(c)={0} " +
+    @Query("MATCH (c:Country{isEnabled:true})-[:" + HAS_RULE_TEMPLATE + "]-(t:WTABaseRuleTemplateDTO) where id(c)={0} " +
             "Match (t)<-[:" + HAS_RULE_TEMPLATES + "]-(r:RuleTemplateCategory{ruleTemplateCategoryType:'WTA'})  " +
             "Optional Match (t)-[:" + HAS_TEMPLATE_MATRIX + "]->(tempValue:PhaseTemplateValue)\n" +
-            "with tempValue ORDER BY tempValue.sequence ,t,c,r "+
-            "with t,c,r, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
+            "Optional MATCH(t)-[:"+HAS_BREAK_MATRIX+"]-(breakTemplateValue:BreakTemplateValue) " +
+            "with tempValue ORDER BY tempValue.sequence,t,c,r,breakTemplateValue "+
+            "with t,c,r,breakTemplateValue, CASE WHEN tempValue IS NOT NULL THEN collect (tempValue)  else [] END as phaseTemplateValues \n" +
             "Return id(t) as id ," +
             "t.timeLimit as timeLimit," +
             "t.balanceType as balanceType," +
@@ -187,15 +190,16 @@ public interface WTABaseRuleTemplateGraphRepository extends Neo4jBaseRepository<
             "t.yellowZone as yellowZone," +
             "t.forbid as forbid," +
             "t.allowExtraActivity as allowExtraActivity," +
-            "phaseTemplateValues as phaseTemplateValues"
+            "phaseTemplateValues as phaseTemplateValues, " +
+            "CASE when breakTemplateValue IS NULL THEN [] else collect(breakTemplateValue) END as breakTemplateValues"
     )
     List<RuleTemplateResponseDTO> getWTABaseRuleTemplateByCountryId(Long countryId);
 
-    @Query("MATCH (c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE ]-(t:WTABaseRuleTemplate) where id(c)={0} AND LOWER(t.name) = LOWER({1})\n" +
+    @Query("MATCH (c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE ]-(t:WTABaseRuleTemplateDTO) where id(c)={0} AND LOWER(t.name) = LOWER({1})\n" +
             "return t")
     WTABaseRuleTemplate existsByName(Long countryId,String name);
 
-    @Query("MATCH (c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE ]-(t:WTABaseRuleTemplate) where id(c)={0} and t.templateType CONTAINS {1} return t.templateType ORDER BY t.created_at desc\n" +
+    @Query("MATCH (c:Country{isEnabled:true})-[:HAS_RULE_TEMPLATE ]-(t:WTABaseRuleTemplateDTO) where id(c)={0} and t.templateType CONTAINS {1} return t.templateType ORDER BY t.created_at desc\n" +
             "Limit 1")
     String getLastInsertedTemplateType(Long countryId,String templateType);
 

@@ -43,6 +43,8 @@ import com.kairos.activity.serializers.MongoDateMapper;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.service.fls_visitour.schedule.Scheduler;
 import com.kairos.activity.service.fls_visitour.schedule.TaskConverterService;
+import com.kairos.activity.service.pay_out.PayOutCalculationService;
+import com.kairos.activity.service.pay_out.PayOutService;
 import com.kairos.activity.service.planner.TasksMergingService;
 import com.kairos.activity.service.time_bank.TimeBankService;
 import com.kairos.activity.spec.MergeTaskSpecification;
@@ -162,6 +164,10 @@ public class TaskService extends MongoBaseService {
     @Inject private TimeBankService timeBankService;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
+    @Inject
+    private PayOutService payOutService;
+    @Inject
+    private PayOutCalculationService payOutCalculationService;
 
     public List<Long> getClientTaskServices(Long clientId, long orgId) {
         logger.info("Fetching tasks for ClientId: " + clientId);
@@ -690,6 +696,7 @@ public class TaskService extends MongoBaseService {
         List<GetWorkShiftsFromWorkPlaceByIdResult> timeCareShiftsByPagination = shiftsFromTimeCare.stream().skip(skip).limit(MONOGDB_QUERY_RECORD_LIMIT).collect(Collectors.toList());
         List<Shift> shiftsToCreate = new ArrayList<>();
         StaffUnitPositionDetails staffUnitPositionDetails = new StaffUnitPositionDetails(unitPositionDTO.getWorkingDaysInWeek(),unitPositionDTO.getTotalWeeklyMinutes());
+        staffUnitPositionDetails.setFullTimeWeeklyMinutes(unitPositionDTO.getFullTimeWeeklyMinutes());
         for (GetWorkShiftsFromWorkPlaceByIdResult timeCareShift : timeCareShiftsByPagination) {
             Shift shift = shiftsInKairos.stream().filter(shiftInKairos -> shiftInKairos.getExternalId().equals(timeCareShift.getId())).findAny().orElse(mapTimeCareShiftDataToKairos
                     (timeCareShift, workPlaceId));
@@ -707,11 +714,9 @@ public class TaskService extends MongoBaseService {
 
         }
         if (!shiftsToCreate.isEmpty()) {
-
             save(shiftsToCreate);
             timeBankService.saveTimeBanks(unitPositionDTO.getId(), shiftsToCreate);
-
-
+            payOutService.savePayOuts(unitPositionDTO.getId(), shiftsToCreate);
         }
     }
 
@@ -778,7 +783,7 @@ public class TaskService extends MongoBaseService {
                         engineerMetaData.put("prename", staff.getFirstName());
                         engineerMetaData.put("name", staff.getLastName());
                         //Address1 (Home)
-                        //  engineerMetaData.put("scountry", staff.getContactAddress().getCountry());
+                        //  engineerMetaData.put("scountry", staff.getContactAddress().getCountryId());
                         engineerMetaData.put("scountry", "DK");
                         engineerMetaData.put("szip", officeZipCode.getZipCode());
                         engineerMetaData.put("scity", officeAddress.getCity());

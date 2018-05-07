@@ -1,5 +1,6 @@
 package com.kairos.activity.service;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
+import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.activity.util.DateUtils;
 import com.mongodb.BasicDBObject;
@@ -45,6 +46,10 @@ public class MongoBaseService {
          *  Set Id if entity don't have Id
          * */
         if(entity.getId() == null){
+            if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
+                //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
+                className = entity.getClass().getSuperclass().getSimpleName();
+            }
             entity.setId(mongoSequenceRepository.nextSequence(className));
         }
         /**
@@ -107,6 +112,10 @@ public class MongoBaseService {
                     /**
                      *  Set Id if entity don't have Id
                      * */
+                    if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
+                        //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
+                        className = entity.getClass().getSuperclass().getSimpleName();
+                    }
                     entity.setId(mongoSequenceRepository.nextSequence(className));
 
                     dbObject = new BasicDBObject();

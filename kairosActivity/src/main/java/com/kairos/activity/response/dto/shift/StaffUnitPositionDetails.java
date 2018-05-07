@@ -1,8 +1,9 @@
 package com.kairos.activity.response.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 
-
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -25,14 +26,23 @@ public class StaffUnitPositionDetails {
     private long id;
     private float salary;
     private int totalWeeklyMinutes;
+    private BigInteger workingTimeAgreementId;
 
     public StaffUnitPositionDetails() {
 
     }
 
-    public StaffUnitPositionDetails(int workingDaysInWeek, int totalWeeklyHours) {
+    public BigInteger getWorkingTimeAgreementId() {
+        return workingTimeAgreementId;
+    }
+
+    public void setWorkingTimeAgreementId(BigInteger workingTimeAgreementId) {
+        this.workingTimeAgreementId = workingTimeAgreementId;
+    }
+
+    public StaffUnitPositionDetails(int workingDaysInWeek, int totalWeeklyMinutes) {
         this.workingDaysInWeek = workingDaysInWeek;
-        this.totalWeeklyHours = totalWeeklyHours;
+        this.totalWeeklyMinutes = totalWeeklyMinutes;
     }
 
 

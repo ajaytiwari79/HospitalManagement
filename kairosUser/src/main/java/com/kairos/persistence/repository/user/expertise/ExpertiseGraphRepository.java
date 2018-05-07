@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.user.expertise.*;
+import com.kairos.persistence.model.user.filter.FilterDetailQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -72,19 +73,20 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     Expertise getExpertiesOfCountry(Long countryId, Long expertiseId);
 
 
-    //TODO need to add publish filter as well
+
     @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,hasDraftCopy:false}) where id(country) = {0}" +
-            "match(expertise)-[:" + SUPPORTS_SERVICE + "]-(orgService:OrganizationService)\n" +
             "match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "match(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
+            "match(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
+            "with expertise,union,level, Collect(orgService) as services \n"+
             "match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable)" +
             "optional match(seniorityLevel)-[functionRelation:" + HAS_FUNCTION + "]->(functions:Function) \n" +
-            "with expertise,payTable,union,level,orgService,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
+            "with expertise,payTable,union,level,services,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
-            "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
+            "with expertise,payTable,union,level,services,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
             "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis , expertise.history as history," +
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
-            "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
+            "services as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels")
     List<ExpertiseQueryResult> getUnpublishedExpertise(long countryId);
@@ -96,17 +98,18 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
 
     @Query("match (e:Expertise)-[:" + VERSION_OF + "]->(expertise:Expertise) where id(e) = {0}" +
-            "match(expertise)-[:" + SUPPORTS_SERVICE + "]-(orgService:OrganizationService)\n" +
             "match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "match(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
+            "match(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
+            "with expertise,union,level, Collect(orgService) as services \n"+
             "match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable)" +
             "optional match(seniorityLevel)-[functionRelation:" + HAS_FUNCTION + "]->(functions:Function) \n" +
-            "with expertise,payTable,union,level,orgService,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
+            "with expertise,payTable,union,level,services,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
-            "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
+            "with expertise,payTable,union,level,services,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
             "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis, expertise.history as history, " +
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
-            "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
+            "services as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels order by expertise.creationDate")
     ExpertiseQueryResult getParentExpertiseByExpertiseId(Long expertiseId);
@@ -117,34 +120,35 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<Expertise> getExpertiseByIdsIn(List<Long> ids);
 
     @Query("match (expertise:Expertise{deleted:false}) where id(expertise) = {0}" +
-            "match(expertise)-[:" + SUPPORTS_SERVICE + "]-(orgService:OrganizationService)\n" +
             "match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
-            "match(expertise)-[:" + HAS_PAY_TABLE + "]-(payTable:PayTable)\n" +
             "match(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
+            "match(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
+            "with expertise,union,level, Collect(orgService) as services \n"+
             "match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable)" +
             "optional match(seniorityLevel)-[functionRelation:" + HAS_FUNCTION + "]->(functions:Function) \n" +
-            "with expertise,payTable,union,level,orgService,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
+            "with expertise,payTable,union,level,services,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
-            "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
+            "with expertise,payTable,union,level,services,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
             "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis ,expertise.history as history," +
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
-            "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
+            "services as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels order by expertise.creationDate")
     ExpertiseQueryResult getExpertiseById(Long expertiseId);
 
     @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0}" +
-            "match(expertise)-[:" + SUPPORTS_SERVICE + "]-(orgService:OrganizationService)\n" +
             "match(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "match(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
+            "match(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
+            "with expertise,union,level, Collect(orgService) as services \n"+
             "match(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable)" +
             "optional match(seniorityLevel)-[functionRelation:" + HAS_FUNCTION + "]->(functions:Function) \n" +
-            "with expertise,payTable,union,level,orgService,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
+            "with expertise,payTable,union,level,services,seniorityLevel,payGradeData,CASE when functions IS NULL THEN [] ELSE collect({name:functions.name,id:id(functions),amount:functionRelation.amount }) END as functionData  \n" +
             "optional match(seniorityLevel)-[:" + HAS_PAY_GROUP_AREA + "]-(pga:PayGroupArea)  \n" +
-            "with expertise,payTable,union,level,orgService,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
+            "with expertise,payTable,union,level,services,seniorityLevel,functionData,payGradeData,CASE when pga IS NULL THEN [] ELSE  collect  (distinct{name:pga.name,id:id(pga)}) END as payGroupAreas    \n" +
             "return expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate,expertise.paidOutFrequency as paidOutFrequency ,expertise.startDateMillis as startDateMillis , expertise.history as history," +
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
-            "orgService as organizationService,level as organizationLevel,payTable as payTable,union as union,"
+            "services as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels order by expertise.creationDate")
     List<ExpertiseQueryResult> getAllExpertiseByCountryId(Long countryId);
@@ -156,6 +160,22 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("match(expertise:Expertise{deleted:false,history:false})-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level) where id(level)={0} AND expertise.name={1}  AND id(expertise)<> {2}" +
             "with count(expertise) as expertiseCount " +
             "RETURN case when expertiseCount>0 THEN  true ELSE false END as response")
-    Boolean checkExpertiseNameUniqueInOrganizationLevel(Long organizationLevelId, String expertiseName,Long currentExpertise);
+    Boolean checkExpertiseNameUniqueInOrganizationLevel(Long organizationLevelId, String expertiseName, Long currentExpertise);
+
+    @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0}" +
+            "match(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) where id(orgService) IN {1}\n" +
+            "return expertise order by expertise.creationDate")
+    List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds);
+
+    // Get Expertise data for filters by countryId
+    @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}\n" +
+            "    match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {1}\n" +
+            "    match(expertise)-[:" + SUPPORTS_SERVICES + "]-(os) return toString(id(expertise)) as id, expertise.name as value ORDER BY value")
+    List<FilterDetailQueryResult> getExpertiseByCountryIdForFilters(Long unitId, Long countryId);
+   
+  @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0}" +
+            "match(expertise)-[:" + ORG_TYPE_HAS_EXPERTISE + "]-(orgSubType:OrganizationType) where id(orgSubType) = {1} \n" +
+            "return id(expertise) as id, expertise.name as name order by expertise.creationDate")
+    List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId,Long organizationSubTypeId);
 
 }

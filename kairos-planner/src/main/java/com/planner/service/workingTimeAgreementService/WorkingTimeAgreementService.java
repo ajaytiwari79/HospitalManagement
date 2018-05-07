@@ -8,7 +8,7 @@ public class WorkingTimeAgreementService {
     /*private static Logger logger = LoggerFactory.getLogger(WorkingTimeAgreementService.class);
 
     @Autowired private WorkingTimeAgreementRepository workingTimeAgreementRepository;
-    @Autowired private StaffService staffService;
+    @Autowired private TaskStaffService staffService;
 
     public WorkingTimeAggrementDTO saveWorkingTimeAgreement(WorkingTimeAggrementDTO workingTimeAggrementDTO){
         UnitStaffRelationShip unitStaffRelationShip = staffService.getOneByUnitStaffRelation(workingTimeAggrementDTO.getUnitId(),workingTimeAggrementDTO.getStaffId());

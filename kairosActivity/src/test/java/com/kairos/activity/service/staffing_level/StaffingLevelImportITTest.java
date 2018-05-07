@@ -4,8 +4,6 @@ import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuration;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
-import org.apache.commons.io.IOUtils;
-import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,7 +56,7 @@ public class StaffingLevelImportITTest {
 
         assertTrue(staffingLevels.size() == 7);
         StaffingLevel staffingLevel = staffingLevels.get(5);
-        List<StaffingLevelInterval> staffingLevelIntervalList = staffingLevel.getStaffingLevelInterval();
+        List<StaffingLevelInterval> staffingLevelIntervalList = staffingLevel.getPresenceStaffingLevelInterval();
         StaffingLevelDuration duration = null;
 
         LocalTime excelFrom = LocalTime.of(16, 0);

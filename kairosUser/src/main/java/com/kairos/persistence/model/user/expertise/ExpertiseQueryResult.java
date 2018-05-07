@@ -30,7 +30,7 @@ public class ExpertiseQueryResult {
 
 
     private Level organizationLevel;
-    private OrganizationService organizationService;
+    private List<OrganizationService> organizationService;
     //TODO in current unwinded property cant be set to any nested domain to QueryResult DTO , We will change if in feature this will handle
     private Organization union;
     private PayTable payTable;
@@ -116,11 +116,11 @@ public class ExpertiseQueryResult {
         this.organizationLevel = organizationLevel;
     }
 
-    public OrganizationService getOrganizationService() {
+    public List<OrganizationService> getOrganizationService() {
         return organizationService;
     }
 
-    public void setOrganizationService(OrganizationService organizationService) {
+    public void setOrganizationService(List<OrganizationService> organizationService) {
         this.organizationService = organizationService;
     }
 

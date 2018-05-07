@@ -8,8 +8,39 @@ import com.kairos.persistence.model.enums.MasterDataTypeEnum;
 public class TagDTO {
 
     private Long id;
-    private MasterDataTypeEnum masterDataType;
     private String name;
+
+    private MasterDataTypeEnum masterDataType;
+
+    private boolean countryTag;
+
+    private long countryId;
+
+    private long organizationId;
+
+    public long getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(long countryId) {
+        this.countryId = countryId;
+    }
+
+    public long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(long organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public boolean isCountryTag() {
+        return countryTag;
+    }
+
+    public void setCountryTag(boolean countryTag) {
+        this.countryTag = countryTag;
+    }
 
     public Long getId() {
         return id;

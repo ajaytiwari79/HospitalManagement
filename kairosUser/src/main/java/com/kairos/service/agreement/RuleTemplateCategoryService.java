@@ -103,12 +103,12 @@ public class RuleTemplateCategoryService extends UserBaseService {
             RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, "NONE", CTA);
             ruleTemplateCategoryGraphRepository.deleteRelationOfRuleTemplateCategoryAndCTA(templateCategoryId, ctaRuleTemplates);
             ruleTemplateCategoryGraphRepository.setAllCTAWithCategoryNone(noneRuleTemplateCategory.getId(), ctaRuleTemplates);
-        } else {
+        }/* else {
             List<Long> wtaBaseRuleTemplateList = wtaBaseRuleTemplateGraphRepository.findAllWTABelongsByTemplateCategoryId(templateCategoryId);
             RuleTemplateCategory noneRuleTemplateCategory = ruleTemplateCategoryGraphRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
             wtaBaseRuleTemplateGraphRepository.deleteRelationOfRuleTemplateCategoryAndWTA(templateCategoryId, wtaBaseRuleTemplateList);
             wtaBaseRuleTemplateGraphRepository.setAllWTAWithCategoryNone(noneRuleTemplateCategory.getId(), wtaBaseRuleTemplateList);
-        }
+        }*/
         return true;
 
     }
@@ -228,7 +228,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
     }
 
 
-    public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
+    /*public RuleTemplateWrapper getRulesTemplateCategoryByUnit(Long unitId) {
         Organization organization = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             throw new DataNotFoundByIdException("Organization does not exist");
@@ -241,7 +241,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
         return ruleTemplateWrapper;
 
-    }
+    }*/
     // creating default rule template category NONE
     public void createDefaultRuleTemplateCategory( RuleTemplateCategory ruleTemplateCategory) {
         save(ruleTemplateCategory);

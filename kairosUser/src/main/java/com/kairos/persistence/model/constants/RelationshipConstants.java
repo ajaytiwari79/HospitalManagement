@@ -202,6 +202,9 @@ public abstract class RelationshipConstants {
     public final static String FILTER_BY_PAGE = "FILTER_BY_PAGE";
 
     public final static String HAS_FAVOURITE_FILTERS = "HAS_FAVOURITE_FILTERS";
+    public final static String FILTER_DETAIL= "FILTER_DETAIL";
+    public final static String APPLICABLE_FOR = "APPLICABLE_FOR";
+    public final static String HAS_FILTER_GROUP = "HAS_FILTER_GROUP";
 
     public final static String BELONGS_TO_STAFF = "BELONGS_TO_STAFF";
     public final static String UNAVAILABLE_ON = "UNAVAILABLE_ON";
@@ -213,6 +216,7 @@ public abstract class RelationshipConstants {
     public final static String RESOURCE_HAS_EQUIPMENT = "RESOURCE_HAS_EQUIPMENT";
     public final static String LOCATED_IN = "LOCATED_IN";
     public final static String ORGANIZATION_HAS_UNIONS = "ORGANIZATION_HAS_UNIONS";
+    public final static String BACKING_BY_UNION = "BACKING_BY_UNION";
 
 
     public final static String IN_UNIT = "IN_UNIT";
@@ -227,7 +231,7 @@ public abstract class RelationshipConstants {
     public final static String HAS_PAY_GROUP_AREA = "HAS_PAY_GROUP_AREA";
     public final static String FOR_SENIORITY_LEVEL = "FOR_SENIORITY_LEVEL";
     public final static String SUPPORTED_BY_UNION = "SUPPORTED_BY_UNION";
-    public final static String SUPPORTS_SERVICE = "SUPPORTS_SERVICE";
+    public final static String SUPPORTS_SERVICES = "SUPPORTS_SERVICES";
     public final static String HAS_FUNCTION = "HAS_FUNCTION";
     public final static String VERSION_OF = "VERSION_OF";
     public final static String HAS_PAY_TABLE = "HAS_PAY_TABLE";
@@ -235,6 +239,8 @@ public abstract class RelationshipConstants {
     public final static String HAS_SENIORITY_LEVEL = "HAS_SENIORITY_LEVEL";
     public final static String HAS_REASON_CODE = "HAS_REASON_CODE";
     public final static String HAS_PAYMENT_SETTINGS = "HAS_PAYMENT_SETTINGS";
+    public final static String HAS_BREAK_MATRIX="HAS_BREAK_MATRIX";
+    public final static String HAS_PERSONALIZED_SETTINGS = "HAS_PERSONALIZED_SETTINGS";
 
 
     /**

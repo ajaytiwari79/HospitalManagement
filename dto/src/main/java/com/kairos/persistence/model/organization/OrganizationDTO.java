@@ -24,12 +24,20 @@ public class OrganizationDTO {
     private List<Long> businessTypeId;
     private AddressDTO contactAddress;
     private int dayShiftTimeDeduction = 4; //in percentage
-
+    private boolean isKairosHub;
     private int nightShiftTimeDeduction = 7; //in percentage
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
     private boolean isOneTimeSyncPerformed;
     private LocalTime nightStartTime;
     private LocalTime nightEndTime;
+
+    public boolean isKairosHub() {
+        return isKairosHub;
+    }
+
+    public void setKairosHub(boolean kairosHub) {
+        isKairosHub = kairosHub;
+    }
 
     public Long getId() {
         return id;

@@ -10,6 +10,25 @@ import javax.validation.constraints.NotNull;
 public class EmploymentDTO {
     @NotNull
     private String endDate;
+    private Long reasonCodeId;
+    private Long accessGroupIdOnEmploymentEnd;
+
+    public Long getAccessGroupIdOnEmploymentEnd() {
+        return accessGroupIdOnEmploymentEnd;
+    }
+
+    public void setAccessGroupIdOnEmploymentEnd(Long accessGroupIdOnEmploymentEnd) {
+        this.accessGroupIdOnEmploymentEnd = accessGroupIdOnEmploymentEnd;
+    }
+
+
+    public Long getReasonCodeId() {
+        return reasonCodeId;
+    }
+
+    public void setReasonCodeId(Long reasonCodeId) {
+        this.reasonCodeId = reasonCodeId;
+    }
 
     public String getEndDate() {
         return endDate;
