@@ -6,9 +6,9 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +23,13 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
     private long intervalLength;
     private String intervalUnit;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
     private long daysLimit;
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private boolean isRestingTimeAllowed;
+    private int restingTime;
+
 
 
     public MinMaxSetting getMinMaxSetting() {
@@ -38,6 +41,22 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     }
     protected float recommendedValue;
 
+
+    public boolean isRestingTimeAllowed() {
+        return isRestingTimeAllowed;
+    }
+
+    public void setRestingTimeAllowed(boolean restingTimeAllowed) {
+        isRestingTimeAllowed = restingTimeAllowed;
+    }
+
+    public int getRestingTime() {
+        return restingTime;
+    }
+
+    public void setRestingTime(int restingTime) {
+        this.restingTime = restingTime;
+    }
 
     public List<PartOfDay> getPartOfDays() {
         return partOfDays;
@@ -90,20 +109,19 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         this.intervalLength = intervalLength;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
     public DaysOffInPeriodWTATemplate(String name, boolean disabled,
-                                      String description,  long intervalLength, long validationStartDateMillis, long minimumDaysOff, String intervalUnit) {
+                                      String description, long intervalLength, LocalDate validationStartDate, long minimumDaysOff, String intervalUnit) {
         this.intervalLength = intervalLength;
         this.daysLimit = minimumDaysOff;
-        this.validationStartDateMillis = validationStartDateMillis;
-
+        this.validationStartDate = validationStartDate;
         this.name = name;
         this.disabled = disabled;
         this.description = description;

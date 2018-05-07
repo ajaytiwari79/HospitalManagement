@@ -10,7 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,14 +27,14 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
     private long noOfPartOfDayWorked;
     private long intervalLength;
     private String intervalUnit;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
 
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
-    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
 
     public MinMaxSetting getMinMaxSetting() {
@@ -116,15 +118,15 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.intervalLength = intervalLength;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
-    public NumberOfPartOfDayShiftsWTATemplate(String name,  boolean disabled, String description,long noOfPartOfDayWorked) {
+    public NumberOfPartOfDayShiftsWTATemplate(String name, boolean disabled, String description, long noOfPartOfDayWorked) {
         this.noOfPartOfDayWorked = noOfPartOfDayWorked;
         this.name = name;
         this.disabled = disabled;

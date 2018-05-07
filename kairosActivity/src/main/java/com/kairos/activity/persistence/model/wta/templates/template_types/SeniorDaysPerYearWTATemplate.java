@@ -4,6 +4,7 @@ import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
 public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
     private List<AgeRange> ageRange;
     private List<Long> activitieIds;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
     private Long numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
@@ -39,12 +40,12 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
     }
 
     public SeniorDaysPerYearWTATemplate(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activitieIds,
-                                        long validationStartDateMillis, Long numberOfWeeks) {
+                                        LocalDate validationStartDate, Long numberOfWeeks) {
         super(name , description);
         this.disabled=disabled;
         this.ageRange = ageRange;
         this.activitieIds = activitieIds;
-        this.validationStartDateMillis = validationStartDateMillis;
+        this.validationStartDate = validationStartDate;
         this.numberOfWeeks = numberOfWeeks;
     }
 
@@ -64,12 +65,12 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
         this.activitieIds = activitieIds;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
     public Long getNumberOfWeeks() {

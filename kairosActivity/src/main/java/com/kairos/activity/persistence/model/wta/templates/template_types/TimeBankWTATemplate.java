@@ -27,7 +27,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
 
     public MinMaxSetting getMinMaxSetting() {

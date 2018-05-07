@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -24,7 +25,7 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
 
     private long minimumRest;//hh:mm
     private long daysWorked;
-    private List<PartOfDay> partOfDays = new ArrayList<>();
+    private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY);
 
     private List<Long> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
