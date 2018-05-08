@@ -53,11 +53,11 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
 
     public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterEntityType, List<String>> filters, Boolean fetchStaffHavingUnitPosition){
         String matchRelationshipQueryForStaff = "";
-        if(fetchStaffHavingUnitPosition && Optional.ofNullable(filters.get(FilterEntityType.EMPLOYMENT_TYPE)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterEntityType.EMPLOYMENT_TYPE)).isPresent()){
             matchRelationshipQueryForStaff+= " MATCH (unitPos)-[HAS_EMPLOYMENT_TYPE]-(employmentType:EmploymentType) "+
                     "WHERE id(employmentType) IN {employmentTypeIds} with user, staff, unitPos";
         }
-        if(fetchStaffHavingUnitPosition && Optional.ofNullable(filters.get(FilterEntityType.EXPERTISE)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterEntityType.EXPERTISE)).isPresent()){
             matchRelationshipQueryForStaff+= " MATCH (unitPos)-[HAS_EXPERTISE_IN]-(expertise:Expertise) "+
                     "WHERE id(expertise) IN {expertiseIds} with user, staff, unitPos";
         }
@@ -89,7 +89,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             queryParameters.put("genderList",
                     filters.get(FilterEntityType.GENDER));
         }
-        if(fetchStaffHavingUnitPosition && Optional.ofNullable(filters.get(FilterEntityType.EMPLOYMENT_TYPE)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterEntityType.EMPLOYMENT_TYPE)).isPresent()){
             queryParameters.put("employmentTypeIds",
                     convertListOfStringIntoLong(filters.get(FilterEntityType.EMPLOYMENT_TYPE)));
         }
@@ -97,7 +97,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             queryParameters.put("engineerTypeIds",
                     convertListOfStringIntoLong(filters.get(FilterEntityType.ENGINEER_TYPE)));
         }
-        if(fetchStaffHavingUnitPosition && Optional.ofNullable(filters.get(FilterEntityType.EXPERTISE)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterEntityType.EXPERTISE)).isPresent()){
             queryParameters.put("expertiseIds",
                     convertListOfStringIntoLong(filters.get(FilterEntityType.EXPERTISE)));
         }
@@ -120,12 +120,6 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         query+= getMatchQueryForRelationshipOfStaffByFilters(filters, fetchStaffHavingUnitPosition);
 
         query+= " Optional MATCH (staff)-[:HAS_CONTACT_ADDRESS]-(contactAddress:ContactAddress) WITH engineerType, staff, user, contactAddress";
-        /*if(Optional.ofNullable(filters.get(FilterEntityType.ENGINEER_TYPE)).isPresent()){
-            query+= " OPTIONAL Match (staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) WHERE id(engineerType) IN {engineerTypeIds} with engineerType,contactAddress, staff, user";
-
-        } else {
-            query+= " OPTIONAL Match (staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) with engineerType,contactAddress, staff, user";
-        }*/
 
         query+= " return distinct {id:id(staff), city:contactAddress.city,province:contactAddress.province, "+
                 "firstName:staff.firstName,lastName:staff.lastName,employedSince :staff.employedSince,"+

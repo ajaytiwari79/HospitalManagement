@@ -173,10 +173,9 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "    match(expertise)-[:" + SUPPORTS_SERVICES + "]-(os) return toString(id(expertise)) as id, expertise.name as value ORDER BY value")
     List<FilterDetailQueryResult> getExpertiseByCountryIdForFilters(Long unitId, Long countryId);*/
 
-    @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) WHERE id(o)={0}\n" +
-            " MATCH (os)-[:"+ORGANIZATION_SUB_SERVICE+"]-(oss:OrganizationService{isEnabled:true}) " +
-            " MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) WHERE id(country) = {1}\n" +
-            " MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(os) return toString(id(expertise)) as id, expertise.name as value ORDER BY value")
+    @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) WHERE id(o)=64\n" +
+            " MATCH (country:Country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE id(country) = 4\n" +
+            " MATCH(expertise)-[:"+SUPPORTS_SERVICES+"]->(os) return toString(id(expertise)) as id, expertise.name as value ORDER BY value")
     List<FilterDetailQueryResult> getExpertiseByCountryIdForFilters(Long unitId, Long countryId);
    
   @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0}" +

@@ -64,12 +64,12 @@ public class StaffFilterService extends UserBaseService{
     ExpertiseGraphRepository expertiseGraphRepository;
 
 
-    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long organizationId){
+    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long organizationId, Long unitId){
         Long userId = UserContext.getUserDetails().getId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organizationId);
 
         FiltersAndFavouriteFiltersDTO filtersAndFavouriteFiltersDTO = new FiltersAndFavouriteFiltersDTO(
-                getAllFilters(moduleId, organizationService.getCountryIdOfOrganization(organizationId), organizationId),
+                getAllFilters(moduleId, organizationService.getCountryIdOfOrganization(organizationId), unitId),
                 getFavouriteFilters(moduleId, staff.getId()));
         return filtersAndFavouriteFiltersDTO;
     }
@@ -106,6 +106,7 @@ public class StaffFilterService extends UserBaseService{
     }
 
     public FilterQueryResult getFilterDataByFilterEntity(FilterEntityType filterEntityType, Long countryId, Long unitId){
+
         FilterQueryResult tempFilterDTO = new FilterQueryResult();
         tempFilterDTO.setName(filterEntityType.name());
         tempFilterDTO.setTitle(filterEntityType.value);
@@ -119,9 +120,12 @@ public class StaffFilterService extends UserBaseService{
             throw new InvalidRequestException("Filter feature is not enabled for the module");
         }
         List<FilterQueryResult> filterDTOs = new ArrayList<>();
-        // TODO refactor to fetch list by stream
+
         filterGroup.getFilterTypes().forEach(filterEntityType -> {
-            filterDTOs.add(getFilterDataByFilterEntity(filterEntityType, countryId, unitId));
+            FilterQueryResult tempFilterQueryResult = getFilterDataByFilterEntity(filterEntityType, countryId, unitId);
+            if(tempFilterQueryResult.getFilterData().size() > 0){
+                filterDTOs.add(getFilterDataByFilterEntity(filterEntityType, countryId, unitId));
+            }
         });
         return filterDTOs;
     }

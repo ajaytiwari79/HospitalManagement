@@ -43,11 +43,11 @@ public class StaffFilterController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.updateFavouriteFilter(filterId, organizationId, staffFilterDTO));
     }
 
-    @RequestMapping(value = "/all_filter/{moduleId}", method = RequestMethod.GET)
+    @RequestMapping(value = UNIT_URL+"/all_filter/{moduleId}", method = RequestMethod.GET)
     @ApiOperation("To get all and favourite filters")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllAndFavouriteFilters(@PathVariable long organizationId, @PathVariable String moduleId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllAndFavouriteFilters(moduleId, organizationId));
+    public ResponseEntity<Map<String, Object>> getAllAndFavouriteFilters(@PathVariable long organizationId, @PathVariable long unitId, @PathVariable String moduleId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllAndFavouriteFilters(moduleId, organizationId, unitId));
     }
 
     @RequestMapping(value = "/filter/{filterId}", method = RequestMethod.DELETE)
@@ -61,8 +61,7 @@ public class StaffFilterController {
     @ApiOperation("Get All staff List available in Org")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId, @RequestParam("unitPosition") boolean allStaffRequired, @RequestBody StaffFilterDTO staffFilterDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, allStaffRequired, staffFilterDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, !allStaffRequired, staffFilterDTO));
     }
-
 
 }
