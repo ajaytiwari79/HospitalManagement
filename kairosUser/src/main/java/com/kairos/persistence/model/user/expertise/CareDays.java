@@ -5,9 +5,9 @@ import org.neo4j.ogm.annotation.NodeEntity;
 
 @NodeEntity
 public class CareDays extends UserBaseEntity implements Comparable<CareDays> {
-    private int from;
-    private int to;
-    private int leavesAllowed;
+    private Integer from;
+    private Integer to;
+    private Integer leavesAllowed;
 
     public CareDays() {
         //Default Constructor
@@ -19,27 +19,27 @@ public class CareDays extends UserBaseEntity implements Comparable<CareDays> {
         this.leavesAllowed = leavesAllowed;
     }
 
-    public int getFrom() {
+    public Integer getFrom() {
         return from;
     }
 
-    public void setFrom(int from) {
+    public void setFrom(Integer from) {
         this.from = from;
     }
 
-    public int getTo() {
+    public Integer getTo() {
         return to;
     }
 
-    public void setTo(int to) {
+    public void setTo(Integer to) {
         this.to = to;
     }
 
-    public int getLeavesAllowed() {
+    public Integer getLeavesAllowed() {
         return leavesAllowed;
     }
 
-    public void setLeavesAllowed(int leavesAllowed) {
+    public void setLeavesAllowed(Integer leavesAllowed) {
         this.leavesAllowed = leavesAllowed;
     }
 
