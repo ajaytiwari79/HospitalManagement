@@ -81,10 +81,6 @@ public class ShiftService extends MongoBaseService {
     @Inject private WTAService wtaService;
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
-        /*boolean valid=staffingLevelMongoRepository.existsByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(),shiftStartDate);
-        if(!valid){
-            throw new DataNotFoundByIdException("Staffing level not found for this Day");
-*/
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid activity Id ." + shiftDTO.getActivityId());
