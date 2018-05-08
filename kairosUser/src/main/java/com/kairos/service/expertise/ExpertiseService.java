@@ -742,17 +742,10 @@ public class ExpertiseService extends UserBaseService {
                     throw new DataNotFoundByIdException("No expertise found" + expertiseId);
                 }
                 validateAgeRange(ageRangeDTO);
-                if (wtaType.equals(SENIOR_DAYS)) {
-                    List<SeniorDays> seniorDays =ObjectMapperUtils.copyPropertiesByMapper(ageRangeDTO, new SeniorDays());
-                    expertise.setSeniorDays(seniorDays);
-                    save(expertise);
-                    ageRangeDTO = ObjectMapperUtils.copyPropertiesByMapper(expertise.getSeniorDays(), new AgeRangeDTO());
-                } else if (wtaType.equals(CHILD_CARE)) {
-                    List<ChildCareDays> childCareDays = ObjectMapperUtils.copyPropertiesByMapper(ageRangeDTO, new ChildCareDays());
-                    expertise.setChildCareDays(childCareDays);
-                    save(expertise);
-                    ageRangeDTO = ObjectMapperUtils.copyPropertiesByMapper(expertise.getChildCareDays(), new AgeRangeDTO());
-                }
+                List<CareDays> careDays=ObjectMapperUtils.copyPropertiesByMapper(ageRangeDTO, new CareDays());
+                expertise.setCareDays(careDays);
+                save(expertise);
+                ageRangeDTO = ObjectMapperUtils.copyPropertiesByMapper(expertise.getChildCareDays(), new AgeRangeDTO());
                 return ageRangeDTO;
             }
 

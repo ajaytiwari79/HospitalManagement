@@ -76,6 +76,9 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = HAS_CHILD_CARE_DAYS)
     private List<ChildCareDays> childCareDays;
 
+    @Relationship(type = HAS_CARE_DAYS)
+    private List<CareDays> careDays;
+
 
     public String getDescription() {
         return description;
@@ -233,6 +236,14 @@ public class Expertise extends UserBaseEntity {
     public void setChildCareDays(List<ChildCareDays> childCareDays) {
         this.childCareDays = childCareDays;
 
+    }
+
+    public List<CareDays> getCareDays() {
+        return careDays;
+    }
+
+    public void setCareDays(List<CareDays> careDays) {
+        this.careDays = careDays;
     }
 
     public Expertise() {
