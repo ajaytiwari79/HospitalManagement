@@ -26,14 +26,14 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
     private boolean proportional;
     private long toTime;
     private String toDayOfWeek;
-    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
     private long intervalLength;
     private String intervalUnit;
-    private List<PartOfDay> partOfDays = new ArrayList<>();
-    private float recommendedValue;
-    private MinMaxSetting minMaxSetting;
     private boolean isRestingTimeAllowed;
     private int restingTime;
+
+    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    protected float recommendedValue;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
 
     public boolean isRestingTimeAllowed() {

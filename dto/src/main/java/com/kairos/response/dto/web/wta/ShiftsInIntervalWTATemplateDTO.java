@@ -9,6 +9,7 @@ import com.kairos.activity.persistence.enums.WTATemplateType;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,13 +25,12 @@ public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private LocalDate validationStartDate;
     private long shiftsLimit;
     private boolean onlyCompositeShifts;//(checkbox)
-    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
-    private List<Long> plannedTimeIds = new ArrayList<>();
-    private List<BigInteger> timeTypeIds = new ArrayList<>();
-    private List<BigInteger> activityIds = new ArrayList<>();
 
-    private List<PartOfDay> partOfDays = new ArrayList<>();
-    private float recommendedValue;
+    private List<BigInteger> timeTypeIds;
+    private List<BigInteger> activityIds;
+    private List<Long> plannedTimeIds;
+    protected List<PartOfDay> partOfDays;
+    protected float recommendedValue;
     private MinMaxSetting minMaxSetting;
 
 

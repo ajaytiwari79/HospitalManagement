@@ -47,6 +47,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate{
         this.activitieIds = activitieIds;
         this.validationStartDate = validationStartDate;
         this.numberOfWeeks = numberOfWeeks;
+        this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
     }
 
     public List<AgeRange> getAgeRange() {

@@ -24,10 +24,9 @@ public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTempla
     private long continuousDayRestHours;
     private long averageRest;//(hours number)
     private String shiftAffiliation;//(List checkbox)
-    private WTATemplateType wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
 
     public MinMaxSetting getMinMaxSetting() {
