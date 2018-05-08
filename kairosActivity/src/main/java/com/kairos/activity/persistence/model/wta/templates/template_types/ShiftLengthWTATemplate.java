@@ -91,5 +91,6 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         super(name, description);
         this.timeLimit = timeLimit;
         this.checkAgainstTimeRules = checkAgainstTimeRules;
+        this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 }

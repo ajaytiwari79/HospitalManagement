@@ -91,6 +91,7 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
         this.description = description;
 
         this.continuousWeekRest=continuousWeekRest;
+        wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
 
     }
 

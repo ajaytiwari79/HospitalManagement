@@ -126,6 +126,7 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         this.disabled = disabled;
         this.description = description;
         this.intervalUnit = intervalUnit;
+        wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
 
     }
 

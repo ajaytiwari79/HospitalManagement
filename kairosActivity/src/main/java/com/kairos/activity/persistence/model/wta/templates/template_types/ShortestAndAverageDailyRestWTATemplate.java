@@ -126,6 +126,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         this.continuousDayRestHours=continuousDayRestHours;
         this.averageRest=averageRest;
         this.shiftAffiliation=shiftAffiliation;
+        wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     }
     public ShortestAndAverageDailyRestWTATemplate() {
         wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
