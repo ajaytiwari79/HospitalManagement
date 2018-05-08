@@ -4,6 +4,8 @@ import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,17 +13,32 @@ import java.util.List;
  */
 public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
     private List<AgeRange> ageRange;
-    private List<Long> activitieIds;
-    private long validationStartDateMillis;
-    private Long numberOfWeeks;
-    private WTATemplateType wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
-    private List<BigInteger> timeTypeIds;
-    private List<Long> plannedTimeIds;
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
+    private List<Long> plannedTimeIds = new ArrayList<>();
+    private LocalDate validationStartDate;
+    private int numberOfWeeks;
+    private boolean borrowLeave;
+    private boolean carryForwardLeave;
 
     public ChildCareDaysCheckWTATemplateDTO() {
         //Default Constructor
     }
 
+    public boolean isBorrowLeave() {
+        return borrowLeave;
+    }
+
+    public void setBorrowLeave(boolean borrowLeave) {
+        this.borrowLeave = borrowLeave;
+    }
+
+    public boolean isCarryForwardLeave() {
+        return carryForwardLeave;
+    }
+
+    public void setCarryForwardLeave(boolean carryForwardLeave) {
+        this.carryForwardLeave = carryForwardLeave;
+    }
 
     public List<BigInteger> getTimeTypeIds() {
         return timeTypeIds;
@@ -39,15 +56,7 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
         this.plannedTimeIds = plannedTimeIds;
     }
 
-    public ChildCareDaysCheckWTATemplateDTO(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activitieIds, long validationStartDateMillis, Long numberOfWeeks) {
-        super(name, description);
-        this.disabled=disabled;
-        this.ageRange = ageRange;
-        this.activitieIds = activitieIds;
-
-        this.validationStartDateMillis = validationStartDateMillis;
-        this.numberOfWeeks = numberOfWeeks;
-    }
+    
 
     public List<AgeRange> getAgeRange() {
         return ageRange;
@@ -57,28 +66,21 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
         this.ageRange = ageRange;
     }
 
-    public List<Long> getActivitieIds() {
-        return activitieIds;
+
+
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setActivitieIds(List<Long> activitieIds) {
-        this.activitieIds = activitieIds;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
-
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
-    }
-
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
-    }
-
-    public Long getNumberOfWeeks() {
+    public int getNumberOfWeeks() {
         return numberOfWeeks;
     }
 
-    public void setNumberOfWeeks(Long numberOfWeeks) {
+    public void setNumberOfWeeks(int numberOfWeeks) {
         this.numberOfWeeks = numberOfWeeks;
     }
 

@@ -10,7 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,16 +25,16 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
     private List<String> balanceType;//multiple check boxes
     private long intervalLength;//
     private String intervalUnit;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
     private long shiftsLimit;
     private boolean onlyCompositeShifts;//(checkbox)
 
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
-    protected List<PartOfDay> partOfDays = new ArrayList<>();
+    protected List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.DAY,PartOfDay.EVENING,PartOfDay.NIGHT);
     protected float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
 
     public MinMaxSetting getMinMaxSetting() {
@@ -99,12 +101,28 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
+    }
+
+    public List<PartOfDay> getPartOfDays() {
+        return partOfDays;
+    }
+
+    public void setPartOfDays(List<PartOfDay> partOfDays) {
+        this.partOfDays = partOfDays;
+    }
+
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
     }
 
     public long getShiftsLimit() {
@@ -125,16 +143,17 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
 
     public ShiftsInIntervalWTATemplate(String name,  boolean disabled,
                                        String description, long intervalLength, String intervalUnit,
-                                       long validationStartDateMillis, long shiftsLimit, boolean onlyCompositeShifts) {
+                                       LocalDate validationStartDate, long shiftsLimit, boolean onlyCompositeShifts) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
         this.balanceType = balanceType;
         this.intervalLength =intervalLength;
         this.intervalUnit=intervalUnit;
-        this.validationStartDateMillis =validationStartDateMillis;
+        this.validationStartDate =validationStartDate;
         this.shiftsLimit =shiftsLimit;
         this.onlyCompositeShifts=onlyCompositeShifts;
+        wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
 
     }
     public ShiftsInIntervalWTATemplate() {

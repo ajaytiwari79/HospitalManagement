@@ -21,11 +21,28 @@ import java.util.List;
 public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
 
     private long continuousWeekRest;
-
+    private long intervalLength;
+    private String intervalUnit;
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
+
+    public long getIntervalLength() {
+        return intervalLength;
+    }
+
+    public void setIntervalLength(long intervalLength) {
+        this.intervalLength = intervalLength;
+    }
+
+    public String getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -74,6 +91,7 @@ public class WeeklyRestPeriodWTATemplate extends WTABaseRuleTemplate {
         this.description = description;
 
         this.continuousWeekRest=continuousWeekRest;
+        wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
 
     }
 
