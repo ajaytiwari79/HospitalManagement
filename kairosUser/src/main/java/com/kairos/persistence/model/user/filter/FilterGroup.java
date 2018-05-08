@@ -3,7 +3,7 @@ package com.kairos.persistence.model.user.filter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.enums.FilterEntityType;
+import com.kairos.persistence.model.enums.FilterType;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -23,7 +23,7 @@ public class FilterGroup extends UserBaseEntity {
     private List<AccessPage> accessPages;
 
 
-    private List<FilterEntityType> filterTypes;
+    private List<FilterType> filterTypes;
 
     public FilterGroup(){
         // default constructor
@@ -37,11 +37,11 @@ public class FilterGroup extends UserBaseEntity {
         this.accessPages = accessPages;
     }
 
-    public List<FilterEntityType> getFilterTypes() {
+    public List<FilterType> getFilterTypes() {
         return filterTypes;
     }
 
-    public void setFilterTypes(List<FilterEntityType> filterTypes) {
+    public void setFilterTypes(List<FilterType> filterTypes) {
         this.filterTypes = filterTypes;
     }
 }

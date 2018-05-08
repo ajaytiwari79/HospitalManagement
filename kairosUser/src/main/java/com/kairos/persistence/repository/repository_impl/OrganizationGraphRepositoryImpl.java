@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.repository_impl;
 
-import com.kairos.persistence.model.enums.FilterEntityType;
+import com.kairos.persistence.model.enums.FilterType;
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
 import com.kairos.response.dto.web.client.ClientFilterDTO;
 import org.apache.commons.lang.StringUtils;
@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.ENGINEER_TYPE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.PEOPLE_IN_HOUSEHOLD_LIST;
 import static com.kairos.persistence.model.enums.CitizenHealthStatus.ALIVE;
 import static com.kairos.persistence.model.enums.CitizenHealthStatus.DECEASED;
@@ -32,14 +31,14 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return subString;
     }
 
-    public String getMatchQueryForPropertiesOfStaffByFilters(Map<FilterEntityType, List<String>> filters, String searchText){
+    public String getMatchQueryForPropertiesOfStaffByFilters(Map<FilterType, List<String>> filters, String searchText){
         String matchQueryForStaff = "";
         int countOfSubString = 0;
-        if(Optional.ofNullable(filters.get(FilterEntityType.STAFF_STATUS)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent()){
             matchQueryForStaff+= appendWhereOrAndPreFixOnQueryString(countOfSubString) + "  staff.currentStatus IN {staffStatusList} ";
             countOfSubString+= 1;
         }
-        if(Optional.ofNullable(filters.get(FilterEntityType.GENDER)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterType.GENDER)).isPresent()){
             matchQueryForStaff+= appendWhereOrAndPreFixOnQueryString(countOfSubString) + " user.gender IN {genderList} ";
             countOfSubString+= 1;
         }
@@ -51,17 +50,17 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return matchQueryForStaff;
     }
 
-    public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterEntityType, List<String>> filters, Boolean fetchStaffHavingUnitPosition){
+    public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters, Boolean fetchStaffHavingUnitPosition){
         String matchRelationshipQueryForStaff = "";
-        if(Optional.ofNullable(filters.get(FilterEntityType.EMPLOYMENT_TYPE)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()){
             matchRelationshipQueryForStaff+= " MATCH (unitPos)-[HAS_EMPLOYMENT_TYPE]-(employmentType:EmploymentType) "+
                     "WHERE id(employmentType) IN {employmentTypeIds} with user, staff, unitPos";
         }
-        if(Optional.ofNullable(filters.get(FilterEntityType.EXPERTISE)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()){
             matchRelationshipQueryForStaff+= " MATCH (unitPos)-[HAS_EXPERTISE_IN]-(expertise:Expertise) "+
                     "WHERE id(expertise) IN {expertiseIds} with user, staff, unitPos";
         }
-        if(Optional.ofNullable(filters.get(FilterEntityType.ENGINEER_TYPE)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterType.ENGINEER_TYPE)).isPresent()){
             matchRelationshipQueryForStaff+= " Match (staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) WHERE id(engineerType) IN {engineerTypeIds} with engineerType, staff, user";
 
         } else {
@@ -75,31 +74,31 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     }
 
     public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, Boolean fetchStaffHavingUnitPosition,
-                                         Map<FilterEntityType, List<String>> filters, String searchText, String imagePath){
+                                         Map<FilterType, List<String>> filters, String searchText, String imagePath){
 
         Map<String, Object> queryParameters = new HashMap();
 
         queryParameters.put("unitId", unitId);
         queryParameters.put("parentOrganizationId", parentOrganizationId);
-        if(Optional.ofNullable(filters.get(FilterEntityType.STAFF_STATUS)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent()){
             queryParameters.put("staffStatusList",
-                    filters.get(FilterEntityType.STAFF_STATUS));
+                    filters.get(FilterType.STAFF_STATUS));
         }
-        if(Optional.ofNullable(filters.get(FilterEntityType.GENDER)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterType.GENDER)).isPresent()){
             queryParameters.put("genderList",
-                    filters.get(FilterEntityType.GENDER));
+                    filters.get(FilterType.GENDER));
         }
-        if(Optional.ofNullable(filters.get(FilterEntityType.EMPLOYMENT_TYPE)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()){
             queryParameters.put("employmentTypeIds",
-                    convertListOfStringIntoLong(filters.get(FilterEntityType.EMPLOYMENT_TYPE)));
+                    convertListOfStringIntoLong(filters.get(FilterType.EMPLOYMENT_TYPE)));
         }
-        if(Optional.ofNullable(filters.get(FilterEntityType.ENGINEER_TYPE)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterType.ENGINEER_TYPE)).isPresent()){
             queryParameters.put("engineerTypeIds",
-                    convertListOfStringIntoLong(filters.get(FilterEntityType.ENGINEER_TYPE)));
+                    convertListOfStringIntoLong(filters.get(FilterType.ENGINEER_TYPE)));
         }
-        if(Optional.ofNullable(filters.get(FilterEntityType.EXPERTISE)).isPresent()){
+        if(Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()){
             queryParameters.put("expertiseIds",
-                    convertListOfStringIntoLong(filters.get(FilterEntityType.EXPERTISE)));
+                    convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
         }
         if(StringUtils.isNotBlank(searchText)){
             queryParameters.put("searchText",searchText);
