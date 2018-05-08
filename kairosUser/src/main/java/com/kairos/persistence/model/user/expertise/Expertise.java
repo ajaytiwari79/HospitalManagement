@@ -71,13 +71,10 @@ public class Expertise extends UserBaseEntity {
     private List<SeniorityLevel> seniorityLevel;
 
     @Relationship(type = HAS_SENIOR_DAYS)
-    private List<SeniorDays> seniorDays;
+    private List<CareDays> seniorDays;
 
     @Relationship(type = HAS_CHILD_CARE_DAYS)
-    private List<ChildCareDays> childCareDays;
-
-    @Relationship(type = HAS_CARE_DAYS)
-    private List<CareDays> careDays;
+    private List<CareDays> childCareDays;
 
 
     public String getDescription() {
@@ -221,29 +218,20 @@ public class Expertise extends UserBaseEntity {
         this.history = history;
     }
 
-    public List<SeniorDays> getSeniorDays() {
+    public List<CareDays> getSeniorDays() {
         return seniorDays;
     }
 
-    public void setSeniorDays(List<SeniorDays> seniorDays) {
+    public void setSeniorDays(List<CareDays> seniorDays) {
         this.seniorDays = seniorDays;
     }
 
-    public List<ChildCareDays> getChildCareDays() {
+    public List<CareDays> getChildCareDays() {
         return childCareDays;
     }
 
-    public void setChildCareDays(List<ChildCareDays> childCareDays) {
+    public void setChildCareDays(List<CareDays> childCareDays) {
         this.childCareDays = childCareDays;
-
-    }
-
-    public List<CareDays> getCareDays() {
-        return careDays;
-    }
-
-    public void setCareDays(List<CareDays> careDays) {
-        this.careDays = careDays;
     }
 
     public Expertise() {
