@@ -15,29 +15,27 @@ public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO{
     private List<Long> activitieIds;
     private LocalDate validationStartDate;
     private Long numberOfWeeks;
-    private WTATemplateType wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
-    private List<BigInteger> timeTypeIds;
-    private List<Long> plannedTimeIds;
+    private boolean borrowLeave;
+    private boolean carryForwardLeave;
 
     public SeniorDaysPerYearWTATemplateDTO() {
         //Default Constructor
     }
 
-
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
+    public boolean isBorrowLeave() {
+        return borrowLeave;
     }
 
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
+    public void setBorrowLeave(boolean borrowLeave) {
+        this.borrowLeave = borrowLeave;
     }
 
-    public List<Long> getPlannedTimeIds() {
-        return plannedTimeIds;
+    public boolean isCarryForwardLeave() {
+        return carryForwardLeave;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
+    public void setCarryForwardLeave(boolean carryForwardLeave) {
+        this.carryForwardLeave = carryForwardLeave;
     }
 
     public LocalDate getValidationStartDate() {

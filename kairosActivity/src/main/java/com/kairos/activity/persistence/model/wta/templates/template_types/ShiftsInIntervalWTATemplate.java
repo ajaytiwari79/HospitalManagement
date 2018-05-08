@@ -153,6 +153,7 @@ public class ShiftsInIntervalWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDate =validationStartDate;
         this.shiftsLimit =shiftsLimit;
         this.onlyCompositeShifts=onlyCompositeShifts;
+        wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
 
     }
     public ShiftsInIntervalWTATemplate() {

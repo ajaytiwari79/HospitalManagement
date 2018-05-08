@@ -113,6 +113,7 @@ public class VetoPerPeriodWTATemplate extends WTABaseRuleTemplate {
         this.disabled = disabled;
         this.description = description;
         this.maximumVetoPercentage = maximumVetoPercentage;
+        wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;
 
     }
 

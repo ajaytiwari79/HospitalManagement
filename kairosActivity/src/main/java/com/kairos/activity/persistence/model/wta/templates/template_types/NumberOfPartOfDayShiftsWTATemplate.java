@@ -131,6 +131,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
+        wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;
     }
     public NumberOfPartOfDayShiftsWTATemplate() {
         wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;

@@ -105,5 +105,6 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         super(name, description);
         this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.limitCount = limitCount;
+        this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 }
