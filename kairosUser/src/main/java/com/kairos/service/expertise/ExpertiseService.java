@@ -731,7 +731,8 @@ public class ExpertiseService extends UserBaseService {
         return expertiseGraphRepository.getUnpublishedExpertise(countryId);
     }
 
-    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
-        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
+    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId,String selectedDate) throws ParseException {
+        Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
+        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId,selectedDateInLong);
     }
 }

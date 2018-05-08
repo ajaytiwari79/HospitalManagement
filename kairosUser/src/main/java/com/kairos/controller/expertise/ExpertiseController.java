@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -68,8 +69,8 @@ public class ExpertiseController {
     @ApiOperation(value = "Get all expertise by orgSubType")
     @RequestMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/organization_sub_type/{organizationSubTypeId}/expertise", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getExpertiseByOrganizationSubType(@PathVariable long countryId,@PathVariable long organizationSubTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByOrganizationSubType(countryId,organizationSubTypeId));
+    public ResponseEntity<Map<String, Object>> getExpertiseByOrganizationSubType(@PathVariable long countryId, @PathVariable long organizationSubTypeId, @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId, selectedDate));
     }
 
 }

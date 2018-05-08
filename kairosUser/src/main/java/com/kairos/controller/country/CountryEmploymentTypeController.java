@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -75,7 +76,7 @@ public class CountryEmploymentTypeController {
     @RequestMapping(value = COUNTRY_URL + "/employment_type_with_organizationType", method = RequestMethod.GET)
     @ApiOperation("get  expertise level region employment Type organizationType  of country")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getOrganizationMappingDetails (@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getOrganizationMappingDetails(countryId));
+    public ResponseEntity<Map<String, Object>> getOrganizationMappingDetails (@PathVariable Long countryId , @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getOrganizationMappingDetails(countryId,selectedDate));
     }
 }

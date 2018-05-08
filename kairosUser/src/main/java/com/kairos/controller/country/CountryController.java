@@ -924,8 +924,8 @@ public class CountryController {
     @ApiOperation(value = "Get Available expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllExpertise(@PathVariable long countryId, @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException{
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getAllExpertise(countryId,selectedDate));
+    public ResponseEntity<Map<String, Object>> getAllExpertise(@PathVariable long countryId, @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getAllExpertise(countryId, selectedDate));
     }
 
     @ApiOperation(value = "Get all union with Service")
@@ -997,8 +997,8 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/organization_type/{orgTypeId}/expertise", method = RequestMethod.GET)
     @ApiOperation("get expertise list for particular organization type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getExpertise(@PathVariable long countryId, @PathVariable long orgTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getExpertise(countryId, orgTypeId));
+    public ResponseEntity<Map<String, Object>> getExpertise(@PathVariable long countryId, @PathVariable long orgTypeId, @RequestParam(value = "selectedDate", required = false) String selectedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getExpertise(countryId, orgTypeId,selectedDate));
     }
 
     @RequestMapping(value = "/country/organizaton_service/{organizationServiceId}", method = RequestMethod.GET)
