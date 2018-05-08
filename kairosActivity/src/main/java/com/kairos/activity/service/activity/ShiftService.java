@@ -264,6 +264,11 @@ public class ShiftService extends MongoBaseService {
         save(shift);
         timeBankService.saveTimeBank(shift.getUnitPositionId(), shift);
         payOutService.savePayOut(shift.getUnitPositionId(), shift);
+        Activity activity = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
+        boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+        applicationContext.publishEvent(new ShiftNotificationEvent(shift.getUnitId(), DateUtils.onlyDate(shift.getStartDate()), shift,
+                false, null,isShiftForPreence,true));
+
     }
 
     public Long countByActivityId(BigInteger activityId) {

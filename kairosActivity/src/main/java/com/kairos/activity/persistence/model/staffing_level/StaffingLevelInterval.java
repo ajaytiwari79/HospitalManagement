@@ -26,6 +26,13 @@ public class StaffingLevelInterval {
         this.staffingLevelDuration = staffingLevelDuration;
     }
 
+    public StaffingLevelInterval(int minNoOfStaff, int maxNoOfStaff, StaffingLevelDuration staffingLevelDuration,int availableNoOfStaff) {
+        this.minNoOfStaff = minNoOfStaff;
+        this.maxNoOfStaff = maxNoOfStaff;
+        this.staffingLevelDuration = staffingLevelDuration;
+        this.availableNoOfStaff = availableNoOfStaff;
+    }
+
     public StaffingLevelInterval(int sequence, int minNoOfStaff, int maxNoOfStaff,
                                  StaffingLevelDuration staffingLevelDuration) {
         this.sequence=sequence;

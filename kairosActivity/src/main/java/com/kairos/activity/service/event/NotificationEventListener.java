@@ -17,7 +17,7 @@ public class NotificationEventListener {
     @Autowired
     StaffingLevelService staffingLevelService;
 
-    //@Async
+    @Async
     @EventListener
     public void shiftNotificationEvent(ShiftNotificationEvent shiftNotificationEvent) throws UnsupportedEncodingException {
          logger.info("shift created details {}",shiftNotificationEvent);

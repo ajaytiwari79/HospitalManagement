@@ -11,6 +11,16 @@ public class ShiftNotificationEvent {
    private boolean shiftUpdated;
    private Shift previousStateShift;
    private boolean isShiftForPresence;
+    private boolean deletedShift;
+
+    public boolean isDeletedShift() {
+        return deletedShift;
+    }
+
+    public void setDeletedShift(boolean deletedShift) {
+        this.deletedShift = deletedShift;
+    }
+
 
     public boolean isShiftForPresence() {
         return isShiftForPresence;
@@ -32,7 +42,20 @@ public class ShiftNotificationEvent {
         this.shiftUpdated = shiftUpdated;
         this.previousStateShift = previousStateShift;
         this.isShiftForPresence = isShiftForPresence;
+
     }
+    public ShiftNotificationEvent(Long unitId, Date currentDate, Shift shift,
+                                  boolean shiftUpdated, Shift previousStateShift, boolean isShiftForPresence,boolean deletedShift) {
+        this.unitId = unitId;
+        this.currentDate = currentDate;
+        this.shift = shift;
+        this.shiftUpdated = shiftUpdated;
+        this.previousStateShift = previousStateShift;
+        this.isShiftForPresence = isShiftForPresence;
+        this.deletedShift = deletedShift;
+
+    }
+
 
     public Long getUnitId() {
         return unitId;
