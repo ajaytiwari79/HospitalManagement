@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -382,8 +383,9 @@ public class ExpertiseService extends UserBaseService {
     }
 
 
-    public List<ExpertiseQueryResult> getAllExpertise(long countryId) {
-        return expertiseGraphRepository.getAllExpertiseByCountryId(countryId);
+    public List<ExpertiseQueryResult> getAllExpertise(long countryId, String selectedDate) throws ParseException {
+        Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
+        return expertiseGraphRepository.getAllExpertiseByCountryId(countryId, selectedDateInLong);
     }
 
 
@@ -729,7 +731,7 @@ public class ExpertiseService extends UserBaseService {
         return expertiseGraphRepository.getUnpublishedExpertise(countryId);
     }
 
-    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId,Long organizationSubTypeId) {
-        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId,organizationSubTypeId);
+    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
+        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
     }
 }
