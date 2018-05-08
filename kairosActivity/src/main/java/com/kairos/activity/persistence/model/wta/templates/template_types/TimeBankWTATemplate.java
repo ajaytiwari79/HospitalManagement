@@ -74,6 +74,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
         this.yellowZone = yellowZone;
         this.forbid = forbid;
         this.allowExtraActivity = allowExtraActivity;
+        wtaTemplateType = WTATemplateType.TIME_BANK;
     }
 
     public TimeBankTypeEnum getFrequency() {
