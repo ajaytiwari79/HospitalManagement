@@ -26,6 +26,7 @@ public class ShiftNotificationEvent {
 
     public ShiftNotificationEvent(Long unitId, Date currentDate, Shift shift,
       boolean shiftUpdated, Shift previousStateShift, boolean isShiftForPresence) {
+        this.unitId = unitId;
         this.currentDate = currentDate;
         this.shift = shift;
         this.shiftUpdated = shiftUpdated;
