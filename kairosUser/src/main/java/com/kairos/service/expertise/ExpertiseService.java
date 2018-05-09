@@ -2,6 +2,7 @@ package com.kairos.service.expertise;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DuplicateDataException;
@@ -40,14 +41,14 @@ import com.kairos.util.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.yaml.snakeyaml.introspector.PropertyUtils;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstants.FULL_TIME_WEEKLY_MINUTES;
-import static com.kairos.constants.AppConstants.NUMBER_OF_WORKING_DAYS_IN_WEEK;
+import static com.kairos.constants.AppConstants.*;
 import static javax.management.timer.Timer.ONE_DAY;
 
 import java.util.ArrayList;
@@ -125,6 +126,7 @@ public class ExpertiseService extends UserBaseService {
                 throw new DataNotFoundByIdException("Invalid expertise Id");
             }
             validateSeniorityLevel(expertise.getSeniorityLevel(), expertiseDTO.getSeniorityLevel(), -1L);
+
             if (expertise.isPublished()) {
                 expertiseResponseDTO = createCopyOfExpertise(expertise, expertiseDTO, countryId);
                 // Expertise is already published Now we need to maintain a tempCopy of it.
@@ -329,6 +331,7 @@ public class ExpertiseService extends UserBaseService {
             seniorityLevel = addNewSeniorityLevelInExpertise(expertise, seniorityLevel, expertiseDTO.getSeniorityLevel());
 
         }
+
         save(expertise);
         expertiseDTO.setId(expertise.getId());
         expertiseDTO.setPublished(expertise.isPublished());
@@ -729,7 +732,40 @@ public class ExpertiseService extends UserBaseService {
         return expertiseGraphRepository.getUnpublishedExpertise(countryId);
     }
 
-    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId,Long organizationSubTypeId) {
-        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId,organizationSubTypeId);
+    public List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
+        return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
     }
-}
+
+    public List<AgeRangeDTO> updateAgeRangeInExpertise (Long expertiseId, List < AgeRangeDTO > ageRangeDTO, String wtaType){
+                Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
+                if (!expertise.isPresent() || expertise.get().isDeleted()) {
+                    throw new DataNotFoundByIdException("No expertise found" + expertiseId);
+                }
+                validateAgeRange(ageRangeDTO);
+
+                List<CareDays> careDays=ObjectMapperUtils.copyPropertiesByMapper(ageRangeDTO, new CareDays());
+                if(wtaType.equalsIgnoreCase(SENIOR_DAYS)){
+                        expertise.get().setSeniorDays(careDays);
+                }
+                else if(wtaType.equalsIgnoreCase(CHILD_CARE)){
+                    expertise.get().setChildCareDays(careDays);
+                }
+                save(expertise.get());
+                ageRangeDTO = ObjectMapperUtils.copyPropertiesByMapper((wtaType.equals(CHILD_CARE)?expertise.get().getChildCareDays():expertise.get().getSeniorDays()), new AgeRangeDTO());
+                return ageRangeDTO;
+            }
+
+            //Validating age range
+            public void validateAgeRange (List < AgeRangeDTO > ageRangeDTO) {
+                Collections.sort(ageRangeDTO);
+                for (int i = 0; i < ageRangeDTO.size(); i++) {
+                    if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
+                        throw new ActionNotPermittedException("Invalid Range: From " + ageRangeDTO.get(i).getFrom() + " to " + ageRangeDTO.get(i).getTo());
+                    if (ageRangeDTO.size() > 1 && i < ageRangeDTO.size() - 1 && ageRangeDTO.get(i).getTo() > ageRangeDTO.get(i + 1).getFrom())
+                        throw new ActionNotPermittedException("Age Range overlap");
+                }
+
+            }
+
+
+    }
