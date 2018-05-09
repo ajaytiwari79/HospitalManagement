@@ -53,9 +53,9 @@ public class ShiftDTO {
     private LocalDate startLocalDate;
     @JsonFormat(pattern = "YYYY-MM-DD")
     private LocalDate endLocalDate;
-    @JsonFormat(pattern = "HH:MM")
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
-    @JsonFormat(pattern = "HH:MM")
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
 
