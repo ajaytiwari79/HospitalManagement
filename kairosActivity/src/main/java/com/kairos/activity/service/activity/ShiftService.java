@@ -191,6 +191,7 @@ public class ShiftService extends MongoBaseService {
         }
 
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
+
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid activity  Id : " + shiftDTO.getActivityId());
         }
@@ -199,6 +200,8 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(shift).isPresent()) {
             throw new DataNotFoundByIdException("Invalid activity  Id : " + shiftDTO.getId());
         }
+        Activity activityOld = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
+
         //copy old state of activity object
         Shift oldStateOfShift = new Shift();
         BeanUtils.copyProperties(shift, oldStateOfShift);
@@ -223,8 +226,10 @@ public class ShiftService extends MongoBaseService {
         Date shiftStartDate = DateUtils.onlyDate(shift.getStartDate());
         //anil m2 notify event for updating staffing level
         boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+
         applicationContext.publishEvent(new ShiftNotificationEvent(staffAdditionalInfoDTO.getUnitId(), shiftStartDate, shift,
-                true, oldStateOfShift,isShiftForPreence));
+                true, oldStateOfShift,isShiftForPreence,false,isActivityChangedFromAbsenceToPresence(activityOld,activity),
+                isActivityChangedFromPresenceToAbsence(activityOld,activity)));
         ShiftQueryResult shiftQueryResult = shift.getShiftQueryResult();
         shiftQueryResult.setName(activity.getName());
         shiftQueryResult.setDurationMinutes(shift.getDurationMinutes());
@@ -267,7 +272,7 @@ public class ShiftService extends MongoBaseService {
         Activity activity = activityRepository.findActivityByIdAndEnabled(shift.getActivityId());
         boolean isShiftForPreence = !(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
         applicationContext.publishEvent(new ShiftNotificationEvent(shift.getUnitId(), DateUtils.onlyDate(shift.getStartDate()), shift,
-                false, null,isShiftForPreence,true));
+                false, null,isShiftForPreence,true,false,false));
 
     }
 
@@ -515,6 +520,24 @@ public class ShiftService extends MongoBaseService {
             }
         }
         return shiftQueryResults;
+    }
+
+    public boolean isActivityChangedFromPresenceToAbsence(Activity activityOld, Activity activityCurrent) {
+        boolean isShiftOldForPresence = !(activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+        boolean isShiftCurrentForAbsence = (activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+
+        return isShiftOldForPresence&&isShiftCurrentForAbsence;
+
+
+    }
+
+    public boolean isActivityChangedFromAbsenceToPresence(Activity activityOld, Activity activityCurrent) {
+        boolean isShiftOldForAbsence = (activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+        boolean isShiftCurrentForPresence = !(activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_DAY")||activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals("FULL_WEEK"));
+
+        return isShiftOldForAbsence&&isShiftCurrentForPresence;
+
+
     }
 
 }

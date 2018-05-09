@@ -10,6 +10,7 @@ import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.messaging.wshandlers.StaffingLevelGraphStompClientWebSocketHandler;
 import com.kairos.activity.persistence.model.activity.Activity;
+import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.activity.tabs.ActivityCategory;
 import com.kairos.activity.persistence.model.staffing_level.*;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
@@ -212,9 +213,24 @@ public class StaffingLevelService extends MongoBaseService {
             staffingLevel = shiftNotificationEvent.isShiftForPresence()? updateStaffingLevelAvailableStaffCountForDeletedShift(staffingLevel,shiftNotificationEvent) :
                     updateAbsenceStaffingLevelAvailableStaffCountForDeletedShift(staffingLevel,shiftNotificationEvent);
         }
-        else if (shiftNotificationEvent.isShiftUpdated() && isShiftPeriodModified(shiftNotificationEvent)) {
+        else if (shiftNotificationEvent.isShiftUpdated() && (isShiftPeriodModified(shiftNotificationEvent)||shiftNotificationEvent.isActivityChangedFromAbsenceToPresence()
+        ||shiftNotificationEvent.isActivityChangedFromPresenceToAbsence())) {
             logger.info("shift period is modified");
-            staffingLevel = shiftNotificationEvent.isShiftForPresence()? updateStaffingLevelAvailableStaffCountForUpdatedShift(staffingLevel, shiftNotificationEvent) : staffingLevel;
+            if(shiftNotificationEvent.isActivityChangedFromPresenceToAbsence()) {
+                Shift shiftCurrent = shiftNotificationEvent.getShift();
+                shiftNotificationEvent.setShift(shiftNotificationEvent.getPreviousStateShift());
+                staffingLevel = updateStaffingLevelAvailableStaffCountForDeletedShift(staffingLevel,shiftNotificationEvent);
+                shiftNotificationEvent.setShift(shiftCurrent);
+                staffingLevel = updateAbsenceStaffingLevelAvailableStaffCountForNewlyCreatedShift(staffingLevel,shiftNotificationEvent);
+            }
+            else if(shiftNotificationEvent.isActivityChangedFromAbsenceToPresence()) {
+                staffingLevel = updateAbsenceStaffingLevelAvailableStaffCountForDeletedShift(staffingLevel,shiftNotificationEvent);
+                staffingLevel = updateStaffingLevelAvailableStaffCountForNewlyCreatedShift(staffingLevel,shiftNotificationEvent);
+            }
+            else {
+                staffingLevel = shiftNotificationEvent.isShiftForPresence()? updateStaffingLevelAvailableStaffCountForUpdatedShift(staffingLevel, shiftNotificationEvent) : staffingLevel;
+
+            }
             ;
         } else if (!shiftNotificationEvent.isShiftUpdated()) {
             logger.info("new shift is created");

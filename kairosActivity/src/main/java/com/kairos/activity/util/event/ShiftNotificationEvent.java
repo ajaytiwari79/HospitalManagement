@@ -11,7 +11,27 @@ public class ShiftNotificationEvent {
    private boolean shiftUpdated;
    private Shift previousStateShift;
    private boolean isShiftForPresence;
-    private boolean deletedShift;
+   private boolean deletedShift;
+   private boolean isActivityChangedFromPresenceToAbsence;
+   private boolean isActivityChangedFromAbsenceToPresence;
+
+
+    public boolean isActivityChangedFromPresenceToAbsence() {
+        return isActivityChangedFromPresenceToAbsence;
+    }
+
+    public void setActivityChangedFromPresenceToAbsence(boolean activityChangedFromPresenceToAbsence) {
+        isActivityChangedFromPresenceToAbsence = activityChangedFromPresenceToAbsence;
+    }
+
+    public boolean isActivityChangedFromAbsenceToPresence() {
+        return isActivityChangedFromAbsenceToPresence;
+    }
+
+    public void setActivityChangedFromAbsenceToPresence(boolean activityChangedFromAbsenceToPresence) {
+        isActivityChangedFromAbsenceToPresence = activityChangedFromAbsenceToPresence;
+    }
+
 
     public boolean isDeletedShift() {
         return deletedShift;
@@ -45,7 +65,8 @@ public class ShiftNotificationEvent {
 
     }
     public ShiftNotificationEvent(Long unitId, Date currentDate, Shift shift,
-                                  boolean shiftUpdated, Shift previousStateShift, boolean isShiftForPresence,boolean deletedShift) {
+                                  boolean shiftUpdated, Shift previousStateShift, boolean isShiftForPresence,boolean deletedShift,boolean isActivityChangedFromAbsenceToPresence,
+                                  boolean isActivityChangedFromPresenceToAbsence) {
         this.unitId = unitId;
         this.currentDate = currentDate;
         this.shift = shift;
@@ -53,6 +74,8 @@ public class ShiftNotificationEvent {
         this.previousStateShift = previousStateShift;
         this.isShiftForPresence = isShiftForPresence;
         this.deletedShift = deletedShift;
+        this.isActivityChangedFromAbsenceToPresence = isActivityChangedFromAbsenceToPresence;
+        this.isActivityChangedFromPresenceToAbsence = isActivityChangedFromPresenceToAbsence;
 
     }
 
