@@ -112,7 +112,7 @@ public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTempla
     }
 
     public ShortestAndAverageDailyRestWTATemplateDTO() {
-
+        this.wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     }
 
 }

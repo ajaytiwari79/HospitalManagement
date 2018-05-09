@@ -140,5 +140,6 @@ public class ShiftsInIntervalWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
 
     public ShiftsInIntervalWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.NUMBER_OF_SHIFTS_IN_INTERVAL;
     }
 }
