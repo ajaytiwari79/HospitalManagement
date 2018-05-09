@@ -49,7 +49,6 @@ public class CountryExpertiseDTO {
     @Valid
     private SeniorityLevelDTO seniorityLevel;
 
-
     private List<Long> tags;
     private Boolean published;
 

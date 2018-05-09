@@ -8,5 +8,5 @@ import java.math.BigInteger;
 public class QuestionAnswerPair {
 
     private BigInteger nightWorkerQuestionId;
-    private boolean answer;
+    private Boolean answer;
 }

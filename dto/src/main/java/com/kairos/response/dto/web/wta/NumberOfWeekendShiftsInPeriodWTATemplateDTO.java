@@ -180,6 +180,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
 
     }
     public NumberOfWeekendShiftsInPeriodWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
     }
 
 

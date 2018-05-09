@@ -24,8 +24,10 @@ public class NightWorkerMongoRepositoryImpl implements CustomNightWorkerMongoRep
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("staffId").is(staffId)),
-                unwind("staffQuestionnaires", true),
-                lookup("staffQuestionnaire", "tags", "_id", "tags_data"),
+                unwind("staffQuestionnairesId", true),
+                lookup("staffQuestionnaire", "staffQuestionnairesId", "_id", "staffQuestionnairesList"),
+                unwind("staffQuestionnairesList", true),
+                group("$id"),
                 lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
                 match(Criteria.where("current_phase_data.sequence").ne(sequence)), count().as("countOfPhasesWithOtherSequence")
         );

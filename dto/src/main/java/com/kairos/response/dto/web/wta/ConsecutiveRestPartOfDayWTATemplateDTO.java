@@ -22,7 +22,6 @@ public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateD
 
     private long minimumRest;//hh:mm
     private long daysWorked;
-    private WTATemplateType wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
     protected List<PartOfDay> partOfDays = new ArrayList<>();
 
     private List<Long> plannedTimeIds = new ArrayList<>();
@@ -107,6 +106,7 @@ public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateD
 
     }
     public ConsecutiveRestPartOfDayWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
     }
 
 }

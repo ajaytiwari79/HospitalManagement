@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -10,6 +11,7 @@ import java.util.List;
 /**
  * Created by pavan on 7/5/18.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
 public class StaffExpertiseQueryResult {
     private Long id;

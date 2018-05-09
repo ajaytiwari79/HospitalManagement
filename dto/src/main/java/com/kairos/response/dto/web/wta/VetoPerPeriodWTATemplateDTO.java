@@ -23,7 +23,7 @@ import java.util.List;
 public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private double maximumVetoPercentage;
-    private WTATemplateType wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;;
+
 
     private List<BigInteger> activityIds;
     private List<Long> plannedTimeIds;
@@ -115,6 +115,7 @@ public class VetoPerPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     }
     public VetoPerPeriodWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.VETO_PER_PERIOD;;
     }
 
 }

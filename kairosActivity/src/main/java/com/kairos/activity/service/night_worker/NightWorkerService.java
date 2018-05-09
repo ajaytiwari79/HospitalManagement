@@ -2,8 +2,11 @@ package com.kairos.activity.service.night_worker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.persistence.model.night_worker.NightWorker;
+import com.kairos.activity.persistence.model.night_worker.QuestionAnswerPair;
+import com.kairos.activity.persistence.model.night_worker.StaffQuestionnaire;
 import com.kairos.activity.persistence.repository.night_worker.NightWorkerMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.persistence.model.enums.PersonType;
 import com.kairos.response.dto.web.night_worker.NightWorkerGeneralResponseDTO;
 import com.kairos.response.dto.web.night_worker.NightWorkerQuestionnaireDTO;
@@ -32,7 +35,7 @@ public class NightWorkerService extends MongoBaseService {
         return null;
     }
 
-    public NightWorkerGeneralResponseDTO getNightWorkerDetailsOfStaff(Long staffId){
+    public NightWorkerGeneralResponseDTO getNightWorkerDetailsOfStaff(Long unitId, Long staffId){
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
         if(Optional.ofNullable(nightWorker).isPresent()){
             ObjectMapper objectMapper =  new ObjectMapper();
@@ -42,7 +45,7 @@ public class NightWorkerService extends MongoBaseService {
         }
     }
 
-    public NightWorkerGeneralResponseDTO updateNightWorkerGeneralDetails(Long staffId, NightWorkerGeneralResponseDTO nightWorkerDTO){
+    public NightWorkerGeneralResponseDTO updateNightWorkerGeneralDetails(Long unitId, Long staffId, NightWorkerGeneralResponseDTO nightWorkerDTO){
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
         if(Optional.ofNullable(nightWorker).isPresent()){
             nightWorker.setNightWorker(nightWorkerDTO.isNightWorker());
@@ -55,6 +58,16 @@ public class NightWorkerService extends MongoBaseService {
         save(nightWorker);
         ObjectMapper objectMapper =  new ObjectMapper();
         return objectMapper.convertValue(nightWorker, NightWorkerGeneralResponseDTO.class);
+    }
+
+    public StaffQuestionnaire addNightWorkerQuestionnaire(Long unitId, Long staffId, QuestionnaireAnswerResponseDTO answerResponseDTO){
+        NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
+        StaffQuestionnaire staffQuestionnaire = new StaffQuestionnaire(
+                ObjectMapperUtils.copyProperties(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
+        save(staffQuestionnaire);
+        nightWorker.getStaffQuestionnaires().add(staffQuestionnaire.getId());
+        save(nightWorker);
+        return staffQuestionnaire;
     }
 
     /*public List<QuestionnaireAnswerResponseDTO> updateNightWorkerGeneralDetails(Long staffId, QuestionnaireAnswerResponseDTO questionnaireDTO){

@@ -11,4 +11,20 @@ import java.util.List;
 public class StaffQuestionnaire extends MongoBaseEntity{
 
     private List<QuestionAnswerPair> questionAnswerPair;
+
+    public StaffQuestionnaire(){
+        // default constructor
+    }
+
+    public StaffQuestionnaire(List<QuestionAnswerPair> questionAnswerPair){
+        this.questionAnswerPair = questionAnswerPair;
+    }
+
+    public List<QuestionAnswerPair> getQuestionAnswerPair() {
+        return questionAnswerPair;
+    }
+
+    public void setQuestionAnswerPair(List<QuestionAnswerPair> questionAnswerPair) {
+        this.questionAnswerPair = questionAnswerPair;
+    }
 }

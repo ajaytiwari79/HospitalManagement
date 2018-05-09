@@ -1,4 +1,3 @@
-
 1. Query to add list of questions for Night Worker
 try {
    db.nightWorkerQuestion.insertMany( [
@@ -17,3 +16,5 @@ try {
 } catch (e) {
    print (e);
 }
+
+db.shifts.updateMany({},{$set:{shiftState:"UNPUBLISHED"}})

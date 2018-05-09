@@ -452,6 +452,7 @@ public class CountryService extends UserBaseService {
      * @param countryId
      * @return
      */
+    //TODO Reduce web service calls/multiple calls
     public CTARuleTemplateDefaultDataWrapper getDefaultDataForCTATemplate(Long countryId, Long unitId){
         List<ActivityTypeDTO> activityTypeDTOS = new ArrayList<>();
          if(Optional.ofNullable(unitId).isPresent()){
