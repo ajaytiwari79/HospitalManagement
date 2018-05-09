@@ -1,0 +1,80 @@
+package com.kairos.activity.service.priority_group;
+
+import com.kairos.activity.custom_exception.DataNotFoundByIdException;
+import com.kairos.activity.persistence.model.priority_group.*;
+import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRepository;
+import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.util.ObjectMapperUtils;
+import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class PriorityGroupService extends MongoBaseService {
+    @Inject
+    PriorityGroupRepository priorityGroupRepository;
+
+    public boolean createPriorityGroupForCountry(long countryId) {
+        List<PriorityGroup> priorityGroups = new ArrayList<>();
+        OpenShiftCancelProcess openShiftCancelProcess = new OpenShiftCancelProcess(true, false, true, true, 10);
+        RoundRule roundRule = new RoundRule(10, 10, 10, 10);
+        StaffExcludeFilter staffExcludeFilter = new StaffExcludeFilter(false, 10, 10, 10, 10, 10, 10,
+                10, 10, false, 10, 10, 10, false, false, false);
+        StaffIncludeFilter staffIncludeFilter = new StaffIncludeFilter(false, false, false, false, false, new ArrayList<BigInteger>(), new ArrayList<BigInteger>());
+        PriorityGroup priorityGroup1 = new PriorityGroup(1,true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
+        PriorityGroup priorityGroup2 = new PriorityGroup(2,true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
+        PriorityGroup priorityGroup3 = new PriorityGroup(3,true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
+        PriorityGroup priorityGroup4 = new PriorityGroup(4,true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
+        priorityGroups.add(priorityGroup1);
+        priorityGroups.add(priorityGroup2);
+        priorityGroups.add(priorityGroup3);
+        priorityGroups.add(priorityGroup4);
+        save(priorityGroups);
+
+        return true;
+    }
+
+    public List<PriorityGroupDTO> findAllPriorityGroups(long countryId) {
+        return priorityGroupRepository.findByCountryIdAndDeletedFalse(countryId);
+    }
+
+    public PriorityGroupDTO updatePriorityGroup(long countryId, BigInteger priorityGroupId, PriorityGroupDTO priorityGroupDTO) {
+        PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndCountryIdAndDeletedFalse(priorityGroupId, countryId);
+        if (!Optional.ofNullable(priorityGroup).isPresent()) {
+            throw new DataNotFoundByIdException("Priority group not found" + priorityGroupId);
+        }
+        ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
+        save(priorityGroup);
+        return new PriorityGroupDTO(priorityGroup.getId(), priorityGroup.isActivated(),
+                priorityGroup.getOpenShiftCancelProcess(), priorityGroup.getRoundRule(), priorityGroup.getStaffExcludeFilter(), priorityGroup.getStaffIncludeFilter(), priorityGroup.getCountryId(), priorityGroup.getUnitId());
+    }
+
+    public boolean deletePriorityGroup(long countryId, BigInteger priorityGroupId) {
+        PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndCountryIdAndDeletedFalse(priorityGroupId, countryId);
+        if (!Optional.ofNullable(priorityGroup).isPresent()) {
+            throw new DataNotFoundByIdException("Priority group not found" + priorityGroupId);
+        }
+        priorityGroup.setDeleted(true);
+        save(priorityGroup);
+        return true;
+    }
+
+    public boolean copyPriorityGroupsForUnit(long unitId,long countryId){
+        List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByCountryIdAndActivatedTrue(countryId);
+        priorityGroups.forEach(priorityGroup -> {
+            priorityGroup.setCountryParentId(priorityGroup.getId());
+            priorityGroup.setUnitId(unitId);
+            priorityGroup.setId(null);
+            priorityGroup.setCountryId(null);
+            });
+        save(priorityGroups);
+        return true;
+    }
+
+
+}
