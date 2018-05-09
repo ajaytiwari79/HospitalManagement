@@ -11,6 +11,8 @@ import com.kairos.activity.persistence.repository.common.MongoSequenceRepository
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.response.dto.activity.ActivityTagDTO;
 import com.kairos.activity.service.phase.PhaseService;
+import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.enums.shift.ShiftState;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -141,16 +143,19 @@ public class ShiftIntegrationServiceTest {
 
     @Test
     public void publishShifts() throws Exception {
+
         List<BigInteger> shifts = new ArrayList<>();
-        shifts.add(new BigInteger("4"));
-        shifts.add(new BigInteger("6"));
-        HttpEntity<List<BigInteger>> requestBodyData = new HttpEntity<>(shifts);
+        shifts.add(new BigInteger("110"));
+        shifts.add(new BigInteger("109"));
+        ShiftPublishDTO shiftPublishDTO = new ShiftPublishDTO(shifts, ShiftState.FIXED);
+
+        HttpEntity<ShiftPublishDTO> requestBodyData = new HttpEntity<>(shiftPublishDTO);
 
         ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> typeReference =
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>>() {
                 };
         ResponseEntity<RestTemplateResponseEnvelope<Map<String, List<BigInteger>>>> response = restTemplate.exchange(
-                baseUrlForUnit + "/publish", HttpMethod.PUT, requestBodyData, typeReference);
+                baseUrlForUnit + "/publish_shifts", HttpMethod.PUT, requestBodyData, typeReference);
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 

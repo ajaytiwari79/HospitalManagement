@@ -3,6 +3,7 @@ package com.kairos.activity.controller.activity;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.service.activity.ShiftService;
+import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.activity.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -110,8 +111,8 @@ public class ShiftController {
     @ApiOperation("publish Shifts")
     @PutMapping(value = "/publish_shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> publishShifts(@RequestBody List<BigInteger> shiftIds) {
+    public ResponseEntity<Map<String, Object>> publishShifts(@RequestBody @Valid  ShiftPublishDTO shiftPublishDTO) {
         //List<BigInteger> shiftIds= requestData.get("shiftIds");
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.publishShifts(shiftIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.publishShifts(shiftPublishDTO));
     }
 }

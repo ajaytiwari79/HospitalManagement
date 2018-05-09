@@ -16,6 +16,7 @@ import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.response.dto.shift.ShiftQueryResult;
+import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.enums.shift.ShiftState;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.kairos.activity.service.MongoBaseService;
@@ -176,6 +177,15 @@ public class ShiftService extends MongoBaseService {
 
 
     public ShiftQueryResult updateShift(Long organizationId, ShiftDTO shiftDTO, String type) {
+
+        Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
+        if (!Optional.ofNullable(shift).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid shift  Id : " + shiftDTO.getId());
+        }
+
+        if (shift.getShiftState().equals(ShiftState.FIXED) || shift.getShiftState().equals(ShiftState.PUBLISHED) || shift.getShiftState().equals(ShiftState.LOCKED)) {
+            throw new DataNotFoundByIdException("Shift cant be edited please change state. Current state is " + shift.getShiftState());
+        }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), null);
         WTAResponseDTO wtaResponseDTO = wtaService.getWta(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
         staffAdditionalInfoDTO.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
@@ -188,10 +198,7 @@ public class ShiftService extends MongoBaseService {
             throw new DataNotFoundByIdException("Invalid activity  Id : " + shiftDTO.getActivityId());
         }
 
-        Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
-        if (!Optional.ofNullable(shift).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid activity  Id : " + shiftDTO.getId());
-        }
+
         //copy old state of activity object
         Shift oldStateOfShift = new Shift();
         BeanUtils.copyProperties(shift, oldStateOfShift);
@@ -203,8 +210,8 @@ public class ShiftService extends MongoBaseService {
         shift.setBonusTimeBank(shiftDTO.getBonusTimeBank());
         shift.setAmount(shiftDTO.getAmount());
         shift.setRemarks(shiftDTO.getRemarks());
-        shift.setStartDate(shiftDTO.getStartDate());
-        shift.setEndDate(shiftDTO.getEndDate());
+        shift.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(shiftDTO.getStartLocalDate(),shiftDTO.getStartTime()));
+        shift.setEndDate( DateUtils.getDateByLocalDateAndLocalTime(shiftDTO.getEndLocalDate(),shiftDTO.getEndTime()));
         shift.setName(activity.getName());
         shift.setDurationMinutes(shiftDTO.getDurationMinutes());
 
@@ -504,8 +511,8 @@ public class ShiftService extends MongoBaseService {
         return shiftQueryResults;
     }
 
-    public Map<String, List<BigInteger>> publishShifts(List<BigInteger> shiftIds) {
-        List<Shift> shifts = shiftMongoRepository.findByIdInAndDeletedFalse(shiftIds);
+    public Map<String, List<BigInteger>> publishShifts(ShiftPublishDTO shiftPublishDTO) {
+        List<Shift> shifts = shiftMongoRepository.findByIdInAndDeletedFalse(shiftPublishDTO.getShiftIds());
 
         List<BigInteger> success = new ArrayList<>();
         List<BigInteger> error = new ArrayList<>();
@@ -514,8 +521,8 @@ public class ShiftService extends MongoBaseService {
         response.put("error", error);
         if (!shifts.isEmpty()) {
             shifts.forEach(shift -> {
-                if (shift.getShiftState().equals(ShiftState.UNPUBLISHED)) {
-                    shift.setShiftState(ShiftState.PUBLISHED);
+                if (!shift.isDeleted()) {
+                    shift.setShiftState(shiftPublishDTO.getShiftState());
                     success.add(shift.getId());
                 } else {
                     error.add(shift.getId());
