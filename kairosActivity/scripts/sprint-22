@@ -1,0 +1,1 @@
+db.shifts.updateMany({},{$set:{shiftState:"UNPUBLISHED"}})
