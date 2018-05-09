@@ -2,6 +2,7 @@ package com.kairos.activity.persistence.repository.night_worker;
 
 import com.kairos.activity.persistence.model.night_worker.NightWorker;
 import com.kairos.activity.persistence.repository.custom_repository.MongoBaseRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
 
@@ -10,4 +11,6 @@ import java.math.BigInteger;
  */
 public interface NightWorkerMongoRepository extends MongoBaseRepository<NightWorker, BigInteger>, CustomNightWorkerMongoRepository{
 
+    @Query(value = "{ unitId:?0 }")
+    NightWorker findByStaffId(Long staffId);
 }

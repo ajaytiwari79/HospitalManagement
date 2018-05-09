@@ -10,9 +10,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.count;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  * Created by prerna on 8/5/18.
@@ -22,14 +20,12 @@ public class NightWorkerMongoRepositoryImpl implements CustomNightWorkerMongoRep
     @Inject
     MongoTemplate mongoTemplate;
 
-    /*public  boolean checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(Long unitId, Date startDate, Date endDate, int sequence) {
+    /*public  boolean getNightWorkerGeneralDetails(Long staffId) {
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("unitId").is(unitId)
-                        .orOperator(
-                                Criteria.where("startDate").gte(startDate).lte(endDate),
-                                Criteria.where("endDate").gte(startDate).lte(endDate)
-                        )),
+                match(Criteria.where("deleted").is(false).and("staffId").is(staffId)),
+                unwind("staffQuestionnaires", true),
+                lookup("staffQuestionnaire", "tags", "_id", "tags_data"),
                 lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
                 match(Criteria.where("current_phase_data.sequence").ne(sequence)), count().as("countOfPhasesWithOtherSequence")
         );
