@@ -534,7 +534,7 @@ public class UnitPositionService extends UserBaseService {
      * @author vipul
      * used to get all positions of organization n by organization and staff Id
      * */
-    public EmploymentUnitPositionDTO getUnitPositionsOfStaff(long id, long staffId, String type) {
+    public EmploymentUnitPositionDTO getUnitPositionsOfStaff(long id, long staffId, boolean allOrganization) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
             throw new DataNotFoundByIdException("Invalid Staff Id" + staffId);
@@ -546,7 +546,7 @@ public class UnitPositionService extends UserBaseService {
         Employment employment = employmentReasonCode.getEmployment();
         Long reasonCodeId = Optional.ofNullable(employmentReasonCode.getReasonCode()).isPresent()?employmentReasonCode.getReasonCode().getId():null;
         EmploymentQueryResult employmentQueryResult = new EmploymentQueryResult(employment.getId(),employment.getStartDateMillis(),employment.getEndDateMillis(),reasonCodeId,employment.getAccessGroupIdOnEmploymentEnd());
-        List<UnitPositionQueryResult> unitPositionQueryResults = unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId());
+        List<UnitPositionQueryResult> unitPositionQueryResults = (allOrganization)?unitPositionGraphRepository.getAllUnitPositionsByUser(user.getId()):unitPositionGraphRepository.getAllUnitPositionsForCurrentOrganization(staffId);
         List<WTAResponseDTO> wtaResponseDTOS = workingTimeAgreementRestClient.getWTAByIds(unitPositionQueryResults.stream().map(u->u.getWorkingTimeAgreementId()).collect(Collectors.toList()));
         Map<BigInteger,WTAResponseDTO> wtaResponseDTOMap = wtaResponseDTOS.stream().collect(Collectors.toMap(w->w.getId(),w->w));
         unitPositionQueryResults.forEach(u->{
