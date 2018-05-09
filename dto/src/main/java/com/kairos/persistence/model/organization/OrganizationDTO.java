@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.client.dto.organization.CompanyType;
+import com.kairos.client.dto.organization.CompanyUnitType;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -18,26 +20,40 @@ public class OrganizationDTO {
     @NotNull(message = "error.name.notnull")
     private String name;
     private String description;
-    private boolean isPreKairos;
-    private List<Long> organizationTypeId;
-    private List<Long> organizationSubTypeId;
+    private boolean preKairos;
+    private List<Long> typeId;
+    private List<Long> subTypeId;
     private List<Long> businessTypeId;
-    private AddressDTO contactAddress;
+    private AddressDTO homeAddress;
     private int dayShiftTimeDeduction = 4; //in percentage
-    private boolean isKairosHub;
     private int nightShiftTimeDeduction = 7; //in percentage
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
     private boolean isOneTimeSyncPerformed;
     private LocalTime nightStartTime;
     private LocalTime nightEndTime;
+    private String externalId;
 
-    public boolean isKairosHub() {
-        return isKairosHub;
-    }
+    private String desiredUrl;
+    private String shortCompanyName;
+    private Long companyCategoryId;
+    private Integer kairosCompanyId;
+    private CompanyType companyType;
 
-    public void setKairosHub(boolean kairosHub) {
-        isKairosHub = kairosHub;
-    }
+    private String vatId;
+
+    private boolean costCenter;
+    private Integer costCenterId;
+    private CompanyUnitType companyUnitType;
+
+
+    private List<Long> businessTypeIds;
+    private boolean isAddressProtected;
+    private boolean isVerifiedByGoogleMap;
+    private boolean kairosHub;
+    private Long levelId;
+    private  Boolean union;
+    private boolean boardingCompleted;
+
 
     public Long getId() {
         return id;
@@ -59,44 +75,36 @@ public class OrganizationDTO {
         return name;
     }
 
-    public AddressDTO getContactAddress() {
-        return contactAddress;
+    public AddressDTO getHomeAddress() {
+        return homeAddress;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setContactAddress(AddressDTO contactAddress) {
-        this.contactAddress = contactAddress;
+    public void setHomeAddress(AddressDTO homeAddress) {
+        this.homeAddress = homeAddress;
     }
 
-    public boolean isPreKairos() {
-        return isPreKairos;
+    public List<Long> getTypeId() {
+        return typeId;
     }
 
-    public void setPreKairos(boolean preKairos) {
-        isPreKairos = preKairos;
-    }
-
-    public List<Long> getOrganizationTypeId() {
-        return organizationTypeId;
-    }
-
-    public List<Long> getOrganizationSubTypeId() {
-        return organizationSubTypeId;
+    public List<Long> getSubTypeId() {
+        return subTypeId;
     }
 
     public List<Long> getBusinessTypeId() {
         return businessTypeId;
     }
 
-    public void setOrganizationTypeId(List<Long> organizationTypeId) {
-        this.organizationTypeId = organizationTypeId;
+    public void setTypeId(List<Long> typeId) {
+        this.typeId = typeId;
     }
 
-    public void setOrganizationSubTypeId(List<Long> organizationSubTypeId) {
-        this.organizationSubTypeId = organizationSubTypeId;
+    public void setSubTypeId(List<Long> subTypeId) {
+        this.subTypeId = subTypeId;
     }
 
     public void setBusinessTypeId(List<Long> businessTypeId) {
@@ -149,5 +157,149 @@ public class OrganizationDTO {
 
     public void setNightEndTime(LocalTime nightEndTime) {
         this.nightEndTime = nightEndTime;
+    }
+
+    public String getDesiredUrl() {
+        return desiredUrl;
+    }
+
+    public void setDesiredUrl(String desiredUrl) {
+        this.desiredUrl = desiredUrl;
+    }
+
+    public String getShortCompanyName() {
+        return shortCompanyName;
+    }
+
+    public void setShortCompanyName(String shortCompanyName) {
+        this.shortCompanyName = shortCompanyName;
+    }
+
+    public Long getCompanyCategoryId() {
+        return companyCategoryId;
+    }
+
+    public void setCompanyCategoryId(Long companyCategoryId) {
+        this.companyCategoryId = companyCategoryId;
+    }
+
+    public Integer getKairosCompanyId() {
+        return kairosCompanyId;
+    }
+
+    public void setKairosCompanyId(Integer kairosCompanyId) {
+        this.kairosCompanyId = kairosCompanyId;
+    }
+
+    public CompanyType getCompanyType() {
+        return companyType;
+    }
+
+    public void setCompanyType(CompanyType companyType) {
+        this.companyType = companyType;
+    }
+
+    public String getVatId() {
+        return vatId;
+    }
+
+    public void setVatId(String vatId) {
+        this.vatId = vatId;
+    }
+
+    public boolean isCostCenter() {
+        return costCenter;
+    }
+
+    public void setCostCenter(boolean costCenter) {
+        this.costCenter = costCenter;
+    }
+
+    public Integer getCostCenterId() {
+        return costCenterId;
+    }
+
+    public void setCostCenterId(Integer costCenterId) {
+        this.costCenterId = costCenterId;
+    }
+
+    public CompanyUnitType getCompanyUnitType() {
+        return companyUnitType;
+    }
+
+    public void setCompanyUnitType(CompanyUnitType companyUnitType) {
+        this.companyUnitType = companyUnitType;
+    }
+
+    public List<Long> getBusinessTypeIds() {
+        return businessTypeIds;
+    }
+
+    public void setBusinessTypeIds(List<Long> businessTypeIds) {
+        this.businessTypeIds = businessTypeIds;
+    }
+
+    public boolean isAddressProtected() {
+        return isAddressProtected;
+    }
+
+    public void setAddressProtected(boolean addressProtected) {
+        isAddressProtected = addressProtected;
+    }
+
+    public boolean isVerifiedByGoogleMap() {
+        return isVerifiedByGoogleMap;
+    }
+
+    public void setVerifiedByGoogleMap(boolean verifiedByGoogleMap) {
+        isVerifiedByGoogleMap = verifiedByGoogleMap;
+    }
+
+    public boolean isKairosHub() {
+        return kairosHub;
+    }
+
+    public void setKairosHub(boolean kairosHub) {
+        this.kairosHub = kairosHub;
+    }
+
+    public Long getLevelId() {
+        return levelId;
+    }
+
+    public void setLevelId(Long levelId) {
+        this.levelId = levelId;
+    }
+
+    public Boolean getUnion() {
+        return union;
+    }
+
+    public void setUnion(Boolean union) {
+        this.union = union;
+    }
+
+    public boolean isBoardingCompleted() {
+        return boardingCompleted;
+    }
+
+    public void setBoardingCompleted(boolean boardingCompleted) {
+        this.boardingCompleted = boardingCompleted;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public boolean isPreKairos() {
+        return preKairos;
+    }
+
+    public void setPreKairos(boolean preKairos) {
+        this.preKairos = preKairos;
     }
 }

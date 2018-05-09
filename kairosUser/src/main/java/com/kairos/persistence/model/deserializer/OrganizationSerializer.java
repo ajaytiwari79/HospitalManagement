@@ -45,7 +45,7 @@ public class OrganizationSerializer extends StdSerializer<Organization>{
         jgen.writeStringField("name", value.getName());
         jgen.writeStringField("email", value.getEmail());
         jgen.writeObject(value.getContactDetail());
-//        jgen.writeStringField("address", value.getContactAddress());
+//        jgen.writeStringField("address", value.getHomeAddress());
         jgen.writeEndObject();
 
 

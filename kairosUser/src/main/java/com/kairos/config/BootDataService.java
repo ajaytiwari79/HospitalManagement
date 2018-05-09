@@ -632,7 +632,7 @@ public class BootDataService {
         kairosCountryLevel.setEanNumber("501234567890");
         kairosCountryLevel.setEmail("kairos_denmark@kairos.com");
         kairosCountryLevel.setContactDetail(new ContactDetail("info@kairos.com", "kairos_denmark@kairos.com", "431311", "653322"));
-//        kairosCountryLevel.setContactAddress(new ContactAddress("Thorsgade", 2, 5000, "Odense", 4345, "Commercial"));
+//        kairosCountryLevel.setHomeAddress(new ContactAddress("Thorsgade", 2, 5000, "Odense", 4345, "Commercial"));
 //        kairosCountryLevel.setOrganizationType(privateOrganization);
         kairosCountryLevel.setCostCenterCode("OD12");
         kairosCountryLevel.setOrganizationLevel(OrganizationLevel.COUNTRY);
@@ -738,7 +738,7 @@ public class BootDataService {
 /*
 
         michalAsStaff = new Staff();
-//        michalAsStaff.setContactAddress(new ContactAddress("Baker Street", 3, 1221, "Glostrup", 4533, "Apartments"));
+//        michalAsStaff.setHomeAddress(new ContactAddress("Baker Street", 3, 1221, "Glostrup", 4533, "Apartments"));
         michalAsStaff.setGeneralNote("New Joiner, Need to learn to handle client interaction");
         michalAsStaff.setUser(michal);
         michalAsStaff.setSignature("mick");
@@ -758,7 +758,7 @@ public class BootDataService {
         michalAsStaff.setPassword(new BCryptPasswordEncoder().encode("oodles"));
 
         livaAsStaff = new Staff();
-//        livaAsStaff.setContactAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
+//        livaAsStaff.setHomeAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
         livaAsStaff.setGeneralNote("New Joiner, Need to learn to handle client interaction");
         livaAsStaff.setUser(liva);
         livaAsStaff.setSignature("liva");
@@ -777,7 +777,7 @@ public class BootDataService {
 
 
  /*       almaAsStaff = new Staff();
-//        almaAsStaff.setContactAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
+//        almaAsStaff.setHomeAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
         almaAsStaff.setGeneralNote("New Joiner, Need to learn to handle client interaction");
         almaAsStaff.setUser(alma);
         almaAsStaff.setSignature("liva");
@@ -796,7 +796,7 @@ public class BootDataService {
 
         adminAsStaff = new Staff();
         ContactAddress contactAddress = new ContactAddress();
-//        adminAsStaff.setContactAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
+//        adminAsStaff.setHomeAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
         adminAsStaff.setGeneralNote("Will manage the platform");
         adminAsStaff.setUser(admin);
         adminAsStaff.setSignature("ulrik");
