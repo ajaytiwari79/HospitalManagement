@@ -25,7 +25,14 @@ public class UserPersonalizedSettingsService extends UserBaseService{
     public UserPersonalizedSettingsDto getAllSettingsByUser(Long userId) {
 
         UserPersonalizedSettingsQueryResult userPersonalizedSettingsQueryResult =  userPersonalizedSettingsRepository.findAllByUser(userId);
-        UserPersonalizedSettingsDto userPersonalizedSettingsDto = new UserPersonalizedSettingsDto( new SelfRosteringViewDto(userPersonalizedSettingsQueryResult.getSelfRosteringView().getAbsenceViewSettings()));
+        UserPersonalizedSettingsDto userPersonalizedSettingsDto;
+        if(Optional.ofNullable(userPersonalizedSettingsQueryResult).isPresent()) {
+            userPersonalizedSettingsDto = new UserPersonalizedSettingsDto( new SelfRosteringViewDto(userPersonalizedSettingsQueryResult.getSelfRosteringView().getAbsenceViewSettings()));
+
+        }
+        else {
+            userPersonalizedSettingsDto = new UserPersonalizedSettingsDto( new SelfRosteringViewDto());
+        }
         return userPersonalizedSettingsDto;
     }
 
@@ -33,9 +40,10 @@ public class UserPersonalizedSettingsService extends UserBaseService{
     public UserPersonalizedSettings updateUserPersonalizedSettings(Long userId, UserPersonalizedSettingsDto userPersonalizedSettingsDto) {
 
         UserPersonalizedSettingsQueryResult userPersonalizedSettingsQueryResult =  userPersonalizedSettingsRepository.findAllByUser(userId);
-        UserPersonalizedSettings userPersonalizedSettings = userPersonalizedSettingsQueryResult.getUserPersonalizedSettings();
-        userPersonalizedSettings.setSelfRosteringView(userPersonalizedSettingsQueryResult.getSelfRosteringView());
-        if(Optional.ofNullable(userPersonalizedSettings).isPresent()) {
+        UserPersonalizedSettings userPersonalizedSettings;
+        if(Optional.ofNullable(userPersonalizedSettingsQueryResult).isPresent()) {
+            userPersonalizedSettings = userPersonalizedSettingsQueryResult.getUserPersonalizedSettings();
+            userPersonalizedSettings.setSelfRosteringView(userPersonalizedSettingsQueryResult.getSelfRosteringView());
            userPersonalizedSettings.getSelfRosteringView().setAbsenceViewSettings(userPersonalizedSettingsDto.getSelfRosteringView().getAbsenceViewSettings());
             save(userPersonalizedSettings);
 
