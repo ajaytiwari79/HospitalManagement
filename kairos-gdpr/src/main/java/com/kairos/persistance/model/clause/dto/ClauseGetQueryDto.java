@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ClauseGetQueryDto {
 
-    private List<String> accountTypes;
+    private List<BigInteger> accountTypes;
     private List<String> tags;
     private List<Long> organizationTypes;
     private List<Long>  organizationSubTypes;
@@ -19,7 +19,7 @@ public class ClauseGetQueryDto {
         return tags;
     }
 
-    public List<String> getAccountTypes() {
+    public List<BigInteger> getAccountTypes() {
         return accountTypes;
     }
 

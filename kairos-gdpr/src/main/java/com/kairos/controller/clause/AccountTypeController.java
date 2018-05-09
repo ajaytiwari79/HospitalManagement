@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import static com.kairos.constant.ApiConstant.API_ACCOUNT_TYPE_URL;
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +44,7 @@ public class AccountTypeController {
 
     @ApiOperation(value ="accounts  by ids list" )
     @RequestMapping(value = "/accountlist", method = RequestMethod.POST)
-    public ResponseEntity<Object> getAccountList(@RequestBody List<Long> accountList) {
+    public ResponseEntity<Object> getAccountList(@RequestBody List<BigInteger> accountList) {
         if (!Optional.ofNullable(accountList).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Account List in Null");
         }

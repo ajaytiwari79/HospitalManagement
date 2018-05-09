@@ -42,11 +42,11 @@ public class AgreementTemplateService extends MongoBaseService {
 
     public AgreementTemplate createAgrementTemplate(AgreementTemplateDto agreementTemplateDto) {
         AgreementTemplate newAgreementTemplate = new AgreementTemplate();
-        Long orgTypeId, orgServiceId, accountType, countryId;
+        Long orgTypeId, orgServiceId, countryId;
         orgTypeId = agreementTemplateDto.getOrganisationTypeid();
         orgServiceId = agreementTemplateDto.getOrgServiceid();
         countryId = agreementTemplateDto.getCountryId();
-        accountType = agreementTemplateDto.getAccountTypeId();
+        BigInteger accountType = agreementTemplateDto.getAccountTypeId();
         Boolean isDefault = true;
         List<BigInteger> clauseids = agreementTemplateDto.getClauseIds();
         if (orgTypeId != null) {
@@ -58,7 +58,7 @@ public class AgreementTemplateService extends MongoBaseService {
             isDefault = false;
         }
         if (accountType != null) {
-            newAgreementTemplate.setAccountType(accountTypeMongoRepository.findById(accountType.toString()));
+            newAgreementTemplate.setAccountType(accountTypeMongoRepository.findByid(accountType));
             isDefault = false;
         }
         if (clauseids.size() > 0) {

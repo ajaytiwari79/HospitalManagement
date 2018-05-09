@@ -14,6 +14,7 @@ import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,67 +46,44 @@ public class ClauseService extends MongoBaseService {
 
     public Clause createClause(ClauseDto clauseDto) {
 
-        List<Long> orgServiceIds, orgTypeIds, accountTypeIds, orgSubServiceIds, orgSubTypeIds;
+        List<Long> orgServiceIds, orgTypeIds, orgSubServiceIds, orgSubTypeIds;
         orgServiceIds = clauseDto.getOrganizationServiceIds();
         orgTypeIds = clauseDto.getOrganizationTypeIds();
-        accountTypeIds = clauseDto.getAccountType();
+       List<BigInteger> accountTypeIds = clauseDto.getAccountType();
         orgSubServiceIds = clauseDto.getOrganizationServiceIds();
         orgSubTypeIds = clauseDto.getOrganizationSubTypeIds();
         List<AccountType> accountTypes;
-
-        List<OrganizationService> organizationServices = new ArrayList<>();
+        List<String> tags =new ArrayList<>();
+       /* List<OrganizationService> organizationServices = new ArrayList<>();
         List<OrganizationType> organizationTypes = new ArrayList<>();
         List<OrganizationService> organizationSubServices = new ArrayList<>();
-        List<OrganizationType> organizationSubTypes = new ArrayList<>();
+        List<OrganizationType> organizationSubTypes = new ArrayList<>();*/
         Clause clause = new Clause();
-
-
-        if (!Optional.ofNullable(clauseDto).isPresent()) {
-            throw new RequestDataNull("No Data Entered");
-        } else {
-            List<String> tags = new ArrayList<>();
+        if (Optional.ofNullable(clauseDto.getTags()).isPresent())
+        {
+            tags = new ArrayList<>();
             for (String tag : clauseDto.getTags()) {
                 tags.add(tag);
-            }
+            }   }
             System.err.println("+++++++");
 
-            if (accountTypeIds.size() !=0) {
+            if (accountTypeIds!=null&&!accountTypeIds.isEmpty()) {
                 accountTypes = accountTypeService.getAccountList(accountTypeIds);
             } else {
                 throw new RequestDataNull("Accounttype list cannot be  empty");
             }
-            if (Optional.ofNullable(orgServiceIds).isPresent()) {
-                System.err.println("++"+orgServiceIds.size());
-               // organizationServices = organizationServiceService.getOrganizationServices(orgServiceIds);
-                clause.setOrganizationServices(orgServiceIds);
 
-            }
-            if (Optional.ofNullable(orgTypeIds).isPresent()) {
+            clause.setOrganizationServices(orgServiceIds);
+            clause.setOrganizationSubServices(orgSubServiceIds);
+            clause.setOrganizationTypes(orgTypeIds);
+            clause.setOrganizationSubTypes(orgSubTypeIds);
 
-                //  organizationTypes = organizationTypeService.getOrganizationTypes(clauseDto.getOrganizationTypeIds());
-                clause.setOrganizationTypes(orgTypeIds);
-
-            }
-            if (Optional.ofNullable(orgSubServiceIds).isPresent()) {
-                System.err.println("++"+orgSubServiceIds.size());
-
-                // organizationSubServices=organizationServiceService.
-                clause.setOrganizationSubServices(orgSubServiceIds);
-
-
-            }
-            if (Optional.ofNullable(orgSubTypeIds).isPresent()) {
-                System.err.println("++"+orgSubTypeIds.size());
-
-                clause.setOrganizationSubTypes(orgSubTypeIds);
-
-            }
             clause.setAccountTypes(accountTypes);
             clause.setTitle(clauseDto.getTitle());
             clause.setDescription(clauseDto.getDescription());
             clause.setTags(tags);
             return save(clause);
-        }
+
 
 
     }
@@ -147,58 +125,80 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Clause updateClause(BigInteger clauseid, String description) {
-        Clause clause = clauseRepository.findByid(clauseid);
-        if (!Optional.ofNullable(clause).isPresent()) {
+    public Clause updateClause(BigInteger clauseid, ClauseDto clauseDto) {
+        Clause exists = clauseRepository.findByid(clauseid);
+        if (!Optional.ofNullable(exists).isPresent()) {
             throw new NotExists("clause for given id " + clauseid + " not exist");
+        } else {
+            List<Long> orgServiceIds, orgTypeIds, orgSubServiceIds, orgSubTypeIds;
+            orgServiceIds = clauseDto.getOrganizationServiceIds();
+            orgTypeIds = clauseDto.getOrganizationTypeIds();
+            List<BigInteger>accountTypeIds = clauseDto.getAccountType();
+            orgSubServiceIds = clauseDto.getOrganizationServiceIds();
+            orgSubTypeIds = clauseDto.getOrganizationSubTypeIds();
+            List<AccountType> accountTypes = new ArrayList<>();
+            List<String> tags;
+            if (!Optional.ofNullable(clauseDto).isPresent()) {
+                throw new RequestDataNull("No Data Entered");
+            } else {
+                tags = new ArrayList<>();
+                for (String tag : clauseDto.getTags()) {
+                    tags.add(tag);
+                }
+                if (accountTypeIds!=null&&!accountTypeIds.isEmpty()) {
+                    accountTypes = accountTypeService.getAccountList(accountTypeIds);
+                } else {
+                    throw new RequestDataNull("Accounttype list cannot be  empty");
+                }
+                exists.setOrganizationServices(orgServiceIds);
+                exists.setOrganizationSubServices(orgSubServiceIds);
+                exists.setOrganizationTypes(orgTypeIds);
+                exists.setOrganizationSubTypes(orgSubTypeIds);
+
+            }
+            exists.setAccountTypes(accountTypes);
+            exists.setDescription(clauseDto.getDescription());
+            exists.setTags(tags);
+            exists.setTitle(clauseDto.getTitle());
         }
-        clause.setDescription(description);
-        save(clause);
-        return clause;
+
+        return save(exists);
     }
 
 
     public List<Clause> getClause(ClauseGetQueryDto clauseQueryDto) {
         Query query = new Query();
         String whereQuery = null;
-        List<Long> value = null;
         List<Clause> clauses;
-        List<Long> organizationTypes, organizationSubTypes,
-                organizationServices, organizationSubServices;
+        List<Long> organizationTypes, organizationSubTypes, organizationServices, organizationSubServices;
         organizationTypes = clauseQueryDto.getOrganizationTypes();
         organizationSubTypes = clauseQueryDto.getOrganizationSubTypes();
         organizationServices = clauseQueryDto.getOrganizationServices();
         organizationSubServices = clauseQueryDto.getOrganizationSubServices();
-
-
-
         Criteria criteria = new Criteria();
         if (!Optional.ofNullable(clauseQueryDto).isPresent()) {
             return null;
         } else {
 
-            if (clauseQueryDto.getAccountTypes().size() != 0) {
+            if (clauseQueryDto.getAccountTypes()!=null) {
                 whereQuery = "accountTypes._id";
                 query.addCriteria((Criteria.where(whereQuery).in(clauseQueryDto.getAccountTypes())));
             }
-            if (organizationServices.size() != 0) {
+            if (organizationServices!=null) {
                 whereQuery = "organizationServices";
-                value = organizationServices;
-                query.addCriteria((Criteria.where(whereQuery).in(value)));
+                query.addCriteria((Criteria.where(whereQuery).in(organizationServices)));
 
             }
-            if (organizationTypes.size() != 0) {
+            if (organizationTypes!=null) {
                 whereQuery = "organizationTypes";
-                value = organizationTypes;
-                query.addCriteria((Criteria.where(whereQuery).in(value)));
+                query.addCriteria((Criteria.where(whereQuery).in(organizationTypes)));
 
             }
-            if (clauseQueryDto.getOrganizationSubServices().size()!=0) {
-               /* whereQuery = "organizationServices";
-                value = clauseQueryDto.getOrganizationSubServices();
-                query.addCriteria(Criteria.where(whereQuery).in(value));*/
+           /* if (organizationSubServices!=null) {
+                whereQuery = "organizationServices";
+                query.addCriteria(Criteria.where(whereQuery).in(organizationSubServices));
 
-            }
+            }*/
             if (clauseQueryDto.getTags() != null) {
                 whereQuery = "tags";
                 query.addCriteria(Criteria.where(whereQuery).in(clauseQueryDto.getTags()));

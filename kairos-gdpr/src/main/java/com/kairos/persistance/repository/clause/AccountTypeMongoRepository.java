@@ -12,8 +12,8 @@ import java.math.BigInteger;
 @Repository
 public interface AccountTypeMongoRepository extends  MongoRepository<AccountType,BigInteger> {
 
-   @Query("{'_id':?0}")
-   AccountType findById(String id);
+
+   AccountType findByid(BigInteger id);
 
    @Query("{'typeOfAccount':?0}")
    AccountType findByTypeOfAccount(String typeOfAccount);

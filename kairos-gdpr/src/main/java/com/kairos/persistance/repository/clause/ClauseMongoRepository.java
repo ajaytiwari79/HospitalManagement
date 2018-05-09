@@ -20,7 +20,6 @@ public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger
     @Query("{'organizationType.name':?0}")
     List<Clause> getClauseByOrganizationType(String organizationType);
 
-
     Clause findByid(BigInteger id);
 
     @Query("{'accountType':?0}")

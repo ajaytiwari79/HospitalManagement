@@ -101,11 +101,9 @@ public class ClauseController {
 
     @ApiOperation("update clause description")
     @PutMapping("/update/clause/{clauseId}")
-    public ResponseEntity<Object> updateClause(@PathVariable BigInteger clauseId, @RequestParam String description) {
-        if (StringUtils.isEmpty(description)) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "description cannot be null");
-        } else
-            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(clauseId, description));
+    public ResponseEntity<Object> updateClause(@PathVariable BigInteger clauseId,@Validated @RequestBody ClauseDto clauseDto) {
+
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(clauseId, clauseDto));
 
     }
 

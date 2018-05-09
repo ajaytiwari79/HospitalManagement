@@ -1,9 +1,11 @@
 package com.kairos.persistance.model.clause.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.persistance.model.clause.Clause;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class ClauseDto {
     private List<Long> organizationSubServiceIds;
     private List<Long> organizationSubTypeIds;
 
-    private List<Long> accountType;
+    private List<BigInteger> accountType;
 
     public String getTitle() {
         return title;
@@ -56,7 +58,7 @@ public class ClauseDto {
         return organizationSubTypeIds;
     }
 
-    public List<Long> getAccountType() {
+    public List<BigInteger> getAccountType() {
         return accountType;
     }
 

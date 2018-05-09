@@ -9,6 +9,7 @@ import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,11 +44,11 @@ public class AccountTypeService extends MongoBaseService {
     }
 
 
-    public List<AccountType> getAccountList(List<Long> accountList) {
+    public List<AccountType> getAccountList(List<BigInteger> accountList) {
         List<AccountType> accountTypeList = new ArrayList<>();
         AccountType accountType;
-        for (Long accoundTypeId : accountList) {
-            accountType = accountTypeRepository.findById(accoundTypeId.toString());
+        for (BigInteger accoundTypeId : accountList) {
+            accountType = accountTypeRepository.findByid(accoundTypeId);
             if (accountType != null) {
                 accountTypeList.add(accountType);
             } else {

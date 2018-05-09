@@ -48,6 +48,7 @@ dependencies {
     compile('org.apache.jackrabbit:jackrabbit-jcr2dav:2.10.1')
     compile('javax.jcr:jcr:2.0')
     compile('org.apache.jackrabbit:oak-jcr:1.7.6')
+    compile('org.apache.commons:commons-lang3:3.0')
    // swagger
     compile('io.springfox:springfox-swagger2:2.4.0')
     compile('io.springfox:springfox-swagger-ui:2.4.0')

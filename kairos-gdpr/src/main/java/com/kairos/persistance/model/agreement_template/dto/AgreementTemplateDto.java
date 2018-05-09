@@ -20,7 +20,7 @@ public class AgreementTemplateDto {
 
     private Long organisationTypeid;
     private Long orgServiceid;
-    private Long accountTypeId;
+    private BigInteger accountTypeId;
     private List<BigInteger> clauseIds;
     private  Long countryId;
 
@@ -40,7 +40,7 @@ public class AgreementTemplateDto {
         return orgServiceid;
     }
 
-    public Long getAccountTypeId() {
+    public BigInteger getAccountTypeId() {
         return accountTypeId;
     }
 

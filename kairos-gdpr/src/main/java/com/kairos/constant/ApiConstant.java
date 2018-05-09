@@ -12,7 +12,8 @@ public final class ApiConstant {
 
 
 
-// Asset urls
+// GlobalAsset urls
+
     public static final String API_ASSET_URL=API_V1+"/asset";
 
 
