@@ -24,7 +24,8 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     private long durationBetweenShifts;
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
-    private List<BigInteger> activityIds = new ArrayList<>();
+    private List<Long> plannedTimeIds = new ArrayList<>();
+    private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
@@ -38,12 +39,20 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
 
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
+    public List<Long> getPlannedTimeIds() {
+        return plannedTimeIds;
     }
 
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
+    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
+        this.plannedTimeIds = plannedTimeIds;
+    }
+
+    public List<BigInteger> getTimeTypeIds() {
+        return timeTypeIds;
+    }
+
+    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
+        this.timeTypeIds = timeTypeIds;
     }
 
     public List<PartOfDay> getPartOfDays() {
@@ -86,6 +95,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
         this.disabled = disabled;
         this.description = description;
         this.durationBetweenShifts = durationBetweenShifts;
+        wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
 
     }
     public DurationBetweenShiftsWTATemplate() {

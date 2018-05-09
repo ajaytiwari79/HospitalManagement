@@ -8,7 +8,6 @@ import com.kairos.activity.enums.RuleTemplates;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.phase.Phase;
-import com.kairos.activity.response.dto.shift.RuleTemplateCategoryDTO;
 
 import com.kairos.activity.util.DateUtils;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;

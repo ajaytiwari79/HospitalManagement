@@ -20,7 +20,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.COUNT
 public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCode, Long> {
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND reasonCode.reasonCodeType={1} return id(reasonCode) as id, reasonCode.name as name," +
-            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY id")
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate")
     List<ReasonCodeResponseDTO> findReasonCodesByCountry(long countryId, ReasonCodeType reasonCodeType);
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND id(reasonCode) <> {1} AND reasonCode.name=~{2} AND reasonCode.reasonCodeType={3}" +
@@ -32,7 +32,7 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
 
 
     @Query("MATCH (organization:Organization)-[:" + COUNTRY + "]->(country:Country)<-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} AND reasonCode.reasonCodeType={1}" +
-            " return id(reasonCode) as id, reasonCode.name as name, reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY id")
+            " return id(reasonCode) as id, reasonCode.name as name, reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType ORDER BY reasonCode.creationDate")
     List<ReasonCodeResponseDTO> findReasonCodesByOrganizationAndReasonCodeType(Long organizationId, ReasonCodeType reasonCodeType);
 }
 

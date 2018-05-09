@@ -7,6 +7,7 @@ import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private List<Long> activities;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
     private int numberOfWeeks;
     private boolean borrowLeave;
     private boolean carryForwardLeave;
@@ -63,13 +64,13 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     }
 
     public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activities,
-                                         int numberOfLeaves, long validationStartDateMillis, int numberOfWeeks) {
+                                         int numberOfLeaves, LocalDate validationStartDate, int numberOfWeeks) {
         super(name, description);
         this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
         this.disabled=disabled;
         this.ageRange = ageRange;
         this.activities = activities;
-        this.validationStartDateMillis = validationStartDateMillis;
+        this.validationStartDate = validationStartDate;
         this.numberOfWeeks = numberOfWeeks;
     }
 
@@ -89,12 +90,12 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         this.activities = activities;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
     public int getNumberOfWeeks() {

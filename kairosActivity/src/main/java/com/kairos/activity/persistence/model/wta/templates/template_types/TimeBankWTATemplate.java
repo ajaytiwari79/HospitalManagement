@@ -27,7 +27,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
 
     public MinMaxSetting getMinMaxSetting() {
@@ -74,6 +74,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
         this.yellowZone = yellowZone;
         this.forbid = forbid;
         this.allowExtraActivity = allowExtraActivity;
+        wtaTemplateType = WTATemplateType.TIME_BANK;
     }
 
     public TimeBankTypeEnum getFrequency() {

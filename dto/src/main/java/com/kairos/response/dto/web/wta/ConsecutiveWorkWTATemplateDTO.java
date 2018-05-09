@@ -20,7 +20,7 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private boolean checkAgainstTimeRules;
     private long limitCount;//no of days
-    private WTATemplateType wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
+
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
     private List<BigInteger> timeTypeIds = new ArrayList<>();
@@ -96,7 +96,7 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
     public ConsecutiveWorkWTATemplateDTO() {
-
+        this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 
     public ConsecutiveWorkWTATemplateDTO(String name, boolean minimum, String description, boolean checkAgainstTimeRules, long limitCount) {
