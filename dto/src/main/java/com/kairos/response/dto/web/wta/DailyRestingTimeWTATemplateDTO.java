@@ -20,7 +20,7 @@ import java.util.List;
 public class DailyRestingTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long continuousDayRestHours;
-    private WTATemplateType wtaTemplateType = WTATemplateType.DAILY_RESTING_TIME;
+
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
@@ -74,7 +74,7 @@ public class DailyRestingTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
     public DailyRestingTimeWTATemplateDTO() {
-
+        this.wtaTemplateType = WTATemplateType.DAILY_RESTING_TIME;
 
     }
 

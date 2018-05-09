@@ -19,7 +19,7 @@ public class ShiftLengthWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long timeLimit;
     private boolean checkAgainstTimeRules;
-    private WTATemplateType wtaTemplateType = WTATemplateType.SHIFT_LENGTH;;
+
     private List<Long> dayTypeIds = new ArrayList<>();
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
@@ -83,7 +83,7 @@ public class ShiftLengthWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
     public ShiftLengthWTATemplateDTO() {
-
+        this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;;
     }
 
     public ShiftLengthWTATemplateDTO(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules) {

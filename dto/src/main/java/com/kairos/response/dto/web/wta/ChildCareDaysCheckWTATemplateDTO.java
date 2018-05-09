@@ -21,7 +21,7 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO{
     private boolean carryForwardLeave;
 
     public ChildCareDaysCheckWTATemplateDTO() {
-        //Default Constructor
+        this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
     }
 
     public boolean isBorrowLeave() {
