@@ -106,5 +106,6 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
     public DaysOffInPeriodWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
     }
 }

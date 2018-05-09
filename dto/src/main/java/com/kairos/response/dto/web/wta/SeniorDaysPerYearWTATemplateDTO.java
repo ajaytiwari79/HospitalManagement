@@ -19,7 +19,7 @@ public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO{
     private boolean carryForwardLeave;
 
     public SeniorDaysPerYearWTATemplateDTO() {
-        //Default Constructor
+        this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
     }
 
     public boolean isBorrowLeave() {
