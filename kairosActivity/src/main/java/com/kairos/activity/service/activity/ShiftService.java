@@ -38,6 +38,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.swing.*;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -184,7 +185,7 @@ public class ShiftService extends MongoBaseService {
         }
 
         if (shift.getShiftState().equals(ShiftState.FIXED) || shift.getShiftState().equals(ShiftState.PUBLISHED) || shift.getShiftState().equals(ShiftState.LOCKED)) {
-            throw new DataNotFoundByIdException("Shift cant be edited please change state. Current state is " + shift.getShiftState());
+            throw new ActionNotPermittedException("Shift cant be edited please change state. Current state is " + shift.getShiftState());
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), null);
         WTAResponseDTO wtaResponseDTO = wtaService.getWta(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
@@ -210,8 +211,8 @@ public class ShiftService extends MongoBaseService {
         shift.setBonusTimeBank(shiftDTO.getBonusTimeBank());
         shift.setAmount(shiftDTO.getAmount());
         shift.setRemarks(shiftDTO.getRemarks());
-        shift.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(shiftDTO.getStartLocalDate(),shiftDTO.getStartTime()));
-        shift.setEndDate( DateUtils.getDateByLocalDateAndLocalTime(shiftDTO.getEndLocalDate(),shiftDTO.getEndTime()));
+        shift.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(shiftDTO.getStartLocalDate(), shiftDTO.getStartTime()));
+        shift.setEndDate(DateUtils.getDateByLocalDateAndLocalTime(shiftDTO.getEndLocalDate(), shiftDTO.getEndTime()));
         shift.setName(activity.getName());
         shift.setDurationMinutes(shiftDTO.getDurationMinutes());
 
@@ -256,8 +257,11 @@ public class ShiftService extends MongoBaseService {
 
     public void deleteShift(BigInteger shiftId) {
         Shift shift = shiftMongoRepository.findOne(shiftId);
-        if (!Optional.ofNullable(shift).isPresent() || !shift.getShiftState().equals(ShiftState.UNPUBLISHED)) {
+        if (!Optional.ofNullable(shift).isPresent()) {
             throw new DataNotFoundByIdException("Invalid shift  Id : " + shiftId);
+        }
+        if (!shift.getShiftState().equals(ShiftState.UNPUBLISHED)) {
+            throw new ActionNotPermittedException("Cant delete " + shift.getShiftState() + " shift");
         }
         shift.setDeleted(true);
         save(shift);
