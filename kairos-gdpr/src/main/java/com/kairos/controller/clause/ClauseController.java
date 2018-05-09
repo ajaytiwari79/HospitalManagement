@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -46,7 +47,7 @@ public class ClauseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.createClause(clauseDto));
     }
 
-    @ApiOperation("get clause by organization type")
+    /*@ApiOperation("get clause by organization type")
     @GetMapping("/byorganizationType")
     public ResponseEntity<Object> getClauseByOrganizationType(@RequestParam String organizationType) {
         Map<String, Object> result = new HashMap<>();
@@ -57,27 +58,28 @@ public class ClauseController {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, result.get("data"));
         }
     }
-
+*/
     @ApiOperation("get clause by id")
     @GetMapping("/clause/id/{id}")
-    public ResponseEntity<Object> getClauseById(@PathVariable Long id) {
-        if (id == null && id.toString().equals("")) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null");
+    public ResponseEntity<Object> getClauseById(@PathVariable BigInteger id) {
+        if (id!=null) {
+            return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseById(id));
+
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseById(id));
+        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "id cannot be null  or empty");
 
     }
 
-    @ApiOperation("get clause by account type")
+   /* @ApiOperation("get clause by account type")
     @GetMapping("/byAccount")
     public ResponseEntity<Object> getClauseByAccountType(@RequestParam String accountType) {
-        if (accountType == null || accountType.equals("")) {
+        if (StringUtils.isEmpty(accountType)) {
             throw new NullPointerException("AccountType Cannot be Null or Empty");
         } else
             return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.getClauseByAccountType(accountType));
 
     }
-
+*/
 
     @ApiOperation("get clause by multi select")
     @PostMapping("/clause")
@@ -87,14 +89,20 @@ public class ClauseController {
 
     @ApiOperation("delete clause by id")
     @DeleteMapping("/delete/id/{id}")
-    public ResponseEntity<Object> deleteClause(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteClause(@PathVariable BigInteger id) {
+        if (id!=null)
+        {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.deleteClause(id));
+    }
+    else
+        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"id cannot be null or empty");
+
     }
 
     @ApiOperation("update clause description")
-    @PutMapping("/update/clause/id/{clauseId}")
-    public ResponseEntity<Object> updateClause(@PathVariable Long clauseId, @RequestParam String description) {
-        if (description == null || description.equals("")) {
+    @PutMapping("/update/clause/{clauseId}")
+    public ResponseEntity<Object> updateClause(@PathVariable BigInteger clauseId, @RequestParam String description) {
+        if (StringUtils.isEmpty(description)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "description cannot be null");
         } else
             return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(clauseId, description));

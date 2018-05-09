@@ -26,7 +26,7 @@ return save(organizationType);
 
 
 
-    public List<OrganizationType> getOrganizationTypeByList(List<Long> orgTypeListId)
+    public List<OrganizationType> getOrganizationTypes(List<Long> orgTypeListId)
     {
 
        List<OrganizationType> organizationTypeList=new ArrayList<>();

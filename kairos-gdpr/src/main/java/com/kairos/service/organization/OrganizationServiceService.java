@@ -38,7 +38,7 @@ if (!Optional.ofNullable(exists).isPresent())
 }
 
 
-    public List<OrganizationService> getOrganizationServiceList(List<Long> orgTypeListId) {
+    public List<OrganizationService> getOrganizationServices(List<Long> orgTypeListId) {
 
         OrganizationService organizationService;
         List<OrganizationService> organizationServiceList = new ArrayList<>();
@@ -54,5 +54,30 @@ if (!Optional.ofNullable(exists).isPresent())
 
 
     }
+
+
+
+/*
+
+    public List<OrganizationService> getSubServicesByIds(List<Long> orgSubServiceId)
+    {
+
+        List<OrganizationService> subServiceList=new ArrayList<>();
+if (orgSubServiceId.size()!=0)
+{
+    for (Long id:orgSubServiceId)
+    {
+subServiceList.add(organizationServicerepository.findByOrganizationSubService(id));
+}
+return subServiceList;
+}
+else
+    return null;
+
+    }
+
+*/
+
+
 
     }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.List;
 
 @Repository
 public interface OrganizationServiceMongoRepository extends MongoRepository<OrganizationService, BigInteger> {
@@ -16,5 +17,7 @@ public interface OrganizationServiceMongoRepository extends MongoRepository<Orga
 
     OrganizationService findByName(String name);
 
+    @Query("{'organization_service.organizationSubService.name':?0}")
+    OrganizationService findByOrganizationSubService(String id);
 
 }

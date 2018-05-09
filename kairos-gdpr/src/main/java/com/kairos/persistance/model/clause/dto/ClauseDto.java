@@ -23,6 +23,9 @@ public class ClauseDto {
 
     private List<Long> organizationServiceIds;
     private List<Long> organizationTypeIds;
+    private List<Long> organizationSubServiceIds;
+    private List<Long> organizationSubTypeIds;
+
     private List<Long> accountType;
 
     public String getTitle() {
@@ -43,6 +46,14 @@ public class ClauseDto {
 
     public List<Long> getOrganizationTypeIds() {
         return organizationTypeIds;
+    }
+
+    public List<Long> getOrganizationSubServiceIds() {
+        return organizationSubServiceIds;
+    }
+
+    public List<Long> getOrganizationSubTypeIds() {
+        return organizationSubTypeIds;
     }
 
     public List<Long> getAccountType() {

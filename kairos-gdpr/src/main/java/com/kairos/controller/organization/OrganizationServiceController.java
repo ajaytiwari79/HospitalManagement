@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @RestController
@@ -35,7 +37,7 @@ public class OrganizationServiceController {
         if (orgTypeList == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization Service List is Empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.getOrganizationServiceList(orgTypeList));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationServiceService.getOrganizationServices(orgTypeList));
     }
 
 

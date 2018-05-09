@@ -44,7 +44,7 @@ public class OrganizationTypeController {
         if (orgTypeList == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization List is Empty");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrganizationTypeByList(orgTypeList));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrganizationTypes(orgTypeList));
     }
 
 

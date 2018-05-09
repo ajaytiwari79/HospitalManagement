@@ -45,13 +45,21 @@ public class ClauseService extends MongoBaseService {
 
     public Clause createClause(ClauseDto clauseDto) {
 
-        List<Long> orgServiceIds,orgTypeIds,accountTypeIds;
-        orgServiceIds=clauseDto.getOrganizationServiceIds();
-        orgTypeIds=clauseDto.getOrganizationTypeIds();
-        accountTypeIds=clauseDto.getAccountType();
-        List<AccountType> accountTypeList;
-        List<OrganizationService> organizationServiceList=new ArrayList<>();
-        List<OrganizationType> organizationTypeList=new ArrayList<>();
+        List<Long> orgServiceIds, orgTypeIds, accountTypeIds, orgSubServiceIds, orgSubTypeIds;
+        orgServiceIds = clauseDto.getOrganizationServiceIds();
+        orgTypeIds = clauseDto.getOrganizationTypeIds();
+        accountTypeIds = clauseDto.getAccountType();
+        orgSubServiceIds = clauseDto.getOrganizationServiceIds();
+        orgSubTypeIds = clauseDto.getOrganizationSubTypeIds();
+        List<AccountType> accountTypes;
+
+        List<OrganizationService> organizationServices = new ArrayList<>();
+        List<OrganizationType> organizationTypes = new ArrayList<>();
+        List<OrganizationService> organizationSubServices = new ArrayList<>();
+        List<OrganizationType> organizationSubTypes = new ArrayList<>();
+        Clause clause = new Clause();
+
+
         if (!Optional.ofNullable(clauseDto).isPresent()) {
             throw new RequestDataNull("No Data Entered");
         } else {
@@ -59,28 +67,43 @@ public class ClauseService extends MongoBaseService {
             for (String tag : clauseDto.getTags()) {
                 tags.add(tag);
             }
-            if (accountTypeIds.size() < 0) {
-                throw new RequestDataNull("Account type cannot be  empty or null");
+            System.err.println("+++++++");
+
+            if (accountTypeIds.size() !=0) {
+                accountTypes = accountTypeService.getAccountList(accountTypeIds);
             } else {
-               accountTypeList = accountTypeService.getAccountList(accountTypeIds);
-                if (!Optional.ofNullable(accountTypeList).isPresent()) {
-                    throw new NotExists("Acoount type for Clause not Exist");
-                }
+                throw new RequestDataNull("Accounttype list cannot be  empty");
             }
-            if (orgServiceIds.size()>0)
-            {
-               organizationServiceList = organizationServiceService.getOrganizationServiceList(orgServiceIds);
+            if (Optional.ofNullable(orgServiceIds).isPresent()) {
+                System.err.println("++"+orgServiceIds.size());
+               // organizationServices = organizationServiceService.getOrganizationServices(orgServiceIds);
+                clause.setOrganizationServices(orgServiceIds);
 
             }
-            if (orgTypeIds.size()>0)
-            {
-                organizationTypeList = organizationTypeService.getOrganizationTypeByList(clauseDto.getOrganizationTypeIds());
+            if (Optional.ofNullable(orgTypeIds).isPresent()) {
+
+                //  organizationTypes = organizationTypeService.getOrganizationTypes(clauseDto.getOrganizationTypeIds());
+                clause.setOrganizationTypes(orgTypeIds);
 
             }
+            if (Optional.ofNullable(orgSubServiceIds).isPresent()) {
+                System.err.println("++"+orgSubServiceIds.size());
 
-            Clause clause=new Clause(clauseDto.getTitle(),clauseDto.getDescription(), tags,accountTypeList,organizationServiceList
-                    ,organizationTypeList);
+                // organizationSubServices=organizationServiceService.
+                clause.setOrganizationSubServices(orgSubServiceIds);
 
+
+            }
+            if (Optional.ofNullable(orgSubTypeIds).isPresent()) {
+                System.err.println("++"+orgSubTypeIds.size());
+
+                clause.setOrganizationSubTypes(orgSubTypeIds);
+
+            }
+            clause.setAccountTypes(accountTypes);
+            clause.setTitle(clauseDto.getTitle());
+            clause.setDescription(clauseDto.getDescription());
+            clause.setTags(tags);
             return save(clause);
         }
 
@@ -88,7 +111,7 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Map<String, Object> getClauseByOrganizationType(String orgTypeName) {
+    /*public Map<String, Object> getClauseByOrganizationType(String orgTypeName) {
 
         Map<String, Object> result = new HashMap<>();
         Boolean isSuccess = false;
@@ -102,18 +125,16 @@ public class ClauseService extends MongoBaseService {
         } else
             throw new NotExists("Clauses not Exist for organizationType" + orgTypeName);
     }
+*/
 
-
-    public Clause getClauseById(Long id) {
-        Clause clause = (Clause) clauseRepository.findByid(id.toString());
+    public Clause getClauseById(BigInteger id) {
+        Clause clause = (Clause) clauseRepository.findByid(id);
 
         if (!Optional.ofNullable(clause).isPresent()) {
             throw new NotExists("clause Data Not Exist for given id" + id);
 
         } else
             return clause;
-
-
     }
 
 
@@ -126,8 +147,8 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Clause updateClause(Long clauseid, String description) {
-        Clause clause = clauseRepository.findByid(clauseid.toString());
+    public Clause updateClause(BigInteger clauseid, String description) {
+        Clause clause = clauseRepository.findByid(clauseid);
         if (!Optional.ofNullable(clause).isPresent()) {
             throw new NotExists("clause for given id " + clauseid + " not exist");
         }
@@ -140,44 +161,54 @@ public class ClauseService extends MongoBaseService {
     public List<Clause> getClause(ClauseGetQueryDto clauseQueryDto) {
         Query query = new Query();
         String whereQuery = null;
-        List<String> value = null;
+        List<Long> value = null;
         List<Clause> clauses;
+        List<Long> organizationTypes, organizationSubTypes,
+                organizationServices, organizationSubServices;
+        organizationTypes = clauseQueryDto.getOrganizationTypes();
+        organizationSubTypes = clauseQueryDto.getOrganizationSubTypes();
+        organizationServices = clauseQueryDto.getOrganizationServices();
+        organizationSubServices = clauseQueryDto.getOrganizationSubServices();
+
+
+
         Criteria criteria = new Criteria();
         if (!Optional.ofNullable(clauseQueryDto).isPresent()) {
             return null;
         } else {
 
-            if (clauseQueryDto.getAccountTypes() != null) {
-                whereQuery = "accountTypeList.typeOfAccount";
-                value = clauseQueryDto.getAccountTypes();
+            if (clauseQueryDto.getAccountTypes().size() != 0) {
+                whereQuery = "accountTypes._id";
+                query.addCriteria((Criteria.where(whereQuery).in(clauseQueryDto.getAccountTypes())));
+            }
+            if (organizationServices.size() != 0) {
+                whereQuery = "organizationServices";
+                value = organizationServices;
+                query.addCriteria((Criteria.where(whereQuery).in(value)));
 
-                query.addCriteria((Criteria.where(whereQuery).in(value)));
             }
-            if (clauseQueryDto.getOrganizationServices() != null) {
-                whereQuery = "organizationServiceList.name";
-                value = clauseQueryDto.getOrganizationServices();
+            if (organizationTypes.size() != 0) {
+                whereQuery = "organizationTypes";
+                value = organizationTypes;
                 query.addCriteria((Criteria.where(whereQuery).in(value)));
+
             }
-            if (clauseQueryDto.getOrganizationTypes() != null) {
-                whereQuery = "organizationTypeList.name";
-                value = clauseQueryDto.getOrganizationTypes();
-                query.addCriteria((Criteria.where(whereQuery).in(value)));
-            }
-            if (clauseQueryDto.getOrganizationSubServices() != null) {
-                whereQuery = "organizationServiceList.organizationSubService.name ";
+            if (clauseQueryDto.getOrganizationSubServices().size()!=0) {
+               /* whereQuery = "organizationServices";
                 value = clauseQueryDto.getOrganizationSubServices();
-                query.addCriteria(Criteria.where(whereQuery).in(value));
+                query.addCriteria(Criteria.where(whereQuery).in(value));*/
+
             }
             if (clauseQueryDto.getTags() != null) {
                 whereQuery = "tags";
-                value = clauseQueryDto.getTags();
-                query.addCriteria(Criteria.where(whereQuery).in(value));
+                query.addCriteria(Criteria.where(whereQuery).in(clauseQueryDto.getTags()));
             }
             clauses = mongoTemplate.find(query, Clause.class);
-            if (clauses.size() <= 0) {
-                throw new NotExists("clause not exists");
+            if (clauses.size() != 0) {
+                return clauses;
             }
-            return clauses;
+            throw new NotExists("clause not exists");
+
         }
 
     }
@@ -186,10 +217,10 @@ public class ClauseService extends MongoBaseService {
     public List<Clause> getClausesByIds(List<BigInteger> clausesId) {
 
         List<Clause> clauses = new ArrayList<>();
-        if (clausesId.size() > 0) {
+        if (clausesId.size() != 0) {
             for (BigInteger id : clausesId) {
 
-                Clause clause = clauseRepository.findByid(id.toString());
+                Clause clause = clauseRepository.findByid(id);
                 if (clause != null) {
                     clauses.add(clause);
                 } else {
@@ -215,9 +246,9 @@ public class ClauseService extends MongoBaseService {
     }
 
 
-    public Boolean deleteClause(Long clauseId) {
+    public Boolean deleteClause(BigInteger clauseId) {
 
-        Clause clause = clauseRepository.findByid(clauseId.toString());
+        Clause clause = clauseRepository.findByid(clauseId);
         if (Optional.ofNullable(clause).isPresent()) {
             clauseRepository.delete(clause);
             return true;

@@ -51,7 +51,7 @@ public class AccountTypeService extends MongoBaseService {
             if (accountType != null) {
                 accountTypeList.add(accountType);
             } else {
-                throw new NotExists("Account of type ->" + accountType + "not Exists");
+                throw new NotExists("Account for id ->" + accoundTypeId + "not Exists");
             }
         }
         return accountTypeList;
