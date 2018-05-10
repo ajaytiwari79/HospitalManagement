@@ -632,7 +632,7 @@ public class BootDataService {
         kairosCountryLevel.setEanNumber("501234567890");
         kairosCountryLevel.setEmail("kairos_denmark@kairos.com");
         kairosCountryLevel.setContactDetail(new ContactDetail("info@kairos.com", "kairos_denmark@kairos.com", "431311", "653322"));
-//        kairosCountryLevel.setHomeAddress(new ContactAddress("Thorsgade", 2, 5000, "Odense", 4345, "Commercial"));
+//        kairosCountryLevel.setContactAddress(new ContactAddress("Thorsgade", 2, 5000, "Odense", 4345, "Commercial"));
 //        kairosCountryLevel.setOrganizationType(privateOrganization);
         kairosCountryLevel.setCostCenterCode("OD12");
         kairosCountryLevel.setOrganizationLevel(OrganizationLevel.COUNTRY);
@@ -677,7 +677,7 @@ public class BootDataService {
         michal.setNickName("Micky");
         michal.setLastName("John");
         michal.setGender(Gender.MALE);
-//        michal.setHomeAddress(new ContactAddress("Baker Street", 3, 1221, "Glostrup", 4533, "Apartments"));
+//        michal.setContactAddress(new ContactAddress("Baker Street", 3, 1221, "Glostrup", 4533, "Apartments"));
         michal.setContactDetail(new ContactDetail("micky21@kairoscountrylevel.com", "micky21@gmail.com", "536533", "facebook.com/micky_original"));
         michal.setAge(27);
         michal.setCreationDate(DateUtil.getCurrentDate().getTime());
@@ -692,7 +692,7 @@ public class BootDataService {
         liva.setNickName("Liva");
         liva.setLastName("Rasmussen");
         liva.setGender(Gender.FEMALE);
-//        liva.setHomeAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
+//        liva.setContactAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
         liva.setContactDetail(new ContactDetail("liva33@kairosCountryLevel.com", "liva31@gmail.com", "536533", "facebook.com/liva33_cool"));
         liva.setAge(24);
         liva.setCreationDate(DateUtil.getCurrentDate().getTime());
@@ -707,7 +707,7 @@ public class BootDataService {
         alma.setNickName("alma");
         alma.setLastName("Krogh");
         alma.setGender(Gender.FEMALE);
-//        alma.setHomeAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
+//        alma.setContactAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
         alma.setContactDetail(new ContactDetail("alma_01@kairoscountrylevel.com", "alma007@gmail.com", "536533", "facebook.com/alma_cool"));
         alma.setAge(28);
         alma.setCreationDate(DateUtil.getCurrentDate().getTime());
@@ -722,7 +722,7 @@ public class BootDataService {
         admin.setNickName("Ulrik");
         admin.setLastName("Rasmussen");
         admin.setGender(Gender.MALE);
-//        admin.setHomeAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
+//        admin.setContactAddress(new ContactAddress("Rosewood Street", 1, 5421, "Glostrup", 2123, "Apartments"));
         admin.setContactDetail(new ContactDetail("ulrik_01@kairoscountrylevel.com", "alma007@gmail.com", "536533", "facebook.com/ulrik_cool"));
         admin.setAge(28);
         admin.setCreationDate(DateUtil.getCurrentDate().getTime());
@@ -738,7 +738,7 @@ public class BootDataService {
 /*
 
         michalAsStaff = new Staff();
-//        michalAsStaff.setHomeAddress(new ContactAddress("Baker Street", 3, 1221, "Glostrup", 4533, "Apartments"));
+//        michalAsStaff.setContactAddress(new ContactAddress("Baker Street", 3, 1221, "Glostrup", 4533, "Apartments"));
         michalAsStaff.setGeneralNote("New Joiner, Need to learn to handle client interaction");
         michalAsStaff.setUser(michal);
         michalAsStaff.setSignature("mick");
@@ -758,7 +758,7 @@ public class BootDataService {
         michalAsStaff.setPassword(new BCryptPasswordEncoder().encode("oodles"));
 
         livaAsStaff = new Staff();
-//        livaAsStaff.setHomeAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
+//        livaAsStaff.setContactAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
         livaAsStaff.setGeneralNote("New Joiner, Need to learn to handle client interaction");
         livaAsStaff.setUser(liva);
         livaAsStaff.setSignature("liva");
@@ -777,7 +777,7 @@ public class BootDataService {
 
 
  /*       almaAsStaff = new Staff();
-//        almaAsStaff.setHomeAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
+//        almaAsStaff.setContactAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
         almaAsStaff.setGeneralNote("New Joiner, Need to learn to handle client interaction");
         almaAsStaff.setUser(alma);
         almaAsStaff.setSignature("liva");
@@ -796,7 +796,7 @@ public class BootDataService {
 
         adminAsStaff = new Staff();
         ContactAddress contactAddress = new ContactAddress();
-//        adminAsStaff.setHomeAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
+//        adminAsStaff.setContactAddress(new ContactAddress("Rosewood Street", 3, 1221, "Glostrup", 4533, "Apartments"));
         adminAsStaff.setGeneralNote("Will manage the platform");
         adminAsStaff.setUser(admin);
         adminAsStaff.setSignature("ulrik");

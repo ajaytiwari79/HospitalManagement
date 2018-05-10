@@ -24,7 +24,7 @@ public class OrganizationDTO {
     private List<Long> typeId;
     private List<Long> subTypeId;
     private List<Long> businessTypeId;
-    private AddressDTO homeAddress;
+    private AddressDTO contactAddress;
     private int dayShiftTimeDeduction = 4; //in percentage
     private int nightShiftTimeDeduction = 7; //in percentage
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
@@ -75,16 +75,16 @@ public class OrganizationDTO {
         return name;
     }
 
-    public AddressDTO getHomeAddress() {
-        return homeAddress;
+    public AddressDTO getContactAddress() {
+        return contactAddress;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setHomeAddress(AddressDTO homeAddress) {
-        this.homeAddress = homeAddress;
+    public void setContactAddress(AddressDTO contactAddress) {
+        this.contactAddress = contactAddress;
     }
 
     public List<Long> getTypeId() {

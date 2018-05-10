@@ -410,7 +410,7 @@ public class EmploymentService extends UserBaseService {
         ContactDetail staffContactDetail = staffGraphRepository.getContactDetail(staff.getId());
 
         OrganizationContactAddress organizationContactData = organizationGraphRepository.getContactAddressOfOrg(unitId);
-        ContactAddress officeAddress = organizationContactData.getHomeAddress();
+        ContactAddress officeAddress = organizationContactData.getContactAddress();
         if (officeAddress == null) {
             throw new InternalError("organization address is null");
         }
