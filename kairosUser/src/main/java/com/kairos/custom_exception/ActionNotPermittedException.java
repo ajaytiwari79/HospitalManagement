@@ -8,8 +8,6 @@ import javax.inject.Inject;
  * Created by vipul on 5/9/17.
  */
 public class ActionNotPermittedException extends RuntimeException {
-    @Inject
-    private LocaleService localeService;
     public ActionNotPermittedException(String message) {
         super(message);
     }
