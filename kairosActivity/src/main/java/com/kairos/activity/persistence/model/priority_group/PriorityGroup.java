@@ -1,6 +1,7 @@
 package com.kairos.activity.persistence.model.priority_group;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.activity.enums.PriorityGroup.Priority;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -18,7 +19,7 @@ public class PriorityGroup extends MongoBaseEntity {
     private StaffIncludeFilter staffIncludeFilter;
     //private Priority priority;
     private Long countryId;
-    private Long unitId=-1L;
+    private Long unitId;
     private BigInteger countryParentId;
     private Integer priority;
 

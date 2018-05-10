@@ -15,6 +15,14 @@ public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGro
 
     PriorityGroup findByIdAndCountryIdAndDeletedFalse(BigInteger priorityGroupId,long countryId);
 
-    List<PriorityGroup> findAllByCountryIdAndActivatedTrue(long countryId);
+    List<PriorityGroup> findAllByCountryIdAndActivatedTrueAndDeletedFalse(long countryId);
+
+    List<PriorityGroupDTO> findByUnitIdAndDeletedFalse(long unitId);
+
+    PriorityGroup findByIdAndUnitIdAndDeletedFalse(BigInteger priorityGroupId,long countryId);
+
+    boolean existsByCountryId(long countryId);
+
+
 
 }

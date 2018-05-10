@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -22,6 +21,7 @@ import static com.kairos.activity.constants.ApiConstants.*;
 public class PriorityGroupController {
     @Inject
     PriorityGroupService priorityGroupService;
+
     @ApiOperation("Create Priority Group")
     @PostMapping(value = COUNTRY_URL+"/priority_group")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -55,6 +55,27 @@ public class PriorityGroupController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> copyPriorityGroupsForUnit(@PathVariable Long unitId,@RequestParam("countryId") Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.copyPriorityGroupsForUnit(unitId,countryId));
+    }
+
+    @ApiOperation("Get all Priority Group based on unitId")
+    @GetMapping(value = UNIT_URL+"/priority_groups")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getPriorityGroupsOfUnit(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.getPriorityGroupsOfUnit(unitId));
+    }
+
+    @ApiOperation("Update Priority Group")
+    @PutMapping(value = UNIT_URL+"/priority_group/{priorityGroupId}")
+        //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updatePriorityGroupOfUnit(@PathVariable Long unitId, @PathVariable BigInteger priorityGroupId, @RequestBody PriorityGroupDTO priorityGroupDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.updatePriorityGroupOfUnit(unitId,priorityGroupId, priorityGroupDTO));
+    }
+
+    @ApiOperation("delete Priority Group based on countryId")
+    @DeleteMapping(value = UNIT_URL+"/priority_group/{priorityGroupId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deletePriorityGroupOfUnit(@PathVariable Long unitId, @PathVariable BigInteger priorityGroupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.deletePriorityGroupOfUnit(unitId,priorityGroupId));
     }
 
 }

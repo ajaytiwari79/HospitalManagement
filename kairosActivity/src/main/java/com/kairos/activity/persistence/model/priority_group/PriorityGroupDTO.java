@@ -1,10 +1,10 @@
 package com.kairos.activity.persistence.model.priority_group;
 
-import com.kairos.activity.enums.PriorityGroup.Priority;
-import com.kairos.activity.enums.PriorityGroup.ShiftSelectionType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.math.BigInteger;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PriorityGroupDTO {
     private BigInteger id;
 //    private ShiftSelectionType shiftSelectionType;
@@ -18,13 +18,14 @@ public class PriorityGroupDTO {
     private StaffIncludeFilter staffIncludeFilter;
 //    private Priority priority;
     private Long countryId;
-    private Long unitId=-1L;
+    private Long unitId;
+    private Integer priority;
 
     public PriorityGroupDTO() {
         //Default Constructor
     }
 
-    public PriorityGroupDTO(BigInteger id,  boolean activated,
+    public PriorityGroupDTO(Integer priority, BigInteger id, boolean activated,
                             OpenShiftCancelProcess openShiftCancelProcess, RoundRule roundRule, StaffExcludeFilter staffExcludeFilter,
                             StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId) {
         this.id = id;
@@ -99,5 +100,13 @@ public class PriorityGroupDTO {
 
     public void setUnitId(Long unitId) {
         this.unitId = unitId;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 }
