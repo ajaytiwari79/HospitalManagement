@@ -43,7 +43,7 @@ public class AccountTypeController {
     }
 
     @ApiOperation(value ="accounts  by ids list" )
-    @RequestMapping(value = "/accountlist", method = RequestMethod.POST)
+    @RequestMapping(value = "/account_list", method = RequestMethod.POST)
     public ResponseEntity<Object> getAccountList(@RequestBody List<BigInteger> accountList) {
         if (!Optional.ofNullable(accountList).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Account List in Null");
@@ -55,7 +55,7 @@ public class AccountTypeController {
 
 
     @ApiOperation(value ="all account type " )
-    @RequestMapping(value = "/accounts", method = RequestMethod.GET)
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
     public ResponseEntity<Object> getAllAccounts() {
           return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAllAccounts());
 

@@ -2,6 +2,7 @@ package com.kairos.service.asset;
 
 
 import com.kairos.ExceptionHandler.DataNotFoundByIdException;
+import com.kairos.ExceptionHandler.DuplicateDataException;
 import com.kairos.ExceptionHandler.NotExists;
 import com.kairos.ExceptionHandler.RequestDataNull;
 import com.kairos.persistance.model.asset.GlobalAsset;
@@ -29,12 +30,17 @@ public class GlobalAssetService extends MongoBaseService {
             throw new RequestDataNull("Global asset description and name cannotbe null");
         } else {
 
+            if(globalAssetMongoRepository.findByName(globalAsset.getName())!=null)
+            {
+                throw new DuplicateDataException("asset for name "+globalAsset.getName()+" already exists");
+            }
             GlobalAsset newAsset=new GlobalAsset();
             List<Long> organizationType, organizationSubType, organizationService, organizationSubService;
             organizationType = globalAsset.getOrganisationType();
             organizationSubType = globalAsset.getOrganisationSubType();
             organizationService = globalAsset.getOrganisationService();
             organizationSubService = globalAsset.getOrganisationSubService();
+
             if (organizationType != null && !organizationType.isEmpty()) {
                 newAsset.setOrganisationType(organizationType);
             }
@@ -123,6 +129,20 @@ public class GlobalAssetService extends MongoBaseService {
         return true;
 
     }
+
+    public GlobalAsset getGlobalAssetById(BigInteger id) {
+        GlobalAsset exists = globalAssetMongoRepository.findByid(id);
+        if (!Optional.of(exists).isPresent()) {
+            throw new DataNotFoundByIdException("asset not Exist for id " + id);
+
+        } else
+
+        return exists;
+
+    }
+
+
+
 
 
 }

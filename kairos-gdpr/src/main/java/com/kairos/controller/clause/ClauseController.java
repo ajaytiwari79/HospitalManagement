@@ -103,8 +103,10 @@ public class ClauseController {
     @PutMapping("/update/clause/{clauseId}")
     public ResponseEntity<Object> updateClause(@PathVariable BigInteger clauseId,@Validated @RequestBody ClauseDto clauseDto) {
 
+        if (clauseId!=null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, clauseService.updateClause(clauseId, clauseDto));
-
+        }
+        return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST,false,"clauseId cannot be null or empty");
     }
 
 

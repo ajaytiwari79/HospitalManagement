@@ -1,6 +1,7 @@
 package com.kairos.service.clause;
 
 import com.kairos.ExceptionHandler.DataNotFoundByIdException;
+import com.kairos.ExceptionHandler.DuplicateDataException;
 import com.kairos.ExceptionHandler.NotExists;
 
 import com.kairos.ExceptionHandler.RequestDataNull;
@@ -59,6 +60,12 @@ public class ClauseService extends MongoBaseService {
         List<OrganizationService> organizationSubServices = new ArrayList<>();
         List<OrganizationType> organizationSubTypes = new ArrayList<>();*/
         Clause clause = new Clause();
+        if (clauseRepository.findByTitle(clauseDto.getTitle())!=null)
+        {
+
+            throw new DuplicateDataException("clause with name title "+clauseDto.getTitle()+" already Exist");
+        }
+
         if (Optional.ofNullable(clauseDto.getTags()).isPresent())
         {
             tags = new ArrayList<>();

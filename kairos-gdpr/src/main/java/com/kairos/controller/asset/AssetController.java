@@ -20,6 +20,7 @@ import static com.kairos.constant.ApiConstant.API_ASSET_URL;
 @RestController
 @RequestMapping(API_ASSET_URL)
 @Api(API_ASSET_URL)
+@CrossOrigin
 public class AssetController {
 
 
@@ -30,15 +31,11 @@ public class AssetController {
     @ApiOperation(value = "add global asset")
     @RequestMapping(value = "/global/add_asset", method = RequestMethod.POST)
     public ResponseEntity<Object> addAsset(@RequestBody GlobalAsset asset) {
-        if (!Optional.ofNullable(asset).isPresent()) {
-            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Null or GlbalAsset Empty data");
-        }
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.addAsset(asset));
+          return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.addAsset(asset));
     }
 
     @ApiOperation(value = "get all asset")
-    @RequestMapping(value = "/global/getAll", method = RequestMethod.GET)
+    @RequestMapping(value = "/global/all", method = RequestMethod.GET)
     public ResponseEntity<Object> getAllAsset() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.getAllAsset());
     }
@@ -53,6 +50,12 @@ public class AssetController {
     @DeleteMapping("/global/delete/{id}")
     public ResponseEntity<Object> deleteAssetById(@PathVariable BigInteger id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.deleteAssetById(id));
+    }
+
+    @ApiOperation(value = "delete asset")
+    @GetMapping("/global/id/{id}")
+    public ResponseEntity<Object> getGlobalAssetById(@PathVariable BigInteger id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.getGlobalAssetById(id));
     }
 
 

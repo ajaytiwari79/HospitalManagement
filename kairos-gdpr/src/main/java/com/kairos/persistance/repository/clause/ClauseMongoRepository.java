@@ -15,10 +15,8 @@ import java.util.Optional;
 @Repository
 public interface ClauseMongoRepository extends MongoRepository<Clause,BigInteger>{
 
-    Clause findByTitle(String title);
 
-    @Query("{'organizationType.name':?0}")
-    List<Clause> getClauseByOrganizationType(String organizationType);
+    Clause findByTitle(String title);
 
     Clause findByid(BigInteger id);
 
