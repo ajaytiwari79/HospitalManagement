@@ -55,8 +55,10 @@ public class PriorityGroupService extends MongoBaseService {
         }
         ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
         save(priorityGroup);
-        return new PriorityGroupDTO(priorityGroup.getPriority(), priorityGroup.getId(), priorityGroup.isActivated(),
-                priorityGroup.getOpenShiftCancelProcess(), priorityGroup.getRoundRule(), priorityGroup.getStaffExcludeFilter(), priorityGroup.getStaffIncludeFilter(), priorityGroup.getCountryId(), priorityGroup.getUnitId());
+        ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
+        return priorityGroupDTO;
+//        return new PriorityGroupDTO(priorityGroup.getPriority(), priorityGroup.getId(), priorityGroup.isActivated(),
+//                priorityGroup.getOpenShiftCancelProcess(), priorityGroup.getRoundRule(), priorityGroup.getStaffExcludeFilter(), priorityGroup.getStaffIncludeFilter(), priorityGroup.getCountryId(), priorityGroup.getUnitId());
     }
 
     public boolean deletePriorityGroup(long countryId, BigInteger priorityGroupId) {
@@ -92,8 +94,10 @@ public class PriorityGroupService extends MongoBaseService {
         }
         ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
         save(priorityGroup);
-        return new PriorityGroupDTO(priorityGroup.getPriority(), priorityGroup.getId(), priorityGroup.isActivated(),
-                priorityGroup.getOpenShiftCancelProcess(), priorityGroup.getRoundRule(), priorityGroup.getStaffExcludeFilter(), priorityGroup.getStaffIncludeFilter(), priorityGroup.getCountryId(), priorityGroup.getUnitId());
+        ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
+        return priorityGroupDTO;
+//        return new PriorityGroupDTO(priorityGroup.getPriority(), priorityGroup.getId(), priorityGroup.isActivated(),
+//                priorityGroup.getOpenShiftCancelProcess(), priorityGroup.getRoundRule(), priorityGroup.getStaffExcludeFilter(), priorityGroup.getStaffIncludeFilter(), priorityGroup.getCountryId(), priorityGroup.getUnitId());
     }
 
     public boolean deletePriorityGroupOfUnit(long unitId, BigInteger priorityGroupId) {
@@ -105,6 +109,17 @@ public class PriorityGroupService extends MongoBaseService {
         save(priorityGroup);
         return true;
     }
+
+    public boolean copyPriorityGroupsForOrder(long unitId,int orderId){
+        List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByUnitIdAndActivatedTrueAndDeletedFalse(unitId);
+        priorityGroups.forEach(priorityGroup -> {
+            priorityGroup.setOrderId(orderId);
+            priorityGroup.setId(null);
+            });
+        save(priorityGroups);
+        return true;
+    }
+
 
 
 

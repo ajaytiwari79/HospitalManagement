@@ -23,6 +23,8 @@ public interface PriorityGroupRepository extends MongoBaseRepository<PriorityGro
 
     boolean existsByCountryId(long countryId);
 
+    List<PriorityGroup> findAllByUnitIdAndActivatedTrueAndDeletedFalse(long unitId);
+
 
 
 }

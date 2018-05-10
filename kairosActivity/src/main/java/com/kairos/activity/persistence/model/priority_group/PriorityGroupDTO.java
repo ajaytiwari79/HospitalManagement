@@ -20,6 +20,7 @@ public class PriorityGroupDTO {
     private Long countryId;
     private Long unitId;
     private Integer priority;
+    private Integer orderId;
 
     public PriorityGroupDTO() {
         //Default Constructor
@@ -108,5 +109,13 @@ public class PriorityGroupDTO {
 
     public void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
     }
 }

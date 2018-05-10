@@ -78,4 +78,11 @@ public class PriorityGroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.deletePriorityGroupOfUnit(unitId,priorityGroupId));
     }
 
+    @ApiOperation("Copy Priority Group for Units")
+    @PostMapping(value = UNIT_URL+"/order/{orderId}/copy_priority_group")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> copyPriorityGroupsForOrder(@PathVariable Long unitId,@PathVariable Integer orderId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, priorityGroupService.copyPriorityGroupsForOrder(unitId,orderId));
+    }
+
 }

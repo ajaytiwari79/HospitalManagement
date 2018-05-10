@@ -22,6 +22,7 @@ public class PriorityGroup extends MongoBaseEntity {
     private Long unitId;
     private BigInteger countryParentId;
     private Integer priority;
+    private Integer orderId;
 
     public PriorityGroup() {
         //Default Constructor
@@ -111,5 +112,13 @@ public class PriorityGroup extends MongoBaseEntity {
 
     public void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
     }
 }
