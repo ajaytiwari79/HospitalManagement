@@ -226,4 +226,8 @@ public class OrganizationActivityService extends MongoBaseService {
         return activityDTO;
     }
 
+    public List<ActivityDTO> getActivitiesWithBalanceSettings(long unitId){
+        return  activityMongoRepository.findAllActivitiesWithBalanceSettings(unitId);
+    }
+
 }

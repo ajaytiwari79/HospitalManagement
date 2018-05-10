@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
@@ -21,6 +22,7 @@ import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.OrderDefaultDataWrapper;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
@@ -40,10 +42,7 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.response.dto.web.CountryDTO;
-import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
-import com.kairos.response.dto.web.OrganizationTypeDTO;
-import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
+import com.kairos.response.dto.web.*;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.service.UserBaseService;
@@ -1376,6 +1375,13 @@ public class OrganizationService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
         }
         return unit.getTimeZone(); //(Optional.ofNullable(unit.getTimeZone()).isPresent() ? unit.getTimeZone().toString() : "") ;
+    }
+
+    public OrderDefaultDataWrapper getDefaultDataForOrder(long unitId){
+            List<OrderResponseDTO> orders=priorityGroupIntegrationService.getAllOrderByUnit(unitId);
+            List<ActivityDTO> activities=priorityGroupIntegrationService.getAllActivityByUnit(unitId);
+
+
     }
 }
 

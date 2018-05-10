@@ -211,4 +211,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return (Activity) mongoTemplate.findOne(query,Activity.class);
     }
 
+    @Override
+    public List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId) {
+
+        return null;
+    }
+
 }
