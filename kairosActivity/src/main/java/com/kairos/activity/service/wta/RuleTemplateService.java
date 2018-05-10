@@ -6,6 +6,7 @@ import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -204,6 +205,17 @@ public class RuleTemplateService extends MongoBaseService {
         //careDaysCheck.setPhaseTemplateValues(phaseTemplateValues);
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
+
+        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate=new DaysOffAfterASeriesWTATemplate("Days Off After a Series",false,"Days Off After a Series",1,week,1);
+        dailyRestingTimeWTATemplate.setCountryId(countryDTO.getId());
+        dailyRestingTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+        wtaBaseRuleTemplates1.add(daysOffAfterASeriesWTATemplate);
+
+        NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate=new NoOfSequenceShiftWTATemplate("No Of Sequence Shift",false,"No OF Sequence Shift",1, PartOfDay.DAY,PartOfDay.NIGHT);
+        noOfSequenceShiftWTATemplate.setCountryId(countryDTO.getId());
+        noOfSequenceShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+        wtaBaseRuleTemplates1.add(noOfSequenceShiftWTATemplate);
+
 
         BreaksInShiftWTATemplate breaksInShiftWTATemplate = new BreaksInShiftWTATemplate("Break In Shift",false,"Break In Shift",Arrays.asList(new BreakTemplateValue()));
         breaksInShiftWTATemplate.setCountryId(countryDTO.getId());

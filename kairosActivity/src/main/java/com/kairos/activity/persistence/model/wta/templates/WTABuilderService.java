@@ -103,6 +103,11 @@ public class WTABuilderService extends MongoBaseService {
             case BREAK_IN_SHIFT:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,BreaksInShiftWTATemplate.class);
                 break;
+            case DAYS_OFF_AFTER_A_SERIES:
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,DaysOffAfterASeriesWTATemplate.class);
+                break;
+            case NO_OF_SEQUENCE_SHIFT:
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,NoOfSequenceShiftWTATemplate.class);
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
