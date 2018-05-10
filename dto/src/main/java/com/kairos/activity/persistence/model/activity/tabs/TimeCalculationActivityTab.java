@@ -15,6 +15,7 @@ import java.util.List;
 public class TimeCalculationActivityTab implements Serializable {
 
     private String methodForCalculatingTime;
+    private String calculationType;
     private Boolean allowBreakReduction;
     private Long fixedTimeValue;
     private Long monthsToCalculate;
@@ -176,9 +177,10 @@ public class TimeCalculationActivityTab implements Serializable {
         this.multiplyWithValue = multiplyWithValue;
     }
 
-    public TimeCalculationActivityTab(String methodForCalculatingTime, Boolean allowBreakReduction, Long fixedTimeValue, Long monthsToCalculate, String methodForCalculatingTimeInMonths, List<String> balanceType,
+    public TimeCalculationActivityTab(String methodForCalculatingTime, String calculationType, Boolean allowBreakReduction, Long fixedTimeValue, Long monthsToCalculate, String methodForCalculatingTimeInMonths, List<String> balanceType,
                                       Boolean multiplyWith, Double multiplyWithValue, Boolean multiplyByVacationFactor, Boolean multiplyByFinalSchedule, String breakTemplates, List<Long> dayTypes, DayOfWeek fullWeekStart, DayOfWeek fullWeekEnd, int historyDuration, LocalTime defaultStartTime) {
         this.methodForCalculatingTime = methodForCalculatingTime;
+        this.calculationType = calculationType;
         this.allowBreakReduction = allowBreakReduction;
         this.fixedTimeValue = fixedTimeValue;
         this.monthsToCalculate = monthsToCalculate;
@@ -196,4 +198,11 @@ public class TimeCalculationActivityTab implements Serializable {
         this.defaultStartTime = defaultStartTime;
     }
 
+    public String getCalculationType() {
+        return calculationType;
+    }
+
+    public void setCalculationType(String calculationType) {
+        this.calculationType = calculationType;
+    }
 }
