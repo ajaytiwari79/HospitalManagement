@@ -7,13 +7,12 @@ import org.joda.time.Interval;
 import java.util.List;
 
 @XStreamAlias("StaffingLevelInterval")
+@Deprecated
 public class StaffingLevelInterval {
     private DateTime start;
     private DateTime end;
-
     private int minimumStaffRequired;
     private int maximumStaffRequired;
-
     private List<StaffingLevelSkill> skillLevels;
     private List<StaffingLevelActivityType> activityTypeLevels;
 

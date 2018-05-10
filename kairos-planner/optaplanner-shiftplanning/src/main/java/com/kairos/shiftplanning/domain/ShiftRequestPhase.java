@@ -1,26 +1,20 @@
 package com.kairos.shiftplanning.domain;
 
 import com.kairos.shiftplanning.domain.wta.listeners.ShiftStartTimeListener;
-import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.utils.JodaLocalDateConverter;
 import com.kairos.shiftplanning.utils.JodaLocalTimeConverter;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.joda.time.*;
-import org.kie.api.runtime.rule.RuleContext;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.CustomShadowVariable;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
-import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 @PlanningEntity
@@ -28,7 +22,7 @@ import java.util.*;
 public class ShiftRequestPhase implements Shift{
     private static Logger log= LoggerFactory.getLogger(ShiftRequestPhase.class);
     private UUID id;
-    private Employee employee;
+    private EmployeePlanningFact employee;
     //@CustomShadowVariable(variableListenerClass = ShiftIntervalListener.class,
       //      sources = @PlanningVariableReference(variableName = "shift",entityClass = ActivityLineInterval.class))
     @CustomShadowVariable(variableListenerClass = ShiftStartTimeListener.class,
@@ -101,11 +95,11 @@ public class ShiftRequestPhase implements Shift{
 
 
 
-    public Employee getEmployee() {
+    public EmployeePlanningFact getEmployee() {
         return employee;
     }
 
-    public void setEmployee(Employee employee) {
+    public void setEmployee(EmployeePlanningFact employee) {
         this.employee = employee;
     }
 
@@ -129,7 +123,7 @@ public class ShiftRequestPhase implements Shift{
     }*/
 
    /* public void breakActivityContraints(ActivityLineInterval activityLineInterval,HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext,int index){
-        activityLineInterval.getActivity().breakActivityContraints(scoreHolder,kContext,index);
+        activityLineInterval.getActivityPlannerEntity().breakActivityContraints(scoreHolder,kContext,index);
     }*/
 
     /*public int checkConstraints(List<Shift> shifts, int index){
@@ -357,15 +351,15 @@ public class ShiftRequestPhase implements Shift{
                 '}';
     }
 
-    public ShiftRequestPhase getShiftByActivity(Activity activity,List<ShiftRequestPhase> shifts){
+    public ShiftRequestPhase getShiftByActivity(ActivityPlannerEntity activityPlannerEntity, List<ShiftRequestPhase> shifts){
         for (ShiftRequestPhase shift:shifts) {
 
         }
         return null;
     }
-    public boolean hasIntervalsForActivity(Activity activity){
+    public boolean hasIntervalsForActivity(ActivityPlannerEntity activityPlannerEntity){
         for(ActivityLineInterval ali:activityLineIntervals){
-            if(ali.getActivity().getId().equals(activity.getId())){
+            if(ali.getActivityPlannerEntity().getId().equals(activityPlannerEntity.getId())){
                 return true;
             }
         }
@@ -375,7 +369,7 @@ public class ShiftRequestPhase implements Shift{
         return id.toString().substring(0,6);
     }
     public boolean isAbsenceActivityApplied(){
-        return CollectionUtils.isNotEmpty(activityLineIntervals) && new ArrayList<>(activityLineIntervals).get(0).getActivity().isTypeAbsence();
+        return CollectionUtils.isNotEmpty(activityLineIntervals) && new ArrayList<>(activityLineIntervals).get(0).getActivityPlannerEntity().isTypeAbsence();
     }
     public int getMissingBreakTimes(){
         int totalMins=getMinutes();
@@ -411,7 +405,7 @@ public class ShiftRequestPhase implements Shift{
         //log.info("true");
         return true;
     }
-    public boolean hasAnyEmployee(List<Employee> emps){
+    public boolean hasAnyEmployee(List<EmployeePlanningFact> emps){
         //log.info("E"+this.getPrettyId()+":::"+emps.contains(this.employee));
         return emps.contains(this.employee);
     }
