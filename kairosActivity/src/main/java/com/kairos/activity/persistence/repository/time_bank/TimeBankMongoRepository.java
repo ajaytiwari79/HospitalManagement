@@ -21,7 +21,7 @@ public interface TimeBankMongoRepository extends MongoBaseRepository<DailyTimeBa
     @Query("{unitPositionId:{$in:?0},date:{$gte:?1 , $lte:?2}}")
     List<DailyTimeBankEntry> findAllByUnitPositionsAndDate(List<Long> unitPositionIds, Date startDate, Date endDate);
 
-    @Query("{unitPositionId:?0,date:{$gte:?1 , $lt:?2}}")
+    @Query("{unitPositionId:?0,date:{$gte:?1 , $lte:?2}}")
     List<DailyTimeBankEntry> findAllByUnitPositionAndDate(Long unitPositionId, Date startDate, Date endDate);
 
     @Query("{unitPositionId:?0,date:{$gte:?1}}")
