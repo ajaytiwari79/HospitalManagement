@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.user.expertise.*;
-import com.kairos.persistence.model.user.filter.FilterDetailQueryResult;
+import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -181,10 +181,15 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds,Long selectedDateMillis);
 
     // Get Expertise data for filters by countryId
-    @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}\n" +
+    /*@Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}\n" +
             "    match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {1}\n" +
             "    match(expertise)-[:" + SUPPORTS_SERVICES + "]-(os) return toString(id(expertise)) as id, expertise.name as value ORDER BY value")
-    List<FilterDetailQueryResult> getExpertiseByCountryIdForFilters(Long unitId, Long countryId);
+    List<FilterSelectionQueryResult> getExpertiseByCountryIdForFilters(Long unitId, Long countryId);*/
+
+    @Query("MATCH (o:Organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) WHERE id(o)=64\n" +
+            " MATCH (country:Country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE id(country) = 4\n" +
+            " MATCH(expertise)-[:"+SUPPORTS_SERVICES+"]->(os) return toString(id(expertise)) as id, expertise.name as value ORDER BY value")
+    List<FilterSelectionQueryResult> getExpertiseByCountryIdForFilters(Long unitId, Long countryId);
    
   @Query("match (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) where id(country) = {0}  AND expertise.startDateMillis<={2} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis > {2}) \n" +
             "match(expertise)-[:" + ORG_TYPE_HAS_EXPERTISE + "{isEnabled:true}]-(orgSubType:OrganizationType) where id(orgSubType) = {1} \n" +
