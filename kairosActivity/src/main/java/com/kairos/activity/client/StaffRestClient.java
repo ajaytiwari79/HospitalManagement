@@ -221,22 +221,28 @@ public class StaffRestClient {
         }
     }
 
-    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(Long staffId, String type, Long unitEmploymentId,List<Long> activityDayTypes) {
+    public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(Long staffId, String type, Long unitEmploymentId,List<Long> activityTimeCalculationDayTypes,List<Long> activityRulesTabDayTypes) {
 
         final String baseUrl = getBaseUrl(true);
 
-        String dayType = "";
-        if(activityDayTypes!=null && !activityDayTypes.isEmpty()) {
-            String a = activityDayTypes.toString().replace("[","");
+        String activityTimeCalculationDayTypesIds = "";
+        if(activityTimeCalculationDayTypes!=null && !activityTimeCalculationDayTypes.isEmpty()) {
+            String a = activityTimeCalculationDayTypes.toString().replace("[","");
             a.replace("]","");
-            dayType = a.replace("]","");
+            activityTimeCalculationDayTypesIds = a.replace("]","");
+        }
+        String activityRulesTabDayTypesIds = "";
+        if(activityTimeCalculationDayTypes!=null && !activityTimeCalculationDayTypes.isEmpty()) {
+            String a = activityTimeCalculationDayTypes.toString().replace("[","");
+            a.replace("]","");
+            activityRulesTabDayTypesIds = a.replace("]","");
         }
         try {
             ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>> restExchange =
                     restTemplate.exchange(
-                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type+"&activityDayTypes="+dayType,
+                            baseUrl + "/staff/{staffId}/verifyUnitEmployment/{unitEmploymentId}/?type=" + type+"&activityTimeCalculationDayTypes="+activityTimeCalculationDayTypesIds+"&activityRulesTabDayTypes="+activityRulesTabDayTypes,
                             HttpMethod.GET, null, typeReference, staffId, unitEmploymentId);
             RestTemplateResponseEnvelope<StaffAdditionalInfoDTO> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {

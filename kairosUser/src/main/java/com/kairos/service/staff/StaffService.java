@@ -89,8 +89,6 @@ import java.io.InputStream;
 import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1555,29 +1553,32 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitPositionId, long id, String type, List<Long> activityDayTypes) {
-        Long unitId = -1L;
+    public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitPositionId, long id, String type, List<Long> activityTimeCalculationDayTypes,List<Long> activityRulesTabDayTypes) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
-        unitId = organization.getId();
+        Long unitId = organization.getId();
 
-        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = new StaffAdditionalInfoQueryResult();
-        staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
+        StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
         StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         staffAdditionalInfoQueryResult.setUnitId(organization.getId());
         staffAdditionalInfoQueryResult.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
         staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
         if (Optional.ofNullable(unitPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitPosition(unitPosition);
-
             WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
-
-        if (activityDayTypes != null && !activityDayTypes.isEmpty()) {
-            List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(activityDayTypes);
+        if (activityTimeCalculationDayTypes != null && !activityTimeCalculationDayTypes.isEmpty()) {
+            List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(activityTimeCalculationDayTypes);
             if (dayTypes != null && !dayTypes.isEmpty()) {
                 List<DayOfWeek> days = dayTypes.stream().filter(dt -> !dt.isHolidayType()).flatMap(dt -> dt.getValidDays().stream().map(d -> DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
-                staffAdditionalInfoQueryResult.setActivityDayTypes(days);
+                staffAdditionalInfoQueryResult.setActivityTimeCalculationDayTypes(days);
+            }
+        }
+        if (activityRulesTabDayTypes != null && !activityRulesTabDayTypes.isEmpty()) {
+            List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(activityRulesTabDayTypes);
+            if (dayTypes != null && !dayTypes.isEmpty()) {
+                List<DayOfWeek> days = dayTypes.stream().filter(dt -> !dt.isHolidayType()).flatMap(dt -> dt.getValidDays().stream().map(d -> DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
+                staffAdditionalInfoQueryResult.setActivityRulesTabDayTypes(days);
             }
         }
         staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());

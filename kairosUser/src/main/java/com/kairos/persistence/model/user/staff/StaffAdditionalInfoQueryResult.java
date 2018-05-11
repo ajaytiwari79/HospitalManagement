@@ -25,9 +25,17 @@ public class StaffAdditionalInfoQueryResult {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
-    private List<DayOfWeek> activityDayTypes;
+    private List<DayOfWeek> activityTimeCalculationDayTypes;
+    private List<DayOfWeek> activityRulesTabDayTypes;
     private ZoneId unitTimeZone;
 
+    public List<DayOfWeek> getActivityRulesTabDayTypes() {
+        return activityRulesTabDayTypes;
+    }
+
+    public void setActivityRulesTabDayTypes(List<DayOfWeek> activityRulesTabDayTypes) {
+        this.activityRulesTabDayTypes = activityRulesTabDayTypes;
+    }
 
     public ZoneId getUnitTimeZone() {
         return unitTimeZone;
@@ -37,12 +45,12 @@ public class StaffAdditionalInfoQueryResult {
         this.unitTimeZone = unitTimeZone;
     }
 
-    public List<DayOfWeek> getActivityDayTypes() {
-        return activityDayTypes;
+    public List<DayOfWeek> getActivityTimeCalculationDayTypes() {
+        return activityTimeCalculationDayTypes;
     }
 
-    public void setActivityDayTypes(List<DayOfWeek> activityDayTypes) {
-        this.activityDayTypes = activityDayTypes;
+    public void setActivityTimeCalculationDayTypes(List<DayOfWeek> activityTimeCalculationDayTypes) {
+        this.activityTimeCalculationDayTypes = activityTimeCalculationDayTypes;
     }
 
     public StaffAdditionalInfoQueryResult() {

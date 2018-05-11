@@ -9,7 +9,12 @@ import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.phase.Phase;
 
+import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import com.kairos.activity.util.DateUtils;
+import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.activity.util.WTARuleTemplateValidatorUtility;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -23,126 +28,91 @@ import static com.kairos.activity.enums.RuleTemplates.getByTemplateType;
  */
 public class ActivityWTARulesSpecification extends AbstractActivitySpecification<Activity> {
     Logger logger = LoggerFactory.getLogger(ActivityWTARulesSpecification.class);
-    private WTAResponseDTO wtaResponseDTO;
+    private WTAQueryResultDTO wtaResponseDTO;
     private Shift shift;
     private Phase phase;
-    private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
+    private List<Shift> shifts;
+    //private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
 
-    public ActivityWTARulesSpecification(WTAResponseDTO wtaResponseDTO, Phase phase, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public ActivityWTARulesSpecification(WTAQueryResultDTO wtaResponseDTO, Phase phase, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         this.wtaResponseDTO = wtaResponseDTO;
         this.shift = shift;
         this.phase = phase;
-        this.staffAdditionalInfoDTO = staffAdditionalInfoDTO;
+        //this.staffAdditionalInfoDTO = staffAdditionalInfoDTO;
     }
 
     @Override
     public boolean isSatisfied(Activity activity) {
-        if (wtaResponseDTO.getEndDateMillis()!=null && new DateTime(wtaResponseDTO.getEndDateMillis()).isBefore(shift.getEndDate().getTime())) {
+        if (wtaResponseDTO.getEndDate()!=null && new DateTime(wtaResponseDTO.getEndDate()).isBefore(shift.getEndDate().getTime())) {
             throw new ActionNotPermittedException("WTA is Expired for unit employment.");
         }
-       /* List<RuleTemplateCategoryDTO> ruleTemplates = wtaResponseDTO.getRuleTemplates();
-        for (int i = 0; i < ruleTemplates.size(); i++) {
-            RuleTemplateCategoryDTO currentWTARuleTemplate = ruleTemplates.get(i);
-            String currentTemplateType=getTemplateType(currentWTARuleTemplate.getTemplateType());
-            RuleTemplates tempType=getByTemplateType(currentTemplateType);
-            if(!Optional.ofNullable(tempType).isPresent()){
-                throw new DataNotFoundException("Template Type not Found");
-            }
-            switch (tempType) {
-                case MAXIMUM_SHIFT_LENGTH: //MaximumShiftLengthWTATemplate
-                    if (!currentWTARuleTemplate.getCheckAgainstTimeRules()) {
-                        continue;
-                    } else {
-                        if (!Optional.ofNullable(currentWTARuleTemplate.getPhaseTemplateValues()).isPresent()) {
-                            throw new NoSuchFieldError("Rule template matrix Not found");
-                        }
-                        for (int j = 0; j < currentWTARuleTemplate.getPhaseTemplateValues().size(); j++) {
-                            logger.info(currentWTARuleTemplate.getPhaseTemplateValues().get(j).getPhaseName() + "  " + (phase.getName()));
-                            if (currentWTARuleTemplate.getPhaseTemplateValues().get(j).getPhaseName().equalsIgnoreCase(phase.getName()) && !currentWTARuleTemplate.getPhaseTemplateValues().get(j).isDisabled()) {
-                                Long differenceInMinutes = DateUtils.getDifferenceBetweenDatesInMinute(shift.getStartDate(), shift.getEndDate());
-                                if (differenceInMinutes > currentWTARuleTemplate.getPhaseTemplateValues().get(j).getStaffValue())
-                                    throw new ActionNotPermittedException("Incorrect Maximum allowed shift length " + currentWTARuleTemplate.getPhaseTemplateValues().get(j).getStaffValue());
-                            }
-                        }
-
-                    }
+        for (WTABaseRuleTemplate ruleTemplate : wtaResponseDTO.getRuleTemplates()){
+            switch (ruleTemplate.getWtaTemplateType()) {
+                case SHIFT_LENGTH:
+                    WTARuleTemplateValidatorUtility.checkConstraints(shift,(ShiftLengthWTATemplate)ruleTemplate);
                     break;
-                case MINIMUM_SHIFT_LENGTH: //MinimumShiftLengthWTATemplate
-                    if (!currentWTARuleTemplate.getCheckAgainstTimeRules()) {
-                        continue;
-                    } else {
-                        if (!Optional.ofNullable(currentWTARuleTemplate.getPhaseTemplateValues()).isPresent()) {
-                            throw new NoSuchFieldError("Rule template matrix Not found");
-                        }
-                        for (int j = 0; j < currentWTARuleTemplate.getPhaseTemplateValues().size(); j++) {
-                            logger.info(currentWTARuleTemplate.getPhaseTemplateValues().get(j).getPhaseName() + "  " + (phase.getName()));
-                            if (currentWTARuleTemplate.getPhaseTemplateValues().get(j).getPhaseName().equalsIgnoreCase(phase.getName()) && !currentWTARuleTemplate.getPhaseTemplateValues().get(j).isDisabled()) {
-                                Long differenceInMinutes = DateUtils.getDifferenceBetweenDatesInMinute(shift.getStartDate(), shift.getEndDate());
-                                if (differenceInMinutes < currentWTARuleTemplate.getPhaseTemplateValues().get(j).getStaffValue())
-                                    throw new ActionNotPermittedException("Incorrect minimum allowed shift length " + currentWTARuleTemplate.getPhaseTemplateValues().get(j).getStaffValue());
-                            }
-                        }
-
-                    }
-                    break;
-                case MAXIMUM_NUMBER_OF_CONSECUTIVE_DAYS:
-                    break;
-                case MINIMUM_REST_AFTER_CONSECUTIVE_DAYS_WORKED:
-                    break;
-                case MAXIMUM_NIGHT_SHIFTS_LENGTH:  //ShiftLengthWTATemplateDTO
-//                    if (!currentWTARuleTemplate.getCheckAgainstTimeRules()) {
-//                        continue;
-//                    } else {
-//                        Long differenceInMinutes = DateUtils.getDifferenceBetweenDatesInMinute(shift.getStartDate(), shift.getEndDate());
-//                        TimeInterval interval = new TimeInterval(staffAdditionalInfoDTO.getOrganizationNightStartTimeFrom(), staffAdditionalInfoDTO.getOrganizationNightEndTimeTo());
-//                        DateTime dateTime = new DateTime();
-//                        dateTime.plusMinutes(staffAdditionalInfoDTO.getOrganizationNightStartTimeFrom().intValue());
-//                        //Long organizationNightDurationInMinute = DateUtils.getDifferenceBetweenDatesInMinute(staffAdditionalInfoDTO.getOrganizationNightStartTimeFrom(), staffAdditionalInfoDTO.getOrganizationNightEndTimeTo());
-                        //if (differenceInMinutes < currentWTARuleTemplate.getPhaseTemplateValues().get(j).getStaffValue())
-                        //throw new ActionNotPermittedException("Incorrect minimum allowed shift length " + currentWTARuleTemplate.getPhaseTemplateValues().get(j).getStaffValue());
-                    //}
-                    break;
-                case MINIMUM_NUMBER_OF_CONSECUTIVE_NIGHTS:
+                case CONSECUTIVE_WORKING_PARTOFDAY:
+                    WTARuleTemplateValidatorUtility.checkConstraints(shifts,(ConsecutiveWorkWTATemplate)ruleTemplate);
                     break;
 
-                case MAXIMUM_NUMBER_OF_CONSECUTIVE_NIGHTS:
+          /*  case CONSECUTIVE_NIGHTS_AND_DAYS:
+                ConsecutiveRestPartOfDayWTATemplate consecutiveRestPartOfDayWTATemplate = new ConsecutiveRestPartOfDayWTATemplate();
+                copyProperties(ruleTemplate,consecutiveRestPartOfDayWTATemplate);
+                consecutiveRestPartOfDayWTATemplate.setRuleTemplateCategoryId((BigInteger) ruleTemplate.get("ruleTemplateCategoryId"));
+                wtaBaseRuleTemplate = consecutiveRestPartOfDayWTATemplate;
+                break;*/
+                case REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS:
+                    WTARuleTemplateValidatorUtility.checkConstraints((ConsecutiveRestPartOfDayWTATemplate)ruleTemplate);
                     break;
-                case MINIMUM_REST_AFTER_CONSECUTIVE_NIGHTS_WORKED:
+                case NUMBER_OF_PARTOFDAY:
+                    WTARuleTemplateValidatorUtility.checkConstraints((NumberOfPartOfDayShiftsWTATemplate)ruleTemplate);
                     break;
-                case MAXIMUM_NUMBER_OF_WORK_NIGHTS:
+                case DAYS_OFF_IN_PERIOD:
+                    WTARuleTemplateValidatorUtility.checkConstraints((DaysOffInPeriodWTATemplate)ruleTemplate);
                     break;
-                case MINIMUM_NUMBER_OF_DAYS_OFF_PER_PERIOD:
+                case AVERAGE_SHEDULED_TIME:
+                    WTARuleTemplateValidatorUtility.checkConstraints((AverageScheduledTimeWTATemplate)ruleTemplate);
                     break;
-                case MAXIMUM_AVERAGE_SCHEDULED_TIME_PER_WEEK_WITHIN_AN_INTERVAL:
+                case VETO_PER_PERIOD:
+                    WTARuleTemplateValidatorUtility.checkConstraints((VetoPerPeriodWTATemplate)ruleTemplate);
                     break;
-                case MAXIMUM_VETO_PER_PERIOD:
+                case NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD:
+                    WTARuleTemplateValidatorUtility.checkConstraints((NumberOfWeekendShiftsInPeriodWTATemplate)ruleTemplate);
                     break;
-                case NUMBER_OF_WEEKEND_SHIFTS_IN_A_PERIOD_COMPARED_TO_AVERAGE:
+            /*case CARE_DAYS_CHECK:
+                wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,ChildCareDayCheckWTATemplate.class);
+                break;*/
+                case DAILY_RESTING_TIME:
+                    WTARuleTemplateValidatorUtility.checkConstraints((DailyRestingTimeWTATemplate)ruleTemplate);
                     break;
-                case CARE_DAYS_CHECK:
+                case DURATION_BETWEEN_SHIFTS:
+                    WTARuleTemplateValidatorUtility.checkConstraints((DurationBetweenShiftsWTATemplate)ruleTemplate);
                     break;
-                case MINIMUM_DAILY_RESTING_TIME:
+                case WEEKLY_REST_PERIOD:
+                    WTARuleTemplateValidatorUtility.checkConstraints((WeeklyRestPeriodWTATemplate)ruleTemplate);
                     break;
-                case MINIMUM_DURATION_BETWEEN_SHIFTS:
+                case SHORTEST_AND_AVERAGE_DAILY_REST:
+                    WTARuleTemplateValidatorUtility.checkConstraints((ShortestAndAverageDailyRestWTATemplate)ruleTemplate);
                     break;
-                case MINIMUM_WEEKLY_REST_PERIOD_FIXED_WEEKS:
+                case NUMBER_OF_SHIFTS_IN_INTERVAL:
+                    WTARuleTemplateValidatorUtility.checkConstraints((ShiftsInIntervalWTATemplate)ruleTemplate);
                     break;
-                case SHORTEST_AND_AVERAGE_DAILY_REST_FIXED_TIMES:
+                case TIME_BANK:
+                    WTARuleTemplateValidatorUtility.checkConstraints((TimeBankWTATemplate)ruleTemplate);
                     break;
-                case MAXIMUM_NUMBER_OF_SHIFTS_PER_INTERVAL:
+                case SENIOR_DAYS_PER_YEAR:
+                    WTARuleTemplateValidatorUtility.checkConstraints((SeniorDaysPerYearWTATemplate)ruleTemplate);
                     break;
-                case MAXIMUM_SENIOR_DAYS_PER_YEAR:
+                case CHILD_CARE_DAYS_CHECK:
+                    WTARuleTemplateValidatorUtility.checkConstraints((ChildCareDaysCheckWTATemplate)ruleTemplate);
                     break;
-                case MAXIMUM_TIME_BANK:
-                    break;
-                case MINIMUM_TIME_BANK:
-                    break;
-                case BREAKS_IN_SHIFT:
+                case BREAK_IN_SHIFT:
+                    WTARuleTemplateValidatorUtility.checkConstraints((BreaksInShiftWTATemplate)ruleTemplate);
                     break;
                 default:
                     throw new DataNotFoundByIdException("Invalid TEMPLATE");
             }
-        }*/
+        }
         return true;
     }
     private String getTemplateType(String templateType){

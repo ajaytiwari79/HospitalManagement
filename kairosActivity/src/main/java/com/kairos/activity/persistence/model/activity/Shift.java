@@ -6,6 +6,7 @@ import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.response.dto.shift.ShiftQueryResult;
 import com.kairos.enums.shift.ShiftState;
+import org.joda.time.Interval;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -199,6 +200,10 @@ public class Shift extends MongoBaseEntity {
 
     public boolean isMainShift() {
         return isMainShift;
+    }
+
+    public Interval getInterval(){
+        return new Interval(this.startDate.getTime(),this.getEndDate().getTime());
     }
 
     public void setMainShift(boolean mainShift) {

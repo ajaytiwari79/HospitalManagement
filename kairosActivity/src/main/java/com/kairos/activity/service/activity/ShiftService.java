@@ -11,9 +11,11 @@ import com.kairos.activity.custom_exception.InvalidRequestException;
 import com.kairos.activity.persistence.model.activity.Activity;
 import com.kairos.activity.persistence.model.activity.Shift;
 import com.kairos.activity.persistence.model.phase.Phase;
+import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
+import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.response.dto.shift.ShiftQueryResult;
 import com.kairos.activity.shift.ShiftPublishDTO;
@@ -38,7 +40,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.swing.*;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -81,16 +82,16 @@ public class ShiftService extends MongoBaseService {
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
-    private WTAService wtaService;
+    private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
 
     public List<ShiftQueryResult> createShift(Long organizationId, ShiftDTO shiftDTO, String type, boolean bySubShift) {
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid activity Id ." + shiftDTO.getActivityId());
         }
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), activity.getTimeCalculationActivityTab().getDayTypes());
-        WTAResponseDTO wtaResponseDTO = wtaService.getWta(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
-        staffAdditionalInfoDTO.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), activity.getTimeCalculationActivityTab().getDayTypes(),activity.getRulesActivityTab().getDayTypes());
+        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setWorkingTimeAgreement(wtaQueryResultDTO);
         if (staffAdditionalInfoDTO.getUnitId() == null) {
             throw new DataNotFoundByIdException(shiftDTO.getStaffId() + " Staff Do not belong to unit ->" + shiftDTO.getUnitId());
         }
@@ -131,8 +132,8 @@ public class ShiftService extends MongoBaseService {
         shift.setName(activity.getName());
         validateShiftWithActivity(activity, shift, staffAdditionalInfoDTO);
         List<Integer> activityDayTypes = new ArrayList<>();
-        if (staffAdditionalInfoDTO.getActivityDayTypes() != null && !staffAdditionalInfoDTO.getActivityDayTypes().isEmpty()) {
-            activityDayTypes = staffAdditionalInfoDTO.getActivityDayTypes().stream().map(ad -> ad.getValue()).collect(Collectors.toList());
+        if (staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes() != null && !staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes().isEmpty()) {
+            activityDayTypes = staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes().stream().map(ad -> ad.getValue()).collect(Collectors.toList());
         }
         if (activityDayTypes.contains(new DateTime(shiftDTO.getStartDate()).getDayOfWeek())) {
             timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
@@ -152,8 +153,8 @@ public class ShiftService extends MongoBaseService {
         List<Shift> shifts = new ArrayList<>(shiftDTOS.size());
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>(shiftDTOS.size());
         List<Integer> activityDayTypes = new ArrayList<>();
-        if (staffAdditionalInfoDTO.getActivityDayTypes() != null && !staffAdditionalInfoDTO.getActivityDayTypes().isEmpty()) {
-            activityDayTypes = staffAdditionalInfoDTO.getActivityDayTypes().stream().map(ad -> ad.getValue()).collect(Collectors.toList());
+        if (staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes() != null && !staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes().isEmpty()) {
+            activityDayTypes = staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes().stream().map(ad -> ad.getValue()).collect(Collectors.toList());
         }
         for (ShiftDTO shiftDTO : shiftDTOS) {
             Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getStartDate());
@@ -187,19 +188,16 @@ public class ShiftService extends MongoBaseService {
         if (shift.getShiftState().equals(ShiftState.FIXED) || shift.getShiftState().equals(ShiftState.PUBLISHED) || shift.getShiftState().equals(ShiftState.LOCKED)) {
             throw new ActionNotPermittedException("Shift cant be edited please change state. Current state is " + shift.getShiftState());
         }
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), null);
-        WTAResponseDTO wtaResponseDTO = wtaService.getWta(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
-        staffAdditionalInfoDTO.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
-        if (staffAdditionalInfoDTO.getUnitId() == null) {
-            throw new DataNotFoundByIdException(shiftDTO.getStaffId() + " Staff Do not belong to unit ->" + shiftDTO.getUnitId());
-        }
-
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid activity  Id : " + shiftDTO.getActivityId());
         }
-
-
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), null,activity.getRulesActivityTab().getDayTypes());
+        WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getOne(staffAdditionalInfoDTO.getUnitPosition().getWorkingTimeAgreementId());
+        staffAdditionalInfoDTO.getUnitPosition().setWorkingTimeAgreement(wtaQueryResultDTO);
+        if (staffAdditionalInfoDTO.getUnitId() == null) {
+            throw new DataNotFoundByIdException(shiftDTO.getStaffId() + " Staff Do not belong to unit ->" + shiftDTO.getUnitId());
+        }
         //copy old state of activity object
         Shift oldStateOfShift = new Shift();
         BeanUtils.copyProperties(shift, oldStateOfShift);
@@ -292,12 +290,12 @@ public class ShiftService extends MongoBaseService {
 
         ActivitySpecification<Activity> activitySpecification = activityEmploymentTypeSpecification.and(activityExpertiseSpecification).and(activitySkillSpec).and(activityWTARulesSpecification); //
 
-        List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
+       /* List<Long> dayTypeIds = activity.getRulesActivityTab().getDayTypes();
         if (dayTypeIds != null) {
             List<DayType> dayTypes = countryRestClient.getDayTypes(dayTypeIds);
             ActivitySpecification<Activity> activityDayTypeSpec = new ActivityDayTypeSpecification(dayTypes, shift.getStartDate());
             activitySpecification.and(activityDayTypeSpec);
-        }
+        }*/
 
         activitySpecification.isSatisfied(activity);
 
@@ -309,14 +307,15 @@ public class ShiftService extends MongoBaseService {
         if (!Optional.ofNullable(shift).isPresent()) {
             throw new DataNotFoundByIdException("Invalid shift id : " + shiftDTO.getId());
         }
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), null);
-        if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
-            throw new DataNotFoundByIdException("Invalid staff id : " + shiftDTO.getStaffId());
-        }
         Activity activity = activityRepository.findActivityByIdAndEnabled(shiftDTO.getActivityId());
         if (!Optional.ofNullable(activity).isPresent()) {
             throw new DataNotFoundByIdException("Invalid activity id : " + shiftDTO.getActivityId());
         }
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRestClient.verifyUnitEmploymentOfStaff(shiftDTO.getStaffId(), type, shiftDTO.getUnitPositionId(), null,activity.getRulesActivityTab().getDayTypes());
+        if (!Optional.ofNullable(staffAdditionalInfoDTO).isPresent()) {
+            throw new DataNotFoundByIdException("Invalid staff id : " + shiftDTO.getStaffId());
+        }
+
         shift = shiftDTO.buildShift();
         shift.setUnitId(unitId);
         validateShiftWithActivity(activity, shift, staffAdditionalInfoDTO);

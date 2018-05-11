@@ -1,6 +1,7 @@
 package com.kairos.activity.response.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 
 import java.math.BigInteger;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class StaffUnitPositionDetails {
     private Expertise expertise;
     private EmploymentType employmentType;
-    private WTAResponseDTO workingTimeAgreement;
+    private WTAQueryResultDTO workingTimeAgreement;
     private Long startDateMillis;
     private int workingDaysInWeek;
     private Long endDateMillis;
@@ -142,11 +143,11 @@ public class StaffUnitPositionDetails {
         this.employmentType = employmentType;
     }
 
-    public WTAResponseDTO  getWorkingTimeAgreement() {
+    public WTAQueryResultDTO  getWorkingTimeAgreement() {
         return workingTimeAgreement;
     }
 
-    public void setWorkingTimeAgreement(WTAResponseDTO  workingTimeAgreement) {
+    public void setWorkingTimeAgreement(WTAQueryResultDTO  workingTimeAgreement) {
         this.workingTimeAgreement = workingTimeAgreement;
     }
 

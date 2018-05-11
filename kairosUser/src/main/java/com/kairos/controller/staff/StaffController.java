@@ -572,8 +572,8 @@ public class StaffController {
     @ApiOperation("verify staff has unit employment in unit or not ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentData(@RequestParam("type") String type, @PathVariable long unitId, @PathVariable long staffId,
-                                                                      @PathVariable Long unitPositionId,@RequestParam("activityDayTypes") List<Long> activityDayTypes) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(staffId, unitPositionId, unitId, type,activityDayTypes));
+                                                                      @PathVariable Long unitPositionId,@RequestParam("activityTimeCalculationDayTypes") List<Long> activityTimeCalculationDayTypes,@RequestParam("activityRulesTabDayTypes") List<Long> activityRulesTabDayTypes) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffEmploymentData(staffId, unitPositionId, unitId, type,activityTimeCalculationDayTypes,activityRulesTabDayTypes));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
