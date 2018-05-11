@@ -36,13 +36,12 @@ public class NightWorkerController {
     @ApiOperation(value = "get night worker general details")
     @GetMapping(value = "/night_worker/general/{staffId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getNightWorkerGeneralDetails(@PathVariable Long staffId, @PathVariable Long unitId,
-                                                           @RequestBody @Valid NightWorkerGeneralResponseDTO nightWorkerGeneralResponseDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.getNightWorkerDetailsOfStaff(staffId, unitId));
+    public ResponseEntity<Map<String, Object>> getNightWorkerGeneralDetails(@PathVariable Long staffId, @PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.getNightWorkerDetailsOfStaff(unitId, staffId));
     }
 
     @ApiOperation(value = "get night worker general details")
-    @GetMapping(value = "/night_worker/questionnaire/{staffId}")
+    @PostMapping(value = "/night_worker/questionnaire/{staffId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addNightWorkerQuestionnaireDetails(@PathVariable Long staffId, @PathVariable Long unitId,
                                                                             @RequestBody @Valid QuestionnaireAnswerResponseDTO questionnaireAnswerResponseDTO) {

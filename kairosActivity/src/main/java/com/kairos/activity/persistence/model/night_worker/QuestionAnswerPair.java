@@ -7,6 +7,26 @@ import java.math.BigInteger;
  */
 public class QuestionAnswerPair {
 
-    private BigInteger nightWorkerQuestionId;
+    private BigInteger questionId;
     private Boolean answer;
+
+    public QuestionAnswerPair(){
+        // default constructor
+    }
+
+    public BigInteger getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(BigInteger questionId) {
+        this.questionId = questionId;
+    }
+
+    public Boolean getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(Boolean answer) {
+        this.answer = answer;
+    }
 }

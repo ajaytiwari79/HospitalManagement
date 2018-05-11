@@ -24,11 +24,12 @@ public class NightWorker extends MongoBaseEntity{
         // default constructor
     }
 
-    public NightWorker(boolean nightWorker, LocalDate startDate, PersonType personType, int questionnaireFrequency){
+    public NightWorker(boolean nightWorker, LocalDate startDate, PersonType personType, int questionnaireFrequency, Long staffId){
         this.nightWorker = nightWorker;
         this.startDate = startDate;
         this.personType = personType;
         this.questionnaireFrequency = questionnaireFrequency;
+        this.staffId = staffId;
     }
 
     public boolean isNightWorker() {

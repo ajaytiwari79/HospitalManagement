@@ -1,5 +1,6 @@
 package com.kairos.response.dto.web.night_worker;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.enums.PersonType;
 
 import java.math.BigInteger;
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 /**
  * Created by prerna on 8/5/18.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NightWorkerGeneralResponseDTO {
 
     private BigInteger id;

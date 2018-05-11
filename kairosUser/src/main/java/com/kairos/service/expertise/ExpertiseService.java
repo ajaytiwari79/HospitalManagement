@@ -747,7 +747,7 @@ public class ExpertiseService extends UserBaseService {
                 }
                 validateAgeRange(ageRangeDTO);
 
-                List<CareDays> careDays=ObjectMapperUtils.copyPropertiesByMapper(ageRangeDTO, new CareDays());
+                List<CareDays> careDays=ObjectMapperUtils.copyPropertiesByMapper(ageRangeDTO, CareDays.class);
                 if(wtaType.equalsIgnoreCase(SENIOR_DAYS)){
                         expertise.get().setSeniorDays(careDays);
                 }
@@ -755,7 +755,7 @@ public class ExpertiseService extends UserBaseService {
                     expertise.get().setChildCareDays(careDays);
                 }
                 save(expertise.get());
-                ageRangeDTO = ObjectMapperUtils.copyPropertiesByMapper((wtaType.equals(CHILD_CARE)?expertise.get().getChildCareDays():expertise.get().getSeniorDays()), new AgeRangeDTO());
+                ageRangeDTO = ObjectMapperUtils.copyPropertiesByMapper((wtaType.equals(CHILD_CARE)?expertise.get().getChildCareDays():expertise.get().getSeniorDays()), AgeRangeDTO.class);
                 return ageRangeDTO;
             }
 

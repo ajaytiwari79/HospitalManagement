@@ -11,6 +11,6 @@ import java.math.BigInteger;
  */
 public interface NightWorkerMongoRepository extends MongoBaseRepository<NightWorker, BigInteger>, CustomNightWorkerMongoRepository{
 
-    @Query(value = "{ unitId:?0 }")
+    @Query(value = "{ staffId:?0, deleted:false }")
     NightWorker findByStaffId(Long staffId);
 }
