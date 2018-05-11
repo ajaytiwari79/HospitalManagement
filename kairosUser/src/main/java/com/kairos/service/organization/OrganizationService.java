@@ -26,6 +26,7 @@ import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
+import com.kairos.persistence.model.user.expertise.OrderAndActivityDTO;
 import com.kairos.persistence.model.user.expertise.OrderDefaultDataWrapper;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -216,8 +217,7 @@ public class OrganizationService extends UserBaseService {
     @Inject FunctionGraphRepository functionGraphRepository;
     @Inject ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject DayTypeGraphRepository dayTypeGraphRepository;
-    @Inject
-    PresenceTypeService presenceTypeService;
+    @Inject PresenceTypeRepository presenceTypeRepository;
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
     }
@@ -1396,24 +1396,26 @@ public class OrganizationService extends UserBaseService {
     }
 
     public OrderDefaultDataWrapper getDefaultDataForOrder(long unitId){
-            List<OrderResponseDTO> orders=priorityGroupIntegrationService.getAllOrderByUnit(unitId);
-            List<ActivityDTO> activities=priorityGroupIntegrationService.getAllActivityByUnit(unitId);
+            OrderAndActivityDTO orderAndActivityDTO=priorityGroupIntegrationService.getAllOrderAndActivitiesByUnit(unitId);
+//            List<OrderResponseDTO> orders=priorityGroupIntegrationService.getAllOrderByUnit(unitId);
+//            List<ActivityDTO> activities=priorityGroupIntegrationService.getAllActivityByUnit(unitId);
             List<Skill> skills=skillGraphRepository.findAllSkills();
             List<Expertise> expertise=expertiseGraphRepository.getExpertiseByServices();
             List<StaffPersonalDetailDTO> staffList=staffGraphRepository.getAllStaffWithMobileNumber(unitId);
-            List<PresenceTypeDTO> plannedTypes=pr
+            List<PresenceType> plannedTypes=presenceTypeRepository.findAllPresenceType();
             List<FunctionDTO> functions= functionGraphRepository.findFunctionsByOrganization(unitId);
             List<ReasonCodeResponseDTO> reasonCodes=reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId,ReasonCodeType.ORDER);
             List<DayType> dayTypes=dayTypeGraphRepository.getDayTypeWithService();
             OrderDefaultDataWrapper orderDefaultDataWrapper=new OrderDefaultDataWrapper();
-            orderDefaultDataWrapper.setOrders(orders);
-            orderDefaultDataWrapper.setActivities(activities);
+            orderDefaultDataWrapper.setOrders(orderAndActivityDTO.getOrders());
+            orderDefaultDataWrapper.setActivities(orderAndActivityDTO.getActivities());
             orderDefaultDataWrapper.setSkills(skills);
             orderDefaultDataWrapper.setExpertise(expertise);
             orderDefaultDataWrapper.setStaffList(staffList);
             orderDefaultDataWrapper.setFunctions(functions);
             orderDefaultDataWrapper.setReasonCodes(reasonCodes);
             orderDefaultDataWrapper.setDayTypes(dayTypes);
+            orderDefaultDataWrapper.setPlannedTime(plannedTypes);
             return orderDefaultDataWrapper;
     }
 }

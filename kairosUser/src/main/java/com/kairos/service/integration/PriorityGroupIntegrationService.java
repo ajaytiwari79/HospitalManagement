@@ -2,7 +2,9 @@ package com.kairos.service.integration;
 
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.response.dto.ActivityDTO;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.priority_group.PriorityGroupRestClient;
+import com.kairos.persistence.model.user.expertise.OrderAndActivityDTO;
 import com.kairos.response.dto.web.OrderResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,13 +27,20 @@ public class PriorityGroupIntegrationService {
         priorityGroupRestClient.publish(null,unitId,IntegrationOperation.CREATE,"/copy_priority_group",countryDetail);
     }
 
-    public List<com.kairos.response.dto.web.open_shift.OrderResponseDTO> getAllOrderByUnit(long unitId){
-        return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders",null);
+//    public List<com.kairos.response.dto.web.open_shift.OrderResponseDTO> getAllOrderByUnit(long unitId){
+//        return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders",null);
+//
+//        }
 
-        }
-    public List<ActivityDTO> getAllActivityByUnit(long unitId){
-        return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/activities_with_balance_settings",null);
-        }
+//    public List<ActivityDTO> getAllActivityByUnit(long unitId){
+//        return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders_and_activities",null);
+//        }
+
+    public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId){
+        ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders_and_activities",null),OrderAndActivityDTO.class);
+        return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders_and_activities",null);
+    }
+
 
 
 }

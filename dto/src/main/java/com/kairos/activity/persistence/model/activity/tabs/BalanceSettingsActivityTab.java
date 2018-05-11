@@ -1,9 +1,11 @@
 package com.kairos.activity.persistence.model.activity.tabs;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.response.dto.web.cta.TimeTypeDTO;
 
 import java.math.BigInteger;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BalanceSettingsActivityTab {
     private Integer addTimeTo;
     private String addDayTo;
@@ -11,7 +13,6 @@ public class BalanceSettingsActivityTab {
     private BigInteger timeTypeId;;
     private boolean onCallTimePresent ;
     private Boolean negativeDayBalancePresent;
-    private TimeTypeDTO timeType;
 
     public BalanceSettingsActivityTab() {
         //Default Constructor
@@ -19,14 +20,6 @@ public class BalanceSettingsActivityTab {
 
     public Integer getAddTimeTo() {
         return addTimeTo;
-    }
-
-    public TimeTypeDTO getTimeType() {
-        return timeType;
-    }
-
-    public void setTimeType(TimeTypeDTO timeType) {
-        this.timeType = timeType;
     }
 
     public void setAddTimeTo(Integer addTimeTo) {

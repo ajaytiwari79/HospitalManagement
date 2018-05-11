@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.util.CPRUtil;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -11,6 +12,7 @@ import java.time.Period;
  * Created by vipul on 8/9/17.
  */
 @QueryResult
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class StaffPersonalDetailDTO {
     private long id;
     private String lastName;

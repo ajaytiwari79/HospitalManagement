@@ -217,7 +217,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
                         "balanceSettingsActivityTab.timeType"),
-               project("balanceSettingsActivityTab").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("balanceSettingsActivityTab.timeType")
+               project("balanceSettingsActivityTab").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("timeType").andInclude("timeType.label")
 
         );
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);

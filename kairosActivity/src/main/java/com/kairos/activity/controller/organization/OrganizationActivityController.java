@@ -303,9 +303,9 @@ public class OrganizationActivityController {
     }
 
     @ApiOperation("Get all activity based on unitId")
-    @GetMapping(value = "/activities_with_balance_settings")
+    @GetMapping(value = "/orders_and_activities")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivitiesWithBalanceSettings(@PathVariable Long unitId, @RequestParam("type") String type) {
+    public ResponseEntity<Map<String, Object>> getActivitiesWithBalanceSettings(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivitiesWithBalanceSettings(unitId));
     }
 

@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.persistence.model.organization.DayType;
+import com.kairos.persistence.model.timetype.PresenceTypeDTO;
 import com.kairos.persistence.model.user.agreement.cta.PlannedTimeWithFactor;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.skill.Skill;
@@ -17,7 +18,7 @@ public class OrderDefaultDataWrapper {
     private List<Expertise> expertise;
     private List<TimeType> timeTypes;
     private List<StaffPersonalDetailDTO> staffList;
-    private List<PlannedTimeWithFactor> plannedTimeWithFactors;
+    private List<PresenceType> plannedTime;
     private List<FunctionDTO> functions;
     private List<ReasonCodeResponseDTO> reasonCodes;
     private List<com.kairos.persistence.model.user.country.DayType> dayTypes;
@@ -74,12 +75,12 @@ public class OrderDefaultDataWrapper {
         this.staffList = staffList;
     }
 
-    public List<PlannedTimeWithFactor> getPlannedTimeWithFactors() {
-        return plannedTimeWithFactors;
+    public List<PresenceType> getPlannedTime() {
+        return plannedTime;
     }
 
-    public void setPlannedTimeWithFactors(List<PlannedTimeWithFactor> plannedTimeWithFactors) {
-        this.plannedTimeWithFactors = plannedTimeWithFactors;
+    public void setPlannedTime(List<PresenceType> plannedTime) {
+        this.plannedTime = plannedTime;
     }
 
     public List<FunctionDTO> getFunctions() {
