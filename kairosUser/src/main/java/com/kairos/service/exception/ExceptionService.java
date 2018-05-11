@@ -1,19 +1,20 @@
-package com.kairos.activity.service.exception_handler;
+package com.kairos.service.exception;
 
-import com.kairos.activity.custom_exception.ActionNotPermittedException;
-import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.custom_exception.DuplicateDataException;
-import com.kairos.activity.custom_exception.InvalidRequestException;
-import com.kairos.activity.service.locale.LocaleService;
+import com.kairos.custom_exception.ActionNotPermittedException;
+import com.kairos.custom_exception.DataNotFoundByIdException;
+import com.kairos.custom_exception.DuplicateDataException;
+import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.service.locale.LocaleService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
+
 /**
- * Created by vipul on 11/5/18.
+ * Created by vipul on 10/5/18.
  */
 @Service
-public class ExceptionHandlerService {
+public class ExceptionService {
     @Inject
     private LocaleService localeService;
 
@@ -22,7 +23,7 @@ public class ExceptionHandlerService {
             try {
                 params[i] = localeService.getMessage(params[i].toString());
             } catch (Exception e) {
-                params[i] = (params[i].toString());
+                // intentionally left empty
             }
 
         }

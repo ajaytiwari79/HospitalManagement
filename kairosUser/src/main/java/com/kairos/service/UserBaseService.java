@@ -2,7 +2,6 @@ package com.kairos.service;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.repository.user.UserBaseRepository;
-import com.kairos.service.exception_handler.ExceptionHandlerService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
