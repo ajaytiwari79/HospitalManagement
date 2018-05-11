@@ -15,8 +15,9 @@ import com.kairos.activity.persistence.repository.activity.ActivityMongoReposito
 import com.kairos.activity.persistence.repository.activity.ShiftMongoRepository;
 import com.kairos.activity.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.activity.response.dto.shift.ShiftDTO;
-import com.kairos.activity.response.dto.shift.ShiftQueryResult;
+import com.kairos.activity.shift.ShiftQueryResult;
 import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.activity.shift.ShiftWrapper;
 import com.kairos.enums.shift.ShiftState;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.kairos.activity.service.MongoBaseService;
@@ -536,6 +537,16 @@ public class ShiftService extends MongoBaseService {
         }
 
         return response;
+    }
+
+    public ShiftWrapper getAllShiftsOfSelectedDate(Long unitId, Date selectedDate) throws ParseException {
+        Date endDate = new Date(selectedDate.toString());
+        endDate.setDate(endDate.getDate() + 1);
+        DateFormat dateISOFormat = new SimpleDateFormat(MONGODB_QUERY_DATE_FORMAT);
+        List<ShiftQueryResult> assignedShifts = shiftMongoRepository.getAllAssignedShiftsByDateAndUnitId(unitId, selectedDate, endDate);
+        List<ShiftQueryResult> openShifts = new ArrayList<>();
+        return new ShiftWrapper(assignedShifts, openShifts);
+
     }
 
 }

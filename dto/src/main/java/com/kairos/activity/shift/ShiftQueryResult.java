@@ -1,7 +1,6 @@
-package com.kairos.activity.response.dto.shift;
+package com.kairos.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.enums.shift.ShiftState;
 
 import java.math.BigInteger;
@@ -34,7 +33,6 @@ public class ShiftQueryResult {
     private String remarks;
     private BigInteger activityId;
     private Long staffId;
-    private Phase phase;
     private Integer weekCount;
     private static boolean overrideWeekCount;
     private Long unitId;
@@ -152,14 +150,6 @@ public class ShiftQueryResult {
     public ShiftQueryResult() {
     }
 
-    public Phase getPhase() {
-        return phase;
-    }
-
-    public void setPhase(Phase phase) {
-        this.phase = phase;
-    }
-
     public Integer getWeekCount() {
         if (!overrideWeekCount) {
             ZonedDateTime now = ZonedDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
@@ -263,9 +253,9 @@ public class ShiftQueryResult {
     }
 
 
-    public List<ShiftQueryResult> sortShifts(){
-        if(Optional.ofNullable(subShifts).isPresent()){
-            subShifts.sort((s1,s2)->s1.getStartDate().compareTo(s2.getStartDate()));
+    public List<ShiftQueryResult> sortShifts() {
+        if (Optional.ofNullable(subShifts).isPresent()) {
+            subShifts.sort((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate()));
         }
         return subShifts;
     }
