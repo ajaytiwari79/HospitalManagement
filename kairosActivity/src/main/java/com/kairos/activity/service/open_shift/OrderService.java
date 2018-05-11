@@ -10,12 +10,14 @@ import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class OrderService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(PhaseService.class);

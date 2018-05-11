@@ -48,7 +48,7 @@ public class OrderController {
     @ApiOperation(value = "Get All orders by unitId")
     @RequestMapping(value = "/", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId(@PathVariable Long unitId) {
+    public ResponseEntity<Map<String, Object>> getAllOrdersByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, orderService.getOrdersByUnitId(unitId));
     }
 
