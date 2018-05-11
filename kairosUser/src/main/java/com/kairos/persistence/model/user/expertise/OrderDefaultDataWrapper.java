@@ -3,11 +3,9 @@ package com.kairos.persistence.model.user.expertise;
 import com.kairos.activity.response.dto.ActivityDTO;
 import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.user.agreement.cta.PlannedTimeWithFactor;
-import com.kairos.persistence.model.user.country.Function;
-import com.kairos.persistence.model.user.country.ReasonCode;
-import com.kairos.persistence.model.user.country.TimeType;
+import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
 
 import java.util.List;
@@ -18,11 +16,11 @@ public class OrderDefaultDataWrapper {
     private List<Skill> skills;
     private List<Expertise> expertise;
     private List<TimeType> timeTypes;
-    private List<Staff> staffList;
+    private List<StaffPersonalDetailDTO> staffList;
     private List<PlannedTimeWithFactor> plannedTimeWithFactors;
-    private List<Function> functions;
-    private List<ReasonCode> reasonCodes;
-    private List<DayType> dayTypes;
+    private List<FunctionDTO> functions;
+    private List<ReasonCodeResponseDTO> reasonCodes;
+    private List<com.kairos.persistence.model.user.country.DayType> dayTypes;
 
     public OrderDefaultDataWrapper() {
         //Default Constructor
@@ -68,11 +66,11 @@ public class OrderDefaultDataWrapper {
         this.timeTypes = timeTypes;
     }
 
-    public List<Staff> getStaffList() {
+    public List<StaffPersonalDetailDTO> getStaffList() {
         return staffList;
     }
 
-    public void setStaffList(List<Staff> staffList) {
+    public void setStaffList(List<StaffPersonalDetailDTO> staffList) {
         this.staffList = staffList;
     }
 
@@ -84,27 +82,27 @@ public class OrderDefaultDataWrapper {
         this.plannedTimeWithFactors = plannedTimeWithFactors;
     }
 
-    public List<Function> getFunctions() {
+    public List<FunctionDTO> getFunctions() {
         return functions;
     }
 
-    public void setFunctions(List<Function> functions) {
+    public void setFunctions(List<FunctionDTO> functions) {
         this.functions = functions;
     }
 
-    public List<ReasonCode> getReasonCodes() {
+    public List<ReasonCodeResponseDTO> getReasonCodes() {
         return reasonCodes;
     }
 
-    public void setReasonCodes(List<ReasonCode> reasonCodes) {
+    public void setReasonCodes(List<ReasonCodeResponseDTO> reasonCodes) {
         this.reasonCodes = reasonCodes;
     }
 
-    public List<DayType> getDayTypes() {
+    public List<com.kairos.persistence.model.user.country.DayType> getDayTypes() {
         return dayTypes;
     }
 
-    public void setDayTypes(List<DayType> dayTypes) {
+    public void setDayTypes(List<com.kairos.persistence.model.user.country.DayType> dayTypes) {
         this.dayTypes = dayTypes;
     }
 }

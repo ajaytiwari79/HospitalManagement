@@ -96,8 +96,5 @@ public class OpenningHourService {
         return true;
     }
 
-    public OrderDefaultDataWrapper getDefaultDataForOrder(long unitId){
-            List<OrderResponseDTO> orderResponseDTOS=
-    }
 
 }

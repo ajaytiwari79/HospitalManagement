@@ -9,6 +9,7 @@ import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
+import com.kairos.persistence.model.enums.ReasonCodeType;
 import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -17,16 +18,22 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
 import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
+import com.kairos.persistence.model.user.agreement.cta.PlannedTimeWithFactor;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
+import com.kairos.persistence.model.user.country.FunctionDTO;
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.OrderDefaultDataWrapper;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
+import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.staff.Staff;
+import com.kairos.persistence.model.user.staff.StaffPersonalDetail;
+import com.kairos.persistence.model.user.staff.StaffPersonalDetailDTO;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -41,9 +48,11 @@ import com.kairos.persistence.repository.user.payment_type.PaymentTypeGraphRepos
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.*;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
+import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -200,6 +209,11 @@ public class OrganizationService extends UserBaseService {
     StaffService staffService;
     @Inject
     PriorityGroupIntegrationService priorityGroupIntegrationService;
+    @Inject
+    SkillGraphRepository skillGraphRepository;
+    @Inject FunctionGraphRepository functionGraphRepository;
+    @Inject ReasonCodeGraphRepository reasonCodeGraphRepository;
+    @Inject DayTypeGraphRepository dayTypeGraphRepository;
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
     }
@@ -1380,8 +1394,23 @@ public class OrganizationService extends UserBaseService {
     public OrderDefaultDataWrapper getDefaultDataForOrder(long unitId){
             List<OrderResponseDTO> orders=priorityGroupIntegrationService.getAllOrderByUnit(unitId);
             List<ActivityDTO> activities=priorityGroupIntegrationService.getAllActivityByUnit(unitId);
-
-
+            List<Skill> skills=skillGraphRepository.findAllSkills();
+            List<Expertise> expertise=expertiseGraphRepository.getExpertiseByServices();
+            List<StaffPersonalDetailDTO> staffList=staffGraphRepository.getAllStaffWithMobileNumber(unitId);
+            //List<PlannedTimeWithFactor> plannedTimeWithFactors=
+            List<FunctionDTO> functions= functionGraphRepository.findFunctionsByOrganization(unitId);
+            List<ReasonCodeResponseDTO> reasonCodes=reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId,ReasonCodeType.ORDER);
+            List<DayType> dayTypes=dayTypeGraphRepository.getDayTypeWithService();
+            OrderDefaultDataWrapper orderDefaultDataWrapper=new OrderDefaultDataWrapper();
+            orderDefaultDataWrapper.setOrders(orders);
+            orderDefaultDataWrapper.setActivities(activities);
+            orderDefaultDataWrapper.setSkills(skills);
+            orderDefaultDataWrapper.setExpertise(expertise);
+            orderDefaultDataWrapper.setStaffList(staffList);
+            orderDefaultDataWrapper.setFunctions(functions);
+            orderDefaultDataWrapper.setReasonCodes(reasonCodes);
+            orderDefaultDataWrapper.setDayTypes(dayTypes);
+            return orderDefaultDataWrapper;
     }
 }
 

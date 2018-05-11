@@ -59,8 +59,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
 
 
-    @Query(value="{unitPositionId:?0,deleted:false,isMainShift:true,startDate:{$gte:?1,$lte:?2}}",fields="{ 'startDate' : 1, 'endDate' : 1,'unitPositionId':1}")
-    List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId);
+//    @Query(value="{unitId:?0,deleted:false}",fields="{ 'balanceSettingsActivityTab' : 1,''}")
+//    List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId);
 
-    ;
+
 }

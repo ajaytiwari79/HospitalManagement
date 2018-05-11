@@ -25,14 +25,13 @@ public class PriorityGroupIntegrationService {
         priorityGroupRestClient.publish(null,unitId,IntegrationOperation.CREATE,"/copy_priority_group",countryDetail);
     }
 
-    public List<OrderResponseDTO> getAllOrderByUnit(long unitId){
+    public List<com.kairos.response.dto.web.open_shift.OrderResponseDTO> getAllOrderByUnit(long unitId){
         return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders",null);
 
         }
     public List<ActivityDTO> getAllActivityByUnit(long unitId){
-        return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders",null);
-
-    }
+        return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/activities_with_balance_settings",null);
+        }
 
 
 }

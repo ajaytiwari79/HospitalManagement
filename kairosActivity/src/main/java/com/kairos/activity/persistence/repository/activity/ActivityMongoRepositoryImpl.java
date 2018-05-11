@@ -211,10 +211,17 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return (Activity) mongoTemplate.findOne(query,Activity.class);
     }
 
-    @Override
-    public List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId) {
 
-        return null;
+    public List<ActivityDTO> findAllActivitiesWithBalanceSettings(long unitId) {
+       Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
+                        "balanceSettingsActivityTab.timeType"),
+               project("balanceSettingsActivityTab").and("balanceSettingsActivityTab.timeType").arrayElementAt(0).as("balanceSettingsActivityTab.timeType")
+
+        );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
     }
 
 }

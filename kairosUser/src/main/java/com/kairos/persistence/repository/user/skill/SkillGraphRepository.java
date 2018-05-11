@@ -93,6 +93,9 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
 
     List<Skill> findByExternalIdInAndIsEnabledTrue(List<String> timecareIds);
 
+    @Query("MATCH (skill{isEnabled:isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory) return {id:id(skillCategory),name:skillCategory.name,children:collect({id:id(skill),name:skill.name,parentId:id(skillCategory)})} AS skillList")
+    List<Skill> findAllSkills();
+
 
 
 }
