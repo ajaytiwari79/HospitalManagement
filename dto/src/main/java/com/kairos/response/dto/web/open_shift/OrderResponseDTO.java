@@ -5,13 +5,6 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class OrderResponseDTO {
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
 
     private Long unitId;
     private Long activityId;
@@ -42,6 +35,14 @@ public class OrderResponseDTO {
     private DeadlineRule deadlineRule;
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
 
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
 
     public Long getActivityId() {
         return activityId;

@@ -69,10 +69,11 @@ public class PriorityGroupRestClient {
     }
     public static <T> String getURI(T t,String uri,Map<String,Object> queryParams,Object... pathParams){
         URIBuilder builder = new URIBuilder();
-        queryParams.entrySet().forEach(e->{
-            builder.addParameter(e.getKey(),e.getValue().toString());
-        });
-
+        if(queryParams!=null){
+            queryParams.entrySet().forEach(e->{
+                builder.addParameter(e.getKey(),e.getValue().toString());
+            });
+        }
         try {
             uri= uri+builder.build().toString();
         } catch (URISyntaxException e) {

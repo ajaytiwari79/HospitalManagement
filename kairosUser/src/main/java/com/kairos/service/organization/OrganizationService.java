@@ -53,6 +53,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.response.dto.web.*;
 import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
+import com.kairos.response.dto.web.wta.PresenceTypeDTO;
 import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -64,6 +65,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
+import com.kairos.service.country.PresenceTypeService;
 import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
@@ -214,6 +216,8 @@ public class OrganizationService extends UserBaseService {
     @Inject FunctionGraphRepository functionGraphRepository;
     @Inject ReasonCodeGraphRepository reasonCodeGraphRepository;
     @Inject DayTypeGraphRepository dayTypeGraphRepository;
+    @Inject
+    PresenceTypeService presenceTypeService;
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
     }
@@ -1397,7 +1401,7 @@ public class OrganizationService extends UserBaseService {
             List<Skill> skills=skillGraphRepository.findAllSkills();
             List<Expertise> expertise=expertiseGraphRepository.getExpertiseByServices();
             List<StaffPersonalDetailDTO> staffList=staffGraphRepository.getAllStaffWithMobileNumber(unitId);
-            //List<PlannedTimeWithFactor> plannedTimeWithFactors=
+            List<PresenceTypeDTO> plannedTypes=pr
             List<FunctionDTO> functions= functionGraphRepository.findFunctionsByOrganization(unitId);
             List<ReasonCodeResponseDTO> reasonCodes=reasonCodeGraphRepository.findReasonCodesByOrganizationAndReasonCodeType(unitId,ReasonCodeType.ORDER);
             List<DayType> dayTypes=dayTypeGraphRepository.getDayTypeWithService();
