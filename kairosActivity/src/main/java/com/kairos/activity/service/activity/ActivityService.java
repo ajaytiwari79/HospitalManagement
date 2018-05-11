@@ -16,9 +16,11 @@ import com.kairos.activity.custom_exception.DataNotFoundException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
 import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.persistence.model.activity.Activity;
+import com.kairos.activity.persistence.model.activity.TimeType;
 import com.kairos.activity.persistence.model.activity.tabs.*;
 import com.kairos.activity.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.activity.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.activity.persistence.repository.activity.TimeTypeMongoRepository;
 import com.kairos.activity.persistence.repository.tag.TagMongoRepository;
 import com.kairos.activity.response.dto.*;
 import com.kairos.activity.response.dto.ActivityDTO;
@@ -88,6 +90,8 @@ public class ActivityService extends MongoBaseService {
     private OrganizationActivityService organizationActivityService;
 
     @Inject
+    private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject
     private EnvConfig envConfig;
     @Inject
     private SkillRestClient skillRestClient;
@@ -128,7 +132,7 @@ public class ActivityService extends MongoBaseService {
         if (activityCategory != null) {
             generalActivityTab.setCategoryId(activityCategory.getId());
         } else {
-            ActivityCategory category = new ActivityCategory("NONE", "", countryId);
+            ActivityCategory category = new ActivityCategory("NONE", "", countryId, null);
             save(category);
             generalActivityTab.setCategoryId(category.getId());
         }
@@ -175,7 +179,6 @@ public class ActivityService extends MongoBaseService {
 
     public Map<String, Object> findAllActivityByCountry(long countryId) {
         Map<String, Object> response = new HashMap<>();
-
         List<ActivityTagDTO> activities = activityMongoRepository.findAllActivityByCountry(countryId);
         List<ActivityCategory> acivitityCategories = activityCategoryRepository.findByCountryId(countryId);
         response.put("activities", activities);
@@ -229,32 +232,15 @@ public class ActivityService extends MongoBaseService {
     public ActivityTabsWrapper updateGeneralTab(Long countryId, GeneralActivityTabDTO generalDTO) {
         //check category is available in country
         logger.info(generalDTO.toString());
-        ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted(generalDTO.getCategoryName(), countryId, false);
-
-        if (activityCategory != null) {
-
-            generalDTO.setCategoryId(activityCategory.getId());
-        } else {
-
-            ActivityCategory category = new ActivityCategory(generalDTO.getCategoryName(), "", countryId);
-            save(category);
-
-            if (category == null) {
-
-                throw new DataNotFoundByIdException("Category can't be created!!");
-
-            }
-
-            generalDTO.setCategoryId(category.getId());
-
+        ActivityCategory activityCategory = activityCategoryRepository.getByIdAndNonDeleted(generalDTO.getCategoryId());
+        if (activityCategory == null) {
+            throw new DataNotFoundByIdException("Category Not Available");
         }
         Activity isActivityAlreadyExists = activityMongoRepository.findByNameExcludingCurrentInCountry("^" + generalDTO.getName().trim() + "$", generalDTO.getActivityId(), countryId);
-
         if (Optional.ofNullable(isActivityAlreadyExists).isPresent()) {
             throw new DuplicateDataException("Name already is use " + generalDTO.getName());
         }
         GeneralActivityTab generalTab = generalDTO.buildGeneralActivityTab();
-
         Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(generalDTO.getActivityId())));
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
@@ -262,6 +248,7 @@ public class ActivityService extends MongoBaseService {
         if (Optional.ofNullable(activity.getGeneralActivityTab().getOriginalIconName()).isPresent()) {
             generalTab.setOriginalIconName(activity.getGeneralActivityTab().getOriginalIconName());
         }
+        activity.getBalanceSettingsActivityTab().setTimeTypeId(activityCategory.getTimeTypeId());
         activity.setGeneralActivityTab(generalTab);
         activity.setName(generalTab.getName());
         activity.setTags(generalDTO.getTags());
@@ -318,10 +305,25 @@ public class ActivityService extends MongoBaseService {
             throw new DataNotFoundByIdException("TimeCareActivity not found : " + balanceDTO.getActivityId());
         }
         activity.setBalanceSettingsActivityTab(balanceSettingsTab);
+        //updating activity category based on time type
+        updateActivityCategory(activity);
         save(activity);
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(balanceSettingsTab);
 
         return activityTabsWrapper;
+
+    }
+
+    public void updateActivityCategory(Activity activity){
+        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId(), activity.getCountryId());
+        if(timeType == null)
+            throw new DataNotFoundException("Related Time Type not found");
+        ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(activity.getCountryId(), activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if(category == null){
+            category = new ActivityCategory(timeType.getLabel(), "", activity.getCountryId(), timeType.getId());
+            save(category);
+        }
+        activity.getGeneralActivityTab().setCategoryId(category.getId());
 
     }
 
@@ -778,7 +780,7 @@ public class ActivityService extends MongoBaseService {
         }
         ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId, false);
         if (activityCategory == null) {
-            activityCategory = new ActivityCategory("NONE", "", countryId);
+            activityCategory = new ActivityCategory("NONE", "", countryId, null);
             save(activityCategory);
         }
         List<Long> orgTypes = organizationDTO.getOrganizationTypes().stream().map(organizationTypeDTO -> organizationTypeDTO.getId()).collect(Collectors.toList());
