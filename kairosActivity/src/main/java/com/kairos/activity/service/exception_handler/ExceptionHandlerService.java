@@ -17,28 +17,32 @@ public class ExceptionHandlerService {
     @Inject
     private LocaleService localeService;
 
-    public void dataNotFoundByIdException(String message, Object... source) {
-        source[0] = localeService.getMessage(source[0].toString());
-        message = localeService.getMessage(message, source);
-        throw new DataNotFoundByIdException(message);
+    private String convertMessage(String message, Object... params) {
+        for (int i = 0; i < params.length; i++) {
+            try {
+                params[i] = localeService.getMessage(params[i].toString());
+            } catch (Exception e) {
+                params[i] = (params[i].toString());
+            }
+
+        }
+        return localeService.getMessage(message, params);
     }
 
-    public void actionNotPermittedException(String message, Object... source) {
-        source[0] = localeService.getMessage(source[0].toString());
-        message = localeService.getMessage(message, source);
-        throw new ActionNotPermittedException(message);
+    public void dataNotFoundByIdException(String message, Object... params) {
+        throw new DataNotFoundByIdException(convertMessage(message, params));
     }
 
-    public void duplicateDataException(String message, Object... source) {
-        source[0] = localeService.getMessage(source[0].toString());
-        message = localeService.getMessage(message, source);
-        throw new DuplicateDataException(message);
+    public void actionNotPermittedException(String message, Object... params) {
+        throw new ActionNotPermittedException(convertMessage(message, params));
     }
 
-    public void invalidRequestException(String message, Object... source) {
-        source[0] = localeService.getMessage(source[0].toString());
-        message = localeService.getMessage(message, source);
-        throw new InvalidRequestException(message);
+    public void duplicateDataException(String message, Object... params) {
+        throw new DuplicateDataException(convertMessage(message, params));
+    }
+
+    public void invalidRequestException(String message, Object... params) {
+        throw new InvalidRequestException(convertMessage(message, params));
     }
 
 }

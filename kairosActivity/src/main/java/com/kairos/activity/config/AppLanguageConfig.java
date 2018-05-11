@@ -29,6 +29,7 @@ public class AppLanguageConfig implements WebMvcConfigurer {
         messageSource.setBasenames("classpath:messages/messages");
         messageSource.setUseCodeAsDefaultMessage(true);
         messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setFallbackToSystemLocale(false);
         messageSource.setCacheSeconds(3600);
         return messageSource;
     }
@@ -42,7 +43,7 @@ public class AppLanguageConfig implements WebMvcConfigurer {
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver slr = new SessionLocaleResolver();
-        slr.setDefaultLocale(Locale.US);
+        slr.setDefaultLocale(Locale.UK);
         return slr;
     }
 
