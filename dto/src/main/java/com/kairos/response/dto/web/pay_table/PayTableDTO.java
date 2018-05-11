@@ -18,7 +18,6 @@ public class PayTableDTO {
     private Long id;
     @NotNull(message = "name can't be null")
     private String name;
-    @NotNull(message = "short name  can't be null")
     private String shortName;
     private String description;
 
