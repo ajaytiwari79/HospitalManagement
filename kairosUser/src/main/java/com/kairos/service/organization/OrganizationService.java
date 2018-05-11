@@ -283,7 +283,7 @@ public class OrganizationService extends UserBaseService {
         //List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
         //List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
         //linkWTAToOrganization(allWtaCopy, allWta);
-
+        organization.setTimeZone(ZoneId.of(TIMEZONE_UTC));
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
@@ -489,7 +489,7 @@ public class OrganizationService extends UserBaseService {
         if (!Optional.ofNullable(parent).isPresent()) {
             throw new DataNotFoundByIdException("Can't find Organization with provided Id" + unitId);
         }
-
+        unit.setTimeZone(ZoneId.of(TIMEZONE_UTC));
         unit.setName(organizationDTO.getName());
         unit.setDescription(organizationDTO.getDescription());
         unit.setPrekairos(organizationDTO.isPreKairos());

@@ -6,6 +6,7 @@ package com.kairos.constants;
 public class AppConstants {
     private AppConstants() {
     }
+    public static final String TIMEZONE_UTC = "UTC";
 
     // Request methods
     public static final String GET = "GET";
@@ -195,4 +196,6 @@ public class AppConstants {
 
     // Staff
     public static final String UNIT_MANAGER_EMPLOYMENT_DESCRIPTION = "Working as Unit Manager";
+    public static final String CHILD_CARE="childCare";
+    public static final String SENIOR_DAYS="seniorDays";
 }

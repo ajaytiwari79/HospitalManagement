@@ -4,6 +4,7 @@ import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.AgeRange;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -12,41 +13,37 @@ import java.util.List;
 public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO{
     private List<AgeRange> ageRange;
     private List<Long> activitieIds;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
     private Long numberOfWeeks;
-    private WTATemplateType wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
-    private List<BigInteger> timeTypeIds;
-    private List<Long> plannedTimeIds;
+    private boolean borrowLeave;
+    private boolean carryForwardLeave;
 
     public SeniorDaysPerYearWTATemplateDTO() {
-        //Default Constructor
+        this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
     }
 
-
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
+    public boolean isBorrowLeave() {
+        return borrowLeave;
     }
 
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
+    public void setBorrowLeave(boolean borrowLeave) {
+        this.borrowLeave = borrowLeave;
     }
 
-    public List<Long> getPlannedTimeIds() {
-        return plannedTimeIds;
+    public boolean isCarryForwardLeave() {
+        return carryForwardLeave;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
+    public void setCarryForwardLeave(boolean carryForwardLeave) {
+        this.carryForwardLeave = carryForwardLeave;
     }
 
-    public SeniorDaysPerYearWTATemplateDTO(String name, boolean minimum, boolean disabled, String description, List<AgeRange> ageRange, List<Long> activitieIds,
-                                           long validationStartDateMillis, Long numberOfWeeks) {
-        super(name , description);
-        this.disabled=disabled;
-        this.ageRange = ageRange;
-        this.activitieIds = activitieIds;
-        this.validationStartDateMillis = validationStartDateMillis;
-        this.numberOfWeeks = numberOfWeeks;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
+    }
+
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
     public List<AgeRange> getAgeRange() {
@@ -65,13 +62,6 @@ public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO{
         this.activitieIds = activitieIds;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
-    }
-
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
-    }
 
     public Long getNumberOfWeeks() {
         return numberOfWeeks;

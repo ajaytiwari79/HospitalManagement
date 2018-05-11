@@ -8,6 +8,7 @@ import com.kairos.activity.persistence.enums.WTATemplateType;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,13 +22,13 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
     private long intervalLength;
     private String intervalUnit;
-    private long validationStartDateMillis;
+/*    private long validationStartDateMillis;*/
     private boolean balanceAdjustment;
     private boolean useShiftTimes;
     private long maximumAvgTime;
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
 
     public List<PartOfDay> getPartOfDays() {
@@ -72,9 +73,6 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         this.intervalLength = intervalLength;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
-    }
 
 
     public boolean isBalanceAdjustment() {
@@ -85,9 +83,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         this.balanceAdjustment = balanceAdjustment;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
-    }
+
 
     public boolean isUseShiftTimes() {
         return useShiftTimes;
@@ -98,10 +94,10 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     }
 
     public AverageScheduledTimeWTATemplate(String name, boolean disabled,
-                                           String description, long intervalLength, long validationStartDateMillis
+                                           String description, long intervalLength, LocalDate validationStartDate
             , boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime, String intervalUnit) {
         this.intervalLength = intervalLength;
-        this.validationStartDateMillis = validationStartDateMillis;
+        //this.validationStartDateMillis = validationStartDateMillis;
         this.name = name;
         this.disabled = disabled;
         this.description = description;
@@ -109,6 +105,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         this.useShiftTimes =useShiftTimes;
         this.maximumAvgTime=maximumAvgTime;
         this.intervalUnit=intervalUnit;
+        wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
 
     }
 

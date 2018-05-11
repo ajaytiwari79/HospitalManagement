@@ -22,7 +22,7 @@ public class TimeBankWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private Integer yellowZone;
     private boolean forbid;
     private boolean allowExtraActivity;
-    private WTATemplateType wtaTemplateType = WTATemplateType.TIME_BANK;;
+
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
@@ -62,7 +62,7 @@ public class TimeBankWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.wtaTemplateType = wtaTemplateType;
     }
     public TimeBankWTATemplateDTO() {
-        //Default Constructor
+        this.wtaTemplateType = WTATemplateType.TIME_BANK;
     }
 
     public TimeBankWTATemplateDTO(String name, boolean disabled, String description, TimeBankTypeEnum frequency, Integer yellowZone, boolean forbid, boolean allowExtraActivity) {

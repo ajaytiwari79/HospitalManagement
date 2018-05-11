@@ -23,7 +23,7 @@ public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private boolean balanceAdjustment;
     private boolean useShiftTimes;
     private long maximumAvgTime;
-    private WTATemplateType wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
+
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
@@ -128,7 +128,7 @@ public class AverageScheduledTimeWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
     public AverageScheduledTimeWTATemplateDTO() {
-
+        this.wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
     }
 
 
