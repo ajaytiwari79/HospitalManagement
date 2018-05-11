@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -21,9 +22,7 @@ public class CountryExpertiseDTO {
 
     private Long id;
 
-    @NotNull(message = "error.Expertise.name.notnull")
-    @NotEmpty(message="error.Expertise.name.notEmpty")
-
+    @NotBlank(message="Expertise name can't be empty or null or blank")
     private String name;
 
     private String description;
