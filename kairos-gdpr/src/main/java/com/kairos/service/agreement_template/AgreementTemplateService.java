@@ -1,9 +1,7 @@
 package com.kairos.service.agreement_template;
 
 
-import com.kairos.ExceptionHandler.DataNotFoundByIdException;
-import com.kairos.ExceptionHandler.NotExists;
-import com.kairos.persistance.country.Country;
+import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.persistance.model.agreement_template.AgreementTemplate;
 import com.kairos.persistance.model.agreement_template.dto.AgreementTemplateDto;
 import com.kairos.persistance.model.agreement_template.response.dto.AgreementQueryResult;

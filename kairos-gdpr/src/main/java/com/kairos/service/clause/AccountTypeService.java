@@ -1,8 +1,8 @@
 package com.kairos.service.clause;
 
 
-import com.kairos.ExceptionHandler.DuplicateDataException;
-import com.kairos.ExceptionHandler.NotExists;
+import com.kairos.custome_exception.DataNotExists;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.persistance.model.clause.AccountType;
 import com.kairos.persistance.repository.clause.AccountTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -40,7 +40,7 @@ public class AccountTypeService extends MongoBaseService {
         if (Optional.ofNullable(account).isPresent()) {
             return account;
         } else
-            throw new NotExists("Account for account type ->" + typeOfAccount + " Not exists");
+            throw new DataNotExists("Account for account type ->" + typeOfAccount + " Not exists");
     }
 
 
@@ -52,7 +52,7 @@ public class AccountTypeService extends MongoBaseService {
             if (accountType != null) {
                 accountTypeList.add(accountType);
             } else {
-                throw new NotExists("Account for id ->" + accoundTypeId + "not Exists");
+                throw new DataNotExists("Account for id ->" + accoundTypeId + "not Exists");
             }
         }
         return accountTypeList;
@@ -69,7 +69,7 @@ public class AccountTypeService extends MongoBaseService {
             return accountTypeList;
         }
         else
-            throw new NotExists("accounts not exist create account");
+            throw new DataNotExists("accounts not exist create account");
     }
 
 }

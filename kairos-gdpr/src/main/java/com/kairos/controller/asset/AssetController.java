@@ -37,7 +37,7 @@ public class AssetController {
     @ApiOperation(value = "get all asset")
     @RequestMapping(value = "/global/all", method = RequestMethod.GET)
     public ResponseEntity<Object> getAllAsset() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.getAllAsset());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.getAllGlobalAsset());
     }
 
     @ApiOperation(value = "update asset by id")
@@ -52,7 +52,7 @@ public class AssetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.deleteAssetById(id));
     }
 
-    @ApiOperation(value = "delete asset")
+    @ApiOperation(value = "get global asset by id")
     @GetMapping("/global/id/{id}")
     public ResponseEntity<Object> getGlobalAssetById(@PathVariable BigInteger id) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.getGlobalAssetById(id));

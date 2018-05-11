@@ -1,21 +1,18 @@
 package com.kairos.service.clause;
 
-import com.kairos.ExceptionHandler.DataNotFoundByIdException;
-import com.kairos.ExceptionHandler.DuplicateDataException;
-import com.kairos.ExceptionHandler.NotExists;
+import com.kairos.custome_exception.DataNotFoundByIdException;
+import com.kairos.custome_exception.DuplicateDataException;
+import com.kairos.custome_exception.DataNotExists;
 
-import com.kairos.ExceptionHandler.RequestDataNull;
+import com.kairos.custome_exception.RequestDataNull;
 import com.kairos.persistance.model.clause.AccountType;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.model.clause.dto.ClauseDto;
 import com.kairos.persistance.model.clause.dto.ClauseGetQueryDto;
-import com.kairos.persistance.model.organization.OrganizationService;
-import com.kairos.persistance.model.organization.OrganizationType;
 import com.kairos.persistance.repository.clause.ClauseMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -108,7 +105,7 @@ public class ClauseService extends MongoBaseService {
             result.put("data", clauses);
             return result;
         } else
-            throw new NotExists("Clauses not Exist for organizationType" + orgTypeName);
+            throw new DataNotExists("Clauses not Exist for organizationType" + orgTypeName);
     }
 */
 
@@ -116,7 +113,7 @@ public class ClauseService extends MongoBaseService {
         Clause clause = (Clause) clauseRepository.findByid(id);
 
         if (!Optional.ofNullable(clause).isPresent()) {
-            throw new NotExists("clause Data Not Exist for given id" + id);
+            throw new DataNotExists("clause Data Not Exist for given id" + id);
 
         } else
             return clause;
@@ -128,14 +125,14 @@ public class ClauseService extends MongoBaseService {
         if (clauses != null)
             return clauses;
         else
-            throw new NotExists("Clauses for AccountTYpe : " + accountType + "  Not Exists");
+            throw new DataNotExists("Clauses for AccountTYpe : " + accountType + "  Not Exists");
     }
 
 
     public Clause updateClause(BigInteger clauseid, ClauseDto clauseDto) {
         Clause exists = clauseRepository.findByid(clauseid);
         if (!Optional.ofNullable(exists).isPresent()) {
-            throw new NotExists("clause for given id " + clauseid + " not exist");
+            throw new DataNotExists("clause for given id " + clauseid + " not exist");
         } else {
             List<Long> orgServiceIds, orgTypeIds, orgSubServiceIds, orgSubTypeIds;
             orgServiceIds = clauseDto.getOrganizationServiceIds();
@@ -214,7 +211,7 @@ public class ClauseService extends MongoBaseService {
             if (clauses.size() != 0) {
                 return clauses;
             }
-            throw new NotExists("clause not exists");
+            throw new DataNotExists("clause not exists");
 
         }
 
@@ -246,7 +243,7 @@ public class ClauseService extends MongoBaseService {
 
         List<Clause> clauses = clauseRepository.findAll();
         if (clauses == null) {
-            throw new NotExists("CLauses not Exist ");
+            throw new DataNotExists("CLauses not Exist ");
         }
         return clauses;
 

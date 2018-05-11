@@ -1,8 +1,8 @@
 package com.kairos.service.organization;
 
 
-import com.kairos.ExceptionHandler.DuplicateDataException;
-import com.kairos.ExceptionHandler.NotExists;
+import com.kairos.custome_exception.DataNotExists;
+import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.persistance.model.organization.OrganizationService;
 import com.kairos.persistance.repository.organization.OrganizationServiceMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -47,7 +47,7 @@ if (!Optional.ofNullable(exists).isPresent())
             if (Optional.ofNullable(organizationService).isPresent()) {
                 organizationServiceList.add(organizationService);
             } else {
-                throw new NotExists("organization service for id  ->" + id + "not exist");
+                throw new DataNotExists("organization service for id  ->" + id + "not exist");
             }
         }
         return organizationServiceList;

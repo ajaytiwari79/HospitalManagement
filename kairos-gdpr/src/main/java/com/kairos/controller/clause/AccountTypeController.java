@@ -26,14 +26,14 @@ public class AccountTypeController {
 
 
     @ApiOperation(value ="create new account type" )
-    @PostMapping("/create")
+    @PostMapping("/add_account")
     public ResponseEntity<Object> createAccountType(@RequestBody AccountType accountType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.createAccountType(accountType));
 
     }
 
     @ApiOperation(value ="account type by name" )
-    @GetMapping("/account_type/{typeOfAccount}")
+    @GetMapping("/typeOfAccount/{typeOfAccount}")
     public ResponseEntity<Object> getAccount(@PathVariable String typeOfAccount) {
         if (typeOfAccount == null || typeOfAccount.equals("")) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "typeOfAccount parameter is null or empty");

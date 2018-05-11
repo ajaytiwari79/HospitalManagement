@@ -1,4 +1,4 @@
-package com.kairos.ExceptionHandler;
+package com.kairos.custome_exception;
 
 public class WorkSpaceExistException extends RuntimeException {
     public WorkSpaceExistException(String message)

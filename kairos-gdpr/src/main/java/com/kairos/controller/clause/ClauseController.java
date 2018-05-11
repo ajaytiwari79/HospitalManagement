@@ -1,10 +1,9 @@
 package com.kairos.controller.clause;
 
-import static com.kairos.constant.ApiConstant.API_ASSET_URL;
 import static com.kairos.constant.ApiConstant.API_CLAUSES_URL;
 
 
-import com.kairos.ExceptionHandler.NotExists;
+import com.kairos.custome_exception.DataNotExists;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.model.clause.dto.ClauseDto;
 import com.kairos.persistance.model.clause.dto.ClauseGetQueryDto;
@@ -17,7 +16,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -129,7 +127,7 @@ public class ClauseController {
             , HttpServletResponse httpServletResponse) {
         Page<Clause> resultPage = clauseService.getClausePagination(page, size);
         if (page > resultPage.getTotalPages()) {
-            throw new NotExists("Clauses Not for Page" + page);
+            throw new DataNotExists("Clauses Not for Page" + page);
         }
         eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent(uriComponentsBuilder, httpServletResponse, Clause.class, page, resultPage.getTotalPages(), size));
         return resultPage;

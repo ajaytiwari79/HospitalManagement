@@ -1,7 +1,7 @@
 package com.kairos.service;
 
 
-import com.kairos.ExceptionHandler.WorkSpaceExistException;
+import com.kairos.custome_exception.WorkSpaceExistException;
 
 import org.apache.jackrabbit.api.JackrabbitSession;
 import org.springframework.beans.factory.annotation.Autowired;

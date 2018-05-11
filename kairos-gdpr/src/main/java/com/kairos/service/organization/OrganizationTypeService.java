@@ -1,6 +1,6 @@
 package com.kairos.service.organization;
 
-import com.kairos.ExceptionHandler.NotExists;
+import com.kairos.custome_exception.DataNotExists;
 import com.kairos.persistance.model.organization.OrganizationType;
 import com.kairos.persistance.repository.organization.OrganizationTypeMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -38,7 +38,7 @@ OrganizationType organizationType=organizationTypeRepository.findById(id.toStrin
                organizationTypeList.add(organizationType);
            }
            else
-               throw new NotExists("organization type for id  ->"+id+ "not exist");
+               throw new DataNotExists("organization type for id  ->"+id+ "not exist");
 
        }
 return organizationTypeList;

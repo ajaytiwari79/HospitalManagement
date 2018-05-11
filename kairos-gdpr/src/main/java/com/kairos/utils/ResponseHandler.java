@@ -20,6 +20,7 @@ public static  ResponseEntity<Object> generateResponse(HttpStatus httpStatus,Boo
 result.put("isSuccess",isSuccess);
 result.put("data",response);
 result.put("status",httpStatus.value());
+    result.put("message",httpStatus.value());
 result.put("dateTime",dateTime);
 
 return new ResponseEntity<Object>(result,httpStatus);
