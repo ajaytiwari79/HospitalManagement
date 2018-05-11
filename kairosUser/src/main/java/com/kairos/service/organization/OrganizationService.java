@@ -18,7 +18,6 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
 import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
-import com.kairos.persistence.model.user.agreement.cta.PlannedTimeWithFactor;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
@@ -1397,8 +1396,6 @@ public class OrganizationService extends UserBaseService {
 
     public OrderDefaultDataWrapper getDefaultDataForOrder(long unitId){
             OrderAndActivityDTO orderAndActivityDTO=priorityGroupIntegrationService.getAllOrderAndActivitiesByUnit(unitId);
-//            List<OrderResponseDTO> orders=priorityGroupIntegrationService.getAllOrderByUnit(unitId);
-//            List<ActivityDTO> activities=priorityGroupIntegrationService.getAllActivityByUnit(unitId);
             List<Skill> skills=skillGraphRepository.findAllSkills();
             List<Expertise> expertise=expertiseGraphRepository.getExpertiseByServices();
             List<StaffPersonalDetailDTO> staffList=staffGraphRepository.getAllStaffWithMobileNumber(unitId);

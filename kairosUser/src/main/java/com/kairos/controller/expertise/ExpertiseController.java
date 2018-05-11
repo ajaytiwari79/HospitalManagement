@@ -2,13 +2,16 @@ package com.kairos.controller.expertise;
 
 import com.kairos.response.dto.web.experties.AgeRangeDTO;
 import com.kairos.service.expertise.ExpertiseService;
+import com.kairos.service.locale.LocaleService;
 import com.kairos.service.unit_position.UnitPositionService;
 import com.kairos.util.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.inject.Inject;
 import java.text.ParseException;
 import javax.validation.Valid;
@@ -29,7 +32,8 @@ public class ExpertiseController {
     private ExpertiseService expertiseService;
     @Inject
     private UnitPositionService unitPositionService;
-
+    @Autowired
+    private LocaleService localeService;
 
     @ApiOperation(value = "Assign Staff expertise")
     @RequestMapping(value = "/expertise/staff/{staffId}", method = RequestMethod.PUT)
@@ -79,9 +83,12 @@ public class ExpertiseController {
     @ApiOperation(value = "Update Age range in Expertise")
     @PutMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertise/{expertiseId}/set_age_range")
     public ResponseEntity<Map<String, Object>> updateUnitPosition(@PathVariable Long expertiseId, @RequestBody @Valid List<AgeRangeDTO> ageRangeDTO, @RequestParam("wtaType") String wtaType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateAgeRangeInExpertise(expertiseId, ageRangeDTO,wtaType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateAgeRangeInExpertise(expertiseId, ageRangeDTO, wtaType));
 
 
     }
+
+
+
 
 }

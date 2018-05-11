@@ -27,19 +27,9 @@ public class PriorityGroupIntegrationService {
         priorityGroupRestClient.publish(null,unitId,IntegrationOperation.CREATE,"/copy_priority_group",countryDetail);
     }
 
-//    public List<com.kairos.response.dto.web.open_shift.OrderResponseDTO> getAllOrderByUnit(long unitId){
-//        return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders",null);
-//
-//        }
-
-//    public List<ActivityDTO> getAllActivityByUnit(long unitId){
-//        return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders_and_activities",null);
-//        }
-
     public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId){
-        ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders_and_activities",null),OrderAndActivityDTO.class);
-        return priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders_and_activities",null);
-    }
+        return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders_and_activities",null),OrderAndActivityDTO.class);
+        }
 
 
 
