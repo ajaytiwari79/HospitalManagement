@@ -8,7 +8,6 @@ import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
-import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -17,10 +16,6 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
 import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
-import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
@@ -61,6 +56,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
+import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
@@ -72,7 +68,6 @@ import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -204,7 +199,8 @@ public class OrganizationService extends UserBaseService {
     @Inject private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
     @Inject
     StaffService staffService;
-
+    @Inject
+    PriorityGroupIntegrationService priorityGroupIntegrationService;
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
     }
@@ -304,6 +300,9 @@ public class OrganizationService extends UserBaseService {
             phaseRestClient.createDefaultPhases(organization.getId());
             periodRestClient.createDefaultPeriodSettings(organization.getId());
         }
+
+        priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(organization.getCountry().getId(),organization.getId());
+
 
         /*// TODO Verify code to set Unit Manager of new organization
         // Create Employment for Unit Manager
@@ -621,6 +620,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
         workingTimeAgreementRestClient.assignWTAToOrganization(organizationDTO.getOrganizationSubTypeId(),unit.getId(),country.getId());
+        priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(),unit.getId());
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
         response.put("name", unit.getName());
