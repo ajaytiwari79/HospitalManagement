@@ -1,4 +1,4 @@
-package com.kairos.activity.service.activity;
+package com.kairos.activity.service.shift;
 
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.StaffRestClient;
@@ -38,7 +38,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.swing.*;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;

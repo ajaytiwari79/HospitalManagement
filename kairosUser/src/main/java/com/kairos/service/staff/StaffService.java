@@ -5,6 +5,7 @@ import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
@@ -225,7 +226,11 @@ public class StaffService extends UserBaseService {
         Staff objectToUpdate = staffGraphRepository.findOne(staffId);
 
         if (objectToUpdate == null) {
-            throw new InternalError("Staff can't null");
+            throw new DataNotFoundByIdException("Staff not found");
+        }
+        if(StaffStatusEnum.ACTIVE.equals(objectToUpdate.getCurrentStatus())&&StaffStatusEnum.FICTIVE.equals(staffPersonalDetail.getCurrentStatus()))
+        {
+            throw new ActionNotPermittedException("Active employee can not be converted to Fictive employee");
         }
         staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId, staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList()));
         for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
@@ -349,6 +354,7 @@ public class StaffService extends UserBaseService {
 //            expertiseQueryResult.setRelevantExperienceInMonths(Period.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()).getMonths());
 //            expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(),expertiseQueryResult.getRelevantExperienceInMonths()));
 //        });
+
         map.put("expertiseIds", staffExpertiseQueryResults.stream().map(StaffExpertiseQueryResult::getExpertiseId).collect(Collectors.toList()));
         map.put("expertiseWithExperience", staffExpertiseQueryResults);
 
