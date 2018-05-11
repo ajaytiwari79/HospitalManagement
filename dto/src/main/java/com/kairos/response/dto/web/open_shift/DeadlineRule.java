@@ -3,16 +3,16 @@ package com.kairos.response.dto.web.open_shift;
 import java.time.LocalDate;
 
 public class DeadlineRule {
-    LocalDate Deadline;
+    LocalDate deadline;
     private Integer daysBeforeStart;
     private boolean expiresIfNoCandidateAfterDeadline;
 
     public LocalDate getDeadline() {
-        return Deadline;
+        return deadline;
     }
 
     public void setDeadline(LocalDate deadline) {
-        Deadline = deadline;
+        this.deadline = deadline;
     }
 
     public Integer getDaysBeforeStart() {
