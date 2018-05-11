@@ -2,12 +2,11 @@ package com.kairos.activity.service.priority_group;
 
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
-import com.kairos.activity.enums.PriorityGroup.Priority;
+import com.kairos.activity.enums.PriorityGroup.PriorityGroupName;
 import com.kairos.activity.persistence.model.priority_group.*;
 import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.activity.service.MongoBaseService;
 import com.kairos.activity.util.ObjectMapperUtils;
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -26,15 +25,15 @@ public class PriorityGroupService extends MongoBaseService {
             throw new ActionNotPermittedException("Priority Groups are already created");
         }
         List<PriorityGroup> priorityGroups = new ArrayList<>();
-        OpenShiftCancelProcess openShiftCancelProcess = new OpenShiftCancelProcess(true, false, true, true, 10);
+        OpenShiftCancelProcess openShiftCancelProcess = new OpenShiftCancelProcess(true, false, true, true, false);
         RoundRule roundRule = new RoundRule(10, 10, 10, 10);
         StaffExcludeFilter staffExcludeFilter = new StaffExcludeFilter(false, 10, 10, 10, 10, 10, 10,
                 10, 10, false, 10, 10, 10, false, false, false);
         StaffIncludeFilter staffIncludeFilter = new StaffIncludeFilter(false, false, false, false, false, new ArrayList<BigInteger>(), new ArrayList<BigInteger>());
-        PriorityGroup priorityGroup1 = new PriorityGroup(Priority.ONE.getValue(),true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
-        PriorityGroup priorityGroup2 = new PriorityGroup(Priority.TWO.getValue(),true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
-        PriorityGroup priorityGroup3 = new PriorityGroup(Priority.THREE.getValue(),true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
-        PriorityGroup priorityGroup4 = new PriorityGroup(Priority.FOUR.getValue(),true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
+        PriorityGroup priorityGroup1 = new PriorityGroup(PriorityGroupName.PRIORITY_GROUP1,true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
+        PriorityGroup priorityGroup2 = new PriorityGroup(PriorityGroupName.PRIORITY_GROUP2,true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
+        PriorityGroup priorityGroup3 = new PriorityGroup(PriorityGroupName.PRIORITY_GROUP3,true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
+        PriorityGroup priorityGroup4 = new PriorityGroup(PriorityGroupName.PRIORITY_GROUP4,true, openShiftCancelProcess, roundRule, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
         priorityGroups.add(priorityGroup1);
         priorityGroups.add(priorityGroup2);
         priorityGroups.add(priorityGroup3);
