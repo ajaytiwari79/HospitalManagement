@@ -118,7 +118,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "expertise.endDateMillis as endDateMillis ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
             "services as organizationService,level as organizationLevel,payTable as payTable,union as union,"
             + " CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
-            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels,seniorDays,childCareDays order by expertise.creationDate")
+            "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,functions:functionData,payGroupAreas:payGroupAreas,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels order by expertise.creationDate")
     ExpertiseQueryResult getParentExpertiseByExpertiseId(Long expertiseId);
 
 
