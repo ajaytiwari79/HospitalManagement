@@ -8,14 +8,14 @@ public class OpenShiftCancelProcess {
     private boolean underStaffingPresentForActivity;
     private boolean overStaffingPresentForActivity;
     private boolean sickPersonCallsUnSick;
-    private Integer shortestWorkingTime;
+    private boolean shortestWorkingTime;
 
     public OpenShiftCancelProcess() {
         //Default Constructor
     }
 
     public OpenShiftCancelProcess(boolean shiftAssignedToFictiveEmployee, boolean underStaffingPresentForActivity, boolean overStaffingPresentForActivity,
-                                  boolean sickPersonCallsUnSick, Integer shortestWorkingTime) {
+                                  boolean sickPersonCallsUnSick, boolean shortestWorkingTime) {
         this.shiftAssignedToFictiveEmployee = shiftAssignedToFictiveEmployee;
         this.underStaffingPresentForActivity = underStaffingPresentForActivity;
         this.overStaffingPresentForActivity = overStaffingPresentForActivity;
@@ -47,11 +47,11 @@ public class OpenShiftCancelProcess {
         this.overStaffingPresentForActivity = overStaffingPresentForActivity;
     }
 
-    public Integer getShortestWorkingTime() {
+    public boolean getShortestWorkingTime() {
         return shortestWorkingTime;
     }
 
-    public void setShortestWorkingTime(Integer shortestWorkingTime) {
+    public void setShortestWorkingTime(boolean shortestWorkingTime) {
         this.shortestWorkingTime = shortestWorkingTime;
     }
 
