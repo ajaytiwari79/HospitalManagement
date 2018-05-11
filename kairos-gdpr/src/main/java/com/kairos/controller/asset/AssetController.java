@@ -48,8 +48,8 @@ public class AssetController {
 
     @ApiOperation(value = "delete asset")
     @DeleteMapping("/global/delete/{id}")
-    public ResponseEntity<Object> deleteAssetById(@PathVariable BigInteger id) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.deleteAssetById(id));
+    public ResponseEntity<Object> deleteAsset(@PathVariable BigInteger id) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.deleteAsset(id));
     }
 
     @ApiOperation(value = "get global asset by id")

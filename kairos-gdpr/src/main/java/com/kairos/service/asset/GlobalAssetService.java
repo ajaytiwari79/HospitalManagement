@@ -120,7 +120,7 @@ public class GlobalAssetService extends MongoBaseService {
     }
 
 
-    public Boolean deleteAssetById(BigInteger id) {
+    public Boolean deleteAsset(BigInteger id) {
         GlobalAsset exists = globalAssetMongoRepository.findByid(id);
         if (exists==null) {
             throw new DataNotFoundByIdException("asset not Exist for id " + id);

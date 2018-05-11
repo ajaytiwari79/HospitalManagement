@@ -15,6 +15,13 @@ public final class ApiConstant {
 
     public static final String API_ASSET_URL = API_V1 + "/asset";
 
+//Global master processing activity
+
+public static final String API_PROCESSING_ACTIVITY = API_V1 + "/processing/activity";
+public static final String API_MASTER_PROCESSING_ACTIVITY = API_PROCESSING_ACTIVITY+"/master";
+
+
+
 
     //Account type url
     public static final String API_ACCOUNT_TYPE_URL = API_V1 + "/account";

@@ -1,4 +1,4 @@
-package com.kairos.persistance.model.asset;
+package com.kairos.persistance.model.processing_activity;
 
 
 import com.kairos.persistance.model.common.MongoBaseEntity;
@@ -9,9 +9,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Document(collection = "global_asset")
-public class GlobalAsset extends MongoBaseEntity {
-
+@Document(collection = "master_processing_activity")
+public class MasterProcessingActivity extends MongoBaseEntity {
 
     @NotNullOrEmpty(message = "error.message.name.cannotbe.null.or.empty")
     private  String name;
