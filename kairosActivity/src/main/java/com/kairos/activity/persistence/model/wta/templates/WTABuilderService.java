@@ -108,7 +108,11 @@ public class WTABuilderService extends MongoBaseService {
                 break;
             case NO_OF_SEQUENCE_SHIFT:
                 wtaBaseRuleTemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,NoOfSequenceShiftWTATemplate.class);
-            default:
+                break;
+            case EMPLOYEES_WITH_INCREASE_RISK:
+                wtaBaseRuleTemplate=ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate,EmployeesWithIncreasedRiskWTATemplate.class);
+               break;
+                default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
         wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategoryId());

@@ -29,7 +29,8 @@ public enum WTATemplateType {
 
     //days off after a series "Night Workers"
     DAYS_OFF_AFTER_A_SERIES("days off after a series"),
-    NO_OF_SEQUENCE_SHIFT("no of sequence shift");
+    NO_OF_SEQUENCE_SHIFT("no of sequence shift"),
+    EMPLOYEES_WITH_INCREASE_RISK("employees with increase risk");
     private String value;
 
     WTATemplateType(String value) {
