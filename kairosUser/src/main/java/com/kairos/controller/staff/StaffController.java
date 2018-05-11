@@ -288,7 +288,7 @@ public class StaffController {
     @RequestMapping(value = "/filter",method = RequestMethod.POST)
     @ApiOperation("get staff")
     public ResponseEntity<Map<String, Object>> getStaffWithFilters(@RequestBody StaffFilterDTO staffFilterDTO, @PathVariable Long unitId,@RequestParam String type, @RequestParam long id, @RequestParam("unitPosition") boolean allStaffRequired) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffWithFilter(unitId, type, id,allStaffRequired, staffFilterDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffWithFilter(unitId, type, id, allStaffRequired, staffFilterDTO));
     }
 
     /**

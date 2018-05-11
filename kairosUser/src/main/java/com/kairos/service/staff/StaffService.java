@@ -352,6 +352,7 @@ public class StaffService extends UserBaseService {
 //            expertiseQueryResult.setRelevantExperienceInMonths(Period.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()).getMonths());
 //            expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(),expertiseQueryResult.getRelevantExperienceInMonths()));
 //        });
+
         map.put("expertiseIds", staffExpertiseQueryResults.stream().map(StaffExpertiseQueryResult::getExpertiseId).collect(Collectors.toList()));
         map.put("expertiseWithExperience", staffExpertiseQueryResults);
 

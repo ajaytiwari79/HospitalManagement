@@ -1,4 +1,4 @@
-package com.kairos.activity.service.activity;
+package com.kairos.activity.service.shift;
 
 import com.kairos.activity.client.CountryRestClient;
 import com.kairos.activity.client.StaffRestClient;
