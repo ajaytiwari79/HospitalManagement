@@ -63,11 +63,11 @@ public class ShiftPlanningGenerator {
         unresolvedSolution.setWeekDates(getPlanningDays());
         int[] activitiesRank=activities.stream().mapToInt(a->a.getRank()).toArray();
         unresolvedSolution.setStaffingLevelMatrix(new StaffingLevelMatrix(ShiftPlanningUtility.createStaffingLevelMatrix(unresolvedSolution.getWeekDates(),unresolvedSolution.getActivityLineIntervals(),INTERVAL_MINS,unresolvedSolution.getActivities()), activitiesRank));
-
         //writeObjectToXml(unresolvedSolution);
         return unresolvedSolution;
     }
-
+    @Deprecated
+    //use SHiftPLannignService
     private Map<String, List<ActivityLineInterval>> groupActivityLineIntervals(List<ActivityLineInterval> activityLineIntervals) {
         Map<String,List<ActivityLineInterval>> groupedAlis= new HashMap<>();
 

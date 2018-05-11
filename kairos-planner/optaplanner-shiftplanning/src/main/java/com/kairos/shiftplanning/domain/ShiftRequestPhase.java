@@ -50,6 +50,11 @@ public class ShiftRequestPhase implements Shift{
     private boolean isLocked;
     private boolean isCreatedByStaff;
 
+    public ShiftRequestPhase(EmployeePlanningFact employee, LocalDate date) {
+        this.employee = employee;
+        this.date = date;
+    }
+
     public LocalDate getStartingDayOfThisWeek(){
         LocalDate startOfWeek = new LocalDate().withDayOfWeek(DateTimeConstants.MONDAY);
         return startOfWeek;
