@@ -119,6 +119,9 @@ public class PriorityGroupService extends MongoBaseService {
         save(priorityGroups);
         return true;
     }
+    public PriorityGroupDTO getPriorityGroupById(BigInteger priorityGroupId){
+        return priorityGroupRepository.findByIdAndDeletedFalse(priorityGroupId);
+    }
 
 
 
