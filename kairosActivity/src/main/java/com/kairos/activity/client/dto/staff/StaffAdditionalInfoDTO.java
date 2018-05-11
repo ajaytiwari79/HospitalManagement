@@ -1,6 +1,9 @@
 package com.kairos.activity.client.dto.staff;
 
+import com.kairos.activity.client.dto.TimeSlotWrapper;
 import com.kairos.activity.response.dto.shift.StaffUnitPositionDetails;
+import com.kairos.response.dto.web.cta.DayTypeDTO;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import org.joda.time.DateTimeZone;
 
 import java.time.DayOfWeek;
@@ -22,18 +25,19 @@ public class StaffAdditionalInfoDTO {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
-    private List<DayOfWeek> activityTimeCalculationDayTypes;
-    private List<DayOfWeek> activityRulesTabDayTypes;
+    private List<DayTypeDTO> dayTypes;
     private ZoneId unitTimeZone;
+    private List<TimeSlotWrapper> timeSlotSets;
 
 
-    public List<DayOfWeek> getActivityRulesTabDayTypes() {
-        return activityRulesTabDayTypes;
+    public List<TimeSlotWrapper> getTimeSlotSets() {
+        return timeSlotSets;
     }
 
-    public void setActivityRulesTabDayTypes(List<DayOfWeek> activityRulesTabDayTypes) {
-        this.activityRulesTabDayTypes = activityRulesTabDayTypes;
+    public void setTimeSlotSets(List<TimeSlotWrapper> timeSlotSets) {
+        this.timeSlotSets = timeSlotSets;
     }
+
 
     public DateTimeZone getUnitTimeZone() {
         return DateTimeZone.forID(unitTimeZone.getId());
@@ -47,12 +51,13 @@ public class StaffAdditionalInfoDTO {
         this.unitTimeZone = unitTimeZone;
     }
 
-    public List<DayOfWeek> getActivityTimeCalculationDayTypes() {
-        return activityTimeCalculationDayTypes;
+
+    public List<DayTypeDTO> getDayTypes() {
+        return dayTypes;
     }
 
-    public void setActivityTimeCalculationDayTypes(List<DayOfWeek> activityTimeCalculationDayTypes) {
-        this.activityTimeCalculationDayTypes = activityTimeCalculationDayTypes;
+    public void setDayTypes(List<DayTypeDTO> dayTypes) {
+        this.dayTypes = dayTypes;
     }
 
     public StaffAdditionalInfoDTO() {

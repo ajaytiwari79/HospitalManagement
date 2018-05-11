@@ -6,14 +6,20 @@ package com.kairos.activity.util;
  */
 
 
+import com.kairos.activity.client.dto.TimeSlotWrapper;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.model.activity.Shift;
-import com.kairos.activity.persistence.model.wta.templates.template_types.ConsecutiveWorkWTATemplate;
-import com.kairos.activity.persistence.model.wta.templates.template_types.ShiftLengthWTATemplate;
+import com.kairos.activity.persistence.model.phase.Phase;
+import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
+import com.kairos.activity.persistence.model.wta.templates.template_types.*;
+import com.kairos.persistence.model.user.country.Day;
+import com.kairos.response.dto.web.cta.DayTypeDTO;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.Period;
 
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,7 +35,7 @@ public class WTARuleTemplateValidatorUtility {
 
 
     //MaximumAverageScheduledTimeWTATemplate
-    public static int checkConstraints(List<Shift> shifts){
+    public static int checkConstraints(List<Shift> shifts,AverageScheduledTimeWTATemplate ruleTemplate){
         int totalScheduledTime = 0;//(int) shifts.get(0).getEmployee().getPrevShiftsInfo().getMaximumAverageScheduledTimeInfo();
         for (Shift shift:shifts) {
             if(interval.overlaps(shift.getInterval())){
@@ -102,7 +108,7 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     //MaximumDaysOffInPeriodWTATemplate
-    public static int checkConstraints(List<Shift> shifts){
+    public static int checkConstraints(List<Shift> shifts, DaysOffInPeriodWTATemplate ruleTemplate){
         int shiftsNum=getSortedDates(shifts).size();
         return 7-shiftsNum>daysLimit?0:(daysLimit-(7 - shiftsNum));
     }
@@ -116,7 +122,7 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     //MaximumNumberOfNightsWTATemplate
-    public static int checkConstraints(List<Shift> shifts){
+    public static int checkConstraints(List<Shift> shifts, NumberOfPartOfDayShiftsWTATemplate ruleTemplate){
         if(shifts.size()<0) return 0;
         int count = (int)shifts.get(0).getEmployee().getPrevShiftsInfo().getMaximumNumberOfNightsInfo();
         for (Shift shift:shifts){
@@ -167,7 +173,7 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     // MinimumDailyRestingTimeWTATemplateTemplate
-    public static int checkConstraints(List<Shift> shifts){
+    public static int checkConstraints(List<Shift> shifts,DailyRestingTimeWTATemplate dailyRestingTimeWTATemplate){
         if(shifts.size()<2) return 0;
         List<Interval> intervals=getSortedIntervals(shifts);
         int restingTimeUnder=0;
@@ -183,7 +189,7 @@ public class WTARuleTemplateValidatorUtility {
 
 
     //MinimumDurationBetweenShiftWTATemplate
-    public static boolean checkConsTraints(List<Shift> shifts, Shift shift) {
+    public static boolean checkConstraints(List<Shift> shifts, Shift shift,DurationBetweenShiftsWTATemplate ruleTemplate) {
         boolean isValid = false;
         int timefromPrevShift = 0;
         shifts = (List<Shift>) shifts.stream().filter(shift1 -> shift1.getStartDate() != null && shift1.getEndDate() != null).filter(shift1 -> shift1.getEndDate().isBefore(shift.getStartDate())).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
@@ -201,7 +207,7 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     //MinimumRestConsecutiveNightsWTATemplate
-    public static int checkConstraints(List<Shift> shifts) {
+    public static int checkConstraints(List<Shift> shifts, ConsecutiveRestPartOfDayWTATemplate ruleTemplate) {
         if(shifts.size()<2) return 0;
         sortShifts(shifts);
         List<LocalDate> dates=getSortedDates(shifts);
@@ -224,6 +230,10 @@ public class WTARuleTemplateValidatorUtility {
             l++;
         }
         return totalRestUnder;
+    }
+
+    public boolean isNightShift(Shift shift) {
+        return getNightTimeInterval().contains(shift.getStart().getMinuteOfDay());
     }
 
     //MinimumRestInConsecutiveDaysWTATemplate
@@ -258,7 +268,7 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     //MinimumWeeklyRestPeriodWTATemplate
-    public static int checkConstraints(List<Shift> shifts){
+    public static int checkConstraints(List<Shift> shifts,WeeklyRestPeriodWTATemplate ruleTemplate){
         if(shifts.size()<2) return 0;
         int totalRestTime = interval.toPeriod().getMinutes();
         for (Shift shift:shifts) {
@@ -269,14 +279,14 @@ public class WTARuleTemplateValidatorUtility {
 
 
     //NumberOfWeekendShiftInPeriodWTATemplate
-    public static int checkConstraints(List<Shift> shifts){
+    public static int checkConstraints(List<Shift> shifts,NumberOfWeekendShiftsInPeriodWTATemplate ruleTemplate){
         int weekendShifts=(int) shifts.stream().filter(s->interval.contains(s.getStartDate())).count();
         return weekendShifts>numberShiftsPerPeriod?weekendShifts-numberShiftsPerPeriod:0;
     }
 
 
     //ShortestAndAverageDailyRestWTATemplate
-    public int checkConstraints(List<Shift> shifts){
+    public static int checkConstraints(List<Shift> shifts,ShortestAndAverageDailyRestWTATemplate ruleTemplate){
         if(shifts.size()<2) return 0;
         List<Interval> intervals= getSortedIntervals(shifts);
         int restingTimeUnder=0;
@@ -326,9 +336,49 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     public static List<LocalDate> getSortedAndUniqueDates(List<Shift> shifts){
-        List<LocalDate> dates=new ArrayList<>(shifts.stream().map(s->DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
+        List<LocalDate> dates=new ArrayList<LocalDate>(shifts.stream().map(s->DateUtils.asJodaLocalDate(s.getStartDate())).collect(Collectors.toSet()));
         Collections.sort(dates);
         return dates;
+    }
+
+
+    public static List<Integer> getValidDays(List<DayTypeDTO> dayTypeDTOS,List<Long> dayTypeIds){
+        Set<Integer> dayOfWeeks = new HashSet<>();
+        dayTypeDTOS.forEach(dayTypeDTO -> {
+            dayTypeIds.forEach(dayTypeId->{
+                if(dayTypeDTO.getId().equals(dayTypeId)){
+                    dayOfWeeks.addAll(dayTypeDTO.getValidDays().stream().filter(day -> !day.equals(Day.EVERYDAY)).map(day -> DayOfWeek.valueOf(day.name()).getValue()).collect(Collectors.toList()));
+                }
+            });
+        });
+        return new ArrayList<>(dayOfWeeks);
+    }
+
+    public static boolean isValidForPartOfDay(Shift shift, List<PartOfDay> partOfDays, List<TimeSlotWrapper> timeSlotWrappers){
+        for (PartOfDay partOfDay:partOfDays){
+            switch (partOfDay){
+                case DAY: return new TimeInterval(new DateTime(shift.getStartDate()).getMinuteOfDay(),new DateTime(shift.getEndDate()).getMinuteOfDay()).overlaps(getTimeSlotByPartOfDay(PartOfDay.DAY.name(),timeSlotWrappers));
+                case NIGHT:return new TimeInterval(new DateTime(shift.getStartDate()).getMinuteOfDay(),new DateTime(shift.getEndDate()).getMinuteOfDay()).overlaps(getTimeSlotByPartOfDay(PartOfDay.DAY.name(),timeSlotWrappers));
+                case EVENING:return new TimeInterval(new DateTime(shift.getStartDate()).getMinuteOfDay(),new DateTime(shift.getEndDate()).getMinuteOfDay()).overlaps(getTimeSlotByPartOfDay(PartOfDay.DAY.name(),timeSlotWrappers));
+            }
+        }
+        return false;
+    }
+
+    public static TimeInterval getTimeSlotByPartOfDay(String partOfDay, List<TimeSlotWrapper> timeSlotWrappers){
+        TimeInterval timeInterval = null;
+        for (TimeSlotWrapper timeSlotWrapper:timeSlotWrappers){
+            if(partOfDay.equals(timeSlotWrapper.getName())){
+                timeInterval = new TimeInterval(((timeSlotWrapper.getStartHour()*60)+timeSlotWrapper.getStartMinute()),((timeSlotWrapper.getEndHour()*60)+timeSlotWrapper.getEndMinute()));
+            }
+        }
+        return timeInterval;
+    }
+
+    public getValueByPhase(Phase phase, List<PhaseTemplateValue> phaseTemplateValues,){
+        phaseTemplateValues.forEach(p->{
+            if(p.getStaffValue())
+        });
     }
 
 }

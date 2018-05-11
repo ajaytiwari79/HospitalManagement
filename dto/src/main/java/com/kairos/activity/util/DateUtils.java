@@ -410,4 +410,8 @@ public class DateUtils {
             DateTime dateTime = new DateTime(date);
             return dateTime.toString(formatter);
     }
+
+    public static org.joda.time.LocalDate asJodaLocalDate(Date date){
+        return new DateTime(date).toLocalDate();
+    }
 }

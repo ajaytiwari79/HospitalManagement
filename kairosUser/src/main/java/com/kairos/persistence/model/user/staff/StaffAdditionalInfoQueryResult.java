@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.user.staff;
 
+import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.user.unit_position.StaffUnitPositionDetails;
+import com.kairos.response.dto.web.cta.DayTypeDTO;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.DayOfWeek;
@@ -25,16 +28,17 @@ public class StaffAdditionalInfoQueryResult {
     private StaffUnitPositionDetails unitPosition;
     private Date organizationNightStartTimeFrom;
     private Date organizationNightEndTimeTo;
-    private List<DayOfWeek> activityTimeCalculationDayTypes;
-    private List<DayOfWeek> activityRulesTabDayTypes;
+    private List<DayTypeDTO> dayTypes;
     private ZoneId unitTimeZone;
+    private List<TimeSlotWrapper> timeSlotSets;
+    private UserDTO user;
 
-    public List<DayOfWeek> getActivityRulesTabDayTypes() {
-        return activityRulesTabDayTypes;
+    public List<TimeSlotWrapper> getTimeSlotSets() {
+        return timeSlotSets;
     }
 
-    public void setActivityRulesTabDayTypes(List<DayOfWeek> activityRulesTabDayTypes) {
-        this.activityRulesTabDayTypes = activityRulesTabDayTypes;
+    public void setTimeSlotSets(List<TimeSlotWrapper> timeSlotSets) {
+        this.timeSlotSets = timeSlotSets;
     }
 
     public ZoneId getUnitTimeZone() {
@@ -45,12 +49,12 @@ public class StaffAdditionalInfoQueryResult {
         this.unitTimeZone = unitTimeZone;
     }
 
-    public List<DayOfWeek> getActivityTimeCalculationDayTypes() {
-        return activityTimeCalculationDayTypes;
+    public List<DayTypeDTO> getDayTypes() {
+        return dayTypes;
     }
 
-    public void setActivityTimeCalculationDayTypes(List<DayOfWeek> activityTimeCalculationDayTypes) {
-        this.activityTimeCalculationDayTypes = activityTimeCalculationDayTypes;
+    public void setDayTypes(List<DayTypeDTO> dayTypes) {
+        this.dayTypes = dayTypes;
     }
 
     public StaffAdditionalInfoQueryResult() {

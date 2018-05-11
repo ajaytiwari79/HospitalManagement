@@ -2,6 +2,7 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.enums.IntegrationOperation;
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.TaskServiceRestClient;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -11,9 +12,12 @@ import com.kairos.custom_exception.DataNotMatchedException;
 import com.kairos.custom_exception.DuplicateDataException;
 import com.kairos.persistence.model.enums.Gender;
 import com.kairos.persistence.model.enums.StaffStatusEnum;
+import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.user.access_permission.AccessGroup;
 import com.kairos.persistence.model.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.user.access_permission.AccessPage;
@@ -35,6 +39,7 @@ import com.kairos.persistence.model.user.staff.*;
 import com.kairos.persistence.model.user.unit_position.UnitPositionQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.agreement.wta.WorkingTimeAgreementGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -51,6 +56,7 @@ import com.kairos.response.dto.web.client.ClientStaffInfoDTO;
 import com.kairos.response.dto.web.PasswordUpdateDTO;
 import com.kairos.response.dto.web.StaffAssignedTasksWrapper;
 import com.kairos.response.dto.web.StaffTaskDTO;
+import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import com.kairos.response.dto.web.skill.SkillDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -173,6 +179,7 @@ public class StaffService extends UserBaseService {
     private OrganizationServiceRepository organizationServiceRepository;
     @Inject
     private PlannerSyncService plannerSyncService;
+    @Inject private TimeSlotGraphRepository timeSlotGraphRepository;
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
         Staff staff = staffGraphRepository.findOne(staffId);
@@ -1554,34 +1561,25 @@ public class StaffService extends UserBaseService {
 
     }
 
-    public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitPositionId, long id, String type, List<Long> activityTimeCalculationDayTypes,List<Long> activityRulesTabDayTypes) {
+    public StaffAdditionalInfoQueryResult getStaffEmploymentData(long staffId, Long unitPositionId, long id, String type) {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Long unitId = organization.getId();
-
+        List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
+        //List<TimeSlotSetDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotSets,TimeSlotSetDTO.class);
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, staffId);
         StaffUnitPositionDetails unitPosition = unitPositionGraphRepository.getUnitPositionById(unitPositionId);
         staffAdditionalInfoQueryResult.setUnitId(organization.getId());
         staffAdditionalInfoQueryResult.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
+        staffAdditionalInfoQueryResult.setTimeSlotSets(timeSlotWrappers);
         staffAdditionalInfoQueryResult.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
+
         if (Optional.ofNullable(unitPosition).isPresent()) {
             staffAdditionalInfoQueryResult.setUnitPosition(unitPosition);
             WTAResponseDTO wtaResponseDTO = workingTimeAgreementGraphRepository.findRuleTemplateByWTAId(unitPositionId);
             staffAdditionalInfoQueryResult.getUnitPosition().setWorkingTimeAgreement(wtaResponseDTO);
         }
-        if (activityTimeCalculationDayTypes != null && !activityTimeCalculationDayTypes.isEmpty()) {
-            List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(activityTimeCalculationDayTypes);
-            if (dayTypes != null && !dayTypes.isEmpty()) {
-                List<DayOfWeek> days = dayTypes.stream().filter(dt -> !dt.isHolidayType()).flatMap(dt -> dt.getValidDays().stream().map(d -> DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
-                staffAdditionalInfoQueryResult.setActivityTimeCalculationDayTypes(days);
-            }
-        }
-        if (activityRulesTabDayTypes != null && !activityRulesTabDayTypes.isEmpty()) {
-            List<DayType> dayTypes = dayTypeGraphRepository.getDayTypes(activityRulesTabDayTypes);
-            if (dayTypes != null && !dayTypes.isEmpty()) {
-                List<DayOfWeek> days = dayTypes.stream().filter(dt -> !dt.isHolidayType()).flatMap(dt -> dt.getValidDays().stream().map(d -> DayOfWeek.valueOf(d.name()))).collect(Collectors.toList());
-                staffAdditionalInfoQueryResult.setActivityRulesTabDayTypes(days);
-            }
-        }
+
         staffAdditionalInfoQueryResult.setUnitTimeZone(organization.getTimeZone());
         return staffAdditionalInfoQueryResult;
     }

@@ -178,6 +178,10 @@ public class Shift extends MongoBaseEntity {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
     }
 
+    public int getMinutes(){
+        return (int)getInterval().toDuration().getStandardMinutes();
+    }
+
     public String getRemarks() {
         return remarks;
     }

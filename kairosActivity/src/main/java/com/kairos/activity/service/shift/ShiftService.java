@@ -19,6 +19,8 @@ import com.kairos.activity.persistence.repository.wta.WorkingTimeAgreementMongoR
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.response.dto.shift.ShiftQueryResult;
 import com.kairos.activity.shift.ShiftPublishDTO;
+import com.kairos.activity.util.WTARuleTemplateValidatorUtility;
+import com.kairos.activity.util.userContext.UserContext;
 import com.kairos.enums.shift.ShiftState;
 import com.kairos.response.dto.web.wta.WTAResponseDTO;
 import com.kairos.activity.service.MongoBaseService;
@@ -132,8 +134,8 @@ public class ShiftService extends MongoBaseService {
         shift.setName(activity.getName());
         validateShiftWithActivity(activity, shift, staffAdditionalInfoDTO);
         List<Integer> activityDayTypes = new ArrayList<>();
-        if (staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes() != null && !staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes().isEmpty()) {
-            activityDayTypes = staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes().stream().map(ad -> ad.getValue()).collect(Collectors.toList());
+        if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
+            activityDayTypes = WTARuleTemplateValidatorUtility.getValidDays(staffAdditionalInfoDTO.getDayTypes(),activity.getTimeCalculationActivityTab().getDayTypes());
         }
         if (activityDayTypes.contains(new DateTime(shiftDTO.getStartDate()).getDayOfWeek())) {
             timeBankCalculationService.calculateScheduleAndDurationHour(shift, activity, staffAdditionalInfoDTO.getUnitPosition());
@@ -153,8 +155,8 @@ public class ShiftService extends MongoBaseService {
         List<Shift> shifts = new ArrayList<>(shiftDTOS.size());
         List<ShiftQueryResult> shiftQueryResults = new ArrayList<>(shiftDTOS.size());
         List<Integer> activityDayTypes = new ArrayList<>();
-        if (staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes() != null && !staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes().isEmpty()) {
-            activityDayTypes = staffAdditionalInfoDTO.getActivityTimeCalculationDayTypes().stream().map(ad -> ad.getValue()).collect(Collectors.toList());
+        if (staffAdditionalInfoDTO.getDayTypes() != null && !staffAdditionalInfoDTO.getDayTypes().isEmpty()) {
+            activityDayTypes = WTARuleTemplateValidatorUtility.getValidDays(staffAdditionalInfoDTO.getDayTypes(),activity.getTimeCalculationActivityTab().getDayTypes());
         }
         for (ShiftDTO shiftDTO : shiftDTOS) {
             Date shiftStartDate = DateUtils.onlyDate(shiftDTO.getStartDate());
