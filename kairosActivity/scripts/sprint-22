@@ -1,1 +1,20 @@
+1. Query to add list of questions for Night Worker
+try {
+   db.nightWorkerQuestion.insertMany( [
+	{ "_id":"1",question:"Diabetes?"},
+	{ "_id":"2",question:"Heart or circulatory problems?"},
+	{ "_id":"3",question:"Stomach or intestinal problems, such as ulcers?"},
+	{ "_id":"4",question:"Any medical condition which causes difficulty sleeping?"},
+	{ "_id":"5",question:"Chronic chest disorders where night time symptoms may be particularly troublesome?"},
+	{ "_id":"6",question:"Any medical condition requiring medication on a strict timetable?"},
+	{ "_id":"7",question:"Any medical condition where the timing of meals is particularly important?"},
+	{ "_id":"8",question:"Any mental health problems which may be affected by night work?"},
+	{ "_id":"9",question:"Any other medical condition which may affect your ability to work safely at night?"},
+	{ "_id":"10",question:"Are you a new or expectant mother? (optional question)"},
+	{ "_id":"11",question:"If you have worked at night before, did this cause any ill health?"},
+   ]);
+} catch (e) {
+   print (e);
+}
+
 db.shifts.updateMany({},{$set:{shiftState:"UNPUBLISHED"}})
