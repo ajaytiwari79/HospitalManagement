@@ -2,7 +2,7 @@ package com.kairos.activity.controller.activity;
 
 import com.kairos.activity.response.dto.shift.ShiftDTO;
 import com.kairos.activity.service.activity.ActivityService;
-import com.kairos.activity.service.activity.ShiftService;
+import com.kairos.activity.service.shift.ShiftService;
 import com.kairos.activity.shift.ShiftPublishDTO;
 import com.kairos.activity.util.response.ResponseHandler;
 import io.swagger.annotations.Api;

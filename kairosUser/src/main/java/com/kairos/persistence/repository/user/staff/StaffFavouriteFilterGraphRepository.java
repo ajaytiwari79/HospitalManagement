@@ -14,11 +14,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.APPLI
 @Repository
 public interface StaffFavouriteFilterGraphRepository extends Neo4jBaseRepository<StaffFavouriteFilter, Long> {
 
-    @Query("MATCH (ap:AccessPage)-[r:"+APPLICABLE_FOR+"]-(fg:FilterGroup{deleted:false})-[:HAS_FILTER_GROUP]-(staffFavouriteFilter:StaffFavouriteFilter)\n"+
+    @Query("MATCH (ap:AccessPage)-[r:"+APPLICABLE_FOR+"]-(fg:FilterGroup{deleted:false})-[:HAS_FILTER_GROUP]-(staffFavouriteFilter:StaffFavouriteFilter{deleted:false})\n"+
             "WHERE ap.moduleId={0} AND LOWER(staffFavouriteFilter.name) = LOWER({1}) return COUNT(fg)>0")
     Boolean checkIfFavouriteFilterExistsWithName(String moduleId, String name);
 
-    @Query("MATCH (ap:AccessPage)-[r:"+APPLICABLE_FOR+"]-(fg:FilterGroup{deleted:false})-[:HAS_FILTER_GROUP]-(staffFavouriteFilter:StaffFavouriteFilter)\n"+
+    @Query("MATCH (ap:AccessPage)-[r:"+APPLICABLE_FOR+"]-(fg:FilterGroup{deleted:false})-[:HAS_FILTER_GROUP]-(staffFavouriteFilter:StaffFavouriteFilter{deleted:false})\n"+
             "WHERE ap.moduleId={0} AND LOWER(staffFavouriteFilter.name) = LOWER({1}) AND NOT(id(staffFavouriteFilter) = {2}) return COUNT(fg)>0")
     Boolean checkIfFavouriteFilterExistsWithNameExceptId(String moduleId, String name, Long staffFavouriteFilterId);
 }
