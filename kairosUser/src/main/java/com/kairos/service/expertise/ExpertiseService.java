@@ -778,12 +778,5 @@ public class ExpertiseService extends UserBaseService {
 
     }
 
-    public String test(Long selectedDate) {
-        if (selectedDate == 1L) {
-            exceptionHandlerService.dataNotFoundByIdException("exception.dataNotFound", "country", selectedDate);
-        }
-        return "";
-
-    }
 
 }

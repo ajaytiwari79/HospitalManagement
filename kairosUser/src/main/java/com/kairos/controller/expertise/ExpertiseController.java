@@ -89,12 +89,6 @@ public class ExpertiseController {
     }
 
 
-    @ApiOperation(value = "Update Age range in Expertise")
-    @PutMapping(value = PARENT_ORGANIZATION_URL + COUNTRY_URL + "/expertiselangua")
-    public ResponseEntity<Map<String, Object>> test( @RequestParam(value = "selectedDate", required = false) Long selectedDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.test(selectedDate));
 
-
-    }
 
 }

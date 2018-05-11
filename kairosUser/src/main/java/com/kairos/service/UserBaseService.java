@@ -2,6 +2,7 @@ package com.kairos.service;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.repository.user.UserBaseRepository;
+import com.kairos.service.exception_handler.ExceptionHandlerService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -16,7 +17,7 @@ import java.util.List;
  * UserBaseService
  */
 @Service
-public class UserBaseService {
+public class UserBaseService  {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -42,13 +43,13 @@ public class UserBaseService {
         return userBaseRepository.save(entity);
     }
 
-    public <T extends UserBaseEntity> List<T> save(List<T> entities){
+    public <T extends UserBaseEntity> List<T> save(List<T> entities) {
         DateTime dt = new DateTime();
         DateTime utc = dt.withZoneRetainFields(DateTimeZone.forID("Etc/GMT"));
         Date date = utc.toDate();
         logger.info("Utc Time: " + date);
         Long dateTime = date.getTime();
-        entities.forEach(entity->{
+        entities.forEach(entity -> {
             if (entity.getId() == null) {
                 entity.setCreationDate(dateTime);
             }
