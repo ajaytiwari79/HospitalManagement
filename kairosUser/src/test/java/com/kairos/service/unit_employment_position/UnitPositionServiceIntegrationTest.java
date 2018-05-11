@@ -64,7 +64,7 @@ public class UnitPositionServiceIntegrationTest {
 
     }
 
-    @Test
+    /*@Test
     public void test1_createUnitPosition() throws Exception {
         UnitPositionDTO unitPositionDTO = new UnitPositionDTO(5791L, 1507L, 1616174226503L, null,
                 11, 11182L, 8364L, 15115L, 14730L, 95L, null);
@@ -78,7 +78,7 @@ public class UnitPositionServiceIntegrationTest {
         logger.info(response.toString());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
         createdId = (long) response.getBody().getData().get("id");
-    }
+    }*/
 
     @Test
 
@@ -93,7 +93,7 @@ public class UnitPositionServiceIntegrationTest {
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
     }
 
-    @Test
+   /* @Test
     public void test3_updateUnitPosition() throws Exception {
         UnitPositionDTO unitPositionDTO = new UnitPositionDTO(5791L, 1507L, 1616174226503L, null,
                 11, 11182L, 8364L, 15115L, 14730L, 95L, null);
@@ -106,7 +106,7 @@ public class UnitPositionServiceIntegrationTest {
                 HttpMethod.PUT, requestBodyData, typeReference);
         logger.info(response.toString());
         Assert.assertTrue(HttpStatus.OK.equals(response.getStatusCode()));
-    }
+    }*/
 
     public final String getBaseUrl(Long organizationId, Long countryId, Long unitId) {
         if (organizationId != null && countryId != null) {

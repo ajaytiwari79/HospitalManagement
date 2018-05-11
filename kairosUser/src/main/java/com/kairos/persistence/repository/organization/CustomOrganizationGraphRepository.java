@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.organization;
 
+import com.kairos.persistence.model.enums.FilterType;
 import com.kairos.response.dto.web.client.ClientFilterDTO;
 
 import java.util.List;
@@ -12,4 +13,7 @@ public interface CustomOrganizationGraphRepository {
     List<Map> getClientsWithFilterParameters(ClientFilterDTO clientFilterDTO, List<Long> citizenIds,
                                              Long organizationId, String imagePath, String skip,String moduleId);
 
+
+    List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, Boolean fetchStaffHavingUnitPosition,
+                                  Map<FilterType, List<String>> filters, String searchText, String imagePath);
 }

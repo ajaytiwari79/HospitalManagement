@@ -3,9 +3,9 @@ package com.kairos.activity.client;
 import com.kairos.activity.client.dto.DayType;
 import com.kairos.activity.client.dto.RestTemplateResponseEnvelope;
 import com.kairos.activity.client.dto.TimeSlot;
-import com.kairos.activity.client.dto.country.CountryDTO;
 import com.kairos.activity.response.dto.OrganizationTypeHierarchyQueryResult;
 import com.kairos.activity.util.userContext.UserContext;
+import com.kairos.response.dto.web.CountryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +82,32 @@ public class CountryRestClient {
             logger.info("response {}", e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
         }
+
+    }
+
+    public CountryDTO getCountryById(long countryId) {
+        final String baseUrl = getBaseUrl(false);
+        try {
+            ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<CountryDTO>>() {
+            };
+            ResponseEntity<RestTemplateResponseEnvelope<CountryDTO>> restExchange =
+                    restTemplate.exchange(
+                            baseUrl + "/countryId/{countryId}",
+                            HttpMethod.GET,
+                            null, typeReference, countryId);
+
+            RestTemplateResponseEnvelope<CountryDTO> response = restExchange.getBody();
+            if (restExchange.getStatusCode().is2xxSuccessful()) {
+                return response.getData();
+            } else {
+                throw new RuntimeException(response.getMessage());
+            }
+        } catch (HttpClientErrorException e) {
+            logger.info("status {}", e.getStatusCode());
+            logger.info("response {}", e.getResponseBodyAsString());
+            throw new RuntimeException("exception occurred in user micro service " + e.getMessage());
+        }
+
 
     }
 

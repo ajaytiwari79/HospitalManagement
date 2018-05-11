@@ -1,13 +1,12 @@
 package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.user.country.dto.EmploymentTypeDTO;
+import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 import com.kairos.persistence.model.user.country.EmploymentType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
 import static com.kairos.persistence.model.constants.RelationshipConstants.EMPLOYMENT_TYPE_SETTINGS;
@@ -37,7 +36,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
         @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND et.deleted={2}  with et\n" +
                 "MATCH (o:Organization)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n"+
                 "o,et,r \n" +
-                "return id(et) as id, et.name as name, et.description as description,\n" +
+                "return id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories , et.paymentFrequency as paymentFrequency, \n" +
                 "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +
                 "CASE WHEN r IS null THEN et.allowedForShiftPlan ELSE r.allowedForShiftPlan  END AS allowedForShiftPlan,\n" +
                 "CASE WHEN r IS null THEN et.allowedForFlexPool ELSE r.allowedForFlexPool  END AS allowedForFlexPool")
@@ -46,7 +45,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
         @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND  NOT (ID(et) IN {3}) AND et.deleted={2}  with et\n" +
                 "OPTIONAL MATCH (o:Organization)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n"+
                 "o,et,r \n" +
-                "return id(et) as id, et.name as name, et.description as description,\n" +
+                "return id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories , et.paymentFrequency as paymentFrequency, \n" +
                 "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +
                 "CASE WHEN r IS null THEN et.allowedForShiftPlan ELSE r.allowedForShiftPlan  END AS allowedForShiftPlan,\n" +
                 "CASE WHEN r IS null THEN et.allowedForFlexPool ELSE r.allowedForFlexPool  END AS allowedForFlexPool")
@@ -70,6 +69,12 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
         @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} AND employmentType.name=~{1} AND id(employmentType) <> {2} " +
                 "with count(employmentType) as employmentTypeCount return CASE when employmentTypeCount>0 THEN  true ELSE false END as response")
         boolean findByNameExcludingCurrent(Long countryId,String name,Long employmentTypeId);
+
+
+        // Get Employment Type data for filters by countryId
+        @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} return toString(id(employmentType)) as id, employmentType.name as value")
+        List<FilterSelectionQueryResult> getEmploymentTypeByCountryIdForFilters(Long countryId);
+
 
 
 }

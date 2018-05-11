@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.organization.time_slot;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.enums.time_slot.TimeSlotMode;
 import com.kairos.response.dto.web.organization.time_slot.TimeSlotSetDTO;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -27,6 +28,7 @@ public class TimeSlotSet extends UserBaseEntity{
     @DateLong
     private Date endDate;
     private TimeSlotMode timeSlotMode;
+    private TimeSlotType timeSlotType;
     private boolean deleted;
     private boolean defaultSet = false;
 
@@ -81,6 +83,14 @@ public class TimeSlotSet extends UserBaseEntity{
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public TimeSlotType getTimeSlotType() {
+        return timeSlotType;
+    }
+
+    public void setTimeSlotType(TimeSlotType timeSlotType) {
+        this.timeSlotType = timeSlotType;
     }
 
     public void updateTimeSlotSet(TimeSlotSetDTO timeSlotSetDTO){

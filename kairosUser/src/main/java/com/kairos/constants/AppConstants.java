@@ -193,5 +193,6 @@ public class AppConstants {
     public static final String MANAGE_COUNTRY_TAB_MODULE_ID = "module_4";
     public static final String MAIL_FROM = "info@nordicplanning.dk";
 
-
+    // Staff
+    public static final String UNIT_MANAGER_EMPLOYMENT_DESCRIPTION = "Working as Unit Manager";
 }

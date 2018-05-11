@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import java.util.List;
-@XStreamAlias("StaffingLevel")
+@XStreamAlias("staffinglevel")
 public class StaffingLevel {
     private String id;
     private Long unitId;

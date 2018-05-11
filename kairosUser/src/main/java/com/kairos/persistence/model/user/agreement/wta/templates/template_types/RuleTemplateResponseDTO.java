@@ -3,6 +3,7 @@ package com.kairos.persistence.model.user.agreement.wta.templates.template_types
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.enums.TimeBankTypeEnum;
+import com.kairos.persistence.model.user.agreement.wta.templates.BreakTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.PhaseTemplateValue;
 import com.kairos.persistence.model.user.agreement.wta.templates.RuleTemplateCategory;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -62,6 +63,7 @@ public class RuleTemplateResponseDTO {
     private Integer yellowZone;
     private Boolean forbid;
     private Boolean allowExtraActivity;
+    private List<BreakTemplateValue> breakTemplateValues;
 
 
     public String getLastUpdatedBy() {
@@ -423,5 +425,13 @@ public class RuleTemplateResponseDTO {
 
     public void setAllowExtraActivity(Boolean allowExtraActivity) {
         this.allowExtraActivity = allowExtraActivity;
+    }
+
+    public List<BreakTemplateValue> getBreakTemplateValues() {
+        return breakTemplateValues;
+    }
+
+    public void setBreakTemplateValues(List<BreakTemplateValue> breakTemplateValues) {
+        this.breakTemplateValues = breakTemplateValues;
     }
 }

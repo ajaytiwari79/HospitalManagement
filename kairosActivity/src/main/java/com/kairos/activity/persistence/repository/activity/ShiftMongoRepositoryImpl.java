@@ -45,9 +45,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     }
 
-    public List<ShiftQueryResult> findAllActivityBetweenDuration(Long staffId, Date startDate, Date endDate, Long unitId) {
+    public List<ShiftQueryResult> findAllActivityBetweenDuration(Long unitPositionId,Long staffId, Date startDate, Date endDate, Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("staffId").is(staffId).and("isMainShift").is(true)
+                match(Criteria.where("unitId").is(unitId).and("unitPositionId").is(unitPositionId).and("deleted").is(false).and("staffId").is(staffId).and("isMainShift").is(true)
                         .and("startDate").gte(startDate).and("endDate").lte(endDate)),
                 graphLookup("shifts").startWith("$subShifts").connectFrom("subShifts").connectTo("_id").as("subShifts"));
         AggregationResults<ShiftQueryResult> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftQueryResult.class);
@@ -91,4 +91,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return null;//result.getMappedResults();
     }
 
+    /*public Shift findShiftBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("deleted").is(false).and("isMainShift").is(true).and("unitPositionId").is(unitPositionId).orOperator(Criteria.where("startDate").exists(true).
+                andOperator(Criteria.where("startDate").gte(startDate),Criteria.where("startDate").lt(endDate)),Criteria.where("endDate").exists(true).andOperator(
+                Criteria.where("endDate").gt(startDate),Criteria.where("endDate").lte(endDate))));
+                      return (Shift) mongoTemplate.findOne(query,Shift.class);
+    }*/
 }

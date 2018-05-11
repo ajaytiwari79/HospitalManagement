@@ -2,10 +2,10 @@ package com.planner.domain.location;
 
 import com.planner.domain.common.BaseEntity;
 
-import org.springframework.data.cassandra.mapping.Table;
+//import org.springframework.data.cassandra.core.mapping.Table;
 
 
-@Table
+//@Table
 public class LocationDistance extends BaseEntity {
 
 	private String firstLocationId;

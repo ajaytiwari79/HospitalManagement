@@ -2,6 +2,7 @@ package com.kairos.activity.service.period;
 
 import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.Phase.PhaseDTO;
+import com.kairos.activity.constants.AppConstants;
 import com.kairos.activity.custom_exception.ActionNotPermittedException;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.persistence.model.period.PeriodPhaseFlippingDate;
@@ -347,8 +348,8 @@ public class PlanningPeriodService extends MongoBaseService {
 
         // Check if period is in request phase (Changes for start date and end date can be done in Request Phase
         // We are checking request phase by its name, can be done by sequence, need to ask
-        // TO DO check phase by sequence
-        if(!phaseMongoRepository.checkPhaseByName(planningPeriod.getCurrentPhaseId(), "REQUEST")){
+        // We know here that sequence of request phase is 0
+        if(!phaseMongoRepository.checkPhaseBySequence(planningPeriod.getCurrentPhaseId(), AppConstants.REQUEST_PHASE_SEQUENCE)){
             throw new ActionNotPermittedException("Period with name : " + planningPeriod.getName() + " is not in Request Phase.");
         }
 
@@ -366,6 +367,12 @@ public class PlanningPeriodService extends MongoBaseService {
         // Fetch previous and next planning periods
         PlanningPeriod previousPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(unitId, planningPeriodDTO.getStartDate());
         PlanningPeriod nextPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(unitId, planningPeriodDTO.getEndDate());
+
+        // We know here that sequence of request phase is 0
+        if(planningPeriodMongoRepository.checkIfPeriodsByStartAndEndDateExistInPhaseExceptGivenSequence(
+                unitId, planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),AppConstants.REQUEST_PHASE_SEQUENCE)){
+            throw new ActionNotPermittedException("Period can not be merged to the phase which is not in Request Phase ");
+        }
 
         Date startDateOfPeriodToBeDeleted = Optional.ofNullable(previousPeriod).isPresent() ? previousPeriod.getStartDate() : planningPeriod.getStartDate() ;
         Date endDateOfPeriodToBeDeleted = Optional.ofNullable(nextPeriod).isPresent() ? nextPeriod.getEndDate() : planningPeriodDTO.getEndDate();
@@ -441,6 +448,28 @@ public class PlanningPeriodService extends MongoBaseService {
         save(planningPeriod);
 
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
+    }
+
+    public boolean updateFlippingDate(BigInteger periodId, Long unitId, Date date){
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
+        boolean updateCurrentAndNextPhases = false;
+        BigInteger nextPhaseId = null;
+        for(PeriodPhaseFlippingDate phaseFlippingDate : planningPeriod.getPhaseFlippingDate()){
+
+            if(planningPeriod.getNextPhaseId().equals(phaseFlippingDate.getPhaseId()) ){
+                if(phaseFlippingDate.getFlippingDate().compareTo(date) <= 0){
+                    updateCurrentAndNextPhases = true;
+                }
+                break;
+            }
+            nextPhaseId = phaseFlippingDate.getPhaseId();
+        }
+        if(updateCurrentAndNextPhases){
+            planningPeriod.setCurrentPhaseId(planningPeriod.getNextPhaseId());
+            planningPeriod.setNextPhaseId(nextPhaseId);
+            save(planningPeriod);
+        }
+        return true;
     }
 
     /**

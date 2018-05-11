@@ -1,10 +1,9 @@
 package com.kairos.activity.service.staffing_level;
 
 import com.kairos.activity.KairosActivityApplication;
-import com.kairos.activity.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelDuration;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSetting;
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelDto;
+import com.kairos.activity.response.dto.staffing_level.PresenceStaffingLevelDto;
 import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
 import com.kairos.activity.service.activity.ActivityService;
 import com.kairos.activity.util.DateUtils;
@@ -25,7 +24,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.inject.Inject;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -45,7 +43,7 @@ public class StaffingLevelIntegrationTest {
     public void addStaffingLevel() {
         String baseUrl=getBaseUrl(95L,95L);
 
-        HttpEntity<StaffingLevelDto> entity = new HttpEntity<StaffingLevelDto>(getStaffingLevelDTO());
+        HttpEntity<PresenceStaffingLevelDto> entity = new HttpEntity<PresenceStaffingLevelDto>(getStaffingLevelDTO());
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl+"/staffing_level/",
@@ -73,11 +71,11 @@ public class StaffingLevelIntegrationTest {
     }
 
 
-    private StaffingLevelDto getStaffingLevelDTO(){
+    private PresenceStaffingLevelDto getStaffingLevelDTO(){
 
         StaffingLevelDuration duration=new StaffingLevelDuration(LocalTime.now(),LocalTime.now());
         StaffingLevelSetting staffingLevelSetting=new StaffingLevelSetting(15,duration);
-        StaffingLevelDto dto=new StaffingLevelDto(1L, DateUtils.getDate(),20L,staffingLevelSetting);
+        PresenceStaffingLevelDto dto=new PresenceStaffingLevelDto(1L, DateUtils.getDate(),20L,staffingLevelSetting);
         List<StaffingLevelTimeSlotDTO> staffingLevelTimeSlots=new ArrayList<>();
         StaffingLevelTimeSlotDTO timeSlotDTO1=new StaffingLevelTimeSlotDTO(0,5,10,new StaffingLevelDuration(LocalTime.now(),
                 LocalTime.now()) );
@@ -89,7 +87,7 @@ public class StaffingLevelIntegrationTest {
                 LocalTime.now()) );
         staffingLevelTimeSlots.add(timeSlotDTO1);staffingLevelTimeSlots.add(timeSlotDTO2);
         staffingLevelTimeSlots.add(timeSlotDTO3); staffingLevelTimeSlots.add(timeSlotDTO4);
-        dto.setStaffingLevelInterval(staffingLevelTimeSlots);
+        dto.setPresenceStaffingLevelInterval(staffingLevelTimeSlots);
         return dto;
     }
 

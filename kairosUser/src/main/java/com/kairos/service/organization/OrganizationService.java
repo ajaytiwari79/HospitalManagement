@@ -1,11 +1,15 @@
 package com.kairos.service.organization;
 
+import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
+import com.kairos.client.WorkingTimeAgreementRestClient;
 import com.kairos.client.dto.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.custom_exception.ActionNotPermittedException;
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.custom_exception.DataNotMatchedException;
+import com.kairos.persistence.model.enums.Gender;
+import com.kairos.persistence.model.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.group.Group;
@@ -16,10 +20,12 @@ import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
 import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
 import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
 import com.kairos.persistence.model.user.country.dto.OrganizationMappingDTO;
+import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
@@ -39,8 +45,12 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.response.dto.web.CountryDTO;
 import com.kairos.response.dto.web.OrganizationExternalIdsDTO;
+import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.TimeSlotsDeductionDTO;
+import com.kairos.response.dto.web.experties.ExpertiseResponseDTO;
+import com.kairos.response.dto.web.wta.WTABasicDetailsDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -54,6 +64,7 @@ import com.kairos.service.country.DayTypeService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
+import com.kairos.service.staff.StaffService;
 import com.kairos.util.DateConverter;
 import com.kairos.util.DateUtil;
 import com.kairos.util.FormatUtil;
@@ -61,8 +72,10 @@ import com.kairos.util.timeCareShift.GetAllWorkPlacesResponse;
 import com.kairos.util.timeCareShift.GetAllWorkPlacesResult;
 import com.kairos.util.timeCareShift.GetWorkShiftsFromWorkPlaceByIdResult;
 import com.kairos.util.userContext.UserContext;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -188,9 +201,20 @@ public class OrganizationService extends UserBaseService {
     WorkingTimeAgreementGraphRepository workingTimeAgreementGraphRepository;
     @Inject
     PeriodRestClient periodRestClient;
+    @Inject private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
+    @Inject
+    StaffService staffService;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
+    }
+
+    public com.kairos.activity.client.dto.organization.OrganizationDTO getOrganizationWithCountryId(long id) {
+        Organization organization = organizationGraphRepository.findOne(id);
+        Country country = organizationGraphRepository.getCountry(organization.getId());
+        com.kairos.activity.client.dto.organization.OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(organization, com.kairos.activity.client.dto.organization.OrganizationDTO.class);
+        organizationDTO.setCountryId(country.getId());
+        return organizationDTO;
     }
 
     public boolean showCountryTagForOrganization(long id) {
@@ -230,11 +254,11 @@ public class OrganizationService extends UserBaseService {
             logger.info("Linked with region level " + count);
         }
         accessGroupService.createDefaultAccessGroups(organization);
-        timeSlotService.createDefaultTimeSlots(organization);
+        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         return organization;
     }
-
 
     public HashMap<String, Object> createParentOrganization(ParentOrganizationDTO orgDetails, long countryId, Long organizationId) {
 
@@ -257,17 +281,20 @@ public class OrganizationService extends UserBaseService {
          * @Modified vipul
          * when creating an organization linking all existing wta with this subtype to organization
          */
-        List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
-        List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
-        List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
-        linkWTAToOrganization(allWtaCopy, allWta);
-        organization.setWorkingTimeAgreements(allWtaCopy);
+        //List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
+        //List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
+        //List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
+        //linkWTAToOrganization(allWtaCopy, allWta);
+
+
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
+        workingTimeAgreementRestClient.assignWTAToOrganization(orgDetails.getSubTypeId(),organization.getId(),countryId);
 
         organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
         accessGroupService.createDefaultAccessGroups(organization);
-        timeSlotService.createDefaultTimeSlots(organization);
+        timeSlotService.createDefaultTimeSlots(organization,TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(organization,TimeSlotType.TASK_PLANNING);
         long creationDate = DateUtil.getCurrentDate().getTime();
         organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
         creationDate = DateUtil.getCurrentDate().getTime();
@@ -278,25 +305,31 @@ public class OrganizationService extends UserBaseService {
             periodRestClient.createDefaultPeriodSettings(organization.getId());
         }
 
-
+        /*// TODO Verify code to set Unit Manager of new organization
+        // Create Employment for Unit Manager
+        // Check if user exists or Create User
+        StaffCreationPOJOData staffCreationPOJOData = new StaffCreationPOJOData("Andreas","L. Jacobsen", "0108572361",
+                "Sam", "andreas@gmail.com", Gender.MALE, "andreas@gmail.com",null, 0L );
+        User user = staffService.createUnitManagerForNewOrganization(organization.getId(), staffCreationPOJOData);*/
 
         HashMap<String, Object> orgResponse = new HashMap<>();
         orgResponse.put("orgData", organizationResponse(organization, orgDetails));
         orgResponse.put("permissions", accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
+//        orgResponse.put("permissions", accessPageService.getPermissionOfUserInUnit(organization.getId(), user.getId()));
         return orgResponse;
     }
 
-    List<WorkingTimeAgreement> getWTAWithExpertise(List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults){
+    /*List<WorkingTimeAgreement> getWTAWithExpertise(List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults){
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
         for (WTAAndExpertiseQueryResult allWtaExpertiseQueryResult : allWtaExpertiseQueryResults) {
             allWtaExpertiseQueryResult.getWorkingTimeAgreement().setExpertise(allWtaExpertiseQueryResult.getExpertise());
             workingTimeAgreements.add(allWtaExpertiseQueryResult.getWorkingTimeAgreement());
         }
         return workingTimeAgreements;
-    }
+    }*/
 
 
-    private void linkWTAToOrganization(List<WorkingTimeAgreement> WTAList, List<WorkingTimeAgreement> allWta) {
+    /*private void linkWTAToOrganization(List<WorkingTimeAgreement> WTAList, List<WorkingTimeAgreement> allWta) {
         allWta.forEach(workingTimeAgreement -> {
             WorkingTimeAgreement newWtaObject = new WorkingTimeAgreement();
             wtaService.copyWta(workingTimeAgreement, newWtaObject);
@@ -307,7 +340,7 @@ public class OrganizationService extends UserBaseService {
             WTAList.add(newWtaObject);
         });
 
-    }
+    }*/
 
     public HashMap<String, Object> updateParentOrganization(ParentOrganizationDTO orgDetails, long organizationId, long countryId) {
         Organization organization = organizationGraphRepository.findOne(organizationId, 2);
@@ -569,22 +602,25 @@ public class OrganizationService extends UserBaseService {
          * @Modified by vipul
          *  Added all wta of from parent organization
          */
-        List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
+       /* List<WorkingTimeAgreement> allWtaCopy = new ArrayList<>();
         List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults=workingTimeAgreementGraphRepository.getAllWTAByOrganization(unitId);
         List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
         linkWTAToOrganization(allWtaCopy, allWta);
         unit.setWorkingTimeAgreements(allWtaCopy);
-
+*/
         //Assign Parent Organization's level to unit
         unit.setLevel(parent.getLevel());
 
         organizationGraphRepository.save(unit);
         organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         accessGroupService.createDefaultAccessGroups(unit);
-        timeSlotService.createDefaultTimeSlots(unit);
+        timeSlotService.createDefaultTimeSlots(unit,TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(unit,TimeSlotType.TASK_PLANNING);
         phaseRestClient.createDefaultPhases(unit.getId());
         periodRestClient.createDefaultPeriodSettings(unit.getId());
-
+        Organization organization = fetchParentOrganization(unit.getId());
+        Country country = organizationGraphRepository.getCountry(organization.getId());
+        workingTimeAgreementRestClient.assignWTAToOrganization(organizationDTO.getOrganizationSubTypeId(),unit.getId(),country.getId());
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
         response.put("name", unit.getName());
@@ -593,6 +629,7 @@ public class OrganizationService extends UserBaseService {
         response.put("children", Collections.emptyList());
         response.put("permissions", accessPageService.getPermissionOfUserInUnit(parent.getId(), unit, UserContext.getUserDetails().getId()));
         return response;
+
     }
 
     public List<Map<String, Object>> getAllOrganization() {
@@ -858,7 +895,8 @@ public class OrganizationService extends UserBaseService {
         Organization child = organizationGraphRepository.findOne(childId);
         organizationGraphRepository.createChildOrganization(parent.getId(), child.getId());
         accessGroupService.createDefaultAccessGroups(child);
-        timeSlotService.createDefaultTimeSlots(child);
+        timeSlotService.createDefaultTimeSlots(child,TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(child,TimeSlotType.TASK_PLANNING);
         return true;
     }
 
@@ -1274,6 +1312,62 @@ public class OrganizationService extends UserBaseService {
     // For Test Cases
     public Organization getOneParentUnitByCountry(Long countryId){
         return organizationGraphRepository.getOneParentUnitByCountry(countryId);
+    }
+
+    public WTABasicDetailsDTO getWTARelatedInfo(Long countryId,Long organizationId,Long organizationSubTypeId,Long organizationTypeId,Long expertiseId){
+        WTABasicDetailsDTO wtaBasicDetailsDTO = new WTABasicDetailsDTO();
+        if(expertiseId!=null) {
+            Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 0);
+            if(expertise!=null){
+                ExpertiseResponseDTO expertiseResponseDTO = new ExpertiseResponseDTO();
+                BeanUtils.copyProperties(expertise,expertiseResponseDTO);
+                wtaBasicDetailsDTO.setExpertiseResponse(expertiseResponseDTO);
+            }
+        }
+        if(organizationId!=null) {
+            Organization organization = organizationGraphRepository.findOne(organizationId, 0);
+            if(organization!=null){
+                OrganizationDTO organizationDTO = new OrganizationDTO();
+                BeanUtils.copyProperties(organization,organizationDTO);
+                wtaBasicDetailsDTO.setOrganization(organizationDTO);
+            }
+        }
+        if(countryId!=null) {
+            Country country = countryGraphRepository.findOne(countryId, 0);
+            if(country!=null){
+                CountryDTO countryDTO = new CountryDTO();
+                BeanUtils.copyProperties(country,countryDTO);
+                wtaBasicDetailsDTO.setCountryDTO(countryDTO);
+            }
+        }
+        if(organizationTypeId!=null) {
+            OrganizationType organizationType = organizationTypeGraphRepository.findOne(organizationTypeId, 0);
+            if(organizationType!=null){
+                OrganizationTypeDTO organizationTypeDTO = new OrganizationTypeDTO();
+                BeanUtils.copyProperties(organizationType,organizationTypeDTO);
+                wtaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
+            }
+        }
+        if(organizationSubTypeId!=null) {
+            OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId,0);
+            List<Organization> organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+           if(organizationSubType!=null){
+               OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
+               BeanUtils.copyProperties(organizationSubType,organizationSubTypeDTO);
+               wtaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
+           }
+           if(organizations!=null){
+               List<OrganizationDTO> organizationDTOS = new ArrayList<>();
+               organizations.forEach(organization->{
+                   OrganizationDTO organizationDTO = new OrganizationDTO();
+                   ObjectMapperUtils.copyProperties(organization,organizationDTO);
+                    organizationDTOS.add(organizationDTO);
+               });
+               wtaBasicDetailsDTO.setOrganizations(organizationDTOS);
+           }
+        }
+
+        return wtaBasicDetailsDTO;
     }
 
     public ZoneId getTimeZoneStringOfUnit(Long unitId) {

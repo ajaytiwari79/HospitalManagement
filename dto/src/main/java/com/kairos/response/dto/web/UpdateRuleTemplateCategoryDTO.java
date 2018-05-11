@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -18,10 +19,19 @@ public class UpdateRuleTemplateCategoryDTO {
     //@NotNull(message = "error.RuleTemplate.description.name.notnull")
     private String description;
 
-    //    private List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
+    //    private List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplates;
     private List<Long> tags;
+    private BigInteger id;
 
     UpdateRuleTemplateCategoryDTO(){}
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

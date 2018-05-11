@@ -1,8 +1,6 @@
 package com.planner.repository.taskRepository;
 
 
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select;
 import com.planner.domain.task.PlanningTaskType;
 import com.planner.repository.customRepository.BaseRepository;
 import org.springframework.stereotype.Repository;
@@ -11,10 +9,11 @@ import org.springframework.stereotype.Repository;
 public class TaskTypeRepository extends BaseRepository {
 
     public boolean exist(Long externalId,long unitId){
-        Select select = QueryBuilder.select().from("planningtasktype").allowFiltering();
+        /*Select select = QueryBuilder.select().from("planningtasktype").allowFiltering();
         select.where(QueryBuilder.eq("externalid",externalId));
         select.where(QueryBuilder.in("unitid",unitId));
-        return ((PlanningTaskType) findByField(select,PlanningTaskType.class))!=null;
+        return ((PlanningTaskType) findByField(select,PlanningTaskType.class))!=null;*/
+        return false;
     }
 
     /*public List<PlanningTaskType> findAllByIds(List ids) {
