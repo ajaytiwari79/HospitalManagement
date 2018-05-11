@@ -9,28 +9,21 @@ import java.time.LocalTime;
 import java.util.List;
 @Document
 public class Order extends MongoBaseEntity {
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
 
     private Long unitId;
     private Long activityId;
     private Long plannedTimeId;
     private Long contactPersonId;
     private String contactPersonMobile;
-    private LocalDate StartDate;
+    private LocalDate startDate;
     private LocalDate endDate;
     private LocalTime fromTime;
     private LocalTime toTime;
-    private Integer MinOpenShiftHours;
+    private Integer minOpenShiftHours;
     private WeekType weekType;
     private DayTypeOrder dayType;
     private Long reasonCodeId;
-    private String notForPlanner;
+    private String noteForPlanner;
     private Long experitiseId;
     private List<Long> skillLevel;
     private Long functionId;
@@ -44,8 +37,14 @@ public class Order extends MongoBaseEntity {
     private ShiftAssignmentCriteria siftAssignmentCriteria;
     private BringYour bringYour;
     private DeadlineRule deadlineRule;
-    private ShiftAssignmentCriteria shiftAssignmentCriteria;
 
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
 
     public Long getActivityId() {
         return activityId;
@@ -80,11 +79,11 @@ public class Order extends MongoBaseEntity {
     }
 
     public LocalDate getStartDate() {
-        return StartDate;
+        return startDate;
     }
 
     public void setStartDate(LocalDate startDate) {
-        StartDate = startDate;
+        this.startDate = startDate;
     }
 
     public LocalDate getEndDate() {
@@ -112,11 +111,11 @@ public class Order extends MongoBaseEntity {
     }
 
     public Integer getMinOpenShiftHours() {
-        return MinOpenShiftHours;
+        return minOpenShiftHours;
     }
 
     public void setMinOpenShiftHours(Integer minOpenShiftHours) {
-        MinOpenShiftHours = minOpenShiftHours;
+        this.minOpenShiftHours = minOpenShiftHours;
     }
 
     public WeekType getWeekType() {
@@ -143,12 +142,12 @@ public class Order extends MongoBaseEntity {
         this.reasonCodeId = reasonCodeId;
     }
 
-    public String getNotForPlanner() {
-        return notForPlanner;
+    public String getNoteForPlanner() {
+        return noteForPlanner;
     }
 
-    public void setNotForPlanner(String notForPlanner) {
-        this.notForPlanner = notForPlanner;
+    public void setNoteForPlanner(String noteForPlanner) {
+        this.noteForPlanner = noteForPlanner;
     }
 
     public Long getExperitiseId() {
@@ -255,13 +254,6 @@ public class Order extends MongoBaseEntity {
         this.deadlineRule = deadlineRule;
     }
 
-    public ShiftAssignmentCriteria getShiftAssignmentCriteria() {
-        return shiftAssignmentCriteria;
-    }
-
-    public void setShiftAssignmentCriteria(ShiftAssignmentCriteria shiftAssignmentCriteria) {
-        this.shiftAssignmentCriteria = shiftAssignmentCriteria;
-    }
 
 
 
