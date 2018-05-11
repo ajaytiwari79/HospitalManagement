@@ -6,7 +6,6 @@ import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PriorityGroup extends MongoBaseEntity {
     //private ShiftSelectionType shiftSelectionType;
     //private boolean singleLongerShift;
