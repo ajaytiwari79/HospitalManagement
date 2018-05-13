@@ -110,7 +110,7 @@ public class PriorityGroupService extends MongoBaseService {
         return true;
     }
 
-    public boolean copyPriorityGroupsForOrder(long unitId,int orderId){
+    public boolean copyPriorityGroupsForOrder(long unitId,BigInteger orderId){
         List<PriorityGroup> priorityGroups = priorityGroupRepository.findAllByUnitIdAndActivatedTrueAndDeletedFalse(unitId);
         priorityGroups.forEach(priorityGroup -> {
             priorityGroup.setOrderId(orderId);

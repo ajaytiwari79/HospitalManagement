@@ -29,15 +29,23 @@ public class Order extends MongoBaseEntity {
     private Long functionId;
     private boolean acuteOrder;
     private StartFrom startFrom;
-    private OpenShiftPrioirty priority;
+    private Integer priority;
     private Integer feedback;
     private String noteForCandidate;
     private LocalDate deadline;
     private OrderNotificationsCriteriaForPlanner notificationsCriteria;
     private ShiftAssignmentCriteria siftAssignmentCriteria;
-    private BringYour bringYour;
+    private BringYour bringVehicle;
     private DeadlineRule deadlineRule;
 
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
     public Long getUnitId() {
         return unitId;
     }
@@ -190,13 +198,7 @@ public class Order extends MongoBaseEntity {
         this.startFrom = startFrom;
     }
 
-    public OpenShiftPrioirty getPriority() {
-        return priority;
-    }
 
-    public void setPriority(OpenShiftPrioirty priority) {
-        this.priority = priority;
-    }
 
     public Integer getFeedback() {
         return feedback;
@@ -238,12 +240,12 @@ public class Order extends MongoBaseEntity {
         this.siftAssignmentCriteria = siftAssignmentCriteria;
     }
 
-    public BringYour getBringYour() {
-        return bringYour;
+    public BringYour getBringVehicle() {
+        return bringVehicle;
     }
 
-    public void setBringYour(BringYour bringYour) {
-        this.bringYour = bringYour;
+    public void setBringVehicle(BringYour bringVehicle) {
+        this.bringVehicle = bringVehicle;
     }
 
     public DeadlineRule getDeadlineRule() {

@@ -4,6 +4,16 @@ public class OrderNotificationsCriteriaForPlanner {
 
     private boolean confirmCandidateBeforePlanning;
     private boolean sendSMSOnNoCandidateBeforeDeadline;
+    private boolean sendSmsOnCandidateFound;
+
+    public boolean isSendSmsOnCandidateFound() {
+        return sendSmsOnCandidateFound;
+    }
+
+    public void setSendSmsOnCandidateFound(boolean sendSmsOnCandidateFound) {
+        this.sendSmsOnCandidateFound = sendSmsOnCandidateFound;
+    }
+
 
     public boolean isConfirmCandidateBeforePlanning() {
         return confirmCandidateBeforePlanning;
