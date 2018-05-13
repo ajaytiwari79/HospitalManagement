@@ -32,7 +32,7 @@ public class OrderResponseDTO {
     private Long functionId;
     private boolean acuteOrder;
     private StartFrom startFrom;
-    private OpenShiftPrioirty priority;
+    private Integer priority;
     private Integer feedback;
     private String noteForCandidate;
     private LocalDate deadline;
@@ -187,13 +187,7 @@ public class OrderResponseDTO {
         this.startFrom = startFrom;
     }
 
-    public OpenShiftPrioirty getPriority() {
-        return priority;
-    }
 
-    public void setPriority(OpenShiftPrioirty priority) {
-        this.priority = priority;
-    }
 
     public Integer getFeedback() {
         return feedback;
@@ -259,4 +253,11 @@ public class OrderResponseDTO {
         this.shiftAssignmentCriteria = shiftAssignmentCriteria;
     }
 
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
 }

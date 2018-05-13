@@ -19,6 +19,16 @@ public class OpenShift extends MongoBaseEntity {
     private List<Long> declinedBy;
     private Long unitId;
     private BigInteger orderId;
+    private BigInteger activityId;
+
+    public BigInteger getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(BigInteger activityId) {
+        this.activityId = activityId;
+    }
+
 
     public Long getUnitId() {
         return unitId;
