@@ -2,6 +2,7 @@ package com.kairos.activity.controller.order;
 
 import com.kairos.activity.service.open_shift.OrderService;
 import com.kairos.activity.util.response.ResponseHandler;
+import com.kairos.response.dto.web.open_shift.OrderOpenshiftResponseDTO;
 import com.kairos.response.dto.web.open_shift.OrderResponseDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +27,7 @@ public class OrderController {
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ApiOperation("create orders")
-    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderResponseDTO orderResponseDto)  {
+    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderOpenshiftResponseDTO orderResponseDto)  {
         orderService.createOrder(orderResponseDto);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
     }
