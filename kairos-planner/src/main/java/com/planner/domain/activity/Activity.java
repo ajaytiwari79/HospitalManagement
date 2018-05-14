@@ -1,9 +1,11 @@
-package com.planner.domain;
+package com.planner.domain.activity;
+
+import com.planner.domain.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.util.List;
 
-public class Activity extends MongoBaseEntity{
+public class Activity extends MongoBaseEntity {
     private String name;
     private List<Long> expertises;
     private String description;

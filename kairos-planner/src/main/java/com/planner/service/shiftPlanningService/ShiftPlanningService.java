@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelActivity;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.util.DateUtils;
-import com.kairos.planning.domain.Employee;
 import com.kairos.planning.utils.JodaTimeConverter;
 import com.kairos.shiftplanning.domain.*;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
@@ -13,7 +12,7 @@ import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
 import com.kairos.shiftplanning.utils.JodaTimeUtil;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.planner.commonUtil.StaticField;
-import com.planner.domain.Activity;
+import com.planner.domain.activity.Activity;
 import com.planner.domain.staff.Staff;
 import com.planner.domain.staff.UnitPosition;
 import com.planner.domain.staffinglevel.StaffingLevel;
@@ -33,13 +32,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -301,9 +305,8 @@ public class ShiftPlanningService {
         return  shifts;
     }
 
-    private Map<String, List<ActivityLineInterval>> groupActivityLineIntervals(List<ActivityLineInterval> activityLineIntervals) {
+    public Map<String, List<ActivityLineInterval>> groupActivityLineIntervals(List<ActivityLineInterval> activityLineIntervals) {
         Map<String,List<ActivityLineInterval>> groupedAlis= new HashMap<>();
-
         for(ActivityLineInterval ali:activityLineIntervals){
             String key=ali.getStart().toLocalDate().toString("MM/dd/yyyy")+"_"+ali.getActivityPlannerEntity().getId()+"_"+ali.getStaffNo();
             if(groupedAlis.containsKey(key)){
@@ -315,5 +318,23 @@ public class ShiftPlanningService {
             }
         }
         return groupedAlis;
+    }
+
+    public Document loadBaseSolverConfigXML(){
+        String filepath = "baseSolverConfig.xml";
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory
+                    .newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            Document doc = docBuilder.parse(filepath);
+            return doc;
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

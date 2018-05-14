@@ -41,7 +41,7 @@ public class PlanningService {
 
 
     public TaskPlanningDTO submitTaskPlanningProblem(TaskPlanningDTO taskPlanningDTO){
-        SolverConfigDTO solverConfigDTO = solverConfigService.getOneForPlanning(taskPlanningDTO.getSolverConfigId());
+        SolverConfigDTO solverConfigDTO =null;// solverConfigService.getOneForPlanning(taskPlanningDTO.getSolverConfigId());
         boolean initializedTaskPlanner = initializeTaskPlanner(solverConfigDTO);
         if(initializedTaskPlanner){
             PlanningProblem planningProblem = new PlanningProblem();

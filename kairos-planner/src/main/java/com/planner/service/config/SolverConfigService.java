@@ -1,19 +1,8 @@
 package com.planner.service.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.planner.domain.config.Category;
-import com.planner.domain.config.Constraint;
-import com.planner.domain.config.Rule;
-import com.planner.domain.config.SolverConfig;
-import com.planner.enums.SolverConfigPhase;
+import com.kairos.dto.solverconfig.SolverConfigDTO;
+import com.planner.domain.solverconfig.SolverConfig;
 import com.planner.repository.config.SolverConfigRepository;
-import com.planner.responseDto.config.CategoryDTO;
-import com.planner.responseDto.config.ConstraintDTO;
-import com.planner.responseDto.config.RuleDTO;
-import com.planner.responseDto.config.SolverConfigDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +18,12 @@ public class SolverConfigService {
 
     @Autowired private SolverConfigRepository solverConfigRepository;
 
-    public List<SolverConfigDTO> getAllSolverConfig(Long unitId){
+    public void addSolverConfig(Long unitId, SolverConfigDTO solverConfigDTO){
+        SolverConfig solverConfig= new SolverConfig(solverConfigDTO.getTemplateTypes(),120,unitId);
+        solverConfigRepository.save(solverConfig);
+    }
+
+    /*public List<SolverConfigDTO> getAllSolverConfig(Long unitId){
         List<SolverConfigDTO> solverConfigDTOS = null;
         if(unitId!=null){
             List<SolverConfig> solverConfigs = solverConfigRepository.getAllByUnitId(unitId,SolverConfig.class);
@@ -204,13 +198,13 @@ public class SolverConfigService {
             constraint.setSolverConfigId(solverConfig.getId());
             constraint.setStaticRuleValues(contraintDto.getStaticRuleValues());
             Rule rule = null;
-            /*rule.setPattern(contraintDto.getRuleDTO().getPattern());
+            *//*rule.setPattern(contraintDto.getRuleDTO().getPattern());
             rule.setRuleCondition(contraintDto.getRuleDTO().getRuleCondition());
             rule.setNoOfruleValues(contraintDto.getRuleDTO().getNoOfruleValues());
             rule.setDisabled(contraintDto.getRuleDTO().isDisabled());
             rule.setRuleName(contraintDto.getRuleDTO().getRuleName());
             rule.setSalience(contraintDto.getRuleDTO().getSalience());
-            rule.setOutputValues(contraintDto.getRuleDTO().getOutputValues());*/
+            rule.setOutputValues(contraintDto.getRuleDTO().getOutputValues());*//*
             rule = solverConfigRepository.findById(contraintDto.getRuleId(),Rule.class);
             if(rule!=null){
                 constraint.setRuleId(rule.getId());
@@ -220,7 +214,7 @@ public class SolverConfigService {
             }
         }
         return true;
-        /*ObjectMapper mapper = new ObjectMapper();
+        *//*ObjectMapper mapper = new ObjectMapper();
         List<Rule> rules = new ArrayList<>();
         try {
             TypeFactory typeFactory = mapper.getTypeFactory();
@@ -231,7 +225,7 @@ public class SolverConfigService {
             e.printStackTrace();
         }
         //solverConfigRepository.saveList(rules);
-        return true;*/
-    }
+        return true;*//*
+    }*/
 
 }
