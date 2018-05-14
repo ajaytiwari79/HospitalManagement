@@ -50,12 +50,10 @@ public class NightWorkerService extends MongoBaseService {
     }
 
     public NightWorkerGeneralResponseDTO getNightWorkerDetailsOfStaff(Long unitId, Long staffId){
-        // TODO check if valid staff
+
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
         if(Optional.ofNullable(nightWorker).isPresent()){
-            ObjectMapper objectMapper =  new ObjectMapper();
             return ObjectMapperUtils.copyPropertiesByMapper(nightWorker, NightWorkerGeneralResponseDTO.class);
-
         } else {
             return new NightWorkerGeneralResponseDTO(false);
         }
@@ -68,7 +66,6 @@ public class NightWorkerService extends MongoBaseService {
     }
 
     public NightWorkerGeneralResponseDTO updateNightWorkerGeneralDetails(Long unitId, Long staffId, NightWorkerGeneralResponseDTO nightWorkerDTO){
-        // TODO check if valid staff
 
         validateNightWorkerGeneralDetails(nightWorkerDTO);
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
@@ -96,7 +93,7 @@ public class NightWorkerService extends MongoBaseService {
     }
 
     public QuestionnaireAnswerResponseDTO addNightWorkerQuestionnaire(Long unitId, Long staffId, QuestionnaireAnswerResponseDTO answerResponseDTO){
-        // TODO check if valid staff
+
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(staffId);
         if(!Optional.ofNullable(nightWorker).isPresent()){
             throw new DataNotFoundByIdException("Staff is not a night worker");
