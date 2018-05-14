@@ -286,11 +286,7 @@ public class ShiftPlanningService {
                 }
             }
         }
-        List<org.joda.time.LocalDate> dates = new ArrayList<>();
-        for(LocalDate ld=start;!ld.isAfter(end);ld=ld.plusDays(1)){
-            dates.add(new org.joda.time.LocalDate(ld.getYear(),ld.getMonthValue(),ld.getYear()));
-        }
-
+        List<org.joda.time.LocalDate> dates = JodaTimeUtil.getLocalDates(start, end);
         Map<org.joda.time.LocalDate, Object[]> matrix=ShiftPlanningUtility.createStaffingLevelMatrix(dates, activityLineIntervals,15, acts);
         problem.setStaffingLevelMatrix(new StaffingLevelMatrix(matrix,new int[1]));
         problem.setActivityLineIntervals(activityLineIntervals);
@@ -302,6 +298,7 @@ public class ShiftPlanningService {
         problem.setActivitiesPerDay(perDayActivities);
         return problem;
     }
+
     public List<ShiftRequestPhase> createEmptyShiftsForEmployees(List<EmployeePlanningFact> employees, List<org.joda.time.LocalDate> dates){
         List<ShiftRequestPhase> shifts= new ArrayList<>();
         for(EmployeePlanningFact employee:employees){
@@ -312,6 +309,7 @@ public class ShiftPlanningService {
         }
         return  shifts;
     }
+
     private Map<String, List<ActivityLineInterval>> groupActivityLineIntervals(List<ActivityLineInterval> activityLineIntervals) {
         Map<String,List<ActivityLineInterval>> groupedAlis= new HashMap<>();
 

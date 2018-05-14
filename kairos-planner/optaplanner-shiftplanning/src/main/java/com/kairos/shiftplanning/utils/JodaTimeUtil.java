@@ -4,7 +4,9 @@ import com.kairos.activity.util.DateUtils;
 import org.joda.time.Interval;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class JodaTimeUtil {
 
@@ -18,5 +20,12 @@ public class JodaTimeUtil {
 
 		LocalDate localDate = DateUtils.getLocalDateFromDate(date);
 		return new org.joda.time.LocalDate(localDate.getYear(),localDate.getMonthValue(),localDate.getDayOfMonth());
+	}
+	public static List<org.joda.time.LocalDate> getLocalDates(LocalDate start, LocalDate end) {
+		List<org.joda.time.LocalDate> dates = new ArrayList<>();
+		for(LocalDate ld = start; !ld.isAfter(end); ld=ld.plusDays(1)){
+			dates.add(new org.joda.time.LocalDate(ld.getYear(),ld.getMonthValue(),ld.getYear()));
+		}
+		return dates;
 	}
 }
