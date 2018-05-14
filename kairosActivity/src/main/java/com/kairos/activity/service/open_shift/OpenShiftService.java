@@ -7,6 +7,7 @@ import com.kairos.activity.persistence.model.open_shift.Order;
 import com.kairos.activity.persistence.repository.open_shift.OpenShiftMongoRepository;
 import com.kairos.activity.persistence.repository.open_shift.OrderMongoRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.service.phase.PhaseService;
 import com.kairos.activity.service.priority_group.PriorityGroupService;
 import com.kairos.activity.util.ObjectMapperUtils;
@@ -30,6 +31,8 @@ public class OpenShiftService extends MongoBaseService {
     private OpenShiftMongoRepository openShiftMongoRepository;
     @Inject
     private PriorityGroupService priorityGroupService;
+    @Inject
+    private ExceptionService exceptionService;
 
 
     public void createOpenShift(OpenShiftResponseDTO openShiftResponseDTO) {
@@ -83,8 +86,9 @@ public class OpenShiftService extends MongoBaseService {
     public OpenShiftResponseDTO pickOpenShiftByStaff(long unitId, BigInteger openShiftId, long staffId,ShiftSelectionType shiftSelectionType) {
         OpenShift openShift = openShiftMongoRepository.findByIdAndUnitIdAndDeletedFalse(openShiftId, unitId);
         if (!Optional.ofNullable(openShift).isPresent()) {
-            throw new DataNotFoundByIdException("Open Shift not found" + openShiftId);
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound","openShift",openShiftId);
         }
+
         if (shiftSelectionType.equals(ShiftSelectionType.FIRST_PICK)) {
             openShift.setParentOpenShiftId(openShift.getId());
             openShift.setId(null);
