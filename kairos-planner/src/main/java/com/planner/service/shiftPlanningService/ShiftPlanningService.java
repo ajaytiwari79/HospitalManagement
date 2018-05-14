@@ -245,46 +245,14 @@ public class ShiftPlanningService {
             activityKariosIdMap.put(activity.getKairosId().longValue(),act);
             acts.add(act);
         }
-        Map<String, ActivityPlannerEntity> activityMap=new HashMap<>();
-        acts.forEach(a->activityMap.put(a.getId(),a));
+        /*Map<String, ActivityPlannerEntity> activityMap=new HashMap<>();
+        acts.forEach(a->activityMap.put(a.getId(),a));*/
         List<StaffingLevelPlannerEntity> sls= new ArrayList<>();
-        //loops to be sl-> per_interval -> per_activity -> number_of_staff
         List<ActivityLineInterval> activityLineIntervals= new ArrayList<>();
         Map<org.joda.time.LocalDate, List<ActivityPlannerEntity>> perDayActivities= new HashMap<>();
         for (StaffingLevel staffingLevel:staffingLevels){
-            org.joda.time.LocalDate date=JodaTimeUtil.getJodaLocalDateFromDate(staffingLevel.getCurrentDate());
-            List<StaffingLevelInterval> psli=staffingLevel.getPresenceStaffingLevelInterval();
-            for(StaffingLevelInterval sli: psli){
-                for(StaffingLevelActivity sla:sli.getStaffingLevelActivities()){
-                    if(!perDayActivities.containsKey(date)){
-                        List<ActivityPlannerEntity> slActs= new ArrayList<>();
-                        slActs.add(activityKariosIdMap.get(sla.getActivityId()));
-                        perDayActivities.put(date,slActs);
-                    }else if(!perDayActivities.get(date).contains(activityKariosIdMap.get(sla.getActivityId()))){
-                        perDayActivities.get(date).add(activityKariosIdMap.get(sla.getActivityId()));
-                    }
-                    for (int i = 1; i <= sla.getMaxNoOfStaff(); i++) {
-                        ActivityLineInterval ali= new ActivityLineInterval(UUID.randomUUID().toString(),DateUtils.getDateTime(staffingLevel.getCurrentDate(),sli.getStaffingLevelDuration().getFrom()),sli.getStaffingLevelDuration().getDuration(),i <= sla.getMinNoOfStaff(),activityMap.get(sla.getActivityId().toString()),i);
-                        activityLineIntervals.add(ali);
-                    }
-                }
-            }
-            List<StaffingLevelInterval> asli=staffingLevel.getAbsenceStaffingLevelInterval();
-            for(StaffingLevelInterval sli: asli){
-                for(StaffingLevelActivity sla:sli.getStaffingLevelActivities()){
-                    if(!perDayActivities.containsKey(date)){
-                        List<ActivityPlannerEntity> slActs= new ArrayList<>();
-                        slActs.add(activityKariosIdMap.get(sla.getActivityId()));
-                        perDayActivities.put(date,slActs);
-                    }else if(!perDayActivities.get(date).contains(activityKariosIdMap.get(sla.getActivityId()))){
-                        perDayActivities.get(date).add(activityKariosIdMap.get(sla.getActivityId()));
-                    }
-                    for (int i = 1; i <= sla.getMaxNoOfStaff(); i++) {
-                        ActivityLineInterval ali= new ActivityLineInterval(UUID.randomUUID().toString(),DateUtils.getDateTime(staffingLevel.getCurrentDate(),sli.getStaffingLevelDuration().getFrom()),sli.getStaffingLevelDuration().getDuration(),i <= sla.getMinNoOfStaff(),activityMap.get(sla.getActivityId().toString()),i);
-                        activityLineIntervals.add(ali);
-                    }
-                }
-            }
+            activityLineIntervals.addAll(getActivityLineIntervals(activityKariosIdMap, perDayActivities, staffingLevel,true));
+            activityLineIntervals.addAll(getActivityLineIntervals(activityKariosIdMap, perDayActivities, staffingLevel,false));
         }
         List<org.joda.time.LocalDate> dates = JodaTimeUtil.getLocalDates(start, end);
         Map<org.joda.time.LocalDate, Object[]> matrix=ShiftPlanningUtility.createStaffingLevelMatrix(dates, activityLineIntervals,15, acts);
@@ -297,6 +265,29 @@ public class ShiftPlanningService {
         problem.setActivitiesIntervalsGroupedPerDay(groupActivityLineIntervals(activityLineIntervals));
         problem.setActivitiesPerDay(perDayActivities);
         return problem;
+    }
+
+    private List<ActivityLineInterval> getActivityLineIntervals(Map<Long, ActivityPlannerEntity> kairosIdActivities, Map<org.joda.time.LocalDate, List<ActivityPlannerEntity>> perDayActivities, StaffingLevel staffingLevel,boolean presence) {
+        List<ActivityLineInterval> activityLineIntervals= new ArrayList<>();
+        org.joda.time.LocalDate date=JodaTimeUtil.getJodaLocalDateFromDate(staffingLevel.getCurrentDate());
+        List<StaffingLevelInterval> psli=presence?staffingLevel.getPresenceStaffingLevelInterval():staffingLevel.getAbsenceStaffingLevelInterval();
+        //loops to be sl-> per_interval -> per_activity -> number_of_staff
+        for(StaffingLevelInterval sli: psli){
+            for(StaffingLevelActivity sla:sli.getStaffingLevelActivities()){
+                if(!perDayActivities.containsKey(date)){
+                    List<ActivityPlannerEntity> slActs= new ArrayList<>();
+                    slActs.add(kairosIdActivities.get(sla.getActivityId()));
+                    perDayActivities.put(date,slActs);
+                }else if(!perDayActivities.get(date).contains(kairosIdActivities.get(sla.getActivityId()))){
+                    perDayActivities.get(date).add(kairosIdActivities.get(sla.getActivityId()));
+                }
+                for (int i = 1; i <= sla.getMaxNoOfStaff(); i++) {
+                    ActivityLineInterval ali= new ActivityLineInterval(UUID.randomUUID().toString(),DateUtils.getDateTime(staffingLevel.getCurrentDate(),sli.getStaffingLevelDuration().getFrom()),sli.getStaffingLevelDuration().getDuration(),i <= sla.getMinNoOfStaff(),kairosIdActivities.get(sla.getActivityId()),i);
+                    activityLineIntervals.add(ali);
+                }
+            }
+        }
+        return activityLineIntervals;
     }
 
     public List<ShiftRequestPhase> createEmptyShiftsForEmployees(List<EmployeePlanningFact> employees, List<org.joda.time.LocalDate> dates){
