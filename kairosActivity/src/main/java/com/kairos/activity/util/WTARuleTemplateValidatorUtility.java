@@ -116,7 +116,7 @@ public class WTARuleTemplateValidatorUtility {
     //MaximumNightShiftLengthWTATemplate
     public static int checkConstraints(Shift shift){
         if(isNightShift(shift)){
-            return !((ShiftRequestPhase)shift).isAbsenceActivityApplied() && shift.getMinutes() > timeLimit?(shift.getMinutes()-timeLimit):0;
+            return !(shift).isAbsenceActivityApplied() && shift.getMinutes() > timeLimit?(shift.getMinutes()-timeLimit):0;
         }
         return 0;
     }
@@ -264,7 +264,7 @@ public class WTARuleTemplateValidatorUtility {
 
     //MinimumShiftLengthWTATemplate
     public static int checkConstraints(Shift shift){
-        return !((ShiftRequestPhase)shift).isAbsenceActivityApplied() && shift.getMinutes()<timeLimit?((int) timeLimit-shift.getMinutes()):0;
+        return !(shift).isAbsenceActivityApplied() && shift.getMinutes()<timeLimit?((int) timeLimit-shift.getMinutes()):0;
     }
 
     //MinimumWeeklyRestPeriodWTATemplate
@@ -375,7 +375,7 @@ public class WTARuleTemplateValidatorUtility {
         return timeInterval;
     }
 
-    public getValueByPhase(Phase phase, List<PhaseTemplateValue> phaseTemplateValues,){
+    public getValueByPhase(Phase phase, List<PhaseTemplateValue> phaseTemplateValues){
         phaseTemplateValues.forEach(p->{
             if(p.getStaffValue())
         });
