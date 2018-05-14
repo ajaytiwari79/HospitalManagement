@@ -10,19 +10,19 @@ import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
 
-    private int sequence;
+    //private int sequence;
     private boolean isRestingTimeAllowed;
     private int restingTime;
-    private PartOfDay from;
-    private PartOfDay to;
+    private PartOfDay sequenceShiftFrom;
+    private PartOfDay sequenceShiftTo;
 
-    public int getSequence() {
+   /* public int getNightShiftSequence() {
         return sequence;
     }
 
-    public void setSequence(int sequence) {
+    public void setNightShiftSequence(int sequence) {
         this.sequence = sequence;
-    }
+    }*/
 
     public boolean isRestingTimeAllowed() {
         return isRestingTimeAllowed;
@@ -40,20 +40,20 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         this.restingTime = restingTime;
     }
 
-    public PartOfDay getFrom() {
-        return from;
+    public PartOfDay getSequenceShiftFrom() {
+        return sequenceShiftFrom;
     }
 
-    public void setFrom(PartOfDay from) {
-        this.from = from;
+    public void setSequenceShiftFrom(PartOfDay sequenceShiftFrom) {
+        this.sequenceShiftFrom = sequenceShiftFrom;
     }
 
-    public PartOfDay getTo() {
-        return to;
+    public PartOfDay getSequenceShiftTo() {
+        return sequenceShiftTo;
     }
 
-    public void setTo(PartOfDay to) {
-        this.to = to;
+    public void setSequenceShiftTo(PartOfDay sequenceShiftTo) {
+        this.sequenceShiftTo = sequenceShiftTo;
     }
 
     public WTATemplateType getWtaTemplateType() {
@@ -68,12 +68,12 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         wtaTemplateType=WTATemplateType.NO_OF_SEQUENCE_SHIFT;
     }
 
-    public NoOfSequenceShiftWTATemplate(String name,boolean disabled, String description, int sequence,PartOfDay from,PartOfDay to) {
+    public NoOfSequenceShiftWTATemplate(String name, boolean disabled, String description,  PartOfDay sequenceShiftFrom, PartOfDay sequenceShiftTo) {
         this.name = name;
         this.disabled = disabled;
         this.description = description;
-        this.sequence=sequence;
-        this.to=to;
-        this.from=from;
+        //this.sequence=sequence;
+        this.sequenceShiftTo = sequenceShiftTo;
+        this.sequenceShiftFrom = sequenceShiftFrom;
     }
 }

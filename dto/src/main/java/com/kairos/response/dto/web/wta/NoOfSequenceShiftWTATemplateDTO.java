@@ -12,8 +12,8 @@ public class NoOfSequenceShiftWTATemplateDTO extends WTABaseRuleTemplateDTO
     private int sequence;
     private boolean isRestingTimeAllowed;
     private int restingTime;
-    private PartOfDay from;
-    private PartOfDay to;
+    private PartOfDay sequenceShiftFrom;
+    private PartOfDay sequenceShiftTo;
 
     public int getSequence() {
         return sequence;
@@ -39,21 +39,22 @@ public class NoOfSequenceShiftWTATemplateDTO extends WTABaseRuleTemplateDTO
         this.restingTime = restingTime;
     }
 
-    public PartOfDay getFrom() {
-        return from;
+    public PartOfDay getSequenceShiftFrom() {
+        return sequenceShiftFrom;
     }
 
-    public void setFrom(PartOfDay from) {
-        this.from = from;
+    public void setSequenceShiftFrom(PartOfDay sequenceShiftFrom) {
+        this.sequenceShiftFrom = sequenceShiftFrom;
     }
 
-    public PartOfDay getTo() {
-        return to;
+    public PartOfDay getSequenceShiftTo() {
+        return sequenceShiftTo;
     }
 
-    public void setTo(PartOfDay to) {
-        this.to = to;
+    public void setSequenceShiftTo(PartOfDay sequenceShiftTo) {
+        this.sequenceShiftTo = sequenceShiftTo;
     }
+
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
     }

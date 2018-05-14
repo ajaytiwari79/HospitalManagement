@@ -12,7 +12,7 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
 
     private long intervalLength;
     private String intervalUnit;
-    private int sequence;
+    private int nightShiftSequence;
     private boolean isRestingTimeAllowed;
     private int restingTime;
 
@@ -32,12 +32,12 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
         this.intervalUnit = intervalUnit;
     }
 
-    public int getSequence() {
-        return sequence;
+    public int getNightShiftSequence() {
+        return nightShiftSequence;
     }
 
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
+    public void setNightShiftSequence(int nightShiftSequence) {
+        this.nightShiftSequence = nightShiftSequence;
     }
 
     public boolean isRestingTimeAllowed() {
@@ -67,13 +67,13 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
     }
 
-    public DaysOffAfterASeriesWTATemplate(String name, boolean disabled, String description, long intervalLength, String intervalUnit, int sequence) {
+    public DaysOffAfterASeriesWTATemplate(String name, boolean disabled, String description, long intervalLength, String intervalUnit, int nightShiftSequence) {
         this.name=name;
         this.disabled=disabled;
         this.description=description;
         this.intervalLength = intervalLength;
         this.intervalUnit = intervalUnit;
-        this.sequence = sequence;
+        this.nightShiftSequence = nightShiftSequence;
         wtaTemplateType=WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
     }
 }

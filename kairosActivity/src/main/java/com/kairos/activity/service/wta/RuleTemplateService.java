@@ -206,20 +206,23 @@ public class RuleTemplateService extends MongoBaseService {
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
 
-        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate=new DaysOffAfterASeriesWTATemplate("Days Off After a Series",false,"Days Off After a Series",1,week,1);
-        dailyRestingTimeWTATemplate.setCountryId(countryDTO.getId());
-        dailyRestingTimeWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate=new DaysOffAfterASeriesWTATemplate("Minimum days off after a series of night shifts in sequence",false,"Minimum days off after a series of night shifts in sequence",1,week,1);
+        daysOffAfterASeriesWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+        daysOffAfterASeriesWTATemplate.setCountryId(countryDTO.getId());
+        daysOffAfterASeriesWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(daysOffAfterASeriesWTATemplate);
 
-        NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate=new NoOfSequenceShiftWTATemplate("No Of Sequence Shift",false,"No OF Sequence Shift",1, PartOfDay.DAY,PartOfDay.NIGHT);
+        NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate=new NoOfSequenceShiftWTATemplate("No Of Sequence Shift",false,"No OF Sequence Shift", PartOfDay.DAY,PartOfDay.NIGHT);
+        noOfSequenceShiftWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         noOfSequenceShiftWTATemplate.setCountryId(countryDTO.getId());
         noOfSequenceShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(noOfSequenceShiftWTATemplate);
 
         EmployeesWithIncreasedRiskWTATemplate employeesWithIncreasedRiskWTATemplate=new EmployeesWithIncreasedRiskWTATemplate("Employees with Increased Risk",false,"Employees with increased risk",18,62,false);
+        employeesWithIncreasedRiskWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         employeesWithIncreasedRiskWTATemplate.setCountryId(countryDTO.getId());
         employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
+        //wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
 
         BreaksInShiftWTATemplate breaksInShiftWTATemplate = new BreaksInShiftWTATemplate("Break In Shift",false,"Break In Shift",Arrays.asList(new BreakTemplateValue()));
         breaksInShiftWTATemplate.setCountryId(countryDTO.getId());
