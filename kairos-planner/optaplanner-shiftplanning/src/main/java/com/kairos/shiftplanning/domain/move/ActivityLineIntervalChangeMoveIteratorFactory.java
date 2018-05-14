@@ -1,6 +1,6 @@
 package com.kairos.shiftplanning.domain.move;
 
-import com.kairos.shiftplanning.domain.Activity;
+import com.kairos.shiftplanning.domain.ActivityPlannerEntity;
 import com.kairos.shiftplanning.domain.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.ActivityLineIntervalWrapper;
 import com.kairos.shiftplanning.domain.ShiftRequestPhase;
@@ -29,11 +29,11 @@ public class ActivityLineIntervalChangeMoveIteratorFactory implements MoveIterat
         List<ShiftRequestPhase> workingShifts= solution.getShifts();
         List<ShiftRequestPhase> shifts=new ArrayList<>(workingShifts);
         ShiftRequestPhase shift=shifts.get(new Random().nextInt(shifts.size()));
-        Activity activity=solution.getActivities().get(new Random().nextInt(solution.getActivities().size()));
+        ActivityPlannerEntity activity=solution.getActivities().get(new Random().nextInt(solution.getActivities().size()));
         //for (ShiftRequestPhase shift:shifts){
 
             for (ActivityLineInterval activityLineInterval:activityLineIntervals) {
-                if(!activity.getId().equals(activityLineInterval.getActivity().getId())){// ||  !activityLineInterval.isRequired()
+                if(!activity.getId().equals(activityLineInterval.getActivityPlannerEntity().getId())){// ||  !activityLineInterval.isRequired()
                     continue;
                 }
                 if(shift==null){
@@ -64,10 +64,10 @@ public class ActivityLineIntervalChangeMoveIteratorFactory implements MoveIterat
         List<ShiftRequestPhase> shifts=new ArrayList<>(workingShifts);
         //Pick a random date's shift and ALIs
         ShiftRequestPhase shift=shifts.get(new Random().nextInt(shifts.size()));
-        Activity activity=solution.getActivitiesPerDay().get(shift.getDate()).get(workingRandom.nextInt(solution.getActivitiesPerDay().get(shift.getDate()).size()));
+        ActivityPlannerEntity activityPlannerEntity =solution.getActivitiesPerDay().get(shift.getDate()).get(workingRandom.nextInt(solution.getActivitiesPerDay().get(shift.getDate()).size()));
         for (ActivityLineInterval activityLineInterval:activityLineIntervals) {
             //if(activityLineInterval.getShift()!=null)continue;
-            if(!activity.getId().equals(activityLineInterval.getActivity().getId())){// ||  !activityLineInterval.isRequired()
+            if(!activityPlannerEntity.getId().equals(activityLineInterval.getActivityPlannerEntity().getId())){// ||  !activityLineInterval.isRequired()
                 continue;
             }
             if(activityLineInterval.getStart().toLocalDate().equals(shift.getDate())){

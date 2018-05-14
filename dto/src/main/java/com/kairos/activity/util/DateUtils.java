@@ -38,6 +38,12 @@ public class DateUtils {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate;
     }
+    public static Date convertLocalDateToDate(LocalDate dateToConvert) {
+        return Date.from(dateToConvert.atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+    }
+
 
     public static Date getStartOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -324,6 +330,10 @@ public class DateUtils {
         return add(date, Calendar.DAY_OF_MONTH, amount);
     }
 
+    public static Date addMonths(final Date date, final int amount) {
+        return add(date, Calendar.MONTH, amount);
+    }
+
     private static Date add(final Date date, final int calendarField, final int amount) {
         if (date == null) {
             throw new IllegalArgumentException("The date must not be null");
@@ -409,5 +419,11 @@ public class DateUtils {
         DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
             DateTime dateTime = new DateTime(date);
             return dateTime.toString(formatter);
+    }
+    /**
+     * returns Joda DateTime from {@link java.util.Date} and {@link java.time.LocalTime}
+     */
+    public static DateTime getDateTime(Date date, LocalTime time){
+        return new DateTime(date).withMinuteOfHour(time.getMinute()).withHourOfDay(time.getHour());
     }
 }

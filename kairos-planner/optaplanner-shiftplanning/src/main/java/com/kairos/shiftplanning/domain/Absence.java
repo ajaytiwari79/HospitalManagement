@@ -8,12 +8,12 @@ import java.util.UUID;
 @XStreamAlias("Absence")
 public class Absence {
     private UUID id;
-    private Employee employee;
+    private EmployeePlanningFact employee;
     private DateTime start;
     private DateTime end;
     private String type;
 
-    public Absence(UUID id, Employee employee, DateTime start, DateTime end, String type) {
+    public Absence(UUID id, EmployeePlanningFact employee, DateTime start, DateTime end, String type) {
         this.id = id;
         this.employee = employee;
         this.start = start;
@@ -32,11 +32,11 @@ public class Absence {
         this.id = id;
     }
 
-    public Employee getEmployee() {
+    public EmployeePlanningFact getEmployee() {
         return employee;
     }
 
-    public void setEmployee(Employee employee) {
+    public void setEmployee(EmployeePlanningFact employee) {
         this.employee = employee;
     }
 

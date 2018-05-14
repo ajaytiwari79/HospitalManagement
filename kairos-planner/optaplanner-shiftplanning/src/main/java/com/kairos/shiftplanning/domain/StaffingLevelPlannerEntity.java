@@ -7,12 +7,11 @@ import org.joda.time.LocalDate;
 
 import java.util.List;
 @XStreamAlias("staffinglevel")
-public class StaffingLevel {
+public class StaffingLevelPlannerEntity {
     private String id;
     private Long unitId;
     private LocalDate date;
     private List<StaffingLevelInterval> intervals;
-    private Integer intervalMinutes;
     public Long getUnitId() {
         return unitId;
     }
@@ -44,13 +43,7 @@ public class StaffingLevel {
         this.id = id;
     }
 
-    public Integer getIntervalMinutes() {
-        return intervalMinutes;
-    }
 
-    public void setIntervalMinutes(Integer intervalMinutes) {
-        this.intervalMinutes = intervalMinutes;
-    }
     @Deprecated
     public Integer getStaffingLevelSatisfaction(List<ShiftConstrutionPhase> shifts){
         return ShiftPlanningUtility.getStaffingLevelSatisfaction(this,shifts);

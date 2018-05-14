@@ -9,7 +9,7 @@ public class ActivityLineIntervalComparator implements Comparator<ActivityLineIn
     @Override
     public int compare(ActivityLineInterval a1, ActivityLineInterval a2) {
         return new CompareToBuilder()
-                .append(a1.getActivity().getId(), a2.getActivity().getId())
+                .append(a1.getActivityPlannerEntity().getId(), a2.getActivityPlannerEntity().getId())
                 .append(a1.getStaffNo(), a2.getStaffNo())
                 .append(a1.getStart(), a2.getStart())
                 .toComparison();

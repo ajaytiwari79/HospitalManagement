@@ -1,9 +1,6 @@
 package com.kairos.shiftplanning.executioner;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.kairos.shiftplanning.domain.*;
 import com.kairos.shiftplanning.domain.activityConstraint.*;
 import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
@@ -25,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.*;
@@ -51,14 +47,14 @@ public class ShiftPlanningGenerator {
         ShiftRequestPhasePlanningSolution unresolvedSolution = new ShiftRequestPhasePlanningSolution();
         Object[] objects = dailyStaffingLines();
         List<DailyStaffingLine> staffingLines = (List<DailyStaffingLine>)objects[1];
-        List<Activity> activities = (List<Activity>)objects[0];
-        List<Employee> employees= generateEmployeeList(activities);
+        List<ActivityPlannerEntity> activities = (List<ActivityPlannerEntity>)objects[0];
+        List<EmployeePlanningFact> employees= generateEmployeeList(activities);
         unresolvedSolution.setEmployees(employees);
         List<ActivityLineInterval> activityLineIntervals= getActivityLineIntervalsList(staffingLines);
         //TODO sort activityLineIntervals
         List<SkillLineInterval> skillLineIntervals=staffingLines.stream().map(dailyStaffingLine -> dailyStaffingLine.getDailySkillLine().getSkillLineIntervals()).collect(ArrayList::new, List::addAll, List::addAll);
         unresolvedSolution.setActivities(activities);
-        unresolvedSolution.setActivitiesPerDay((Map<LocalDate, List<Activity>>) objects[2]);
+        unresolvedSolution.setActivitiesPerDay((Map<LocalDate, List<ActivityPlannerEntity>>) objects[2]);
         unresolvedSolution.setActivityLineIntervals(activityLineIntervals);
         unresolvedSolution.setSkillLineIntervals(skillLineIntervals);
         unresolvedSolution.setShifts(generateShiftForAssignments( employees));
@@ -67,16 +63,16 @@ public class ShiftPlanningGenerator {
         unresolvedSolution.setWeekDates(getPlanningDays());
         int[] activitiesRank=activities.stream().mapToInt(a->a.getRank()).toArray();
         unresolvedSolution.setStaffingLevelMatrix(new StaffingLevelMatrix(ShiftPlanningUtility.createStaffingLevelMatrix(unresolvedSolution.getWeekDates(),unresolvedSolution.getActivityLineIntervals(),INTERVAL_MINS,unresolvedSolution.getActivities()), activitiesRank));
-
         //writeObjectToXml(unresolvedSolution);
         return unresolvedSolution;
     }
-
+    @Deprecated
+    //use SHiftPLannignService
     private Map<String, List<ActivityLineInterval>> groupActivityLineIntervals(List<ActivityLineInterval> activityLineIntervals) {
         Map<String,List<ActivityLineInterval>> groupedAlis= new HashMap<>();
 
         for(ActivityLineInterval ali:activityLineIntervals){
-            String key=ali.getStart().toLocalDate().toString("MM/dd/yyyy")+"_"+ali.getActivity().getId()+"_"+ali.getStaffNo();
+            String key=ali.getStart().toLocalDate().toString("MM/dd/yyyy")+"_"+ali.getActivityPlannerEntity().getId()+"_"+ali.getStaffNo();
             if(groupedAlis.containsKey(key)){
                 groupedAlis.get(key).add(ali);
             }else{
@@ -107,8 +103,8 @@ public class ShiftPlanningGenerator {
     public BreaksIndirectAndActivityPlanningSolution loadUnsolvedBreakAndIndirectActivityPlanningSolution(String filePath){
         //XStream xstream = new XStream();
         XStream xstream = new XStream(new PureJavaReflectionProvider());
-        xstream.processAnnotations(Employee.class);
-        xstream.processAnnotations(StaffingLevel.class);
+        xstream.processAnnotations(EmployeePlanningFact.class);
+        xstream.processAnnotations(StaffingLevelPlannerEntity.class);
         xstream.processAnnotations(StaffingLevelInterval.class);
         xstream.setMode(XStream.ID_REFERENCES);
         //xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
@@ -154,8 +150,8 @@ public class ShiftPlanningGenerator {
     public ShiftRequestPhasePlanningSolution loadUnsolvedSolutionFromXML(String problemXml) {
         //XStream xstream = new XStream();
         XStream xstream = new XStream(new PureJavaReflectionProvider());
-        xstream.processAnnotations(Employee.class);
-        xstream.processAnnotations(StaffingLevel.class);
+        xstream.processAnnotations(EmployeePlanningFact.class);
+        xstream.processAnnotations(StaffingLevelPlannerEntity.class);
         xstream.processAnnotations(StaffingLevelInterval.class);
         xstream.setMode(XStream.ID_REFERENCES);
         //xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
@@ -177,7 +173,7 @@ public class ShiftPlanningGenerator {
         return unresolvedSolution;
     }
 
-    private List<Absence> generateAbsenceList(List<Employee> employees) {
+    private List<Absence> generateAbsenceList(List<EmployeePlanningFact> employees) {
         List<Absence> absences= new ArrayList<>();
         employees.forEach(employee -> {
             /*Absence absenceVeto1= new Absence(UUID.randomUUID(),employee,new DateTime(getPlanningWeekStart().plusDays(3)),new DateTime(getPlanningWeekStart().plusDays(4)),"VETO");
@@ -190,7 +186,7 @@ public class ShiftPlanningGenerator {
         return absences;
     }
 
-    private List<IndirectActivity> generateIndirectActivities(List<Employee> employees) {
+    private List<IndirectActivity> generateIndirectActivities(List<EmployeePlanningFact> employees) {
         return Arrays.asList(new IndirectActivity(UUID.randomUUID(),20,false,new ArrayList<>(employees.subList(2,5)),"XYZ",false));
     }
 
@@ -203,7 +199,7 @@ public class ShiftPlanningGenerator {
         //saveRecomendationPlanningProblem(shiftPlanningSolution.getStaffingLevels());
 
     }
-
+/*
     private void saveRecomendationPlanningProblem(List<StaffingLevel> staffingLevels){
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -213,7 +209,7 @@ public class ShiftPlanningGenerator {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     private void writeStringToFile(String data,String path){
         try {
@@ -224,10 +220,10 @@ public class ShiftPlanningGenerator {
             e.printStackTrace();
         }
     }
-    private List<ShiftRequestPhase> generateShifts(List<Employee> employees){
+    private List<ShiftRequestPhase> generateShifts(List<EmployeePlanningFact> employees){
         LocalDate shiftStart=getPlanningWeekStart();
         List<ShiftRequestPhase> shifts= new ArrayList<>();
-        //for (Employee employee : employees) {
+        //for (EmployeePlanningFact employee : employees) {
         int start = 5;
         for(int i=0;i<6;i++){
             ShiftRequestPhase shift = new ShiftRequestPhase();
@@ -243,9 +239,9 @@ public class ShiftPlanningGenerator {
         return shifts;
     }
 
-    public List<ShiftRequestPhase> generateShiftForAssignments(List<Employee> employees) {
+    public List<ShiftRequestPhase> generateShiftForAssignments(List<EmployeePlanningFact> employees) {
         List<ShiftRequestPhase> shiftList = new ArrayList<>();
-        for(Employee emp:employees){
+        for(EmployeePlanningFact emp:employees){
             for(LocalDate date:getPlanningDays()) {
                 ShiftRequestPhase sa = new ShiftRequestPhase();
                 sa.setEmployee(emp);
@@ -270,9 +266,9 @@ public class ShiftPlanningGenerator {
     }
 
 
-    public List<Employee> generateEmployeeList(List<Activity> activities) {
-        List<Employee> employees = new ArrayList<Employee>();
-        Employee employee = new Employee("145","Sachin Verma",createSkillSet());
+    public List<EmployeePlanningFact> generateEmployeeList(List<ActivityPlannerEntity> activities) {
+        List<EmployeePlanningFact> employees = new ArrayList<EmployeePlanningFact>();
+        EmployeePlanningFact employee =null;// new EmployeePlanningFact("145","Sachin Verma",createSkillSet(), expertiseId);
         employee.setCollectiveTimeAgreement(getCTA(activities));
         employee.setBaseCost(new BigDecimal(1.5));
         employee.setWorkingTimeConstraints(getWTA());
@@ -280,9 +276,9 @@ public class ShiftPlanningGenerator {
         employee.setPrevShiftStart(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(20));
         employee.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
         employees.add(employee);
-        //employees.add(new Employee(102l,"Jane Doe",new ArrayList<Skill>()));
-        //employees.add(new Employee(103l,"Jean Doe",new ArrayList<Skill>()));
-        Employee employee2 = new Employee("160","Pradeep Singh",Collections.singleton(createDistinctSkill()));
+        //employees.add(new EmployeePlanningFact(102l,"Jane Doe",new ArrayList<Skill>()));
+        //employees.add(new EmployeePlanningFact(103l,"Jean Doe",new ArrayList<Skill>()));
+        EmployeePlanningFact employee2 = null;//new EmployeePlanningFact("160","Pradeep Singh",Collections.singleton(createDistinctSkill()), expertiseId);
         employee2.setCollectiveTimeAgreement(getCTA(activities));
         employee2.setBaseCost(new BigDecimal(1.5));
         employee2.setWorkingTimeConstraints(getWTA());
@@ -291,7 +287,7 @@ public class ShiftPlanningGenerator {
         employee2.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
         employees.add(employee2);
 
-        Employee employee3 = new Employee("170","Arvind Das",Collections.singleton(createDistinctSkill()));
+        EmployeePlanningFact employee3 = null;//new EmployeePlanningFact("170","Arvind Das",Collections.singleton(createDistinctSkill()), expertiseId);
         employee3.setCollectiveTimeAgreement(getCTA(activities));
         employee3.setBaseCost(new BigDecimal(1.5));
         employee3.setWorkingTimeConstraints(getWTA());
@@ -300,7 +296,7 @@ public class ShiftPlanningGenerator {
         employee3.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
         employees.add(employee3);
 
-        Employee employee4 = new Employee("180","Ulrik",Collections.singleton(createDistinctSkill()));
+        EmployeePlanningFact employee4 =null;// new EmployeePlanningFact("180","Ulrik",Collections.singleton(createDistinctSkill()), expertiseId);
         employee4.setCollectiveTimeAgreement(getCTA(activities));
         employee4.setBaseCost(new BigDecimal(1.5));
         employee4.setWorkingTimeConstraints(getWTA());
@@ -309,7 +305,7 @@ public class ShiftPlanningGenerator {
         employee4.setPrevShiftEnd(new DateTime().withDayOfWeek(1).minusDays(1).withTimeAtStartOfDay().minusHours(10));
         employees.add(employee4);
 
-        Employee employee5 = new Employee("190","Ramanuj",Collections.singleton(createDistinctSkill()));
+        EmployeePlanningFact employee5 = null;//new EmployeePlanningFact("190","Ramanuj",Collections.singleton(createDistinctSkill()), expertiseId);
         employee5.setCollectiveTimeAgreement(getCTA(activities));
         employee5.setBaseCost(new BigDecimal(1.5));
         employee5.setWorkingTimeConstraints(getWTA());
@@ -319,7 +315,7 @@ public class ShiftPlanningGenerator {
         employees.add(employee5);
 
 
-        Employee employee6 = new Employee("195","Dravid",Collections.singleton(createDistinctSkill()));
+        EmployeePlanningFact employee6 = null;//new EmployeePlanningFact("195","Dravid",Collections.singleton(createDistinctSkill()), expertiseId);
         employee6.setCollectiveTimeAgreement(getCTA(activities));
         employee6.setBaseCost(new BigDecimal(1.5));
         employee6.setWorkingTimeConstraints(getWTA());
@@ -346,7 +342,7 @@ public class ShiftPlanningGenerator {
     }*/
 
 
-   public CollectiveTimeAgreement getCTA(List<Activity> activities){
+   public CollectiveTimeAgreement getCTA(List<ActivityPlannerEntity> activities){
         CollectiveTimeAgreement collectiveTimeAgreement = new CollectiveTimeAgreement();
         List<CTARuleTemplate> ctaRuleTemplates = new ArrayList<CTARuleTemplate>();
         ctaRuleTemplates.add(getWorkingEveningShift(activities));
@@ -361,7 +357,7 @@ public class ShiftPlanningGenerator {
        return collectiveTimeAgreement;
    }
 
-   private CTARuleTemplate getWorkingEveningShift(List<Activity> activities){
+   private CTARuleTemplate getWorkingEveningShift(List<ActivityPlannerEntity> activities){
        CTARuleTemplate workingEveningShift = new CTARuleTemplate();
        workingEveningShift.setCtaIntervals(Arrays.asList(new CTAInterval(new TimeInterval(1020,1380),CompensationType.MINUTES,new BigDecimal(10.5))));
        workingEveningShift.setId(101l);
@@ -373,7 +369,7 @@ public class ShiftPlanningGenerator {
        return workingEveningShift;
    }
 
-   private CTARuleTemplate getWorkingNightShift(List<Activity> activities){
+   private CTARuleTemplate getWorkingNightShift(List<ActivityPlannerEntity> activities){
        CTARuleTemplate workingNightShift = new CTARuleTemplate();
        workingNightShift.setCtaIntervals(Arrays.asList(new CTAInterval(new TimeInterval(1380,420),CompensationType.MINUTES,new BigDecimal(10.5))));
        workingNightShift.setId(102l);
@@ -385,7 +381,7 @@ public class ShiftPlanningGenerator {
        return workingNightShift;
    }
 
-    private CTARuleTemplate getWorkingOnPublicHoliday(List<Activity> activities){
+    private CTARuleTemplate getWorkingOnPublicHoliday(List<ActivityPlannerEntity> activities){
         CTARuleTemplate workingOnPublicHoliday = new CTARuleTemplate();
         //workingOnPublicHoliday.setStartFrom(1380);
         //workingOnPublicHoliday.setEndTo(420);
@@ -410,7 +406,7 @@ public class ShiftPlanningGenerator {
         return localDates;
     }
 
-   private CTARuleTemplate getWorkingOnSaturday(List<Activity> activities){
+   private CTARuleTemplate getWorkingOnSaturday(List<ActivityPlannerEntity> activities){
        CTARuleTemplate workingOnSaturday = new CTARuleTemplate();
       // workingOnSaturday.setStartFrom(1380);
       // workingOnSaturday.setEndTo(420);
@@ -424,7 +420,7 @@ public class ShiftPlanningGenerator {
        return workingOnSaturday;
    }
 
-    private CTARuleTemplate getWorkingOnSunday(List<Activity> activities){
+    private CTARuleTemplate getWorkingOnSunday(List<ActivityPlannerEntity> activities){
         CTARuleTemplate workingOnSunday = new CTARuleTemplate();
         // workingOnSaturday.setStartFrom(1380);
         // workingOnSaturday.setEndTo(420);
@@ -439,7 +435,7 @@ public class ShiftPlanningGenerator {
     }
 
 
-    private CTARuleTemplate getWorkingOnHalfPublicHoliday(List<Activity> activities){
+    private CTARuleTemplate getWorkingOnHalfPublicHoliday(List<ActivityPlannerEntity> activities){
         CTARuleTemplate workingOnHalfPublicHoliday = new CTARuleTemplate();
         workingOnHalfPublicHoliday.setCtaIntervals(Arrays.asList(new CTAInterval(new TimeInterval(720,1440),CompensationType.PERCENTAGE,new BigDecimal(20.5))));
         workingOnHalfPublicHoliday.setId(104l);
@@ -552,7 +548,7 @@ public class ShiftPlanningGenerator {
         //return IntStream.of(0,1,2,3,4,5,6).mapToObj(i->weekStart.plusDays(i)).collect(Collectors.toList());
         return IntStream.of(0).mapToObj(i->weekStart.plusDays(i)).collect(Collectors.toList());
     }
-    @Deprecated
+    /*@Deprecated
     public List<StaffingLevel> createStaffingLevels(){
         List<StaffingLevel> staffingLevels = new ArrayList<>();
         for(int j=0;j<7;j++) {
@@ -567,16 +563,16 @@ public class ShiftPlanningGenerator {
             List<StaffingLevelInterval> intervals = new ArrayList<>();
             StaffingLevelActivityType[] staffingLevelActivityTypes = getActivityTypes(intervalMins);
             StaffingLevelSkill[] staffingLevelSkills=getSkillsDemand(intervalMins);
-            /*IntStream.rangeClosed(0, (1440 / intervalMins) - 1).forEachOrdered(i -> {
+            *//*IntStream.rangeClosed(0, (1440 / intervalMins) - 1).forEachOrdered(i -> {
                 intervals.add(new StaffingLevelInterval(dateTime.withTimeAtStartOfDay().plusMinutes(i * intervalMins), dateTime.withTimeAtStartOfDay().plusMinutes((i + 1) * intervalMins),
                         0, 0, staffingLevelSkills[i]==null || !dateTime.equals(getPlanningWeekStart())?null:Arrays.asList(staffingLevelSkills[i]), staffingLevelActivityTypes[i] == null ? null : Arrays.asList(staffingLevelActivityTypes[i])));
-            });*/
+            });*//*
             staffingLevel.setIntervals(intervals);
             printStaffingLevel(staffingLevel);
             staffingLevels.add(staffingLevel);
         }
         return  staffingLevels;
-    }
+    }*/
     private Object[] dailyStaffingLines(){
         return generateActivityLine();
     }
@@ -598,31 +594,31 @@ public class ShiftPlanningGenerator {
         //List<LocalDate> planningWeekDates= getPlanningWeek();
         List<LocalDate> planningWeekDates=getPlanningDays();
         int intervalMins=15;
-        List<Activity> activitys=getActivities();
-        Map<LocalDate,List<Activity>> activitiesPerDay= new HashMap<>();
+        List<ActivityPlannerEntity> activityPlannerEntities =getActivities();
+        Map<LocalDate,List<ActivityPlannerEntity>> activitiesPerDay= new HashMap<>();
         planningWeekDates.forEach(date->{
             DailyActivityLine dailyActivityLine= new DailyActivityLine(date,new ArrayList<>());
             activitiesPerDay.put(date,new ArrayList<>());
-            for (Activity activity:activitys){
-                activitiesPerDay.get(date).add(activity);
-                if(activity.isBlankActivity()){
+            for (ActivityPlannerEntity activityPlannerEntity : activityPlannerEntities){
+                activitiesPerDay.get(date).add(activityPlannerEntity);
+                if(activityPlannerEntity.isBlankActivity()){
                     for(int staffNum=0;staffNum<3;staffNum++){//first staff is required
                         for(int j=0;j<96;j++){
-                            ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),date.toDateTimeAtStartOfDay().plusMinutes(j*intervalMins),intervalMins,false,activity,staffNum);
+                            ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),date.toDateTimeAtStartOfDay().plusMinutes(j*intervalMins),intervalMins,false, activityPlannerEntity,staffNum);
                             dailyActivityLine.getActivityLineIntervals().add(activityLineInterval);
                         }
                     }
                 }
-                else if(activity.isTypePresence()){
+                else if(activityPlannerEntity.isTypePresence()){
                     for(int staffNum=0;staffNum<3;staffNum++){//first staff is required
                         for(int j=46;j<52;j++){//32..80
-                            ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),date.toDateTimeAtStartOfDay().plusMinutes(j*intervalMins),intervalMins,staffNum<2,activity,staffNum);
+                            ActivityLineInterval activityLineInterval= new ActivityLineInterval(getId(),date.toDateTimeAtStartOfDay().plusMinutes(j*intervalMins),intervalMins,staffNum<2, activityPlannerEntity,staffNum);
                             dailyActivityLine.getActivityLineIntervals().add(activityLineInterval);
                         }
                     }
-                }else if(activity.isTypeAbsence()){
+                }else if(activityPlannerEntity.isTypeAbsence()){
                     for(int staffNum=0;staffNum<2;staffNum++){
-                        ActivityLineInterval activityLineInterval= new ActivityLineInterval(getAbsenceId(),date.toDateTimeAtStartOfDay(),24*60,staffNum==0,activity,staffNum);
+                        ActivityLineInterval activityLineInterval= new ActivityLineInterval(getAbsenceId(),date.toDateTimeAtStartOfDay(),24*60,staffNum==0, activityPlannerEntity,staffNum);
                         dailyActivityLine.getActivityLineIntervals().add(activityLineInterval);
                     }
                 }
@@ -633,7 +629,7 @@ public class ShiftPlanningGenerator {
             DailyStaffingLine dailyStaffingLine= new DailyStaffingLine(dailyActivityLine,dailySkillLine );
             dailyStaffingLines.add(dailyStaffingLine);
         });
-        Object[] objects = {activitys,dailyStaffingLines,activitiesPerDay};
+        Object[] objects = {activityPlannerEntities,dailyStaffingLines,activitiesPerDay};
         return objects;
     }
     //@Deprecated
@@ -669,17 +665,17 @@ public class ShiftPlanningGenerator {
         return dailyStaffingLines;
     }*/
 
-    private void printStaffingLevel(StaffingLevel staffingLevel) {
+   /* private void printStaffingLevel(StaffingLevel staffingLevel) {
         staffingLevel.getIntervals().forEach(interval->{
             if(interval.getActivityTypeLevels()==null) return;
             StringBuilder sb = new StringBuilder();
-            /*interval.getStaffingLevelActivityTypes().forEach(act->{
+            *//*interval.getStaffingLevelActivityTypes().forEach(act->{
                 sb.append(act.getMinimumStaffRequired()).append(",").append(act.getSkillSet().toArray()[0]);
-            });*/
-            /*log.info("start:{} end:{} min:{} max:{} Activity:{}",interval.getStart().toString("HH:mm"),interval.getEnd().toString("HH:mm"),interval.getMinimumStaffRequired(),
-                    interval.getMaximumStaffRequired(),sb.toString());*/
+            });*//*
+            *//*log.info("start:{} end:{} min:{} max:{} ActivityPlannerEntity:{}",interval.getStart().toString("HH:mm"),interval.getEnd().toString("HH:mm"),interval.getMinimumStaffRequired(),
+                    interval.getMaximumStaffRequired(),sb.toString());*//*
         });
-    }
+    }*/
 
     private int[][] getMinMaxWorkHours(Integer intervalMins){
 
@@ -740,26 +736,22 @@ public class ShiftPlanningGenerator {
         timeTypes[1]= new TimeType(UUID.randomUUID().toString(),"absence");
         return timeTypes;
     }
-    private List<Activity> getActivities(){
+    private List<ActivityPlannerEntity> getActivities(){
         TimeType[] timeTypes= createTimeTypes();
-        List<Activity> activitys = new ArrayList<>();
-        Activity activity = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10);
-        activity.setActivityConstraints(getActivityContraints());
-        activity.setActivityCost(1.0f);
-        Activity activity2 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Team B",timeTypes[0], 2,9);
-        activity2.setActivityConstraints(getActivityContraints());
-        activity2.setActivityCost(1.5f);
-        Activity activity3 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2);
-        activity3.setActivityConstraints(getActivityContraints());
-        activity3.setActivityCost(1.5f);
-        Activity activity4 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[0], 4,1);
-        activity4.setActivityConstraints(getActivityContraints());
-        activity4.setActivityCost(1.5f);
-        activitys.add(activity);
-        activitys.add(activity2);
-        activitys.add(activity3);
-        activitys.add(activity4);
-        return activitys;
+        List<ActivityPlannerEntity> activityPlannerEntities = new ArrayList<>();
+        ActivityPlannerEntity activityPlannerEntity = null;//new ActivityPlannerEntity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10, expertiseId);
+        activityPlannerEntity.setActivityConstraints(getActivityContraints());
+        ActivityPlannerEntity activityPlannerEntity2 = null;//new ActivityPlannerEntity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Team B",timeTypes[0], 2,9, expertiseId);
+        activityPlannerEntity2.setActivityConstraints(getActivityContraints());
+        ActivityPlannerEntity activityPlannerEntity3 = null;//new ActivityPlannerEntity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2, expertiseId);
+        activityPlannerEntity3.setActivityConstraints(getActivityContraints());
+        ActivityPlannerEntity activityPlannerEntity4 = null;//new ActivityPlannerEntity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[0], 4,1, expertiseId);
+        activityPlannerEntity4.setActivityConstraints(getActivityContraints());
+        activityPlannerEntities.add(activityPlannerEntity);
+        activityPlannerEntities.add(activityPlannerEntity2);
+        activityPlannerEntities.add(activityPlannerEntity3);
+        activityPlannerEntities.add(activityPlannerEntity4);
+        return activityPlannerEntities;
     }
 
     private List<String> getActivityIds(){
