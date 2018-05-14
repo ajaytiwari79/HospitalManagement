@@ -242,6 +242,10 @@ public abstract class RelationshipConstants {
     public final static String HAS_PAYMENT_SETTINGS = "HAS_PAYMENT_SETTINGS";
     public final static String HAS_BREAK_MATRIX="HAS_BREAK_MATRIX";
     public final static String HAS_PERSONALIZED_SETTINGS = "HAS_PERSONALIZED_SETTINGS";
+    public final static String HAS_SENIOR_DAYS = "HAS_SENIOR_DAYS";
+    public final static String HAS_CHILD_CARE_DAYS = "HAS_CHILD_CARE_DAYS";
+
+
 
 
     /**

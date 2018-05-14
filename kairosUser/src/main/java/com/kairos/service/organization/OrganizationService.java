@@ -18,9 +18,6 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
 import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
-import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.client.ContactAddressDTO;
 import com.kairos.persistence.model.user.country.*;
@@ -490,7 +487,7 @@ public class OrganizationService extends UserBaseService {
         organizationResponseDTO.setTypeId(organizationTypeId);
         organizationResponseDTO.setSubTypeId(organizationSubTypeId);
         organizationResponseDTO.setExternalId(organization.getExternalId());
-        organizationResponseDTO.setHomeAddress(filterContactAddressInfo(organization.getContactAddress()));
+        organizationResponseDTO.setContactAddress(filterContactAddressInfo(organization.getContactAddress()));
         organizationResponseDTO.setLevelId((organization.getLevel() == null) ? null : organization.getLevel().getId());
 
         organizationResponseDTO.setUnion(organization.isUnion());
@@ -553,7 +550,7 @@ public class OrganizationService extends UserBaseService {
         organization.setExternalId(orgDetails.getExternalId());
 
         // Verify Address here
-        AddressDTO addressDTO = orgDetails.getHomeAddress();
+        AddressDTO addressDTO = orgDetails.getContactAddress();
         ZipCode zipCode;
         addressDTO.setVerifiedByGoogleMap(true);
         if (addressDTO.isVerifiedByGoogleMap()) {
@@ -637,7 +634,7 @@ public class OrganizationService extends UserBaseService {
         unit.setDescription(organizationDTO.getDescription());
         unit.setPrekairos(organizationDTO.isPreKairos());
 
-        AddressDTO addressDTO = organizationDTO.getHomeAddress();
+        AddressDTO addressDTO = organizationDTO.getContactAddress();
 
 
         // Verify Address here
@@ -935,7 +932,7 @@ public class OrganizationService extends UserBaseService {
         for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
             HashMap<String, Object> orgBasicData = new HashMap<>();
             orgBasicData.put("orgData", organizationData);
-            Map<String, Object> address = (Map<String, Object>) organizationData.get("homeAddress");
+            Map<String, Object> address = (Map<String, Object>) organizationData.get("contactAddress");
             orgBasicData.put("municipalities", (address.get("zipCodeId") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCodeId"))));
             orgData.add(orgBasicData);
         }
@@ -951,7 +948,7 @@ public class OrganizationService extends UserBaseService {
         for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
             HashMap<String, Object> orgBasicData = new HashMap<>();
             orgBasicData.put("orgData", organizationData);
-            Map<String, Object> address = (Map<String, Object>) organizationData.get("homeAddress");
+            Map<String, Object> address = (Map<String, Object>) organizationData.get("contactAddress");
             orgBasicData.put("municipalities", (address.get("zipCodeId") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCodeId"))));
             if(organizationData.get("gdprUnit")!=null && (boolean)organizationData.get("gdprUnit")==true) {
                 data.put("gdprUnit", orgBasicData);

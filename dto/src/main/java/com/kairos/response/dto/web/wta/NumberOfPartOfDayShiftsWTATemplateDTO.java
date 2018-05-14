@@ -23,7 +23,7 @@ public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDT
     private long intervalLength;
     private String intervalUnit;
     private long validationStartDateMillis;
-    private WTATemplateType wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;
+
 
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private List<BigInteger> activityIds = new ArrayList<>();
@@ -129,7 +129,7 @@ public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDT
         this.description = description;
     }
     public NumberOfPartOfDayShiftsWTATemplateDTO() {
-
+        this.wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;
     }
 
 

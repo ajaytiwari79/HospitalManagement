@@ -50,7 +50,7 @@ public class UnionService {
         for (Map<String, Object> organizationData : organizationQueryResult.getOrganizations()) {
             HashMap<String, Object> orgBasicData = new HashMap<>();
             orgBasicData.put("orgData", organizationData);
-            Map<String, Object> address = (Map<String, Object>) organizationData.get("homeAddress");
+            Map<String, Object> address = (Map<String, Object>) organizationData.get("contactAddress");
             orgBasicData.put("municipalities", (address.get("zipCode") == null) ? Collections.emptyMap() : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) address.get("zipCode"))));
             orgData.add(orgBasicData);
         }

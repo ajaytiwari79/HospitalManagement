@@ -6,6 +6,7 @@ import com.kairos.activity.enums.MinMaxSetting;
 import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.enums.WTATemplateType;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,14 +20,13 @@ public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTempla
 
     private long intervalLength;//
     private String intervalUnit;
-    private long validationStartDateMillis;
+    private LocalDate validationStartDate;
     private long continuousDayRestHours;
     private long averageRest;//(hours number)
     private String shiftAffiliation;//(List checkbox)
-    private WTATemplateType wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
-    private MinMaxSetting minMaxSetting;
+    private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
 
 
     public MinMaxSetting getMinMaxSetting() {
@@ -79,12 +79,12 @@ public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTempla
         this.intervalUnit = intervalUnit;
     }
 
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
+    public LocalDate getValidationStartDate() {
+        return validationStartDate;
     }
 
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
+    public void setValidationStartDate(LocalDate validationStartDate) {
+        this.validationStartDate = validationStartDate;
     }
 
     public long getContinuousDayRestHours() {
@@ -111,21 +111,8 @@ public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTempla
         this.shiftAffiliation = shiftAffiliation;
     }
 
-    public ShortestAndAverageDailyRestWTATemplateDTO(String name, boolean disabled,
-                                                     String description, long intervalLength, String intervalUnit, long validationStartDateMillis,
-                                                     long continuousDayRestHours, long averageRest, String shiftAffiliation) {
-        this.name = name;
-        this.disabled = disabled;
-        this.description = description;
-        this.intervalLength =intervalLength;
-        this.intervalUnit=intervalUnit;
-        this.validationStartDateMillis =validationStartDateMillis;
-        this.continuousDayRestHours=continuousDayRestHours;
-        this.averageRest=averageRest;
-        this.shiftAffiliation=shiftAffiliation;
-    }
     public ShortestAndAverageDailyRestWTATemplateDTO() {
-
+        this.wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     }
 
 }

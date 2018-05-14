@@ -1,17 +1,19 @@
 package com.kairos.persistence.model.user.staff;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.Date;
+import java.util.List;
 
 /**
- * Created by pavan on 27/3/18.
+ * Created by pavan on 7/5/18.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
-public class StaffExperienceInExpertiseDTO {
+public class StaffExpertiseQueryResult {
     private Long id;
     private String name;
     private Long expertiseId;
@@ -19,9 +21,9 @@ public class StaffExperienceInExpertiseDTO {
     @DateLong
     private Date expertiseStartDate;
     private Integer nextSeniorityLevelInMonths;
+    private List<SeniorityLevel> seniorityLevels;
 
-
-    public StaffExperienceInExpertiseDTO() {
+    public StaffExpertiseQueryResult() {
         //Default Constructor
     }
 
@@ -73,23 +75,11 @@ public class StaffExperienceInExpertiseDTO {
         this.nextSeniorityLevelInMonths = nextSeniorityLevelInMonths;
     }
 
-    public StaffExperienceInExpertiseDTO(Long id, String name, Long expertiseId, Integer relevantExperienceInMonths, Date expertiseStartDate) {
-        this.id = id;
-        this.name = name;
-        this.expertiseId = expertiseId;
-        this.relevantExperienceInMonths = relevantExperienceInMonths;
-        this.expertiseStartDate = expertiseStartDate;
+    public List<SeniorityLevel> getSeniorityLevels() {
+        return seniorityLevels;
     }
 
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("StaffExperienceInExpertiseDTO{");
-        sb.append("id=").append(id);
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", expertiseId=").append(expertiseId);
-        sb.append(", relevantExperienceInMonths=").append(relevantExperienceInMonths);
-        sb.append(", expertiseStartDate=").append(expertiseStartDate);
-        sb.append('}');
-        return sb.toString();
+    public void setSeniorityLevels(List<SeniorityLevel> seniorityLevels) {
+        this.seniorityLevels = seniorityLevels;
     }
 }

@@ -19,7 +19,7 @@ public class OrganizationResponseDTO {
     private  List<Long> typeId;
     private  List<Long> subTypeId;
     private  String externalId;
-    private  ContactAddressDTO homeAddress;
+    private  ContactAddressDTO contactAddress;
     private  Long levelId;
 
     private Boolean union;
@@ -108,12 +108,12 @@ public class OrganizationResponseDTO {
         this.externalId = externalId;
     }
 
-    public ContactAddressDTO getHomeAddress() {
-        return homeAddress;
+    public ContactAddressDTO getContactAddress() {
+        return contactAddress;
     }
 
-    public void setHomeAddress(ContactAddressDTO homeAddress) {
-        this.homeAddress = homeAddress;
+    public void setContactAddress(ContactAddressDTO contactAddress) {
+        this.contactAddress = contactAddress;
     }
 
     public Long getLevelId() {

@@ -747,7 +747,7 @@ public class TaskService extends MongoBaseService {
                     TimeCareOrganizationDTO timeCareOrganizationDTO = timeCareRestClient.getPrerequisitesForTimeCareTask(shift);
 
                     OrganizationContactAddress organizationContactData = timeCareOrganizationDTO.getOrganizationContactAddress();
-                    ContactAddressDTO officeAddress = organizationContactData.getHomeAddress();
+                    ContactAddressDTO officeAddress = organizationContactData.getContactAddress();
                     if (officeAddress == null) {
                         throw new InternalError("organization address is null");
                     }
