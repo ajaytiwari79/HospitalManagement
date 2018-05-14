@@ -100,6 +100,8 @@ public class RuleTemplateService extends MongoBaseService {
 
         ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days",true,"Maximum number of consecutive days",true,daysCount);
         consecutiveWorking.setCountryId(countryDTO.getId());
+        consecutiveWorking.setIntervalLength(12);
+        consecutiveWorking.setIntervalUnit(week);
         consecutiveWorking.setPhaseTemplateValues(phaseTemplateValues);
         consecutiveWorking.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(consecutiveWorking);
