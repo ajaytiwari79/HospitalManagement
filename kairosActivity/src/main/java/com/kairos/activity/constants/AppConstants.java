@@ -227,4 +227,12 @@ public class AppConstants {
     public static final int PRESENCE_LIMIT_IN_YEAR = 1;
     public static final int ABSENCE_LIMIT_IN_YEAR = 2;
 
+
+    //RuleTemplate
+    public static final String MONTHS = "MONTHS";
+    public static final String WEEKS = "WEEKS";
+    public static final String DAYS = "DAYS";
+    public static final String YEARS = "YEARS";
+
+
 }

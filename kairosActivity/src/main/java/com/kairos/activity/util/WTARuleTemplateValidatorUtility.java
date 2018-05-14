@@ -14,14 +14,13 @@ import com.kairos.activity.persistence.model.wta.templates.PhaseTemplateValue;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.model.user.country.Day;
 import com.kairos.response.dto.web.cta.DayTypeDTO;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.joda.time.LocalDate;
-import org.joda.time.Period;
+import org.joda.time.*;
 
 import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.activity.constants.AppConstants.*;
 
 /**
  * @author pradeep
@@ -45,7 +44,7 @@ public class WTARuleTemplateValidatorUtility {
         return totalScheduledTime>maximumAvgTime?totalScheduledTime-(int)maximumAvgTime:0;
     }
 
-    //MaximumConsecutiveWorkingDaysWTATemplate
+
     public static int getConsecutiveDays(List<LocalDate> localDates) {
         if(localDates.size()<2) return 0;
         Collections.sort(localDates);
@@ -66,6 +65,7 @@ public class WTARuleTemplateValidatorUtility {
         return max;
     }
 
+    //MaximumConsecutiveWorkingDaysWTATemplate
     public static int checkConstraints(List<Shift> shifts, ConsecutiveWorkWTATemplate ruleTemplate) {
         int consecutiveDays = getConsecutiveDays(getSortedAndUniqueDates(shifts));
         return consecutiveDays > daysLimit?(consecutiveDays-(int) daysLimit):0;
@@ -232,7 +232,7 @@ public class WTARuleTemplateValidatorUtility {
         return totalRestUnder;
     }
 
-    public boolean isNightShift(Shift shift) {
+    public boolean isNightShift(Shift shift,TimeSlotWrapper timeSlotWrapper) {
         return getNightTimeInterval().contains(shift.getStart().getMinuteOfDay());
     }
 
@@ -303,7 +303,7 @@ public class WTARuleTemplateValidatorUtility {
     }
 
     public static List<LocalDate> getSortedDates(List<Shift> shifts){
-        List<LocalDate> dates=new ArrayList<>(shifts.stream().map(s->DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
+        List<LocalDate> dates=new ArrayList<>(shifts.stream().map(s->DateUtils.asJodaLocalDate(s.getStartDate())).collect(Collectors.toSet()));
         Collections.sort(dates);
         return dates;
     }
@@ -373,6 +373,31 @@ public class WTARuleTemplateValidatorUtility {
             }
         }
         return timeInterval;
+    }
+
+    public Interval addInterval(Interval interval1,Interval interval2){
+        if(interval1.getStart().isAfter(interval2.getStart())){
+            interval1 = interval1.withStart(interval2.getStart());
+        }
+        if(interval1.getEnd().isBefore(interval2.getEnd())){
+            interval1 = interval1.withEnd(interval2.getEnd());
+        }
+        return interval1;
+    }
+
+    public Interval getIntervalByRuleTemplate(Date shiftStartDate,Date shiftEndDate,String intervalUnit,long intervalValue){
+        Interval interval = null;
+        switch (intervalUnit){
+            case DAYS:interval = new Interval(new DateTime(shiftStartDate).minusDays((int)intervalValue),new DateTime(shiftEndDate).plusDays((int)intervalValue));
+                break;
+            case WEEKS:interval = new Interval(new DateTime(shiftStartDate).minusWeeks((int)intervalValue),new DateTime(shiftEndDate).plusWeeks((int)intervalValue));
+                break;
+            case MONTHS:interval = new Interval(new DateTime(shiftStartDate).minusMonths((int)intervalValue),new DateTime(shiftEndDate).plusMonths((int)intervalValue));
+                break;
+            case YEARS:interval = new Interval(new DateTime(shiftStartDate).minusYears((int)intervalValue),new DateTime(shiftEndDate).plusYears((int)intervalValue));
+                break;
+        }
+        return interval;
     }
 
     public getValueByPhase(Phase phase, List<PhaseTemplateValue> phaseTemplateValues){

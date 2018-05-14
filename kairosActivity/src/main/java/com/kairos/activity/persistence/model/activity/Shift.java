@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -50,6 +51,8 @@ public class Shift extends MongoBaseEntity {
 
     private Long unitPositionId;
     private ShiftState shiftState;
+    private List<BigInteger> brokenRuleTemplateIds;
+
     public Shift() {
     }
 
@@ -61,9 +64,16 @@ public class Shift extends MongoBaseEntity {
     }
 
 
+    public List<BigInteger> getBrokenRuleTemplateIds() {
+        return brokenRuleTemplateIds;
+    }
+
+    public void setBrokenRuleTemplateIds(List<BigInteger> brokenRuleTemplateIds) {
+        this.brokenRuleTemplateIds = brokenRuleTemplateIds;
+    }
 
     public Shift(BigInteger id, String name, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
-                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitId,Long unitPositionId) {
+                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, BigInteger activityId, Long staffId, Long unitId, Long unitPositionId) {
         this.name = name;
         this.id = id;
         this.startDate = startDate;
