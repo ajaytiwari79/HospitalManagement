@@ -32,6 +32,7 @@ public class DocumentVersioningService {
         versioningNode.addMixin("mix:versionable");
 
         versioningNode.setProperty("jcr:data", binary);
+
         versioningNode.save();
         session.save();
         Version firstversion = versioningNode.checkin();

@@ -17,8 +17,8 @@ public final class ApiConstant {
 
 //Global master processing activity
 
-public static final String API_PROCESSING_ACTIVITY = API_V1 + "/processing/activity";
-public static final String API_MASTER_PROCESSING_ACTIVITY = API_PROCESSING_ACTIVITY+"/master";
+public static final String API_PROCESSING_ACTIVITY = API_V1 + "/processing_activity";
+public static final String API_MASTER_PROCESSING_ACTIVITY = API_V1+"/master_processing_activity";
 
 
 
@@ -28,11 +28,7 @@ public static final String API_MASTER_PROCESSING_ACTIVITY = API_PROCESSING_ACTIV
 
 
     //Agreement template
-    public static final String API_AGREEMENT_TEMPLATE_URl = API_V1 + "/agreement/template";
-
-
-    //processing activity
-    public static final String API_PROCESSING_ACIVITY = API_V1 + "/processing/activity";
+    public static final String API_AGREEMENT_TEMPLATE_URl = API_V1 + "/agreement_template";
 
 
     //Processing Purpose

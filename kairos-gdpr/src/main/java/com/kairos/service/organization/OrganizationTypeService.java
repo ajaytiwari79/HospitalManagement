@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrganizationTypeService extends MongoBaseService {
@@ -26,7 +27,7 @@ return save(organizationType);
 
 
 
-    public List<OrganizationType> getOrganizationTypes(List<Long> orgTypeListId)
+    public List<OrganizationType> getOrganizationTypes(Set<Long> orgTypeListId)
     {
 
        List<OrganizationType> organizationTypeList=new ArrayList<>();

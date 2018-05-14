@@ -24,6 +24,7 @@ import static com.kairos.constant.ApiConstant.API_AGREEMENT_TEMPLATE_URl;
 @RestController
 @RequestMapping(API_AGREEMENT_TEMPLATE_URl)
 @Api(API_AGREEMENT_TEMPLATE_URl)
+@CrossOrigin
 public class AgreementTemplateController {
 
 
@@ -48,7 +49,7 @@ public class AgreementTemplateController {
 
     @GetMapping("/agreement/id/{id}")
     public ResponseEntity<Object> getAgreementTemplateById(@PathVariable BigInteger id) {
-        if (!Optional.ofNullable(id).isPresent()) {
+        if (id==null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementTemplateService.getAgreementTemplateById(id));
@@ -56,16 +57,21 @@ public class AgreementTemplateController {
     }
 
 
-    @DeleteMapping("delete/id{id}")
+    @DeleteMapping("delete/id/{id}")
     public ResponseEntity<Object> deleteById(@PathVariable BigInteger id) {
 
+        if (id==null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementTemplateService.deleteById(id));
 
     }
 
     @PutMapping("/update/{id}")
     public   ResponseEntity<Object> updateAgreementtemplate(@PathVariable BigInteger id, @RequestBody List<BigInteger> clausesIds ) {
-
+        if (id==null) {
+            return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "agreement template id cannot be null or empty");
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, agreementTemplateService.updateAgreementTemplateclauses(id,clausesIds));
 
     }

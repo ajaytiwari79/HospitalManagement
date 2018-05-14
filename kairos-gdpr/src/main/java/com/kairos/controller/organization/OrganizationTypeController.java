@@ -13,6 +13,7 @@ import static com.kairos.constant.ApiConstant.API_ORGANIZATION_TYPE;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(API_ORGANIZATION_TYPE)
@@ -39,7 +40,7 @@ public class OrganizationTypeController {
 
 
     @RequestMapping(value = "/organizationTypeList", method = RequestMethod.POST)
-    public ResponseEntity<Object> getOrganizationTypeByList(@RequestBody List<Long> orgTypeList) {
+    public ResponseEntity<Object> getOrganizationTypeByList(@RequestBody Set<Long> orgTypeList) {
 
         if (orgTypeList == null) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "organization List is Empty");

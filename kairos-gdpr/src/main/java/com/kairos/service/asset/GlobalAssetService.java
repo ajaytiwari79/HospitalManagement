@@ -1,18 +1,21 @@
 package com.kairos.service.asset;
 
 
+import com.kairos.client.OrganizationTypeRestClient;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.custome_exception.DataNotExists;
 import com.kairos.custome_exception.RequestDataNull;
 import com.kairos.persistance.model.asset.GlobalAsset;
 import com.kairos.persistance.repository.asset.GlobalAssetMongoRepository;
+import com.kairos.response.dto.OrganizationTypeRestClientDto;
 import com.kairos.service.MongoBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +26,8 @@ public class GlobalAssetService extends MongoBaseService {
     @Inject
     private GlobalAssetMongoRepository globalAssetMongoRepository;
 
+    @Inject
+    private OrganizationTypeRestClient  organizationTypeRestClient;
 
     public GlobalAsset addAsset(GlobalAsset globalAsset) {
 
@@ -136,13 +141,18 @@ public class GlobalAssetService extends MongoBaseService {
         if (!Optional.of(exists).isPresent()) {
             throw new DataNotFoundByIdException("asset not Exist for id " + id);
 
-        } else
+        } else {
+
+
+            List<OrganizationTypeRestClientDto> organizationTypes = organizationTypeRestClient.getOrganizationType(new HashSet<>(exists.getOrganisationType()));
+            List<OrganizationTypeRestClientDto> organizationSubTypes = organizationTypeRestClient.getOrganizationType(new HashSet<>(exists.getOrganisationSubType()));
+            System.err.println(organizationTypes.get(0).getName());
+            System.err.println(organizationSubTypes.get(1).getName());
+
+        }
 
         return exists;
-
     }
-
-
 
 
 

@@ -14,7 +14,10 @@ import org.apache.jackrabbit.oak.spi.blob.FileBlobStore;
 import org.apache.jackrabbit.oak.spi.security.OpenSecurityProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.web.client.RestTemplate;
 
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
@@ -40,6 +43,16 @@ public class KairosGdprApplication {
 return repo;
     }
 
+    @Primary
+    @Bean
+    public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
+       /* RestTemplate template =restTemplateBuilder
+                .interceptors(new UserContextInterceptor())
+                .messageConverters(mappingJackson2HttpMessageConverter())
+                .build();
+         template;*/
+         return new RestTemplate();
+    }
 
 
 }

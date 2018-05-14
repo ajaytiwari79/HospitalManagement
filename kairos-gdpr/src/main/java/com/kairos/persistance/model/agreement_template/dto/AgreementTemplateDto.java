@@ -3,6 +3,7 @@ package com.kairos.persistance.model.agreement_template.dto;
 import com.kairos.persistance.model.clause.AccountType;
 import com.kairos.persistance.model.organization.OrganizationService;
 import com.kairos.persistance.model.organization.OrganizationType;
+import com.kairos.utils.custome_annotation.NotNullOrEmpty;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -11,11 +12,10 @@ import java.util.List;
 
 public class AgreementTemplateDto {
 
-    @NotNull(message = "error.agreement.name.cannotbe.null")
-    @NotEmpty(message = "error.agreement.name.cannotbe.empty")
+    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
     private String name;
-    @NotNull(message = "error.agreement.description.cannotbe.null")
-    @NotEmpty(message = "error.agreement.description.cannotbe.empty")
+
+    @NotNullOrEmpty(message = "error.agreement.name.cannotbe.empty.or.null")
     private String description;
 
     private Long organisationTypeid;

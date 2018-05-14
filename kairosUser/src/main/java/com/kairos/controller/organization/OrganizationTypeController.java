@@ -1,6 +1,7 @@
 package com.kairos.controller.organization;
 
 import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.response.dto.web.organizationtype_service_dto.OrganizationTypeAndSubTypeResponseDto;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.service.organization.OrganizationTypeService;
 import com.kairos.util.response.ResponseHandler;
@@ -91,5 +92,28 @@ public class OrganizationTypeController {
     }
 
 
+    //Bobby
+    @ApiOperation(value = "Get  Organization Types by set ids")
+    @RequestMapping(value = "/organization_type/", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getAllOrganizationTypeByIds(@RequestBody Set<Long> ids) {
+        List<OrganizationType> response = organizationTypeService.getAllOrganizationTypeByIds(ids);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+    }
 
+
+
+    //bobby
+    @ApiOperation(value = "Get  Organization Types by set ids")
+    @RequestMapping(value = "/organization_sub_types/", method = RequestMethod.POST)
+    ResponseEntity<Map<String, Object>> getAllOrganizationSubTypeByIds(@RequestBody Set<Long> ids) {
+        List<OrganizationType> response = organizationTypeService.getAllOrganizationSubTypeByIds(ids);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+    }
+
+//bobby
+    @ApiOperation(value = "get organization and services")
+    @RequestMapping(value = COUNTRY_URL+"/organization_type/all", method = RequestMethod.GET)
+    ResponseEntity<Map<String, Object>> getOrgTypeAndOrgServicesResponseDto(@PathVariable Long countryId) {
+    return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllOrganizationTypeAndServiceAndSubServices(countryId) );
+    }
 }

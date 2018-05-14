@@ -4,13 +4,14 @@ package com.kairos.service.agreement_template;
 import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.persistance.model.agreement_template.AgreementTemplate;
 import com.kairos.persistance.model.agreement_template.dto.AgreementTemplateDto;
-import com.kairos.persistance.model.agreement_template.response.dto.AgreementQueryResult;
 import com.kairos.persistance.model.clause.Clause;
 import com.kairos.persistance.repository.agreement_template.AgreementTemplateMongoRepository;
 import com.kairos.persistance.repository.clause.AccountTypeMongoRepository;
 import com.kairos.persistance.repository.organization.OrganizationServiceMongoRepository;
 import com.kairos.persistance.repository.organization.OrganizationTypeMongoRepository;
+import com.kairos.response.dto.AgreementQueryResult;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.clause.AccountTypeService;
 import com.kairos.service.clause.ClauseService;
 import org.springframework.stereotype.Service;
 import javax.inject.Inject;
@@ -32,7 +33,7 @@ public class AgreementTemplateService extends MongoBaseService {
     private OrganizationServiceMongoRepository organizationServiceMongoRepository;
 
     @Inject
-    private AccountTypeMongoRepository accountTypeMongoRepository;
+    private AccountTypeService accountTypeService;
 
     @Inject
     private ClauseService clauseService;
@@ -56,20 +57,16 @@ public class AgreementTemplateService extends MongoBaseService {
             isDefault = false;
         }
         if (accountType != null) {
-            newAgreementTemplate.setAccountType(accountTypeMongoRepository.findByid(accountType));
+
+            newAgreementTemplate.setAccountType(accountTypeService.getAccountTypeById(accountType));
             isDefault = false;
         }
-        if (clauseids.size() > 0) {
+        if (clauseids.size()!= 0) {
              clauseService.getClausesByIds(clauseids);
             newAgreementTemplate.setClauses(clauseids);
             isDefault = false;
         }
-       /* if (countryId != null) {
-
-        }*/
-
-
-        newAgreementTemplate.setDefault(isDefault);
+           newAgreementTemplate.setDefault(isDefault);
         newAgreementTemplate.setName(agreementTemplateDto.getName());
         newAgreementTemplate.setDescription(agreementTemplateDto.getDescription());
         return save(newAgreementTemplate);

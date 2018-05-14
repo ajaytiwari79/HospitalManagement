@@ -1,7 +1,6 @@
-package com.kairos.persistance.model.agreement_template.response.dto;
+package com.kairos.response.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistance.country.Country;
 import com.kairos.persistance.model.clause.AccountType;
@@ -15,8 +14,6 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class AgreementQueryResult {
-
-
 
     private BigInteger id;
     private String name;

@@ -2,6 +2,7 @@ package com.kairos.service.clause;
 
 
 import com.kairos.custome_exception.DataNotExists;
+import com.kairos.custome_exception.DataNotFoundByIdException;
 import com.kairos.custome_exception.DuplicateDataException;
 import com.kairos.persistance.model.clause.AccountType;
 import com.kairos.persistance.repository.clause.AccountTypeMongoRepository;
@@ -71,5 +72,24 @@ public class AccountTypeService extends MongoBaseService {
         else
             throw new DataNotExists("accounts not exist create account");
     }
+
+
+
+
+    public AccountType getAccountTypeById(BigInteger id) {
+
+        AccountType exists = accountTypeRepository.findByid(id);
+        if (!Optional.ofNullable(exists).isPresent()) {
+            throw new DataNotFoundByIdException("Account  type not Exists for id" + id);
+        } else {
+
+            return exists;
+        }
+    }
+
+
+
+
+
 
 }

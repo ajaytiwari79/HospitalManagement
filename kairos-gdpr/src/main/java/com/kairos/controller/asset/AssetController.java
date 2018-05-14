@@ -6,6 +6,7 @@ import com.kairos.service.asset.GlobalAssetService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,7 +55,7 @@ public class AssetController {
 
     @ApiOperation(value = "get global asset by id")
     @GetMapping("/global/id/{id}")
-    public ResponseEntity<Object> getGlobalAssetById(@PathVariable BigInteger id) {
+    public ResponseEntity<Object> getGlobalAssetById(@PathVariable BigInteger id, HttpServletRequest httpServletRequest) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, globalAssetService.getGlobalAssetById(id));
     }
 

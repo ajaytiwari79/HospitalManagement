@@ -6,6 +6,7 @@ import com.kairos.service.clause.AccountTypeService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @RestController
 @Api(API_ACCOUNT_TYPE_URL)
 @RequestMapping(API_ACCOUNT_TYPE_URL)
+@CrossOrigin
 public class AccountTypeController {
 
 
@@ -35,7 +37,7 @@ public class AccountTypeController {
     @ApiOperation(value ="account type by name" )
     @GetMapping("/typeOfAccount/{typeOfAccount}")
     public ResponseEntity<Object> getAccount(@PathVariable String typeOfAccount) {
-        if (typeOfAccount == null || typeOfAccount.equals("")) {
+        if (StringUtils.isBlank(typeOfAccount)) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "typeOfAccount parameter is null or empty");
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccount(typeOfAccount));
@@ -44,11 +46,11 @@ public class AccountTypeController {
 
     @ApiOperation(value ="accounts  by ids list" )
     @RequestMapping(value = "/account_list", method = RequestMethod.POST)
-    public ResponseEntity<Object> getAccountList(@RequestBody List<BigInteger> accountList) {
-        if (!Optional.ofNullable(accountList).isPresent()) {
+    public ResponseEntity<Object> getAccountList(@RequestBody List<BigInteger> accountids) {
+        if (!Optional.ofNullable(accountids).isPresent()) {
             return ResponseHandler.invalidResponse(HttpStatus.BAD_REQUEST, false, "Account List in Null");
         }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountList(accountList));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, accountTypeService.getAccountList(accountids));
 
     }
 
