@@ -32,9 +32,9 @@ public class NightWorkerService extends MongoBaseService {
     @Inject
     NightWorkerMongoRepository nightWorkerMongoRepository;
 
-    public List<NightWorkerQuestionnaireDTO> getNightWorkerQuestionnaire(){
+    public List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaire(Long unitId, Long staffId){
 
-        return null;
+        return nightWorkerMongoRepository.getNightWorkerQuestionnaireDetails(staffId);
     }
 
     public NightWorkerGeneralResponseDTO getNightWorkerDetailsOfStaff(Long unitId, Long staffId){

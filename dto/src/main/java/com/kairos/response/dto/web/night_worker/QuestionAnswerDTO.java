@@ -8,9 +8,10 @@ import java.math.BigInteger;
 /**
  * Created by prerna on 8/5/18.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class QuestionAnswerDTO {
     private BigInteger questionId;
-//    private String question;
+    private String question;
     private Boolean answer;
 
     public QuestionAnswerDTO(){
@@ -31,5 +32,13 @@ public class QuestionAnswerDTO {
 
     public void setAnswer(Boolean answer) {
         this.answer = answer;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
     }
 }
