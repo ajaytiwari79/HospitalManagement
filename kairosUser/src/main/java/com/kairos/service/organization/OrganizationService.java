@@ -359,6 +359,46 @@ public class OrganizationService extends UserBaseService {
         return organizationResponseMap;
     }
 
+    public OrganizationResponseWrapper createUnion(OrganizationDTO orgDetails, long countryId, Long organizationId) {
+
+        Country country = countryGraphRepository.findOne(countryId);
+        if (country == null) {
+            throw new InternalError("Country not found");
+        }
+        Organization organization = new Organization();
+        organization.setParentOrganization(true);
+        organization.setCountry(country);
+        organization.setBoardingCompleted(orgDetails.isBoardingCompleted());
+        organization = saveOrganizationDetails(organization, orgDetails, false, countryId);
+
+        OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
+        organization.setOrganizationSetting(organizationSetting);
+
+
+        organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
+        save(organization);
+        workingTimeAgreementRestClient.assignWTAToOrganization(orgDetails.getSubTypeId(),organization.getId(),countryId);
+
+        organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
+        accessGroupService.createDefaultAccessGroups(organization);
+        timeSlotService.createDefaultTimeSlots(organization,TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(organization,TimeSlotType.TASK_PLANNING);
+        long creationDate = DateUtil.getCurrentDate().getTime();
+        organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), creationDate, creationDate);
+        creationDate = DateUtil.getCurrentDate().getTime();
+        organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), creationDate, creationDate);
+        // DO NOT CREATE PHASE for UNION
+        if (!orgDetails.getUnion()) {
+            phaseRestClient.createDefaultPhases(organization.getId());
+            periodRestClient.createDefaultPeriodSettings(organization.getId());
+        }
+        OrganizationResponseWrapper organizationResponseWrapper = new OrganizationResponseWrapper();
+        organizationResponseWrapper.setOrgData(organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId()));
+        organizationResponseWrapper.setPermissions(accessPageService.getPermissionOfUserInUnit(organizationId, organization, UserContext.getUserDetails().getId()));
+
+        return organizationResponseWrapper;
+    }
+
     /*List<WorkingTimeAgreement> getWTAWithExpertise(List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults){
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>();
         for (WTAAndExpertiseQueryResult allWtaExpertiseQueryResult : allWtaExpertiseQueryResults) {
@@ -422,6 +462,20 @@ public class OrganizationService extends UserBaseService {
             organizationResponseDTOs.put("workCenterUnit",organizationResponse(workCenterUnit, organizationRequestWrapper.getWorkCenterUnit().getTypeId(), organizationRequestWrapper.getWorkCenterUnit().getSubTypeId(), organizationRequestWrapper.getWorkCenterUnit().getCompanyCategoryId()));
         }
         return organizationResponseDTOs;
+    }
+
+
+    public OrganizationResponseDTO updateUnion(OrganizationDTO orgDetails, long organizationId, long countryId) {
+        Organization organization = organizationGraphRepository.findOne(organizationId, 2);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            throw new InternalError("Organization not found by Id " + organizationId);
+        }
+        organization = saveOrganizationDetails(organization, orgDetails, true, countryId);
+        if (!Optional.ofNullable(organization).isPresent()) {
+            return null;
+        }
+        save(organization);
+        return organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId());
     }
 
     private OrganizationResponseDTO organizationResponse(Organization organization, List<Long> organizationTypeId, List<Long> organizationSubTypeId, Long companyCategoryId) {
@@ -963,6 +1017,9 @@ public class OrganizationService extends UserBaseService {
         response.put("organizationTypes", organizationTypesForUnit);
         response.put("businessTypes", businessTypes);
         response.put("level", organization.getLevel());
+        response.put("companyTypes", CompanyType.getListOfCompanyType());
+        response.put("companyUnitTypes", CompanyUnitType.getListOfCompanyUnitType());
+        response.put("companyCategories",companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId));
         return response;
     }
 

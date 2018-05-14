@@ -349,11 +349,27 @@ public class CountryController {
                 createParentOrganization(organizationRequestWrapper, countryId, organizationId));
     }
 
+
     @ApiOperation(value = "Update Parent Organization")
     @RequestMapping(value = COUNTRY_URL + "/parent_organization/{parentOrganizationId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateParentOrganization(@PathVariable long countryId, @PathVariable long parentOrganizationId, @Valid @RequestBody OrganizationRequestWrapper organizationRequestWrapper) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateParentOrganization(organizationRequestWrapper, parentOrganizationId, countryId));
+    }
+
+    @ApiOperation(value = "Create a Union")
+    @RequestMapping(value = COUNTRY_URL + "/union", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> createUnion(@PathVariable Long organizationId,
+                                                                        @PathVariable long countryId,
+                                                                        @RequestBody OrganizationDTO unionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, organizationService.
+                createUnion(unionDTO, countryId, organizationId));
+    }
+
+    @ApiOperation(value = "Update Union")
+    @RequestMapping(value = COUNTRY_URL + "/union/{unionId}", method = RequestMethod.PUT)
+    public ResponseEntity<Map<String, Object>> updateUnion(@PathVariable long countryId, @PathVariable long parentOrganizationId, @Valid @RequestBody OrganizationDTO unionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateUnion(unionDTO, parentOrganizationId, countryId));
     }
 
     @ApiOperation(value = "Delete Parent Organization")
