@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 
 import com.kairos.persistence.repository.user.unit_position.UnitPositionGraphRepository;
 
+import com.kairos.response.dto.web.experties.PaidOutFrequencyEnum;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.region.RegionService;
@@ -159,7 +160,7 @@ public class EmploymentTypeService extends UserBaseService {
         Boolean settingUpdated = employmentTypeGraphRepository.setEmploymentTypeSettingsForOrganization(unitId, employmentTypeId,
                 organizationEmploymentTypeDTO.isAllowedForContactPerson(),
                 organizationEmploymentTypeDTO.isAllowedForShiftPlan(),
-                organizationEmploymentTypeDTO.isAllowedForFlexPool(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
+                organizationEmploymentTypeDTO.isAllowedForFlexPool(), organizationEmploymentTypeDTO.getPaymentFrequency(), DateUtil.getCurrentDate().getTime(), DateUtil.getCurrentDate().getTime());
         if (settingUpdated) {
             return organizationEmploymentTypeDTO;
         } else {
