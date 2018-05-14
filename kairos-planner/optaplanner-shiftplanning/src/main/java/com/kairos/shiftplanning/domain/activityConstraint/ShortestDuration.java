@@ -1,13 +1,8 @@
 package com.kairos.shiftplanning.domain.activityConstraint;
 
-import com.kairos.shiftplanning.domain.Activity;
-import com.kairos.shiftplanning.domain.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.ActivityPlannerEntity;
 import com.kairos.shiftplanning.domain.ShiftRequestPhase;
 import com.kairos.shiftplanning.domain.constraints.ScoreLevel;
-import org.kie.api.runtime.rule.RuleContext;
-import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
-
-import java.util.List;
 
 public class ShortestDuration {
 
@@ -49,8 +44,8 @@ public class ShortestDuration {
         this.weight = weight;
     }
 
-    public int checkConstraints(Activity activity, ShiftRequestPhase shift){
-       /*int minutes = shift.getActivityLineIntervalsList().stream().filter(a->a.getActivity().equals(activity)).mapToInt(a->a.getInterval().toDuration().toStandardMinutes().getMinutes()).sum();
+    public int checkConstraints(ActivityPlannerEntity activityPlannerEntity, ShiftRequestPhase shift){
+       /*int minutes = shift.getActivityLineIntervalsList().stream().filter(a->a.getActivityPlannerEntity().equals(activityPlannerEntity)).mapToInt(a->a.getInterval().toDuration().toStandardMinutes().getMinutes()).sum();
         if(minutes>0){
             int duration = Math.round((float)minutes/shift.getMinutes()*100);
             return duration<shortestDuration?shortestDuration-duration:0;

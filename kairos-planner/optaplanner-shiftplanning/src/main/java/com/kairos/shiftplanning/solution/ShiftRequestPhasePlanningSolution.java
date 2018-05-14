@@ -3,9 +3,7 @@ package com.kairos.shiftplanning.solution;
 import com.kairos.shiftplanning.domain.*;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
@@ -24,7 +22,7 @@ public class ShiftRequestPhasePlanningSolution {
 	private String id;
 	private Long unitId;
 	@ProblemFactCollectionProperty
-    private List<Employee> employees;
+    private List<EmployeePlanningFact> employees;
     @ProblemFactCollectionProperty
     private List<LocalDate> weekDates;
     @PlanningEntityCollectionProperty
@@ -32,7 +30,7 @@ public class ShiftRequestPhasePlanningSolution {
     private List<ShiftRequestPhase> shifts;
     //TODO it should have all activities per day
     @ProblemFactCollectionProperty
-    private List<Activity> activities;
+    private List<ActivityPlannerEntity> activities;
     @PlanningEntityCollectionProperty
     //@ValueRangeProvider(id = "activityLineIntervals")
     private List<ActivityLineInterval> activityLineIntervals;
@@ -40,7 +38,7 @@ public class ShiftRequestPhasePlanningSolution {
     private List<SkillLineInterval> skillLineIntervals;
     //@PlanningEntityCollectionProperty
     //private List<DateTime> possibleStartDateTimes;
-    private Map<LocalDate,List<Activity>> activitiesPerDay;
+    private Map<LocalDate,List<ActivityPlannerEntity>> activitiesPerDay;
 	@XStreamConverter(HardMediumSoftLongScoreXStreamConverter.class)
 	@PlanningScore
     private HardMediumSoftLongScore score;
@@ -66,11 +64,11 @@ public class ShiftRequestPhasePlanningSolution {
         this.shifts = shifts;
     }
 
-    public List<Activity> getActivities() {
+    public List<ActivityPlannerEntity> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<Activity> activities) {
+    public void setActivities(List<ActivityPlannerEntity> activities) {
         this.activities = activities;
     }
 
@@ -80,11 +78,11 @@ public class ShiftRequestPhasePlanningSolution {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public List<Employee> getEmployees() {
+	public List<EmployeePlanningFact> getEmployees() {
 		return employees;
 	}
 
-	public void setEmployees(List<Employee> employees) {
+	public void setEmployees(List<EmployeePlanningFact> employees) {
 		this.employees = employees;
 	}
 
@@ -122,11 +120,11 @@ public class ShiftRequestPhasePlanningSolution {
         this.weekDates = weekDates;
     }
 
-    public Map<LocalDate, List<Activity>> getActivitiesPerDay() {
+    public Map<LocalDate, List<ActivityPlannerEntity>> getActivitiesPerDay() {
         return activitiesPerDay;
     }
 
-    public void setActivitiesPerDay(Map<LocalDate, List<Activity>> activitiesPerDay) {
+    public void setActivitiesPerDay(Map<LocalDate, List<ActivityPlannerEntity>> activitiesPerDay) {
         this.activitiesPerDay = activitiesPerDay;
     }
 

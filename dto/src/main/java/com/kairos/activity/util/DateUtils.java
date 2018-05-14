@@ -38,6 +38,12 @@ public class DateUtils {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate;
     }
+    public static Date convertLocalDateToDate(LocalDate dateToConvert) {
+        return Date.from(dateToConvert.atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+    }
+
 
     public static Date getStartOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -409,5 +415,11 @@ public class DateUtils {
         DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
             DateTime dateTime = new DateTime(date);
             return dateTime.toString(formatter);
+    }
+    /**
+     * returns Joda DateTime from {@link java.util.Date} and {@link java.time.LocalTime}
+     */
+    public static DateTime getDateTime(Date date, LocalTime time){
+        return new DateTime(date).withMinuteOfHour(time.getMinute()).withHourOfDay(time.getHour());
     }
 }

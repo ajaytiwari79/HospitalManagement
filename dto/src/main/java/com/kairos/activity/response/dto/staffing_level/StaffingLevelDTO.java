@@ -1,36 +1,49 @@
-package com.planner.domain.staffinglevel;
+package com.kairos.activity.response.dto.staffing_level;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelInterval;
 import com.kairos.activity.persistence.model.staffing_level.StaffingLevelSetting;
-import com.kairos.activity.response.dto.staffing_level.StaffingLevelTimeSlotDTO;
-import com.planner.domain.MongoBaseEntity;
-import com.planner.domain.common.BaseEntity;
-////import org.springframework.data.cassandra.core.mapping.Table;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-public class StaffingLevel extends MongoBaseEntity {
-    private  BigInteger unitId;
+
+/**
+ * Created by sachin
+ */
+public class StaffingLevelDTO {
+    private BigInteger id;
+    @NotNull
     private Long phaseId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date currentDate;
     private Long weekCount;
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelInterval> presenceStaffingLevelInterval =new ArrayList<>();
     private List<StaffingLevelInterval> absenceStaffingLevelInterval =new ArrayList<>();
-    public StaffingLevel() {
+
+    public StaffingLevelDTO() {
     }
 
-    public StaffingLevel(BigInteger unitId, Long phaseId, Date currentDate, Long weekCount, StaffingLevelSetting staffingLevelSetting, List<StaffingLevelInterval> presenceStaffingLevelInterval,List<StaffingLevelInterval> absenceStaffingLevelInterval,BigInteger kariosId) {
+    public StaffingLevelDTO(BigInteger id, @NotNull Long phaseId, Date currentDate, Long weekCount, StaffingLevelSetting staffingLevelSetting,
+                            List<StaffingLevelInterval> presenceStaffingLevelInterval, List<StaffingLevelInterval> absenceStaffingLevelInterval) {
+        this.id = id;
         this.phaseId = phaseId;
         this.currentDate = currentDate;
         this.weekCount = weekCount;
         this.staffingLevelSetting = staffingLevelSetting;
         this.presenceStaffingLevelInterval = presenceStaffingLevelInterval;
         this.absenceStaffingLevelInterval = absenceStaffingLevelInterval;
-        this.unitId=unitId;
-        this.kairosId=kariosId;
+    }
+
+    public BigInteger getId() {
+        return id;
+    }
+
+    public void setId(BigInteger id) {
+        this.id = id;
     }
 
     public Long getPhaseId() {
@@ -64,13 +77,6 @@ public class StaffingLevel extends MongoBaseEntity {
     public void setStaffingLevelSetting(StaffingLevelSetting staffingLevelSetting) {
         this.staffingLevelSetting = staffingLevelSetting;
     }
-    public BigInteger getUnitId() {
-        return unitId;
-    }
-    public void setUnitId(BigInteger unitId) {
-        this.unitId = unitId;
-    }
-
 
     public List<StaffingLevelInterval> getPresenceStaffingLevelInterval() {
         return presenceStaffingLevelInterval;
