@@ -56,6 +56,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
+import com.kairos.service.integration.PriorityGroupIntegrationService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
@@ -198,7 +199,8 @@ public class OrganizationService extends UserBaseService {
     @Inject private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
     @Inject
     StaffService staffService;
-
+    @Inject
+    PriorityGroupIntegrationService priorityGroupIntegrationService;
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
     }
@@ -298,6 +300,9 @@ public class OrganizationService extends UserBaseService {
             phaseRestClient.createDefaultPhases(organization.getId());
             periodRestClient.createDefaultPeriodSettings(organization.getId());
         }
+
+        priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(organization.getCountry().getId(),organization.getId());
+
 
         /*// TODO Verify code to set Unit Manager of new organization
         // Create Employment for Unit Manager
@@ -615,6 +620,7 @@ public class OrganizationService extends UserBaseService {
         Organization organization = fetchParentOrganization(unit.getId());
         Country country = organizationGraphRepository.getCountry(organization.getId());
         workingTimeAgreementRestClient.assignWTAToOrganization(organizationDTO.getOrganizationSubTypeId(),unit.getId(),country.getId());
+        priorityGroupIntegrationService.createDefaultPriorityGroupsFromCountry(country.getId(),unit.getId());
         Map<String, Object> response = new HashMap<>();
         response.put("id", unit.getId());
         response.put("name", unit.getName());
