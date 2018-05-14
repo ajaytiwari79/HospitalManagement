@@ -17,19 +17,19 @@ public class QuestionnaireAnswerResponseDTO {
 //    private LocalDate dateOfAnswer;
 
     private BigInteger id;
+    private String name;
+    private boolean questionnaireFormEnabled;
     private List<QuestionAnswerDTO> questionAnswerPair;
 
     public QuestionnaireAnswerResponseDTO(){
         // default constructor
     }
 
-    /*public LocalDate getDateOfAnswer() {
-        return dateOfAnswer;
+    public QuestionnaireAnswerResponseDTO(String name, boolean questionnaireFormEnabled, List<QuestionAnswerDTO> questionAnswerPair){
+        this.name = name;
+        this.questionnaireFormEnabled = questionnaireFormEnabled;
+        this.questionAnswerPair = questionAnswerPair;
     }
-
-    public void setDateOfAnswer(LocalDate dateOfAnswer) {
-        this.dateOfAnswer = dateOfAnswer;
-    }*/
 
     public List<QuestionAnswerDTO> getQuestionAnswerPair() {
         return questionAnswerPair;
@@ -45,5 +45,21 @@ public class QuestionnaireAnswerResponseDTO {
 
     public void setId(BigInteger id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isQuestionnaireFormEnabled() {
+        return questionnaireFormEnabled;
+    }
+
+    public void setQuestionnaireFormEnabled(boolean questionnaireFormEnabled) {
+        this.questionnaireFormEnabled = questionnaireFormEnabled;
     }
 }

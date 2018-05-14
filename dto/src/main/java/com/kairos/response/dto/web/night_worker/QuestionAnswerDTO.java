@@ -12,7 +12,7 @@ import java.math.BigInteger;
 public class QuestionAnswerDTO {
     private BigInteger questionId;
     private String question;
-    private Boolean answer;
+    private boolean answer;
 
     public QuestionAnswerDTO(){
         // default constructor
@@ -26,11 +26,15 @@ public class QuestionAnswerDTO {
         this.questionId = questionId;
     }
 
+    public boolean isAnswer() {
+        return answer;
+    }
+
     public Boolean getAnswer() {
         return answer;
     }
 
-    public void setAnswer(Boolean answer) {
+    public void setAnswer(boolean answer) {
         this.answer = answer;
     }
 

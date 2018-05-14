@@ -1,7 +1,9 @@
 package com.kairos.activity.persistence.repository.night_worker;
 
+import com.kairos.response.dto.web.night_worker.QuestionAnswerDTO;
 import com.kairos.response.dto.web.night_worker.QuestionnaireAnswerResponseDTO;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -10,4 +12,8 @@ import java.util.List;
 public interface CustomNightWorkerMongoRepository {
 
     List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaireDetails(Long staffId);
+
+    boolean checkIfNightWorkerQuestionnaireFormIsEnabled(Long staffId, Date date);
+
+    List<QuestionAnswerDTO> getNightWorkerQuestions();
 }
