@@ -38,9 +38,6 @@ public class ExpertiseUpdateDTO {
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
-    @NotNull(message = "Paid Out Frequency can not be null")
-    private PaidOutFrequencyEnum paidOutFrequency;
-
     @Valid
     private SeniorityLevelDTO seniorityLevel;
 
@@ -132,14 +129,6 @@ public class ExpertiseUpdateDTO {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
     }
 
-
-    public PaidOutFrequencyEnum getPaidOutFrequency() {
-        return paidOutFrequency;
-    }
-
-    public void setPaidOutFrequency(PaidOutFrequencyEnum paidOutFrequency) {
-        this.paidOutFrequency = paidOutFrequency;
-    }
 
     public SeniorityLevelDTO getSeniorityLevel() {
         return seniorityLevel;
