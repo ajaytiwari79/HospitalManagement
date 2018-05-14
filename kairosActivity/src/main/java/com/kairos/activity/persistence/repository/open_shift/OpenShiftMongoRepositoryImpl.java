@@ -1,9 +1,14 @@
 package com.kairos.activity.persistence.repository.open_shift;
 
 import com.kairos.activity.persistence.model.open_shift.OpenShift;
+
+
 import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
+import com.mongodb.BasicDBObject;
+import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 
