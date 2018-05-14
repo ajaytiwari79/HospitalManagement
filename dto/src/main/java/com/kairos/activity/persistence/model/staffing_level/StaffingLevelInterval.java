@@ -6,7 +6,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
-
 public class StaffingLevelInterval {
     private int sequence;
     private int minNoOfStaff;

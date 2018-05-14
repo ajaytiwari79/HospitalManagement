@@ -53,7 +53,7 @@ public class ContinousActivityPerShift {
             aLIs = aLIs.subList(aLIs.indexOf(lineInterval),aLIs.size());
             //TODO need to care of all occurance of this activity
             for (ActivityLineInterval ali : aLIs) {
-                if (ali.getActivity().equals(lineInterval.getActivity())) {
+                if (ali.getActivityPlannerEntity().equals(lineInterval.getActivityPlannerEntity())) {
                     count++;
                 } else break;
             }

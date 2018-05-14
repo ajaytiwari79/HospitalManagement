@@ -26,4 +26,6 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query("{'unitPositionId':7223,'deleted':false,'isMainShift':true,'$or':[{'startDate': {$gte:?1,$lt: ?2}},{'endDate':{$gt:?1,$lte:?2}}]}")
     public List<Shift> findShiftBetweenDurationByUnitPosition(Long unitPositionId, Date startDate, Date endDate);
+
+    List<Shift> findByIdInAndDeletedFalse(List<BigInteger> shiftIds);
 }

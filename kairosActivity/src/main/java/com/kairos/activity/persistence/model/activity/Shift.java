@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.response.dto.shift.ShiftQueryResult;
+import com.kairos.enums.shift.ShiftState;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -47,7 +48,7 @@ public class Shift extends MongoBaseEntity {
     private String externalId;
 
     private Long unitPositionId;
-
+    private ShiftState shiftState;
     public Shift() {
     }
 
@@ -223,6 +224,7 @@ public class Shift extends MongoBaseEntity {
                 ", phase=" + phase +
                 ", weekCount=" + weekCount +
                 ", unitId=" + unitId +
+                ", state=" + shiftState +
                 '}';
     }
 
@@ -279,6 +281,7 @@ public class Shift extends MongoBaseEntity {
                 this.activityId,this.staffId, this.unitId, this.unitPositionId);
         shiftQueryResult.setDurationMinutes(this.getDurationMinutes());
         shiftQueryResult.setScheduledMinutes(this.getScheduledMinutes());
+        shiftQueryResult.setShiftState(this.getShiftState());
         return shiftQueryResult;
     }
 
@@ -297,5 +300,13 @@ public class Shift extends MongoBaseEntity {
 
     public void setUnitPositionId(Long unitPositionId) {
         this.unitPositionId = unitPositionId;
+    }
+
+    public ShiftState getShiftState() {
+        return shiftState;
+    }
+
+    public void setShiftState(ShiftState shiftState) {
+        this.shiftState = shiftState;
     }
 }

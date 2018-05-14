@@ -250,8 +250,7 @@ public class TimeBankService extends MongoBaseService {
             endDate = new DateTime().withTimeAtStartOfDay();
         }
         //endDate = endDate.plusMonths(5);//todo this should be removed
-
-        return endDate.isAfter(startDate) ? new Interval(startDate, endDate) : new Interval(new DateTime(),new DateTime());
+        return new Interval(startDate, endDate);
     }
 
 
