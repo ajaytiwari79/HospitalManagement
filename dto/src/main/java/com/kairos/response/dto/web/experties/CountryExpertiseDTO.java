@@ -22,7 +22,7 @@ public class CountryExpertiseDTO {
 
     private Long id;
 
-    @NotBlank(message="Expertise name can't be empty or null or blank")
+    @NotBlank(message="Expertise name is required")
     private String name;
 
     private String description;
