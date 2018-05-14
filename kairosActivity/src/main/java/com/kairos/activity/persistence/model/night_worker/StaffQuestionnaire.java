@@ -10,13 +10,15 @@ import java.util.List;
  */
 public class StaffQuestionnaire extends MongoBaseEntity{
 
+    private String name;
     private List<QuestionAnswerPair> questionAnswerPair;
 
     public StaffQuestionnaire(){
         // default constructor
     }
 
-    public StaffQuestionnaire(List<QuestionAnswerPair> questionAnswerPair){
+    public StaffQuestionnaire(String name, List<QuestionAnswerPair> questionAnswerPair){
+        this.name = name;
         this.questionAnswerPair = questionAnswerPair;
     }
 
@@ -26,5 +28,13 @@ public class StaffQuestionnaire extends MongoBaseEntity{
 
     public void setQuestionAnswerPair(List<QuestionAnswerPair> questionAnswerPair) {
         this.questionAnswerPair = questionAnswerPair;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
