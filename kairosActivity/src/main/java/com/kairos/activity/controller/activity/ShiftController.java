@@ -113,15 +113,15 @@ public class ShiftController {
     @ApiOperation("publish Shifts")
     @PutMapping(value = "/publish_shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> publishShifts(@RequestBody @Valid  ShiftPublishDTO shiftPublishDTO) {
+    public ResponseEntity<Map<String, Object>> publishShifts(@RequestBody @Valid ShiftPublishDTO shiftPublishDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.publishShifts(shiftPublishDTO));
     }
 
 
-    @ApiOperation("publish Shifts")
-    @PutMapping(value = "/shifts")
+    @ApiOperation("get all open and assigned shifts of all staff for a particular date.")
+    @GetMapping(value = "/shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllShiftsOfSelectedDate( @PathVariable long unitId,@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date selectedDate) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId,selectedDate));
+    public ResponseEntity<Map<String, Object>> getAllShiftsOfSelectedDate(@PathVariable long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date selectedDate) throws ParseException {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftsOfSelectedDate(unitId, selectedDate));
     }
 }

@@ -1,5 +1,7 @@
 package com.kairos.activity.shift;
 
+import com.kairos.response.dto.web.open_shift.OpenShiftResponseDTO;
+
 import java.util.List;
 
 /**
@@ -7,13 +9,13 @@ import java.util.List;
  */
 public class ShiftWrapper {
     private List<ShiftQueryResult> assignedShifts;
-    private List<ShiftQueryResult> openShifts;
+    private List<OpenShiftResponseDTO> openShifts;
 
     public ShiftWrapper() {
         //default case
     }
 
-    public ShiftWrapper(List<ShiftQueryResult> assignedShifts, List<ShiftQueryResult> openShifts) {
+    public ShiftWrapper(List<ShiftQueryResult> assignedShifts, List<OpenShiftResponseDTO> openShifts) {
         this.assignedShifts = assignedShifts;
         this.openShifts = openShifts;
     }
@@ -26,11 +28,11 @@ public class ShiftWrapper {
         this.assignedShifts = assignedShifts;
     }
 
-    public List<ShiftQueryResult> getOpenShifts() {
+    public List<OpenShiftResponseDTO> getOpenShifts() {
         return openShifts;
     }
 
-    public void setOpenShifts(List<ShiftQueryResult> openShifts) {
+    public void setOpenShifts(List<OpenShiftResponseDTO> openShifts) {
         this.openShifts = openShifts;
     }
 }

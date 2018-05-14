@@ -8,7 +8,7 @@ import java.util.List;
 
 import java.math.BigInteger;
 
-public interface OpenShiftMongoRepository extends MongoBaseRepository<OpenShift,BigInteger> {
+public interface OpenShiftMongoRepository extends MongoBaseRepository<OpenShift,BigInteger>,CustomOpenShiftMongoRepository {
 
     @Query("{'deleted' : false,'_id':?0}")
     OpenShift findOpenShiftByIdAndEnabled(BigInteger id);
