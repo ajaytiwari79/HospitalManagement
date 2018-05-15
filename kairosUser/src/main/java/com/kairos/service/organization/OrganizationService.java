@@ -466,17 +466,17 @@ public class OrganizationService extends UserBaseService {
     }
 
 
-    public OrganizationResponseDTO updateUnion(OrganizationDTO orgDetails, long organizationId, long countryId) {
-        Organization organization = organizationGraphRepository.findOne(organizationId, 2);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            throw new InternalError("Organization not found by Id " + organizationId);
+    public OrganizationResponseDTO updateUnion(OrganizationDTO orgDetails, long unionId, long countryId) {
+        Organization union = organizationGraphRepository.findOne(unionId, 2);
+        if (!Optional.ofNullable(union).isPresent()) {
+            throw new InternalError("Union not found by Id " + unionId);
         }
-        organization = saveOrganizationDetails(organization, orgDetails, true, countryId);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        union = saveOrganizationDetails(union, orgDetails, true, countryId);
+        if (!Optional.ofNullable(union).isPresent()) {
             return null;
         }
-        save(organization);
-        return organizationResponse(organization, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId());
+        save(union);
+        return organizationResponse(union, orgDetails.getTypeId(), orgDetails.getSubTypeId(), orgDetails.getCompanyCategoryId());
     }
 
     private OrganizationResponseDTO organizationResponse(Organization organization, List<Long> organizationTypeId, List<Long> organizationSubTypeId, Long companyCategoryId) {

@@ -369,8 +369,8 @@ public class CountryController {
 
     @ApiOperation(value = "Update Union")
     @RequestMapping(value = COUNTRY_URL + "/union/{unionId}", method = RequestMethod.PUT)
-    public ResponseEntity<Map<String, Object>> updateUnion(@PathVariable long countryId, @PathVariable long parentOrganizationId, @Valid @RequestBody OrganizationDTO unionDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateUnion(unionDTO, parentOrganizationId, countryId));
+    public ResponseEntity<Map<String, Object>> updateUnion(@PathVariable long countryId, @PathVariable long unionId, @Valid @RequestBody OrganizationDTO unionDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.updateUnion(unionDTO, unionId, countryId));
     }
 
     @ApiOperation(value = "Delete Parent Organization")
