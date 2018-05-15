@@ -2,7 +2,6 @@ package com.kairos.service.access_permisson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.client.dto.organization.OrganizationCategoryDTO;
-import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.enums.OrganizationCategory;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.enums.OrganizationLevel;
@@ -365,7 +364,7 @@ public class AccessGroupService extends UserBaseService {
 
         Organization unit = organizationGraphRepository.findOne(accessPermissionDTO.getUnitId(),0);
         if(unit == null){
-            exceptionService.internalServerError("error.unitCantbeNull");
+            exceptionService.internalServerError("error.unit.notNull");
         }
         Organization parent;
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
@@ -577,7 +576,7 @@ public class AccessGroupService extends UserBaseService {
     public AccessGroupDTO copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
         Optional<Organization> organization = organizationGraphRepository.findById(organizationId);
         if (!organization.isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.organizationNotFound",organizationId);
+            exceptionService.dataNotFoundByIdException("exception.organization.id.notFound",organizationId);
 
         }
         Organization parent;
@@ -588,7 +587,7 @@ public class AccessGroupService extends UserBaseService {
             parent = organizationGraphRepository.getParentOfOrganization(organization.get().getId());
         }
         if(Optional.ofNullable(parent).isPresent()){
-            exceptionService.actionNotPermittedException("exception.accessGroupCopiedException");
+            exceptionService.actionNotPermittedException("exception.accessGroup.copied");
 
         }
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroupDTO.getName().trim());
@@ -613,7 +612,7 @@ public class AccessGroupService extends UserBaseService {
     public CountryAccessGroupDTO copyCountryAccessGroup(long countryId, CountryAccessGroupDTO countryAccessGroupDTO) {
         Optional<Country> country = countryGraphRepository.findById(countryId);
         if(!country.isPresent()){
-            exceptionService.dataNotFoundByIdException("exception.countryNotFound",countryId);
+            exceptionService.dataNotFoundByIdException("exception.country.id.notFound",countryId);
 
         }
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isCountryAccessGroupExistWithName(countryId, countryAccessGroupDTO.getName().trim(), countryAccessGroupDTO.getOrganizationCategory().toString());

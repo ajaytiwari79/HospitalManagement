@@ -22,6 +22,7 @@ import com.kairos.response.dto.web.UpdateRuleTemplateCategoryDTO;
 import com.kairos.response.dto.web.aggrements.RuleTemplateWrapper;
 import com.kairos.service.UserBaseService;
 import com.kairos.service.country.CountryService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.util.ArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,9 @@ public class RuleTemplateCategoryService extends UserBaseService {
     private WTABaseRuleTemplateGraphRepository wtaRuleTemplateGraphRepository;
     @Inject
     private RuleTemplateCategoryGraphRepository ruleTemplateCategoryRepository;
+    @Inject
+    private ExceptionService exceptionService;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -66,7 +70,7 @@ public class RuleTemplateCategoryService extends UserBaseService {
         int ruleFound = countryGraphRepository.checkDuplicateRuleTemplateCategory(countryId, ruleTemplateCategory.getRuleTemplateCategoryType(), name);
 
         if (ruleFound != 0) {
-            throw new DuplicateDataException("Can't create duplicate rule template category in same country " + name);
+            exceptionService.duplicateDataException("exception.ruleTemplate.category.duplicate",name);
         }
 
         Country country = countryService.getCountryById(countryId);
@@ -79,7 +83,8 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public List<RuleTemplateCategory> getRulesTemplateCategory(long countryId, RuleTemplateCategoryType ruleTemplateCategoryType) {
         Country country = countryService.getCountryById(countryId);
         if (country == null) {
-            throw new DataNotFoundByIdException("Country does not exist");
+            exceptionService.dataNotFoundByIdException("error.country.id.notExist");
+
         }
         return ruleTemplateCategoryGraphRepository.getRuleTemplateCategoryByCountry(countryId, ruleTemplateCategoryType);
 
@@ -93,10 +98,12 @@ public class RuleTemplateCategoryService extends UserBaseService {
     public boolean deleteRuleTemplateCategory(long countryId, long templateCategoryId) {
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if (ruleTemplateCategory == null) {
-            throw new DataNotFoundByIdException("RULE template ruleTemplateCategory does not exist" + templateCategoryId);
+            exceptionService.dataNotFoundByIdException("error.ruleTemplate.category.notExist",templateCategoryId);
+
         }
         if (ruleTemplateCategory.getName() != null && ruleTemplateCategory.getName().equals("NONE")) {
-            throw new ActionNotPermittedException("Can't delete none template category " + templateCategoryId);
+            exceptionService.actionNotPermittedException("error.ruleTemplate.category.delete",templateCategoryId);
+
         }
         if (ruleTemplateCategory.getRuleTemplateCategoryType().equals(CTA)) {
             List<Long> ctaRuleTemplates = ruleTemplateCategoryGraphRepository.findAllExistingCTARuleTemplateByCategory(ruleTemplateCategory.getName(), countryId);
@@ -116,11 +123,13 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
     public Map<String, Object> updateRuleTemplateCategory(Long countryId, Long templateCategoryId, UpdateRuleTemplateCategoryDTO ruleTemplateCategory) {
         if (countryService.getCountryById(countryId) == null) {
-            throw new DataNotFoundByIdException("Country does not exist");
+            exceptionService.dataNotFoundByIdException("error.country.id.notExist");
+
         }
         RuleTemplateCategory ruleTemplateCategoryObj = (RuleTemplateCategory) ruleTemplateCategoryGraphRepository.findOne(templateCategoryId);
         if(!Optional.ofNullable(ruleTemplateCategoryObj).isPresent()){
-            throw new DataNotFoundByIdException("Invalid category "+templateCategoryId);
+            exceptionService.dataNotFoundByIdException("error.ruleTemplate.category.invalid",templateCategoryId);
+
         }
         if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategory.getName().equals("NONE")) {
             throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
