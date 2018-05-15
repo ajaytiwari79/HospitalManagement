@@ -355,10 +355,10 @@ public class StaffService extends UserBaseService {
 
 
         List<StaffExpertiseQueryResult> staffExpertiseQueryResults=staffExpertiseRelationShipGraphRepository.getExpertiseWithExperience(staff.getId());
-//        staffExpertiseQueryResults.forEach(expertiseQueryResult ->{
-//            expertiseQueryResult.setRelevantExperienceInMonths(Period.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()).getMonths());
-//            expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(),expertiseQueryResult.getRelevantExperienceInMonths()));
-//        });
+        staffExpertiseQueryResults.forEach(expertiseQueryResult ->{
+            expertiseQueryResult.setRelevantExperienceInMonths(Period.between(DateUtil.asLocalDate(expertiseQueryResult.getExpertiseStartDate()), LocalDate.now()).getMonths());
+            expertiseQueryResult.setNextSeniorityLevelInMonths(nextSeniorityLevelInMonths(expertiseQueryResult.getSeniorityLevels(),expertiseQueryResult.getRelevantExperienceInMonths()));
+        });
 
         map.put("expertiseIds", staffExpertiseQueryResults.stream().map(StaffExpertiseQueryResult::getExpertiseId).collect(Collectors.toList()));
         map.put("expertiseWithExperience", staffExpertiseQueryResults);
