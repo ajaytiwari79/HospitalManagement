@@ -12,6 +12,7 @@ import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.activity.persistence.model.wta.templates.template_types.*;
+import com.kairos.activity.response.dto.ShiftQueryResultWithActivity;
 import com.kairos.activity.util.DateUtils;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.activity.util.WTARuleTemplateValidatorUtility;
@@ -29,12 +30,12 @@ import static com.kairos.activity.enums.RuleTemplates.getByTemplateType;
 public class ActivityWTARulesSpecification extends AbstractActivitySpecification<Activity> {
     Logger logger = LoggerFactory.getLogger(ActivityWTARulesSpecification.class);
     private WTAQueryResultDTO wtaResponseDTO;
-    private Shift shift;
+    private ShiftQueryResultWithActivity shift;
     private Phase phase;
-    private List<Shift> shifts;
+    private List<ShiftQueryResultWithActivity> shifts;
     //private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
 
-    public ActivityWTARulesSpecification(WTAQueryResultDTO wtaResponseDTO, Phase phase, Shift shift,List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public ActivityWTARulesSpecification(WTAQueryResultDTO wtaResponseDTO, Phase phase, ShiftQueryResultWithActivity shift,List<ShiftQueryResultWithActivity> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         this.wtaResponseDTO = wtaResponseDTO;
         this.shift = shift;
         this.phase = phase;
@@ -54,7 +55,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
                     WTARuleTemplateValidatorUtility.checkConstraints(shift,(ShiftLengthWTATemplate)ruleTemplate);
                     break;
                 case CONSECUTIVE_WORKING_PARTOFDAY:
-                    WTARuleTemplateValidatorUtility.checkConstraints(shifts,(ConsecutiveWorkWTATemplate)ruleTemplate);
+                    WTARuleTemplateValidatorUtility.checkConstraints(shifts,shift,(ConsecutiveWorkWTATemplate)ruleTemplate);
                     break;
 
           /*  case CONSECUTIVE_NIGHTS_AND_DAYS:

@@ -21,7 +21,6 @@ import java.util.List;
 public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
-    private boolean checkAgainstTimeRules;
     private List<Long> dayTypeIds = new ArrayList<>();
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.NIGHT);
     private float recommendedValue;
@@ -75,22 +74,14 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         this.timeLimit = timeLimit;
     }
 
-    public boolean isCheckAgainstTimeRules() {
-        return checkAgainstTimeRules;
-    }
-
-    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-    }
 
     public ShiftLengthWTATemplate() {
         wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 
-    public ShiftLengthWTATemplate(String name, boolean minimum, String description, long timeLimit, boolean checkAgainstTimeRules) {
+    public ShiftLengthWTATemplate(String name, String description, long timeLimit) {
         super(name, description);
         this.timeLimit = timeLimit;
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 }

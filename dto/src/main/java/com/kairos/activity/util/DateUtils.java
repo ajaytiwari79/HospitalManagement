@@ -411,6 +411,11 @@ public class DateUtils {
             return dateTime.toString(formatter);
     }
 
+    public static ZonedDateTime getZoneDateTime(Date date){
+         return ZonedDateTime.ofInstant(date.toInstant(),
+                ZoneId.systemDefault());
+    }
+
     public static org.joda.time.LocalDate asJodaLocalDate(Date date){
         return new DateTime(date).toLocalDate();
     }
