@@ -67,7 +67,7 @@ public class OrganizationTypeController {
     @ApiOperation(value = "Get All organization and sub-organization based on CountryId")
     @RequestMapping(value = COUNTRY_URL + "/OrganizationType", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllWTAWithOrganization(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllWTAWithOrganization(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getAllOrganizationTypeAndSubType(countryId));
     }
 
     @RequestMapping(value = "/organization_type/{organizationTypeId}/organizations", method = RequestMethod.GET)

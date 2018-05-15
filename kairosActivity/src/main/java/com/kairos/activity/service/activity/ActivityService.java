@@ -1009,8 +1009,7 @@ public class ActivityService extends MongoBaseService {
         return activity;
     }
 
-
-
-
-
+    public List<ActivityDTO> getActivitiesWithTimeTypes(long countryId){
+       return activityMongoRepository.findAllActivitiesWithTimeTypes(countryId);
+    }
 }

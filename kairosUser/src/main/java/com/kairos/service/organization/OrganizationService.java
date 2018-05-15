@@ -27,6 +27,8 @@ import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.OrderAndActivityDTO;
 import com.kairos.persistence.model.user.expertise.OrderDefaultDataWrapper;
+import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
+import com.kairos.persistence.model.user.open_shift.RuleTemplateDefaultData;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
@@ -1414,6 +1416,17 @@ public class OrganizationService extends UserBaseService {
             orderDefaultDataWrapper.setDayTypes(dayTypes);
             orderDefaultDataWrapper.setPlannedTime(plannedTypes);
             return orderDefaultDataWrapper;
+    }
+
+    public RuleTemplateDefaultData getDefaultDataForRuleTemplate(long countryId){
+        RuleTemplateDefaultData ruleTemplateDefaultData=new RuleTemplateDefaultData();
+        List<OrganizationTypeAndSubType> organizationTypeAndSubTypes=organizationTypeGraphRepository.getAllOrganizationTypeAndSubType(countryId);
+        List<Skill> skills=skillGraphRepository.findAllSkills();
+        List<ActivityDTO> activityDTOS= priorityGroupIntegrationService.getAllActivitiesAndTimeTypes(countryId);
+        ruleTemplateDefaultData.setOrganizationTypeAndSubType(organizationTypeAndSubTypes);
+        ruleTemplateDefaultData.setActivities(activityDTOS);
+        ruleTemplateDefaultData.setSkills(skills);
+        return ruleTemplateDefaultData;
     }
 }
 

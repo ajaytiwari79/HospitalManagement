@@ -356,4 +356,11 @@ public class ActivityController {
     public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityByCountry(countryId));
     }
+
+    @ApiOperation("Get all activity based on country")
+    @GetMapping(value = "/activities_with_time_types")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getActivitiesWithTimeTypes(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivitiesWithTimeTypes(countryId));
+    }
 }

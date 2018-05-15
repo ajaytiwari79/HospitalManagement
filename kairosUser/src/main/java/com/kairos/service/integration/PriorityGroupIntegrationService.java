@@ -21,16 +21,18 @@ public class PriorityGroupIntegrationService {
     @Autowired
     PriorityGroupRestClient priorityGroupRestClient;
 
-    public void createDefaultPriorityGroupsFromCountry(long countryId,long unitId){
-        Map<String,Object> countryDetail =new HashMap<>();
-        countryDetail.put("countryId",countryId);
-        priorityGroupRestClient.publish(null,unitId,IntegrationOperation.CREATE,"/copy_priority_group",countryDetail);
+    public void createDefaultPriorityGroupsFromCountry(long countryId, long unitId) {
+        Map<String, Object> countryDetail = new HashMap<>();
+        countryDetail.put("countryId", countryId);
+        priorityGroupRestClient.publish(null, unitId,true, IntegrationOperation.CREATE, "/copy_priority_group", countryDetail);
     }
 
-    public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId){
-        return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null ,unitId,IntegrationOperation.GET,"/orders_and_activities",null),OrderAndActivityDTO.class);
-        }
+    public OrderAndActivityDTO getAllOrderAndActivitiesByUnit(long unitId) {
+        return ObjectMapperUtils.copyPropertiesByMapper(priorityGroupRestClient.publish(null, unitId,true, IntegrationOperation.GET, "/orders_and_activities", null), OrderAndActivityDTO.class);
+    }
 
-
+    public List<ActivityDTO> getAllActivitiesAndTimeTypes(long countryId){
+        return priorityGroupRestClient.publish(null,countryId,false,IntegrationOperation.GET,"/activities_with_time_types",null);
+    }
 
 }
