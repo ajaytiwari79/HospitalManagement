@@ -2,8 +2,8 @@ package com.kairos.response.dto.web.open_shift;
 
 public class ShiftAssignmentCriteria {
     private boolean firstPick;
-    private boolean pickableFabionacci;
-    private boolean showInterestFabionaci;
+    private boolean pickableFibonacci;
+    private boolean showInterestFibonacci;
     private boolean showInterestPlannerWillChoose;
 
     public boolean isFirstPick() {
@@ -14,20 +14,20 @@ public class ShiftAssignmentCriteria {
         this.firstPick = firstPick;
     }
 
-    public boolean isPickableFabionacci() {
-        return pickableFabionacci;
+    public boolean isPickableFibonacci() {
+        return pickableFibonacci;
     }
 
-    public void setPickableFabionacci(boolean pickableFabionacci) {
-        this.pickableFabionacci = pickableFabionacci;
+    public void setPickableFibonacci(boolean pickableFibonacci) {
+        this.pickableFibonacci = pickableFibonacci;
     }
 
-    public boolean isShowInterestFabionaci() {
-        return showInterestFabionaci;
+    public boolean isShowInterestFibonacci() {
+        return showInterestFibonacci;
     }
 
-    public void setShowInterestFabionaci(boolean showInterestFabionaci) {
-        this.showInterestFabionaci = showInterestFabionaci;
+    public void setShowInterestFibonacci(boolean showInterestFibonacci) {
+        this.showInterestFibonacci = showInterestFibonacci;
     }
 
     public boolean isShowInterestPlannerWillChoose() {

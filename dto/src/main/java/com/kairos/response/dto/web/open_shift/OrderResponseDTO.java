@@ -1,18 +1,11 @@
 package com.kairos.response.dto.web.open_shift;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 public class OrderResponseDTO {
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
     private Long unitId;
     private Long activityId;
     private Long plannedTimeId;
@@ -38,9 +31,26 @@ public class OrderResponseDTO {
     private LocalDate deadline;
     private OrderNotificationsCriteriaForPlanner notificationsCriteria;
     private ShiftAssignmentCriteria siftAssignmentCriteria;
-    private BringYour bringYour;
+    private BringVehicle bringVehicle;
     private DeadlineRule deadlineRule;
     private ShiftAssignmentCriteria shiftAssignmentCriteria;
+    private BigInteger orderId;
+
+    public BigInteger getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(BigInteger orderId) {
+        this.orderId = orderId;
+    }
+
+    public Long getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
+    }
 
 
     public Long getActivityId() {
@@ -229,12 +239,12 @@ public class OrderResponseDTO {
         this.siftAssignmentCriteria = siftAssignmentCriteria;
     }
 
-    public BringYour getBringYour() {
-        return bringYour;
+    public BringVehicle getBringVehicle() {
+        return bringVehicle;
     }
 
-    public void setBringYour(BringYour bringYour) {
-        this.bringYour = bringYour;
+    public void setBringVehicle(BringVehicle bringVehicle) {
+        this.bringVehicle = bringVehicle;
     }
 
     public DeadlineRule getDeadlineRule() {

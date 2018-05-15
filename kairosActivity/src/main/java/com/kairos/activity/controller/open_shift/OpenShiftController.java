@@ -29,15 +29,13 @@ public class OpenShiftController {
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ApiOperation("create openshifts")
     public ResponseEntity<Map<String, Object>> createOpenShift(@RequestBody OpenShiftResponseDTO openShiftResponseDTO)  {
-        openShiftService.createOpenShift(openShiftResponseDTO);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,openShiftService.createOpenShift(openShiftResponseDTO));
     }
 
     @RequestMapping(value = "/{openShiftId}", method = RequestMethod.PUT)
     @ApiOperation("update openShift")
     public ResponseEntity<Map<String, Object>> updateOpenShift(@PathVariable BigInteger openShiftId, @RequestBody OpenShiftResponseDTO openShiftResponseDTO)  {
-        openShiftService.updateOpenShift(openShiftResponseDTO,openShiftId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,openShiftService.updateOpenShift(openShiftResponseDTO,openShiftId));
     }
 
     @ApiOperation("delete an openshift")

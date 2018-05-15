@@ -28,8 +28,7 @@ public class OrderController {
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ApiOperation("create orders")
     public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderOpenshiftResponseDTO orderResponseDto)  {
-        orderService.createOrder(orderResponseDto);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,true);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,orderService.createOrder(orderResponseDto));
     }
 
     @RequestMapping(value = "/{orderId}", method = RequestMethod.PUT)

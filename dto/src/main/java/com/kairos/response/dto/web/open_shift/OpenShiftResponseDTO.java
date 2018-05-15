@@ -15,6 +15,16 @@ public class OpenShiftResponseDTO {
     private List<Long> declinedBy;
     private Long unitId;
     private BigInteger orderId;
+    private BigInteger openShiftId;
+
+    public BigInteger getOpenShiftId() {
+        return openShiftId;
+    }
+
+    public void setOpenShiftId(BigInteger openShiftId) {
+        this.openShiftId = openShiftId;
+    }
+
 
 
     public Long getUnitId() {

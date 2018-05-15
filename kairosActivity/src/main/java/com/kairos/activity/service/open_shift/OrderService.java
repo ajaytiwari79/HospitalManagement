@@ -32,20 +32,23 @@ public class OrderService extends MongoBaseService {
 
 
 
-   public void createOrder(OrderOpenshiftResponseDTO orderOpenshiftResponseDTO) {
+   public OrderOpenshiftResponseDTO createOrder(OrderOpenshiftResponseDTO orderOpenshiftResponseDTO) {
 
     Order order = new Order();
     OrderResponseDTO orderResponseDTO = orderOpenshiftResponseDTO.getOrder();
     List<OpenShiftResponseDTO> openShiftResponseDTOs = orderOpenshiftResponseDTO.getOpenshifts();
     ObjectMapperUtils.copyProperties(orderResponseDTO,order);
     save(order);
-    priorityGroupService.copyPriorityGroupsForOrder(orderResponseDTO.getUnitId(),order.getId());
+    orderResponseDTO.setOrderId(order.getId());
+    //priorityGroupService.copyPriorityGroupsForOrder(orderResponseDTO.getUnitId(),order.getId());
     openShiftService.createOpenShiftFromOrder(openShiftResponseDTOs, order.getId());
+
+    return orderOpenshiftResponseDTO;
 
 
     }
 
-    public void updateOrder(OrderResponseDTO orderResponseDTO,BigInteger orderId) {
+    public OrderResponseDTO updateOrder(OrderResponseDTO orderResponseDTO,BigInteger orderId) {
 
         Order order = orderMongoRepository.findOrderByIdAndEnabled(orderId);
         if(!Optional.ofNullable(order).isPresent()) {
@@ -53,8 +56,7 @@ public class OrderService extends MongoBaseService {
         }
         ObjectMapperUtils.copyProperties(orderResponseDTO,order);
         save(order);
-
-
+        return orderResponseDTO;
     }
 
     public void deleteOrder(BigInteger orderId) {

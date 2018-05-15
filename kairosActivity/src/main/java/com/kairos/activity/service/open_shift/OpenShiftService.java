@@ -17,9 +17,12 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OpenShiftService extends MongoBaseService {
@@ -32,14 +35,16 @@ public class OpenShiftService extends MongoBaseService {
 
 
 
-        public void createOpenShift(OpenShiftResponseDTO openShiftResponseDTO) {
+        public OpenShiftResponseDTO createOpenShift(OpenShiftResponseDTO openShiftResponseDTO) {
 
             OpenShift openShift = new OpenShift();
             ObjectMapperUtils.copyProperties(openShiftResponseDTO,openShift);
             save(openShift);
+            openShiftResponseDTO.setOpenShiftId(openShift.getId());
+            return openShiftResponseDTO;
         }
 
-        public void createOpenShiftFromOrder(List<OpenShiftResponseDTO> openShiftResponseDTOs, BigInteger orderId) {
+        public List<OpenShiftResponseDTO> createOpenShiftFromOrder(List<OpenShiftResponseDTO> openShiftResponseDTOs, BigInteger orderId) {
 
             List<OpenShift> openShifts = new ArrayList<OpenShift>();
             for(OpenShiftResponseDTO openShiftResponseDTO: openShiftResponseDTOs) {
@@ -50,9 +55,17 @@ public class OpenShiftService extends MongoBaseService {
 
             }
             save(openShifts);
+            Map<LocalDate,BigInteger> openShiftIDMap = openShifts.stream().collect(Collectors.toMap(OpenShift::getStartDate,
+                            OpenShift::getId));
+            for(OpenShiftResponseDTO openShiftResponseDTO: openShiftResponseDTOs) {
+                openShiftResponseDTO.setOpenShiftId(openShiftIDMap.get(openShiftResponseDTO.getStartDate()));
+            }
+
+            return openShiftResponseDTOs;
+
         }
 
-        public void updateOpenShift(OpenShiftResponseDTO openShiftResponseDTO,BigInteger openShiftId) {
+        public OpenShiftResponseDTO updateOpenShift(OpenShiftResponseDTO openShiftResponseDTO,BigInteger openShiftId) {
 
             OpenShift openShift = openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
             if(!Optional.ofNullable(openShift).isPresent()) {
@@ -60,6 +73,7 @@ public class OpenShiftService extends MongoBaseService {
             }
             ObjectMapperUtils.copyProperties(openShiftResponseDTO,openShift);
             save(openShift);
+            return openShiftResponseDTO;
         }
 
         public void deleteOpenShift(BigInteger openShiftId) {

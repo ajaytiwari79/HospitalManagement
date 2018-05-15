@@ -35,7 +35,7 @@ public class Order extends MongoBaseEntity {
     private LocalDate deadline;
     private OrderNotificationsCriteriaForPlanner notificationsCriteria;
     private ShiftAssignmentCriteria siftAssignmentCriteria;
-    private BringYour bringVehicle;
+    private BringVehicle bringVehicle;
     private DeadlineRule deadlineRule;
 
 
@@ -240,11 +240,11 @@ public class Order extends MongoBaseEntity {
         this.siftAssignmentCriteria = siftAssignmentCriteria;
     }
 
-    public BringYour getBringVehicle() {
+    public BringVehicle getBringVehicle() {
         return bringVehicle;
     }
 
-    public void setBringVehicle(BringYour bringVehicle) {
+    public void setBringVehicle(BringVehicle bringVehicle) {
         this.bringVehicle = bringVehicle;
     }
 
