@@ -16,14 +16,14 @@ public class PriorityGroup extends MongoBaseEntity {
     private BigInteger countryParentId;
     private PriorityGroupName name;
     private BigInteger orderId;
-    private SchedulerProcess schedulerProcess;
+    private ScheduledProcess scheduledProcess;
 
     public PriorityGroup() {
         //Default Constructor
     }
 
     public PriorityGroup(PriorityGroupName name, boolean deActivated, OpenShiftCancelProcess openShiftCancelProcess, RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
-                         StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId) {
+                         StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId,ScheduledProcess scheduledProcess) {
         this.name=name;
         this.deActivated = deActivated;
         this.openShiftCancelProcess = openShiftCancelProcess;
@@ -32,6 +32,7 @@ public class PriorityGroup extends MongoBaseEntity {
         this.staffIncludeFilter = staffIncludeFilter;
         this.countryId = countryId;
         this.unitId = unitId;
+        this.scheduledProcess=scheduledProcess;
     }
 
     public boolean isDeActivated() {
@@ -116,11 +117,11 @@ public class PriorityGroup extends MongoBaseEntity {
         this.orderId = orderId;
     }
 
-    public SchedulerProcess getSchedulerProcess() {
-        return schedulerProcess;
+    public ScheduledProcess getScheduledProcess() {
+        return scheduledProcess;
     }
 
-    public void setSchedulerProcess(SchedulerProcess schedulerProcess) {
-        this.schedulerProcess = schedulerProcess;
+    public void setScheduledProcess(ScheduledProcess scheduledProcess) {
+        this.scheduledProcess = scheduledProcess;
     }
 }

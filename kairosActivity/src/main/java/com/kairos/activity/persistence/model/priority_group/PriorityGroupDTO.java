@@ -17,7 +17,7 @@ public class PriorityGroupDTO {
     private Long unitId;
     private PriorityGroupName name;
     private BigInteger orderId;
-    private SchedulerProcess schedulerProcess;
+    private ScheduledProcess scheduledProcess;
 
     public PriorityGroupDTO() {
         //Default Constructor
@@ -116,11 +116,11 @@ public class PriorityGroupDTO {
         this.name = name;
     }
 
-    public SchedulerProcess getSchedulerProcess() {
-        return schedulerProcess;
+    public ScheduledProcess getScheduledProcess() {
+        return scheduledProcess;
     }
 
-    public void setSchedulerProcess(SchedulerProcess schedulerProcess) {
-        this.schedulerProcess = schedulerProcess;
+    public void setScheduledProcess(ScheduledProcess scheduledProcess) {
+        this.scheduledProcess = scheduledProcess;
     }
 }

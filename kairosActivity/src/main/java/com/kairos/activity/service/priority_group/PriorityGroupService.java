@@ -46,6 +46,8 @@ public class PriorityGroupService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
         }
         ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
+        priorityGroup.setId(priorityGroupId);
+        priorityGroup.setCountryId(countryId);
         save(priorityGroup);
         ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
         return priorityGroupDTO;
@@ -85,6 +87,8 @@ public class PriorityGroupService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
         }
         ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
+        priorityGroup.setId(priorityGroupId);
+        priorityGroup.setUnitId(unitId);
         save(priorityGroup);
         ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
         return priorityGroupDTO;

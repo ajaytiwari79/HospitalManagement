@@ -1,36 +1,49 @@
 package com.kairos.activity.persistence.model.priority_group;
 
+import com.kairos.activity.enums.PriorityGroup.DayCheckPeriod;
+
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-public class SchedulerProcess {
-    private String dayCheckPeriod; // to show the content selected e.g. Monday,Tuesday,Wednesday,Thursday,Friday. Every 60 minute
+public class ScheduledProcess {
+    private DayCheckPeriod dayCheckPeriod; // to show the content selected e.g. Monday,Tuesday,Wednesday,Thursday,Friday. Every 60 minute
     private Integer startMinute;//
-    private String selectedRepeatInterval;//
+    private Integer selectedRepeatInterval;//
     private Set<DayOfWeek> selectedDays;//
-    private String runOnce;//
+    private Integer runOnce;//
     private List<String> selectedTimes;//
 
 
-    public SchedulerProcess() {
+
+
+    public ScheduledProcess() {
         //Default Constructor
     }
 
-    public String getDayCheckPeriod() {
+    public ScheduledProcess(DayCheckPeriod dayCheckPeriod, Integer startMinute, Integer selectedRepeatInterval,
+                            Set<DayOfWeek> selectedDays, Integer runOnce, List<String> selectedTimes) {
+        this.dayCheckPeriod = dayCheckPeriod;
+        this.startMinute = startMinute;
+        this.selectedRepeatInterval = selectedRepeatInterval;
+        this.selectedDays = selectedDays;
+        this.runOnce = runOnce;
+        this.selectedTimes = selectedTimes;
+    }
+
+    public DayCheckPeriod getDayCheckPeriod() {
         return dayCheckPeriod;
     }
 
-    public void setDayCheckPeriod(String dayCheckPeriod) {
+    public void setDayCheckPeriod(DayCheckPeriod dayCheckPeriod) {
         this.dayCheckPeriod = dayCheckPeriod;
     }
 
-    public String getSelectedRepeatInterval() {
+    public Integer getSelectedRepeatInterval() {
         return selectedRepeatInterval;
     }
 
-    public void setSelectedRepeatInterval(String selectedRepeatInterval) {
+    public void setSelectedRepeatInterval(Integer selectedRepeatInterval) {
         this.selectedRepeatInterval = selectedRepeatInterval;
     }
 
@@ -58,7 +71,7 @@ public class SchedulerProcess {
         this.startMinute = startMinute;
     }
 
-    public String getRepeat() {
+    public Integer getRepeat() {
         return selectedRepeatInterval;
     }
 
@@ -74,11 +87,11 @@ public class SchedulerProcess {
         this.selectedDays = selectedDays;
     }
 
-    public String getRunOnce() {
+    public Integer getRunOnce() {
         return runOnce;
     }
 
-    public void setRunOnce(String runOnce) {
+    public void setRunOnce(Integer runOnce) {
         this.runOnce = runOnce;
     }
 
