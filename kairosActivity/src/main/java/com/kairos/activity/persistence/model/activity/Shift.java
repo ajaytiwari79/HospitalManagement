@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import com.kairos.activity.persistence.model.phase.Phase;
 import com.kairos.activity.response.dto.shift.ShiftQueryResult;
+import com.kairos.activity.util.DateTimeInterval;
 import com.kairos.enums.shift.ShiftState;
 import org.joda.time.Interval;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -189,7 +190,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public int getMinutes(){
-        return (int)getInterval().toDuration().getStandardMinutes();
+        return getInterval().getMinutes();
     }
 
     public String getRemarks() {
@@ -216,8 +217,8 @@ public class Shift extends MongoBaseEntity {
         return isMainShift;
     }
 
-    public Interval getInterval(){
-        return new Interval(this.startDate.getTime(),this.getEndDate().getTime());
+    public DateTimeInterval getInterval(){
+        return new DateTimeInterval(this.startDate.getTime(),this.getEndDate().getTime());
     }
 
     public void setMainShift(boolean mainShift) {

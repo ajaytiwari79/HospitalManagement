@@ -2,7 +2,9 @@ package com.kairos.activity.util;
 
 
 import java.time.*;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
+import java.util.Date;
 
 /**
  * @author pradeep
@@ -91,7 +93,7 @@ public class DateTimeInterval {
     }
 
     public DateTimeInterval overlap(DateTimeInterval interval) {
-        if (overlaps(interval) == false) {
+        if (!overlaps(interval)) {
             return null;
         }
         long start = Math.max(getStartMillis(), interval.getStartMillis());
@@ -132,6 +134,25 @@ public class DateTimeInterval {
         }
     }
 
+    public boolean contains(long millisInstant) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (millisInstant >= thisStart && millisInstant < thisEnd);
+    }
+
+    public boolean contains(Date date) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (date.getTime() >= thisStart && date.getTime() < thisEnd);
+    }
+
+    public boolean containsNow() {
+        Date date = new Date();
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (date.getTime() >= thisStart && date.getTime() < thisEnd);
+    }
+
     public boolean abuts(DateTimeInterval interval) {
         if (interval == null) {
             long now = ZonedDateTime.now().toInstant().toEpochMilli();
@@ -143,7 +164,19 @@ public class DateTimeInterval {
     }
 
     public int getMinutes(){
-        return ((getStart().getHour()*60) + getStart().getMinute()) - ((getEnd().getHour()*60)+getEnd().getMinute());
+        return (int) (this.start - this.end)/60000;
+    }
+
+    public int getHours(){
+        return (int) (this.start - this.end)/3600000;
+    }
+
+    public int getSeconds(){
+        return (int) (this.start - this.end)/1000;
+    }
+
+    public Long getMilliSeconds(){
+        return (this.start - this.end);
     }
 
     @Override
