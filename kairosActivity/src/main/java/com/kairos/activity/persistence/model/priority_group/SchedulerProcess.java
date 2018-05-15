@@ -1,21 +1,21 @@
 package com.kairos.activity.persistence.model.priority_group;
 
 import java.time.DayOfWeek;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
 public class SchedulerProcess {
     private String interval; // to show the content selected e.g. Monday,Tuesday,Wednesday,Thursday,Friday. Every 60 minute
-    private Date lastRunTime;
-    private Date nextRunTime;
+    private LocalDateTime lastRunTime;
+    private LocalDateTime nextRunTime;
     private Integer startMinute;
     private String repeat;
     private Set<DayOfWeek> days;
     private String runOnce;
     private List<String> selectedHours;
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private Integer weeks;
 
     public SchedulerProcess() {
@@ -30,19 +30,19 @@ public class SchedulerProcess {
         this.interval = interval;
     }
 
-    public Date getLastRunTime() {
+    public LocalDateTime getLastRunTime() {
         return lastRunTime;
     }
 
-    public void setLastRunTime(Date lastRunTime) {
+    public void setLastRunTime(LocalDateTime lastRunTime) {
         this.lastRunTime = lastRunTime;
     }
 
-    public Date getNextRunTime() {
+    public LocalDateTime getNextRunTime() {
         return nextRunTime;
     }
 
-    public void setNextRunTime(Date nextRunTime) {
+    public void setNextRunTime(LocalDateTime nextRunTime) {
         this.nextRunTime = nextRunTime;
     }
 
@@ -86,19 +86,19 @@ public class SchedulerProcess {
         this.selectedHours = selectedHours;
     }
 
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
 
