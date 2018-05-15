@@ -47,12 +47,20 @@ public class NightWorkerController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.getNightWorkerQuestionnaire(unitId, staffId));
     }
 
-    @ApiOperation(value = "get night worker questionnaire details")
+    /*@ApiOperation(value = "get night worker questionnaire details")
     @PostMapping(value = "/staff/{staffId}/night_worker_questionnaire")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addNightWorkerQuestionnaireDetails(@PathVariable Long staffId, @PathVariable Long unitId,
                                                                             @RequestBody @Valid QuestionnaireAnswerResponseDTO questionnaireAnswerResponseDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.addNightWorkerQuestionnaire(unitId, staffId, questionnaireAnswerResponseDTO));
+    }*/
+
+    @ApiOperation(value = "update night worker questionnaire details")
+    @PutMapping(value = "/staff/{staffId}/night_worker_questionnaire/{questionnaireId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateNightWorkerQustionnaie(@PathVariable Long staffId, @PathVariable Long unitId, @PathVariable BigInteger questionnaireId,
+                                                                                  @RequestBody @Valid QuestionnaireAnswerResponseDTO questionnaireAnswerResponseDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.updateNightWorkerQuestionnaire(unitId, staffId, questionnaireId, questionnaireAnswerResponseDTO));
     }
 
 }

@@ -227,4 +227,7 @@ public class AppConstants {
     public static final int PRESENCE_LIMIT_IN_YEAR = 1;
     public static final int ABSENCE_LIMIT_IN_YEAR = 2;
 
+    // Staff Questionnaire
+    public static final String QUESTIONNAIE_NAME_PREFIX = "Questionnaire";
+
 }

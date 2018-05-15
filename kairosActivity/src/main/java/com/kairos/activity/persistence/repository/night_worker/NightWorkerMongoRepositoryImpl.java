@@ -33,7 +33,7 @@ public class NightWorkerMongoRepositoryImpl implements CustomNightWorkerMongoRep
     public List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaireDetails(Long staffId) {
 
 //         String groupString = "{$group:{'id':'$_id', 'questionAnswerPair': { '$addToSet': '$questionAnswerPair' }}}";
-        String groupString = "{$group:{_id:'$_id', 'name':{'$first':'$name'}, 'questionAnswerPair': { '$addToSet': '$questionAnswerPair' }}}";
+        String groupString = "{$group:{_id:'$_id', 'name':{'$first':'$name'}, 'submitted':{'$first':'$submitted'}, 'questionAnswerPair': { '$addToSet': '$questionAnswerPair' }}}";
 
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("staffId").is(staffId)),
@@ -41,7 +41,8 @@ public class NightWorkerMongoRepositoryImpl implements CustomNightWorkerMongoRep
                 unwind("staffQuestionnairesIds"),
                 lookup("staffQuestionnaire", "staffQuestionnairesIds", "_id", "staffQuestionnaire"),
                 unwind("staffQuestionnaire"),
-                project().and("staffQuestionnaire.name").as("name").and("staffQuestionnaire._id").as("_id").
+                project().and("staffQuestionnaire.name").as("name").
+                        and("staffQuestionnaire.submitted").as("submitted").and("staffQuestionnaire._id").as("_id").
                         and("staffQuestionnaire.questionAnswerPair").as("questionAnswerPair").
                         and("staffQuestionnaire.name").as("name"),
                 unwind("questionAnswerPair"),
@@ -50,12 +51,14 @@ public class NightWorkerMongoRepositoryImpl implements CustomNightWorkerMongoRep
                 project().and("questionAnswerPair.answer").as("questionAnswerPair.answer").
                         and("questionAnswerPair.question.question").as("questionAnswerPair.question").
                         and("questionAnswerPair.question._id").as( "questionAnswerPair.questionId").
-                        and("name").as("name"),
+                        and("name").as("name").
+                        and("submitted").as("submitted"),
+
 
                 new CustomAggregationOperation(Document.parse(groupString))
         );
 
-        AggregationResults<QuestionnaireAnswerResponseDTO> result = mongoTemplate.aggregate (aggregation, NightWorker.class, QuestionnaireAnswerResponseDTO.class);
+        AggregationResults<QuestionnaireAnswerResponseDTO> result = mongoTemplate. aggregate (aggregation, NightWorker.class, QuestionnaireAnswerResponseDTO.class);
         return result.getMappedResults();
     }
 
