@@ -48,4 +48,7 @@ public class ExceptionService {
     public void internalServerError(String message, Object... params) {
         throw new InternalError(convertMessage(message, params));
     }
+    public void illegalArgumentException(String message, Object... params) {
+        throw new IllegalArgumentException(convertMessage(message, params));
+    }
 }
