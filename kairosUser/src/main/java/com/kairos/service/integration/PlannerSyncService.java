@@ -37,7 +37,7 @@ public class PlannerSyncService {
         plannerRestClient.publish(createStaffDTO(staff),unitId,integrationOperation);
     }
     @Async
-    public void  publishStaffs(Long unitId, List<Staff> staff, IntegrationOperation integrationOperation) {
+    public void publishStaff(Long unitId, List<Staff> staff, IntegrationOperation integrationOperation) {
         plannerRestClient.publish(createStaffs(staff),unitId,integrationOperation);
     }
     @Async

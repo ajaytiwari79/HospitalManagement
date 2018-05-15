@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.user.country;
 import com.kairos.persistence.model.user.country.EngineerType;
-import com.kairos.persistence.model.user.filter.FilterDetailQueryResult;
-import com.kairos.response.dto.web.filter.FilterDetailDTO;
+import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import org.springframework.data.neo4j.annotation.Query;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
@@ -25,7 +24,7 @@ public interface EngineerTypeGraphRepository extends Neo4jBaseRepository<Enginee
 
     // Get Engineer Type data for filters by countryId
     @Query("MATCH (et:EngineerType{isEnabled:true})-[:"+BELONGS_TO +"]->(c:Country) where id(c)={0} return toString(id(et)) as id, et.name as value" )
-    List<FilterDetailQueryResult> getEngineerTypeByCountryIdForFilters(Long countryId);
+    List<FilterSelectionQueryResult> getEngineerTypeByCountryIdForFilters(Long countryId);
 
 
 }

@@ -23,13 +23,20 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private String intervalUnit;
     private LocalDate validationStartDate;
     private long daysLimit;
-    private WTATemplateType wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
-    private List<PartOfDay> partOfDays = new ArrayList<>();
-    private float recommendedValue;
+    private List<PartOfDay> partOfDays;
     private MinMaxSetting minMaxSetting;
     private boolean isRestingTimeAllowed;
     private int restingTime;
 
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    protected float recommendedValue;
     public boolean isRestingTimeAllowed() {
         return isRestingTimeAllowed;
     }
@@ -63,13 +70,6 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
         this.partOfDays = partOfDays;
     }
 
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
 
 
     public WTATemplateType getWtaTemplateType() {
@@ -115,5 +115,6 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
     public DaysOffInPeriodWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
     }
 }

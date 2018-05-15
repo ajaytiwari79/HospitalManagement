@@ -19,7 +19,7 @@ import java.util.List;
 public class WeeklyRestPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long continuousWeekRest;
-    private WTATemplateType wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;;
+
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
     protected float recommendedValue;
@@ -95,5 +95,6 @@ public class WeeklyRestPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     }
 
     public WeeklyRestPeriodWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;;
     }
 }

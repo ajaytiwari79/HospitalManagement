@@ -12,32 +12,39 @@ import java.util.List;
  */
 public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO{
     private List<AgeRange> ageRange;
-    private List<Long> activitieIds;
+    private List<BigInteger> activityIds;
     private LocalDate validationStartDate;
     private Long numberOfWeeks;
-    private WTATemplateType wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
-    private List<BigInteger> timeTypeIds;
-    private List<Long> plannedTimeIds;
+    private boolean borrowLeave;
+    private boolean carryForwardLeave;
 
+    public float getRecommendedValue() {
+        return recommendedValue;
+    }
+
+    public void setRecommendedValue(float recommendedValue) {
+        this.recommendedValue = recommendedValue;
+    }
+
+    protected float recommendedValue;
     public SeniorDaysPerYearWTATemplateDTO() {
-        //Default Constructor
+        this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
     }
 
-
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
+    public boolean isBorrowLeave() {
+        return borrowLeave;
     }
 
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
+    public void setBorrowLeave(boolean borrowLeave) {
+        this.borrowLeave = borrowLeave;
     }
 
-    public List<Long> getPlannedTimeIds() {
-        return plannedTimeIds;
+    public boolean isCarryForwardLeave() {
+        return carryForwardLeave;
     }
 
-    public void setPlannedTimeIds(List<Long> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
+    public void setCarryForwardLeave(boolean carryForwardLeave) {
+        this.carryForwardLeave = carryForwardLeave;
     }
 
     public LocalDate getValidationStartDate() {
@@ -56,12 +63,12 @@ public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO{
         this.ageRange = ageRange;
     }
 
-    public List<Long> getActivitieIds() {
-        return activitieIds;
+    public List<BigInteger> getActivityIds() {
+        return activityIds;
     }
 
-    public void setActivitieIds(List<Long> activitieIds) {
-        this.activitieIds = activitieIds;
+    public void setActivityIds(List<BigInteger> activityIds) {
+        this.activityIds = activityIds;
     }
 
 

@@ -6,7 +6,6 @@ import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.user.country.Country;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.response.dto.web.OrganizationTypeDTO;
 import com.kairos.response.dto.web.UpdateOrganizationTypeDTO;
 import com.kairos.service.UserBaseService;
 import com.kairos.util.DateUtil;
@@ -14,8 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.kairos.response.dto.web.OrganizationTypeDTO;
 
 import javax.inject.Inject;
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -85,8 +86,6 @@ public class OrganizationTypeService extends UserBaseService {
         }
         return objectList;
     }
-
-
 
 
     public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
@@ -165,8 +164,9 @@ public class OrganizationTypeService extends UserBaseService {
      * @param orgTypeId
      * @return
      */
-    public List<Map<String, Object>> getExpertise(long countryId, long orgTypeId) {
-        OrgTypeExpertiseQueryResult orgTypeExpertiseQueryResult = organizationTypeGraphRepository.getExpertiseOfOrganizationType(countryId, orgTypeId);
+    public List<Map<String, Object>> getExpertise(long countryId, long orgTypeId, String selectedDate) throws ParseException {
+        Long selectedDateInLong = (selectedDate != null) ? DateUtil.getIsoDateInLong(selectedDate) : DateUtil.getCurrentDateMillis();
+        OrgTypeExpertiseQueryResult orgTypeExpertiseQueryResult = organizationTypeGraphRepository.getExpertiseOfOrganizationType(countryId, orgTypeId,selectedDateInLong);
         return orgTypeExpertiseQueryResult.getExpertise();
     }
 

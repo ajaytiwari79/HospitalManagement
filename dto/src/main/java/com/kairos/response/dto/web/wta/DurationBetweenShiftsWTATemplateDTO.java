@@ -20,7 +20,7 @@ import java.util.List;
 public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private long durationBetweenShifts;
-    private WTATemplateType wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
+
 
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private List<Long> plannedTimeIds = new ArrayList<>();
@@ -95,5 +95,6 @@ public class DurationBetweenShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO 
 
     }
     public DurationBetweenShiftsWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
     }
     }

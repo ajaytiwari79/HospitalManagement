@@ -29,7 +29,24 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     private List<BigInteger> timeTypeIds = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
+    private int intervalLength;
+    private String intervalUnit;
 
+    public int getIntervalLength() {
+        return intervalLength;
+    }
+
+    public void setIntervalLength(int intervalLength) {
+        this.intervalLength = intervalLength;
+    }
+
+    public String getIntervalUnit() {
+        return intervalUnit;
+    }
+
+    public void setIntervalUnit(String intervalUnit) {
+        this.intervalUnit = intervalUnit;
+    }
 
     public MinMaxSetting getMinMaxSetting() {
         return minMaxSetting;
@@ -105,5 +122,6 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
         super(name, description);
         this.checkAgainstTimeRules = checkAgainstTimeRules;
         this.limitCount = limitCount;
+        this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 }

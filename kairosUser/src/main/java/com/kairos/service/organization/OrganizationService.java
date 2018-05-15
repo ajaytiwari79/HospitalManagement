@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
@@ -57,6 +58,7 @@ import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.integration.PriorityGroupIntegrationService;
+import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
@@ -200,7 +202,12 @@ public class OrganizationService extends UserBaseService {
     @Inject
     StaffService staffService;
     @Inject
+
     PriorityGroupIntegrationService priorityGroupIntegrationService;
+
+    private PlannerSyncService plannerSyncService;
+
+
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
     }
@@ -281,7 +288,7 @@ public class OrganizationService extends UserBaseService {
         //List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
         //List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
         //linkWTAToOrganization(allWtaCopy, allWta);
-
+        organization.setTimeZone(ZoneId.of(TIMEZONE_UTC));
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
@@ -490,7 +497,7 @@ public class OrganizationService extends UserBaseService {
         if (!Optional.ofNullable(parent).isPresent()) {
             throw new DataNotFoundByIdException("Can't find Organization with provided Id" + unitId);
         }
-
+        unit.setTimeZone(ZoneId.of(TIMEZONE_UTC));
         unit.setName(organizationDTO.getName());
         unit.setDescription(organizationDTO.getDescription());
         unit.setPrekairos(organizationDTO.isPreKairos());
@@ -1376,6 +1383,13 @@ public class OrganizationService extends UserBaseService {
             throw new DataNotFoundByIdException("Incorrect id of an organization " + unitId);
         }
         return unit.getTimeZone(); //(Optional.ofNullable(unit.getTimeZone()).isPresent() ? unit.getTimeZone().toString() : "") ;
+    }
+
+    public Object initialOptaplannerSync(Long organisationId, Long unitId) {
+        List<Staff> staff=staffGraphRepository.getAllStaffByUnitId(unitId);
+        plannerSyncService.publishStaff(unitId,staff,IntegrationOperation.CREATE);
+        phaseRestClient.initialOptaplannerSync(unitId);
+        return null;
     }
 }
 

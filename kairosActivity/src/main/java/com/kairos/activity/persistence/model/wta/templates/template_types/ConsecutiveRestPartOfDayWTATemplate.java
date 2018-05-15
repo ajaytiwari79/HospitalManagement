@@ -105,6 +105,7 @@ public class ConsecutiveRestPartOfDayWTATemplate extends WTABaseRuleTemplate {
         this.description=description;
         this.minimumRest = minimumRest;
         this.daysWorked = daysWorked;
+        wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;
 
     }
     public ConsecutiveRestPartOfDayWTATemplate() {

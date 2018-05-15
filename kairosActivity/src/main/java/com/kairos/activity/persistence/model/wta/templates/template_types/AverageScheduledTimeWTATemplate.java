@@ -105,6 +105,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         this.useShiftTimes =useShiftTimes;
         this.maximumAvgTime=maximumAvgTime;
         this.intervalUnit=intervalUnit;
+        wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
 
     }
 

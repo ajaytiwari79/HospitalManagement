@@ -6,6 +6,7 @@ import com.kairos.activity.client.OrganizationRestClient;
 import com.kairos.activity.client.dto.organization.OrganizationDTO;
 import com.kairos.activity.custom_exception.DataNotFoundByIdException;
 import com.kairos.activity.custom_exception.DuplicateDataException;
+import com.kairos.activity.persistence.enums.PartOfDay;
 import com.kairos.activity.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.activity.persistence.model.wta.templates.RuleTemplateCategory;
 import com.kairos.activity.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -67,16 +68,16 @@ public class RuleTemplateService extends MongoBaseService {
         }
 
 
-//        List<RuleTemplateResponseDTO> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(countryId);
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(countryId);
         RuleTemplateCategory ruleTemplateCategory = ruleTemplateCategoryMongoRepository.findByName(countryId, "NONE", RuleTemplateCategoryType.WTA);
         if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
             ruleTemplateCategory = new RuleTemplateCategory("NONE","None", RuleTemplateCategoryType.WTA);
             ruleTemplateCategory.setCountryId(countryDTO.getId());
             save(ruleTemplateCategory);
         }
-        /*if (Optional.ofNullable(wtaBaseRuleTemplates).isPresent() && !wtaBaseRuleTemplates.isEmpty()) {
+        if (Optional.ofNullable(wtaBaseRuleTemplates).isPresent() && !wtaBaseRuleTemplates.isEmpty()) {
             throw new DataNotFoundByIdException("WTA Rule Template already exists");
-        }*/
+        }
 
         String week = "WEEK";
         String TUESDAY = "TUESDAY";
@@ -100,6 +101,8 @@ public class RuleTemplateService extends MongoBaseService {
 
         ConsecutiveWorkWTATemplate consecutiveWorking = new ConsecutiveWorkWTATemplate("Maximum number of consecutive days",true,"Maximum number of consecutive days",true,daysCount);
         consecutiveWorking.setCountryId(countryDTO.getId());
+        consecutiveWorking.setIntervalLength(12);
+        consecutiveWorking.setIntervalUnit(week);
         consecutiveWorking.setPhaseTemplateValues(phaseTemplateValues);
         consecutiveWorking.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(consecutiveWorking);
@@ -169,13 +172,13 @@ public class RuleTemplateService extends MongoBaseService {
         weeklyRestPeriodWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(weeklyRestPeriodWTATemplate);
 
-        ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = new ShortestAndAverageDailyRestWTATemplate("Shortest and Average daily Rest",false,"Shortest and Average daily Rest",1, "NA", localDate, timeInMins, timeInMins, "");
+        ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRestWTATemplate = new ShortestAndAverageDailyRestWTATemplate("Shortest and Average daily Rest",false,"Shortest and Average daily Rest",1, week, localDate, timeInMins, timeInMins, "");
         shortestAndAverageDailyRestWTATemplate.setCountryId(countryDTO.getId());
         shortestAndAverageDailyRestWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         shortestAndAverageDailyRestWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(shortestAndAverageDailyRestWTATemplate);
 
-        ShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = new ShiftsInIntervalWTATemplate("Shifts In Interval",false,"Shifts In Interval",1, "NA", localDate, 1, true);
+        ShiftsInIntervalWTATemplate maximumShiftsInIntervalWTATemplate = new ShiftsInIntervalWTATemplate("Shifts In Interval",false,"Shifts In Interval",1, week, localDate, 1, true);
         maximumShiftsInIntervalWTATemplate.setCountryId(countryDTO.getId());
         maximumShiftsInIntervalWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
         maximumShiftsInIntervalWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
@@ -204,6 +207,24 @@ public class RuleTemplateService extends MongoBaseService {
         //careDaysCheck.setPhaseTemplateValues(phaseTemplateValues);
         careDaysCheck.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
         wtaBaseRuleTemplates1.add(careDaysCheck);
+
+        DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate=new DaysOffAfterASeriesWTATemplate("Minimum days off after a series of night shifts in sequence",false,"Minimum days off after a series of night shifts in sequence",1,week,1);
+        daysOffAfterASeriesWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+        daysOffAfterASeriesWTATemplate.setCountryId(countryDTO.getId());
+        daysOffAfterASeriesWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+        wtaBaseRuleTemplates1.add(daysOffAfterASeriesWTATemplate);
+
+        NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate=new NoOfSequenceShiftWTATemplate("No Of Sequence Shift",false,"No OF Sequence Shift", PartOfDay.DAY,PartOfDay.NIGHT);
+        noOfSequenceShiftWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+        noOfSequenceShiftWTATemplate.setCountryId(countryDTO.getId());
+        noOfSequenceShiftWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+        wtaBaseRuleTemplates1.add(noOfSequenceShiftWTATemplate);
+
+        EmployeesWithIncreasedRiskWTATemplate employeesWithIncreasedRiskWTATemplate=new EmployeesWithIncreasedRiskWTATemplate("Employees with Increased Risk",false,"Employees with increased risk",18,62,false);
+        employeesWithIncreasedRiskWTATemplate.setPhaseTemplateValues(phaseTemplateValues);
+        employeesWithIncreasedRiskWTATemplate.setCountryId(countryDTO.getId());
+        employeesWithIncreasedRiskWTATemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
+        //wtaBaseRuleTemplates1.add(employeesWithIncreasedRiskWTATemplate);
 
         BreaksInShiftWTATemplate breaksInShiftWTATemplate = new BreaksInShiftWTATemplate("Break In Shift",false,"Break In Shift",Arrays.asList(new BreakTemplateValue()));
         breaksInShiftWTATemplate.setCountryId(countryDTO.getId());

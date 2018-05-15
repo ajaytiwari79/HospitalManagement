@@ -175,6 +175,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         this.fromTime=fromTime;
         this.toDayOfWeek=toDayOfWeek;
         this.toTime=toTime;
+        wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
 
 
 
