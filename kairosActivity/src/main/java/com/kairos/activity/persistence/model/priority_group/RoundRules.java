@@ -3,17 +3,18 @@ package com.kairos.activity.persistence.model.priority_group;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RoundRule {
+public class RoundRules {
     private Integer maximumConcurrentEnquiries;
     private Integer candidatesPerRound;
     private Integer waitingTimeBeforeNextRoundInDays;
+    private Integer checkAnswersInDays;// Time to check answer after enquiry
     private Integer minimumCandidateBeforeSelection;
 
-    public RoundRule() {
+    public RoundRules() {
         //Default Constructor
     }
 
-    public RoundRule(Integer maximumConcurrentEnquiries, Integer candidatesPerRound, Integer waitingTimeBeforeNextRoundInDays, Integer minimumCandidateBeforeSelection) {
+    public RoundRules(Integer maximumConcurrentEnquiries, Integer candidatesPerRound, Integer waitingTimeBeforeNextRoundInDays, Integer minimumCandidateBeforeSelection) {
         this.maximumConcurrentEnquiries = maximumConcurrentEnquiries;
         this.candidatesPerRound = candidatesPerRound;
         this.waitingTimeBeforeNextRoundInDays = waitingTimeBeforeNextRoundInDays;
@@ -50,5 +51,13 @@ public class RoundRule {
 
     public void setMinimumCandidateBeforeSelection(Integer minimumCandidateBeforeSelection) {
         this.minimumCandidateBeforeSelection = minimumCandidateBeforeSelection;
+    }
+
+    public Integer getCheckAnswersInDays() {
+        return checkAnswersInDays;
+    }
+
+    public void setCheckAnswersInDays(Integer checkAnswersInDays) {
+        this.checkAnswersInDays = checkAnswersInDays;
     }
 }

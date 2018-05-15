@@ -8,33 +8,28 @@ import java.math.BigInteger;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PriorityGroupDTO {
     private BigInteger id;
-//    private ShiftSelectionType shiftSelectionType;
-   // private boolean singleLongerShift;
-    private boolean activated=true;
-//    private FeatureRule featureRule;
-//    private NotificationWay notificationWay;
+    private boolean deActivated;
     private OpenShiftCancelProcess openShiftCancelProcess;
-    private RoundRule roundRule;
+    private RoundRules roundRules;
     private StaffExcludeFilter staffExcludeFilter;
     private StaffIncludeFilter staffIncludeFilter;
-//    private Priority priority;
     private Long countryId;
     private Long unitId;
     private PriorityGroupName name;
-    private Integer orderId;
+    private BigInteger orderId;
     private SchedulerProcess schedulerProcess;
 
     public PriorityGroupDTO() {
         //Default Constructor
     }
 
-    public PriorityGroupDTO(PriorityGroupName name, BigInteger id, boolean activated,
-                            OpenShiftCancelProcess openShiftCancelProcess, RoundRule roundRule, StaffExcludeFilter staffExcludeFilter,
+    public PriorityGroupDTO(PriorityGroupName name, BigInteger id, boolean deActivated,
+                            OpenShiftCancelProcess openShiftCancelProcess, RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
                             StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId) {
         this.id = id;
-        this.activated = activated;
+        this.deActivated = deActivated;
         this.openShiftCancelProcess = openShiftCancelProcess;
-        this.roundRule = roundRule;
+        this.roundRules = roundRules;
         this.staffExcludeFilter = staffExcludeFilter;
         this.staffIncludeFilter = staffIncludeFilter;
         this.countryId = countryId;
@@ -49,12 +44,12 @@ public class PriorityGroupDTO {
         this.id = id;
     }
 
-    public boolean isActivated() {
-        return activated;
+    public boolean isDeActivated() {
+        return deActivated;
     }
 
-    public void setActivated(boolean activated) {
-        this.activated = activated;
+    public void setDeActivated(boolean deActivated) {
+        this.deActivated = deActivated;
     }
 
     public OpenShiftCancelProcess getOpenShiftCancelProcess() {
@@ -65,12 +60,12 @@ public class PriorityGroupDTO {
         this.openShiftCancelProcess = openShiftCancelProcess;
     }
 
-    public RoundRule getRoundRule() {
-        return roundRule;
+    public RoundRules getRoundRules() {
+        return roundRules;
     }
 
-    public void setRoundRule(RoundRule roundRule) {
-        this.roundRule = roundRule;
+    public void setRoundRules(RoundRules roundRules) {
+        this.roundRules = roundRules;
     }
 
     public StaffExcludeFilter getStaffExcludeFilter() {
@@ -105,11 +100,11 @@ public class PriorityGroupDTO {
         this.unitId = unitId;
     }
 
-    public Integer getOrderId() {
+    public BigInteger getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) {
+    public void setOrderId(BigInteger orderId) {
         this.orderId = orderId;
     }
 

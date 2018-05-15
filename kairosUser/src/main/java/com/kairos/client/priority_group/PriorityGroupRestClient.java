@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.kairos.client.RestClientURLUtil.getBaseUrl;
 
@@ -69,10 +70,11 @@ public class PriorityGroupRestClient {
     }
     public static <T> String getURI(T t,String uri,Map<String,Object> queryParams,Object... pathParams){
         URIBuilder builder = new URIBuilder();
-        queryParams.entrySet().forEach(e->{
-            builder.addParameter(e.getKey(),e.getValue().toString());
-        });
-
+        if(Optional.ofNullable(queryParams).isPresent()){
+            queryParams.entrySet().forEach(e->{
+                builder.addParameter(e.getKey(),e.getValue().toString());
+            });
+        }
         try {
             uri= uri+builder.build().toString();
         } catch (URISyntaxException e) {

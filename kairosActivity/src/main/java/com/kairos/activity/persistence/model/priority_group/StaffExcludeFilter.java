@@ -8,43 +8,44 @@ public class StaffExcludeFilter {
     private Integer numberOfShiftAssigned;
     private Integer numberOfPendingRequest;
     private Integer unitExperienceInWeek;
-    private Integer minimumTimeBankInHours;
-    private Integer minimumRestingTimeBeforeShiftStartInMinutes;
-    private Integer minimumRestingTimeAfterShiftEndInMinutes;
-    private Integer maximumPlannedHours;
-    private Integer maximumDeltaWeeklyTimeBankPerWeekInMinutes;
+    private Integer minTimeBank; // In Minutes
+    private Integer minRestingTimeBeforeShiftStart; // In Minutes
+    private Integer minRestingTimeAfterShiftEnd; // In Minutes
+    private Integer maxPlannedTime; // In Minutes
+    private Integer maxDeltaWeeklyTimeBankPerWeek; // In Minutes
     private boolean personalEntriesFoundFromPrivateCalender;
     private Integer lastWorkingDaysInUnit;
     private Integer lastWorkingDaysWithActivity;
-    private Integer minimumRemainingHoursInActivityPlanningPeriod;
+    private Integer minRemainingTimeLeftInActivityPlanningPeriod; //In Minutes
     private boolean negativeAvailabilityInCalender;
     private boolean veto;
     private boolean stopBricks;
+
 
     public StaffExcludeFilter() {
         //Default Constructor
     }
 
-    public StaffExcludeFilter(boolean blockedForOpenShift, Integer numberOfShiftAssigned, Integer numberOfPendingRequest, Integer unitExperienceInWeek, Integer minimumTimeBankInHours, Integer minimumRestingTimeBeforeShiftStartInMinutes,
-                              Integer minimumRestingTimeAfterShiftEndInMinutes, Integer maximumPlannedHours, Integer maximumDeltaWeeklyTimeBankPerWeekInMinutes, boolean personalEntriesFoundFromPrivateCalender, Integer lastWorkingDaysInUnit,
-                              Integer lastWorkingDaysWithActivity, Integer minimumRemainingHoursInActivityPlanningPeriod, boolean negativeAvailabilityInCalender, boolean veto, boolean stopBricks) {
+    public StaffExcludeFilter(boolean blockedForOpenShift, Integer numberOfShiftAssigned, Integer numberOfPendingRequest, Integer unitExperienceInWeek, Integer minTimeBank, Integer minRestingTimeBeforeShiftStart,
+                              Integer minRestingTimeAfterShiftEnd, Integer maxPlannedTime, Integer maxDeltaWeeklyTimeBankPerWeek, boolean personalEntriesFoundFromPrivateCalender, Integer lastWorkingDaysInUnit,
+                              Integer lastWorkingDaysWithActivity, Integer minRemainingTimeLeftInActivityPlanningPeriod, boolean negativeAvailabilityInCalender, boolean veto, boolean stopBricks) {
         this.blockedForOpenShift = blockedForOpenShift;
         this.numberOfShiftAssigned = numberOfShiftAssigned;
         this.numberOfPendingRequest = numberOfPendingRequest;
         this.unitExperienceInWeek = unitExperienceInWeek;
-        this.minimumTimeBankInHours = minimumTimeBankInHours;
-        this.minimumRestingTimeBeforeShiftStartInMinutes = minimumRestingTimeBeforeShiftStartInMinutes;
-        this.minimumRestingTimeAfterShiftEndInMinutes = minimumRestingTimeAfterShiftEndInMinutes;
-        this.maximumPlannedHours = maximumPlannedHours;
-        this.maximumDeltaWeeklyTimeBankPerWeekInMinutes = maximumDeltaWeeklyTimeBankPerWeekInMinutes;
+        this.minTimeBank = minTimeBank;
+        this.minRestingTimeBeforeShiftStart = minRestingTimeBeforeShiftStart;
+        this.minRestingTimeAfterShiftEnd = minRestingTimeAfterShiftEnd;
+        this.maxPlannedTime = maxPlannedTime;
+        this.maxDeltaWeeklyTimeBankPerWeek = maxDeltaWeeklyTimeBankPerWeek;
         this.personalEntriesFoundFromPrivateCalender = personalEntriesFoundFromPrivateCalender;
         this.lastWorkingDaysInUnit = lastWorkingDaysInUnit;
         this.lastWorkingDaysWithActivity = lastWorkingDaysWithActivity;
-        this.minimumRemainingHoursInActivityPlanningPeriod = minimumRemainingHoursInActivityPlanningPeriod;
+        this.minRemainingTimeLeftInActivityPlanningPeriod = minRemainingTimeLeftInActivityPlanningPeriod;
         this.negativeAvailabilityInCalender = negativeAvailabilityInCalender;
         this.veto = veto;
         this.stopBricks = stopBricks;
-    }
+        }
 
     public boolean isBlockedForOpenShift() {
         return blockedForOpenShift;
@@ -78,44 +79,44 @@ public class StaffExcludeFilter {
         this.unitExperienceInWeek = unitExperienceInWeek;
     }
 
-    public Integer getMinimumTimeBankInHours() {
-        return minimumTimeBankInHours;
+    public Integer getMinTimeBank() {
+        return minTimeBank;
     }
 
-    public void setMinimumTimeBankInHours(Integer minimumTimeBankInHours) {
-        this.minimumTimeBankInHours = minimumTimeBankInHours;
+    public void setMinTimeBank(Integer minTimeBank) {
+        this.minTimeBank = minTimeBank;
     }
 
-    public Integer getMinimumRestingTimeBeforeShiftStartInMinutes() {
-        return minimumRestingTimeBeforeShiftStartInMinutes;
+    public Integer getMinRestingTimeBeforeShiftStart() {
+        return minRestingTimeBeforeShiftStart;
     }
 
-    public void setMinimumRestingTimeBeforeShiftStartInMinutes(Integer minimumRestingTimeBeforeShiftStartInMinutes) {
-        this.minimumRestingTimeBeforeShiftStartInMinutes = minimumRestingTimeBeforeShiftStartInMinutes;
+    public void setMinRestingTimeBeforeShiftStart(Integer minRestingTimeBeforeShiftStart) {
+        this.minRestingTimeBeforeShiftStart = minRestingTimeBeforeShiftStart;
     }
 
-    public Integer getMinimumRestingTimeAfterShiftEndInMinutes() {
-        return minimumRestingTimeAfterShiftEndInMinutes;
+    public Integer getMinRestingTimeAfterShiftEnd() {
+        return minRestingTimeAfterShiftEnd;
     }
 
-    public void setMinimumRestingTimeAfterShiftEndInMinutes(Integer minimumRestingTimeAfterShiftEndInMinutes) {
-        this.minimumRestingTimeAfterShiftEndInMinutes = minimumRestingTimeAfterShiftEndInMinutes;
+    public void setMinRestingTimeAfterShiftEnd(Integer minRestingTimeAfterShiftEnd) {
+        this.minRestingTimeAfterShiftEnd = minRestingTimeAfterShiftEnd;
     }
 
-    public Integer getMaximumPlannedHours() {
-        return maximumPlannedHours;
+    public Integer getMaxPlannedTime() {
+        return maxPlannedTime;
     }
 
-    public void setMaximumPlannedHours(Integer maximumPlannedHours) {
-        this.maximumPlannedHours = maximumPlannedHours;
+    public void setMaxPlannedTime(Integer maxPlannedTime) {
+        this.maxPlannedTime = maxPlannedTime;
     }
 
-    public Integer getMaximumDeltaWeeklyTimeBankPerWeekInMinutes() {
-        return maximumDeltaWeeklyTimeBankPerWeekInMinutes;
+    public Integer getMaxDeltaWeeklyTimeBankPerWeek() {
+        return maxDeltaWeeklyTimeBankPerWeek;
     }
 
-    public void setMaximumDeltaWeeklyTimeBankPerWeekInMinutes(Integer maximumDeltaWeeklyTimeBankPerWeekInMinutes) {
-        this.maximumDeltaWeeklyTimeBankPerWeekInMinutes = maximumDeltaWeeklyTimeBankPerWeekInMinutes;
+    public void setMaxDeltaWeeklyTimeBankPerWeek(Integer maxDeltaWeeklyTimeBankPerWeek) {
+        this.maxDeltaWeeklyTimeBankPerWeek = maxDeltaWeeklyTimeBankPerWeek;
     }
 
     public boolean isPersonalEntriesFoundFromPrivateCalender() {
@@ -142,12 +143,12 @@ public class StaffExcludeFilter {
         this.lastWorkingDaysWithActivity = lastWorkingDaysWithActivity;
     }
 
-    public Integer getMinimumRemainingHoursInActivityPlanningPeriod() {
-        return minimumRemainingHoursInActivityPlanningPeriod;
+    public Integer getMinRemainingTimeLeftInActivityPlanningPeriod() {
+        return minRemainingTimeLeftInActivityPlanningPeriod;
     }
 
-    public void setMinimumRemainingHoursInActivityPlanningPeriod(Integer minimumRemainingHoursInActivityPlanningPeriod) {
-        this.minimumRemainingHoursInActivityPlanningPeriod = minimumRemainingHoursInActivityPlanningPeriod;
+    public void setMinRemainingTimeLeftInActivityPlanningPeriod(Integer minRemainingTimeLeftInActivityPlanningPeriod) {
+        this.minRemainingTimeLeftInActivityPlanningPeriod = minRemainingTimeLeftInActivityPlanningPeriod;
     }
 
     public boolean isNegativeAvailabilityInCalender() {
@@ -173,4 +174,5 @@ public class StaffExcludeFilter {
     public void setStopBricks(boolean stopBricks) {
         this.stopBricks = stopBricks;
     }
+
 }

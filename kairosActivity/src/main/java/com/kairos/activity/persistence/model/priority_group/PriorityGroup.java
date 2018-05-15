@@ -6,45 +6,40 @@ import com.kairos.activity.persistence.model.common.MongoBaseEntity;
 import java.math.BigInteger;
 
 public class PriorityGroup extends MongoBaseEntity {
-    //private ShiftSelectionType shiftSelectionType;
-    //private boolean singleLongerShift;
-    private boolean activated=true;
-    //private FeatureRule featureRule;
-    //private NotificationWay notificationWay;
+    private boolean deActivated;
     private OpenShiftCancelProcess openShiftCancelProcess;
-    private RoundRule roundRule;
+    private RoundRules roundRules;
     private StaffExcludeFilter staffExcludeFilter;
     private StaffIncludeFilter staffIncludeFilter;
-    //private Priority priority;
     private Long countryId;
     private Long unitId;
     private BigInteger countryParentId;
     private PriorityGroupName name;
-    private Integer orderId;
+    private BigInteger orderId;
     private SchedulerProcess schedulerProcess;
 
     public PriorityGroup() {
         //Default Constructor
     }
 
-    public PriorityGroup(PriorityGroupName name, boolean activated, OpenShiftCancelProcess openShiftCancelProcess, RoundRule roundRule, StaffExcludeFilter staffExcludeFilter,
+    public PriorityGroup(PriorityGroupName name, boolean deActivated, OpenShiftCancelProcess openShiftCancelProcess, RoundRules roundRules, StaffExcludeFilter staffExcludeFilter,
                          StaffIncludeFilter staffIncludeFilter, Long countryId, Long unitId) {
         this.name=name;
-        this.activated = activated;
+        this.deActivated = deActivated;
         this.openShiftCancelProcess = openShiftCancelProcess;
-        this.roundRule = roundRule;
+        this.roundRules = roundRules;
         this.staffExcludeFilter = staffExcludeFilter;
         this.staffIncludeFilter = staffIncludeFilter;
         this.countryId = countryId;
         this.unitId = unitId;
     }
 
-    public boolean isActivated() {
-        return activated;
+    public boolean isDeActivated() {
+        return deActivated;
     }
 
-    public void setActivated(boolean activated) {
-        this.activated = activated;
+    public void setDeActivated(boolean deActivated) {
+        this.deActivated = deActivated;
     }
 
 
@@ -57,12 +52,12 @@ public class PriorityGroup extends MongoBaseEntity {
         this.openShiftCancelProcess = openShiftCancelProcess;
     }
 
-    public RoundRule getRoundRule() {
-        return roundRule;
+    public RoundRules getRoundRules() {
+        return roundRules;
     }
 
-    public void setRoundRule(RoundRule roundRule) {
-        this.roundRule = roundRule;
+    public void setRoundRules(RoundRules roundRules) {
+        this.roundRules = roundRules;
     }
 
     public StaffExcludeFilter getStaffExcludeFilter() {
@@ -113,11 +108,11 @@ public class PriorityGroup extends MongoBaseEntity {
         this.name = name;
     }
 
-    public Integer getOrderId() {
+    public BigInteger getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) {
+    public void setOrderId(BigInteger orderId) {
         this.orderId = orderId;
     }
 
