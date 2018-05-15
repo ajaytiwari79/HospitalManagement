@@ -6,8 +6,11 @@ import com.kairos.activity.enums.PriorityGroup.PriorityGroupName;
 import com.kairos.activity.persistence.model.priority_group.*;
 import com.kairos.activity.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.activity.service.MongoBaseService;
+import com.kairos.activity.service.exception.ExceptionService;
 import com.kairos.activity.util.ObjectMapperUtils;
+import com.kairos.activity.util.priority_group.PriorityGroupUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -16,30 +19,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class PriorityGroupService extends MongoBaseService {
     @Inject
-    PriorityGroupRepository priorityGroupRepository;
+    private PriorityGroupRepository priorityGroupRepository;
+    @Inject
+    private  ExceptionService exceptionService;
+
 
     public boolean createPriorityGroupForCountry(long countryId) {
         if(priorityGroupRepository.existsByCountryId(countryId)){
-            throw new ActionNotPermittedException("Priority Groups are already created");
+           exceptionService.duplicateDataException("exception.duplicateData","priority-group");
         }
-        List<PriorityGroup> priorityGroups = new ArrayList<>();
-        OpenShiftCancelProcess openShiftCancelProcess = new OpenShiftCancelProcess(true, false, true, true, false);
-        RoundRules roundRules = new RoundRules(10, 10, 10, 10);
-        StaffExcludeFilter staffExcludeFilter = new StaffExcludeFilter(false, 10, 10, 10, 10, 10, 10,
-                10, 10, false, 10, 10, 10, false, false, false);
-        StaffIncludeFilter staffIncludeFilter = new StaffIncludeFilter(false, false, false, false, false, new ArrayList<Long>(),5000,78.5f,2000);
-        PriorityGroup priorityGroup1 = new PriorityGroup(PriorityGroupName.PRIORITY_GROUP1,false, openShiftCancelProcess, roundRules, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
-        PriorityGroup priorityGroup2 = new PriorityGroup(PriorityGroupName.PRIORITY_GROUP2,false, openShiftCancelProcess, roundRules, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
-        PriorityGroup priorityGroup3 = new PriorityGroup(PriorityGroupName.PRIORITY_GROUP3,false, openShiftCancelProcess, roundRules, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
-        PriorityGroup priorityGroup4 = new PriorityGroup(PriorityGroupName.PRIORITY_GROUP4,false, openShiftCancelProcess, roundRules, staffExcludeFilter, staffIncludeFilter, countryId, -1L);
-        priorityGroups.add(priorityGroup1);
-        priorityGroups.add(priorityGroup2);
-        priorityGroups.add(priorityGroup3);
-        priorityGroups.add(priorityGroup4);
+        List<PriorityGroup> priorityGroups =PriorityGroupUtil.getDefaultDataForPriorityGroup(countryId);
         save(priorityGroups);
-
         return true;
     }
 
@@ -50,7 +43,7 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroupDTO updatePriorityGroup(long countryId, BigInteger priorityGroupId, PriorityGroupDTO priorityGroupDTO) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndCountryIdAndDeletedFalse(priorityGroupId, countryId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            throw new DataNotFoundByIdException("Priority group not found" + priorityGroupId);
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
         }
         ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
         save(priorityGroup);
@@ -63,7 +56,7 @@ public class PriorityGroupService extends MongoBaseService {
     public boolean deletePriorityGroup(long countryId, BigInteger priorityGroupId) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndCountryIdAndDeletedFalse(priorityGroupId, countryId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            throw new DataNotFoundByIdException("Priority group not found" + priorityGroupId);
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
         }
         priorityGroup.setDeleted(true);
         save(priorityGroup);
@@ -89,7 +82,7 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroupDTO updatePriorityGroupOfUnit(long unitId, BigInteger priorityGroupId, PriorityGroupDTO priorityGroupDTO) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId, unitId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            throw new DataNotFoundByIdException("Priority group not found" + priorityGroupId);
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
         }
         ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
         save(priorityGroup);
@@ -102,7 +95,7 @@ public class PriorityGroupService extends MongoBaseService {
     public boolean deletePriorityGroupOfUnit(long unitId, BigInteger priorityGroupId) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId, unitId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            throw new DataNotFoundByIdException("Priority group not found" + priorityGroupId);
+            exceptionService.dataNotFoundByIdException("exception.dataNotFound","priority-group",priorityGroupId);
         }
         priorityGroup.setDeleted(true);
         save(priorityGroup);
@@ -124,8 +117,4 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroup getPriorityGroupOfUnitById(Long unitId, BigInteger priorityGroupId){
         return priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId,unitId);
     }
-
-
-
-
 }
