@@ -45,5 +45,7 @@ public class ExceptionService {
     public void invalidRequestException(String message, Object... params) {
         throw new InvalidRequestException(convertMessage(message, params));
     }
-
+    public void internalServerError(String message, Object... params) {
+        throw new InternalError(convertMessage(message, params));
+    }
 }

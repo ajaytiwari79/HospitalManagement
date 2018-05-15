@@ -24,6 +24,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitEmpAccessGraphRepository;
 import com.kairos.response.dto.web.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.service.UserBaseService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import com.kairos.util.userContext.UserContext;
 import org.joda.time.DateTime;
@@ -67,6 +68,8 @@ public class AccessPageService extends UserBaseService {
     UnitEmpAccessGraphRepository unitEmpAccessGraphRepository;
     @Inject
     UserGraphRepository userGraphRepository;
+    @Inject
+    ExceptionService exceptionService;
 
     public AccessPage createAccessPage(AccessPageDTO accessPageDTO){
         AccessPage accessPage = new AccessPage(accessPageDTO.getName(),accessPageDTO.isModule(),
@@ -75,7 +78,8 @@ public class AccessPageService extends UserBaseService {
             AccessPage parentTab = accessPageRepository.findOne(accessPageDTO.getParentTabId());
             if(!Optional.ofNullable(parentTab).isPresent()){
                 logger.error("Parent access page not found::id " + accessPageDTO.getParentTabId());
-                throw new DataNotFoundByIdException("Parent access page not found::id " + accessPageDTO.getParentTabId());
+                exceptionService.dataNotFoundByIdException("exception.NotFoundException","parentAccessPage","accessPageDTO.getParentTabId()");
+
             }
             List<AccessPage> childTabs = parentTab.getSubPages();
             childTabs.add(accessPage);
@@ -91,7 +95,8 @@ public class AccessPageService extends UserBaseService {
         AccessPage accessPage = (Optional.ofNullable(accessPageId).isPresent())?accessPageRepository.
                 updateAccessTab(accessPageId,accessPageDTO.getName()): null;
         if(!Optional.ofNullable(accessPage).isPresent()){
-            throw new DataNotFoundByIdException("Tab not found: id " + accessPageId);
+            exceptionService.dataNotFoundByIdException("exception.NotFoundException","tab",accessPageId);
+
         }
         return accessPage;
     }
@@ -198,7 +203,8 @@ public class AccessPageService extends UserBaseService {
         AccessPageCustomId accessPageCustomId = accessPageCustomIdRepository.findFirst();
         if(!Optional.ofNullable(accessPageCustomId).isPresent()){
             logger.error("AccessPageCustomId collection is not present");
-            throw new InternalError("AccessPageCustomId collection is not present");
+            exceptionService.internalServerError("error.accessPageCustomIdNotPresent");
+
         }
         String content[];
         String tabId = null;
@@ -220,7 +226,8 @@ public class AccessPageService extends UserBaseService {
             }
         }
         if(!Optional.ofNullable(tabId).isPresent()){
-            throw new InternalError("tab id is not present");
+            exceptionService.internalServerError("error.tabIdNotPresent");
+
         }
         save(accessPageCustomId);
         return tabId;
