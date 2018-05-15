@@ -132,12 +132,14 @@ public class RuleTemplateCategoryService extends UserBaseService {
 
         }
         if (ruleTemplateCategoryObj.getName().equals("NONE") || ruleTemplateCategory.getName().equals("NONE")) {
-            throw new ActionNotPermittedException("Can't rename NONE template category " + templateCategoryId);
+           exceptionService.actionNotPermittedException("error.ruleTemplate.category.rename",templateCategoryId);
+
         }
         if(!ruleTemplateCategory.getName().trim().equalsIgnoreCase(ruleTemplateCategoryObj.getName())){
             boolean isAlreadyExists=ruleTemplateCategoryGraphRepository.findByNameExcludingCurrent(countryId,CTA,"(?i)" + ruleTemplateCategory.getName().trim(),templateCategoryId);
             if(isAlreadyExists){
-                throw new DuplicateDataException("ruleTemplateCategory name already  exists "+ruleTemplateCategory.getName());
+                exceptionService.duplicateDataException("error.ruleTemplate.category.alreadyExist",ruleTemplateCategory.getName());
+
             }
         }
         ruleTemplateCategoryObj.setName(ruleTemplateCategory.getName());
