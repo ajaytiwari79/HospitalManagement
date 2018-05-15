@@ -6,44 +6,48 @@ import java.util.List;
 import java.util.Set;
 
 public class SchedulerProcess {
-    private String interval; // to show the content selected e.g. Monday,Tuesday,Wednesday,Thursday,Friday. Every 60 minute
-    private LocalDateTime lastRunTime;
-    private LocalDateTime nextRunTime;
-    private Integer startMinute;
-    private String repeat;
-    private Set<DayOfWeek> days;
-    private String runOnce;
-    private List<String> selectedHours;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private Integer weeks;
+    private String dayCheckPeriod; // to show the content selected e.g. Monday,Tuesday,Wednesday,Thursday,Friday. Every 60 minute
+    private Integer startMinute;//
+    private String selectedRepeatInterval;//
+    private Set<DayOfWeek> selectedDays;//
+    private String runOnce;//
+    private List<String> selectedTimes;//
+
 
     public SchedulerProcess() {
         //Default Constructor
     }
 
-    public String getInterval() {
-        return interval;
+    public String getDayCheckPeriod() {
+        return dayCheckPeriod;
     }
 
-    public void setInterval(String interval) {
-        this.interval = interval;
+    public void setDayCheckPeriod(String dayCheckPeriod) {
+        this.dayCheckPeriod = dayCheckPeriod;
     }
 
-    public LocalDateTime getLastRunTime() {
-        return lastRunTime;
+    public String getSelectedRepeatInterval() {
+        return selectedRepeatInterval;
     }
 
-    public void setLastRunTime(LocalDateTime lastRunTime) {
-        this.lastRunTime = lastRunTime;
+    public void setSelectedRepeatInterval(String selectedRepeatInterval) {
+        this.selectedRepeatInterval = selectedRepeatInterval;
     }
 
-    public LocalDateTime getNextRunTime() {
-        return nextRunTime;
+    public Set<DayOfWeek> getSelectedDays() {
+        return selectedDays;
     }
 
-    public void setNextRunTime(LocalDateTime nextRunTime) {
-        this.nextRunTime = nextRunTime;
+    public void setSelectedDays(Set<DayOfWeek> selectedDays) {
+        this.selectedDays = selectedDays;
+    }
+
+    public List<String> getSelectedTimes() {
+        return selectedTimes;
+    }
+
+    public void setSelectedTimes(List<String> selectedTimes) {
+        this.selectedTimes = selectedTimes;
     }
 
     public Integer getStartMinute() {
@@ -55,19 +59,19 @@ public class SchedulerProcess {
     }
 
     public String getRepeat() {
-        return repeat;
+        return selectedRepeatInterval;
     }
 
     public void setRepeat(String repeat) {
-        this.repeat = repeat;
+        this.selectedRepeatInterval = selectedRepeatInterval;
     }
 
     public Set<DayOfWeek> getDays() {
-        return days;
+        return selectedDays;
     }
 
-    public void setDays(Set<DayOfWeek> days) {
-        this.days = days;
+    public void setDays(Set<DayOfWeek> selectedDays) {
+        this.selectedDays = selectedDays;
     }
 
     public String getRunOnce() {
@@ -79,34 +83,11 @@ public class SchedulerProcess {
     }
 
     public List<String> getSelectedHours() {
-        return selectedHours;
+        return selectedTimes;
     }
 
-    public void setSelectedHours(List<String> selectedHours) {
-        this.selectedHours = selectedHours;
+    public void setSelectedHours(List<String> selectedTimes) {
+        this.selectedTimes = selectedTimes;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
-    }
-
-    public Integer getWeeks() {
-        return weeks;
-    }
-
-    public void setWeeks(Integer weeks) {
-        this.weeks = weeks;
-    }
 }
