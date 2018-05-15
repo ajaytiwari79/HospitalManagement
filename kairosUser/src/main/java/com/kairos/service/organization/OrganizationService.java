@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.activity.enums.IntegrationOperation;
 import com.kairos.activity.util.ObjectMapperUtils;
 import com.kairos.client.PeriodRestClient;
 import com.kairos.client.PhaseRestClient;
@@ -18,10 +19,6 @@ import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationStaffWrapper;
 import com.kairos.persistence.model.query_wrapper.StaffUnitPositionWrapper;
-import com.kairos.persistence.model.query_wrapper.WTAAndExpertiseQueryResult;
-import com.kairos.persistence.model.user.agreement.wta.WorkingTimeAgreement;
-import com.kairos.persistence.model.user.agreement.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.user.auth.User;
 import com.kairos.persistence.model.user.client.ContactAddress;
 import com.kairos.persistence.model.user.country.*;
 import com.kairos.persistence.model.user.country.DayType;
@@ -62,6 +59,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.CurrencyService;
 import com.kairos.service.country.DayTypeService;
+import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.service.region.RegionService;
 import com.kairos.service.skill.SkillService;
@@ -204,6 +202,8 @@ public class OrganizationService extends UserBaseService {
     @Inject private WorkingTimeAgreementRestClient workingTimeAgreementRestClient;
     @Inject
     StaffService staffService;
+    @Inject
+    private PlannerSyncService plannerSyncService;
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -285,7 +285,7 @@ public class OrganizationService extends UserBaseService {
         //List<WTAAndExpertiseQueryResult> allWtaExpertiseQueryResults = organizationTypeGraphRepository.getAllWTAByOrganiationSubType(orgDetails.getSubTypeId());
         //List<WorkingTimeAgreement> allWta = getWTAWithExpertise(allWtaExpertiseQueryResults);
         //linkWTAToOrganization(allWtaCopy, allWta);
-
+        organization.setTimeZone(ZoneId.of(TIMEZONE_UTC));
 
         organization.setCostTimeAgreements(collectiveTimeAgreementGraphRepository.getCTAsByOrganiationSubTypeIdsIn(orgDetails.getSubTypeId(), countryId));
         save(organization);
@@ -491,7 +491,7 @@ public class OrganizationService extends UserBaseService {
         if (!Optional.ofNullable(parent).isPresent()) {
             throw new DataNotFoundByIdException("Can't find Organization with provided Id" + unitId);
         }
-
+        unit.setTimeZone(ZoneId.of(TIMEZONE_UTC));
         unit.setName(organizationDTO.getName());
         unit.setDescription(organizationDTO.getDescription());
         unit.setPrekairos(organizationDTO.isPreKairos());
@@ -1378,14 +1378,21 @@ public class OrganizationService extends UserBaseService {
         return unit.getTimeZone(); //(Optional.ofNullable(unit.getTimeZone()).isPresent() ? unit.getTimeZone().toString() : "") ;
     }
 
-    public OrganizationCategory getOrganizationCategory(Boolean isUnion, Boolean isKairosHub){
-        if(isUnion){
+    public OrganizationCategory getOrganizationCategory(Boolean isUnion, Boolean isKairosHub) {
+        if (isUnion) {
             return OrganizationCategory.UNION;
-        } else if(isKairosHub){
+        } else if (isKairosHub) {
             return OrganizationCategory.HUB;
-        } else{
+        } else {
             return OrganizationCategory.ORGANIZATION;
         }
+    }
+
+    public Object initialOptaplannerSync(Long organisationId, Long unitId) {
+        List<Staff> staff=staffGraphRepository.getAllStaffByUnitId(unitId);
+        plannerSyncService.publishStaff(unitId,staff,IntegrationOperation.CREATE);
+        phaseRestClient.initialOptaplannerSync(unitId);
+        return null;
     }
 }
 

@@ -73,6 +73,7 @@ public class DailyRestingTimeWTATemplate extends WTABaseRuleTemplate {
         this.disabled = disabled;
         this.description = description;
         this.continuousDayRestHours=continuousDayRestHours;
+        wtaTemplateType = WTATemplateType.DAILY_RESTING_TIME;
     }
 
     public DailyRestingTimeWTATemplate() {

@@ -1,7 +1,6 @@
 package com.kairos.shiftplanning.executioner;
 
 import com.kairos.shiftplanning.domain.*;
-import com.kairos.shiftplanning.domain.move.ActivityLineIntervalSwapMove;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
@@ -214,7 +213,7 @@ public class ShiftPlanningSolver {
                 });
                 if(any.isTrue())
                     log.info(sb.toString());
-            }else if(entity instanceof Activity ) {
+            }else if(entity instanceof ActivityPlannerEntity) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n------------------------\n");
 
@@ -229,7 +228,7 @@ public class ShiftPlanningSolver {
                 });
                 if(any.isTrue())
                     log.info(sb.toString());
-            }else if(entity instanceof Employee ) {
+            }else if(entity instanceof EmployeePlanningFact) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n------------------------\n");
                 sb.append(entity.toString()+"---\n");
@@ -301,10 +300,10 @@ public class ShiftPlanningSolver {
 	private void printStaffingLines(List<ActivityLineInterval> activityLineIntervals) {
         ///activityLineIntervals.sort(Comparator.comparing(a -> a.getStart()).thenComparing(ActivityLineInterval::getStart));
         activityLineIntervals.sort(Comparator.comparing(( ActivityLineInterval a) -> a.getStart().toLocalDate())
-                .thenComparing(a -> a.getActivity().getName())
+                .thenComparing(a -> a.getActivityPlannerEntity().getName())
                 .thenComparingInt(a -> a.getStaffNo())
                 .thenComparing(a -> a.getStart().toLocalTime()));//This doesnt
-        activityLineIntervals.sort(Comparator.comparing(a -> a.getActivity().getName())); //This does
+        activityLineIntervals.sort(Comparator.comparing(a -> a.getActivityPlannerEntity().getName())); //This does
         for(ActivityLineInterval activityLineInterval:activityLineIntervals){
             log.info(activityLineInterval.toString()+"-------"+activityLineInterval.getShift());
         }
@@ -318,7 +317,7 @@ public class ShiftPlanningSolver {
         }
         return unsolvedSolution;
     }
-    private void assignEmployeeToAvaiability(List<Employee> employeeList,boolean assign) {
+    private void assignEmployeeToAvaiability(List<EmployeePlanningFact> employeeList, boolean assign) {
 		/*employeeList.forEach(employee->{
 			employee.getAvailabilityList().forEach(avail->{
 				avail.setEmployee(assign?employee:null);
@@ -368,7 +367,7 @@ public class ShiftPlanningSolver {
     private List<ShiftDTO> getShift(List<ShiftRequestPhase> shiftRequestPhase){
         List<ShiftDTO> shiftDTOS = new ArrayList<>(shiftRequestPhase.size());
         shiftRequestPhase.forEach(s->{
-            //s.getActivityLineIntervals().get(0).getActivity().getId()
+            //s.getActivityLineIntervals().get(0).getActivityPlannerEntity().getId()
             ShiftDTO shiftDTO = new ShiftDTO(s.getStart().toDate(),s.getEnd().toDate(),new BigInteger("320"),95l,1005l);//Long.valueOf(s.getEmployee().getId()));
             shiftDTO.setUnitEmploymentPositionId(12431l);
             if(s.getActivityLineIntervals().size()>1) {
@@ -387,7 +386,7 @@ public class ShiftPlanningSolver {
         List<ActivityLineInterval> alis = getMergedALIs(shift.getActivityLineIntervals());
         if(alis.size()==1) return null;
         alis.forEach(a->{
-            //a.getActivity().getId()
+            //a.getActivityPlannerEntity().getId()
             ShiftDTO shiftDTO = new ShiftDTO(a.getStart().minusHours(5).minusMinutes(30).toDate(),a.getEnd().minusHours(5).minusMinutes(30).toDate(),new BigInteger("375"),95l,1005l);//Long.valueOf(shift.getEmployee().getId()));
             //shiftDTO.setSubShifts(getSubShift(shift,95l));
             shiftDTOS.add(shiftDTO);
@@ -396,19 +395,19 @@ public class ShiftPlanningSolver {
     }
 
     private int getActivityCount(List<ActivityLineInterval> intervals){
-        Set<Activity> activities = new HashSet<>();
+        Set<ActivityPlannerEntity> activities = new HashSet<>();
         intervals.forEach(activityLineInterval -> {
-            activities.add(activityLineInterval.getActivity());
+            activities.add(activityLineInterval.getActivityPlannerEntity());
         });
         return activities.size();
     }
 
     private List<ActivityLineInterval> getMergedALIs(List<ActivityLineInterval> intervals){
-        //String activityId = intervals.get(0).getActivity().getId();
+        //String activityId = intervals.get(0).getActivityPlannerEntity().getId();
         List<ActivityLineInterval> activityLineIntervals = new ArrayList<>();
         ActivityLineInterval activityLineInterval = intervals.get(0);
         for (ActivityLineInterval ali:intervals.subList(1,intervals.size()-1)) {
-            if (activityLineInterval.getEnd().equals(ali.getStart()) && activityLineInterval.getActivity().getId().equals(ali.getActivity().getId())) {
+            if (activityLineInterval.getEnd().equals(ali.getStart()) && activityLineInterval.getActivityPlannerEntity().getId().equals(ali.getActivityPlannerEntity().getId())) {
                 activityLineInterval.setDuration(activityLineInterval.getDuration()+ali.getDuration());
             }else{
                 activityLineIntervals.add(activityLineInterval);

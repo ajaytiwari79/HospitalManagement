@@ -1,6 +1,7 @@
 package com.kairos.activity.response.dto.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.response.dto.web.wta.WTAResponseDTO;
 
 
 import java.util.List;

@@ -70,6 +70,12 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = FOR_SENIORITY_LEVEL)
     private List<SeniorityLevel> seniorityLevel;
 
+    @Relationship(type = HAS_SENIOR_DAYS)
+    private List<CareDays> seniorDays;
+
+    @Relationship(type = HAS_CHILD_CARE_DAYS)
+    private List<CareDays> childCareDays;
+
 
     public String getDescription() {
         return description;
@@ -212,7 +218,24 @@ public class Expertise extends UserBaseEntity {
         this.history = history;
     }
 
+    public List<CareDays> getSeniorDays() {
+        return seniorDays;
+    }
+
+    public void setSeniorDays(List<CareDays> seniorDays) {
+        this.seniorDays = seniorDays;
+    }
+
+    public List<CareDays> getChildCareDays() {
+        return childCareDays;
+    }
+
+    public void setChildCareDays(List<CareDays> childCareDays) {
+        this.childCareDays = childCareDays;
+    }
+
     public Expertise() {
+        //Default Constructor
     }
 
 

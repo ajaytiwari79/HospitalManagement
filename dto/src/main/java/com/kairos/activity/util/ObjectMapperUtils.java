@@ -5,12 +5,19 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import org.apache.commons.beanutils.PropertyUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 /**
  * @author pradeep
@@ -18,14 +25,14 @@ import java.util.List;
  */
 
 public class ObjectMapperUtils {
-
+    public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");
 
     public static <T,E extends Object> List<E> copyProperties(List<T> objects1,Class className) {
         List<E> objects = new ArrayList<>();
         for (int i = 0; i < objects1.size(); i++) {
             try {
                 E e = (E) className.newInstance();
-                PropertyUtils.copyProperties(objects1.get(i),e);
+                PropertyUtils.copyProperties(e,objects1.get(i));
                 objects.add(e);
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |InstantiationException e) {
             }
@@ -67,13 +74,17 @@ public class ObjectMapperUtils {
         return list;
     }
 
-    public static <T extends Object,E extends Object> List<E> copyPropertiesByMapper(List<T> objects1, E Objects) {
+    public static <T extends Object,E extends Object> List<E> copyPropertiesOfListByMapper(List<T> objects, Class className) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         //mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
+        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
+        mapper.registerModule(javaTimeModule);
         try {
-            return mapper.readValue(mapper.writeValueAsString(objects1), mapper.getTypeFactory().constructCollectionType(
-                    List.class, Objects.getClass()));
+            return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
+                    List.class, className));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,9 +94,13 @@ public class ObjectMapperUtils {
 
 
 
-    public static <T> T copyPropertiesByMapper(Object object,Class<T> valueType){
+    public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object,Class<T> valueType){
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(FORMATTER));
+        javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(FORMATTER));
+        objectMapper.registerModule(javaTimeModule);
         //objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         try {
             return objectMapper.readValue(objectMapper.writeValueAsString(object), valueType);

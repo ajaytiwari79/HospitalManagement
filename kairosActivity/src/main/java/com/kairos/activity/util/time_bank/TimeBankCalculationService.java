@@ -145,10 +145,6 @@ public class TimeBankCalculationService {
                     if (ruleTemplate.getAccountType().equals(TIMEBANK_ACCOUNT)) {
                         int ctaTimeBankMin = 0;
                         if ((ruleTemplate.getActivityIds().contains(shift.getActivity().getId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(shift.getActivity().getBalanceSettingsActivityTab().getTimeTypeId())))) {
-                            log.info("days=====" + ruleTemplate.getDays());
-                            log.info("dayOfWeek=====" + shiftInterval.getStart().getDayOfWeek());
-                            log.info("PublicHolidays=====" + ruleTemplate.getPublicHolidays());
-                            log.info("ShiftStart=====" + shiftInterval.getStart());
                             if (((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
                                 if (ruleTemplate.isCalculateScheduledHours()) {
                                     dailyScheduledMin += shift.getScheduledMinutes();
@@ -497,7 +493,7 @@ public class TimeBankCalculationService {
     public List<TimeBankCTADistributionDTO> getDistributionOfTimeBank(List<TimeBankCTADistributionDTO> timeBankCTADistributionDTOS, UnitPositionWithCtaDetailsDTO unitPositionWithCtaDetailsDTO) {
         timeBankCTADistributionDTOS.forEach(timeBankCTADistributionDTO -> {
             unitPositionWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
-                if (timeBankCTADistributionDTO.getId().equals(cta.getId())) {
+                if (!cta.isCalculateScheduledHours() && timeBankCTADistributionDTO.getId().equals(cta.getId())) {
                     timeBankCTADistributionDTO.setName(cta.getName());
                 }
             });
@@ -548,6 +544,7 @@ public class TimeBankCalculationService {
                 parentTimeTypes.add(parentTimeType);
             }
         });
+        scheduleTimeByTimeTypeDTO.setTotalMin(parentTimeTypes.stream().mapToInt(t->t.getTotalMin()).sum());
         scheduleTimeByTimeTypeDTO.setChildren(parentTimeTypes);
         return scheduleTimeByTimeTypeDTO;
     }
