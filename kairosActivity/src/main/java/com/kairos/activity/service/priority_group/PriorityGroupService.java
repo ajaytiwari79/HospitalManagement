@@ -48,6 +48,7 @@ public class PriorityGroupService extends MongoBaseService {
         ObjectMapperUtils.copyProperties(priorityGroupDTO, priorityGroup);
         priorityGroup.setId(priorityGroupId);
         priorityGroup.setCountryId(countryId);
+        priorityGroup.setName(priorityGroup.getName());
         save(priorityGroup);
         ObjectMapperUtils.copyProperties(priorityGroup,priorityGroupDTO);
         return priorityGroupDTO;
